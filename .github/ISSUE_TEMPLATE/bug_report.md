@@ -26,9 +26,6 @@ If applicable, add screenshots to help explain your problem.
 **Environment (please complete the following information):**
  - OS: [e.g. Windows, Linux]
  - Browser [e.g. chrome, safari]
- - Tomcat version [e.g. 8, 9]
- - VIVO version [e.g. 1.11.0, 1.12.0]
- - Apache Solr or ElasticSearch version
 
 **Additional context**
 Add any other context about the problem here.
