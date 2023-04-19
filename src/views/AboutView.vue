@@ -21,3 +21,23 @@ export default defineComponent({
   },
 });
 </script>
+
+
+<style scoped lang="scss">
+.about {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+
+  h1 {
+    margin: 0;
+    text-align: center;
+  }
+
+  v-btn {
+    margin-top: 20px;
+  }
+}
+</style>
