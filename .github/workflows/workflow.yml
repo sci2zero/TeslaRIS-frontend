@@ -2,7 +2,7 @@ name: TeslaRIS Frontend CI
 
 on:
     push:
-        # Don't run if PR is only updating static documentation
+        # Don't run if push or PR are only updating static documentation
         paths-ignore:
             - "**/*.md"
             - "**/*.txt"
