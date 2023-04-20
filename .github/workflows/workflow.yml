@@ -2,9 +2,12 @@ name: TeslaRIS Frontend CI
 
 on:
     push:
+        # Don't run if PR is only updating static documentation
+        paths-ignore:
+            - "**/*.md"
+            - "**/*.txt"
     pull_request:
         branches: ["main"]
-        # Don't run if PR is only updating static documentation
         paths-ignore:
             - "**/*.md"
             - "**/*.txt"
@@ -41,25 +44,25 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-        - uses: actions/checkout@v3
+            - uses: actions/checkout@v3
 
-        - name: Checkout Git repository
-          uses: actions/checkout@v3
+            - name: Checkout Git repository
+              uses: actions/checkout@v3
 
-        - name: Setup Node.js environment
-          uses: actions/setup-node@v3
-          with:
-              node-version: "16"
+            - name: Setup Node.js environment
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16"
 
-        - name: Cache node_modules
-          uses: actions/cache@v3
-          with:
-              path: ~/.npm
-              key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-              restore-keys: ${{ runner.os }}-node-
-        
-        - name: Install package dependencies
-          run: npm ci
+            - name: Cache node_modules
+              uses: actions/cache@v3
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: ${{ runner.os }}-node-
 
-        - name: Lint project
-          run: npm run lint
+            - name: Install package dependencies
+              run: npm ci
+
+            - name: Lint project
+              run: npm run lint
