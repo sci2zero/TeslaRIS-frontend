@@ -24,7 +24,6 @@
         "webfontloader": "^1.0.0"
     },
     "devDependencies": {
-        "@types/node": "^18.14.2",
         "@types/webfontloader": "^1.0.0",
         "@vitejs/plugin-vue": "^4.0.0",
         "@vue/eslint-config-typescript": "^12.0.0",

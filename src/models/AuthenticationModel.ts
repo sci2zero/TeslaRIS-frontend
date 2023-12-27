@@ -14,3 +14,7 @@ export interface RegistrationRequest {
     preferredLanguageId: number;
     personId?: number;
 }
+
+export interface RefreshTokenRequest {
+    refreshTokenValue: string;
+}
