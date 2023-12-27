@@ -6,6 +6,7 @@ import { loadFonts } from "./plugins/webfontloader";
 import { createPinia } from "pinia";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import './assets/main.css'
 
 const pinia = createPinia();
 
@@ -51,4 +52,8 @@ router.beforeEach((to: any, from: any, next: any) => {
     }
   });
 
-createApp(App).use(router).use(pinia).use(vuetify).mount("#app");
+createApp(App)
+.use(router)
+.use(pinia)
+.use(vuetify)
+.mount("#app");
