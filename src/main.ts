@@ -6,6 +6,7 @@ import { loadFonts } from "./plugins/webfontloader";
 import { createPinia } from "pinia";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import AuthenticationService from "./services/AuthenticationService";
 
 const pinia = createPinia();
 
@@ -50,5 +51,32 @@ router.beforeEach((to: any, from: any, next: any) => {
       next();
     }
   });
+
+  axios.interceptors.response.use(
+    (response) => {
+      // Pass the response
+      return response;
+    },
+    async (error) => {
+      const originalRequest = error.config;
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+  
+        const refreshToken: string | null = sessionStorage.getItem("refreshToken");
+        if (refreshToken) {
+          try {
+            const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
+            sessionStorage.setItem("jwt", response.token);
+  
+            return axios(originalRequest);
+          } catch (refreshError) {
+            return Promise.reject(refreshError);
+          }
+        }
+      }
+  
+      return Promise.reject(error);
+    }
+  );
 
 createApp(App).use(router).use(pinia).use(vuetify).mount("#app");
