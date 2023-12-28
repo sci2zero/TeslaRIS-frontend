@@ -12,10 +12,12 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            redirect: `/${defaultLocale}`,
+            name: "base",
+            redirect: { name: 'baseLocale', params: { locale: defaultLocale } },
         },
         {
             path: "/:locale",
+            name: "baseLocale",
             children: [
                 {
                     path: "",

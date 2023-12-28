@@ -5,4 +5,5 @@ export default {
     forgotPasswordLabel: "I forgot my password.",
     registerLabel: "Register",
     registerFromLoginLabel: "Don't have an account? Register.",
+    homeLabel: "Home Page"
 }

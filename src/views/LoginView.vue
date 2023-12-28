@@ -10,21 +10,30 @@
                 <label class="password-field" for="password">{{ $t("passwordLabel") }}</label>
                 <input name="password" type="password">
 
-                <br/>
+                <br />
                 <input class="login-submit" type="button" :value="$t('loginLabel')">
 
-                <br/>
+                <br />
                 <a href="#" class="forgot-password-link">{{ $t("forgotPasswordLabel") }}</a>
-                <br/>
-                <localized-link to="register">{{ $t("registerFromLoginLabel") }}</localized-link>
+                <br />
+                <localized-link to="register">
+                    {{ $t("registerFromLoginLabel") }}
+                </localized-link>
             </form>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
-import LocalizedLink from "../components/localization/LocalizedLink.vue";
 
+<script lang="ts">
+import LocalizedLink from "@/components/localization/LocalizedLink.vue";
+import { defineComponent } from "vue";
+
+export default defineComponent(
+    {
+        components: { LocalizedLink },
+    }
+);
 </script>
 
 <style>
@@ -37,7 +46,7 @@ import LocalizedLink from "../components/localization/LocalizedLink.vue";
             float: right;
             padding: 2em;
             background: #f8f8f8;
-            border-radius: 1em;
+            border-radius: 0 0 1em 1em;
             box-shadow: 0 0 35px #36363630;
         }
 

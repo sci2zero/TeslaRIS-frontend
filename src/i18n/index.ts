@@ -4,6 +4,8 @@ import sr from "./sr"
 
 
 export const defaultLocale = "sr"
+export const supportedLocales = ["sr", "en"]
+
 let _i18n: I18n;
 
 

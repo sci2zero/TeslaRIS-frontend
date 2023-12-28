@@ -1,6 +1,7 @@
 <template>
     <v-app>
         <v-main>
+            <navbar />
             <router-view />
         </v-main>
     </v-app>
@@ -8,15 +9,11 @@
 
 <script lang="ts">
     import { defineComponent } from "vue";
+    import navbar from "@/components/core/Navbar.vue";
 
     export default defineComponent({
         name: "App",
-
-        data() {
-            return {
-                //
-            };
-        },
+        components: {navbar}
     });
 </script>
 

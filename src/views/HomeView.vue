@@ -1,5 +1,5 @@
 <template>
-    <h1>HOME</h1>
+    <h1>{{ $t('homeLabel') }}</h1>
 </template>
 
 <script lang="ts">
@@ -7,8 +7,5 @@
 
     export default defineComponent({
         name: "HomeView",
-
-        components: {
-        },
     });
 </script>
