@@ -1,4 +1,5 @@
 <template>
+    <navbar />
     <div id="login-page">
         <div class="login-wrapper">
             <h2 class="login-title">
@@ -20,7 +21,9 @@
 </template>
 
 <script>
+import navbar from '@/components/core/Navbar.vue'
 export default {
+  components: { navbar },
 
 }
 </script>
@@ -35,7 +38,7 @@ export default {
             float: right;
             padding: 2em;
             background: #f8f8f8;
-            border-radius: 1em;
+            border-radius: 0 0 1em 1em;
             box-shadow: 0 0 35px #36363630;
         }
 
