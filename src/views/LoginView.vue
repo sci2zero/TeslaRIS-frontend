@@ -2,27 +2,29 @@
     <div id="login-page">
         <div class="login-wrapper">
             <h2 class="login-title">
-                Login
+                {{ $t('loginLabel') }}
             </h2>
             <form action="">
-                <label class="email-field" for="email">Email</label>
+                <label class="email-field" for="email">{{ $t("emailLabel") }}</label>
                 <input name="email" type="text">
-                <label class="password-field" for="password">Password</label>
+                <label class="password-field" for="password">{{ $t("passwordLabel") }}</label>
                 <input name="password" type="password">
-                <a href="#" class="forgot-password-link">I forgot password</a>
 
+                <br/>
+                <input class="login-submit" type="button" :value="$t('loginLabel')">
 
-                <input class="login-submit" type="button" value="Login">
-                <a href="#" class="register-link">Register</a>
+                <br/>
+                <a href="#" class="forgot-password-link">{{ $t("forgotPasswordLabel") }}</a>
+                <br/>
+                <localized-link to="register">{{ $t("registerFromLoginLabel") }}</localized-link>
             </form>
         </div>
     </div>
 </template>
 
-<script>
-export default {
+<script setup lang="ts">
+import LocalizedLink from "../components/localization/LocalizedLink.vue";
 
-}
 </script>
 
 <style>

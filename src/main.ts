@@ -4,14 +4,17 @@ import router from "./router";
 import vuetify from "./plugins/vuetify";
 import { loadFonts } from "./plugins/webfontloader";
 import { createPinia } from "pinia";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import './assets/main.css'
+import './assets/main.css';
+import axios from "axios";
+import i18n from './i18n';
+
 import AuthenticationService from "./services/AuthenticationService";
 
 const pinia = createPinia();
 
 loadFonts();
+i18n.setup();
 
 // Configure axios to always include JWT when sending a request
 axios.interceptors.request.use(
@@ -29,7 +32,41 @@ axios.interceptors.request.use(
     }
 );
 
+axios.interceptors.response.use(
+  (response) => {
+    // Pass the response
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken: string | null = sessionStorage.getItem("refreshToken");
+      if (refreshToken) {
+        try {
+          const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
+          sessionStorage.setItem("jwt", response.token);
+
+          return axios(originalRequest);
+        } catch (refreshError) {
+          return Promise.reject(refreshError);
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 router.beforeEach((to: any, from: any, next: any) => {
+    const newLocale: string = to.params.locale;
+    const prevLocale: string = from.params.locale;
+
+    if (newLocale !== prevLocale) {
+      i18n.setLocale(newLocale);
+    }
+
     const { authenticated, authorities } = to.meta;
   
     if (authenticated) {
@@ -53,35 +90,9 @@ router.beforeEach((to: any, from: any, next: any) => {
     }
   });
 
-  axios.interceptors.response.use(
-    (response) => {
-      // Pass the response
-      return response;
-    },
-    async (error) => {
-      const originalRequest = error.config;
-      if (error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-  
-        const refreshToken: string | null = sessionStorage.getItem("refreshToken");
-        if (refreshToken) {
-          try {
-            const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
-            sessionStorage.setItem("jwt", response.token);
-  
-            return axios(originalRequest);
-          } catch (refreshError) {
-            return Promise.reject(refreshError);
-          }
-        }
-      }
-  
-      return Promise.reject(error);
-    }
-  );
-
 createApp(App)
 .use(router)
 .use(pinia)
 .use(vuetify)
+.use(i18n.vueI18n)
 .mount("#app");

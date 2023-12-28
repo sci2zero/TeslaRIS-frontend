@@ -3,6 +3,7 @@ import axios from "axios";
 export class BaseService {
   basePath: string = import.meta.env.VITE_API_BASE_URL as string;
 
+  
   initialzeDownload(blobData: any, documentName: string, extension: string) {
     const blob = new Blob([blobData.data], {
       type: "application/" + extension,

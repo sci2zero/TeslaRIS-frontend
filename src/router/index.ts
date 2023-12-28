@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { defaultLocale } from '../i18n'
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 
@@ -7,25 +8,34 @@ import LoginView from "../views/LoginView.vue";
 
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(import.meta.env.API_BASE_URL),
     routes: [
         {
             path: "/",
-            name: "home",
-            component: HomeView,
-            meta: {
-                authenticated: false,
-                authorities: [],
-            },
+            redirect: `/${defaultLocale}`,
         },
         {
-            path: "/login",
-            name: "login",
-            component: LoginView,
-            meta: {
-                authenticated: false,
-                authorities: [],
-            },
+            path: "/:locale",
+            children: [
+                {
+                    path: "",
+                    name: "home",
+                    component: HomeView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "login",
+                    name: "login",
+                    component: LoginView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+            ]
         },
     ],
 });
