@@ -53,7 +53,7 @@
                     </li>
                     <li>
                         <div v-if="userLoggedIn" class="link-container">
-                            <a href="#" @click="logout">Logout</a>
+                            <a href="#" @click="logout">{{ $t("logoutLabel") }}</a>
                         </div>
                     </li>
                 </ul>

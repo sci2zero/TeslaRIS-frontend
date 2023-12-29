@@ -22,7 +22,7 @@ export class UserService extends BaseService {
   }
 
   async getLoggedInUser(): Promise<AxiosResponse<UserResponse>> {
-    return super.sendRequest(axios.get, `user`);
+    return super.sendRequest(axios.get, "user");
   }
 }
 

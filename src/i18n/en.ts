@@ -7,5 +7,6 @@ export default {
     registerFromLoginLabel: "Don't have an account? Register.",
     homeLabel: "Home Page",
     userPageLabel: "Users",
-    userListLabel: "Registered Users"
+    userListLabel: "Registered Users",
+    logoutLabel: "Logout"
 }

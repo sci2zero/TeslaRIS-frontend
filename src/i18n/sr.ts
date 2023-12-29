@@ -7,5 +7,6 @@ export default {
     registerFromLoginLabel: "Nemate nalog? Registrujte se.",
     homeLabel: "Pocetna Stranica",
     userPageLabel: "Korisnici",
-    userListLabel: "Registrovani Korisnici"
+    userListLabel: "Registrovani Korisnici",
+    logoutLabel: "Izloguj se"
 }
