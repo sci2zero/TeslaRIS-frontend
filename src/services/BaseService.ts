@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export class BaseService {
-  basePath: string = "http://localhost:8081/api/";
+  basePath: string = import.meta.env.VITE_BASE_URL as string;
 
   
   initialzeDownload(blobData: any, documentName: string, extension: string) {

@@ -10,12 +10,12 @@ const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "
 
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.API_BASE_URL),
+    history: createWebHistory(),
     routes: [
         {
             path: "/",
             name: "base",
-            redirect: { name: 'baseLocale', params: { locale: defaultLocale } },
+            redirect: { name: 'home', params: { locale: defaultLocale } },
         },
         {
             path: "/:locale",
