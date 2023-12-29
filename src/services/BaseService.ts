@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export class BaseService {
-  basePath: string = import.meta.env.VITE_API_BASE_URL as string;
+  basePath: string = "http://localhost:8081/api/";
 
   
   initialzeDownload(blobData: any, documentName: string, extension: string) {
@@ -22,6 +22,7 @@ export class BaseService {
   ): Promise<any> {
     const config = {
       headers: { "Content-Type": "application/json" },
+      withCredentials: true
     };
     return restMethod(this.basePath + path, requestBody, config);
   }

@@ -6,12 +6,12 @@
             </h2>
             <form action="">
                 <label class="email-field" for="email">{{ $t("emailLabel") }}</label>
-                <input name="email" type="text">
+                <input v-model="email" name="email" type="text">
                 <label class="password-field" for="password">{{ $t("passwordLabel") }}</label>
-                <input name="password" type="password">
+                <input v-model="password" name="password" type="password">
 
                 <br />
-                <input class="login-submit" type="button" :value="$t('loginLabel')">
+                <input class="login-submit" type="button" :value="$t('loginLabel')" @click="login">
 
                 <br />
                 <a href="#" class="forgot-password-link">{{ $t("forgotPasswordLabel") }}</a>
@@ -27,12 +27,34 @@
 
 <script lang="ts">
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
+import AuthenticationService from "@/services/AuthenticationService";
+import {useLoginStore} from "@/stores/loginStore"
+import { ref } from "vue";
 import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent(
     {
         name: "LoginView",
         components: { LocalizedLink },
+        setup() {
+            const email = ref("");
+            const password = ref("");
+            const loginStore = useLoginStore();
+            const router = useRouter();
+
+            const login = () => {
+                AuthenticationService.login({email: email.value, password: password.value}).then((response) => {
+                    sessionStorage.setItem("jwt", response.data.token);
+                    sessionStorage.setItem("refreshToken", response.data.refreshToken);
+
+                    loginStore.emitLoginSuccess();
+                    router.push({ name: "home" });
+                });
+            };
+
+            return {email, password, login};
+        }
     }
 );
 </script>

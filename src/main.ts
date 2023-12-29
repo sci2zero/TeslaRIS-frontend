@@ -16,7 +16,8 @@ const pinia = createPinia();
 loadFonts();
 i18n.setup();
 
-// Configure axios to always include JWT when sending a request
+// Configure axios to always include JWT and JWT-fingerprint when sending a request
+axios.defaults.withCredentials = true;
 axios.interceptors.request.use(
     (config) => {
       const jwt: string | null = sessionStorage.getItem("jwt");
@@ -46,7 +47,7 @@ axios.interceptors.response.use(
       if (refreshToken) {
         try {
           const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
-          sessionStorage.setItem("jwt", response.token);
+          sessionStorage.setItem("jwt", response.data.token);
 
           return axios(originalRequest);
         } catch (refreshError) {
@@ -79,16 +80,16 @@ router.beforeEach((to: any, from: any, next: any) => {
       if (jwt) {
         const decodedToken: any = jwtDecode(jwt);
         if (
-          authorities.some((element: string) =>
-            decodedToken.roles.includes(element)
+          authorities.some((authority: string) =>
+            decodedToken.role === authority
           )
         ) {
           next();
         } else {
-          next({ name: "Login", params: { locale: newLocale } });
+          next({ name: "login", params: { locale: newLocale } });
         }
       } else {
-        next({ name: "Login", params: { locale: newLocale } });
+        next({ name: "login", params: { locale: newLocale } });
       }
     } else {
       next();

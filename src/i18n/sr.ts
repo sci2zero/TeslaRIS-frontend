@@ -5,5 +5,7 @@ export default {
     forgotPasswordLabel: "Zaboravio sam lozinku.",
     registerLabel: "Registracija",
     registerFromLoginLabel: "Nemate nalog? Registrujte se.",
-    homeLabel: "Pocetna Stranica"
+    homeLabel: "Pocetna Stranica",
+    userPageLabel: "Korisnici",
+    userListLabel: "Registrovani Korisnici"
 }

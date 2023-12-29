@@ -9,7 +9,9 @@
                     <ul class="nav-items">
                         <li>
                             <div class="link-container">
-                                <a href="#">Link</a>
+                                <localized-link to="">
+                                    {{ $t("homeLabel") }}
+                                </localized-link>
                             </div>
                         </li>
                         <li>
@@ -18,8 +20,10 @@
                             </div>
                         </li>
                         <li>
-                            <div class="link-container">
-                                <a href="#">Link</a>
+                            <div v-if="userLoggedIn && userRole === 'ADMIN'" class="link-container">
+                                <localized-link to="users">
+                                    {{ $t("userPageLabel") }}
+                                </localized-link>
                             </div>
                         </li>
                     </ul>
@@ -34,33 +38,84 @@
                         </div>
                     </li>
                     <li>
-                        <div class="link-container">
+                        <div v-if="!userLoggedIn" class="link-container">
                             <localized-link to="login">
                                 {{ $t("loginLabel") }}
                             </localized-link>
                         </div>
                     </li>
                     <li>
-                        <div class="link-container">
+                        <div v-if="!userLoggedIn" class="link-container">
                             <localized-link to="register">
                                 {{ $t("registerLabel") }}
                             </localized-link>
                         </div>
                     </li>
+                    <li>
+                        <div v-if="userLoggedIn" class="link-container">
+                            <a href="#" @click="logout">Logout</a>
+                        </div>
+                    </li>
                 </ul>
             </div>
+            <p v-if="userLoggedIn">
+                {{ userName }} ({{ userRole }})
+            </p>
         </div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import LangChangeItem from './LangChangeItem.vue';
 import LocalizedLink from "../localization/LocalizedLink.vue";
+import UserService from "@/services/UserService";
+import AuthenticationService from '@/services/AuthenticationService';
+import { defineComponent } from 'vue';
+import { useLoginStore } from '@/stores/loginStore';
+import { watchEffect } from 'vue';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-export default {
-    name: "NavbarHeader",
-    components: { LangChangeItem, LocalizedLink }
-}
+export default defineComponent(
+    {
+        name: "NavbarHeader",
+        components: { LangChangeItem, LocalizedLink },
+        setup() {
+            const loginStore = useLoginStore();
+            const userLoggedIn = ref(false);
+            const userName = ref("");
+            const userRole = ref("");
+            const router = useRouter();
+
+            const populateUserData = () => {
+                UserService.getLoggedInUser().then((response) => {
+                    userName.value = response.data.firstname + " " + response.data.lastName;
+                    userRole.value = UserService.provideUserRole();
+                });
+            };
+
+            const logout = () => {
+                AuthenticationService.logoutUser();
+                userLoggedIn.value = false;
+                loginStore.userLoggedOut();
+                router.push({ name: "login" });
+            };
+
+            watchEffect(() => {
+                if (loginStore.userLoggedIn) {
+                    userLoggedIn.value = true;
+                    populateUserData();
+                }
+            });
+
+            if(AuthenticationService.userLoggedIn()) {
+                userLoggedIn.value = true;
+                populateUserData();
+            }
+
+            return {userName, userRole, userLoggedIn, logout};
+        }
+    });
 </script>
 
 <style scoped>
