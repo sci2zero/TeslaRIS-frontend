@@ -8,11 +8,11 @@ export const supportedLocales = ["sr", "en"]
 
 let _i18n: I18n;
 
-
 function setup(options = { locale: defaultLocale }) {
   _i18n = createI18n({
     locale: options.locale,
     fallbackLocale: defaultLocale,
+    allowComposition: true,
     messages: {
       en: en,
       sr: sr,

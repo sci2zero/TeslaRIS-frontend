@@ -13,16 +13,17 @@
 </template>
   
 <script lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { defineComponent, onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { supportedLocales, defaultLocale } from '../../i18n'
 
-  export default {
+  export default defineComponent({
+    name: "LangChangeItem",
     setup() {
       const currentRoute = useRoute();
       const router = useRouter();
 
-      const selectedLocale = ref('');
+      const selectedLocale = ref("");
   
       const switchLang = (lang: string) => {
         const currentPath = currentRoute.path.replace(/^\/[a-z]+/, `/${lang}`);
@@ -45,7 +46,7 @@
         selectedLocale
       };
     },
-  };
+  });
 </script>
   
   <style scoped>

@@ -8,5 +8,9 @@ export default {
     homeLabel: "Pocetna Stranica",
     userPageLabel: "Korisnici",
     userListLabel: "Registrovani Korisnici",
-    logoutLabel: "Izloguj se"
+    logoutLabel: "Izloguj se",
+    emailOrPasswordIncorrectError: "Neispravan email ili lozinka.",
+    closeLabel: "Zatvori",
+    mandatoryFieldError: "Ovo je obavezno polje",
+    emailFormatError: "Neispravan format email-a"
 }

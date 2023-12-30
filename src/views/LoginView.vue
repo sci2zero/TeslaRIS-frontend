@@ -4,14 +4,16 @@
             <h2 class="login-title">
                 {{ $t('loginLabel') }}
             </h2>
-            <form action="">
-                <label class="email-field" for="email">{{ $t("emailLabel") }}</label>
-                <input v-model="email" name="email" type="text">
-                <label class="password-field" for="password">{{ $t("passwordLabel") }}</label>
-                <input v-model="password" name="password" type="password">
+            <v-form @submit.prevent>
+                <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
+                <v-text-field
+                    v-model="password" :rules="passwordFieldRules" name="password" type="password"
+                    :label="$t('passwordLabel')"></v-text-field>
 
                 <br />
-                <input class="login-submit" type="button" :value="$t('loginLabel')" @click="login">
+                <v-btn class="login-submit" block type="submit" @click="login">
+                    {{ $t('loginLabel') }}
+                </v-btn>
 
                 <br />
                 <a href="#" class="forgot-password-link">{{ $t("forgotPasswordLabel") }}</a>
@@ -19,9 +21,22 @@
                 <localized-link to="register">
                     {{ $t("registerFromLoginLabel") }}
                 </localized-link>
-            </form>
+            </v-form>
         </div>
     </div>
+    <v-snackbar
+        v-model="snackbar"
+        :timeout="timeout">
+        {{ $t("emailOrPasswordIncorrectError") }}
+        <template #actions>
+            <v-btn
+                color="blue"
+                variant="text"
+                @click="snackbar = false">
+                {{ $t("closeLabel") }}
+            </v-btn>
+        </template>
+    </v-snackbar>
 </template>
 
 
@@ -29,8 +44,10 @@
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import AuthenticationService from "@/services/AuthenticationService";
 import {useLoginStore} from "@/stores/loginStore"
+import { computed } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
 export default defineComponent(
@@ -38,10 +55,31 @@ export default defineComponent(
         name: "LoginView",
         components: { LocalizedLink },
         setup() {
+            const snackbar = ref(false);
+            const timeout = 5000;
             const email = ref("");
             const password = ref("");
             const loginStore = useLoginStore();
             const router = useRouter();
+            const i18n = useI18n();
+            const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
+            const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
+
+            const emailFieldRules = [
+                (value: string) => {
+                    if (!value) return requiredFieldMessage.value;
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) return emailFormatMessage.value;
+                    return true;
+                }
+            ];
+
+            const passwordFieldRules = [
+                (value: string) => {
+                    if (!value) return requiredFieldMessage.value;
+                    return true;
+                }
+            ];
 
             const login = () => {
                 AuthenticationService.login({email: email.value, password: password.value}).then((response) => {
@@ -50,10 +88,12 @@ export default defineComponent(
 
                     loginStore.emitLoginSuccess();
                     router.push({ name: "home" });
+                }).catch(() => {
+                    snackbar.value = true;
                 });
             };
 
-            return {email, password, login};
+            return {email, emailFieldRules, password, passwordFieldRules, snackbar, timeout, login};
         }
     }
 );

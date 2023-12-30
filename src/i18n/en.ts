@@ -8,5 +8,9 @@ export default {
     homeLabel: "Home Page",
     userPageLabel: "Users",
     userListLabel: "Registered Users",
-    logoutLabel: "Logout"
+    logoutLabel: "Logout",
+    emailOrPasswordIncorrectError: "Incorrect Email and Password combination.",
+    closeLabel: "Close",
+    mandatoryFieldError: "This is a mandatory field",
+    emailFormatError: "Invalid email format"
 }
