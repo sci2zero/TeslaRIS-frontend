@@ -4,14 +4,16 @@
             <h2 class="login-title">
                 {{ $t('loginLabel') }}
             </h2>
-            <v-form @submit.prevent>
+            <v-form v-model="isFormValid" @submit.prevent>
                 <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
                 <v-text-field
                     v-model="password" :rules="passwordFieldRules" name="password" type="password"
                     :label="$t('passwordLabel')"></v-text-field>
 
                 <br />
-                <v-btn class="login-submit" block type="submit" @click="login">
+                <v-btn
+                    class="login-submit" block type="submit" :disabled="!isFormValid"
+                    @click="login">
                     {{ $t('loginLabel') }}
                 </v-btn>
 
@@ -55,6 +57,7 @@ export default defineComponent(
         name: "LoginView",
         components: { LocalizedLink },
         setup() {
+            const isFormValid = ref(false);
             const snackbar = ref(false);
             const timeout = 5000;
             const email = ref("");
@@ -93,7 +96,7 @@ export default defineComponent(
                 });
             };
 
-            return {email, emailFieldRules, password, passwordFieldRules, snackbar, timeout, login};
+            return {email, emailFieldRules, password, passwordFieldRules, snackbar, timeout, isFormValid, login};
         }
     }
 );
