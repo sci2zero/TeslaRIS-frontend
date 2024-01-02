@@ -40,14 +40,16 @@ axios.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    originalRequest._retry = true;
+    if (error.response.status === 401 && originalRequest._retry) {
+      originalRequest._retry = false;
 
       const refreshToken: string | null = sessionStorage.getItem("refreshToken");
       if (refreshToken) {
         try {
           const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
           sessionStorage.setItem("jwt", response.data.token);
+          sessionStorage.setItem("refreshToken", response.data.refreshToken);
 
           return axios(originalRequest);
         } catch (refreshError) {
@@ -56,7 +58,7 @@ axios.interceptors.response.use(
       }
     }
 
-    return Promise.reject(error);
+    return error;
   }
 );
 

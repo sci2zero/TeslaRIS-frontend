@@ -24,6 +24,10 @@ export class UserService extends BaseService {
   async getLoggedInUser(): Promise<AxiosResponse<UserResponse>> {
     return super.sendRequest(axios.get, "user");
   }
+
+  async searchUsers(tokens: string): Promise<AxiosResponse<any>> {
+    return super.sendRequest(axios.get, `user/search?${tokens}`);
+  }
 }
 
 export default new UserService();

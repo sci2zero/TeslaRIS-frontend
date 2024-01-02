@@ -12,5 +12,10 @@ export default {
     emailOrPasswordIncorrectError: "Incorrect Email and Password combination.",
     closeLabel: "Close",
     mandatoryFieldError: "This is a mandatory field",
-    emailFormatError: "Invalid email format"
+    emailFormatError: "Invalid email format",
+    searchBarPlaceholder: "Search",
+    fullNameLabel: "Full Name",
+    organisationUnitLabel: "Organisation Unit",
+    roleLabel: "Role",
+    actionLabel: "Action"
 }

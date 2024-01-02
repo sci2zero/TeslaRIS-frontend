@@ -12,5 +12,10 @@ export default {
     emailOrPasswordIncorrectError: "Neispravan email ili lozinka.",
     closeLabel: "Zatvori",
     mandatoryFieldError: "Ovo je obavezno polje",
-    emailFormatError: "Neispravan format email-a"
+    emailFormatError: "Neispravan format email-a",
+    searchBarPlaceholder: "Pretraga",
+    fullNameLabel: "Ime i Prezime",
+    organisationUnitLabel: "Organizaciona Jedinica",
+    roleLabel: "Uloga",
+    actionLabel: "Akcija"
 }

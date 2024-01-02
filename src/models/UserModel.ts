@@ -8,3 +8,15 @@ export interface UserResponse {
     preferredLanguage: string;
     organisationUnitId: number;
 }
+
+export interface UserAccountIndex {
+    id: string;
+    fullName: string;
+    email: string;
+    emailSortable: string;
+    organisationUnitNameSr: string;
+    organisationUnitNameOther: string;
+    userRole: string;
+    databaseId: number;
+    active: boolean;
+}
