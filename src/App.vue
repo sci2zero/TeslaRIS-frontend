@@ -14,7 +14,6 @@ import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRouter } from "vue-router";
 import { useLoginStore } from '@/stores/loginStore';
-import { useRefreshTokenStore } from '@/stores/refreshTokenStore';
 
 export default defineComponent({
     name: "App",
@@ -22,7 +21,6 @@ export default defineComponent({
     beforeMount() {
         const router = useRouter();
         const loginStore = useLoginStore();
-        const refreshTokenStore = useRefreshTokenStore();
 
         // Configure axios to always include JWT and JWT-fingerprint when sending a request
         axios.defaults.withCredentials = true;
