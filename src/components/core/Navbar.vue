@@ -105,6 +105,8 @@ export default defineComponent(
                 if (loginStore.userLoggedIn) {
                     userLoggedIn.value = true;
                     populateUserData();
+                } else {
+                    userLoggedIn.value = false;
                 }
             });
 
