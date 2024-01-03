@@ -31,7 +31,6 @@ export default defineComponent({
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
             UserService.searchUsers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
-                console.log(response.data.totalElements);
                 users.value = response.data.content;
                 totalUsers.value = response.data.totalElements;
             });

@@ -17,5 +17,8 @@ export default {
     fullNameLabel: "Full Name",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
-    actionLabel: "Action"
+    actionLabel: "Action",
+    actionFailedNotification: "Something went wrong, refresh page and try again.",
+    successfulltUpdatedNotification: "Sucessfully updated",
+    userDidNotAllowNotification: "User did not allow this operation."
 }

@@ -17,5 +17,8 @@ export default {
     fullNameLabel: "Ime i Prezime",
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
-    actionLabel: "Akcija"
+    actionLabel: "Akcija",
+    actionFailedNotification: "Došlo je do greške, osvežite stranicu i pokušajte ponovo.",
+    successfulltUpdatedNotification: "Uspešno ažurirano",
+    userDidNotAllowNotification: "Korisnik nije dozvolio ovu operaciju."
 }

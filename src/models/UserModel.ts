@@ -20,3 +20,7 @@ export interface UserAccountIndex {
     databaseId: number;
     active: boolean;
 }
+
+export interface TakeRoleOfUserRequest {
+    userEmail: string;
+}
