@@ -28,8 +28,11 @@ export default defineComponent(
             const searchInput = ref("");
 
             const onSearch = () => {
-                const tokens: string[] = searchInput.value.trim().split(" ");
-                let searchParams = "";
+                let tokens: string[] = searchInput.value.trim().split(" ");
+                if (tokens.length === 1 && tokens[0] === '') {
+                    tokens = ["*"]
+                }
+                let searchParams: string = "";
                 tokens.forEach(token => {
                     if (token !== "") {
                         searchParams += `tokens=${token}&`;
