@@ -20,5 +20,8 @@ export default {
     actionLabel: "Akcija",
     actionFailedNotification: "Došlo je do greške, osvežite stranicu i pokušajte ponovo.",
     successfulltUpdatedNotification: "Uspešno ažurirano",
-    userDidNotAllowNotification: "Korisnik nije dozvolio ovu operaciju."
+    userDidNotAllowNotification: "Korisnik nije dozvolio ovu operaciju.",
+    accountActivationInProgress: "Aktivacija naloga...",
+    accountActivationSuccessfull: "Nalog uspešno aktiviran, možete zatvoriti ovu stranicu i ulogovati se.",
+    accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru.."
 }

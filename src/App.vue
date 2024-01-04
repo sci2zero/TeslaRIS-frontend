@@ -47,6 +47,7 @@ export default defineComponent({
         async (error) => {
             const originalRequest = error.config;
             console.log(originalRequest)
+            console.log(error.response)
             if (!originalRequest.url.endsWith("/user/authenticate") 
                 && !originalRequest.url.endsWith("/user/takeRole") 
                 && !originalRequest.url.endsWith("/user/refresh-token") 
@@ -56,18 +57,23 @@ export default defineComponent({
         
                 const refreshToken: string | null = sessionStorage.getItem("refreshToken");
                 if (refreshToken) {
-                try {
-                    const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
-                    sessionStorage.setItem("jwt", response.data.token);
-                    sessionStorage.setItem("refreshToken", response.data.refreshToken);
-        
-                    return axios(originalRequest);
-                } catch (refreshError) {
-                    AuthenticationService.logoutUser();
-                    loginStore.userLoggedOut();
-                    router.push({ name: "login" });
-                    return Promise.reject(refreshError);
-                }
+                    try {
+                        const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
+                        
+                        sessionStorage.setItem("jwt", response.data.token);
+                        sessionStorage.setItem("refreshToken", response.data.refreshToken);
+            
+                        return axios(originalRequest);
+                    } catch (refreshError: any) {
+                        if (refreshError.response.status === 400 || refreshError.response.status === 500) {
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                            return axios(originalRequest);
+                        } 
+                        AuthenticationService.logoutUser();
+                        loginStore.userLoggedOut();
+                        router.push({ name: "login" });
+                        return Promise.reject(refreshError);
+                    }
                 }
             }
             }

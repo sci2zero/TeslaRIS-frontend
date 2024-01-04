@@ -24,3 +24,7 @@ export interface UserAccountIndex {
 export interface TakeRoleOfUserRequest {
     userEmail: string;
 }
+
+export interface ActivateAccountRequest {
+    activationToken: string;
+  }

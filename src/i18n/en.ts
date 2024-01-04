@@ -20,5 +20,8 @@ export default {
     actionLabel: "Action",
     actionFailedNotification: "Something went wrong, refresh page and try again.",
     successfulltUpdatedNotification: "Sucessfully updated",
-    userDidNotAllowNotification: "User did not allow this operation."
+    userDidNotAllowNotification: "User did not allow this operation.",
+    accountActivationInProgress: "Activating account...",
+    accountActivationSuccessfull: "Account successfully activated, you can now close this page and login.",
+    accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator."
 }

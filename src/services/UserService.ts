@@ -1,4 +1,4 @@
-import type { TakeRoleOfUserRequest, UserResponse } from "@/models/UserModel";
+import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest } from "@/models/UserModel";
 import type { AxiosResponse } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BaseService } from "./BaseService";
@@ -36,6 +36,10 @@ export class UserService extends BaseService {
 
   async takeRoleOfAccount(body: TakeRoleOfUserRequest): Promise<AxiosResponse<AuthenticationResponse>> {
     return super.sendRequest(axios.post, "user/take-role", body);
+  }
+
+  async activateUserAccount(body: ActivateAccountRequest): Promise<AxiosResponse> {
+    return super.sendRequest(axios.patch, "user/activate-account", body);
   }
 }
 

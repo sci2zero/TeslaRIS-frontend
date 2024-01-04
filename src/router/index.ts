@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { defaultLocale } from '../i18n'
-import HomeView from "../views/HomeView.vue";
-import LoginView from "../views/LoginView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import UserListView from "../views/UserListView.vue";
+import { defaultLocale } from '@/i18n'
+import HomeView from "@/views/HomeView.vue";
+import LoginView from "@/views/LoginView.vue";
+import RegisterView from "@/views/RegisterView.vue";
+import UserListView from "@/views/UserListView.vue";
+import AccountActivationView from "@/views/AccountActivationView.vue"
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -55,6 +56,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "activate-account/:activationToken",
+                    name: "activateAccount",
+                    component: AccountActivationView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
                     },
                 },
             ]

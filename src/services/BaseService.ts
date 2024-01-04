@@ -18,10 +18,14 @@ export class BaseService {
   async sendRequest(
     restMethod: any = axios.get,
     path: string = "",
-    requestBody: any = {}
+    requestBody: any = {},
+    idempotencyKey: string = ""
   ): Promise<any> {
     const config = {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKey,
+      },
       withCredentials: true
     };
     return restMethod(this.basePath + path, requestBody, config);

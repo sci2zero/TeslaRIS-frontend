@@ -9,7 +9,7 @@ class AuthenticationService extends BaseService {
   }
 
   async refreshToken(refreshTokenRequest: RefreshTokenRequest): Promise<AxiosResponse<AuthenticationResponse>> {
-    return super.sendRequest(axios.post, "user/refresh-token", refreshTokenRequest);
+    return super.sendRequest(axios.post, "user/refresh-token", refreshTokenRequest, "a73a6d1a-13f2-4d5a-a55e-8f489e5b1f99");
   }
 
   async register(registrationRequest: RegistrationRequest): Promise<AxiosResponse<UserResponse>> {
