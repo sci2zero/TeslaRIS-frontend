@@ -3,6 +3,17 @@ import axios from "axios";
 export class BaseService {
   basePath: string = import.meta.env.VITE_BASE_URL as string;
 
+  static generateIdempotencyKey(): string {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+  
+    for (let i = 0; i < 36; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+  
+    return result;
+  }
   
   initialzeDownload(blobData: any, documentName: string, extension: string) {
     const blob = new Blob([blobData.data], {

@@ -4,12 +4,15 @@ import type { AuthenticationRequest, AuthenticationResponse, RefreshTokenRequest
 import type { UserResponse } from "../models/UserModel";
 
 class AuthenticationService extends BaseService {
+
+  private static idempotencyKey: string = super.generateIdempotencyKey();
+
   async login(loginRequest: AuthenticationRequest): Promise<AxiosResponse<AuthenticationResponse>> {
     return super.sendRequest(axios.post, "user/authenticate", loginRequest);
   }
 
   async refreshToken(refreshTokenRequest: RefreshTokenRequest): Promise<AxiosResponse<AuthenticationResponse>> {
-    return super.sendRequest(axios.post, "user/refresh-token", refreshTokenRequest, "a73a6d1a-13f2-4d5a-a55e-8f489e5b1f99");
+    return super.sendRequest(axios.post, "user/refresh-token", refreshTokenRequest, AuthenticationService.idempotencyKey);
   }
 
   async register(registrationRequest: RegistrationRequest): Promise<AxiosResponse<UserResponse>> {

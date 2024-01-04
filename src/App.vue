@@ -65,7 +65,7 @@ export default defineComponent({
             
                         return axios(originalRequest);
                     } catch (refreshError: any) {
-                        if (refreshError.response.status === 400 || refreshError.response.status === 500) {
+                        if (refreshError.response.status === 400 || refreshError.response.status === 409) {
                             await new Promise(resolve => setTimeout(resolve, 300));
                             return axios(originalRequest);
                         } 

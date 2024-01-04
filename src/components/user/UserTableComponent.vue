@@ -6,7 +6,7 @@
         item-value="id"
         search=""
         :items-length="totalUsers"
-        :items-per-page="10"
+        :items-per-page="1"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -90,10 +90,10 @@ export default defineComponent({
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
-            ["fullName", "email_sortable"],
+            ["fullName", "full_name_sortable"],
             ["email", "email_sortable"],
-            ["organisationUnitNameSr", "email_sortable"],
-            ["organisationUnitNameOther", "email_sortable"],
+            ["organisationUnitNameSr", "org_unit_name_sortable"],
+            ["organisationUnitNameOther", "org_unit_name_sortable"],
             ["userRole", "user_role"],
         ]);
 

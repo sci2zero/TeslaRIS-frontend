@@ -26,7 +26,7 @@
                         :class="{ 'selected': item.value === selectedLocale.value }"
                         @click="switchLang(item)"
                     >
-                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item>
 
                     <!-- <v-divider></v-divider>
@@ -103,19 +103,6 @@
       menu: false,
       message: false,
       hints: true,
-      langItems: [
-        {
-          title: 'Serbian',
-          short: "SR",
-          value: 'sr',
-        },
-        {
-          title: 'English',
-          short: "EN",
-          value: 'en',
-        },
-      ]
-      
     }),
 
 
