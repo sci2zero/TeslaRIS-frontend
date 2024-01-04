@@ -56,11 +56,11 @@
                             <a href="#" @click="logout">{{ $t("logoutLabel") }}</a>
                         </div>
                     </li>
+                    <p v-if="userLoggedIn">
+                        {{ userName }} ({{ userRole }})
+                    </p>
                 </ul>
             </div>
-            <p v-if="userLoggedIn">
-                {{ userName }} ({{ userRole }})
-            </p>
         </div>
     </div>
 </template>
