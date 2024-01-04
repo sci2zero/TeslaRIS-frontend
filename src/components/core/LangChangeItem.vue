@@ -1,14 +1,49 @@
 <template>
-    <div>
-        <input
-            id="sr" type="radio" name="lang" :checked="selectedLocale==='sr'"
-            @change="switchLang('sr')" />
-        <label for="sr" class="sr">SR</label>
+    <div class="text-center">
+        <v-menu
+            v-model="menu"
+            :close-on-content-click="true"
+            location="end"
+        >
+            <template #activator="{ props }">
+                <v-btn
+                    color="indigo"
+                    v-bind="props"
+                >
+                    {{ selectedLocale.short }}
+                </v-btn>
+            </template>
 
-        <input
-            id="en" type="radio" name="lang" :checked="selectedLocale==='en'"
-            @change="switchLang('en')" />
-        <label for="en" class="en">EN</label>
+            <v-card min-width="150">
+                <v-list>
+                    <!-- <v-list-subheader>Recent</v-list-subheader> -->
+
+                    <v-list-item
+                        v-for="(item, i) in langItems"
+                        :key="i"
+                        :value="item"
+                        :color="item.value === selectedLocale.value ? '' : 'primary' "
+                        :class="{ 'selected': item.value === selectedLocale.value }"
+                        @click="switchLang(item)"
+                    >
+                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                    </v-list-item>
+
+                    <!-- <v-divider></v-divider>
+                    <v-list-subheader>All languages</v-list-subheader>
+
+
+                    <v-list-item
+                        v-for="(item, i) in langItems"
+                        :key="i"
+                        :value="item"
+                        color="primary"
+                    >
+                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                    </v-list-item> -->
+                </v-list>
+            </v-card>
+        </v-menu>
     </div>
 </template>
   
@@ -23,29 +58,67 @@
       const currentRoute = useRoute();
       const router = useRouter();
 
-      const selectedLocale = ref("");
+      const selectedLocale: any = ref({});
+      const langItems = [
+        {
+          title: 'Serbian',
+          short: "SR",
+          value: 'sr',
+        },
+        {
+          title: 'English',
+          short: "EN",
+          value: 'en',
+        },
+      ];
   
-      const switchLang = (lang: string) => {
-        const currentPath = currentRoute.path.replace(/^\/[a-z]+/, `/${lang}`);
+      const switchLang = (lang: any) => {
+        selectedLocale.value = lang; 
+        const currentPath = currentRoute.path.replace(/^\/[a-z]+/, `/${lang.value}`);
         router.push(currentPath);
       };
+
+      
 
       onMounted(async () => {
         await router.isReady()
         const currentLocale = currentRoute.params.locale as string;
         
         if (supportedLocales.includes(currentLocale)) {
-          selectedLocale.value = currentLocale;
+          selectedLocale.value = langItems.find(x=>x.value == currentLocale);
         } else {
-          selectedLocale.value = defaultLocale;
+          selectedLocale.value = langItems.find(x=>x.value == defaultLocale)
         }
       });
   
       return {
         switchLang,
-        selectedLocale
+        selectedLocale,
+        langItems
       };
     },
+
+    data: () => ({
+      fav: true,
+      menu: false,
+      message: false,
+      hints: true,
+      langItems: [
+        {
+          title: 'Serbian',
+          short: "SR",
+          value: 'sr',
+        },
+        {
+          title: 'English',
+          short: "EN",
+          value: 'en',
+        },
+      ]
+      
+    }),
+
+
   });
 </script>
   
@@ -65,6 +138,11 @@
   
   .en {
     padding-left: 0.125em;
+  }
+
+  .selected {
+    background: #515fb3;
+    color: white;
   }
   </style>
   
