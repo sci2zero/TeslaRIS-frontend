@@ -81,10 +81,11 @@ export default defineComponent({
         const successfulltUpdatedNotification = computed(() => i18n.t("successfulltUpdatedNotification"));
         const userDidNotAllowNotification = computed(() => i18n.t("userDidNotAllowNotification"));
 
+        const ouColumn = computed(() => i18n.t("organisationUnitNameColumn"));
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},
           { title: emailLabel, align: "start", sortable: true, key: "email"},
-          { title: organisationUnitLabel, align: "start", sortable: true, key: "organisationUnitNameSr"},
+          { title: organisationUnitLabel, align: "start", sortable: true, key: ouColumn},
           { title: roleLabel, align: "start", sortable: true, key: "userRole"},
           { title: actionLabel},
         ];
@@ -92,8 +93,8 @@ export default defineComponent({
         const headersSortableMappings: Map<string, string> = new Map([
             ["fullName", "full_name_sortable"],
             ["email", "email_sortable"],
-            ["organisationUnitNameSr", "org_unit_name_sortable"],
-            ["organisationUnitNameOther", "org_unit_name_sortable"],
+            ["organisationUnitNameSr", "org_unit_name_sortable_sr"],
+            ["organisationUnitNameOther", "org_unit_name_sortable_other"],
             ["userRole", "user_role"],
         ]);
 

@@ -23,5 +23,6 @@ export default {
     userDidNotAllowNotification: "User did not allow this operation.",
     accountActivationInProgress: "Activating account...",
     accountActivationSuccessfull: "Account successfully activated, you can now close this page and login.",
-    accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator."
+    accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator.",
+    organisationUnitNameColumn: "organisationUnitNameOther"
 }

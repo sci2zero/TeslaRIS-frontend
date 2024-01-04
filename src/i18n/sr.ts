@@ -23,5 +23,6 @@ export default {
     userDidNotAllowNotification: "Korisnik nije dozvolio ovu operaciju.",
     accountActivationInProgress: "Aktivacija naloga...",
     accountActivationSuccessfull: "Nalog uspešno aktiviran, možete zatvoriti ovu stranicu i ulogovati se.",
-    accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru.."
+    accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru..",
+    organisationUnitNameColumn: "organisationUnitNameSr"
 }
