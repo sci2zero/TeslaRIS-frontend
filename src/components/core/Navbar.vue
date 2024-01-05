@@ -16,7 +16,9 @@
                         </li>
                         <li>
                             <div class="link-container">
-                                <a href="#">Link</a>
+                                <localized-link to="persons">
+                                    {{ $t("personListLabel") }}
+                                </localized-link>
                             </div>
                         </li>
                         <li>

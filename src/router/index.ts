@@ -4,6 +4,7 @@ import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import UserListView from "@/views/UserListView.vue";
+import PersonListView from "@/views/PersonListView.vue";
 import AccountActivationView from "@/views/AccountActivationView.vue"
 
 
@@ -56,6 +57,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "persons",
+                    name: "persons",
+                    component: PersonListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                     },
                 },
                 {

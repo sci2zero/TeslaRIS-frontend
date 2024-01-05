@@ -24,5 +24,9 @@ export default {
     accountActivationInProgress: "Aktivacija naloga...",
     accountActivationSuccessfull: "Nalog uspešno aktiviran, možete zatvoriti ovu stranicu i ulogovati se.",
     accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru..",
-    organisationUnitNameColumn: "organisationUnitNameSr"
+    organisationUnitNameColumn: "organisationUnitNameSr",
+    birthdateLabel: "Datum rođenja",
+    employmentColumn: "employmentsSr",
+    personListLabel: "Istraživači",
+    deleteLabel: "Obriši"
 }

@@ -78,8 +78,6 @@
         router.push(currentPath);
       };
 
-      
-
       onMounted(async () => {
         await router.isReady()
         const currentLocale = currentRoute.params.locale as string;

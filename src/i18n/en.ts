@@ -24,5 +24,9 @@ export default {
     accountActivationInProgress: "Activating account...",
     accountActivationSuccessfull: "Account successfully activated, you can now close this page and login.",
     accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator.",
-    organisationUnitNameColumn: "organisationUnitNameOther"
+    organisationUnitNameColumn: "organisationUnitNameOther",
+    birthdateLabel: "Birthdate",
+    employmentColumn: "employmentsOther",
+    personListLabel: "Researchers",
+    deleteLabel: "Delete"
 }

@@ -1,12 +1,9 @@
 <template>
     <v-data-table-server
-        v-model="selectedUsers"
         :items="users"
         :headers="headers"
-        item-value="id"
-        search=""
         :items-length="totalUsers"
-        :items-per-page="1"
+        :items-per-page="10"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -62,8 +59,6 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(props, {emit}) {
-        const selectedUsers = ref([]);
-
         const i18n = useI18n();
         const loginStore = useLoginStore();
         const router = useRouter();
@@ -105,7 +100,7 @@ export default defineComponent({
                 sortField = headersSortableMappings.get(event.sortBy[0].key);
                 sortDir = event.sortBy[0].order.toUpperCase();
             }
-            emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir)
+            emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir);
         };
 
         const changeActivationStatus = (userId: number) => {
@@ -136,7 +131,7 @@ export default defineComponent({
             });
         };
 
-        return {selectedUsers, headers, snackbar, snackbarText, timeout, refreshTable, changeActivationStatus, takeRoleOfUser};
+        return {headers, snackbar, snackbarText, timeout, refreshTable, changeActivationStatus, takeRoleOfUser};
     }
 });
 </script>
