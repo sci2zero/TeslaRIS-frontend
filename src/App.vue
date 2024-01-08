@@ -29,7 +29,7 @@ export default defineComponent({
             const jwt: string | null = sessionStorage.getItem("jwt");
             if (jwt) {
                 if (config.headers) {
-                config.headers.Authorization = `Bearer ${jwt}`;
+                    config.headers.Authorization = `Bearer ${jwt}`;
                 }
             }
             return config;

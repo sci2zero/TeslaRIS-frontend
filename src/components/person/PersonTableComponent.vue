@@ -1,6 +1,12 @@
 <template>
-    <v-btn v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedPersons.length === 0">
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedPersons.length === 0"
+        @click="deleteSelection">
         {{ $t("deleteLabel") }}
+    </v-btn>
+    <v-btn
+        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedPersons.length !== 2">
+        {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedPersons"
@@ -33,19 +39,17 @@
             </tr>
         </template>
     </v-data-table-server>
-    <!-- <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ snackbarText }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar> -->
+    <div class="notificationContainer">
+        <v-slide-y-transition group>
+            <v-alert
+                v-for="notification in notifications"
+                :key="notification[0]"
+                theme="dark"
+            >
+                {{ notification[1] }}
+            </v-alert>
+        </v-slide-y-transition>
+    </div>
 </template>
 
 <script lang="ts">
@@ -54,6 +58,7 @@ import { ref, computed, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
 import UserService from '@/services/UserService';
+import PersonService from '@/services/PersonService';
 
 export default defineComponent({
     name: "PersonTableComponent",
@@ -72,9 +77,8 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const snackbar = ref(false);
-        const snackbarText = ref("");
-        const timeout = 5000;
+        const notifications = ref<Map<string, string>>(new Map());
+        const tableOptions = ref({page: 0, itemsPerPage: 10, sortBy:[]});
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
@@ -99,6 +103,7 @@ export default defineComponent({
         ]);
 
         const refreshTable = (event: any) => {
+            tableOptions.value = event;
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
             if (event.sortBy.length > 0) {
@@ -112,7 +117,41 @@ export default defineComponent({
             console.log(selectedPersons.value)
         });
 
-        return {selectedPersons, headers, snackbar, snackbarText, timeout, refreshTable, userRole};
+        const deleteSelection = () => {
+            selectedPersons.value.forEach((person: PersonIndex) => {
+                PersonService.deleteResearcher(person.databaseId).then(() => {
+                    addNotification(i18n.t("deleteSuccessNotification", {name: person.name}));
+                    refreshTable(tableOptions.value);
+                }).catch(() => {
+                    addNotification(i18n.t("deleteFailedNotification", {name: person.name}));
+                })
+            });
+        }
+
+        const addNotification = (message: string) => {
+            const notificationId = self.crypto.randomUUID();
+
+            notifications.value.set(notificationId, message);
+            setTimeout(() => removeNotification(notificationId), 2000);
+        }
+
+        const removeNotification = (notificationId: string) => {
+            notifications.value.delete(notificationId);
+        }
+
+        return {selectedPersons, headers, notifications, refreshTable, userRole, deleteSelection};
     }
 });
 </script>
+
+<style scoped>
+  .notificationContainer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    grid-gap: 0.5em;
+    z-index: 99;
+  }
+</style>
+

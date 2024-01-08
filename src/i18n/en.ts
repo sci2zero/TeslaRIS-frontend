@@ -28,5 +28,15 @@ export default {
     birthdateLabel: "Birthdate",
     employmentColumn: "employmentsOther",
     personListLabel: "Researchers",
-    deleteLabel: "Delete"
+    deleteLabel: "Delete",
+    deleteSuccessNotification: "Successfully deleted: {name}.",
+    deleteFailedNotification: "Could not delete: {name}, object allready in use.",
+    compareLabel: "Compare",
+    ouListLabel: "Organisation Units",
+    nameLabel: "Name",
+    keywordsLabel: "Keywords",
+    researchAreasLabel: "Research Areas",
+    nameColumn: "nameOther",
+    keywordsColumn: "keywordsOther",
+    researchAreasColumn: "researchAreasOther"
 }

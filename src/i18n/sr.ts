@@ -28,5 +28,15 @@ export default {
     birthdateLabel: "Datum rođenja",
     employmentColumn: "employmentsSr",
     personListLabel: "Istraživači",
-    deleteLabel: "Obriši"
+    deleteLabel: "Obriši",
+    deleteSuccessNotification: "Uspesno obrisao: {name}.",
+    deleteFailedNotification: "Nije moguce obrisati: {name}, objekat je u upotrebi.",
+    compareLabel: "Uporedi",
+    ouListLabel: "Organizacione Jedinice",
+    nameLabel: "Ime",
+    keywordsLabel: "Kljucne reci",
+    researchAreasLabel: "Oblasti Istrazivanja",
+    nameColumn: "nameSr",
+    keywordsColumn: "keywordsSr",
+    researchAreasColumn: "researchAreasSr"
 }

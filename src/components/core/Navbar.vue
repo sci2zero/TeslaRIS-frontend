@@ -22,6 +22,13 @@
                             </div>
                         </li>
                         <li>
+                            <div class="link-container">
+                                <localized-link to="organisation-units">
+                                    {{ $t("ouListLabel") }}
+                                </localized-link>
+                            </div>
+                        </li>
+                        <li>
                             <div v-if="userLoggedIn && userRole === 'ADMIN'" class="link-container">
                                 <localized-link to="users">
                                     {{ $t("userPageLabel") }}

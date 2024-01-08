@@ -19,6 +19,9 @@ export class UserService extends BaseService {
 
   private getDecodedJwt(): any {
     const jwt = sessionStorage.getItem("jwt");
+    if (jwt === null) {
+      return {};
+    }
     return jwtDecode(jwt as string);
   }
 
