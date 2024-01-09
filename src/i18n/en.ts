@@ -38,5 +38,6 @@ export default {
     researchAreasLabel: "Research Areas",
     nameColumn: "nameOther",
     keywordsColumn: "keywordsOther",
-    researchAreasColumn: "researchAreasOther"
+    researchAreasColumn: "researchAreasOther",
+    addInstitutionEditorLabel: "Add Intitutional Editor"
 }

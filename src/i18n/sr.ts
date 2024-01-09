@@ -38,5 +38,6 @@ export default {
     researchAreasLabel: "Oblasti Istrazivanja",
     nameColumn: "nameSr",
     keywordsColumn: "keywordsSr",
-    researchAreasColumn: "researchAreasSr"
+    researchAreasColumn: "researchAreasSr",
+    addInstitutionEditorLabel: "Dodaj Institucionalnog Urednika"
 }

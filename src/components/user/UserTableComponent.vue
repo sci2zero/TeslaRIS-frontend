@@ -1,4 +1,7 @@
 <template>
+    <v-btn density="compact" style="margin-bottom: 20px;">
+        {{ $t("addInstitutionEditorLabel") }}
+    </v-btn>
     <v-data-table-server
         :items="users"
         :headers="headers"
@@ -77,6 +80,9 @@ export default defineComponent({
         const userDidNotAllowNotification = computed(() => i18n.t("userDidNotAllowNotification"));
 
         const ouColumn = computed(() => i18n.t("organisationUnitNameColumn"));
+
+        const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
+
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},
           { title: emailLabel, align: "start", sortable: true, key: "email"},
@@ -94,6 +100,11 @@ export default defineComponent({
         ]);
 
         const refreshTable = (event: any) => {
+            if (tableOptions.value.initialCustomConfiguration) {
+                tableOptions.value.initialCustomConfiguration = false;
+                event = tableOptions.value;
+            }
+            tableOptions.value = event;
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
             if (event.sortBy.length > 0) {
