@@ -63,10 +63,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
@@ -86,7 +87,6 @@ export default defineComponent({
         const i18n = useI18n();
 
         const notifications = ref<Map<string, string>>(new Map());
-        const tableOptions = ref({page: 0, itemsPerPage: 10, sortBy:[]});
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
@@ -97,6 +97,9 @@ export default defineComponent({
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
         const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
+
+        const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
@@ -113,6 +116,10 @@ export default defineComponent({
         ]);
 
         const refreshTable = (event: any) => {
+            if (tableOptions.value.initialCustomConfiguration) {
+                tableOptions.value.initialCustomConfiguration = false;
+                event = tableOptions.value;
+            }
             tableOptions.value = event;
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
@@ -123,24 +130,40 @@ export default defineComponent({
             emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir);
         };
 
-        watchEffect(() => {
-            console.log(selectedOUs.value)
-        });
-
         const deleteSelection = () => {
-
+            Promise.all(selectedOUs.value.map((organisationUnit: OrganisationUnitIndex) => {
+                return OrganisationUnitService.deleteOrganisationUnit(organisationUnit.databaseId)
+                    .then(() => {
+                        if (i18n.locale.value === "sr") {
+                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameSr }));
+                        } else {
+                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameOther }));
+                        }
+                    })
+                    .catch(() => {
+                        if (i18n.locale.value === "sr") {
+                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameSr }));
+                        } else {
+                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameOther }));
+                        }
+                        return organisationUnit;
+                    });
+            })).then((failedDeletions) => {
+                selectedOUs.value = selectedOUs.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
+                refreshTable(tableOptions.value);
+            });
         }
 
-        // const addNotification = (message: string) => {
-        //     const notificationId = self.crypto.randomUUID();
+        const addNotification = (message: string) => {
+            const notificationId = self.crypto.randomUUID();
 
-        //     notifications.value.set(notificationId, message);
-        //     setTimeout(() => removeNotification(notificationId), 2000);
-        // }
+            notifications.value.set(notificationId, message);
+            setTimeout(() => removeNotification(notificationId), 2000);
+        }
 
-        // const removeNotification = (notificationId: string) => {
-        //     notifications.value.delete(notificationId);
-        // }
+        const removeNotification = (notificationId: string) => {
+            notifications.value.delete(notificationId);
+        }
 
         return {selectedOUs, headers, notifications, refreshTable, userRole, deleteSelection};
     }

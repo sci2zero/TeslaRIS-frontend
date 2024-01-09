@@ -11,6 +11,10 @@ export class OrganisationUnitService extends BaseService {
   async searchOUs(tokens: string): Promise<AxiosResponse<any>> {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
   }
+
+  async deleteOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<any>> {
+    return super.sendRequest(axios.delete, `organisation-unit/${organisationUnitId}`);
+  }
 }
 
 export default new OrganisationUnitService();

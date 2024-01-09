@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
 import UserService from '@/services/UserService';
@@ -78,7 +78,6 @@ export default defineComponent({
         const i18n = useI18n();
 
         const notifications = ref<Map<string, string>>(new Map());
-        const tableOptions = ref({page: 0, itemsPerPage: 10, sortBy:[]});
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
@@ -87,6 +86,9 @@ export default defineComponent({
         const userRole = computed(() => UserService.provideUserRole());
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
+
+        const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
+
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "name"},
           { title: organisationUnitLabel, align: "start", sortable: true, key: employmentColumn},
@@ -103,6 +105,11 @@ export default defineComponent({
         ]);
 
         const refreshTable = (event: any) => {
+            if (tableOptions.value.initialCustomConfiguration) {
+                tableOptions.value.initialCustomConfiguration = false;
+                event = tableOptions.value;
+            }
+
             tableOptions.value = event;
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
@@ -113,20 +120,21 @@ export default defineComponent({
             emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir);
         };
 
-        watchEffect(() => {
-            console.log(selectedPersons.value)
-        });
-
         const deleteSelection = () => {
-            selectedPersons.value.forEach((person: PersonIndex) => {
-                PersonService.deleteResearcher(person.databaseId).then(() => {
-                    addNotification(i18n.t("deleteSuccessNotification", {name: person.name}));
-                    refreshTable(tableOptions.value);
-                }).catch(() => {
-                    addNotification(i18n.t("deleteFailedNotification", {name: person.name}));
-                })
+            Promise.all(selectedPersons.value.map((person: PersonIndex) => {
+                return PersonService.deleteResearcher(person.databaseId)
+                    .then(() => {
+                        addNotification(i18n.t("deleteSuccessNotification", { name: person.name }));
+                    })
+                    .catch(() => {
+                        addNotification(i18n.t("deleteFailedNotification", { name: person.name }));
+                        return person;
+                    });
+            })).then((failedDeletions) => {
+                selectedPersons.value = selectedPersons.value.filter((person) => failedDeletions.includes(person));
+                refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
