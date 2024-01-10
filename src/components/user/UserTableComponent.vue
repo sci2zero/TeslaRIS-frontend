@@ -6,7 +6,8 @@
         :items="users"
         :headers="headers"
         :items-length="totalUsers"
-        :items-per-page="10"
+        :items-per-page-text="$t('itemsPerPageLabel')"
+        :items-per-page-options="[5, 10, 25, 50]"
         @update:options="refreshTable">
         <template #item="row">
             <tr>

@@ -40,6 +40,9 @@
                                 <localized-link to="users">
                                     {{ $t("userPageLabel") }}
                                 </localized-link>
+                                <localized-link to="events">
+                                    {{ $t("eventListLabel") }}
+                                </localized-link>
                             </div>
                         </li>
                     </ul>

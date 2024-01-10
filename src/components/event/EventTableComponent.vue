@@ -1,19 +1,19 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedOUs.length === 0"
+        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedEvents.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedOUs.length !== 2">
+        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedEvents.length !== 2">
         {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server
-        v-model="selectedOUs"
-        :items="organisationUnits"
+        v-model="selectedEvents"
+        :items="events"
         :headers="headers"
         item-value="row"
-        :items-length="totalOUs"
+        :items-length="totalEvents"
         show-select
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
@@ -23,7 +23,7 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedOUs"
+                        v-model="selectedEvents"
                         :value="row.item"
                         style="margin:0px;padding:0px"
                         hide-details
@@ -35,17 +35,14 @@
                 <td v-if="$i18n.locale == 'en'">
                     {{ row.item.nameOther }}
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.keywordsSr }}
-                </td>
-                <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.keywordsOther }}
+                <td>
+                    {{ row.item.dateFromTo }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.researchAreasSr }}
+                    {{ row.item.stateSr }}
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.researchAreasOther }}
+                    {{ row.item.stateOther }}
                 </td>
             </tr>
         </template>
@@ -68,53 +65,51 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
-import OrganisationUnitService from '@/services/OrganisationUnitService';
+import {EventType, type EventIndex} from '@/models/EventModel';
+import EventService from '@/services/EventService';
 
 export default defineComponent({
-    name: "OrganisationUnitTableComponent",
+    name: "PublicationTableComponent",
     props: {
-        organisationUnits: {
-            type: Array<OrganisationUnitIndex>,
+        events: {
+            type: Array<EventIndex>,
             required: true
         }, 
-        totalOUs: {
+        totalEvents: {
             type: Number,
             required: true
         }},
     emits: ["switchPage"],
     setup(props, {emit}) {
-        const selectedOUs = ref([]);
+        const selectedEvents = ref([]);
 
         const i18n = useI18n();
 
         const notifications = ref<Map<string, string>>(new Map());
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
-        const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
-        const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
+        const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
+        const stateLabel = computed(() => i18n.t("stateLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
-        const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
-        const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
+        const stateColumn = computed(() => i18n.t("stateColumn"));
 
         const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
-          { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
-          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn},
+          { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
+          { title: stateLabel, align: "start", sortable: true, key: stateColumn},
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["nameSr", "name_sr_sortable"],
             ["nameOther", "name_other_sortable"],
-            ["keywordsSr", "keywords_sr"],
-            ["keywordsOther", "keywords_other"],
-            ["researchAreasSr", "research_areas_sr_sortable"],
-            ["researchAreasOther", "research_areas_other_sortable"],
+            ["dateFromTo", "date_sortable"],
+            ["stateSr", "state_sr_sortable"],
+            ["stateOther", "state_other_sortable"],
         ]);
 
         const refreshTable = (event: any) => {
@@ -133,27 +128,38 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedOUs.value.map((organisationUnit: OrganisationUnitIndex) => {
-                return OrganisationUnitService.deleteOrganisationUnit(organisationUnit.databaseId)
-                    .then(() => {
-                        if (i18n.locale.value === "sr") {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameSr }));
-                        } else {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameOther }));
-                        }
-                    })
-                    .catch(() => {
-                        if (i18n.locale.value === "sr") {
-                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameSr }));
-                        } else {
-                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameOther }));
-                        }
-                        return organisationUnit;
-                    });
+            Promise.all(selectedEvents.value.map((event: EventIndex) => {
+                switch(event.eventType) {
+                    case EventType.CONFERENCE:
+                        return EventService.deleteConference(event.databaseId)
+                            .then(() => {
+                                pushlocalizedMessage(true, event);
+                            })
+                            .catch(() => {
+                                pushlocalizedMessage(false, event);
+                                return event;
+                            });
+                }
             })).then((failedDeletions) => {
-                selectedOUs.value = selectedOUs.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
+                selectedEvents.value = selectedEvents.value.filter((event) => failedDeletions.includes(event));
                 refreshTable(tableOptions.value);
             });
+        }
+
+        const pushlocalizedMessage = (success: boolean, event: EventIndex) => {
+            if (success) {
+                if (i18n.locale.value === "sr") {
+                    addNotification(i18n.t("deleteSuccessNotification", { name: event.nameSr }));
+                } else {
+                    addNotification(i18n.t("deleteSuccessNotification", { name: event.nameOther }));
+                }
+            } else {
+                if (i18n.locale.value === "sr") {
+                    addNotification(i18n.t("deleteFailedNotification", { name: event.nameSr }));
+                } else {
+                    addNotification(i18n.t("deleteFailedNotification", { name: event.nameOther }));
+                }
+            }
         }
 
         const addNotification = (message: string) => {
@@ -167,7 +173,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedOUs, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedEvents, headers, notifications, refreshTable, userRole, deleteSelection};
     }
 });
 </script>
@@ -182,4 +188,3 @@ export default defineComponent({
     z-index: 99;
   }
 </style>
-

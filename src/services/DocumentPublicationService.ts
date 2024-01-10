@@ -12,8 +12,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/simple-search?${tokens}`);
   }
 
-  async deleteDocumentPublication(organisationUnitId: number): Promise<AxiosResponse<any>> {
-    return super.sendRequest(axios.delete, `document/${organisationUnitId}`);
+  async deleteDocumentPublication(documentPublicationId: number): Promise<AxiosResponse<any>> {
+    return super.sendRequest(axios.delete, `document/${documentPublicationId}`);
   }
 }
 

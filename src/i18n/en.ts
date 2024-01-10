@@ -44,5 +44,10 @@ export default {
     scientificResultsListLabel: "Scientific Results",
     titleLabel: "Title",
     yearOfPublicationLabel: "Year of Publication",
-    typeOfPublicationLabel: "Type of Publication"
+    typeOfPublicationLabel: "Type of Publication",
+    eventListLabel: "Events",
+    eventDateLabel: "Event Date",
+    stateLabel: "State",
+    stateColumn: "stateOther",
+    itemsPerPageLabel: "Items per page:"
 }

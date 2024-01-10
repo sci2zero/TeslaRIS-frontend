@@ -16,6 +16,8 @@
         :items-length="totalPersons"
         show-select
         return-object
+        :items-per-page-text="$t('itemsPerPageLabel')"
+        :items-per-page-options="[5, 10, 25, 50]"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
