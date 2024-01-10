@@ -5,8 +5,9 @@ import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import UserListView from "@/views/UserListView.vue";
 import PersonListView from "@/views/PersonListView.vue";
-import AccountActivationView from "@/views/AccountActivationView.vue"
-import OrganisationUnitListView from "@/views/OrganisationUnitListView.vue"
+import AccountActivationView from "@/views/AccountActivationView.vue";
+import OrganisationUnitListView from "@/views/OrganisationUnitListView.vue";
+import ScientificResultsView from "@/views/ScientificResultsView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -73,6 +74,15 @@ const router = createRouter({
                     path: "organisation-units",
                     name: "organisationUnits",
                     component: OrganisationUnitListView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "scientific-results",
+                    name: "scientificResults",
+                    component: ScientificResultsView,
                     meta: {
                         authenticated: false,
                         authorities: [],

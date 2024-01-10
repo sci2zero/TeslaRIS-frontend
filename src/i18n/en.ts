@@ -39,5 +39,10 @@ export default {
     nameColumn: "nameOther",
     keywordsColumn: "keywordsOther",
     researchAreasColumn: "researchAreasOther",
-    addInstitutionEditorLabel: "Add Intitutional Editor"
+    addInstitutionEditorLabel: "Add Intitutional Editor",
+    titleColumn: "titleOther",
+    scientificResultsListLabel: "Scientific Results",
+    titleLabel: "Title",
+    yearOfPublicationLabel: "Year of Publication",
+    typeOfPublicationLabel: "Type of Publication"
 }

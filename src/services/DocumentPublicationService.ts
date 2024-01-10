@@ -4,8 +4,16 @@ import axios from "axios";
 
 export class DocumentPublicationService extends BaseService {
 
-  async getOUCount(): Promise<AxiosResponse<number>> {
+  async getDocumentCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "document/count");
+  }
+
+  async searchDocumentPublications(tokens: string): Promise<AxiosResponse<any>> {
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}`);
+  }
+
+  async deleteDocumentPublication(organisationUnitId: number): Promise<AxiosResponse<any>> {
+    return super.sendRequest(axios.delete, `document/${organisationUnitId}`);
   }
 }
 

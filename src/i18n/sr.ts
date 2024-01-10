@@ -39,5 +39,10 @@ export default {
     nameColumn: "nameSr",
     keywordsColumn: "keywordsSr",
     researchAreasColumn: "researchAreasSr",
-    addInstitutionEditorLabel: "Dodaj Institucionalnog Urednika"
+    addInstitutionEditorLabel: "Dodaj Institucionalnog Urednika",
+    titleColumn: "titleSr",
+    scientificResultsListLabel: "Rezultati",
+    titleLabel: "Naslov",
+    yearOfPublicationLabel: "Godina izdanja",
+    typeOfPublicationLabel: "Tip Publikacije"
 }
