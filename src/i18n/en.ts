@@ -39,7 +39,7 @@ export default {
     nameColumn: "nameOther",
     keywordsColumn: "keywordsOther",
     researchAreasColumn: "researchAreasOther",
-    addInstitutionEditorLabel: "Add Intitutional Editor",
+    addInstitutionEditorLabel: "Add Institutional Editor",
     titleColumn: "titleOther",
     scientificResultsListLabel: "Scientific Results",
     titleLabel: "Title",
