@@ -49,5 +49,6 @@ export default {
     eventDateLabel: "Event Date",
     stateLabel: "State",
     stateColumn: "stateOther",
-    itemsPerPageLabel: "Items per page:"
+    itemsPerPageLabel: "Items per page:",
+    journalListLabel: "Journals"
 }

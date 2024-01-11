@@ -43,6 +43,9 @@
                                 <localized-link to="events">
                                     {{ $t("eventListLabel") }}
                                 </localized-link>
+                                <localized-link to="journals">
+                                    {{ $t("journalListLabel") }}
+                                </localized-link>
                             </div>
                         </li>
                     </ul>

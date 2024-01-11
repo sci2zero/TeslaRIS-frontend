@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 
-export class DocumentPublicationService extends BaseService {
+export class EventService extends BaseService {
 
   async searchConferences(tokens: string): Promise<AxiosResponse<any>> {
     return super.sendRequest(axios.get, `conference/simple-search?${tokens}`);
@@ -13,4 +13,4 @@ export class DocumentPublicationService extends BaseService {
   }
 }
 
-export default new DocumentPublicationService();
+export default new EventService();
