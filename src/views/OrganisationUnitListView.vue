@@ -15,13 +15,14 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import { ref } from 'vue';
+import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
     components: {SearchBarComponent, OrganisationUnitTableComponent},
     setup() {
         const searchParams = ref("tokens=*");
-        const organisationUnits = ref([]);
+        const organisationUnits = ref<OrganisationUnitIndex[]>([]);
         const totalOUs = ref(0);
         const page = ref(0);
         const size = ref(1);

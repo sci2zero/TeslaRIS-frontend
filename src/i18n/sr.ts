@@ -49,6 +49,9 @@ export default {
     eventDateLabel: "Datum održavanja",
     stateLabel: "Zemlja",
     stateColumn: "stateSr",
+    placeLabel: "Mesto",
+    placeColumn: "placeSr",
     itemsPerPageLabel: "Redova po stranici:",
-    journalListLabel: "Časopisi"
+    journalListLabel: "Časopisi",
+    publisherListLabel: "Izdavači"
 }

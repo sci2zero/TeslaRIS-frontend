@@ -30,7 +30,7 @@ export default {
     personListLabel: "Researchers",
     deleteLabel: "Delete",
     deleteSuccessNotification: "Successfully deleted: {name}.",
-    deleteFailedNotification: "Could not delete: {name}, object allready in use.",
+    deleteFailedNotification: "Could not delete: {name}, object allready in use or is allready deleted.",
     compareLabel: "Compare",
     ouListLabel: "Organisation Units",
     nameLabel: "Name",
@@ -49,6 +49,9 @@ export default {
     eventDateLabel: "Event Date",
     stateLabel: "State",
     stateColumn: "stateOther",
+    placeLabel: "Place",
+    placeColumn: "placeOther",
     itemsPerPageLabel: "Items per page:",
-    journalListLabel: "Journals"
+    journalListLabel: "Journals",
+    publisherListLabel: "Publishers"
 }

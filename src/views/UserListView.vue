@@ -15,13 +15,14 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import UserService from '@/services/UserService';
 import UserTableComponent from '@/components/user/UserTableComponent.vue';
 import { ref } from 'vue';
+import type { UserAccountIndex } from '@/models/UserModel';
 
 export default defineComponent({
     name: "UserListView",
     components: {SearchBarComponent, UserTableComponent},
     setup() {
         const searchParams = ref("tokens=*");
-        const users = ref([]);
+        const users = ref<UserAccountIndex[]>([]);
         const totalUsers = ref(0);
         const page = ref(0);
         const size = ref(1);

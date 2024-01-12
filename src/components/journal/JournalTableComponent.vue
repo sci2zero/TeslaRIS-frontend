@@ -90,7 +90,7 @@ export default defineComponent({
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
+        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
@@ -170,4 +170,3 @@ export default defineComponent({
     z-index: 99;
   }
 </style>
-

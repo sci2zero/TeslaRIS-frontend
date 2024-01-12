@@ -89,7 +89,7 @@ export default defineComponent({
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
+        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
 
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "name"},

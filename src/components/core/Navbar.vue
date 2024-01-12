@@ -46,6 +46,9 @@
                                 <localized-link to="journals">
                                     {{ $t("journalListLabel") }}
                                 </localized-link>
+                                <localized-link to="publishers">
+                                    {{ $t("publisherListLabel") }}
+                                </localized-link>
                             </div>
                         </li>
                     </ul>

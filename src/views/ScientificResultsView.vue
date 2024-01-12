@@ -15,13 +15,14 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { ref } from 'vue';
+import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 
 export default defineComponent({
     name: "ScientificResultsListView",
     components: {SearchBarComponent, PublicationTableComponent},
     setup() {
         const searchParams = ref("tokens=*");
-        const publications = ref([]);
+        const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref(0);
         const page = ref(0);
         const size = ref(1);

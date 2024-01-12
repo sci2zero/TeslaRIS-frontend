@@ -1,19 +1,19 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedOUs.length === 0"
+        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedPublishers.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedOUs.length !== 2">
+        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedPublishers.length !== 2">
         {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server
-        v-model="selectedOUs"
-        :items="organisationUnits"
+        v-model="selectedPublishers"
+        :items="publishers"
         :headers="headers"
         item-value="row"
-        :items-length="totalOUs"
+        :items-length="totalPublishers"
         show-select
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
@@ -23,7 +23,7 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedOUs"
+                        v-model="selectedPublishers"
                         :value="row.item"
                         style="margin:0px;padding:0px"
                         hide-details
@@ -36,16 +36,16 @@
                     {{ row.item.nameOther }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.keywordsSr }}
+                    {{ row.item.placeSr }}
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.keywordsOther }}
+                    {{ row.item.placeOther }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.researchAreasSr }}
+                    {{ row.item.stateSr }}
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.researchAreasOther }}
+                    {{ row.item.stateOther }}
                 </td>
             </tr>
         </template>
@@ -68,53 +68,53 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
-import OrganisationUnitService from '@/services/OrganisationUnitService';
+import type { PublisherIndex } from '@/models/PublisherModel';
+import PublisherService from '@/services/PublisherService';
 
 export default defineComponent({
-    name: "OrganisationUnitTableComponent",
+    name: "PublisherTableComponent",
     props: {
-        organisationUnits: {
-            type: Array<OrganisationUnitIndex>,
+        publishers: {
+            type: Array<PublisherIndex>,
             required: true
         }, 
-        totalOUs: {
+        totalPublishers: {
             type: Number,
             required: true
         }},
     emits: ["switchPage"],
     setup(props, {emit}) {
-        const selectedOUs = ref([]);
+        const selectedPublishers = ref([]);
 
         const i18n = useI18n();
 
         const notifications = ref<Map<string, string>>(new Map());
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
-        const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
-        const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
+        const placeLabel = computed(() => i18n.t("placeLabel"));
+        const stateLabel = computed(() => i18n.t("stateLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
-        const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
-        const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
+        const placeColumn = computed(() => i18n.t("placeColumn"));
+        const stateColumn = computed(() => i18n.t("stateColumn"));
 
         const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
-          { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
-          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn},
+          { title: placeLabel, align: "start", sortable: true, key: placeColumn},
+          { title: stateLabel, align: "start", sortable: true, key: stateColumn},
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["nameSr", "name_sr_sortable"],
             ["nameOther", "name_other_sortable"],
-            ["keywordsSr", "keywords_sr"],
-            ["keywordsOther", "keywords_other"],
-            ["researchAreasSr", "research_areas_sr_sortable"],
-            ["researchAreasOther", "research_areas_other_sortable"],
+            ["placeSr", "place_sr_sortable"],
+            ["placeOther", "place_other_sortable"],
+            ["stateSr", "state_sr_sortable"],
+            ["stateOther", "state_other_sortable"]
         ]);
 
         const refreshTable = (event: any) => {
@@ -133,25 +133,25 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedOUs.value.map((organisationUnit: OrganisationUnitIndex) => {
-                return OrganisationUnitService.deleteOrganisationUnit(organisationUnit.databaseId)
+            Promise.all(selectedPublishers.value.map((publisher: PublisherIndex) => {
+                return PublisherService.deletePublisher(publisher.databaseId)
                     .then(() => {
                         if (i18n.locale.value === "sr") {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameSr }));
+                            addNotification(i18n.t("deleteSuccessNotification", { name: publisher.nameSr }));
                         } else {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameOther }));
+                            addNotification(i18n.t("deleteSuccessNotification", { name: publisher.nameOther }));
                         }
                     })
                     .catch(() => {
                         if (i18n.locale.value === "sr") {
-                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameSr }));
+                            addNotification(i18n.t("deleteFailedNotification", { name: publisher.nameSr }));
                         } else {
-                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameOther }));
+                            addNotification(i18n.t("deleteFailedNotification", { name: publisher.nameOther }));
                         }
-                        return organisationUnit;
+                        return publisher;
                     });
             })).then((failedDeletions) => {
-                selectedOUs.value = selectedOUs.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
+                selectedPublishers.value = selectedPublishers.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
                 refreshTable(tableOptions.value);
             });
         }
@@ -167,7 +167,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedOUs, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedPublishers, headers, notifications, refreshTable, userRole, deleteSelection};
     }
 });
 </script>
@@ -182,4 +182,3 @@ export default defineComponent({
     z-index: 99;
   }
 </style>
-

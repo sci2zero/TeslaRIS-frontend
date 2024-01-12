@@ -1,9 +1,10 @@
-import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest } from "@/models/UserModel";
+import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest, UserAccountIndex } from "@/models/UserModel";
 import type { AxiosResponse } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { AuthenticationResponse } from "@/models/AuthenticationModel";
+import type { Page } from "@/models/Common";
 
 export class UserService extends BaseService {
 
@@ -29,11 +30,11 @@ export class UserService extends BaseService {
     return super.sendRequest(axios.get, "user");
   }
 
-  async searchUsers(tokens: string): Promise<AxiosResponse<any>> {
+  async searchUsers(tokens: string): Promise<AxiosResponse<Page<UserAccountIndex>>> {
     return super.sendRequest(axios.get, `user/search?${tokens}`);
   }
 
-  async updateAccountActivationStatus(userId: number): Promise<any> {
+  async updateAccountActivationStatus(userId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `user/activation-status/${userId}`);
   }
 

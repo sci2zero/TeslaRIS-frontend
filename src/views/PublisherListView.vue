@@ -1,29 +1,29 @@
 <template>
-    <h1>{{ $t("eventListLabel") }}</h1>
+    <h1>{{ $t("publisherListLabel") }}</h1>
     <br />
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
     <br />
     <br />
-    <event-table-component :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
+    <publisher-table-component :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
-import EventService from '@/services/EventService';
-import EventTableComponent from '@/components/event/EventTableComponent.vue';
+import PublisherService from '@/services/PublisherService';
+import PublisherTableComponent from '@/components/publisher/PublisherTableComponent.vue';
 import { ref } from 'vue';
-import type { EventIndex } from '@/models/EventModel';
+import type { PublisherIndex } from '@/models/PublisherModel';
 
 export default defineComponent({
-    name: "OrganisationUnitListView",
-    components: {SearchBarComponent, EventTableComponent},
+    name: "PublisherListView",
+    components: {SearchBarComponent, PublisherTableComponent},
     setup() {
         const searchParams = ref("tokens=*");
-        const events = ref<EventIndex[]>([]);
-        const totalEvents = ref(0);
+        const publishers = ref<PublisherIndex[]>([]);
+        const totalPublishers = ref(0);
         const page = ref(0);
         const size = ref(1);
         const sort = ref("");
@@ -31,9 +31,9 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            EventService.searchConferences(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
-                events.value = response.data.content;
-                totalEvents.value = response.data.totalElements;
+            PublisherService.searchPublishers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+                publishers.value = response.data.content;
+                totalPublishers.value = response.data.totalElements;
             });
         };
 
@@ -45,7 +45,7 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, events, totalEvents, switchPage};
+        return {search, publishers, totalPublishers, switchPage};
     }
 });
 </script>

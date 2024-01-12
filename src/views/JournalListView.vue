@@ -15,13 +15,14 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import JournalService from '@/services/JournalService';
 import JournalTableComponent from '@/components/journal/JournalTableComponent.vue';
 import { ref } from 'vue';
+import type { JournalIndex } from '@/models/JournalModel';
 
 export default defineComponent({
     name: "JournalListView",
     components: {SearchBarComponent, JournalTableComponent},
     setup() {
         const searchParams = ref("tokens=*");
-        const journals = ref([]);
+        const journals = ref<JournalIndex[]>([]);
         const totalJournals = ref(0);
         const page = ref(0);
         const size = ref(1);
@@ -32,7 +33,6 @@ export default defineComponent({
             searchParams.value = tokenParams;
             JournalService.searchJournals(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
                 journals.value = response.data.content;
-                console.log(journals.value)
                 totalJournals.value = response.data.totalElements;
             });
         };

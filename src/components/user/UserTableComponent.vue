@@ -82,7 +82,7 @@ export default defineComponent({
 
         const ouColumn = computed(() => i18n.t("organisationUnitNameColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 0, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
+        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
 
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},

@@ -46,8 +46,6 @@ export default defineComponent({
         },
         async (error) => {
             const originalRequest = error.config;
-            console.log(originalRequest)
-            console.log(error.response)
             if (!originalRequest.url.endsWith("/user/authenticate") 
                 && !originalRequest.url.endsWith("/user/takeRole") 
                 && !originalRequest.url.endsWith("/user/refresh-token") 
