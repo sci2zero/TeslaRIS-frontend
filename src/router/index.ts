@@ -11,6 +11,7 @@ import OrganisationUnitListView from "@/views/OrganisationUnitListView.vue";
 import ScientificResultsView from "@/views/ScientificResultsView.vue";
 import JournalListView from "@/views/JournalListView.vue";
 import PublisherListView from "@/views/PublisherListView.vue";
+import AdvancedSearchView from "@/views/AdvancedSearchView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -113,6 +114,15 @@ const router = createRouter({
                     path: "scientific-results",
                     name: "scientificResults",
                     component: ScientificResultsView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "advanced-search",
+                    name: "advancedSearch",
+                    component: AdvancedSearchView,
                     meta: {
                         authenticated: false,
                         authorities: [],

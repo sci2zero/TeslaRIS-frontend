@@ -21,7 +21,7 @@ export default defineComponent({
     name: "OrganisationUnitListView",
     components: {SearchBarComponent, OrganisationUnitTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
+        const searchParams = ref("tokens=");
         const organisationUnits = ref<OrganisationUnitIndex[]>([]);
         const totalOUs = ref(0);
         const page = ref(0);

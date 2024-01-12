@@ -21,7 +21,7 @@ export default defineComponent({
     name: "JournalListView",
     components: {SearchBarComponent, JournalTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
+        const searchParams = ref("tokens=");
         const journals = ref<JournalIndex[]>([]);
         const totalJournals = ref(0);
         const page = ref(0);

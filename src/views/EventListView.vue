@@ -21,7 +21,7 @@ export default defineComponent({
     name: "OrganisationUnitListView",
     components: {SearchBarComponent, EventTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
+        const searchParams = ref("tokens=");
         const events = ref<EventIndex[]>([]);
         const totalEvents = ref(0);
         const page = ref(0);

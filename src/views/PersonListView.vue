@@ -15,13 +15,14 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PersonService from '@/services/PersonService';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import { ref } from 'vue';
+import type { PersonIndex } from '@/models/PersonModel';
 
 export default defineComponent({
     name: "PersonListView",
     components: {SearchBarComponent, PersonTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
-        const persons = ref([]);
+        const searchParams = ref("tokens=");
+        const persons = ref<PersonIndex[]>([]);
         const totalPersons = ref(0);
         const page = ref(0);
         const size = ref(1);

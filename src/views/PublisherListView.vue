@@ -21,7 +21,7 @@ export default defineComponent({
     name: "PublisherListView",
     components: {SearchBarComponent, PublisherTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
+        const searchParams = ref("tokens=");
         const publishers = ref<PublisherIndex[]>([]);
         const totalPublishers = ref(0);
         const page = ref(0);

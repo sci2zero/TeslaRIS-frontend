@@ -53,5 +53,6 @@ export default {
     placeColumn: "placeOther",
     itemsPerPageLabel: "Items per page:",
     journalListLabel: "Journals",
-    publisherListLabel: "Publishers"
+    publisherListLabel: "Publishers",
+    advancedSearchLabel: "Advanced Search"
 }

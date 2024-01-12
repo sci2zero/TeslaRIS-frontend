@@ -53,5 +53,6 @@ export default {
     placeColumn: "placeSr",
     itemsPerPageLabel: "Redova po stranici:",
     journalListLabel: "Časopisi",
-    publisherListLabel: "Izdavači"
+    publisherListLabel: "Izdavači",
+    advancedSearchLabel: "Napredna Pretraga"
 }

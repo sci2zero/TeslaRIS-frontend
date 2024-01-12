@@ -21,7 +21,7 @@ export default defineComponent({
     name: "ScientificResultsListView",
     components: {SearchBarComponent, PublicationTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
+        const searchParams = ref("tokens=");
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref(0);
         const page = ref(0);

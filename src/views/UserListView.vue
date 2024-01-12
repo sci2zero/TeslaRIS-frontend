@@ -21,7 +21,7 @@ export default defineComponent({
     name: "UserListView",
     components: {SearchBarComponent, UserTableComponent},
     setup() {
-        const searchParams = ref("tokens=*");
+        const searchParams = ref("tokens=");
         const users = ref<UserAccountIndex[]>([]);
         const totalUsers = ref(0);
         const page = ref(0);
