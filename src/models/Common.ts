@@ -5,3 +5,15 @@ export interface Page<Type> {
     size: number;
     number: number;
 }
+
+export interface MultilingualContent {
+    languageTagId: number;
+    content: string;
+    priority: number;
+}
+
+export interface LanguageResponse {
+    id: number;
+    languageCode: string;
+    name: MultilingualContent[];
+}

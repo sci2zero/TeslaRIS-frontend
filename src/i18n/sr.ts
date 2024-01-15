@@ -15,6 +15,10 @@ export default {
     emailFormatError: "Neispravan format email-a",
     searchBarPlaceholder: "Pretraga",
     fullNameLabel: "Ime i Prezime",
+    firstNameLabel: "Ime",
+    surnameLabel: "Prezime",
+    noteLabel: "Komentar",
+    preferredLanguageLabel: "Izabrani Jezik",
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
     actionLabel: "Akcija",
@@ -54,5 +58,6 @@ export default {
     itemsPerPageLabel: "Redova po stranici:",
     journalListLabel: "Časopisi",
     publisherListLabel: "Izdavači",
-    advancedSearchLabel: "Napredna Pretraga"
+    advancedSearchLabel: "Napredna Pretraga",
+    saveLabel: "Sačuvaj"
 }

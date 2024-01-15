@@ -1,7 +1,5 @@
 <template>
-    <v-btn density="compact" style="margin-bottom: 20px;">
-        {{ $t("addInstitutionEditorLabel") }}
-    </v-btn>
+    <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
     <v-data-table-server
         :items="users"
         :headers="headers"
@@ -49,9 +47,11 @@ import UserService from '@/services/UserService';
 import type { UserAccountIndex } from '@/models/UserModel';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/loginStore';
+import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 
 export default defineComponent({
     name: "UserTableComponent",
+    components: { RegisterEmployeeModal },
     props: {
         users: {
             type: Array<UserAccountIndex>,
@@ -130,6 +130,11 @@ export default defineComponent({
             });
         };
 
+        const displayFormNotification = (text: string) => {
+            snackbarText.value = text;
+            snackbar.value = true;
+        }
+
         const takeRoleOfUser = (email: string) => {
             UserService.takeRoleOfAccount({userEmail: email}).then((response) => {
                 sessionStorage.setItem("jwt", response.data.token);
@@ -143,7 +148,7 @@ export default defineComponent({
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable, changeActivationStatus, takeRoleOfUser};
+        return {headers, snackbar, snackbarText, timeout, refreshTable, tableOptions, changeActivationStatus, takeRoleOfUser, displayFormNotification};
     }
 });
 </script>

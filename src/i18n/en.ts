@@ -15,6 +15,10 @@ export default {
     emailFormatError: "Invalid email format",
     searchBarPlaceholder: "Search",
     fullNameLabel: "Full Name",
+    firstNameLabel: "Name",
+    surnameLabel: "Surname",
+    noteLabel: "Note",
+    preferredLanguageLabel: "Preferred Language",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
     actionLabel: "Action",
@@ -54,5 +58,6 @@ export default {
     itemsPerPageLabel: "Items per page:",
     journalListLabel: "Journals",
     publisherListLabel: "Publishers",
-    advancedSearchLabel: "Advanced Search"
+    advancedSearchLabel: "Advanced Search",
+    saveLabel: "Save"
 }
