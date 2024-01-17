@@ -6,20 +6,16 @@
     padding: 2rem;
 
     font-weight: normal;
+    width: 100%;
 }
 
 a,
 .green {
-    text-decoration: none;
-    color: hsla(160, 100%, 37%, 1);
+    /* text-decoration: none; */
+    /* color: hsla(160, 100%, 37%, 1); */
     transition: 0.4s;
 }
 
-@media (hover: hover) {
-    a:hover {
-        background-color: hsla(160, 100%, 37%, 0.2);
-    }
-}
 
 @media (min-width: 1024px) {
     body {
@@ -29,7 +25,20 @@ a,
 
     #app {
         display: grid;
-        grid-template-columns: 1fr 1fr;
         padding: 0 2rem;
     }
+}
+
+
+/* Forms */
+input {
+    display: block;
+    width: 100%;
+    padding: 0.4em;
+    border: 1px solid #bcbcbc;;
+    border-radius: 0.25em;
+}
+
+label {
+    display: block;
 }

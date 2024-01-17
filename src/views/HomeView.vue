@@ -1,18 +1,11 @@
 <template>
-    <hello-world />
+    <h1>{{ $t('homeLabel') }}</h1>
 </template>
 
 <script lang="ts">
-    import { defineComponent } from "vue";
+import { defineComponent } from "vue";
 
-    // Components
-    import HelloWorld from "../components/HelloWorld.vue";
-
-    export default defineComponent({
-        name: "HomeView",
-
-        components: {
-            HelloWorld,
-        },
-    });
+export default defineComponent({
+    name: "HomeView",
+});
 </script>
