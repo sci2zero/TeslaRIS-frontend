@@ -59,5 +59,19 @@ export default {
     journalListLabel: "Časopisi",
     publisherListLabel: "Izdavači",
     advancedSearchLabel: "Napredna Pretraga",
-    saveLabel: "Sačuvaj"
+    saveLabel: "Sačuvaj",
+    userProfileLabel: "Korisnički Profil",
+    oldPasswordLabel: "Stara Lozinka",
+    newPasswordLabel: "Nova Lozinka",
+    repeatNewPasswordLabel: "Ponovi Novu Lozinku",
+    changePasswordLabel: "Promeni Lozinku",
+    allowTakeoverLabel: "Dozvoli Administratorski Pristup",
+    shortPasswordMessage: "Koristite 8 ili više karaktera za svoju šifru.",
+    invalidPasswordFormatMessage: "Molimo vas da izaberete jaču šifru. Koristite barem jedno malo slovo, jedno veliko slovo i jednu cifru.",
+    passwordsDontMatchMessage: "Lozinke se ne podudaraju.",
+    updateResearcherLabel: "Ažuriraj profil istraživača",
+    genericErrorMessage: "Došlo je do greške, osvežite stranicu i pokušajte ponovo.",
+    savedMessage: "Uspešno sačuvano",
+    wrongOldPasswordError: "Pogrešna stara lozinka.",
+    noDataMessage: "Kucajte da biste pretražili..."
 }

@@ -8,6 +8,7 @@ export interface Page<Type> {
 
 export interface MultilingualContent {
     languageTagId: number;
+    languageTag: string;
     content: string;
     priority: number;
 }

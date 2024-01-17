@@ -12,6 +12,7 @@ import ScientificResultsView from "@/views/ScientificResultsView.vue";
 import JournalListView from "@/views/JournalListView.vue";
 import PublisherListView from "@/views/PublisherListView.vue";
 import AdvancedSearchView from "@/views/AdvancedSearchView.vue";
+import UserProfileView from "@/views/UserProfileView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -54,6 +55,15 @@ const router = createRouter({
                     meta: {
                         authenticated: false,
                         authorities: [],
+                    },
+                },
+                {
+                    path: "user-profile",
+                    name: "user-profile",
+                    component: UserProfileView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                     },
                 },
                 {

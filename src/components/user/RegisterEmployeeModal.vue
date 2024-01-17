@@ -53,6 +53,7 @@
                                         :auto-select-first="true"
                                         :rules="requiredSelectionRules"
                                         @update:search="searchOUs($event)"
+                                        :no-data-text="$t('noDataMessage')"
                                     ></v-autocomplete>
                                 </v-col>
                                 <v-col cols="12">

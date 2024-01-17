@@ -59,5 +59,19 @@ export default {
     journalListLabel: "Journals",
     publisherListLabel: "Publishers",
     advancedSearchLabel: "Advanced Search",
-    saveLabel: "Save"
+    saveLabel: "Save",
+    userProfileLabel: "User Profile",
+    oldPasswordLabel: "Old Password",
+    newPasswordLabel: "New Password",
+    repeatNewPasswordLabel: "Repeat New Password",
+    changePasswordLabel: "Change Password",
+    allowTakeoverLabel: "Allow Admin Takeover",
+    shortPasswordMessage: "Use 8 characters or more for your password.",
+    invalidPasswordFormatMessage: "Please choose a stronger password. Use at least one lower-case letter, one upper-case letter and a number.",
+    passwordsDontMatchMessage: "Passwords don't match.",
+    updateResearcherLabel: "Update Researcher Profile",
+    genericErrorMessage: "There was an error, refresh page and try again.",
+    savedMessage: "Saved successfully",
+    wrongOldPasswordError: "Wrong old password provided.",
+    noDataMessage: "Type to search..."
 }

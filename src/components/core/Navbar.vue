@@ -86,6 +86,9 @@
                     <li>
                         <div v-if="userLoggedIn" class="link-container">
                             <a href="#" @click="logout">{{ $t("logoutLabel") }}</a>
+                            <localized-link to="user-profile">
+                                {{ $t("userProfileLabel") }}
+                            </localized-link>
                         </div>
                     </li>
                     <p v-if="userLoggedIn">
