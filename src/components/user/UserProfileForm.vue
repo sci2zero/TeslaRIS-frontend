@@ -1,5 +1,5 @@
 <template>
-    <v-checkbox v-model="allowAccountTakeover" :label="$t('allowTakeoverLabel')" v-if="userRole !== 'ADMIN'" @click="updateAccountTakeoverPermission"></v-checkbox>
+    <v-checkbox v-if="userRole !== 'ADMIN'" v-model="allowAccountTakeover" :label="$t('allowTakeoverLabel')" @click="updateAccountTakeoverPermission"></v-checkbox>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="6">
@@ -19,7 +19,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-        <v-btn color="blue darken-1" v-if="userRole === 'RESEARCHER'" style="margin-top: -15px; margin-bottom: 20px;">
+        <v-btn v-if="userRole === 'RESEARCHER'" color="blue darken-1" style="margin-top: -15px; margin-bottom: 20px;">
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
@@ -37,7 +37,7 @@
                     :items="languages"
                 ></v-select>
             </v-col>
-            <v-col cols="6" v-if="userRole !== 'ADMIN'">
+            <v-col v-if="userRole !== 'ADMIN'" cols="6">
                 <v-autocomplete
                     v-model="selectedOrganisationUnit"
                     :label="$t('organisationUnitLabel')"
@@ -45,9 +45,9 @@
                     :custom-filter="filterOUs"
                     :auto-select-first="true"
                     :rules="userRole === 'RESEARCHER' ? requiredSelectionRules : []"
-                    @update:search="searchOUs($event)"
                     :readonly="userRole === 'RESEARCHER'"
                     :no-data-text="$t('noDataMessage')"
+                    @update:search="searchOUs($event)"
                 ></v-autocomplete>
             </v-col>
         </v-row>
@@ -156,7 +156,6 @@ export default defineComponent({
         const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
         const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
         const savedMessage = computed(() => i18n.t("savedMessage"));
-        const genericErrorMessage = computed(() => i18n.t("genericErrorMessage"));
 
         const emailFieldRules = [
             (value: string) => {

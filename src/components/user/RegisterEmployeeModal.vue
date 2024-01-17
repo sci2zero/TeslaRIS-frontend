@@ -52,8 +52,8 @@
                                         :custom-filter="filterOUs"
                                         :auto-select-first="true"
                                         :rules="requiredSelectionRules"
-                                        @update:search="searchOUs($event)"
                                         :no-data-text="$t('noDataMessage')"
+                                        @update:search="searchOUs($event)"
                                     ></v-autocomplete>
                                 </v-col>
                                 <v-col cols="12">
