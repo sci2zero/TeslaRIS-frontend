@@ -38,7 +38,7 @@ export default {
     deleteFailedNotification: "Nije moguće obrisati: {name}, objekat je u upotrebi ili je već obrisan.",
     compareLabel: "Uporedi",
     ouListLabel: "Organizacione Jedinice",
-    nameLabel: "Ime",
+    nameLabel: "Naziv",
     nameAbbreviationLabel: "Skraćenica Imena",
     keywordsLabel: "Ključne reči",
     researchAreasLabel: "Oblasti Istraživanja",
@@ -83,5 +83,9 @@ export default {
     toLabel: "Do",
     conferenceNumberLabel: "Broj Konferencije",
     entryFeeLabel: "Cena Ulaza",
-    serialEventLabel: "Serijski događaj"
+    serialEventLabel: "Serijski događaj",
+    eventYearLabel: "Godina Održavanja",
+    dontKnowExactDateLabel: "Ne znam tačan datum",
+    rememberedDateLabel: "Setio sam se datuma",
+    requiredFieldsMessage: "Obavezna polja su označena sa *"
 }

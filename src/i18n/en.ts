@@ -83,5 +83,9 @@ export default {
     toLabel: "To",
     conferenceNumberLabel: "Conference Number",
     entryFeeLabel: "Entry Fee",
-    serialEventLabel: "Is serial event"
+    serialEventLabel: "Is serial event",
+    eventYearLabel: "Year",
+    dontKnowExactDateLabel: "I don't know the exact date",
+    rememberedDateLabel: "I remembered the date",
+    requiredFieldsMessage: "The required fields are marked with *"
 }

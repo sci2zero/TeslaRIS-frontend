@@ -19,35 +19,35 @@
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="name"
-                                        :label="$t('firstNameLabel')"
+                                        :label="$t('firstNameLabel') + '*'"
                                         :rules="requiredFieldRules"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="surname"
-                                        :label="$t('surnameLabel')"
+                                        :label="$t('surnameLabel') + '*'"
                                         :rules="requiredFieldRules"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="email"
-                                        :label="$t('emailLabel')"
+                                        :label="$t('emailLabel') + '*'"
                                         :rules="emailFieldRules"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-select
                                         v-model="selectedLanguage"
-                                        :label="$t('preferredLanguageLabel')"
+                                        :label="$t('preferredLanguageLabel') + '*'"
                                         :items="languages"
                                     ></v-select>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-autocomplete
                                         v-model="selectedOrganisationUnit"
-                                        :label="$t('organisationUnitLabel')"
+                                        :label="$t('organisationUnitLabel') + '*'"
                                         :items="organisationUnits"
                                         :custom-filter="filterOUs"
                                         :auto-select-first="true"
@@ -65,6 +65,9 @@
                             </v-row>
                         </v-form>
                     </v-container>
+                    <p style="margin-left: 20px;">
+                        {{ $t("requiredFieldsMessage") }}
+                    </p>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
