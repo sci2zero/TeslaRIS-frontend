@@ -124,7 +124,6 @@ import UserService from "@/services/UserService";
 export default defineComponent({
     name: "UserProfileForm",
     components: {PasswordInputWithMeter},
-    emits: ["success", "failure"],
     setup() {
         const snackbar = ref(false);
         const snackbarText = ref("");

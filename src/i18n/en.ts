@@ -19,6 +19,7 @@ export default {
     surnameLabel: "Surname",
     noteLabel: "Note",
     preferredLanguageLabel: "Preferred Language",
+    languageLabel: "Language",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
     actionLabel: "Action",
@@ -38,6 +39,7 @@ export default {
     compareLabel: "Compare",
     ouListLabel: "Organisation Units",
     nameLabel: "Name",
+    nameAbbreviationLabel: "Name Abbreviation",
     keywordsLabel: "Keywords",
     researchAreasLabel: "Research Areas",
     nameColumn: "nameOther",
@@ -73,5 +75,13 @@ export default {
     genericErrorMessage: "There was an error, refresh page and try again.",
     savedMessage: "Saved successfully",
     wrongOldPasswordError: "Wrong old password provided.",
-    noDataMessage: "Type to search..."
+    noDataMessage: "Type to search...",
+    descriptionLabel: "Description",
+    addConferenceLabel: "Add Conference",
+    tookPlaceLabel: "Took Place",
+    fromLabel: "From",
+    toLabel: "To",
+    conferenceNumberLabel: "Conference Number",
+    entryFeeLabel: "Entry Fee",
+    serialEventLabel: "Is serial event"
 }

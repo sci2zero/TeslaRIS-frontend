@@ -4,6 +4,9 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
+    <v-btn @click="addConference">
+        {{ $t("addConferenceLabel") }}
+    </v-btn>
     <br />
     <br />
     <event-table-component :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
@@ -16,6 +19,7 @@ import EventService from '@/services/EventService';
 import EventTableComponent from '@/components/event/EventTableComponent.vue';
 import { ref } from 'vue';
 import type { EventIndex } from '@/models/EventModel';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
@@ -28,6 +32,8 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +51,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, events, totalEvents, switchPage};
+        const addConference = () => {
+            router.push({name: "submitConference"});
+        }
+
+        return {search, events, totalEvents, switchPage, addConference};
     }
 });
 </script>

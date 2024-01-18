@@ -13,6 +13,7 @@ import JournalListView from "@/views/JournalListView.vue";
 import PublisherListView from "@/views/PublisherListView.vue";
 import AdvancedSearchView from "@/views/AdvancedSearchView.vue";
 import UserProfileView from "@/views/UserProfileView.vue";
+import SubmitConferenceView from "@/views/SubmitConferenceView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -59,7 +60,7 @@ const router = createRouter({
                 },
                 {
                     path: "user-profile",
-                    name: "user-profile",
+                    name: "userProfile",
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
@@ -79,6 +80,15 @@ const router = createRouter({
                     path: "events",
                     name: "events",
                     component: EventListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "submit-conference",
+                    name: "submitConference",
+                    component: SubmitConferenceView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

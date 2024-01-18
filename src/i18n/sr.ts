@@ -19,6 +19,7 @@ export default {
     surnameLabel: "Prezime",
     noteLabel: "Komentar",
     preferredLanguageLabel: "Izabrani Jezik",
+    languageLabel: "Jezik",
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
     actionLabel: "Akcija",
@@ -38,6 +39,7 @@ export default {
     compareLabel: "Uporedi",
     ouListLabel: "Organizacione Jedinice",
     nameLabel: "Ime",
+    nameAbbreviationLabel: "Skraćenica Imena",
     keywordsLabel: "Ključne reči",
     researchAreasLabel: "Oblasti Istraživanja",
     nameColumn: "nameSr",
@@ -73,5 +75,13 @@ export default {
     genericErrorMessage: "Došlo je do greške, osvežite stranicu i pokušajte ponovo.",
     savedMessage: "Uspešno sačuvano",
     wrongOldPasswordError: "Pogrešna stara lozinka.",
-    noDataMessage: "Kucajte da biste pretražili..."
+    noDataMessage: "Kucajte da biste pretražili...",
+    descriptionLabel: "Opis",
+    addConferenceLabel: "Dodaj Konferenciju",
+    tookPlaceLabel: "Održano",
+    fromLabel: "Od",
+    toLabel: "Do",
+    conferenceNumberLabel: "Broj Konferencije",
+    entryFeeLabel: "Cena Ulaza",
+    serialEventLabel: "Serijski događaj"
 }
