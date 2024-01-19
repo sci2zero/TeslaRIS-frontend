@@ -33,6 +33,7 @@ export default {
     birthdateLabel: "Datum rođenja",
     employmentColumn: "employmentsSr",
     personListLabel: "Istraživači",
+    personLabel: "Osoba",
     deleteLabel: "Obriši",
     deleteSuccessNotification: "Uspešno obrisao: {name}.",
     deleteFailedNotification: "Nije moguće obrisati: {name}, objekat je u upotrebi ili je već obrisan.",
@@ -62,6 +63,7 @@ export default {
     publisherListLabel: "Izdavači",
     advancedSearchLabel: "Napredna Pretraga",
     saveLabel: "Sačuvaj",
+    saveAndAddAnotherLabel: "Sačuvaj i dodaj novo",
     userProfileLabel: "Korisnički Profil",
     oldPasswordLabel: "Stara Lozinka",
     newPasswordLabel: "Nova Lozinka",
@@ -87,5 +89,9 @@ export default {
     eventYearLabel: "Godina Održavanja",
     dontKnowExactDateLabel: "Ne znam tačan datum",
     rememberedDateLabel: "Setio sam se datuma",
-    requiredFieldsMessage: "Obavezna polja su označena sa *"
+    requiredFieldsMessage: "Obavezna polja su označena sa *",
+    affiliationStatementLabel: "Izjava o pripadnosti",
+    contributionTypeLabel: "Tip Kontribucije",
+    contributionsLabel: "Kontribucije",
+    additionalFieldsLabel: "Dodatna polja"
 }

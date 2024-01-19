@@ -50,7 +50,7 @@ export const countriesSr: string[] = [
     "Ekvador",
     "Egipat",
     "Salvador",
-    "Ekvatorska Gvineja",
+    "Ekvatorijalna Gvineja",
     "Eritreja",
     "Estonija",
     "Esvatini",

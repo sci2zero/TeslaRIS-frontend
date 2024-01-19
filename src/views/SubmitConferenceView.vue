@@ -3,6 +3,7 @@
         <h1>{{ $t("addConferenceLabel") }}</h1>
     </v-flex>
     <br />
+    <br />
     <conference-submission-form></conference-submission-form>
 </template>
 

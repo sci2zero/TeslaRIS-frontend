@@ -33,6 +33,7 @@ export default {
     birthdateLabel: "Birthdate",
     employmentColumn: "employmentsOther",
     personListLabel: "Researchers",
+    personLabel: "Person",
     deleteLabel: "Delete",
     deleteSuccessNotification: "Successfully deleted: {name}.",
     deleteFailedNotification: "Could not delete: {name}, object allready in use or is allready deleted.",
@@ -62,6 +63,7 @@ export default {
     publisherListLabel: "Publishers",
     advancedSearchLabel: "Advanced Search",
     saveLabel: "Save",
+    saveAndAddAnotherLabel: "Save and Add Another",
     userProfileLabel: "User Profile",
     oldPasswordLabel: "Old Password",
     newPasswordLabel: "New Password",
@@ -87,5 +89,9 @@ export default {
     eventYearLabel: "Year",
     dontKnowExactDateLabel: "I don't know the exact date",
     rememberedDateLabel: "I remembered the date",
-    requiredFieldsMessage: "The required fields are marked with *"
+    requiredFieldsMessage: "The required fields are marked with *",
+    affiliationStatementLabel: "Affiliation Statement",
+    contributionTypeLabel: "Contribution Type",
+    contributionsLabel: "Contributions",
+    additionalFieldsLabel: "Additional Fields"
 }

@@ -18,3 +18,9 @@ export interface LanguageResponse {
     languageCode: string;
     name: MultilingualContent[];
 }
+
+export interface LanguageTagResponse {
+    id: number;
+    languageCode: string;
+    display: string;
+}

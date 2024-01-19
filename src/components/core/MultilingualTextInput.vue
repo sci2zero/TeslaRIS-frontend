@@ -1,6 +1,6 @@
 <template>
     <v-row v-for="(input, index) in inputs" :key="index">
-        <v-col cols="4">
+        <v-col cols="7">
             <v-text-field
                 v-if="!isArea" v-model="input.text" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-text-field>
@@ -8,7 +8,7 @@
                 v-if="isArea" v-model="input.text" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-textarea>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="3">
             <v-select
                 v-model="input.language"
                 :items="supportedLanguages"
@@ -17,7 +17,7 @@
                 @update:model-value="sendContentToParent"
             ></v-select>
         </v-col>
-        <v-col>
+        <v-col cols="2">
             <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
                 -
             </v-btn>
@@ -33,7 +33,7 @@ import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
-import type { LanguageResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
 import UserService from '@/services/UserService';
 import type { UserResponse } from '@/models/UserModel';
@@ -62,11 +62,15 @@ export default defineComponent({
         const inputs = ref<{ language: {title: string, value: number}, text: string }[]>([]);
 
         onMounted(() => {
+            setInitialState();
+        });
+
+        const setInitialState = () => {
             UserService.getLoggedInUser().then((response: AxiosResponse<UserResponse>) => {
                 userPreferredLanguage.value.tag = response.data.preferredLanguage;
-                LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                     const languages = response.data;
-                    languages.forEach((language: LanguageResponse) => {
+                    languages.forEach((language: LanguageTagResponse) => {
                         supportedLanguages.value.push({title: language.languageCode, value: language.id});
                         if (language.languageCode === userPreferredLanguage.value.tag) {
                             userPreferredLanguage.value.id = language.id;
@@ -75,7 +79,7 @@ export default defineComponent({
                     });
                 });
             });
-        });
+        }
 
         const addInput = () => {
             inputs.value.push({ language: {title: userPreferredLanguage.value.tag, value: userPreferredLanguage.value.id}, text: "" });
@@ -83,6 +87,11 @@ export default defineComponent({
 
         const removeInput = (index: number) => {
             inputs.value.splice(index, 1);
+        };
+
+        const clearInput = () => {
+            inputs.value = [];
+            setInitialState();
         };
 
         const sendContentToParent = () => {
@@ -101,7 +110,8 @@ export default defineComponent({
             inputs,
             addInput,
             removeInput,
-            sendContentToParent
+            sendContentToParent,
+            clearInput
         };
     }
 });
