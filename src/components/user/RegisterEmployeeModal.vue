@@ -74,8 +74,11 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="registerEmployee()">
+                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="registerEmployee(false)">
                         {{ $t("saveLabel") }}
+                    </v-btn>
+                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="registerEmployee(true)">
+                        {{ $t("saveAndAddAnotherLabel") }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -168,7 +171,7 @@ export default defineComponent({
             return true;
         }
 
-        const registerEmployee = () => {
+        const registerEmployee = (stayOnPage: boolean) => {
             const newEmployee: EmployeeRegistrationRequest = {
                 name: name.value,
                 surname: surname.value,
@@ -184,7 +187,9 @@ export default defineComponent({
                 email.value = "";
                 note.value = "";
                 selectedOrganisationUnit.value = ouPlaceholder;
-                dialog.value = false;
+                if (!stayOnPage) {
+                    dialog.value = false;   
+                }
             }).catch((error: AxiosError<any, any>) => {
                 emit("failure", error.response?.data.message)
             })
