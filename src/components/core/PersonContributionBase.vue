@@ -26,6 +26,7 @@ import type { PersonIndex } from "@/models/PersonModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import MultilingualTextInput from "./MultilingualTextInput.vue";
+import lodash from "lodash";
 
 export default defineComponent({
     name: "PersonContributionBase",
@@ -55,7 +56,7 @@ export default defineComponent({
             }
         ];
 
-        const searchPersons = (input: string) => {
+        const searchPersons = lodash.debounce((input: string) => {
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");
@@ -75,7 +76,7 @@ export default defineComponent({
                     persons.value = listOfPersons;
                 });
             }
-        };
+        }, 300);
 
         const filterPersons = (): boolean => {
             return true;

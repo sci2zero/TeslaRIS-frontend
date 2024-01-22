@@ -81,19 +81,6 @@
                 {{ $t("requiredFieldsMessage") }}
             </p>
         </v-row>
-
-        <v-row justify="center">
-            <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="addConference(false)">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="addConference(true)">
-                    {{ $t("saveAndAddAnotherLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
     </v-form>
     <v-snackbar
         v-model="snackbar"
@@ -154,7 +141,7 @@ export default defineComponent({
             });
         })
 
-        const name = ref();
+        const name = ref([]);
         const nameAbbreviation = ref([]);
         const description = ref([]);
         const keywords = ref([]);

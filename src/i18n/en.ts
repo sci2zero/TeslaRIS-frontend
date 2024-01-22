@@ -93,5 +93,11 @@ export default {
     affiliationStatementLabel: "Affiliation Statement",
     contributionTypeLabel: "Contribution Type",
     contributionsLabel: "Contributions",
-    additionalFieldsLabel: "Additional Fields"
+    additionalFieldsLabel: "Additional Fields",
+    addPublisherLabel: "Add Publisher",
+    middleNameLabel: "Middle Name",
+    employmentPositionLabel: "Employment Position",
+    phoneNumberLabel: "Phone Number",
+    addPersonLabel: "Add Person",
+    sexLabel: "Sex"
 }

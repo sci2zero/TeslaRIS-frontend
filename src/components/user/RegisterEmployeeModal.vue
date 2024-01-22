@@ -96,6 +96,7 @@ import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import type { EmployeeRegistrationRequest } from "@/models/AuthenticationModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import lodash from "lodash";
 
 export default defineComponent({
     name: "RegisterEmployeeModal",
@@ -141,7 +142,7 @@ export default defineComponent({
             }
         ];
 
-        const searchOUs = (input: string) => {
+        const searchOUs = lodash.debounce((input: string) => {
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");
@@ -161,7 +162,7 @@ export default defineComponent({
                     organisationUnits.value = listOfOUs;
                 });
             }
-        }
+        }, 300);
 
         const filterOUs = (): boolean => {
             return true;

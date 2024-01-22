@@ -4,7 +4,7 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
-    <v-btn @click="addConference">
+    <v-btn color="primary" @click="addConference">
         {{ $t("addConferenceLabel") }}
     </v-btn>
     <br />

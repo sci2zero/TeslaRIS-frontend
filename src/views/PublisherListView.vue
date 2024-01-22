@@ -4,6 +4,9 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
+    <v-btn color="primary" @click="addPublisher">
+        {{ $t("addPublisherLabel") }}
+    </v-btn>
     <br />
     <br />
     <publisher-table-component :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
@@ -16,6 +19,7 @@ import PublisherService from '@/services/PublisherService';
 import PublisherTableComponent from '@/components/publisher/PublisherTableComponent.vue';
 import { ref } from 'vue';
 import type { PublisherIndex } from '@/models/PublisherModel';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "PublisherListView",
@@ -28,6 +32,8 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +51,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, publishers, totalPublishers, switchPage};
+        const addPublisher = () => {
+            router.push({name: "submitPublisher"});
+        }
+
+        return {search, publishers, totalPublishers, switchPage, addPublisher};
     }
 });
 </script>

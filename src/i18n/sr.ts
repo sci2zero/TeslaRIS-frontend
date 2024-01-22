@@ -93,5 +93,11 @@ export default {
     affiliationStatementLabel: "Izjava o pripadnosti",
     contributionTypeLabel: "Tip Kontribucije",
     contributionsLabel: "Kontribucije",
-    additionalFieldsLabel: "Dodatna polja"
+    additionalFieldsLabel: "Dodatna polja",
+    addPublisherLabel: "Dodaj izdavača",
+    middleNameLabel: "Srednje ime",
+    employmentPositionLabel: "Zvanje",
+    phoneNumberLabel: "Broj telefona",
+    addPersonLabel: "Dodaj osobu",
+    sexLabel: "Pol"
 }

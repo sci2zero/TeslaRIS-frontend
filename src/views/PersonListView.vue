@@ -4,6 +4,9 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
+    <v-btn color="primary" @click="addPerson">
+        {{ $t("addPersonLabel") }}
+    </v-btn>
     <br />
     <br />
     <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
@@ -16,6 +19,7 @@ import PersonService from '@/services/PersonService';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import { ref } from 'vue';
 import type { PersonIndex } from '@/models/PersonModel';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "PersonListView",
@@ -28,6 +32,8 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +51,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, persons, totalPersons, switchPage};
+        const addPerson = () => {
+            router.push({name: "submitPerson"});
+        }
+
+        return {search, persons, totalPersons, switchPage, addPerson};
     }
 });
 </script>

@@ -120,6 +120,7 @@ import type { UserUpdateRequest } from "@/models/UserModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import UserService from "@/services/UserService";
+import lodash from "lodash";
 
 export default defineComponent({
     name: "UserProfileForm",
@@ -234,7 +235,7 @@ export default defineComponent({
             })
         };
 
-        const searchOUs = (input: string) => {
+        const searchOUs = lodash.debounce((input: string) => {
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");
@@ -254,7 +255,7 @@ export default defineComponent({
                     organisationUnits.value = listOfOUs;
                 });
             }
-        };
+        }, 300);
 
         const filterOUs = (): boolean => {
             return true;
