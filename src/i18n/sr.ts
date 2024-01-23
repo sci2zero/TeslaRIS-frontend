@@ -88,7 +88,7 @@ export default {
     serialEventLabel: "Serijski događaj",
     eventYearLabel: "Godina Održavanja",
     dontKnowExactDateLabel: "Ne znam tačan datum",
-    rememberedDateLabel: "Setio sam se datuma",
+    knowExactDateLabel: "Znam tačan datum",
     requiredFieldsMessage: "Obavezna polja su označena sa *",
     affiliationStatementLabel: "Izjava o pripadnosti",
     contributionTypeLabel: "Tip Kontribucije",

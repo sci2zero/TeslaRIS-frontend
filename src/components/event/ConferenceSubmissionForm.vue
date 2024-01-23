@@ -27,7 +27,7 @@
                     </v-col>
                     <v-col>
                         <v-btn color="blue darken-1" compact @click="timePeriodInput = !timePeriodInput">
-                            {{ timePeriodInput ? $t("dontKnowExactDateLabel") : $t("rememberedDateLabel") }}
+                            {{ timePeriodInput ? $t("dontKnowExactDateLabel") : $t("knowExactDateLabel") }}
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -117,7 +117,7 @@ export default defineComponent({
     components: {MultilingualTextInput},
     setup() {
         const isFormValid = ref(false);
-        const timePeriodInput = ref(true);
+        const timePeriodInput = ref(false);
         const additionalFields = ref(false);
 
         const snackbar = ref(false);
@@ -149,7 +149,7 @@ export default defineComponent({
         const keywords = ref([]);
         const dateFrom = ref();
         const dateTo = ref();
-        const eventYear = ref(new Date().getFullYear());
+        const eventYear = ref();
         const state = ref();
         const place = ref([]);
         const conferenceNumber = ref("");
@@ -206,7 +206,7 @@ export default defineComponent({
                     conferenceNumber.value = "";
                     dateFrom.value = null;
                     dateTo.value = null;
-                    eventYear.value = new Date().getFullYear();
+                    eventYear.value = null;
                     state.value = null;
                     timePeriodInput.value = true;
 

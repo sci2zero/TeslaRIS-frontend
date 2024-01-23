@@ -88,7 +88,7 @@ export default {
     serialEventLabel: "Is serial event",
     eventYearLabel: "Year",
     dontKnowExactDateLabel: "I don't know the exact date",
-    rememberedDateLabel: "I remembered the date",
+    knowExactDateLabel: "I know the exact date",
     requiredFieldsMessage: "The required fields are marked with *",
     affiliationStatementLabel: "Affiliation Statement",
     contributionTypeLabel: "Contribution Type",
