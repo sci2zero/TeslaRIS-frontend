@@ -7,9 +7,6 @@
                         <v-text-field v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"></v-text-field>
                     </v-col>
                     <v-col>
-                        <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')"></v-text-field>
-                    </v-col>
-                    <v-col>
                         <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
                     </v-col>
                 </v-row>
@@ -32,6 +29,11 @@
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
+                    <v-row>
+                        <v-col>
+                            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')"></v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col>
                             <v-select
@@ -95,6 +97,19 @@
             </p>
         </v-row>
     </v-form>
+    <v-snackbar
+        v-model="snackbar"
+        :timeout="5000">
+        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        <template #actions>
+            <v-btn
+                color="blue"
+                variant="text"
+                @click="snackbar = false">
+                {{ $t("closeLabel") }}
+            </v-btn>
+        </template>
+    </v-snackbar>
 </template>
 
 <script lang="ts">
@@ -119,7 +134,9 @@ export default defineComponent({
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
+
         const snackbar = ref(false);
+        const error = ref(false);
 
         const router = useRouter();
         const i18n = useI18n();
@@ -295,14 +312,18 @@ export default defineComponent({
                     selectedOrganisationUnit.value = ouPlaceholder;
                     selectedEmploymentPosition.value = null;
                     
+                    error.value = false;
                     snackbar.value = true;
                 } else {
                     router.push({ name: "persons" });
                 }
+            }).catch(() => {
+                error.value = true;
+                snackbar.value = true;
             });
         };
 
-        return {isFormValid, additionalFields, snackbar,
+        return {isFormValid, additionalFields, snackbar, error,
             firstName, middleName, lastName, organisationUnits, selectedOrganisationUnit, searchOUs,
             email, birthdate, orcid, mnid, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submitPerson};

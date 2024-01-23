@@ -11,11 +11,12 @@
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchPersons($event)"
+                @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
     </v-row>
-    <multilingual-text-input :label="$t('descriptionLabel')" is-area @set-input="contributionDescription = $event"></multilingual-text-input>
-    <multilingual-text-input :label="$t('affiliationStatementLabel')" @set-input="affiliationStatement = $event"></multilingual-text-input>
+    <multilingual-text-input :label="$t('descriptionLabel')" is-area @set-input="contributionDescription = $event; sendContentToParent()"></multilingual-text-input>
+    <multilingual-text-input :label="$t('affiliationStatementLabel')" @set-input="affiliationStatement = $event; sendContentToParent()"></multilingual-text-input>
 </template>
 
 <script lang="ts">
@@ -31,7 +32,8 @@ import lodash from "lodash";
 export default defineComponent({
     name: "PersonContributionBase",
     components: {MultilingualTextInput},
-    setup() {
+    emits: ["setInput"],
+    setup(_, {emit}) {
         const contributionDescription = ref();
         const affiliationStatement = ref();
 
@@ -82,11 +84,21 @@ export default defineComponent({
             return true;
         };
 
+        const sendContentToParent = () => {
+            const returnObject = {
+                personId: selectedPerson.value.value,
+                description: contributionDescription.value,
+                affiliationStatement: affiliationStatement.value
+            };
+            emit("setInput", returnObject);
+        };
+
         return {persons, 
                 selectedPerson,
                 searchPersons, filterPersons,
                 requiredFieldRules, requiredSelectionRules,
-                contributionDescription, affiliationStatement};
+                contributionDescription, affiliationStatement,
+                sendContentToParent};
     }
 });
 </script>

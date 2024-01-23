@@ -119,7 +119,9 @@ export default defineComponent({
         const isFormValid = ref(false);
         const timePeriodInput = ref(true);
         const additionalFields = ref(false);
+
         const snackbar = ref(false);
+        const error = ref(false);
 
         const router = useRouter();
         const i18n = useI18n();
@@ -192,29 +194,33 @@ export default defineComponent({
                 place: place.value,
                 serialEvent: serialEvent.value
             }
-            EventService.createConference(newConference);
+            EventService.createConference(newConference).then(() => {
+                if (stayOnPage) {
+                    nameRef.value?.clearInput();
+                    abbreviationRef.value?.clearInput();
+                    placeRef.value?.clearInput();
+                    keywordsRef.value?.clearInput();
+                    descriptionRef.value?.clearInput();
+                    serialEvent.value = false;
+                    entryFee.value = "";
+                    conferenceNumber.value = "";
+                    dateFrom.value = null;
+                    dateTo.value = null;
+                    eventYear.value = new Date().getFullYear();
+                    state.value = null;
+                    timePeriodInput.value = true;
 
-            if (stayOnPage) {
-                nameRef.value?.clearInput();
-                abbreviationRef.value?.clearInput();
-                placeRef.value?.clearInput();
-                keywordsRef.value?.clearInput();
-                descriptionRef.value?.clearInput();
-                serialEvent.value = false;
-                entryFee.value = "";
-                conferenceNumber.value = "";
-                dateFrom.value = null;
-                dateTo.value = null;
-                eventYear.value = new Date().getFullYear();
-                state.value = null;
-                timePeriodInput.value = true;
-
+                    error.value = false;
+                    snackbar.value = true;
+                } else {
+                    // TODO: this should redirect to conference landing page
+                    router.push({ name: "events" });
+                }
+            }).catch(() => {
+                error.value = true;
                 snackbar.value = true;
-            } else {
-                // TODO: this should redirect to conference landing page
-                router.push({ name: "events" });
-            }
-        }
+            });
+        };
 
         return {isFormValid, additionalFields, snackbar,
             name, nameAbbreviation, description, keywords,

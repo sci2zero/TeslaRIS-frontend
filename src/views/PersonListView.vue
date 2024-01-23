@@ -4,7 +4,7 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
-    <v-btn color="primary" @click="addPerson">
+    <v-btn v-if="userRole === 'ADMIN' || userRole === 'INSTITUTIONAL_EDITOR'" color="primary" @click="addPerson">
         {{ $t("addPersonLabel") }}
     </v-btn>
     <br />
@@ -13,13 +13,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PersonService from '@/services/PersonService';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import { ref } from 'vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import { useRouter } from 'vue-router';
+import UserService from '@/services/UserService';
 
 export default defineComponent({
     name: "PersonListView",
@@ -34,6 +35,8 @@ export default defineComponent({
         const direction = ref("");
 
         const router = useRouter();
+
+        const userRole = computed(() => UserService.provideUserRole());
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -55,7 +58,7 @@ export default defineComponent({
             router.push({name: "submitPerson"});
         }
 
-        return {search, persons, totalPersons, switchPage, addPerson};
+        return {search, persons, totalPersons, switchPage, addPerson, userRole};
     }
 });
 </script>

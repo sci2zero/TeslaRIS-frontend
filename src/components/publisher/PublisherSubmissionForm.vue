@@ -29,7 +29,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ $t("savedMessage") }}
+        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -61,7 +61,9 @@ export default defineComponent({
     components: {MultilingualTextInput},
     setup() {
         const isFormValid = ref(false);
+
         const snackbar = ref(false);
+        const error = ref(false);
 
         const router = useRouter();
         const i18n = useI18n();
@@ -119,16 +121,20 @@ export default defineComponent({
                 state.value = null;
                 placeRef.value?.clearInput();
 
+                error.value = false;
                 snackbar.value = true;
             } else {
                 router.push({ name: "publishers" });
             }
+            }).catch(() => {
+                error.value = true;
+                snackbar.value = true;
             });
         };
 
         return {
             isFormValid,
-            snackbar,
+            snackbar, error,
             name, nameRef,
             state, countryList,
             place, placeRef,

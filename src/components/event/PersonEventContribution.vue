@@ -2,7 +2,7 @@
     <v-container v-for="(input, index) in inputs" :key="index" class="bg-blue-grey-lighten-5" style="margin-bottom: 20px;">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base></person-contribution-base>
+                <person-contribution-base @set-input="input.contribution = $event"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -18,9 +18,9 @@
         <v-row>
             <v-col>
                 <v-select
+                    v-model="input.contributionType"
                     :items="contributionTypes"
-                    :label="$t('contributionTypeLabel')"
-                    return-object>
+                    :label="$t('contributionTypeLabel')">
                 </v-select>
             </v-col>
         </v-row>
