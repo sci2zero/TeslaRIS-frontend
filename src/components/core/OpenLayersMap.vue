@@ -16,6 +16,7 @@ import { fromLonLat, toLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import lodash from "lodash";
+import TileJSON from 'ol/source/TileJSON.js';
 
 
 export default defineComponent({
@@ -40,12 +41,21 @@ export default defineComponent({
         });
 
         const initializeMap = (mapElement: any) => {
+
+            const adminBoundaryLayer = new TileLayer({
+                source: new TileJSON({
+                    url: 'https://maps.gnosis.earth/ogcapi/collections/NaturalEarth:cultural:ne_10m_admin_0_disputed_areas_scale_rank_minor_islands/map/tiles/WorldCRS84Quad?f=tilejson',
+                    crossOrigin: 'anonymous',
+                }),
+            });
+
             const olMap = new Map({
                 target: mapElement,
                 layers: [
                     new TileLayer({
                         source: new OSM(),
                     }),
+                    adminBoundaryLayer,
                     vectorLayer
                 ],
                 view: view
