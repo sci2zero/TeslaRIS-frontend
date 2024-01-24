@@ -99,5 +99,8 @@ export default {
     employmentPositionLabel: "Zvanje",
     phoneNumberLabel: "Broj telefona",
     addPersonLabel: "Dodaj osobu",
-    sexLabel: "Pol"
+    sexLabel: "Pol",
+    addressLabel: "Adresa",
+    addOULabel: "Dodaj organizacionu jedinicu",
+    addJournalLabel: "Dodaj časopis"
 }

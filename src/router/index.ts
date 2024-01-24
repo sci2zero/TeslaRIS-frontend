@@ -16,6 +16,8 @@ import UserProfileView from "@/views/UserProfileView.vue";
 import SubmitConferenceView from "@/views/SubmitConferenceView.vue";
 import SubmitPublisherView from "@/views/SubmitPublisherView.vue";
 import SubmitPersonView from "@/views/SubmitPersonView.vue";
+import SubmitOrganisationUnitView from "@/views/SubmitOrganisationUnitView.vue";
+import SubmitJournalView from "@/views/SubmitJournalView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -111,7 +113,25 @@ const router = createRouter({
                     component: SubmitPersonView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                        authorities: [roles.admin, roles.institutionalEditor],
+                    },
+                },
+                {
+                    path: "submit-journal",
+                    name: "submitJournal",
+                    component: SubmitJournalView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor],
+                    },
+                },
+                {
+                    path: "submit-organisation-unit",
+                    name: "submitOrganisationUnit",
+                    component: SubmitOrganisationUnitView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
                     },
                 },
                 {

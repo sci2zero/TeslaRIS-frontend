@@ -2,9 +2,11 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
+import type { OrganisationUnitRequest, OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 
 export class OrganisationUnitService extends BaseService {
+
+  private static idempotencyKey: string = super.generateIdempotencyKey();
 
   async getOUCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "organisation-unit/count");
@@ -12,6 +14,10 @@ export class OrganisationUnitService extends BaseService {
 
   async searchOUs(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
+  }
+
+  async createOrganisationUnit(body: OrganisationUnitRequest): Promise<AxiosResponse<OrganisationUnitRequest>> {
+    return super.sendRequest(axios.post, "organisation-unit", body, OrganisationUnitService.idempotencyKey);
   }
 
   async deleteOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<void>> {

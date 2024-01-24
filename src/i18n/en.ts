@@ -99,5 +99,8 @@ export default {
     employmentPositionLabel: "Employment Position",
     phoneNumberLabel: "Phone Number",
     addPersonLabel: "Add Person",
-    sexLabel: "Sex"
+    sexLabel: "Sex",
+    addressLabel: "Address",
+    addOULabel: "Add Organization Unit",
+    addJournalLabel: "Add Journal"
 }

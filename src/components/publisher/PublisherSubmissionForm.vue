@@ -57,7 +57,7 @@ import type { Publisher } from "@/models/PublisherModel";
 import PublisherService from "@/services/PublisherService";
 
 export default defineComponent({
-    name: "SubmitConferenceView",
+    name: "SubmitPublisher",
     components: {MultilingualTextInput},
     setup() {
         const isFormValid = ref(false);

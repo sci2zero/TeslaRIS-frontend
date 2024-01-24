@@ -44,8 +44,8 @@ export default defineComponent({
         const i18n = useI18n();
 
         const contributionTypesEn = [
-            {title: "Organization Board Chair", value: EventContributionType.ORGANIZATION_BOARD_CHAIR},
-            {title: "Organization Board Members", value: EventContributionType.ORGANIZATION_BOARD_MEMBER},
+            {title: "Organisation Board Chair", value: EventContributionType.ORGANIZATION_BOARD_CHAIR},
+            {title: "Organisation Board Members", value: EventContributionType.ORGANIZATION_BOARD_MEMBER},
             {title: "Panelists", value: EventContributionType.PANELISTS},
             {title: "Audience", value: EventContributionType.AUDIENCE},
             {title: "Programme Board Member", value: EventContributionType.PROGRAMME_BOARD_MEMBER},

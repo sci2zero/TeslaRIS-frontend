@@ -4,6 +4,9 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
+    <v-btn color="primary" @click="addOU">
+        {{ $t("addOULabel") }}
+    </v-btn>
     <br />
     <br />
     <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
@@ -16,6 +19,7 @@ import OrganisationUnitService from '@/services/OrganisationUnitService';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import { ref } from 'vue';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
@@ -28,6 +32,8 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +51,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, organisationUnits, totalOUs, switchPage};
+        const addOU = () => {
+            router.push({name: "submitOrganisationUnit"});
+        }
+
+        return {search, organisationUnits, totalOUs, switchPage, addOU};
     }
 });
 </script>
