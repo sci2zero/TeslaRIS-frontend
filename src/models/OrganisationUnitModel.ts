@@ -30,13 +30,13 @@ export interface OrganisationUnitRequest {
 //     superResearchArea?: ResearchArea;
 // }
 
-// interface Contact {
-//     contactEmail: string;
-//     phoneNumber: string;
-// }
+interface Contact {
+    contactEmail: string;
+    phoneNumber: string;
+}
 
-// interface GeoLocation {
-//     longitude: number;
-//     latitude: number;
-//     address?: string;
-// }
+interface GeoLocation {
+    longitude: number;
+    latitude: number;
+    address?: string;
+}

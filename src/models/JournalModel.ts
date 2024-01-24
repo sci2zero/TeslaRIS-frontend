@@ -15,7 +15,7 @@ export interface JournalIndex {
 export interface Journal {
     id?: number;
     title: MultilingualContent[];
-    eISSN?: string;
+    eissn: string;
     printISSN?: string;
     contributions?: PersonPublicationSeriesContribution[];
     languageTagIds: number[];

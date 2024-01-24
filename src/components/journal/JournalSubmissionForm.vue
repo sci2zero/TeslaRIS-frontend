@@ -121,7 +121,7 @@ export default defineComponent({
         const submitJournal = (stayOnPage: boolean) => {
             const newJournal: Journal = {
                 title: title.value,
-                eISSN: eIssn.value,
+                eissn: eIssn.value,
                 printISSN: printIssn.value,
                 languageTagIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value
