@@ -18,6 +18,7 @@ import SubmitPublisherView from "@/views/SubmitPublisherView.vue";
 import SubmitPersonView from "@/views/SubmitPersonView.vue";
 import SubmitOrganisationUnitView from "@/views/SubmitOrganisationUnitView.vue";
 import SubmitJournalView from "@/views/SubmitJournalView.vue";
+import SubmitJournalPublicationView from "@/views/SubmitJournalPublicationView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -117,15 +118,6 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "submit-journal",
-                    name: "submitJournal",
-                    component: SubmitJournalView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor],
-                    },
-                },
-                {
                     path: "submit-organisation-unit",
                     name: "submitOrganisationUnit",
                     component: SubmitOrganisationUnitView,
@@ -141,6 +133,24 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "submit-journal",
+                    name: "submitJournal",
+                    component: SubmitJournalView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-journal-publication",
+                    name: "submitJournalPublication",
+                    component: SubmitJournalPublicationView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                     },
                 },
                 {

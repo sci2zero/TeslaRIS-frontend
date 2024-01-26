@@ -4,6 +4,9 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
+    <v-btn color="primary" @click="addJournalPublication">
+        {{ $t("addJournalPublicationLabel") }}
+    </v-btn>
     <br />
     <br />
     <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
@@ -16,6 +19,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { ref } from 'vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "ScientificResultsListView",
@@ -28,6 +32,8 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +51,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, publications, totalPublications, switchPage};
+        const addJournalPublication = () => {
+            router.push({name: "submitJournalPublication"});
+        }
+
+        return {search, publications, totalPublications, switchPage, addJournalPublication};
     }
 });
 </script>

@@ -1,3 +1,6 @@
+import type { MultilingualContent } from "./Common";
+import type { PersonContribution } from "./PersonModel";
+
 export interface DocumentPublicationIndex {
     id: string;
     titleSr: string;
@@ -26,5 +29,53 @@ export interface DocumentPublicationIndex {
     journalId: number | null;
     databaseId: number | null;
     doi: string;
-  }
+}
   
+export enum JournalPublicationType {
+    REVIEW_ARTICLE,
+    RESEARCH_ARTICLE,
+    PREFACE,
+    COMMENT,
+    CORRECTION,
+    LEXICOGRAPHIC_UNIT,
+    POLEMICS,
+    SCIENTIFIC_CRITIC,
+}
+
+export interface Document {
+    id?: number;
+    title: MultilingualContent[];
+    subTitle: MultilingualContent[];
+    description: MultilingualContent[];
+    keywords: MultilingualContent[];
+    contributions?: PersonDocumentContribution[];
+    uris: string[];
+    documentDate?: string;
+    doi?: string;
+    scopusId?: string;
+    eventId?: number;
+}
+
+export interface JournalPublication extends Document {
+    journalPublicationType: JournalPublicationType;
+    startPage: string;
+    endPage: string;
+    numberOfPages: number;
+    articleNumber: string;
+    volume: string;
+    issue: string;
+    journalId: number;
+  }
+
+export interface PersonDocumentContribution extends PersonContribution {
+    contributionType: DocumentContributionType;
+    isMainContributor: boolean;
+    isCorrespondingContributor: boolean;
+}
+
+export enum DocumentContributionType {
+    AUTHOR,
+    EDITOR,
+    REVIEWER,
+    ADVISOR,
+}

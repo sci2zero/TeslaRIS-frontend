@@ -17,10 +17,10 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
-                        <v-col cols="5">
+                        <v-col cols="6">
                             <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN"></v-text-field>
                         </v-col>
-                        <v-col cols="5">
+                        <v-col cols="6">
                             <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN"></v-text-field>
                         </v-col>
                     </v-row>

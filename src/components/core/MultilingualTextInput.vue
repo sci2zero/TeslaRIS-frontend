@@ -19,10 +19,10 @@
         </v-col>
         <v-col cols="2">
             <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
-                -
+                <v-icon>mdi-delete</v-icon>
             </v-btn>
             <v-btn v-show="index === inputs.length - 1" icon @click="addInput">
-                +
+                <v-icon>mdi-plus</v-icon>
             </v-btn>
         </v-col>
     </v-row>
