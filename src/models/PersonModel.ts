@@ -50,14 +50,14 @@ interface Contact {
 }
 
 export interface PersonContribution {
-    personId?: number;
+    personId: number;
     contributionDescription: MultilingualContent[];
     orderNumber: number;
-    institutionIds: number[];
+    institutionIds?: number[];
     displayAffiliationStatement: MultilingualContent[];
-    personName: PersonName;
-    postalAddress: PostalAddress;
-    contact: Contact;
+    personName?: PersonName;
+    postalAddress?: PostalAddress;
+    contact?: Contact;
 }
 
 export enum EmploymentPosition {

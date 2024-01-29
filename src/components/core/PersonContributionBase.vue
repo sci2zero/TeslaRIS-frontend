@@ -34,8 +34,8 @@ export default defineComponent({
     components: {MultilingualTextInput},
     emits: ["setInput"],
     setup(_, {emit}) {
-        const contributionDescription = ref();
-        const affiliationStatement = ref();
+        const contributionDescription = ref([]);
+        const affiliationStatement = ref([]);
 
         const persons = ref<{ title: string, value: number }[]>([]);
         const personPlaceholder = {title: "", value: -1};
@@ -59,6 +59,9 @@ export default defineComponent({
         ];
 
         const searchPersons = lodash.debounce((input: string) => {
+            if (input.includes("|")) {
+                return;
+            }
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");

@@ -18,6 +18,7 @@
                         ></v-autocomplete>
                     </v-col>
                 </v-row>
+
                 <v-row v-if="selectedJournal.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
@@ -33,6 +34,7 @@
                 <v-row v-if="selectedJournal.value != -1 && myPublications.length == 0">
                     <v-col><h3>{{ $t("noRecentPublicationsLabel") }}</h3></v-col>
                 </v-row>
+
                 <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'" @set-input="title = $event"></multilingual-text-input>
@@ -43,6 +45,14 @@
                         <multilingual-text-input ref="subtitleRef" :label="$t('subtitleLabel')" @set-input="subtitle = $event"></multilingual-text-input>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-col>
+                        <h2>{{ $t("authorsLabel") }}</h2>
+                        <person-publication-contribution @set-input="contributions = $event"></person-publication-contribution>
+                    </v-col>
+                </v-row>
+
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -170,11 +180,12 @@ import type { EventIndex } from '@/models/EventModel';
 import type { DocumentPublicationIndex, JournalPublication } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
+import PersonPublicationContribution from './PersonPublicationContribution.vue';
 
 
 export default defineComponent({
     name: "SubmitJournal",
-    components: {MultilingualTextInput, UriInput},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -207,6 +218,7 @@ export default defineComponent({
         const description = ref([]);
         const keywords = ref([]);
         const place = ref([]);
+        const contributions = ref([]);
         const volume = ref("");
         const issue = ref("");
         const startPage = ref("");
@@ -322,11 +334,11 @@ export default defineComponent({
                 subTitle: subtitle.value,
                 uris: uris.value,
                 volume: volume.value,
-                contributions: [],
+                contributions: contributions.value,
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
-                eventId: selectedEvent.value.value
+                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value
             };
 
             DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
@@ -376,6 +388,7 @@ export default defineComponent({
             searchJournals, journals, selectedJournal, myPublications,
             searchEvents, events, selectedEvent, listPublications,
             publicationTypes, selectedpublicationType,
+            contributions,
             requiredFieldRules, requiredSelectionRules, submitJournalPublication
         };
     }

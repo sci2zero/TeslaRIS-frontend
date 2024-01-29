@@ -51,6 +51,8 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { useRouteStore } from "@/stores/routeStore";
+
 
 export default defineComponent(
     {
@@ -67,6 +69,8 @@ export default defineComponent(
             const i18n = useI18n();
             const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
             const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
+
+            const routeStore = useRouteStore();
 
             const emailFieldRules = [
                 (value: string) => {
@@ -90,6 +94,10 @@ export default defineComponent(
                     sessionStorage.setItem("refreshToken", response.data.refreshToken);
 
                     loginStore.emitLoginSuccess();
+                    if (routeStore.nextRoute != null) {
+                        router.push({ name: routeStore.fetchAndClearRoute() });
+                        return;
+                    }
                     router.push({ name: "home" });
                 }).catch(() => {
                     snackbar.value = true;

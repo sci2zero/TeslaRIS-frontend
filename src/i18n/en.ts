@@ -115,5 +115,7 @@ export default {
     numberOfPagesLabel: "Number of Pages",
     recentPublicationsLabel: "Your publications in this journal:",
     noRecentPublicationsLabel: "You don't have any publications in this journal yet.",
-    uriInputLabel: "Available on"
+    uriInputLabel: "Available on",
+    mainContributorLabel: "Is Main Contributor",
+    authorsLabel: "Authors"
 }

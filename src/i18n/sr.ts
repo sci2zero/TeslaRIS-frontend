@@ -115,5 +115,7 @@ export default {
     numberOfPagesLabel: "Broj strana",
     recentPublicationsLabel: "Vaše publikacije u ovom časopisu:",
     noRecentPublicationsLabel: "Nemate ni jednu publikaciju u ovom časopisu.",
-    uriInputLabel: "Dostupno na"
+    uriInputLabel: "Dostupno na",
+    mainContributorLabel: "Glavni kontributor",
+    authorsLabel: "Autori"
 }

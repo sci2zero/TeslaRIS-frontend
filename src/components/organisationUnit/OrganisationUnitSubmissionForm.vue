@@ -113,8 +113,6 @@ export default defineComponent({
                 contact: {contactEmail: email.value, phoneNumber: phoneNumber.value}
             };
 
-            console.log(newOu)
-
             OrganisationUnitService.createOrganisationUnit(newOu).then(() => {
                 if (stayOnPage) {
                     nameRef.value?.clearInput();

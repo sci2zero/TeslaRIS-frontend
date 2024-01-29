@@ -14,6 +14,9 @@ import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRouter } from "vue-router";
 import { useLoginStore } from '@/stores/loginStore';
+import { jwtDecode } from "jwt-decode";
+import i18n, {defaultLocale, supportedLocales} from './i18n';
+import { useRouteStore } from "./stores/routeStore";
 
 export default defineComponent({
     name: "App",
@@ -21,6 +24,47 @@ export default defineComponent({
     beforeMount() {
         const router = useRouter();
         const loginStore = useLoginStore();
+        const routeStore = useRouteStore();
+
+        router.beforeEach((to: any, from: any, next: any) => {
+            const newLocale: string = to.params.locale;
+            const prevLocale: string = from.params.locale;
+
+            if (!supportedLocales.includes(newLocale)) {
+                next({ name: to.name, params: { locale: defaultLocale } });
+                return;
+            }
+
+            if (newLocale !== prevLocale) {
+                i18n.setLocale(newLocale);
+            }
+
+            const { authenticated, authorities } = to.meta;
+        
+            if (authenticated) {
+                const jwt = sessionStorage.getItem("jwt");
+                if (jwt) {
+                    const decodedToken: any = jwtDecode(jwt);
+                    if (
+                        authorities.some((authority: string) =>
+                            decodedToken.role === authority
+                        )
+                    ) {
+                        next();
+                    } else {
+                        next({ name: "login", params: { locale: newLocale } });
+                        routeStore.setRoute(to.name);
+                    }
+                } else {
+                    next({ name: "login", params: { locale: newLocale } });
+                    if (from.name !== to.name) {
+                        routeStore.setRoute(to.name);
+                    }
+                }
+            } else {
+                next();
+            }
+        });
 
         // Configure axios to always include JWT and JWT-fingerprint when sending a request
         axios.defaults.withCredentials = true;
