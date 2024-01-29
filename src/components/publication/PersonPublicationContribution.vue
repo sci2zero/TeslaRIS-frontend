@@ -74,6 +74,10 @@ export default defineComponent({
             inputs.value.splice(index, 1);
         };
 
+        const clearInput = () => {
+            inputs.value = [{contribution: {}, contributionType:  DocumentContributionType.AUTHOR, isMainContributor: true}];
+        };
+
         const sendContentToParent = () => {
             const returnObject: PersonDocumentContribution[] = [];
             inputs.value.forEach((input, index) => {
@@ -88,7 +92,7 @@ export default defineComponent({
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent}
+        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent, clearInput}
     }
 });
 </script>

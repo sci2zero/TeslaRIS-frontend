@@ -4,7 +4,7 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
-    <v-btn color="primary" @click="addOU">
+    <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
         {{ $t("addOULabel") }}
     </v-btn>
     <br />
@@ -20,6 +20,7 @@ import OrganisationUnitTableComponent from '@/components/organisationUnit/Organi
 import { ref } from 'vue';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { useRouter } from 'vue-router';
+import UserService from '@/services/UserService';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
@@ -34,6 +35,7 @@ export default defineComponent({
         const direction = ref("");
 
         const router = useRouter();
+        const userRole = UserService.provideUserRole();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -55,7 +57,7 @@ export default defineComponent({
             router.push({name: "submitOrganisationUnit"});
         }
 
-        return {search, organisationUnits, totalOUs, switchPage, addOU};
+        return {search, organisationUnits, totalOUs, switchPage, addOU, userRole};
     }
 });
 </script>

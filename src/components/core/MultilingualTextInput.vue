@@ -144,7 +144,6 @@ export default defineComponent({
                                 languageTagId: input.language.value, 
                                 priority: inputs.value.length - index});
             });
-            console.log(returnObject)
             emit("setInput", returnObject);
         };
 

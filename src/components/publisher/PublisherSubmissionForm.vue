@@ -100,11 +100,26 @@ export default defineComponent({
         ];
 
         const submitPublisher = (stayOnPage: boolean) => {
-            let multilingualState: MultilingualContent[] = [];
+            const multilingualState: MultilingualContent[] = [];
             if (state.value) {
+                let stateContentIndex = -1;
+                if (i18n.locale.value === "en") {
+                    stateContentIndex = countriesEn.findIndex(obj => obj === state.value);
+                } else {
+                    stateContentIndex = countriesSr.findIndex(obj => obj === state.value);
+                }
+
                 languageList.value?.forEach((language: LanguageTagResponse) => {
-                    if (language.languageCode === i18n.locale.value.toUpperCase()) {
-                        multilingualState = [{content: state.value, languageTag: i18n.locale.value.toUpperCase(), languageTagId: language.id, priority: 1}];
+                    let content = "";
+                    switch (language.languageCode) {
+                        case "SR":
+                            content = countriesSr[stateContentIndex];
+                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 1});
+                            break;
+                        case "EN":
+                            content = countriesEn[stateContentIndex];
+                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 2});
+                            break;
                     }
                 });
             }

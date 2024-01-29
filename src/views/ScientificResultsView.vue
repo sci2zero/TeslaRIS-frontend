@@ -4,7 +4,7 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
-    <v-btn color="primary" @click="addJournalPublication">
+    <v-btn v-if="userRole" color="primary" @click="addJournalPublication">
         {{ $t("addJournalPublicationLabel") }}
     </v-btn>
     <br />
@@ -20,6 +20,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import { ref } from 'vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import { useRouter } from 'vue-router';
+import UserService from '@/services/UserService';
 
 export default defineComponent({
     name: "ScientificResultsListView",
@@ -34,6 +35,7 @@ export default defineComponent({
         const direction = ref("");
 
         const router = useRouter();
+        const userRole = UserService.provideUserRole();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -55,7 +57,7 @@ export default defineComponent({
             router.push({name: "submitJournalPublication"});
         }
 
-        return {search, publications, totalPublications, switchPage, addJournalPublication};
+        return {search, publications, totalPublications, switchPage, addJournalPublication, userRole};
     }
 });
 </script>

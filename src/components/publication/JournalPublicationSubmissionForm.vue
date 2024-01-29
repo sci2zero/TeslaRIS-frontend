@@ -49,7 +49,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -202,6 +202,7 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
+        const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
 
         const journals = ref<{ title: string; value: number; }[]>([]);
@@ -270,6 +271,9 @@ export default defineComponent({
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
 
         const searchJournals = lodash.debounce((input: string) => {
+            if (input.includes("|")) {
+                return;
+            }
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");
@@ -298,6 +302,9 @@ export default defineComponent({
         };
 
         const searchEvents = lodash.debounce((input: string) => {
+            if (input.includes("|")) {
+                return;
+            }
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");
@@ -349,6 +356,7 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
+                    contributionsRef.value?.clearInput();
                     selectedJournal.value = searchPlaceholder;
                     selectedEvent.value = searchPlaceholder;
                     selectedpublicationType.value = {title: "", value: null};
@@ -388,7 +396,7 @@ export default defineComponent({
             searchJournals, journals, selectedJournal, myPublications,
             searchEvents, events, selectedEvent, listPublications,
             publicationTypes, selectedpublicationType,
-            contributions,
+            contributions, contributionsRef,
             requiredFieldRules, requiredSelectionRules, submitJournalPublication
         };
     }

@@ -15,8 +15,8 @@
             ></v-autocomplete>
         </v-col>
     </v-row>
-    <multilingual-text-input :label="$t('descriptionLabel')" is-area @set-input="contributionDescription = $event; sendContentToParent()"></multilingual-text-input>
-    <multilingual-text-input :label="$t('affiliationStatementLabel')" @set-input="affiliationStatement = $event; sendContentToParent()"></multilingual-text-input>
+    <multilingual-text-input ref="descriptionRef" :label="$t('descriptionLabel')" is-area @set-input="contributionDescription = $event; sendContentToParent()"></multilingual-text-input>
+    <multilingual-text-input ref="affiliationStatementRef" :label="$t('affiliationStatementLabel')" @set-input="affiliationStatement = $event; sendContentToParent()"></multilingual-text-input>
 </template>
 
 <script lang="ts">
@@ -36,6 +36,9 @@ export default defineComponent({
     setup(_, {emit}) {
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
+
+        const descriptionRef = ref<typeof MultilingualTextInput>();
+        const affiliationStatementRef = ref<typeof MultilingualTextInput>();
 
         const persons = ref<{ title: string, value: number }[]>([]);
         const personPlaceholder = {title: "", value: -1};
@@ -96,12 +99,19 @@ export default defineComponent({
             emit("setInput", returnObject);
         };
 
+        const clearInput = () => {
+            selectedPerson.value = personPlaceholder;
+            descriptionRef.value?.clearInput();
+            affiliationStatementRef.value?.clearInput();
+        };
+
         return {persons, 
                 selectedPerson,
                 searchPersons, filterPersons,
                 requiredFieldRules, requiredSelectionRules,
                 contributionDescription, affiliationStatement,
-                sendContentToParent};
+                sendContentToParent, clearInput,
+                descriptionRef, affiliationStatementRef};
     }
 });
 </script>
