@@ -14,7 +14,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                        <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
