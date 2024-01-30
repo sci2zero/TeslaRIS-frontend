@@ -64,6 +64,7 @@ export default {
     journalListLabel: "Časopisi",
     journalLabel: "Časopis",
     publisherListLabel: "Izdavači",
+    publisherLabel: "Izdavač",
     advancedSearchLabel: "Napredna Pretraga",
     saveLabel: "Sačuvaj",
     saveAndAddAnotherLabel: "Sačuvaj i dodaj novo",
@@ -117,5 +118,9 @@ export default {
     noRecentPublicationsLabel: "Nemate ni jednu publikaciju u ovom časopisu.",
     uriInputLabel: "Dostupno na",
     mainContributorLabel: "Glavni kontributor",
-    authorsLabel: "Autori"
+    authorsLabel: "Autori",
+    addProceedingsLabel: "Dodaj zbornik radova",
+    publicationSeriesLabel: "Serija publikacija",
+    publicationSeriesVolumeLabel: "Sveska u seriji publikacija",
+    publicationSeriesIssueLabel: "Izdanje u seriji publikacija"
 }

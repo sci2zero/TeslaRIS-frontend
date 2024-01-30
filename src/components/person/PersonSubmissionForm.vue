@@ -10,21 +10,9 @@
                         <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-autocomplete
-                            v-model="selectedOrganisationUnit"
-                            :label="$t('organisationUnitLabel') + '*'"
-                            :items="organisationUnits"
-                            :custom-filter="(() => true)"
-                            :auto-select-first="true"
-                            :rules="requiredSelectionRules"
-                            :no-data-text="$t('noDataMessage')"
-                            return-object
-                            @update:search="searchOUs($event)"
-                        ></v-autocomplete>
-                    </v-col>
-                </v-row>
+                <v-col cols="12">
+                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" required @set-input="selectedOrganisationUnit = $event"></organisation-unit-autocomplete-search>
+                </v-col>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -123,14 +111,14 @@ import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import OrganisationUnitService from '@/services/OrganisationUnitService';
-import lodash from "lodash";
-import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { EmploymentPosition, Sex } from "@/models/PersonModel";
 import type { BasicPerson } from "@/models/PersonModel";
+import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+
 
 export default defineComponent({
     name: "PersonSubmissionForm",
+    components: { OrganisationUnitAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -153,9 +141,9 @@ export default defineComponent({
         const firstName = ref("");
         const middleName = ref("");
         const lastName = ref("");
-        const organisationUnits = ref<{ title: string, value: number }[]>([]);
-        const ouPlaceholder = {title: "", value: -1};
-        const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
+
+        const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
         const email = ref("");
         const phoneNumber = ref("");
@@ -178,28 +166,6 @@ export default defineComponent({
                 return true;
             }
         ];
-
-        const searchOUs = lodash.debounce((input: string) => {
-            if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params).then((response) => {
-                    const listOfOUs: { title: string, value: number }[] = [];
-                    response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfOUs.push({title: organisationUnit.nameSr, value: organisationUnit.databaseId});
-                        } else {
-                            listOfOUs.push({title: organisationUnit.nameOther, value: organisationUnit.databaseId});
-                        }
-                    })
-                    organisationUnits.value = listOfOUs;
-                });
-            }
-        }, 300);
 
         const employmentPositionsEn = [
             { title: "Scientific Advisor", value: EmploymentPosition.SCIENTIFIC_ADVISOR },
@@ -309,7 +275,7 @@ export default defineComponent({
                     orcid.value = "";
                     scopus.value = "";
                     selectedSex.value = null;
-                    selectedOrganisationUnit.value = ouPlaceholder;
+                    ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = null;
                     
                     error.value = false;
@@ -324,7 +290,7 @@ export default defineComponent({
         };
 
         return {isFormValid, additionalFields, snackbar, error,
-            firstName, middleName, lastName, organisationUnits, selectedOrganisationUnit, searchOUs,
+            firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef,
             email, birthdate, orcid, mnid, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submitPerson};
     }

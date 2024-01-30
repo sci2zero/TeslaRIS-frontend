@@ -64,6 +64,7 @@ export default {
     journalListLabel: "Journals",
     journalLabel: "Journal",
     publisherListLabel: "Publishers",
+    publisherLabel: "Publisher",
     advancedSearchLabel: "Advanced Search",
     saveLabel: "Save",
     saveAndAddAnotherLabel: "Save and Add Another",
@@ -117,5 +118,9 @@ export default {
     noRecentPublicationsLabel: "You don't have any publications in this journal yet.",
     uriInputLabel: "Available on",
     mainContributorLabel: "Is Main Contributor",
-    authorsLabel: "Authors"
+    authorsLabel: "Authors",
+    addProceedingsLabel: "Add Proceedings",
+    publicationSeriesLabel: "Publication Series",
+    publicationSeriesVolumeLabel: "Publication Series Volume",
+    publicationSeriesIssueLabel: "Publication Series Issue"
 }

@@ -1,16 +1,16 @@
 <template>
     <v-row v-for="(uri, index) in uris" :key="index">
-        <v-col cols="9">
+        <v-col cols="10">
             <v-text-field
                 v-model="uri.value" :label="$t('uriInputLabel')" placeholder="URI" outlined
                 @input="sendContentToParent"></v-text-field>
         </v-col>
-        <v-col cols="3">
-            <v-btn icon @click="addUri">
-                <v-icon>mdi-plus</v-icon>
-            </v-btn>
+        <v-col cols="2">
             <v-btn v-if="index > 0" icon @click="removeUri(index)">
                 <v-icon>mdi-delete</v-icon>
+            </v-btn>
+            <v-btn icon @click="addUri">
+                <v-icon>mdi-plus</v-icon>
             </v-btn>
         </v-col>
     </v-row>

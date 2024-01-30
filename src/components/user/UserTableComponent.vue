@@ -11,7 +11,12 @@
             <tr>
                 <td>{{ row.item.fullName }}</td>
                 <td>{{ row.item.email }}</td>
-                <td>{{ row.item.organisationUnitNameSr }}</td>
+                <td v-if="$i18n.locale == 'sr'">
+                    {{ row.item.organisationUnitNameSr }}
+                </td>
+                <td v-if="$i18n.locale == 'en'">
+                    {{ row.item.organisationUnitNameOther }}
+                </td>
                 <td>{{ row.item.userRole }}</td>
                 <td>
                     <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">

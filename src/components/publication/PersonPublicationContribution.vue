@@ -2,7 +2,7 @@
     <v-container v-for="(input, index) in inputs" :key="index" class="bg-blue-grey-lighten-5" style="margin-bottom: 20px;">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -47,6 +47,7 @@ export default defineComponent({
     emits: ["setInput"],
     setup(_, {emit}) {
         const inputs = ref<any[]>([{contributionType:  DocumentContributionType.AUTHOR, isMainContributor: true}]);
+        const baseContributionRef = ref<any>([]);
 
         const i18n = useI18n();
 
@@ -76,6 +77,10 @@ export default defineComponent({
 
         const clearInput = () => {
             inputs.value = [{contribution: {}, contributionType:  DocumentContributionType.AUTHOR, isMainContributor: true}];
+            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+                ref.clearInput();
+            });
+            sendContentToParent();
         };
 
         const sendContentToParent = () => {
@@ -92,7 +97,7 @@ export default defineComponent({
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent, clearInput}
+        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent, baseContributionRef, clearInput}
     }
 });
 </script>

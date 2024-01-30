@@ -19,6 +19,7 @@ import SubmitPersonView from "@/views/SubmitPersonView.vue";
 import SubmitOrganisationUnitView from "@/views/SubmitOrganisationUnitView.vue";
 import SubmitJournalView from "@/views/SubmitJournalView.vue";
 import SubmitJournalPublicationView from "@/views/SubmitJournalPublicationView.vue";
+import SubmitProceedingsView from "@/views/SubmitProceedingsView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -187,6 +188,15 @@ const router = createRouter({
                     meta: {
                         authenticated: false,
                         authorities: [],
+                    },
+                },
+                {
+                    path: "submit-proceedings",
+                    name: "submitProceedings",
+                    component: SubmitProceedingsView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                     },
                 },
                 {

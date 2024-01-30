@@ -4,18 +4,7 @@
             <v-col cols="10">
                 <v-row>
                     <v-col cols="10">
-                        <v-autocomplete
-                            v-model="selectedJournal"
-                            :label="$t('journalListLabel') + '*'"
-                            :items="journals"
-                            :custom-filter="((): boolean => true)"
-                            :auto-select-first="true"
-                            :rules="requiredSelectionRules"
-                            :no-data-text="$t('noDataMessage')"
-                            return-object
-                            @update:search="searchJournals($event)"
-                            @update:model-value="listPublications($event)"
-                        ></v-autocomplete>
+                        <journal-autocomplete-search ref="journalAutocompleteRef" required @set-input="selectedJournal = $event; listPublications($event);"></journal-autocomplete-search>
                     </v-col>
                 </v-row>
 
@@ -128,16 +117,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-autocomplete
-                                v-model="selectedEvent"
-                                :label="$t('eventLabel')"
-                                :items="events"
-                                :custom-filter="((): boolean => true)"
-                                :auto-select-first="true"
-                                :no-data-text="$t('noDataMessage')"
-                                return-object
-                                @update:search="searchEvents($event)"
-                            ></v-autocomplete>
+                            <event-autocomplete-search ref="eventAutocompleteRef" @set-input="selectedEvent = $event"></event-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -172,11 +152,8 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { JournalPublicationType } from "@/models/PublicationModel";
-import type { JournalIndex } from "@/models/JournalModel";
-import JournalService from '@/services/JournalService';
-import lodash from "lodash";
-import EventService from '@/services/EventService';
-import type { EventIndex } from '@/models/EventModel';
+import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
+import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import type { DocumentPublicationIndex, JournalPublication } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
@@ -185,7 +162,7 @@ import PersonPublicationContribution from './PersonPublicationContribution.vue';
 
 export default defineComponent({
     name: "SubmitJournal",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, JournalAutocompleteSearch},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -194,8 +171,6 @@ export default defineComponent({
         const error = ref(false);
 
         const router = useRouter();
-        const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
@@ -205,11 +180,11 @@ export default defineComponent({
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
 
-        const journals = ref<{ title: string; value: number; }[]>([]);
+        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
+        const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
+
         const searchPlaceholder = {title: "", value: -1};
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
-
-        const events = ref<{ title: string; value: number; }[]>([]);
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const myPublications = ref<DocumentPublicationIndex[]>([]);
@@ -231,16 +206,11 @@ export default defineComponent({
         const numberOfPages = ref();
         const uris = ref<string[]>([]);
 
+        const i18n = useI18n();
+        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
         const requiredFieldRules = [
             (value: string) => {
                 if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
                 return true;
             }
         ];
@@ -270,61 +240,11 @@ export default defineComponent({
         const publicationTypes = computed((): { title: string, value: JournalPublicationType | null }[] => i18n.locale.value === "sr" ? journalPublicationTypeSr : journalPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
 
-        const searchJournals = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
-                return;
-            }
-            if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
-                JournalService.searchJournals(params).then((response) => {
-                    const listOfJournals: { title: string, value: number }[] = [];
-                    response.data.content.forEach((journal: JournalIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfJournals.push({title: journal.titleSr, value: journal.databaseId});
-                        } else {
-                            listOfJournals.push({title: journal.titleOther, value: journal.databaseId});
-                        }
-                    })
-                    journals.value = listOfJournals;
-                });
-            }
-        }, 300);
-
         const listPublications = (journal: { title: string, value: number }) => {
             DocumentPublicationService.findMyPublicationsInJournal(journal.value).then((response) => {
                 myPublications.value = response.data;
             });
         };
-
-        const searchEvents = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
-                return;
-            }
-            if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
-                EventService.searchConferences(params).then((response) => {
-                    const listOfEvents: { title: string, value: number }[] = [];
-                    response.data.content.forEach((conference: EventIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfEvents.push({title: conference.nameSr, value: conference.databaseId});
-                        } else {
-                            listOfEvents.push({title: conference.nameOther, value: conference.databaseId});
-                        }
-                    })
-                    events.value = listOfEvents;
-                });
-            }
-        }, 300);
 
         const submitJournalPublication = (stayOnPage: boolean) => {
             const newJournalPublication: JournalPublication = {
@@ -357,8 +277,8 @@ export default defineComponent({
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
-                    selectedJournal.value = searchPlaceholder;
-                    selectedEvent.value = searchPlaceholder;
+                    eventAutocompleteRef.value?.clearInput();
+                    journalAutocompleteRef.value?.clearInput();
                     selectedpublicationType.value = {title: "", value: null};
                     volume.value = "";
                     issue.value = "";
@@ -393,11 +313,11 @@ export default defineComponent({
             description, descriptionRef,
             keywords, keywordsRef,
             place, placeRef, uris, urisRef,
-            searchJournals, journals, selectedJournal, myPublications,
-            searchEvents, events, selectedEvent, listPublications,
+            selectedJournal, journalAutocompleteRef, myPublications,
+            selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType,
             contributions, contributionsRef,
-            requiredFieldRules, requiredSelectionRules, submitJournalPublication
+            requiredFieldRules, submitJournalPublication
         };
     }
 });

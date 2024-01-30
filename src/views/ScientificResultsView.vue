@@ -7,6 +7,9 @@
     <v-btn v-if="userRole" color="primary" @click="addJournalPublication">
         {{ $t("addJournalPublicationLabel") }}
     </v-btn>
+    <v-btn v-if="userRole" color="primary" @click="addProceedings">
+        {{ $t("addProceedingsLabel") }}
+    </v-btn>
     <br />
     <br />
     <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
@@ -57,7 +60,11 @@ export default defineComponent({
             router.push({name: "submitJournalPublication"});
         }
 
-        return {search, publications, totalPublications, switchPage, addJournalPublication, userRole};
+        const addProceedings = () => {
+            router.push({name: "submitProceedings"});
+        }
+
+        return {search, publications, totalPublications, switchPage, addJournalPublication, addProceedings, userRole};
     }
 });
 </script>

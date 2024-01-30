@@ -45,16 +45,7 @@
                                     ></v-select>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-autocomplete
-                                        v-model="selectedOrganisationUnit"
-                                        :label="$t('organisationUnitLabel') + '*'"
-                                        :items="organisationUnits"
-                                        :custom-filter="filterOUs"
-                                        :auto-select-first="true"
-                                        :rules="requiredSelectionRules"
-                                        :no-data-text="$t('noDataMessage')"
-                                        @update:search="searchOUs($event)"
-                                    ></v-autocomplete>
+                                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" required @set-input="selectedOrganisationUnit = $event"></organisation-unit-autocomplete-search>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-textarea
@@ -90,20 +81,19 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import LanguageService from "@/services/LanguageService";
-import OrganisationUnitService from "@/services/OrganisationUnitService";
 import AuthenticationService from "@/services/AuthenticationService";
 import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageResponse } from "@/models/Common";
-import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import type { EmployeeRegistrationRequest } from "@/models/AuthenticationModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
-import lodash from "lodash";
+import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 
 
 export default defineComponent({
     name: "RegisterEmployeeModal",
+    components: { OrganisationUnitAutocompleteSearch },
     emits: ["success", "failure"],
     setup(_, {emit}) {
         const dialog = ref(false);
@@ -115,9 +105,9 @@ export default defineComponent({
         const note = ref("")
         const languages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number } | number>({title: "SR", value: -1});
-        const organisationUnits = ref<{ title: string, value: number }[]>([]);
-        const ouPlaceholder = {title: "", value: -1};
-        const selectedOrganisationUnit = ref<{ title: string, value: number } | number>(ouPlaceholder);
+
+        const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
         const i18n = useI18n();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
@@ -146,32 +136,6 @@ export default defineComponent({
             }
         ];
 
-        const searchOUs = lodash.debounce((input: string) => {
-            if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params).then((response) => {
-                    const listOfOUs: { title: string, value: number }[] = [];
-                    response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfOUs.push({title: organisationUnit.nameSr, value: organisationUnit.databaseId});
-                        } else {
-                            listOfOUs.push({title: organisationUnit.nameOther, value: organisationUnit.databaseId});
-                        }
-                    })
-                    organisationUnits.value = listOfOUs;
-                });
-            }
-        }, 300);
-
-        const filterOUs = (): boolean => {
-            return true;
-        }
-
         const registerEmployee = (stayOnPage: boolean) => {
             const newEmployee: EmployeeRegistrationRequest = {
                 name: name.value,
@@ -179,7 +143,7 @@ export default defineComponent({
                 email: email.value,
                 note: note.value,
                 preferredLanguageId: selectedLanguage.value as number,
-                organisationUnitId: selectedOrganisationUnit.value as number
+                organisationUnitId: selectedOrganisationUnit.value.value
             }
             AuthenticationService.registerEmployee(newEmployee).then(() => {
                 emit("success");
@@ -187,7 +151,7 @@ export default defineComponent({
                 surname.value = "";
                 email.value = "";
                 note.value = "";
-                selectedOrganisationUnit.value = ouPlaceholder;
+                ouAutocompleteRef.value?.clearInput();
                 if (!stayOnPage) {
                     dialog.value = false;   
                 }
@@ -212,11 +176,10 @@ export default defineComponent({
         return {dialog, 
                 name, 
                 surname, 
-                organisationUnits, 
+                ouAutocompleteRef, 
                 selectedOrganisationUnit, 
                 email, note,
                 languages, selectedLanguage, 
-                searchOUs, filterOUs, 
                 registerEmployee, 
                 emailFieldRules, requiredFieldRules, requiredSelectionRules,
                 isFormValid};
