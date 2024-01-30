@@ -1,7 +1,7 @@
 <template>
-    <v-flex class="text-center">
+    <v-sheet class="text-center">
         <h1>{{ $t("addProceedingsLabel") }}</h1>
-    </v-flex>
+    </v-sheet>
     <br />
     <br />
     <proceedings-submission-form ref="submissionFormRef"></proceedings-submission-form>

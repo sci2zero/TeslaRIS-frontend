@@ -8,24 +8,34 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="subtitleRef" :label="$t('subtitleLabel')" @set-input="subtitle = $event"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="placeRef" :label="$t('placeLabel')" @set-input="place = $event"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
                     <v-col cols="10">
-                        <event-autocomplete-search ref="eventAutocompleteRef" @set-input="selectedEvent = $event"></event-autocomplete-search>
+                        <event-autocomplete-search ref="eventAutocompleteRef" @set-input="selectedEvent = $event; setPublicationYear($event.date);"></event-autocomplete-search>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <publisher-autocomplete-search ref="publisherAutocompleteRef" @set-input="selectedPublisher = $event"></publisher-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input ref="subtitleRef" :label="$t('subtitleLabel')" @set-input="subtitle = $event"></multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input ref="placeRef" :label="$t('placeLabel')" @set-input="place = $event"></multilingual-text-input>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col cols="10">
                             <v-select
@@ -78,11 +88,6 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
-                            <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col cols="6">
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
                         </v-col>
@@ -93,11 +98,6 @@
                     <v-row>
                         <v-col cols="12">
                             <journal-autocomplete-search ref="journalAutocompleteRef" @set-input="selectedJournal = $event"></journal-autocomplete-search>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <publisher-autocomplete-search ref="publisherAutocompleteRef" @set-input="selectedPublisher = $event"></publisher-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -244,6 +244,13 @@ export default defineComponent({
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? publicationTypeSr : publicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
 
+        const setPublicationYear = (date: string) => {
+            const year = /\d{4}/.exec(date);
+            if (year) {
+                publicationYear.value = year[0];
+            }
+        };
+
         const submitProceedings = (stayOnPage: boolean) => {
             const newProceedings: Proceedings = {
                 description: description.value,
@@ -299,7 +306,7 @@ export default defineComponent({
             description, descriptionRef,
             publicationYear, doi, scopus,
             articleNumber, numberOfPages,
-            keywords, keywordsRef,
+            keywords, keywordsRef, setPublicationYear,
             publicationSeriesVolume, publicationSeriesIssue,
             publisherAutocompleteRef, selectedPublisher,
             publicationTypes, selectedpublicationType,

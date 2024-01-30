@@ -1,7 +1,7 @@
 <template>
-    <v-flex class="text-center">
+    <v-sheet class="text-center">
         <h1>{{ $t("addConferenceLabel") }}</h1>
-    </v-flex>
+    </v-sheet>
     <br />
     <br />
     <conference-submission-form ref="submissionFormRef"></conference-submission-form>

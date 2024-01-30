@@ -1,7 +1,7 @@
 <template>
-    <v-flex class="text-center">
+    <v-sheet class="text-center">
         <h1>{{ $t("addOULabel") }}</h1>
-    </v-flex>
+    </v-sheet>
     <br />
     <br />
     <organisation-unit-submission-form ref="submissionFormRef"></organisation-unit-submission-form>

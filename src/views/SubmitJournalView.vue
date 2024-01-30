@@ -1,7 +1,7 @@
 <template>
-    <v-flex class="text-center">
+    <v-sheet class="text-center">
         <h1>{{ $t("addJournalLabel") }}</h1>
-    </v-flex>
+    </v-sheet>
     <br />
     <br />
     <journal-submission-form ref="submissionFormRef"></journal-submission-form>

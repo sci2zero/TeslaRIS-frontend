@@ -7,7 +7,7 @@
     <v-btn v-if="userRole" color="primary" @click="addJournalPublication">
         {{ $t("addJournalPublicationLabel") }}
     </v-btn>
-    <v-btn v-if="userRole" color="primary" @click="addProceedings">
+    <v-btn v-if="userRole" color="primary" style="margin-left: 10px;" @click="addProceedings">
         {{ $t("addProceedingsLabel") }}
     </v-btn>
     <br />

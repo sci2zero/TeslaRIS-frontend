@@ -29,7 +29,7 @@ export default defineComponent({
         const i18n = useI18n();
         const searchPlaceholder = {title: "", value: -1};
 
-        const events = ref<{ title: string; value: number; }[]>([]);
+        const events = ref<{ title: string; value: number; date?: string }[]>([]);
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         onMounted(() => {
@@ -48,12 +48,12 @@ export default defineComponent({
                 });
                 params += "page=0&size=5";
                 EventService.searchConferences(params).then((response) => {
-                    const listOfEvents: { title: string, value: number }[] = [];
+                    const listOfEvents: { title: string, value: number, date?: string }[] = [];
                     response.data.content.forEach((conference: EventIndex) => {
                         if (i18n.locale.value === "sr") {
-                            listOfEvents.push({title: conference.nameSr, value: conference.databaseId});
+                            listOfEvents.push({title: conference.nameSr, value: conference.databaseId, date: conference.dateFromTo});
                         } else {
-                            listOfEvents.push({title: conference.nameOther, value: conference.databaseId});
+                            listOfEvents.push({title: conference.nameOther, value: conference.databaseId, date: conference.dateFromTo});
                         }
                     })
                     events.value = listOfEvents;
