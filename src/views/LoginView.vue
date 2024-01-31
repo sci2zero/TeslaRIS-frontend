@@ -4,7 +4,7 @@
             <h2 class="login-title">
                 {{ forgotPasswordForm ? $t('passwordRecoveryInstructions') : $t('loginLabel') }}
             </h2>
-            <v-form v-model="isFormValid" @submit.prevent v-if="!forgotPasswordSubmissionSent">
+            <v-form v-if="!forgotPasswordSubmissionSent" v-model="isFormValid" @submit.prevent>
                 <div v-if="!forgotPasswordForm">
                     <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
                     <v-text-field
@@ -18,7 +18,7 @@
                         {{ $t('loginLabel') }}
                     </v-btn>
                     <br />
-                    <a @click="forgotPasswordForm = true;" href="#" class="forgot-password-link">{{ $t("forgotPasswordLabel") }}</a>
+                    <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
                 </div>
                 <div v-else>
                     <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
@@ -29,7 +29,7 @@
                         {{ $t('resetPasswordLabel') }}
                     </v-btn>
                     <br />
-                    <a @click="forgotPasswordForm = false;" href="#" class="forgot-password-link">{{ $t("knowPasswordLabel") }}</a>
+                    <a href="#" class="forgot-password-link" @click="forgotPasswordForm = false;">{{ $t("knowPasswordLabel") }}</a>
                 </div>
                 <br />
                 <localized-link to="register">
@@ -37,7 +37,7 @@
                 </localized-link>
             </v-form>
             <div v-else>
-                <h4>{{ $t("passwordRecoveryEmailSentMessage", [email])}}</h4>
+                <h4>{{ $t("passwordRecoveryEmailSentMessage", [email]) }}</h4>
                 <v-row>
                     <v-col cols="10">
                         <v-btn

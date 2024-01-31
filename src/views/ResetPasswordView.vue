@@ -26,11 +26,12 @@
                     </v-row>
                     <v-row>
                         <v-col cols="6">
-                            <v-btn block type="submit"
-                            :disabled="!isFormValid"
-                            color="primary"
-                            @click="setNewPassword">
-                            {{ $t('resetPasswordLabel') }}
+                            <v-btn
+                                block type="submit"
+                                :disabled="!isFormValid"
+                                color="primary"
+                                @click="setNewPassword">
+                                {{ $t('resetPasswordLabel') }}
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -38,8 +39,12 @@
             </v-col>
         </v-row>
         <v-sheet class="text-center">
-            <h1 v-if="success === true">{{ $t("resetPasswordSuccessMessage") }}</h1>
-            <h1 v-if="success === false">{{ $t("resetPasswordFailedMessage") }}</h1>
+            <h1 v-if="success === true">
+                {{ $t("resetPasswordSuccessMessage") }}
+            </h1>
+            <h1 v-if="success === false">
+                {{ $t("resetPasswordFailedMessage") }}
+            </h1>
         </v-sheet>
     </v-container>
 </template>
@@ -86,7 +91,7 @@ export default defineComponent(
 
             const setNewPassword = async () => {
                 await router.isReady();
-                let resetRequest: ResetPasswordRequest = {
+                const resetRequest: ResetPasswordRequest = {
                     newPassword: newPassword.value,
                     resetToken: currentRoute.params.resetToken as string
                 };
