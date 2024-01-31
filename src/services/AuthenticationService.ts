@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import { BaseService } from "@/services/BaseService";
-import type { AuthenticationRequest, AuthenticationResponse, RefreshTokenRequest, ResearcherRegistrationRequest, EmployeeRegistrationRequest } from "../models/AuthenticationModel";
+import type { AuthenticationRequest, AuthenticationResponse, RefreshTokenRequest, ResearcherRegistrationRequest, EmployeeRegistrationRequest, ForgotPasswordRequest, ResetPasswordRequest } from "../models/AuthenticationModel";
 import type { UserResponse } from "../models/UserModel";
 
 class AuthenticationService extends BaseService {
@@ -21,6 +21,14 @@ class AuthenticationService extends BaseService {
 
   async registerEmployee(registrationRequest: EmployeeRegistrationRequest): Promise<AxiosResponse<UserResponse>> {
     return super.sendRequest(axios.post, "user/register-institution-admin", registrationRequest, AuthenticationService.idempotencyKey);
+  }
+
+  async submitForgottenPassword(body: ForgotPasswordRequest): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.post, "user/forgot-password", body, AuthenticationService.idempotencyKey);
+  }
+
+  async resetPassword(body: ResetPasswordRequest): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, "user/reset-password", body, AuthenticationService.idempotencyKey);
   }
 
   userLoggedIn() {

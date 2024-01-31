@@ -3,6 +3,13 @@ export default {
     passwordLabel: "Lozinka",
     loginLabel: "Uloguj se",
     forgotPasswordLabel: "Zaboravio sam lozinku.",
+    knowPasswordLabel: "Znam svoju lozinku.",
+    resetPasswordLabel: "Resetuj moju lozinku",
+    resetPasswordSuccessMessage: "Uspešno resetovanje lozinke. Možete otići na stranicu za prijavu i prijaviti se sa svojom novom lozinkom.",
+    resetPasswordFailedMessage: "Neuspešno resetovanje lozinke. Ako se ovaj problem nastavi, kontaktirajte vašeg institucionalnog administratora.",
+    passwordRecoveryInstructions: "Unesite email koji ste iskoristili za registraciju ili prijavu:",
+    passwordRecoveryEmailSentMessage: "Email sa uputstvima za oporavak lozinke poslat je na {0}. Ako niste primili email, kliknite na dugme ispod.",
+    resendLabel: "Pošalji ponovo email",
     registerLabel: "Registracija",
     registerFromLoginLabel: "Nemate nalog? Registrujte se.",
     homeLabel: "Početna Stranica",
@@ -122,5 +129,7 @@ export default {
     addProceedingsLabel: "Dodaj zbornik radova",
     publicationSeriesLabel: "Serija publikacija",
     publicationSeriesVolumeLabel: "Sveska u seriji publikacija",
-    publicationSeriesIssueLabel: "Izdanje u seriji publikacija"
+    publicationSeriesIssueLabel: "Izdanje u seriji publikacija",
+    accountActivationSuccessMessage: "Nalog uspešno aktiviran, sada možete zatvoriti ovu stranicu i prijaviti se.",
+    accountActivationFailedMessage: "Neuspela aktivacija naloga. Ako se ovaj problem nastavi, molimo vas da kontaktirate administratora platforme."
 }

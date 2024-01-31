@@ -20,6 +20,7 @@ import SubmitOrganisationUnitView from "@/views/SubmitOrganisationUnitView.vue";
 import SubmitJournalView from "@/views/SubmitJournalView.vue";
 import SubmitJournalPublicationView from "@/views/SubmitJournalPublicationView.vue";
 import SubmitProceedingsView from "@/views/SubmitProceedingsView.vue";
+import ResetPasswordView from "@/views/ResetPasswordView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -212,6 +213,15 @@ const router = createRouter({
                     path: "activate-account/:activationToken",
                     name: "activateAccount",
                     component: AccountActivationView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "reset-password/:resetToken",
+                    name: "resetPassword",
+                    component: ResetPasswordView,
                     meta: {
                         authenticated: false,
                         authorities: [],

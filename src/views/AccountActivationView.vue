@@ -1,10 +1,10 @@
 <template>
     <h1>Activating account...</h1>
     <h1 v-if="accountSuccessfullyActivated">
-        Account successfully activated, you can now close this page and login.
+        {{ $t("accountActivationSuccessMessage") }}
     </h1>
     <h1 v-if="accountActivationFailed">
-        Account activation failed, if this issue persists please contact platform administrator.
+        {{ $t("accountActivationFailedMessage") }}
     </h1>
 </template>
 

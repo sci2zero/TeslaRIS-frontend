@@ -3,6 +3,13 @@ export default {
     passwordLabel: "Password",
     loginLabel: "Login",
     forgotPasswordLabel: "I forgot my password.",
+    knowPasswordLabel: "I know my password.",
+    resetPasswordLabel: "Reset My Password",
+    resetPasswordSuccessMessage: "Pasword reset successfull, you can go to the login page and login with your new password.",
+    resetPasswordFailedMessage: "Password reset failed, if this issue persist contact your institutional administrator.",
+    passwordRecoveryInstructions: "Enter an email that you used to register or login with:",
+    passwordRecoveryEmailSentMessage: "The email with password recovery instructions is sent to {0}. If you haven't received an email, click on the button below.",
+    resendLabel: "Resend email",
     registerLabel: "Register",
     registerFromLoginLabel: "Don't have an account? Register.",
     homeLabel: "Home Page",
@@ -122,5 +129,7 @@ export default {
     addProceedingsLabel: "Add Proceedings",
     publicationSeriesLabel: "Publication Series",
     publicationSeriesVolumeLabel: "Publication Series Volume",
-    publicationSeriesIssueLabel: "Publication Series Issue"
+    publicationSeriesIssueLabel: "Publication Series Issue",
+    accountActivationSuccessMessage: "Account successfully activated, you can now close this page and login.",
+    accountActivationFailedMessage: "Account activation failed, if this issue persists please contact platform administrator."
 }
