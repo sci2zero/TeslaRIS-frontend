@@ -131,5 +131,8 @@ export default {
     publicationSeriesVolumeLabel: "Sveska u seriji publikacija",
     publicationSeriesIssueLabel: "Izdanje u seriji publikacija",
     accountActivationSuccessMessage: "Nalog uspešno aktiviran, sada možete zatvoriti ovu stranicu i prijaviti se.",
-    accountActivationFailedMessage: "Neuspela aktivacija naloga. Ako se ovaj problem nastavi, molimo vas da kontaktirate administratora platforme."
+    accountActivationFailedMessage: "Neuspela aktivacija naloga. Ako se ovaj problem nastavi, molimo vas da kontaktirate administratora platforme.",
+    bookSeriesListLabel: "Serije knjiga",
+    bookSeriesLabel: "Serija knjiga",
+    addBookSeriesLabel: "Dodaj seriju knjiga"
 }

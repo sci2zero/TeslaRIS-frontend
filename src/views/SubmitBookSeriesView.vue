@@ -1,6 +1,6 @@
 <template>
     <v-sheet class="text-center">
-        <h1>{{ $t("addJournalLabel") }}</h1>
+        <h1>{{ $t("addBookSeriesLabel") }}</h1>
     </v-sheet>
     <br />
     <br />
@@ -26,11 +26,11 @@ import { ref } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 
 export default defineComponent({
-    name: "SubmitJournalView",
+    name: "SubmitBookSeriesView",
     components: {PublicationSeriesSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof PublicationSeriesSubmissionForm>();
-        const inputType = PublicationSeriesType.JOURNAL.toString();
+        const inputType = PublicationSeriesType.BOOK_SERIES.toString();
 
         return {
             submissionFormRef,

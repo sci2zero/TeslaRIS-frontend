@@ -101,6 +101,11 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="12">
+                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" @set-input="selectedBookSeries = $event"></book-series-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="6">
                             <v-text-field v-model="publicationSeriesVolume" :label="$t('publicationSeriesVolumeLabel')" :placeholder="$t('publicationSeriesVolumeLabel')"></v-text-field>
                         </v-col>
@@ -150,11 +155,12 @@ import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue'
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
 import { ProceedingsPublicationType } from "@/models/ProceedingsModel";
 import type { Proceedings } from "@/models/ProceedingsModel";
+import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "SubmitProceedings",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -192,9 +198,11 @@ export default defineComponent({
         const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
+        const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
         const selectedEvent = ref<{ title: string, value: number }>();
         const selectedJournal = ref<{ title: string, value: number }>();
         const selectedPublisher = ref<{ title: string, value: number }>();
+        const selectedBookSeries = ref<{ title: string, value: number }>();
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -266,12 +274,11 @@ export default defineComponent({
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
-                publicationSeriesId: undefined,
+                publicationSeriesId: undefined, // TODO: How to differentiate input?
                 publicationSeriesIssue: publicationSeriesIssue.value,
                 publicationSeriesVolume: publicationSeriesVolume.value,
                 publisherId: selectedPublisher.value?.value,
                 scopusId: scopus.value,
-                // TODO: treba li journal ???
             };
 
             console.log(newProceedings, stayOnPage, router);
@@ -310,6 +317,7 @@ export default defineComponent({
             publicationSeriesVolume, publicationSeriesIssue,
             publisherAutocompleteRef, selectedPublisher,
             publicationTypes, selectedpublicationType,
+            bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, submitProceedings
         };
     }

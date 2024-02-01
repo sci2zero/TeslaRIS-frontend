@@ -86,7 +86,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedPublications = ref([]);
 
         const i18n = useI18n();
@@ -140,7 +140,7 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
-                return DocumentPublicationService.deleteDocumentPublication(publication.databaseId)
+                return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
                     .then(() => {
                         if (i18n.locale.value === "sr") {
                             addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));

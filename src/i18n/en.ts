@@ -131,5 +131,8 @@ export default {
     publicationSeriesVolumeLabel: "Publication Series Volume",
     publicationSeriesIssueLabel: "Publication Series Issue",
     accountActivationSuccessMessage: "Account successfully activated, you can now close this page and login.",
-    accountActivationFailedMessage: "Account activation failed, if this issue persists please contact platform administrator."
+    accountActivationFailedMessage: "Account activation failed, if this issue persists please contact platform administrator.",
+    bookSeriesListLabel: "Book Series",
+    bookSeriesLabel: "Book Series",
+    addBookSeriesLabel: "Add Book Series"
 }

@@ -1,6 +1,6 @@
 import type { PublicationSeries } from "./PublicationSeriesModel";
 
-export interface JournalIndex {
+export interface BookSeriesIndex {
     id: string;
     titleSr: string;
     titleSrSortable: string;
@@ -11,5 +11,5 @@ export interface JournalIndex {
     databaseId: number;
 }
 
-export interface Journal extends PublicationSeries {
+export interface BookSeries extends PublicationSeries {
 }

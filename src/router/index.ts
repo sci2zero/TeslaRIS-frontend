@@ -10,6 +10,7 @@ import AccountActivationView from "@/views/AccountActivationView.vue";
 import OrganisationUnitListView from "@/views/OrganisationUnitListView.vue";
 import ScientificResultsView from "@/views/ScientificResultsView.vue";
 import JournalListView from "@/views/JournalListView.vue";
+import BookSeriesListView from "@/views/BookSeriesListView.vue";
 import PublisherListView from "@/views/PublisherListView.vue";
 import AdvancedSearchView from "@/views/AdvancedSearchView.vue";
 import UserProfileView from "@/views/UserProfileView.vue";
@@ -18,6 +19,7 @@ import SubmitPublisherView from "@/views/SubmitPublisherView.vue";
 import SubmitPersonView from "@/views/SubmitPersonView.vue";
 import SubmitOrganisationUnitView from "@/views/SubmitOrganisationUnitView.vue";
 import SubmitJournalView from "@/views/SubmitJournalView.vue";
+import SubmitBookSeriesView from "@/views/SubmitBookSeriesView.vue";
 import SubmitJournalPublicationView from "@/views/SubmitJournalPublicationView.vue";
 import SubmitProceedingsView from "@/views/SubmitProceedingsView.vue";
 import ResetPasswordView from "@/views/ResetPasswordView.vue";
@@ -123,6 +125,24 @@ const router = createRouter({
                     path: "submit-organisation-unit",
                     name: "submitOrganisationUnit",
                     component: SubmitOrganisationUnitView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "book-series",
+                    name: "bookSeries",
+                    component: BookSeriesListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "submit-book-series",
+                    name: "submitBookSeries",
+                    component: SubmitBookSeriesView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

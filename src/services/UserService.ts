@@ -8,6 +8,8 @@ import type { Page } from "@/models/Common";
 
 export class UserService extends BaseService {
 
+  public cachedUser: AxiosResponse<UserResponse> | null = null;
+
   provideUserEmail(): string {
     const decoded = this.getDecodedJwt();
     return decoded.sub;
@@ -27,7 +29,14 @@ export class UserService extends BaseService {
   }
 
   async getLoggedInUser(): Promise<AxiosResponse<UserResponse>> {
-    return super.sendRequest(axios.get, "user");
+    if (this.cachedUser) {
+      return Promise.resolve(this.cachedUser);
+    }
+
+    const response = await super.sendRequest(axios.get, "user");
+    this.cachedUser = response;
+
+    return response;
   }
 
   async searchUsers(tokens: string): Promise<AxiosResponse<Page<UserAccountIndex>>> {

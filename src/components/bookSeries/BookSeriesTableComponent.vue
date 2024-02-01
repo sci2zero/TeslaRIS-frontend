@@ -1,19 +1,19 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedJournals.length === 0"
+        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedBookSeries.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedJournals.length !== 2">
+        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedBookSeries.length !== 2">
         {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server
-        v-model="selectedJournals"
-        :items="journals"
+        v-model="selectedBookSeries"
+        :items="bookSeries"
         :headers="headers"
         item-value="row"
-        :items-length="totalJournals"
+        :items-length="totalBookSeries"
         show-select
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
@@ -23,7 +23,7 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedJournals"
+                        v-model="selectedBookSeries"
                         :value="row.item"
                         style="margin:0px;padding:0px"
                         hide-details
@@ -62,23 +62,23 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type {JournalIndex} from '@/models/JournalModel';
-import JournalService from '@/services/JournalService';
+import type {BookSeriesIndex} from '@/models/BookSeriesIndex';
+import BookSeriesService from '@/services/BookSeriesService';
 
 export default defineComponent({
-    name: "JournalTableComponent",
+    name: "BookSeriesTableComponent",
     props: {
-        journals: {
-            type: Array<JournalIndex>,
+        bookSeries: {
+            type: Array<BookSeriesIndex>,
             required: true
         }, 
-        totalJournals: {
+        totalBookSeries: {
             type: Number,
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
-        const selectedJournals = ref([]);
+    setup(_, {emit}) {
+        const selectedBookSeries = ref([]);
 
         const i18n = useI18n();
 
@@ -121,25 +121,25 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedJournals.value.map((journal: JournalIndex) => {
-                return JournalService.deleteJournal(journal.databaseId)
+            Promise.all(selectedBookSeries.value.map((bookSeries: BookSeriesIndex) => {
+                return BookSeriesService.deleteBookSeries(bookSeries.databaseId)
                     .then(() => {
                         if (i18n.locale.value === "sr") {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: journal.titleSr }));
+                            addNotification(i18n.t("deleteSuccessNotification", { name: bookSeries.titleSr }));
                         } else {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: journal.titleOther }));
+                            addNotification(i18n.t("deleteSuccessNotification", { name: bookSeries.titleOther }));
                         }
                     })
                     .catch(() => {
                         if (i18n.locale.value === "sr") {
-                            addNotification(i18n.t("deleteFailedNotification", { name: journal.titleSr }));
+                            addNotification(i18n.t("deleteFailedNotification", { name: bookSeries.titleSr }));
                         } else {
-                            addNotification(i18n.t("deleteFailedNotification", { name: journal.titleOther }));
+                            addNotification(i18n.t("deleteFailedNotification", { name: bookSeries.titleOther }));
                         }
-                        return journal;
+                        return bookSeries;
                     });
             })).then((failedDeletions) => {
-                selectedJournals.value = selectedJournals.value.filter((journal) => failedDeletions.includes(journal));
+                selectedBookSeries.value = selectedBookSeries.value.filter((bookSeries) => failedDeletions.includes(bookSeries));
                 refreshTable(tableOptions.value);
             });
         }
@@ -155,7 +155,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedJournals, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedBookSeries, headers, notifications, refreshTable, userRole, deleteSelection};
     }
 });
 </script>

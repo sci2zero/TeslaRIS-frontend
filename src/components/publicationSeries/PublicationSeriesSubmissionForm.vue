@@ -72,11 +72,20 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Journal } from "@/models/JournalModel";
 import JournalService from '@/services/JournalService';
+import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
+import BookSeriesService from '@/services/BookSeriesService';
+
 
 export default defineComponent({
-    name: "SubmitJournal",
+    name: "SubmitPublicationSeries",
     components: {MultilingualTextInput},
-    setup() {
+    props: {
+        inputType: {
+            type: String,
+            required: true
+        },
+    },
+    setup(props) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -118,8 +127,8 @@ export default defineComponent({
             }
         ];
 
-        const submitJournal = (stayOnPage: boolean) => {
-            const newJournal: Journal = {
+        const submitPublicationSeries = (stayOnPage: boolean) => {
+            const newPublicationSeries: Journal = {
                 title: title.value,
                 eissn: eIssn.value,
                 printISSN: printIssn.value,
@@ -127,23 +136,46 @@ export default defineComponent({
                 nameAbbreviation: nameAbbreviations.value
             };
 
-            JournalService.createJournal(newJournal).then(() => {
-                if (stayOnPage) {
-                    titleRef.value?.clearInput();
-                    abbreviationsRef.value?.clearInput();
-                    eIssn.value = "";
-                    printIssn.value = "";
-                    selectedLanguages.value = [defaultLanguage.value];
+            switch(props.inputType) {
+                case PublicationSeriesType.JOURNAL.toString():
+                    JournalService.createJournal(newPublicationSeries).then(() => {
+                        if (stayOnPage) {
+                            titleRef.value?.clearInput();
+                            abbreviationsRef.value?.clearInput();
+                            eIssn.value = "";
+                            printIssn.value = "";
+                            selectedLanguages.value = [defaultLanguage.value];
 
-                    error.value = false;
-                    snackbar.value = true;
-                } else {
-                    router.push({ name: "journals" });
-                }
-            }).catch(() => {
-                error.value = true;
-                snackbar.value = true;
-            });
+                            error.value = false;
+                            snackbar.value = true;
+                        } else {
+                            router.push({ name: "journals" });
+                        }
+                    }).catch(() => {
+                        error.value = true;
+                        snackbar.value = true;
+                    });
+                    break;
+                case PublicationSeriesType.BOOK_SERIES.toString():
+                    BookSeriesService.createBookSeries(newPublicationSeries).then(() => {
+                        if (stayOnPage) {
+                            titleRef.value?.clearInput();
+                            abbreviationsRef.value?.clearInput();
+                            eIssn.value = "";
+                            printIssn.value = "";
+                            selectedLanguages.value = [defaultLanguage.value];
+
+                            error.value = false;
+                            snackbar.value = true;
+                        } else {
+                            router.push({ name: "bookSeries" });
+                        }
+                    }).catch(() => {
+                        error.value = true;
+                        snackbar.value = true;
+                    });
+                    break;
+            }
         };
 
         return {
@@ -154,7 +186,7 @@ export default defineComponent({
             eIssn, printIssn, languageList, selectedLanguages,
             nameAbbreviations, abbreviationsRef,
             requiredFieldRules,
-            submitJournal
+            submitPublicationSeries
         };
     }
 });

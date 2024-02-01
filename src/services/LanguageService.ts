@@ -5,12 +5,32 @@ import type { LanguageResponse, LanguageTagResponse } from "@/models/Common";
 
 export class LanguageService extends BaseService {
 
+  private cachedLanguages: AxiosResponse<LanguageResponse[]> | null = null;
+  
+  private cachedLanguageTags: AxiosResponse<LanguageTagResponse[]> | null = null;
+
   async getAllLanguages(): Promise<AxiosResponse<LanguageResponse[]>> {
-    return super.sendRequest(axios.get, "language");
+    if (this.cachedLanguages) {
+      return Promise.resolve(this.cachedLanguages);
+    }
+
+    const response = await super.sendRequest(axios.get, "language");
+
+    this.cachedLanguages = response;
+
+    return response;
   }
 
   async getAllLanguageTags(): Promise<AxiosResponse<LanguageTagResponse[]>> {
-    return super.sendRequest(axios.get, "language/tags");
+    if (this.cachedLanguageTags) {
+      return Promise.resolve(this.cachedLanguageTags);
+    }
+
+    const response = await super.sendRequest(axios.get, "language/tags");
+
+    this.cachedLanguageTags = response;
+
+    return response;
   }
 }
 

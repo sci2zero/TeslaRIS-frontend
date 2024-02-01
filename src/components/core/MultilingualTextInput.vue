@@ -133,6 +133,7 @@ export default defineComponent({
 
         const clearInput = () => {
             inputs.value = [];
+            supportedLanguages.value = [];
             setInitialState();
         };
 

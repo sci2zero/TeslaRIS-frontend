@@ -2,6 +2,7 @@ import axios, { type AxiosResponse } from "axios";
 import { BaseService } from "@/services/BaseService";
 import type { AuthenticationRequest, AuthenticationResponse, RefreshTokenRequest, ResearcherRegistrationRequest, EmployeeRegistrationRequest, ForgotPasswordRequest, ResetPasswordRequest } from "../models/AuthenticationModel";
 import type { UserResponse } from "../models/UserModel";
+import UserService from "./UserService";
 
 class AuthenticationService extends BaseService {
 
@@ -38,6 +39,7 @@ class AuthenticationService extends BaseService {
   logoutUser(): void {
     sessionStorage.removeItem("jwt");
     sessionStorage.removeItem("refreshToken");
+    UserService.cachedUser = null;
   }
 }
 
