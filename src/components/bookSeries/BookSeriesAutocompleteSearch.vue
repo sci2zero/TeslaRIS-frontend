@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import BookSeriesService from '@/services/BookSeriesService';
 import type { BookSeriesIndex } from '@/models/BookSeriesModel';
+import type { PropType } from 'vue';
 
 
 export default defineComponent({
@@ -29,16 +30,23 @@ export default defineComponent({
         required: {
             type: Boolean,
             default: false
+        },
+        modelValue: {
+            type: Object as PropType<{ title: string, value: number } | undefined>,
+            required: true,
         }
     },
-    emits: ["setInput"],
-    setup(_, {emit}) {
+    emits: ["update:modelValue"],
+    setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
 
         const bookSeries = ref<{ title: string; value: number; }[]>([]);
         const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
 
         onMounted(() => {
+            if(props.modelValue) {
+                selectedBookSeries.value = props.modelValue;
+            }
             sendContentToParent();
         });
 
@@ -77,7 +85,7 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
-            emit("setInput", selectedBookSeries.value);
+            emit("update:modelValue", selectedBookSeries.value);
         };
 
         const clearInput = () => {

@@ -102,7 +102,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" @set-input="selectedBookSeries = $event"></book-series-autocomplete-search>
+                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries"></book-series-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -199,10 +199,12 @@ export default defineComponent({
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
         const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
-        const selectedEvent = ref<{ title: string, value: number }>();
-        const selectedJournal = ref<{ title: string, value: number }>();
-        const selectedPublisher = ref<{ title: string, value: number }>();
-        const selectedBookSeries = ref<{ title: string, value: number }>();
+
+        const searchPlaceholder = {title: "", value: -1};
+        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -274,7 +276,7 @@ export default defineComponent({
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
-                publicationSeriesId: undefined, // TODO: How to differentiate input?
+                publicationSeriesId: selectedBookSeries.value?.value, // TODO: How to differentiate input?
                 publicationSeriesIssue: publicationSeriesIssue.value,
                 publicationSeriesVolume: publicationSeriesVolume.value,
                 publisherId: selectedPublisher.value?.value,
