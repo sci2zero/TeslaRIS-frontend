@@ -6,14 +6,14 @@
         <br />
         <br />
         <v-row v-if="success === null">
-            <v-col cols="12" class="">
+            <v-col cols="12">
                 <v-form v-model="isFormValid" @submit.prevent>
-                    <v-row>
+                    <v-row justify="center">
                         <v-col cols="6" class="bg-blue-grey-lighten-5">
                             <password-input-with-meter :label="$t('newPasswordLabel')" @password-change="newPassword = $event" @show-repeated-password="showRepeatedPassword = !showRepeatedPassword"></password-input-with-meter>
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row justify="center">
                         <v-col cols="6" class="bg-blue-grey-lighten-5">
                             <v-text-field
                                 v-model="repeatNewPassword"
@@ -24,7 +24,7 @@
                             ></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row justify="center">
                         <v-col cols="6">
                             <v-btn
                                 block type="submit"
