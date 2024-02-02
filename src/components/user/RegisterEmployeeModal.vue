@@ -45,7 +45,7 @@
                                     ></v-select>
                                 </v-col>
                                 <v-col cols="12">
-                                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" required @set-input="selectedOrganisationUnit = $event"></organisation-unit-autocomplete-search>
+                                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-textarea

@@ -4,12 +4,12 @@
             <v-col cols="8">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'" @set-input="title = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationsRef" :label="$t('nameAbbreviationLabel')" @set-input="nameAbbreviations = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="abbreviationsRef" v-model="nameAbbreviations" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">

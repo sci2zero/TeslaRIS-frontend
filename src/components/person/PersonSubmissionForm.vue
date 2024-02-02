@@ -11,7 +11,7 @@
                     </v-col>
                 </v-row>
                 <v-col cols="12">
-                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" required @set-input="selectedOrganisationUnit = $event"></organisation-unit-autocomplete-search>
+                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
                 </v-col>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}

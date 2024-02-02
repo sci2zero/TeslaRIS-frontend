@@ -4,12 +4,12 @@
             <v-col cols="8">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="nameRef" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'" @set-input="name = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationRef" :label="$t('nameAbbreviationLabel')" @set-input="nameAbbreviation = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <h3>{{ $t("tookPlaceLabel") }}</h3>
@@ -42,17 +42,17 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="placeRef" :label="$t('placeLabel')" @set-input="place = $event"></multilingual-text-input>
+                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" :is-area="true" :label="$t('descriptionLabel')" @set-input="description = $event"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" :is-area="true" :label="$t('descriptionLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" :label="$t('keywordsLabel')" @set-input="keywords = $event"></multilingual-text-input>
+                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>

@@ -4,7 +4,7 @@
             <v-col cols="10">
                 <v-row>
                     <v-col cols="10">
-                        <journal-autocomplete-search ref="journalAutocompleteRef" required @set-input="selectedJournal = $event; listPublications($event);"></journal-autocomplete-search>
+                        <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" required></journal-autocomplete-search>
                     </v-col>
                 </v-row>
 
@@ -26,12 +26,12 @@
 
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'" @set-input="title = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="subtitleRef" :label="$t('subtitleLabel')" @set-input="subtitle = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
 
@@ -97,12 +97,12 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" is-area :label="$t('descriptionLabel')" @set-input="description = $event"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" :label="$t('keywordsLabel')" @set-input="keywords = $event"></multilingual-text-input>
+                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -112,12 +112,12 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="placeRef" :label="$t('placeLabel')" @set-input="place = $event"></multilingual-text-input>
+                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <event-autocomplete-search ref="eventAutocompleteRef" @set-input="selectedEvent = $event"></event-autocomplete-search>
+                            <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -158,6 +158,7 @@ import type { DocumentPublicationIndex, JournalPublication } from "@/models/Publ
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -245,6 +246,11 @@ export default defineComponent({
                 myPublications.value = response.data;
             });
         };
+
+        watch(selectedJournal, (newValue) => {
+            console.log(newValue.value);
+            listPublications(newValue);
+        });
 
         const submitJournalPublication = (stayOnPage: boolean) => {
             const newJournalPublication: JournalPublication = {

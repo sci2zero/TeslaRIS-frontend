@@ -54,16 +54,31 @@ export default defineComponent({
         rules: {
             type: Array as PropType<((value: string) => string | true)[]>,
             default: () => [],
+        },
+        modelValue: {
+            type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] | undefined>,
+            required: true,
         }
     },
-    emits: ["setInput"],
-    setup(_, {emit}) {
+    emits: ["update:modelValue"],
+    setup(props, {emit}) {
         const userPreferredLanguage = ref<{tag: string, id: number}>({tag: "", id: -1});
         const supportedLanguages = ref<{title: string, value: number}[]>([]);
         const inputs = ref<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]>([]);
 
         onMounted(() => {
             setInitialState();
+            if(props.modelValue && props.modelValue.length > 0 && props.modelValue[0].text !== "") {
+                inputs.value = [];
+                props.modelValue.forEach(input => {
+                    let languageChoice = supportedLanguages.value;
+                    inputs.value.forEach((input) => {
+                        languageChoice = languageChoice.filter(item => item.value !== input.language.value);
+                    });
+                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: languageChoice });
+                    filterFromInputChoices(input.language);
+                });
+            }
         });
 
         const setInitialState = () => {
@@ -145,7 +160,7 @@ export default defineComponent({
                                 languageTagId: input.language.value, 
                                 priority: inputs.value.length - index});
             });
-            emit("setInput", returnObject);
+            emit("update:modelValue", returnObject);
         };
 
         return {

@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
@@ -29,16 +29,23 @@ export default defineComponent({
         required: {
             type: Boolean,
             default: false
+        },
+        modelValue: {
+            type: Object as PropType<{ title: string, value: number } | undefined>,
+            required: true,
         }
     },
-    emits: ["setInput"],
-    setup(_, {emit}) {
+    emits: ["update:modelValue"],
+    setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
 
         const journals = ref<{ title: string; value: number; }[]>([]);
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
 
         onMounted(() => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedJournal.value = props.modelValue;
+            }
             sendContentToParent();
         });
 
@@ -77,7 +84,7 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
-            emit("setInput", selectedJournal.value);
+            emit("update:modelValue", selectedJournal.value);
         };
 
         const clearInput = () => {

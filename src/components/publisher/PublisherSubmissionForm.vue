@@ -4,7 +4,7 @@
             <v-col cols="8">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="nameRef" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'" @set-input="name = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -14,7 +14,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="placeRef" :label="$t('placeLabel')" @set-input="place = $event"></multilingual-text-input>
+                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>

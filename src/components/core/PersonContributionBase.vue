@@ -15,8 +15,8 @@
             ></v-autocomplete>
         </v-col>
     </v-row>
-    <multilingual-text-input ref="descriptionRef" :label="$t('descriptionLabel')" is-area @set-input="contributionDescription = $event; sendContentToParent()"></multilingual-text-input>
-    <multilingual-text-input ref="affiliationStatementRef" :label="$t('affiliationStatementLabel')" @set-input="affiliationStatement = $event; sendContentToParent()"></multilingual-text-input>
+    <multilingual-text-input ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')" is-area></multilingual-text-input>
+    <multilingual-text-input ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"></multilingual-text-input>
 </template>
 
 <script lang="ts">
@@ -28,6 +28,7 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import MultilingualTextInput from "./MultilingualTextInput.vue";
 import lodash from "lodash";
+import { watch } from "vue";
 
 export default defineComponent({
     name: "PersonContributionBase",
@@ -98,6 +99,9 @@ export default defineComponent({
             };
             emit("setInput", returnObject);
         };
+
+        watch(contributionDescription, () => sendContentToParent());
+        watch(affiliationStatement, () => sendContentToParent());
 
         const clearInput = () => {
             selectedPerson.value = personPlaceholder;

@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import PublisherService from '@/services/PublisherService';
@@ -24,8 +24,14 @@ import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "PublisherAutocompleteSearch",
-    emits: ["setInput"],
-    setup(_, {emit}) {
+    props: {
+        modelValue: {
+            type: Object as PropType<{ title: string, value: number } | undefined>,
+            required: true,
+        }
+    },
+    emits: ["update:modelValue"],
+    setup(props, {emit}) {
         const i18n = useI18n();
         const searchPlaceholder = {title: "", value: -1};
 
@@ -33,6 +39,9 @@ export default defineComponent({
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         onMounted(() => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedPublisher.value = props.modelValue;
+            }
             sendContentToParent();
         });
 
@@ -62,7 +71,7 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
-            emit("setInput", selectedPublisher.value);
+            emit("update:modelValue", selectedPublisher.value);
         };
 
         const clearInput = () => {

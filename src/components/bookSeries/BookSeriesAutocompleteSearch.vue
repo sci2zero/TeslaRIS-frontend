@@ -44,7 +44,7 @@ export default defineComponent({
         const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
 
         onMounted(() => {
-            if(props.modelValue) {
+            if(props.modelValue && props.modelValue.value !== -1) {
                 selectedBookSeries.value = props.modelValue;
             }
             sendContentToParent();
