@@ -21,20 +21,32 @@ import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
     name: "UriInput",
-    emits: ["setInput"],
-    setup({emit}) {
+    props: {
+        modelValue: {
+            type: Array<string>,
+            required: true,
+        }
+    },
+    emits: ["update:modelValue"],
+    setup(props, {emit}) {
         const uris = ref([""]);
 
         const addUri = () => {
-        uris.value.push("");
+            if (props.modelValue && props.modelValue.length > 0) {
+                props.modelValue.forEach((uri) => {
+                    uris.value.push(uri);
+                });
+            } else {
+                uris.value.push("");
+            }
         };
 
         const removeUri = (index: number) => {
-        uris.value.splice(index, 1);
+            uris.value.splice(index, 1);
         };
 
         const sendContentToParent = () => {
-            emit("setInput", uris.value);
+            emit("update:modelValue", uris.value);
         };
 
         const clearInput = () => {

@@ -1,9 +1,10 @@
 <template>
     <v-autocomplete
         v-model="selectedEvent"
-        :label="$t('eventLabel')"
+        :label="$t('conferenceLabel') + (required ? '*' : '')"
         :items="events"
         :custom-filter="((): boolean => true)"
+        :rules="required ? requiredSelectionRules : []"
         :auto-select-first="true"
         :no-data-text="$t('noDataMessage')"
         return-object
@@ -20,11 +21,16 @@ import EventService from '@/services/EventService';
 import type { EventIndex } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import { computed } from 'vue';
 
 
 export default defineComponent({
     name: "EventAutocompleteSearch",
     props: {
+        required: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
@@ -44,6 +50,14 @@ export default defineComponent({
             }
             sendContentToParent();
         });
+        
+        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
+        const requiredSelectionRules = [
+            (value: { title: string, value: number } | number) => {
+                if (!value || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
+                return true;
+            }
+        ];
 
         const searchEvents = lodash.debounce((input: string) => {
             if (input.includes("|")) {
@@ -81,6 +95,7 @@ export default defineComponent({
 
         return {
             events, selectedEvent, searchEvents,
+            requiredSelectionRules,
             sendContentToParent, clearInput
         };
     }

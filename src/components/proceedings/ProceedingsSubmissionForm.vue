@@ -58,7 +58,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" @set-input="uris = $event"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris"></uri-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -153,7 +153,7 @@ import UriInput from '../core/UriInput.vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
-import { ProceedingsPublicationType } from "@/models/ProceedingsModel";
+import { ProceedingsPublicationType } from "@/models/PublicationModel";
 import type { Proceedings } from "@/models/ProceedingsModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';

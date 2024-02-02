@@ -61,7 +61,7 @@ export default {
     yearOfPublicationLabel: "Year of Publication",
     typeOfPublicationLabel: "Type of Publication",
     eventListLabel: "Events",
-    eventLabel: "Event",
+    conferenceLabel: "Conference",
     eventDateLabel: "Event Date",
     stateLabel: "State",
     stateColumn: "stateOther",
@@ -122,10 +122,12 @@ export default {
     articleNumberLabel: "Article Number",
     numberOfPagesLabel: "Number of Pages",
     recentPublicationsLabel: "Your publications in this journal:",
-    noRecentPublicationsLabel: "You don't have any publications in this journal yet.",
+    noRecentPublicationsJournalLabel: "You don't have any publications in this journal yet.",
+    noRecentPublicationsconferenceLabel: "You don't have any publications in this conference yet.",
     uriInputLabel: "Available on",
     mainContributorLabel: "Is Main Contributor",
     authorsLabel: "Authors",
+    proceedingsLabel: "Proceedings",
     addProceedingsLabel: "Add Proceedings",
     publicationSeriesLabel: "Publication Series",
     publicationSeriesVolumeLabel: "Publication Series Volume",
@@ -134,5 +136,7 @@ export default {
     accountActivationFailedMessage: "Account activation failed, if this issue persists please contact platform administrator.",
     bookSeriesListLabel: "Book Series",
     bookSeriesLabel: "Book Series",
-    addBookSeriesLabel: "Add Book Series"
+    addBookSeriesLabel: "Add Book Series",
+    addProceedingsPublicationLabel: "Add Proceedings Publication",
+    selectConferenceMessage: "Select Conference in order to select this."
 }

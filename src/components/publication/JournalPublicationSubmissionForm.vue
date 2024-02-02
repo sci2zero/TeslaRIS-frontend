@@ -12,16 +12,16 @@
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
-                            v-for="(journalIndex, i) in myPublications"
+                            v-for="(publicationIndex, i) in myPublications"
                             :key="i"
-                            :value="journalIndex"
+                            :value="publicationIndex"
                         >
-                            {{ $i18n.locale === "sr" ? journalIndex.titleSr : journalIndex.titleOther }}
+                            {{ $i18n.locale === "sr" ? publicationIndex.titleSr : publicationIndex.titleOther }}
                         </p>
                     </v-col>
                 </v-row>
                 <v-row v-if="selectedJournal.value != -1 && myPublications.length == 0">
-                    <v-col><h3>{{ $t("noRecentPublicationsLabel") }}</h3></v-col>
+                    <v-col><h3>{{ $t("noRecentPublicationsJournalLabel") }}</h3></v-col>
                 </v-row>
 
                 <v-row>
@@ -107,7 +107,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" @set-input="uris = $event"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris"></uri-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -162,7 +162,7 @@ import { watch } from 'vue';
 
 
 export default defineComponent({
-    name: "SubmitJournal",
+    name: "SubmitJournalPublication",
     components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, JournalAutocompleteSearch},
     setup() {
         const isFormValid = ref(false);

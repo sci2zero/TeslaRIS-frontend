@@ -1,6 +1,5 @@
 import type { MultilingualContent } from "./Common";
 import type { PersonContribution } from "./PersonModel";
-import type { ProceedingsPublicationType } from "./ProceedingsModel";
 
 export interface DocumentPublicationIndex {
     id: string;
@@ -79,6 +78,33 @@ export enum DocumentContributionType {
     EDITOR,
     REVIEWER,
     ADVISOR,
+}
+
+export interface ProceedingsPublication extends Document {
+    proceedingsPublicationType: ProceedingsPublicationType;
+    startPage: string;
+    endPage: string;
+    numberOfPages: number;
+    articleNumber: string;
+    proceedingsId: number;
+}
+
+export enum ProceedingsPublicationType {
+    REGULAR_FULL_ARTICLE,
+    INVITED_FULL_ARTICLE,
+    INVITED_ABSTRACT_ARTICLE,
+    REGULAR_ABSTRACT_ARTICLE,
+    PREFACE,
+    LEXICOGRAPHIC_UNIT,
+    POLEMICS,
+    SCIENTIFIC_CRITIC,
+}
+
+export interface ProceedingsPublicationResponse {
+    id: number,
+    proceedingsTitle: MultilingualContent[];
+    title: MultilingualContent[];
+    documentDate: string;
 }
 
 export interface ProceedingsPublication extends Document {

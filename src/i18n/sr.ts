@@ -61,7 +61,7 @@ export default {
     yearOfPublicationLabel: "Godina izdanja",
     typeOfPublicationLabel: "Tip Publikacije",
     eventListLabel: "Događaji",
-    eventLabel: "Događaj",
+    conferenceLabel: "Konferencija",
     eventDateLabel: "Datum održavanja",
     stateLabel: "Zemlja",
     stateColumn: "stateSr",
@@ -122,10 +122,12 @@ export default {
     articleNumberLabel: "Broj članka",
     numberOfPagesLabel: "Broj strana",
     recentPublicationsLabel: "Vaše publikacije u ovom časopisu:",
-    noRecentPublicationsLabel: "Nemate ni jednu publikaciju u ovom časopisu.",
+    noRecentPublicationsJournalLabel: "Nemate ni jednu publikaciju u ovom časopisu.",
+    noRecentPublicationsconferenceLabel: "Nemate ni jednu publikaciju u ovoj konferenciji.",
     uriInputLabel: "Dostupno na",
     mainContributorLabel: "Glavni kontributor",
     authorsLabel: "Autori",
+    proceedingsLabel: "Zbornik radova",
     addProceedingsLabel: "Dodaj zbornik radova",
     publicationSeriesLabel: "Serija publikacija",
     publicationSeriesVolumeLabel: "Sveska u seriji publikacija",
@@ -134,5 +136,7 @@ export default {
     accountActivationFailedMessage: "Neuspela aktivacija naloga. Ako se ovaj problem nastavi, molimo vas da kontaktirate administratora platforme.",
     bookSeriesListLabel: "Serije knjiga",
     bookSeriesLabel: "Serija knjiga",
-    addBookSeriesLabel: "Dodaj seriju knjiga"
+    addBookSeriesLabel: "Dodaj seriju knjiga",
+    addProceedingsPublicationLabel: "Dodaj rad u zborniku radova",
+    selectConferenceMessage: "Izaberite konferenciju da bi ste mogli izabrati ovo."
 }
