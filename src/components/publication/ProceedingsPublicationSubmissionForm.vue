@@ -66,7 +66,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">

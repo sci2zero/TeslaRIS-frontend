@@ -1,8 +1,8 @@
 <template>
-    <v-row v-for="(uri, index) in uris" :key="index">
+    <v-row v-for="(element, index) in uris" :key="index">
         <v-col cols="10">
             <v-text-field
-                v-model="uri.value" :label="$t('uriInputLabel')" placeholder="URI" outlined
+                v-model="element.value" :label="$t('uriInputLabel')" placeholder="URI" outlined
                 @input="sendContentToParent"></v-text-field>
         </v-col>
         <v-col cols="2">
@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts">
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -29,16 +30,18 @@ export default defineComponent({
     },
     emits: ["update:modelValue"],
     setup(props, {emit}) {
-        const uris = ref([""]);
+        const uris = ref([{value: ""}]);
 
-        const addUri = () => {
+        onMounted(() => {
             if (props.modelValue && props.modelValue.length > 0) {
                 props.modelValue.forEach((uri) => {
-                    uris.value.push(uri);
+                    uris.value.push({value: uri});
                 });
-            } else {
-                uris.value.push("");
             }
+        });
+
+        const addUri = () => {
+            uris.value.push({value: ""});
         };
 
         const removeUri = (index: number) => {
@@ -46,7 +49,9 @@ export default defineComponent({
         };
 
         const sendContentToParent = () => {
-            emit("update:modelValue", uris.value);
+            const arrayOfUris: string[] = [];
+            uris.value.forEach(uri => arrayOfUris.push(uri.value));
+            emit("update:modelValue", arrayOfUris);
         };
 
         const clearInput = () => {

@@ -1,8 +1,8 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bg-blue-grey-lighten-5" style="margin-bottom: 20px;">
+    <v-container v-for="(input, index) in inputs" :key="index" style="margin-bottom: 20px;">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -15,7 +15,7 @@
                 </v-col>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!basic">
             <v-col>
                 <v-select
                     v-model="input.contributionType"
@@ -25,9 +25,12 @@
                 </v-select>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!basic">
             <v-col>
                 <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @click="sendContentToParent"></v-checkbox>
+            </v-col>
+            <v-col>
+                <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @click="sendContentToParent"></v-checkbox>
             </v-col>
         </v-row>
     </v-container>
@@ -44,9 +47,15 @@ import { DocumentContributionType, type PersonDocumentContribution } from "@/mod
 export default defineComponent({
     name: "PersonPublicationContribution",
     components: {PersonContributionBase},
+    props: {
+        basic: {
+            type: Boolean,
+            default: false
+        }
+    },
     emits: ["setInput"],
-    setup(_, {emit}) {
-        const inputs = ref<any[]>([{contributionType:  DocumentContributionType.AUTHOR, isMainContributor: true}]);
+    setup(props, {emit}) {
+        const inputs = ref<any[]>([{contributionType:  DocumentContributionType.AUTHOR, isMainContributor: false, isCorrespondingContributor: false}]);
         const baseContributionRef = ref<any>([]);
 
         const i18n = useI18n();
@@ -76,7 +85,7 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            inputs.value = [{contribution: {}, contributionType:  DocumentContributionType.AUTHOR, isMainContributor: true}];
+            inputs.value = [{contribution: {}, contributionType:  DocumentContributionType.AUTHOR, isMainContributor: false, isCorrespondingContributor: false}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
@@ -90,9 +99,9 @@ export default defineComponent({
                                     personId: input.contribution.personId,
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
-                                    contributionType: input.contributionType,
-                                    isMainContributor: input.isMainContributor,
-                                    isCorrespondingContributor: !input.isMainContributor});
+                                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType,
+                                    isMainContributor: props.basic ? index === 0 : input.isMainContributor,
+                                    isCorrespondingContributor: props.basic ? false : input.isMainContributor});
             });
             emit("setInput", returnObject);
         };

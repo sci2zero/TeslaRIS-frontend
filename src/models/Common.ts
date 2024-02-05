@@ -24,3 +24,8 @@ export interface LanguageTagResponse {
     languageCode: string;
     display: string;
 }
+
+export interface ExternalValidation {
+    passed: boolean,
+    message: string
+}

@@ -5,7 +5,7 @@
         :items="bookSeries"
         :custom-filter="((): boolean => true)"
         :auto-select-first="true"
-        :rules="required ? requiredSelectionRules : []"
+        :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
         :no-data-text="$t('noDataMessage')"
         return-object
         @update:search="searchBookSeries($event)"
@@ -22,6 +22,7 @@ import { onMounted } from 'vue';
 import BookSeriesService from '@/services/BookSeriesService';
 import type { BookSeriesIndex } from '@/models/BookSeriesModel';
 import type { PropType } from 'vue';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -34,6 +35,10 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
+        },
+        externalValidation: {
+            type: Object as PropType<{ passed: boolean, message: string } | undefined>,
+            default: () => ({ passed: true, message: "" })
         }
     },
     emits: ["update:modelValue"],
@@ -58,11 +63,27 @@ export default defineComponent({
                 return true;
             }
         ];
+        const externalValidationRules = ref([
+            () => {
+                if (props.externalValidation?.passed == false) return props.externalValidation?.message;
+                return true;
+            }
+        ]);
+
+        watch(() => props.externalValidation, () => {
+            externalValidationRules.value = [
+                () => {
+                    if (props.externalValidation?.passed === false) return props.externalValidation?.message;
+                    return true;
+                }
+            ];
+        });
 
         const searchBookSeries = lodash.debounce((input: string) => {
             if (input.includes("|")) {
                 return;
             }
+
             if (input.length >= 3) {
                 let params = "";
                 const tokens = input.split(" ");
@@ -95,7 +116,7 @@ export default defineComponent({
 
         return {
             bookSeries, selectedBookSeries, searchBookSeries,
-            requiredSelectionRules,
+            requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput
         };
     }

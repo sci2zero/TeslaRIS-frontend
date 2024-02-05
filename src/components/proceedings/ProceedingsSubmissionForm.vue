@@ -97,12 +97,12 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal"></journal-autocomplete-search>
+                            <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries"></book-series-autocomplete-search>
+                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -157,6 +157,7 @@ import { ProceedingsPublicationType } from "@/models/PublicationModel";
 import type { Proceedings } from "@/models/ProceedingsModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
+import type { ExternalValidation } from "@/models/Common";
 
 
 export default defineComponent({
@@ -172,6 +173,7 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
+        const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
 
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>([]);
@@ -223,13 +225,6 @@ export default defineComponent({
         const publicationSeriesVolume = ref("");
         const publicationSeriesIssue = ref("");
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
         const publicationTypeSr = [
             { title: "Redovan članak - pun tekst", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
             { title: "Pozvani članak - pun tekst", value: ProceedingsPublicationType.INVITED_FULL_ARTICLE },
@@ -261,6 +256,26 @@ export default defineComponent({
                 publicationYear.value = year[0];
             }
         };
+
+        const requiredFieldRules = [
+            (value: string) => {
+                if (!value) return requiredFieldMessage.value;
+                return true;
+            }
+        ];
+
+        const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
+        const validatePublicationSeriesSelection = (): void => {
+            if (selectedBookSeries.value.value !== -1 && selectedJournal.value.value !== -1) {
+                publicationSeriesExternalValidation.value = { passed: false, message: selectOneMessage.value };
+            } else {
+                publicationSeriesExternalValidation.value = { passed: true, message: "" };
+            }
+        }
+
+        watch([selectedJournal, selectedBookSeries], () => {
+            validatePublicationSeriesSelection();
+        });
 
         watch(selectedEvent, (newValue: any) => {
             setPublicationYear(newValue.date);
@@ -325,7 +340,8 @@ export default defineComponent({
             publisherAutocompleteRef, selectedPublisher,
             publicationTypes, selectedpublicationType,
             bookSeriesAutocompleteRef, selectedBookSeries,
-            requiredFieldRules, submitProceedings
+            requiredFieldRules, validatePublicationSeriesSelection, 
+            publicationSeriesExternalValidation, submitProceedings
         };
     }
 });

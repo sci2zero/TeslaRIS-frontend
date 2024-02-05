@@ -38,7 +38,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -273,6 +273,8 @@ export default defineComponent({
                 doi: doi.value,
                 eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value
             };
+
+            console.log(newJournalPublication)
 
             DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
                 if (stayOnPage) {

@@ -5,7 +5,7 @@
         :items="journals"
         :custom-filter="((): boolean => true)"
         :auto-select-first="true"
-        :rules="required ? requiredSelectionRules : []"
+        :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
         :no-data-text="$t('noDataMessage')"
         return-object
         @update:search="searchJournals($event)"
@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import JournalService from '@/services/JournalService';
 import type { JournalIndex } from '@/models/JournalModel';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -33,6 +34,10 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
+        },
+        externalValidation: {
+            type: Object as PropType<{ passed: boolean, message: string } | undefined>,
+            default: () => ({ passed: true, message: "" })
         }
     },
     emits: ["update:modelValue"],
@@ -57,6 +62,21 @@ export default defineComponent({
                 return true;
             }
         ];
+        const externalValidationRules = ref([
+            () => {
+                if (props.externalValidation?.passed == false) return props.externalValidation?.message;
+                return true;
+            }
+        ]);
+
+        watch(() => props.externalValidation, () => {
+            externalValidationRules.value = [
+                () => {
+                    if (props.externalValidation?.passed === false) return props.externalValidation?.message;
+                    return true;
+                }
+            ];
+        });
 
         const searchJournals = lodash.debounce((input: string) => {
             if (input.includes("|")) {
@@ -94,7 +114,7 @@ export default defineComponent({
 
         return {
             journals, selectedJournal, searchJournals,
-            requiredSelectionRules,
+            requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput
         };
     }

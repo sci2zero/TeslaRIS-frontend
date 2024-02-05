@@ -15,8 +15,10 @@
             ></v-autocomplete>
         </v-col>
     </v-row>
-    <multilingual-text-input ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')" is-area></multilingual-text-input>
-    <multilingual-text-input ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"></multilingual-text-input>
+    <multilingual-text-input
+        v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')"
+        is-area></multilingual-text-input>
+    <multilingual-text-input v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"></multilingual-text-input>
 </template>
 
 <script lang="ts">
@@ -33,6 +35,12 @@ import { watch } from "vue";
 export default defineComponent({
     name: "PersonContributionBase",
     components: {MultilingualTextInput},
+    props: {
+        basic: {
+            type: Boolean,
+            default: false
+        }
+    },
     emits: ["setInput"],
     setup(_, {emit}) {
         const contributionDescription = ref([]);
