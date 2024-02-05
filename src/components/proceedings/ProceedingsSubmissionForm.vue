@@ -158,6 +158,7 @@ import type { Proceedings } from "@/models/ProceedingsModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
+import ProceedingsService from '@/services/ProceedingsService';
 
 
 export default defineComponent({
@@ -296,7 +297,7 @@ export default defineComponent({
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
-                publicationSeriesId: selectedBookSeries.value?.value, // TODO: How to differentiate input?
+                publicationSeriesId: selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value,
                 publicationSeriesIssue: publicationSeriesIssue.value,
                 publicationSeriesVolume: publicationSeriesVolume.value,
                 publisherId: selectedPublisher.value?.value,
@@ -305,23 +306,33 @@ export default defineComponent({
 
             console.log(newProceedings, stayOnPage, router);
 
-            // JournalService.createJournal(newJournal).then(() => {
-            //     if (stayOnPage) {
-            //         titleRef.value?.clearInput();
-            //         abbreviationsRef.value?.clearInput();
-            //         eIssn.value = "";
-            //         printIssn.value = "";
-            //         selectedLanguages.value = [defaultLanguage.value];
+            ProceedingsService.createProceedings(newProceedings).then(() => {
+                if (stayOnPage) {
+                    titleRef.value?.clearInput();
+                    subtitleRef.value?.clearInput();
+                    descriptionRef.value?.clearInput();
+                    keywordsRef.value?.clearInput();
+                    placeRef.value?.clearInput();
+                    urisRef.value?.clearInput();
+                    eventAutocompleteRef.value?.clearInput();
+                    selectedpublicationType.value = {title: "", value: null};
+                    doi.value = "";
+                    scopus.value = "";
+                    articleNumber.value = "";
+                    numberOfPages.value = null;
+                    eIsbn.value = "";
+                    printIsbn.value = "";
+                    publicationYear.value = "";
 
-            //         error.value = false;
-            //         snackbar.value = true;
-            //     } else {
-            //         router.push({ name: "journals" });
-            //     }
-            // }).catch(() => {
-            //     error.value = true;
-            //     snackbar.value = true;
-            // });
+                    error.value = false;
+                    snackbar.value = true;
+                } else {
+                    router.push({ name: "scientificResults" });
+                }
+            }).catch(() => {
+                error.value = true;
+                snackbar.value = true;
+            });
         };
 
         return {

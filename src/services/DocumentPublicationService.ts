@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { DocumentPublicationIndex, JournalPublication, ProceedingsPublicationResponse } from "@/models/PublicationModel";
+import type { DocumentPublicationIndex, JournalPublication, ProceedingsPublication } from "@/models/PublicationModel";
 
 export class DocumentPublicationService extends BaseService {
 
@@ -24,12 +24,12 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "journal-publication", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
-    return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}/my-publications`);
+  async createJProceedingsPublication(body: ProceedingsPublication): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.post, "proceedings-publication", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async readProceedingsForEvent(eventId: number): Promise<AxiosResponse<ProceedingsPublicationResponse[]>> {
-    return super.sendRequest(axios.get, `proceedings/for-event/${eventId}`);
+  async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
+    return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}/my-publications`);
   }
 
   async deleteDocumentPublication(documentPublicationId: number): Promise<AxiosResponse<void>> {

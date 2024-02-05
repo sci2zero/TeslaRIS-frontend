@@ -147,6 +147,7 @@ import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { ProceedingsPublicationResponse, ProceedingsPublication } from "@/models/PublicationModel";
+import ProceedingsService from '@/services/ProceedingsService';
 
 
 export default defineComponent({
@@ -182,7 +183,7 @@ export default defineComponent({
         const keywords = ref([]);
         const contributions = ref([]);
         const availableProceedings = ref<{title: string, value: number}[]>([]);
-        const selectedProceedings = ref({title: "", value: -1});
+        const selectedProceedings = ref(searchPlaceholder);
         const startPage = ref("");
         const endPage = ref("");
         const doi = ref("");
@@ -238,7 +239,7 @@ export default defineComponent({
         };
 
         const fetchProceedings = (event: { title: string, value: number }) => {
-            DocumentPublicationService.readProceedingsForEvent(event.value).then((response) => {
+            ProceedingsService.readProceedingsForEvent(event.value).then((response) => {
                 response.data.forEach((proceedingsResponse: ProceedingsPublicationResponse) => {
                     availableProceedings.value.push({title: `${proceedingsResponse.proceedingsTitle} | ${proceedingsResponse.title} | ${proceedingsResponse.documentDate}`, 
                                                     value: proceedingsResponse.id })
@@ -270,6 +271,35 @@ export default defineComponent({
             };
 
             console.log(newProceedingsPublication, stayOnPage, router)
+
+            DocumentPublicationService.createJProceedingsPublication(newProceedingsPublication).then(() => {
+                if (stayOnPage) {
+                    titleRef.value?.clearInput();
+                    subtitleRef.value?.clearInput();
+                    descriptionRef.value?.clearInput();
+                    keywordsRef.value?.clearInput();
+                    placeRef.value?.clearInput();
+                    urisRef.value?.clearInput();
+                    contributionsRef.value?.clearInput();
+                    eventAutocompleteRef.value?.clearInput();
+                    selectedProceedings.value = searchPlaceholder;
+                    selectedpublicationType.value = {title: "", value: null};
+                    startPage.value = "";
+                    endPage.value = "";
+                    doi.value = "";
+                    scopus.value = "";
+                    articleNumber.value = "";
+                    numberOfPages.value = null;
+
+                    error.value = false;
+                    snackbar.value = true;
+                } else {
+                    router.push({ name: "scientificResults" });
+                }
+            }).catch(() => {
+                error.value = true;
+                snackbar.value = true;
+            });
         };
 
         return {
