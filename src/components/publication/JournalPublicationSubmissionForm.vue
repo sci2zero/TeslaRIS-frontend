@@ -248,7 +248,6 @@ export default defineComponent({
         };
 
         watch(selectedJournal, (newValue) => {
-            console.log(newValue.value);
             listPublications(newValue);
         });
 

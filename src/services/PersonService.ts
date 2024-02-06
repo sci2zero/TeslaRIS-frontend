@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { BasicPerson, PersonIndex } from "@/models/PersonModel";
+import type { BasicPerson, PersonIndex, PersonResponse } from "@/models/PersonModel";
 
 export class PersonService extends BaseService {
 
@@ -22,6 +22,10 @@ export class PersonService extends BaseService {
 
   async deleteResearcher(researcherId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `person/${researcherId}`);
+  }
+
+  async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
+    return super.sendRequest(axios.get, `person/${personId}`);
   }
 }
 

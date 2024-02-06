@@ -11,8 +11,21 @@
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchPersons($event)"
-                @update:model-value="sendContentToParent"
+                @update:model-value="onPersonSelect($event)"
             ></v-autocomplete>
+        </v-col>
+    </v-row>
+    <v-row v-if="personOtherNames.length > 1">
+        <v-col cols="12">
+            <v-select
+                v-model="selectedOtherName"
+                :label="$t('personOtherNamesLabel')"
+                :items="personOtherNames"
+                :auto-select-first="true"
+                :no-data-text="$t('noDataMessage')"
+                return-object
+                @update:model-value="sendContentToParent"
+            ></v-select>
         </v-col>
     </v-row>
     <multilingual-text-input
@@ -31,6 +44,7 @@ import { computed } from "vue";
 import MultilingualTextInput from "./MultilingualTextInput.vue";
 import lodash from "lodash";
 import { watch } from "vue";
+import type { PersonName } from "@/models/PersonModel";
 
 export default defineComponent({
     name: "PersonContributionBase",
@@ -55,6 +69,10 @@ export default defineComponent({
 
         const i18n = useI18n();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
+        const personOtherNamePlaceholder = ref({title: "", value: -1});
+
+        const personOtherNames = ref<{ title: string, value: PersonName | number }[]>([]);
+        const selectedOtherName = ref<{ title: string, value: PersonName | number }>(personOtherNamePlaceholder.value);
 
         const requiredFieldRules = [
             (value: string) => {
@@ -99,11 +117,28 @@ export default defineComponent({
             return true;
         };
 
+        const onPersonSelect = (selection: {title: string, value: number}) => {
+            PersonService.readPerson(selection.value).then((response) => {
+                personOtherNames.value = [{title: selection.title.split("|")[0], value: -1}];
+                selectedOtherName.value = personOtherNames.value[0];
+                response.data.personOtherNames.forEach((otherName) => {
+                    personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName})
+                });
+            });
+            sendContentToParent();
+        };
+
         const sendContentToParent = () => {
+            let otherName = ["", "", "", null, null];
+            if (selectedOtherName.value && selectedOtherName.value?.value !== -1) {
+                const personOtherName = selectedOtherName.value?.value as PersonName;
+                otherName = [personOtherName.firstname, personOtherName.otherName, personOtherName.lastname, personOtherName.dateFrom as string, personOtherName.dateTo as string];
+            }
             const returnObject = {
                 personId: selectedPerson.value.value,
                 description: contributionDescription.value,
-                affiliationStatement: affiliationStatement.value
+                affiliationStatement: affiliationStatement.value,
+                selectedOtherName: otherName
             };
             emit("setInput", returnObject);
         };
@@ -115,6 +150,7 @@ export default defineComponent({
             selectedPerson.value = personPlaceholder;
             descriptionRef.value?.clearInput();
             affiliationStatementRef.value?.clearInput();
+            personOtherNames.value = [];
         };
 
         return {persons, 
@@ -122,8 +158,9 @@ export default defineComponent({
                 searchPersons, filterPersons,
                 requiredFieldRules, requiredSelectionRules,
                 contributionDescription, affiliationStatement,
-                sendContentToParent, clearInput,
-                descriptionRef, affiliationStatementRef};
+                sendContentToParent, clearInput, onPersonSelect,
+                descriptionRef, affiliationStatementRef,
+                personOtherNames, selectedOtherName};
     }
 });
 </script>

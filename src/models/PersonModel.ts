@@ -1,4 +1,4 @@
-import type { MultilingualContent } from "./Common";
+import type { ApproveStatus, MultilingualContent } from "./Common";
 
 export interface PersonIndex {
     id: string;
@@ -30,7 +30,7 @@ export interface BasicPerson {
     employmentPosition: EmploymentPosition;
   }
 
-interface PersonName {
+export interface PersonName {
     firstname: string;
     otherName: string;
     lastname: string;
@@ -95,4 +95,25 @@ export enum EmploymentPosition {
 export enum Sex {
     MALE,
     FEMALE,
+}
+
+export interface PersonResponse {
+    personName: PersonName;
+    personOtherNames: PersonName[];
+    personalInfo: PersonalInfo;
+    biography: MultilingualContent[];
+    keyword: MultilingualContent[];
+    approveStatus: ApproveStatus;
+}
+
+interface PersonalInfo {
+    localBirthDate: string;
+    placeOfBirth?: string;
+    sex: Sex;
+    postalAddress?: PostalAddress;
+    contact: Contact;
+    apvnt?: string;
+    mnid?: string;
+    orcid?: string;
+    scopusAuthorId?: string;
 }

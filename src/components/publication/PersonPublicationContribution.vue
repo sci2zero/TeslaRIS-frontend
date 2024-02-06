@@ -95,10 +95,19 @@ export default defineComponent({
         const sendContentToParent = () => {
             const returnObject: PersonDocumentContribution[] = [];
             inputs.value.forEach((input, index) => {
+                let personName = undefined;
+                if (input.contribution.selectedOtherName) {
+                    personName = {firstname: input.contribution.selectedOtherName[0], 
+                                  otherName: input.contribution.selectedOtherName[1],
+                                  lastname: input.contribution.selectedOtherName[2],
+                                  dateFrom: input.contribution.selectedOtherName[3],
+                                  dateTo: input.contribution.selectedOtherName[4]}
+                }
                 returnObject.push({contributionDescription: input.contribution.description,
                                     personId: input.contribution.personId,
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
+                                    personName: personName,
                                     contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType,
                                     isMainContributor: props.basic ? index === 0 : input.isMainContributor,
                                     isCorrespondingContributor: props.basic ? false : input.isMainContributor});

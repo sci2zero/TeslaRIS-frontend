@@ -29,3 +29,9 @@ export interface ExternalValidation {
     passed: boolean,
     message: string
 }
+
+export enum ApproveStatus {
+    REQUESTED,
+    APPROVED,
+    DECLINED,
+}
