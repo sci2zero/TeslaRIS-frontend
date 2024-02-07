@@ -1,16 +1,28 @@
 <template>
-    <v-autocomplete
-        v-model="selectedEvent"
-        :label="$t('conferenceLabel') + (required ? '*' : '')"
-        :items="events"
-        :custom-filter="((): boolean => true)"
-        :rules="required ? requiredSelectionRules : []"
-        :auto-select-first="true"
-        :no-data-text="$t('noDataMessage')"
-        return-object
-        @update:search="searchEvents($event)"
-        @update:model-value="sendContentToParent"
-    ></v-autocomplete>
+    <v-row>
+        <v-col :cols="allowManualClearing && selectedEvent.value !== -1 ? 10 : 11">
+            <v-autocomplete
+                v-model="selectedEvent"
+                :label="$t('conferenceLabel') + (required ? '*' : '')"
+                :items="events"
+                :custom-filter="((): boolean => true)"
+                :rules="required ? requiredSelectionRules : []"
+                :auto-select-first="true"
+                :no-data-text="$t('noDataMessage')"
+                return-object
+                @update:search="searchEvents($event)"
+                @update:model-value="sendContentToParent"
+            ></v-autocomplete>
+        </v-col>
+        <v-col cols="1" style="margin-top: 20px;">
+            <conference-submission-modal></conference-submission-modal>
+        </v-col>
+        <v-col cols="1">
+            <v-btn v-show="allowManualClearing && selectedEvent.value !== -1" icon @click="clearInput()">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -22,12 +34,18 @@ import type { EventIndex } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { computed } from 'vue';
+import ConferenceSubmissionModal from './ConferenceSubmissionModal.vue';
 
 
 export default defineComponent({
     name: "EventAutocompleteSearch",
+    components: { ConferenceSubmissionModal },
     props: {
         required: {
+            type: Boolean,
+            default: false
+        },
+        allowManualClearing: {
             type: Boolean,
             default: false
         },

@@ -1,16 +1,28 @@
 <template>
-    <v-autocomplete
-        v-model="selectedBookSeries"
-        :label="$t('bookSeriesLabel') + (required ? '*' : '')"
-        :items="bookSeries"
-        :custom-filter="((): boolean => true)"
-        :auto-select-first="true"
-        :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
-        :no-data-text="$t('noDataMessage')"
-        return-object
-        @update:search="searchBookSeries($event)"
-        @update:model-value="sendContentToParent"
-    ></v-autocomplete>
+    <v-row>
+        <v-col :cols="allowManualClearing && selectedBookSeries.value !== -1 ? 10 : 11">
+            <v-autocomplete
+                v-model="selectedBookSeries"
+                :label="$t('bookSeriesLabel') + (required ? '*' : '')"
+                :items="bookSeries"
+                :custom-filter="((): boolean => true)"
+                :auto-select-first="true"
+                :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
+                :no-data-text="$t('noDataMessage')"
+                return-object
+                @update:search="searchBookSeries($event)"
+                @update:model-value="sendContentToParent"
+            ></v-autocomplete>
+        </v-col>
+        <v-col cols="1" style="margin-top: 20px;">
+            <publication-series-submission-modal :input-type="inputType"></publication-series-submission-modal>
+        </v-col>
+        <v-col cols="1">
+            <v-btn v-show="allowManualClearing && selectedBookSeries.value !== -1" icon @click="clearInput()">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -23,12 +35,19 @@ import BookSeriesService from '@/services/BookSeriesService';
 import type { BookSeriesIndex } from '@/models/BookSeriesModel';
 import type { PropType } from 'vue';
 import { watch } from 'vue';
+import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
+import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 
 
 export default defineComponent({
     name: "BookSeriesAutocompleteSearch",
+    components: { PublicationSeriesSubmissionModal },
     props: {
         required: {
+            type: Boolean,
+            default: false
+        },
+        allowManualClearing: {
             type: Boolean,
             default: false
         },
@@ -44,6 +63,8 @@ export default defineComponent({
     emits: ["update:modelValue"],
     setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
+        
+        const inputType = PublicationSeriesType.BOOK_SERIES.toString();
 
         const bookSeries = ref<{ title: string; value: number; }[]>([]);
         const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -117,7 +138,7 @@ export default defineComponent({
         return {
             bookSeries, selectedBookSeries, searchBookSeries,
             requiredSelectionRules, externalValidationRules,
-            sendContentToParent, clearInput
+            sendContentToParent, clearInput, inputType
         };
     }
 });

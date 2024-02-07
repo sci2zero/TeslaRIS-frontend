@@ -1,9 +1,9 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="10">
+            <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="11">
                         <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
                     </v-col>
                 </v-row>
@@ -32,6 +32,9 @@
                             :rules="requiredSelectionRules"
                             return-object
                         ></v-select>
+                    </v-col>
+                    <v-col style="margin-top: 20px;">
+                        <proceedings-submission-modal></proceedings-submission-modal>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -146,13 +149,21 @@ import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import type { ProceedingsPublicationResponse, ProceedingsPublication } from "@/models/PublicationModel";
+import type { ProceedingsPublication } from "@/models/PublicationModel";
 import ProceedingsService from '@/services/ProceedingsService';
+import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModal.vue';
+import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal},
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -240,9 +251,19 @@ export default defineComponent({
 
         const fetchProceedings = (event: { title: string, value: number }) => {
             ProceedingsService.readProceedingsForEvent(event.value).then((response) => {
-                response.data.forEach((proceedingsResponse: ProceedingsPublicationResponse) => {
-                    availableProceedings.value.push({title: `${proceedingsResponse.proceedingsTitle} | ${proceedingsResponse.title} | ${proceedingsResponse.documentDate}`, 
-                                                    value: proceedingsResponse.id })
+                response.data.forEach((proceedingsResponse: ProceedingsResponse) => {
+                    let title: string | undefined;
+                    proceedingsResponse.title.forEach(multilingualContent => {
+                        if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                            title = multilingualContent.content;
+                            return;
+                        }
+                    });
+                    if (!title && proceedingsResponse.title.length > 0) {
+                        title = proceedingsResponse.title[0].content;
+                    }
+
+                    availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number })
                 });
             });
         };

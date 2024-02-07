@@ -1,15 +1,15 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
+                    <v-col cols="12">
+                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -81,10 +81,10 @@
                     </v-row>
                     <v-row>
                         <v-col cols="6">
-                            <v-text-field v-model="numberOfPages" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                            <v-text-field v-model="articleNumber" type="number" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -97,12 +97,12 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
+                            <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
+                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -164,6 +164,12 @@ import ProceedingsService from '@/services/ProceedingsService';
 export default defineComponent({
     name: "SubmitProceedings",
     components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch},
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -283,6 +289,11 @@ export default defineComponent({
         });
 
         const submitProceedings = (stayOnPage: boolean) => {
+            let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
+            if (publicationSeriesId === -1) {
+                publicationSeriesId = undefined;
+            }
+
             const newProceedings: Proceedings = {
                 description: description.value,
                 keywords: keywords.value,
@@ -297,10 +308,10 @@ export default defineComponent({
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
-                publicationSeriesId: selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value,
+                publicationSeriesId: publicationSeriesId,
                 publicationSeriesIssue: publicationSeriesIssue.value,
                 publicationSeriesVolume: publicationSeriesVolume.value,
-                publisherId: selectedPublisher.value?.value,
+                publisherId: selectedPublisher.value?.value !== -1 ? selectedPublisher.value?.value : undefined,
                 scopusId: scopus.value,
             };
 

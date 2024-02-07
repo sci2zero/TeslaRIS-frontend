@@ -1,14 +1,14 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
-                    <v-col>
+                    <v-col cols="12">
                         <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-text-field v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')" :placeholder="$t('nameAbbreviationLabel')"></v-text-field>
                     </v-col>
                 </v-row>
@@ -17,22 +17,22 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col cols="12">
                             <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <open-layers-map ref="mapRef" :read-only="false"></open-layers-map>
                         </v-col>
                     </v-row>
@@ -75,6 +75,12 @@ import OrganisationUnitService from "@/services/OrganisationUnitService";
 export default defineComponent({
     name: "SubmitOrganizationUnit",
     components: {MultilingualTextInput, OpenLayersMap},
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);

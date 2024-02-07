@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col cols="12">
+        <v-col cols="11">
             <v-autocomplete
                 v-model="selectedPerson"
                 :label="$t('personLabel') + '*'"
@@ -14,9 +14,12 @@
                 @update:model-value="onPersonSelect($event)"
             ></v-autocomplete>
         </v-col>
+        <v-col cols="1" style="margin-top: 20px;">
+            <person-submission-modal></person-submission-modal>
+        </v-col>
     </v-row>
-    <v-row v-if="personOtherNames.length > 1">
-        <v-col cols="12">
+    <v-row v-if="personOtherNames.length > 0">
+        <v-col v-if="!customNameInput" cols="10">
             <v-select
                 v-model="selectedOtherName"
                 :label="$t('personOtherNamesLabel')"
@@ -26,6 +29,20 @@
                 return-object
                 @update:model-value="sendContentToParent"
             ></v-select>
+        </v-col>
+        <v-col v-if="customNameInput" cols="3">
+            <v-text-field v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"></v-text-field>
+        </v-col>
+        <v-col v-if="customNameInput" cols="3">
+            <v-text-field v-model="middleName" :label="$t('middleNameLabel') + '*'" :placeholder="$t('middleNameLabel')" :rules="requiredFieldRules"></v-text-field>
+        </v-col>
+        <v-col v-if="customNameInput" cols="3">
+            <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
+        </v-col>
+        <v-col cols="2" style="margin-top: 10px;">
+            <v-btn color="primary" @click="customNameInput = !customNameInput">
+                {{ !customNameInput ? $t("addCustomLabel") : $t("selectFromListLabel") }}
+            </v-btn>
         </v-col>
     </v-row>
     <multilingual-text-input
@@ -45,10 +62,11 @@ import MultilingualTextInput from "./MultilingualTextInput.vue";
 import lodash from "lodash";
 import { watch } from "vue";
 import type { PersonName } from "@/models/PersonModel";
+import PersonSubmissionModal from "../person/PersonSubmissionModal.vue";
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: {MultilingualTextInput},
+    components: { MultilingualTextInput, PersonSubmissionModal },
     props: {
         basic: {
             type: Boolean,
@@ -59,6 +77,11 @@ export default defineComponent({
     setup(_, {emit}) {
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
+
+        const customNameInput = ref(false);
+        const firstName = ref("");
+        const middleName = ref("");
+        const lastName = ref("");
 
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const affiliationStatementRef = ref<typeof MultilingualTextInput>();
@@ -103,7 +126,7 @@ export default defineComponent({
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value === "sr") {
-                            listOfPersons.push({title: `${person.name} | ${person.birthdate} | ${person.employmentsSr}`, value: person.databaseId});
+                            listOfPersons.push({title: `${person.name} | ${person.birthdate ? person.birthdate : "NA"} | ${person.employmentsSr}`, value: person.databaseId});
                         } else {
                             listOfPersons.push({title: `${person.name} | ${person.birthdate} | ${person.employmentsOther}`, value: person.databaseId});
                         }
@@ -134,6 +157,9 @@ export default defineComponent({
                 const personOtherName = selectedOtherName.value?.value as PersonName;
                 otherName = [personOtherName.firstname, personOtherName.otherName, personOtherName.lastname, personOtherName.dateFrom as string, personOtherName.dateTo as string];
             }
+            if (customNameInput.value) {
+                otherName = [firstName.value, middleName.value, lastName.value, null, null]
+            }
             const returnObject = {
                 personId: selectedPerson.value.value,
                 description: contributionDescription.value,
@@ -153,8 +179,9 @@ export default defineComponent({
             personOtherNames.value = [];
         };
 
-        return {persons, 
-                selectedPerson,
+        return {persons,
+                firstName, middleName, lastName,
+                selectedPerson, customNameInput,
                 searchPersons, filterPersons,
                 requiredFieldRules, requiredSelectionRules,
                 contributionDescription, affiliationStatement,

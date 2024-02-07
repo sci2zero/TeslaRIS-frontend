@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
                         <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
@@ -115,6 +115,12 @@ import type { AxiosResponse } from 'axios';
 export default defineComponent({
     name: "ConferenceSubmissionForm",
     components: {MultilingualTextInput},
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
         const timePeriodInput = ref(false);

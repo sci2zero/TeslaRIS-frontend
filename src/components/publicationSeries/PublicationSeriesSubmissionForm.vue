@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
@@ -84,6 +84,10 @@ export default defineComponent({
             type: String,
             required: true
         },
+        inModal: {
+            type: Boolean,
+            default: false
+        }
     },
     setup(props) {
         const isFormValid = ref(false);

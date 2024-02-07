@@ -1,15 +1,27 @@
 <template>
-    <v-autocomplete
-        v-model="selectedPublisher"
-        :label="$t('publisherLabel')"
-        :items="publishers"
-        :custom-filter="((): boolean => true)"
-        :auto-select-first="true"
-        :no-data-text="$t('noDataMessage')"
-        return-object
-        @update:search="searchPublishers($event)"
-        @update:model-value="sendContentToParent"
-    ></v-autocomplete>
+    <v-row>
+        <v-col :cols="allowManualClearing && selectedPublisher.value !== -1 ? 10 : 11">
+            <v-autocomplete
+                v-model="selectedPublisher"
+                :label="$t('publisherLabel')"
+                :items="publishers"
+                :custom-filter="((): boolean => true)"
+                :auto-select-first="true"
+                :no-data-text="$t('noDataMessage')"
+                return-object
+                @update:search="searchPublishers($event)"
+                @update:model-value="sendContentToParent"
+            ></v-autocomplete>
+        </v-col>
+        <v-col cols="1" style="margin-top: 20px;">
+            <publisher-submission-modal></publisher-submission-modal>
+        </v-col>
+        <v-col cols="1">
+            <v-btn v-show="allowManualClearing && selectedPublisher.value !== -1" icon @click="clearInput()">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -20,11 +32,17 @@ import PublisherService from '@/services/PublisherService';
 import type { PublisherIndex } from '@/models/PublisherModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import PublisherSubmissionModal from './PublisherSubmissionModal.vue';
 
 
 export default defineComponent({
     name: "PublisherAutocompleteSearch",
+    components: { PublisherSubmissionModal },
     props: {
+        allowManualClearing: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,

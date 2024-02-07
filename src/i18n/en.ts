@@ -140,5 +140,7 @@ export default {
     addProceedingsPublicationLabel: "Add Proceedings Publication",
     selectConferenceMessage: "Select Conference in order to select this.",
     selectOnePublicationSeriesMessage: "You can only select one type of publication series.",
-    personOtherNamesLabel: "Name format used in the publication"
+    personOtherNamesLabel: "Name format used in the publication",
+    addCustomLabel: "Custom",
+    selectFromListLabel: "List"
 }

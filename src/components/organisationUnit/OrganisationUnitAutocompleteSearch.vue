@@ -1,16 +1,28 @@
 <template>
-    <v-autocomplete
-        v-model="selectedOrganisationUnit"
-        :label="$t('organisationUnitLabel') + (required ? '*' : '')"
-        :items="organisationUnits"
-        :custom-filter="((): boolean => true)"
-        :auto-select-first="true"
-        :rules="required ? requiredSelectionRules : []"
-        :no-data-text="$t('noDataMessage')"
-        return-object
-        @update:search="searchOUs($event)"
-        @update:model-value="sendContentToParent"
-    ></v-autocomplete>
+    <v-row>
+        <v-col :cols="calculateAutocompleteWidth()">
+            <v-autocomplete
+                v-model="selectedOrganisationUnit"
+                :label="$t('organisationUnitLabel') + (required ? '*' : '')"
+                :items="organisationUnits"
+                :custom-filter="((): boolean => true)"
+                :auto-select-first="true"
+                :rules="required ? requiredSelectionRules : []"
+                :no-data-text="$t('noDataMessage')"
+                return-object
+                @update:search="searchOUs($event)"
+                @update:model-value="sendContentToParent"
+            ></v-autocomplete>
+        </v-col>
+        <v-col v-if="userRole === 'ADMIN'" cols="1" style="margin-top: 20px;">
+            <organisation-unit-submission-modal></organisation-unit-submission-modal>
+        </v-col>
+        <v-col cols="1">
+            <v-btn v-show="allowManualClearing && selectedOrganisationUnit.value !== -1" icon @click="clearInput()">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -21,12 +33,19 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
+import OrganisationUnitSubmissionModal from './OrganisationUnitSubmissionModal.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
     name: "OrganisationUnitAutocompleteSearch",
+    components: { OrganisationUnitSubmissionModal },
     props: {
         required: {
+            type: Boolean,
+            default: false
+        },
+        allowManualClearing: {
             type: Boolean,
             default: false
         },
@@ -40,6 +59,8 @@ export default defineComponent({
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const ouPlaceholder = {title: "", value: -1};
         const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
+
+        const userRole = computed(() => UserService.provideUserRole());
 
         onMounted(() => {
             if(props.modelValue && props.modelValue.value !== -1) {
@@ -88,10 +109,18 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const calculateAutocompleteWidth = () => {
+            let numberOfColumns = props.allowManualClearing && selectedOrganisationUnit.value.value !== -1 ? 10 : 11;
+            if (userRole.value !== "ADMIN") {
+                numberOfColumns += 1;
+            }
+            return numberOfColumns;
+        }
+
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
-            requiredSelectionRules,
-            sendContentToParent, clearInput
+            requiredSelectionRules, calculateAutocompleteWidth,
+            sendContentToParent, clearInput, userRole
         };
     }
 });

@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="10">
+            <v-col :cols="inModal ? 12 : 10">
                 <v-row>
                     <v-col cols="10">
                         <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" required></journal-autocomplete-search>
@@ -164,6 +164,12 @@ import { watch } from 'vue';
 export default defineComponent({
     name: "SubmitJournalPublication",
     components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, JournalAutocompleteSearch},
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);

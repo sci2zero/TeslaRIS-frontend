@@ -1,8 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Proceedings } from "@/models/ProceedingsModel";
-import type { ProceedingsPublicationResponse } from "@/models/PublicationModel";
+import type { Proceedings, ProceedingsResponse } from "@/models/ProceedingsModel";
 
 export class ProceedingsService extends BaseService {
 
@@ -12,7 +11,7 @@ export class ProceedingsService extends BaseService {
     return super.sendRequest(axios.post, "proceedings", body, ProceedingsService.idempotencyKey);
   }
 
-  async readProceedingsForEvent(eventId: number): Promise<AxiosResponse<ProceedingsPublicationResponse[]>> {
+  async readProceedingsForEvent(eventId: number): Promise<AxiosResponse<ProceedingsResponse[]>> {
     return super.sendRequest(axios.get, `proceedings/for-event/${eventId}`);
   }
 }

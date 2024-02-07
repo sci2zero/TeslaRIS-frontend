@@ -1,19 +1,19 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
-                    <v-col>
+                    <v-col cols="12">
                         <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-autocomplete v-model="state" :label="$t('stateLabel')" :items="countryList" return-object></v-autocomplete>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
+                    <v-col cols="12">
                         <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
@@ -59,6 +59,12 @@ import PublisherService from "@/services/PublisherService";
 export default defineComponent({
     name: "SubmitPublisher",
     components: {MultilingualTextInput},
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
 

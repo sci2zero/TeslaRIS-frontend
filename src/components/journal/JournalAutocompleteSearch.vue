@@ -1,16 +1,28 @@
 <template>
-    <v-autocomplete
-        v-model="selectedJournal"
-        :label="$t('journalLabel') + (required ? '*' : '')"
-        :items="journals"
-        :custom-filter="((): boolean => true)"
-        :auto-select-first="true"
-        :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
-        :no-data-text="$t('noDataMessage')"
-        return-object
-        @update:search="searchJournals($event)"
-        @update:model-value="sendContentToParent"
-    ></v-autocomplete>
+    <v-row>
+        <v-col :cols="allowManualClearing && selectedJournal.value !== -1 ? 10 : 11">
+            <v-autocomplete
+                v-model="selectedJournal"
+                :label="$t('journalLabel') + (required ? '*' : '')"
+                :items="journals"
+                :custom-filter="((): boolean => true)"
+                :auto-select-first="true"
+                :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
+                :no-data-text="$t('noDataMessage')"
+                return-object
+                @update:search="searchJournals($event)"
+                @update:model-value="sendContentToParent"
+            ></v-autocomplete>
+        </v-col>
+        <v-col cols="1" style="margin-top: 20px;">
+            <publication-series-submission-modal :input-type="inputType"></publication-series-submission-modal>
+        </v-col>
+        <v-col cols="1">
+            <v-btn v-show="allowManualClearing && selectedJournal.value !== -1" icon @click="clearInput()">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -22,12 +34,19 @@ import { onMounted } from 'vue';
 import JournalService from '@/services/JournalService';
 import type { JournalIndex } from '@/models/JournalModel';
 import { watch } from 'vue';
+import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
+import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
 
 
 export default defineComponent({
     name: "JournalAutocompleteSearch",
+    components: { PublicationSeriesSubmissionModal },
     props: {
         required: {
+            type: Boolean,
+            default: false
+        },
+        allowManualClearing: {
             type: Boolean,
             default: false
         },
@@ -43,6 +62,8 @@ export default defineComponent({
     emits: ["update:modelValue"],
     setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
+
+        const inputType = PublicationSeriesType.JOURNAL.toString();
 
         const journals = ref<{ title: string; value: number; }[]>([]);
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -115,7 +136,7 @@ export default defineComponent({
         return {
             journals, selectedJournal, searchJournals,
             requiredSelectionRules, externalValidationRules,
-            sendContentToParent, clearInput
+            sendContentToParent, clearInput, inputType
         };
     }
 });

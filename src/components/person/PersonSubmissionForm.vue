@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
                         <v-text-field v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"></v-text-field>
@@ -10,9 +10,11 @@
                         <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <v-col cols="12">
-                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
-                </v-col>
+                <v-row>
+                    <v-col cols="12">
+                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                    </v-col>
+                </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -119,6 +121,12 @@ import OrganisationUnitAutocompleteSearch from "../organisationUnit/Organisation
 export default defineComponent({
     name: "PersonSubmissionForm",
     components: { OrganisationUnitAutocompleteSearch },
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);

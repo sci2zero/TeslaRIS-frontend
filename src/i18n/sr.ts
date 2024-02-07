@@ -140,5 +140,7 @@ export default {
     addProceedingsPublicationLabel: "Dodaj rad u zborniku radova",
     selectConferenceMessage: "Izaberite konferenciju da bi ste mogli izabrati ovo.",
     selectOnePublicationSeriesMessage: "Možete selektovati samo jedan tip serije publikacija.",
-    personOtherNamesLabel: "Oblik imena korišćen u radu"
+    personOtherNamesLabel: "Oblik imena korišćen u radu",
+    addCustomLabel: "Prilagođeno",
+    selectFromListLabel: "Lista"
 }
