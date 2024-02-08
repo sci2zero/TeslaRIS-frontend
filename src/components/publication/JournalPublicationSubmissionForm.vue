@@ -159,6 +159,7 @@ import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -214,13 +215,7 @@ export default defineComponent({
         const uris = ref<string[]>([]);
 
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules } = useValidationUtils();
 
         const journalPublicationTypeEn = [
             { title: "Review Article", value: JournalPublicationType.REVIEW_ARTICLE },

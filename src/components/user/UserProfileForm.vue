@@ -35,6 +35,7 @@
                     v-model="selectedLanguage"
                     :label="$t('preferredLanguageLabel')"
                     :items="languages"
+                    return-object
                 ></v-select>
             </v-col>
             <v-col v-if="userRole !== 'ADMIN'" cols="6">
@@ -47,6 +48,7 @@
                     :rules="userRole === 'RESEARCHER' ? requiredSelectionRules : []"
                     :readonly="userRole === 'RESEARCHER'"
                     :no-data-text="$t('noDataMessage')"
+                    return-object
                     @update:search="searchOUs($event)"
                 ></v-autocomplete>
             </v-col>
@@ -121,6 +123,7 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import UserService from "@/services/UserService";
 import lodash from "lodash";
+import { useValidationUtils } from "@/utils/ValidationUtils";
 
 export default defineComponent({
     name: "UserProfileForm",
@@ -139,10 +142,10 @@ export default defineComponent({
         const surname = ref("");
         const email = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
-        const selectedLanguage = ref<{ title: string, value: number } | number>({title: "SR", value: -1});
+        const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const ouPlaceholder = {title: "", value: -1};
-        const selectedOrganisationUnit = ref<{ title: string, value: number } | number>(ouPlaceholder);
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
         const allowAccountTakeover = ref(false);
 
         const oldPassword = ref("");
@@ -174,19 +177,7 @@ export default defineComponent({
             }
         ];
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || value as number == -1 || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const populateUserData = () => {
             UserService.getLoggedInUser().then((response) => {
@@ -229,7 +220,7 @@ export default defineComponent({
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
                     if (language.languageCode === preferredLanguage) {
-                        selectedLanguage.value = language.id;
+                        selectedLanguage.value = { title: language.languageCode, value: language.id};
                     }
                 })
             })
@@ -277,7 +268,7 @@ export default defineComponent({
                 firstname: name.value,
                 lastName: surname.value,
                 email: email.value,
-                preferredLanguageId: selectedLanguage.value as number,
+                preferredLanguageId: selectedLanguage.value.value,
                 organisationUnitId: organisationUnitId,
                 oldPassword: oldPassword.value,
                 newPassword: newPassword.value

@@ -29,7 +29,8 @@
                             <v-select
                                 v-model="selectedEmploymentPosition"
                                 :items="employmentPositions"
-                                :label="$t('employmentPositionLabel')">
+                                :label="$t('employmentPositionLabel')"
+                                return-object>
                             </v-select>
                         </v-col>
                     </v-row>
@@ -38,7 +39,8 @@
                             <v-select
                                 v-model="selectedSex"
                                 :items="sexes"
-                                :label="$t('sexLabel')">
+                                :label="$t('sexLabel')"
+                                return-object>
                             </v-select>
                         </v-col>
                     </v-row>
@@ -116,6 +118,7 @@ import type { AxiosResponse } from 'axios';
 import { EmploymentPosition, Sex } from "@/models/PersonModel";
 import type { BasicPerson } from "@/models/PersonModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -136,7 +139,6 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
         const languageList = ref<LanguageTagResponse[]>();
 
@@ -161,19 +163,7 @@ export default defineComponent({
         const apvnt = ref("");
         const scopus = ref("");
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const employmentPositionsEn = [
             { title: "Scientific Advisor", value: EmploymentPosition.SCIENTIFIC_ADVISOR },
@@ -227,7 +217,7 @@ export default defineComponent({
             { title: "Predavač", value: EmploymentPosition.LECTURER },
             { title: "Stariji predavač", value: EmploymentPosition.SENIOR_LECTURER },
             { title: "Profesor strukovnih studija", value: EmploymentPosition.PROFESSOR_OF_VOCATIONAL_STUDIES },
-            { title: "Asistent profesor", value: EmploymentPosition.ASSISTANT_PROFESSOR },
+            { title: "Docent", value: EmploymentPosition.ASSISTANT_PROFESSOR },
             { title: "Vanredni profesor", value: EmploymentPosition.ASSOCIATE_PROFESSOR },
             { title: "Asistent u nastavi", value: EmploymentPosition.TEACHING_ASSISTANT },
             { title: "Redovni profesor", value: EmploymentPosition.FULL_PROFESSOR },
@@ -249,11 +239,13 @@ export default defineComponent({
             { title: "Female", value: Sex.FEMALE },
         ];
 
+        const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
+
         const employmentPositions = computed(() => i18n.locale.value === "sr" ? employmentPositionsSr : employmentPositionsEn);
-        const selectedEmploymentPosition = ref();
+        const selectedEmploymentPosition = ref(selectionPlaceholder);
 
         const sexes = computed(() => i18n.locale.value === "sr" ? sexSr : sexEn);
-        const selectedSex = ref();
+        const selectedSex = ref(selectionPlaceholder);
 
         const submitPerson = (stayOnPage: boolean) => {
             const newPerson: BasicPerson = {
@@ -264,10 +256,10 @@ export default defineComponent({
                 mnid: mnid.value,
                 orcid: orcid.value,
                 scopusAuthorId: scopus.value,
-                sex: selectedSex.value,
+                sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value,
-                employmentPosition: selectedEmploymentPosition.value
+                employmentPosition: selectedEmploymentPosition.value.value
             };
 
             PersonService.createPerson(newPerson).then(() => {
@@ -282,9 +274,9 @@ export default defineComponent({
                     mnid.value = "";
                     orcid.value = "";
                     scopus.value = "";
-                    selectedSex.value = null;
+                    selectedSex.value = selectionPlaceholder;
                     ouAutocompleteRef.value?.clearInput();
-                    selectedEmploymentPosition.value = null;
+                    selectedEmploymentPosition.value = selectionPlaceholder;
                     
                     error.value = false;
                     snackbar.value = true;

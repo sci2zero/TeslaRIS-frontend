@@ -37,13 +37,16 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="6">
                             <v-select
                                 v-model="selectedpublicationType"
                                 :items="publicationTypes"
                                 :label="$t('typeOfPublicationLabel')"
                                 return-object>
                             </v-select>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -77,14 +80,6 @@
                         </v-col>
                         <v-col cols="6">
                             <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field v-model="articleNumber" type="number" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -159,6 +154,7 @@ import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSe
 import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
 import ProceedingsService from '@/services/ProceedingsService';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -179,7 +175,6 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
 
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -224,7 +219,6 @@ export default defineComponent({
         const description = ref([]);
         const eIsbn = ref("");
         const printIsbn = ref("");
-        const articleNumber = ref("");
         const numberOfPages = ref();
         const publicationYear = ref("");
         const doi = ref("");
@@ -264,12 +258,7 @@ export default defineComponent({
             }
         };
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -329,7 +318,6 @@ export default defineComponent({
                     selectedpublicationType.value = {title: "", value: null};
                     doi.value = "";
                     scopus.value = "";
-                    articleNumber.value = "";
                     numberOfPages.value = null;
                     eIsbn.value = "";
                     printIsbn.value = "";
@@ -355,8 +343,7 @@ export default defineComponent({
             place, placeRef, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
             description, descriptionRef,
-            publicationYear, doi, scopus,
-            articleNumber, numberOfPages,
+            publicationYear, doi, scopus, numberOfPages,
             keywords, keywordsRef, setPublicationYear,
             publicationSeriesVolume, publicationSeriesIssue,
             publisherAutocompleteRef, selectedPublisher,

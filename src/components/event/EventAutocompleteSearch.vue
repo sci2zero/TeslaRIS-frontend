@@ -33,8 +33,8 @@ import EventService from '@/services/EventService';
 import type { EventIndex } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-import { computed } from 'vue';
 import ConferenceSubmissionModal from './ConferenceSubmissionModal.vue';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -69,13 +69,7 @@ export default defineComponent({
             sendContentToParent();
         });
         
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredSelectionRules } = useValidationUtils();
 
         const searchEvents = lodash.debounce((input: string) => {
             if (input.includes("|")) {

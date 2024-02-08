@@ -66,11 +66,10 @@ import { defineComponent } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
 import type { OrganisationUnitRequest } from "@/models/OrganisationUnitModel";
 import OpenLayersMap from '../core/OpenLayersMap.vue';
 import OrganisationUnitService from "@/services/OrganisationUnitService";
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 export default defineComponent({
     name: "SubmitOrganizationUnit",
@@ -89,8 +88,6 @@ export default defineComponent({
         const error = ref(false);
 
         const router = useRouter();
-        const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
@@ -102,12 +99,7 @@ export default defineComponent({
         const phoneNumber = ref("");
         const keywords = ref([]);
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules } = useValidationUtils();
 
         const submitOU = (stayOnPage: boolean) => {
             const newOu: OrganisationUnitRequest = {

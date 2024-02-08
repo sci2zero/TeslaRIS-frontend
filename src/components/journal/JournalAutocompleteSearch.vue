@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, type PropType } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
@@ -36,6 +36,7 @@ import type { JournalIndex } from '@/models/JournalModel';
 import { watch } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -76,13 +77,8 @@ export default defineComponent({
         });
 
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredSelectionRules } = useValidationUtils();
+        
         const externalValidationRules = ref([
             () => {
                 if (props.externalValidation?.passed == false) return props.externalValidation?.message;

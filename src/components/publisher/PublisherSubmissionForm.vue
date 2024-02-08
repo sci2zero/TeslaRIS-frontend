@@ -55,6 +55,7 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Publisher } from "@/models/PublisherModel";
 import PublisherService from "@/services/PublisherService";
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 export default defineComponent({
     name: "SubmitPublisher",
@@ -73,7 +74,6 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
         const countryList = computed(() => {
             if (i18n.locale.value === "sr") {
@@ -98,12 +98,7 @@ export default defineComponent({
         const state = ref();
         const place = ref([]);
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules } = useValidationUtils();
 
         const submitPublisher = (stayOnPage: boolean) => {
             const multilingualState: MultilingualContent[] = [];

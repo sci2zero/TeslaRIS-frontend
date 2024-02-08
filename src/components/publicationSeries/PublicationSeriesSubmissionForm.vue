@@ -65,7 +65,6 @@ import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
 import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
@@ -74,6 +73,7 @@ import type { Journal } from "@/models/JournalModel";
 import JournalService from '@/services/JournalService';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -98,7 +98,6 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>([]);
@@ -124,12 +123,7 @@ export default defineComponent({
         const eIssn = ref("");
         const printIssn = ref("");
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules } = useValidationUtils();
 
         const submitPublicationSeries = (stayOnPage: boolean) => {
             const newPublicationSeries: Journal = {

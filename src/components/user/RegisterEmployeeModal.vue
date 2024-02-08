@@ -42,6 +42,7 @@
                                         v-model="selectedLanguage"
                                         :label="$t('preferredLanguageLabel') + '*'"
                                         :items="languages"
+                                        return-object
                                     ></v-select>
                                 </v-col>
                                 <v-col cols="12">
@@ -89,6 +90,7 @@ import type { EmployeeRegistrationRequest } from "@/models/AuthenticationModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import { useValidationUtils } from "@/utils/ValidationUtils";
 
 
 export default defineComponent({
@@ -104,7 +106,7 @@ export default defineComponent({
         const email = ref("")
         const note = ref("")
         const languages = ref<{ title: string, value: number }[]>([]);
-        const selectedLanguage = ref<{ title: string, value: number } | number>({title: "SR", value: -1});
+        const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
 
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
@@ -122,19 +124,7 @@ export default defineComponent({
             }
         ];
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || value as number == -1 || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const registerEmployee = (stayOnPage: boolean) => {
             const newEmployee: EmployeeRegistrationRequest = {
@@ -142,7 +132,7 @@ export default defineComponent({
                 surname: surname.value,
                 email: email.value,
                 note: note.value,
-                preferredLanguageId: selectedLanguage.value as number,
+                preferredLanguageId: selectedLanguage.value.value,
                 organisationUnitId: selectedOrganisationUnit.value.value
             }
             AuthenticationService.registerEmployee(newEmployee).then(() => {
@@ -167,7 +157,7 @@ export default defineComponent({
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
                     if (language.languageCode === "SR") {
-                        selectedLanguage.value = language.id;
+                        selectedLanguage.value = { title: language.languageCode, value: language.id };
                     }
                 })
             })

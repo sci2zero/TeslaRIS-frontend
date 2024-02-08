@@ -35,6 +35,7 @@ import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import OrganisationUnitSubmissionModal from './OrganisationUnitSubmissionModal.vue';
 import UserService from '@/services/UserService';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -70,13 +71,7 @@ export default defineComponent({
         });
 
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredSelectionRules } = useValidationUtils();
 
         const searchOUs = lodash.debounce((input: string) => {
             if (input.length >= 3) {

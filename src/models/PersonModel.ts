@@ -27,7 +27,7 @@ export interface BasicPerson {
     orcid?: string | null;
     scopusAuthorId?: string | null;
     organisationUnitId: number;
-    employmentPosition: EmploymentPosition;
+    employmentPosition?: EmploymentPosition;
   }
 
 export interface PersonName {

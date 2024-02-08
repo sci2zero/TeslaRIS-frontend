@@ -33,7 +33,7 @@
                             return-object
                         ></v-select>
                     </v-col>
-                    <v-col style="margin-top: 20px;">
+                    <v-col style="margin-top: 15px;">
                         <proceedings-submission-modal></proceedings-submission-modal>
                     </v-col>
                 </v-row>
@@ -153,6 +153,7 @@ import type { ProceedingsPublication } from "@/models/PublicationModel";
 import ProceedingsService from '@/services/ProceedingsService';
 import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModal.vue';
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -204,19 +205,7 @@ export default defineComponent({
         const uris = ref<string[]>([]);
 
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || (value as { title: string, value: number }).value === -1 || (value as { title: string, value: number }).value === null) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const proceedingsPublicationTypeEn = [
             { title: "Regular Full Article", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
@@ -303,6 +292,7 @@ export default defineComponent({
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
                     eventAutocompleteRef.value?.clearInput();
+                    availableProceedings.value = [];
                     selectedProceedings.value = searchPlaceholder;
                     selectedpublicationType.value = {title: "", value: null};
                     startPage.value = "";

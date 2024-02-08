@@ -111,6 +111,7 @@ import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 export default defineComponent({
     name: "ConferenceSubmissionForm",
@@ -131,7 +132,6 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
         const countryList = computed(() => {
             if (i18n.locale.value === "sr") {
@@ -168,12 +168,7 @@ export default defineComponent({
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules } = useValidationUtils();
 
         const addConference = (stayOnPage: boolean) => {
             if (!timePeriodInput.value) {

@@ -57,7 +57,7 @@ import { defineComponent } from "vue";
 import PersonService from "@/services/PersonService";
 import type { PersonIndex } from "@/models/PersonModel";
 import { useI18n } from "vue-i18n";
-import { computed } from "vue";
+import { useValidationUtils } from "@/utils/ValidationUtils";
 import MultilingualTextInput from "./MultilingualTextInput.vue";
 import lodash from "lodash";
 import { watch } from "vue";
@@ -90,26 +90,13 @@ export default defineComponent({
         const personPlaceholder = {title: "", value: -1};
         const selectedPerson = ref<{ title: string, value: number }>(personPlaceholder);
 
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
         const personOtherNamePlaceholder = ref({title: "", value: -1});
 
         const personOtherNames = ref<{ title: string, value: PersonName | number }[]>([]);
         const selectedOtherName = ref<{ title: string, value: PersonName | number }>(personOtherNamePlaceholder.value);
-
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
-        const requiredSelectionRules = [
-            (value: { title: string, value: number }) => {
-                if (!value || value.value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
 
         const searchPersons = lodash.debounce((input: string) => {
             if (input.includes("|")) {
