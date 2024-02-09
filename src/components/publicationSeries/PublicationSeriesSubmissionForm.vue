@@ -131,7 +131,8 @@ export default defineComponent({
                 eissn: eIssn.value,
                 printISSN: printIssn.value,
                 languageTagIds: selectedLanguages.value,
-                nameAbbreviation: nameAbbreviations.value
+                nameAbbreviation: nameAbbreviations.value,
+                contributions: []
             };
 
             switch(props.inputType) {
