@@ -42,7 +42,7 @@
                     {{ row.item.keywordsOther }}
                 </td>
                 <td>
-                    {{ row.item.year !== -1 ? row.item.year : "N/A" }}
+                    {{ row.item.year !== -1 ? row.item.year : "" }}
                 </td>
                 <td>
                     {{ row.item.type }}
