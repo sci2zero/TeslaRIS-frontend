@@ -36,6 +36,12 @@
                     {{ row.item.nameOther }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
+                    {{ row.item.superOUNameSr }}
+                </td>
+                <td v-if="$i18n.locale == 'en'">
+                    {{ row.item.superOUNameOther }}
+                </td>
+                <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.keywordsSr }}
                 </td>
                 <td v-if="$i18n.locale == 'en'">
@@ -83,7 +89,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedOUs = ref([]);
 
         const i18n = useI18n();
@@ -93,19 +99,22 @@ export default defineComponent({
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
+        const superOULabel = computed(() => i18n.t("superOULabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
         const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
+        const superOUColumn = computed(() => i18n.t("superOUColumn"));
 
         const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
+          { title: superOULabel, align: "start", sortable: true, key: superOUColumn},
           { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
-          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn},
+          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -115,6 +124,8 @@ export default defineComponent({
             ["keywordsOther", "keywords_other"],
             ["researchAreasSr", "research_areas_sr_sortable"],
             ["researchAreasOther", "research_areas_other_sortable"],
+            ["superOUNameSr", "super_ou_name_sr_sortable"],
+            ["superOUNameOther", "super_ou_name_other_sortable"],
         ]);
 
         const refreshTable = (event: any) => {

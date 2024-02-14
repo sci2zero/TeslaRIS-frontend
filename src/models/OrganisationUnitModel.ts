@@ -13,6 +13,10 @@ export interface OrganisationUnitIndex {
     researchAreasOther: string;
     researchAreasOtherSortable: string;
     databaseId: number;
+    superOUNameSr: string;
+    superOUNameSrSortable: string;
+    superOUNameOther: string;
+    superOUNameOtherSortable: string;
 }
 
 export interface OrganisationUnitRequest {

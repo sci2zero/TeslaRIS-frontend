@@ -37,6 +37,8 @@ export default {
     accountActivationSuccessfull: "Account successfully activated, you can now close this page and login.",
     accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator.",
     organisationUnitNameColumn: "organisationUnitNameOther",
+    superOUColumn: "super_ou_name_other",
+    superOULabel: "Super Organisation Unit",
     birthdateLabel: "Birthdate",
     employmentColumn: "employmentsOther",
     personListLabel: "Researchers",

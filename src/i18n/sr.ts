@@ -37,6 +37,8 @@ export default {
     accountActivationSuccessfull: "Nalog uspešno aktiviran, možete zatvoriti ovu stranicu i ulogovati se.",
     accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru.",
     organisationUnitNameColumn: "organisationUnitNameSr",
+    superOUColumn: "super_ou_name_sr",
+    superOULabel: "Organizaciona nad-jedinica",
     birthdateLabel: "Datum rođenja",
     employmentColumn: "employmentsSr",
     personListLabel: "Istraživači",
