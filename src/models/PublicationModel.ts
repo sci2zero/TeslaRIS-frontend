@@ -15,6 +15,7 @@ export interface DocumentPublicationIndex {
     fullTextOther: string;
     authorIds: number[];
     authorNames: string;
+    authorNamesSortable: string;
     editorIds: number[];
     editorNames: string;
     reviewerIds: number[];

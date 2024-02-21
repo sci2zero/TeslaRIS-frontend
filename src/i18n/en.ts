@@ -51,6 +51,7 @@ export default {
     nameLabel: "Name",
     nameAbbreviationLabel: "Name Abbreviation",
     keywordsLabel: "Keywords",
+    authorNamesLabel: "Authors",
     researchAreasLabel: "Research Areas",
     nameColumn: "nameOther",
     keywordsColumn: "keywordsOther",

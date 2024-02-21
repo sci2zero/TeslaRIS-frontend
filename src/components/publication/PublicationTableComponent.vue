@@ -35,11 +35,8 @@
                 <td v-if="$i18n.locale == 'en'">
                     {{ row.item.titleOther }}
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.keywordsSr }}
-                </td>
-                <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.keywordsOther }}
+                <td>
+                    {{ row.item.authorNames }}
                 </td>
                 <td>
                     {{ row.item.year !== -1 ? row.item.year : "" }}
@@ -94,20 +91,19 @@ export default defineComponent({
         const notifications = ref<Map<string, string>>(new Map());
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
-        const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
+        const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
-        const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
 
         const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
-          { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
+          { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
           { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
           { title: typeOfPublicationLabel, align: "start", sortable: true, key: "type"},
           { title: "DOI", align: "start", sortable: true, key: "doi"},
@@ -116,8 +112,7 @@ export default defineComponent({
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
             ["titleOther", "title_other_sortable"],
-            ["keywordsSr", "keywords_sr"],
-            ["keywordsOther", "keywords_other"],
+            ["authorNames", "author_names_sortable"],
             ["year", "year"],
             ["type", "type"],
             ["doi", "doi"],

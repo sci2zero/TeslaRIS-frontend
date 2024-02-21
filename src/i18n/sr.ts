@@ -51,6 +51,7 @@ export default {
     nameLabel: "Naziv",
     nameAbbreviationLabel: "Skraćenica Imena",
     keywordsLabel: "Ključne reči",
+    authorNamesLabel: "Autori",
     researchAreasLabel: "Oblasti Istraživanja",
     nameColumn: "nameSr",
     keywordsColumn: "keywordsSr",
