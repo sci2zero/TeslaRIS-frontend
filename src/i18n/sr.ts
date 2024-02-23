@@ -145,5 +145,12 @@ export default {
     selectOnePublicationSeriesMessage: "Možete selektovati samo jedan tip serije publikacija.",
     personOtherNamesLabel: "Oblik imena korišćen u radu",
     addCustomLabel: "Prilagođeno",
-    selectFromListLabel: "Lista"
+    selectFromListLabel: "Lista",
+    addPatentLabel: "Dodaj patent",
+    addSoftwareLabel: "Dodaj softver",
+    addDatasetLabel: "Dodaj skup podataka",
+    patentNumberLabel: "Broj patenta",
+    internalNumberLabel: "Interni broj",
+    addNewEntityLabel: "Dodaj novi...",
+    noAvailableProceedingsMessage: "Nema dostupnih zbornika radova."
 }

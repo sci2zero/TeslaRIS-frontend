@@ -116,3 +116,18 @@ export interface ProceedingsPublication extends Document {
     articleNumber: string;
     proceedingsId: number;
 }
+
+export interface Patent extends Document {
+    number: string;
+    publisherId?: number;
+}
+
+export interface Software extends Document {
+    internalNumber: string;
+    publisherId?: number;
+}
+
+export interface Dataset extends Document {
+    internalNumber: string;
+    publisherId?: number;
+}

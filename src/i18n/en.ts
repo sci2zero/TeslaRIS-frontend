@@ -145,5 +145,12 @@ export default {
     selectOnePublicationSeriesMessage: "You can only select one type of publication series.",
     personOtherNamesLabel: "Name format used in the publication",
     addCustomLabel: "Custom",
-    selectFromListLabel: "List"
+    selectFromListLabel: "List",
+    addPatentLabel: "Add Patent",
+    addSoftwareLabel: "Add Software",
+    addDatasetLabel: "Add Dataset",
+    patentNumberLabel: "Patent Number",
+    internalNumberLabel: "Internal Number",
+    addNewEntityLabel: "Add new...",
+    noAvailableProceedingsMessage: "No Available Proceedings."
 }

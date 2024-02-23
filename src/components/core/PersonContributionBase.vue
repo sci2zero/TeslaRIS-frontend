@@ -31,13 +31,17 @@
             ></v-select>
         </v-col>
         <v-col v-if="customNameInput" cols="3">
-            <v-text-field v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"></v-text-field>
+            <v-text-field
+                v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"
+                @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
         <v-col v-if="customNameInput" cols="3">
-            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')"></v-text-field>
+            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
         <v-col v-if="customNameInput" cols="3">
-            <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
+            <v-text-field
+                v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"
+                @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
         <v-col cols="2" style="margin-top: 10px;">
             <v-btn color="primary" @click="customNameInput = !customNameInput">
