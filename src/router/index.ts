@@ -58,6 +58,7 @@ const router = createRouter({
                         authenticated: false,
                         authorities: [],
                     },
+                    props: true,
                 },
                 {
                     path: "register",

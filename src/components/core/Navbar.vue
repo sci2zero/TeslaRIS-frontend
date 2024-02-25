@@ -1,5 +1,81 @@
 <template>
     <div id="navbar">
+        <v-navigation-drawer v-model="sidebar" app>
+            <v-list>
+                <v-list-tile
+                    v-for="item in menuItems"
+                    :key="item.title"
+                >
+                    <localized-link :to="item.pathName">
+                        <v-list-tile-action>
+                            <v-icon>{{ item.icon }}</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>{{ item.title }}</v-list-tile-content>
+                    </localized-link>
+                </v-list-tile>
+            </v-list>
+        </v-navigation-drawer>
+
+        <v-toolbar app>
+            <span class="hidden-sm-and-up">
+                <v-toolbar-side-icon @click="sidebar = !sidebar">
+                </v-toolbar-side-icon>
+            </span>
+            <div class="d-flex">
+                <v-toolbar-title>
+                    <router-link to="/" tag="span" class="logo-link" style="cursor: pointer">
+                        {{ appTitle }}
+                    </router-link>
+                </v-toolbar-title>
+                <!-- Menu -->
+                <div v-for="item in leftMenuItems" :key="item.title" class="text-center">
+                    <v-menu
+                        open-on-hover
+                    >
+                        <template #activator="{ props }">
+                            <v-btn
+                                size="small"
+
+                                v-bind="props"
+                            >
+                                {{ item.title }}
+                            </v-btn>
+                        </template>
+
+                        <v-list>
+                            <v-list-item
+                                v-for="(subItem, index) in item.subItems"
+                                :key="index"
+                            >
+                                <v-list-item-title>{{ subItem.title }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
+            </div>
+            <v-spacer></v-spacer>
+            <v-toolbar-items class="hidden-xs-only">
+                <localized-link
+                    v-for="item in menuItems"
+                    :key="item.title"
+                    :to="item.pathName">
+                    <v-btn
+                        v-if="item.condition"
+                        height="100%"
+                        class="no-uppercase"
+                        flat
+                    >
+                        <v-icon left dark>
+                            {{ item.icon }}
+                        </v-icon>
+                        {{ item.title }}
+                    </v-btn>
+                </localized-link>
+            </v-toolbar-items>
+        </v-toolbar>
+    </div>
+
+    <!-- <div id="navbar">
         <div class="nav-container">
             <div class="left-column">
                 <div class="logo">
@@ -100,7 +176,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script lang="ts">
@@ -108,19 +184,46 @@ import LangChangeItem from './LangChangeItem.vue';
 import LocalizedLink from "../localization/LocalizedLink.vue";
 import UserService from "@/services/UserService";
 import AuthenticationService from '@/services/AuthenticationService';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useLoginStore } from '@/stores/loginStore';
 import { watchEffect } from 'vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from "vue-i18n";
 
 export default defineComponent(
     {
         name: "NavbarHeader",
         components: { LangChangeItem, LocalizedLink },
         setup() {
-            const loginStore = useLoginStore();
+            const i18n = useI18n();
+            const loginTitle = computed(() => i18n.t("loginLabel"));
+            const registerLabel = computed(() => i18n.t("registerLabel"));
+            const logoutLabel = computed(() => i18n.t("logoutLabel"));
             const userLoggedIn = ref(false);
+
+
+            const appTitle = ref('TeslaRIS');
+            const sidebar = ref(false);
+
+            const menu1Sub = ref([
+                { title: loginTitle, pathName: 'login', icon: 'mdi-lock-open' }
+            ])
+
+            const leftMenuItems = ref([
+                { title: "First", type: 'menu', subItems: menu1Sub },
+            ])
+
+            const menuItems = ref([
+                { title: loginTitle, pathName: 'login', icon: 'mdi-lock-open', condition:!userLoggedIn.value },
+                { title: registerLabel, pathName: 'register', icon: 'mdi-login', condition:!userLoggedIn.value },
+                { title: registerLabel, pathName: 'home', icon: 'mdi-logout', condition:userLoggedIn.value },
+                { title: registerLabel, pathName: 'register', icon: 'mdi-login', condition:userLoggedIn.value },
+                { title: registerLabel, pathName: 'register', icon: 'mdi-login', condition:"" },
+            ])
+
+
+            const loginStore = useLoginStore();
             const userName = ref("");
             const userRole = ref("");
             const router = useRouter();
@@ -153,7 +256,7 @@ export default defineComponent(
                 populateUserData();
             }
 
-            return {userName, userRole, userLoggedIn, logout};
+            return {userName, userRole, userLoggedIn, logout, appTitle, sidebar, menuItems, leftMenuItems};
         }
     });
 </script>
@@ -162,9 +265,13 @@ export default defineComponent(
 
     #navbar {
         width: 100%;
-        height: 80px;
         border-bottom: 1px #eee solid;
 
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+            font-weight: bold;
+        }
         .nav-container {
 
             display: flex;

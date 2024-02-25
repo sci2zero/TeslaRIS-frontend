@@ -7,7 +7,6 @@ import UserService from "./UserService";
 class AuthenticationService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
-
   async login(loginRequest: AuthenticationRequest): Promise<AxiosResponse<AuthenticationResponse>> {
     return super.sendRequest(axios.post, "user/authenticate", loginRequest);
   }
@@ -17,7 +16,7 @@ class AuthenticationService extends BaseService {
   }
 
   async registerResearcher(registrationRequest: ResearcherRegistrationRequest): Promise<AxiosResponse<UserResponse>> {
-    return super.sendRequest(axios.post, "user/register-researcher", registrationRequest);
+    return super.sendRequest(axios.post, "user/register-researcher", registrationRequest, AuthenticationService.idempotencyKey);
   }
 
   async registerEmployee(registrationRequest: EmployeeRegistrationRequest): Promise<AxiosResponse<UserResponse>> {

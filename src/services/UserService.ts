@@ -62,6 +62,10 @@ export class UserService extends BaseService {
   async activateUserAccount(body: ActivateAccountRequest): Promise<AxiosResponse> {
     return super.sendRequest(axios.patch, "user/activate-account", body);
   }
+
+  async getUserObjectByPersonId(personId: number): Promise<AxiosResponse> {
+    return super.sendRequest(axios.get, `user/person/${personId}`);
+  }
 }
 
 export default new UserService();

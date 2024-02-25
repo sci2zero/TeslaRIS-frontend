@@ -3,6 +3,7 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
 import type { BasicPerson, PersonIndex, PersonResponse } from "@/models/PersonModel";
+import type { PersonUserResponse } from "@/models/PersonUserModel";
 
 export class PersonService extends BaseService {
 
@@ -26,6 +27,10 @@ export class PersonService extends BaseService {
 
   async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
     return super.sendRequest(axios.get, `person/${personId}`);
+  }
+
+  async getPersonWithUser(personId: number): Promise<AxiosResponse<PersonUserResponse>> {
+    return super.sendRequest(axios.get, `person/${personId}/person-user`);
   }
 }
 

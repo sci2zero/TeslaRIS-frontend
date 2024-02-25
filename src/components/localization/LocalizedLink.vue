@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="localizedUrl">
+    <router-link :to="localizedUrl" class="router-link">
         <slot></slot>
     </router-link>
 </template>
@@ -27,3 +27,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+  .router-link {
+    color: inherit;
+    text-decoration: none;
+  }
+</style>

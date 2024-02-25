@@ -73,11 +73,11 @@
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import AuthenticationService from "@/services/AuthenticationService";
 import {useLoginStore} from "@/stores/loginStore"
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useRouteStore } from "@/stores/routeStore";
 
 
@@ -86,13 +86,15 @@ export default defineComponent(
         name: "LoginView",
         components: { LocalizedLink },
         setup() {
+            const route = useRoute()
+            console.log(route)
+
             const isFormValid = ref(false);
             const snackbar = ref(false);
             const timeout = 5000;
-            const email = ref("");
-            const password = ref("");
+            const email = ref(route.query.email || '');
+            const password = ref();
             const loginStore = useLoginStore();
-            const router = useRouter();
             const i18n = useI18n();
             const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
             const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
