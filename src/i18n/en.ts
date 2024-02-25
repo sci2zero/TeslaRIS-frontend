@@ -37,6 +37,8 @@ export default {
     accountActivationSuccessfull: "Account successfully activated, you can now close this page and login.",
     accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator.",
     organisationUnitNameColumn: "organisationUnitNameOther",
+    superOUColumn: "super_ou_name_other",
+    superOULabel: "Super Organisation Unit",
     birthdateLabel: "Birthdate",
     employmentColumn: "employmentsOther",
     personListLabel: "Researchers",
@@ -49,6 +51,7 @@ export default {
     nameLabel: "Name",
     nameAbbreviationLabel: "Name Abbreviation",
     keywordsLabel: "Keywords",
+    authorNamesLabel: "Authors",
     researchAreasLabel: "Research Areas",
     nameColumn: "nameOther",
     keywordsColumn: "keywordsOther",
@@ -142,5 +145,12 @@ export default {
     selectOnePublicationSeriesMessage: "You can only select one type of publication series.",
     personOtherNamesLabel: "Name format used in the publication",
     addCustomLabel: "Custom",
-    selectFromListLabel: "List"
+    selectFromListLabel: "List",
+    addPatentLabel: "Add Patent",
+    addSoftwareLabel: "Add Software",
+    addDatasetLabel: "Add Dataset",
+    patentNumberLabel: "Patent Number",
+    internalNumberLabel: "Internal Number",
+    addNewEntityLabel: "Add new...",
+    noAvailableProceedingsMessage: "No Available Proceedings."
 }

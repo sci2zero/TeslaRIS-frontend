@@ -12,6 +12,7 @@
             single-line
             hide-details
             @click:append-inner="onSearch"
+            @keydown.enter="onSearch"
         ></v-text-field>
     </v-card>
 </template>

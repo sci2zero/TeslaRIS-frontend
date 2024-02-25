@@ -155,6 +155,7 @@ import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
 import ProceedingsService from '@/services/ProceedingsService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import type { PropType } from 'vue';
 
 
 export default defineComponent({
@@ -164,9 +165,14 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        conference: {
+            type: Object as PropType<{title: string, value: number}>,
+            default: () => ({ title: "", value: -1 })
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(props, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -206,7 +212,7 @@ export default defineComponent({
         const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedEvent = ref<{ title: string, value: number }>(props.conference);
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -304,9 +310,12 @@ export default defineComponent({
                 scopusId: scopus.value,
             };
 
-            console.log(newProceedings, stayOnPage, router);
+            ProceedingsService.createProceedings(newProceedings).then((response) => {
+                if (props.inModal) {
+                    emit("create", response.data);
+                    return;
+                }
 
-            ProceedingsService.createProceedings(newProceedings).then(() => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();

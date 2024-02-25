@@ -37,6 +37,8 @@ export default {
     accountActivationSuccessfull: "Nalog uspešno aktiviran, možete zatvoriti ovu stranicu i ulogovati se.",
     accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru.",
     organisationUnitNameColumn: "organisationUnitNameSr",
+    superOUColumn: "super_ou_name_sr",
+    superOULabel: "Organizaciona nad-jedinica",
     birthdateLabel: "Datum rođenja",
     employmentColumn: "employmentsSr",
     personListLabel: "Istraživači",
@@ -49,6 +51,7 @@ export default {
     nameLabel: "Naziv",
     nameAbbreviationLabel: "Skraćenica Imena",
     keywordsLabel: "Ključne reči",
+    authorNamesLabel: "Autori",
     researchAreasLabel: "Oblasti Istraživanja",
     nameColumn: "nameSr",
     keywordsColumn: "keywordsSr",
@@ -142,5 +145,12 @@ export default {
     selectOnePublicationSeriesMessage: "Možete selektovati samo jedan tip serije publikacija.",
     personOtherNamesLabel: "Oblik imena korišćen u radu",
     addCustomLabel: "Prilagođeno",
-    selectFromListLabel: "Lista"
+    selectFromListLabel: "Lista",
+    addPatentLabel: "Dodaj patent",
+    addSoftwareLabel: "Dodaj softver",
+    addDatasetLabel: "Dodaj skup podataka",
+    patentNumberLabel: "Broj patenta",
+    internalNumberLabel: "Interni broj",
+    addNewEntityLabel: "Dodaj novi...",
+    noAvailableProceedingsMessage: "Nema dostupnih zbornika radova."
 }

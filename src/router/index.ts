@@ -24,6 +24,9 @@ import SubmitJournalPublicationView from "@/views/SubmitJournalPublicationView.v
 import SubmitProceedingsView from "@/views/SubmitProceedingsView.vue";
 import SubmitProceedingsPublicationView from "@/views/SubmitProceedingsPublicationView.vue";
 import ResetPasswordView from "@/views/ResetPasswordView.vue";
+import SubmitPatentView from "@/views/SubmitPatentView.vue";
+import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
+import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -172,6 +175,33 @@ const router = createRouter({
                     path: "submit-journal-publication",
                     name: "submitJournalPublication",
                     component: SubmitJournalPublicationView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-patent",
+                    name: "submitPatent",
+                    component: SubmitPatentView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-software",
+                    name: "submitSoftware",
+                    component: SubmitSoftwareView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-dataset",
+                    name: "submitDataset",
+                    component: SubmitDatasetView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],

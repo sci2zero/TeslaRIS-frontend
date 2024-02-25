@@ -15,6 +15,7 @@ export interface DocumentPublicationIndex {
     fullTextOther: string;
     authorIds: number[];
     authorNames: string;
+    authorNamesSortable: string;
     editorIds: number[];
     editorNames: string;
     reviewerIds: number[];
@@ -114,4 +115,19 @@ export interface ProceedingsPublication extends Document {
     numberOfPages: number;
     articleNumber: string;
     proceedingsId: number;
+}
+
+export interface Patent extends Document {
+    number: string;
+    publisherId?: number;
+}
+
+export interface Software extends Document {
+    internalNumber: string;
+    publisherId?: number;
+}
+
+export interface Dataset extends Document {
+    internalNumber: string;
+    publisherId?: number;
 }

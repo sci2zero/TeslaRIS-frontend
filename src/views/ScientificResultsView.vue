@@ -4,15 +4,29 @@
     <br />
     <search-bar-component @search="search"></search-bar-component>
     <br />
-    <v-btn v-if="userRole" color="primary" @click="addJournalPublication">
-        {{ $t("addJournalPublicationLabel") }}
-    </v-btn>
-    <v-btn v-if="userRole" color="primary" style="margin-left: 10px;" @click="addProceedings">
-        {{ $t("addProceedingsLabel") }}
-    </v-btn>
-    <v-btn v-if="userRole" color="primary" style="margin-left: 10px;" @click="addProceedingsPublication">
-        {{ $t("addProceedingsPublicationLabel") }}
-    </v-btn>
+    <v-menu
+        v-if="userRole"
+        open-on-hover
+    >
+        <template #activator="{ props }">
+            <v-btn
+                color="primary"
+                v-bind="props"
+            >
+                {{ $t("addNewEntityLabel") }}
+            </v-btn>
+        </template>
+
+        <v-list>
+            <v-list-item
+                v-for="(item, index) in items"
+                :key="index"
+                @click="navigateToPage(item.value)"
+            >
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+        </v-list>
+    </v-menu>
     <br />
     <br />
     <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
@@ -27,6 +41,8 @@ import { ref } from 'vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import { useRouter } from 'vue-router';
 import UserService from '@/services/UserService';
+import { useI18n } from 'vue-i18n';
+import { computed } from 'vue';
 
 export default defineComponent({
     name: "ScientificResultsListView",
@@ -59,19 +75,28 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        const addJournalPublication = () => {
-            router.push({name: "submitJournalPublication"});
+        const navigateToPage = (name: string) => {
+            router.push({name: name});
         }
 
-        const addProceedings = () => {
-            router.push({name: "submitProceedings"});
-        }
+        const i18n = useI18n();
+        const addJournalPublicationLabel = computed(() => i18n.t("addJournalPublicationLabel"));
+        const addProceedingsPublicationLabel = computed(() => i18n.t("addProceedingsPublicationLabel"));
+        const addProceedingsLabel = computed(() => i18n.t("addProceedingsLabel"));
+        const addPatentLabel = computed(() => i18n.t("addPatentLabel"));
+        const addSoftwareLabel = computed(() => i18n.t("addSoftwareLabel"));
+        const addDatasetLabel = computed(() => i18n.t("addDatasetLabel"));
 
-        const addProceedingsPublication = () => {
-            router.push({name: "submitProceedingsPublication"});
-        }
+        const items = ref([
+            { title: addJournalPublicationLabel, value: "submitJournalPublication" },
+            { title: addProceedingsPublicationLabel, value: "submitProceedingsPublication" },
+            { title: addProceedingsLabel, value: "submitProceedings" },
+            { title: addPatentLabel, value: "submitPatent" },
+            { title: addSoftwareLabel, value: "submitSoftware" },
+            { title: addDatasetLabel, value: "submitDataset" },
+        ]);
 
-        return {search, publications, totalPublications, switchPage, addJournalPublication, addProceedings, userRole, addProceedingsPublication};
+        return {search, publications, totalPublications, switchPage, userRole, items, navigateToPage};
     }
 });
 </script>

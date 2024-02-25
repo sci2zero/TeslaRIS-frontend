@@ -209,8 +209,10 @@ export default defineComponent({
                 dateTo: dateTo.value,
                 state: multilingualState,
                 place: place.value,
-                serialEvent: serialEvent.value
+                serialEvent: serialEvent.value,
+                contributions: []
             }
+
             EventService.createConference(newConference).then(() => {
                 if (stayOnPage) {
                     nameRef.value?.clearInput();

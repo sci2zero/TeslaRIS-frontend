@@ -28,13 +28,13 @@
                             v-model="selectedProceedings"
                             :items="availableProceedings"
                             :label="$t('proceedingsLabel') + '*'"
-                            :no-data-text="$t('selectConferenceMessage')"
+                            :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
                             :rules="requiredSelectionRules"
                             return-object
                         ></v-select>
                     </v-col>
                     <v-col style="margin-top: 15px;">
-                        <proceedings-submission-modal></proceedings-submission-modal>
+                        <proceedings-submission-modal :conference="selectedEvent" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -152,7 +152,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { ProceedingsPublication } from "@/models/PublicationModel";
 import ProceedingsService from '@/services/ProceedingsService';
 import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModal.vue';
-import type { ProceedingsResponse } from '@/models/ProceedingsModel';
+import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
@@ -262,6 +262,22 @@ export default defineComponent({
             fetchProceedings(newValue);
         });
 
+        const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
+            let title: string | undefined;
+            proceedings.title.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title = multilingualContent.content;
+                    return;
+                }
+            });
+            if (!title && proceedings.title.length > 0) {
+                title = proceedings.title[0].content;
+            }
+            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number };
+            availableProceedings.value.push(toSelect);
+            selectedProceedings.value = toSelect;
+        };
+
         const submitProceedingsPublication = (stayOnPage: boolean) => {
             const newProceedingsPublication: ProceedingsPublication = {
                 articleNumber: articleNumber.value,
@@ -330,7 +346,7 @@ export default defineComponent({
             publicationTypes, selectedpublicationType,
             contributions, contributionsRef,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
-            availableProceedings, selectedProceedings
+            availableProceedings, selectedProceedings, selectNewlyAddedProceedings
         };
     }
 });

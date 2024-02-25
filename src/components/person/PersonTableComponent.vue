@@ -74,7 +74,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedPersons = ref([]);
 
         const i18n = useI18n();
