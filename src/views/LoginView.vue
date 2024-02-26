@@ -90,6 +90,7 @@ export default defineComponent(
         components: { LocalizedLink },
         setup() {
             const route = useRoute()
+            const router = useRouter()
             console.log(route)
 
             const isFormValid = ref(false);
@@ -161,7 +162,8 @@ export default defineComponent(
                         return;
                     }
                     router.push({ name: "home" });
-                }).catch(() => {
+                }).catch((error) => {
+                    console.log(error)
                     snackbar.value = true;
                 });
             };

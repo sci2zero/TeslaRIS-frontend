@@ -1,16 +1,19 @@
 <template>
-    <v-row v-for="(input, index) in inputs" :key="index">
+    <v-row v-for="(input, index) in inputs" :key="index" class="multi-lingual-input">
         <v-col cols="7">
             <v-text-field
-                v-if="!isArea" v-model="input.text" :label="label" :placeholder="label"
+                v-if="!isArea"
+                v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-text-field>
             <v-textarea
-                v-if="isArea" v-model="input.text" :label="label" :placeholder="label"
+                v-if="isArea"
+                v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-textarea>
         </v-col>
         <v-col cols="3">
             <v-select
                 v-model="input.language"
+                hide-details="auto"
                 :items="input.supportedLanguages"
                 :label="$t('languageLabel')"
                 return-object
@@ -175,3 +178,17 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+    .multi-lingual-input:first-child:not(:last-child) > div.v-col{
+        padding-bottom: 0;
+    }
+    .multi-lingual-input:last-child:not(:first-child) > div.v-col{
+        padding-top: 0;
+    }
+    .multi-lingual-input:not(:first-child):not(:last-child)  > div.v-col{
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+
+</style>

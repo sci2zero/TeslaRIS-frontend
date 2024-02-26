@@ -41,6 +41,8 @@ export default {
     superOULabel: "Super Organisation Unit",
     birthdateLabel: "Birthdate",
     employmentColumn: "employmentsOther",
+    resources: "Resources",
+    manage: "Manage",
     personListLabel: "Researchers",
     personLabel: "Person",
     deleteLabel: "Delete",

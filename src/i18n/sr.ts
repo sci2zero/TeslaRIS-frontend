@@ -41,6 +41,8 @@ export default {
     superOULabel: "Organizaciona nad-jedinica",
     birthdateLabel: "Datum rođenja",
     employmentColumn: "employmentsSr",
+    resources: "Resursi",
+    manage: "Upravljanje",
     personListLabel: "Istraživači",
     personLabel: "Osoba",
     deleteLabel: "Obriši",
