@@ -1,5 +1,8 @@
 <template>
     <div id="login-page">
+        <div class="animation">
+            <canvas id="projector">Your browser does not support the Canvas element.</canvas>
+        </div>
         <div class="login-wrapper">
             <h2 class="login-title">
                 {{ forgotPasswordForm ? $t('passwordRecoveryInstructions') : $t('loginLabel') }}
