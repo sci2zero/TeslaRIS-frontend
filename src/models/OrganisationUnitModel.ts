@@ -28,11 +28,21 @@ export interface OrganisationUnitRequest {
     contact?: Contact;
 }
 
-// interface ResearchArea {
-//     name: MultilingualContent[];
-//     description: MultilingualContent[];
-//     superResearchArea?: ResearchArea;
-// }
+export interface OrganisationUnitResponse {
+    id: number;
+    name: MultilingualContent[];
+    nameAbbreviation?: string;
+    keyword: MultilingualContent[];
+    researchAreas: ResearchArea[];
+    location?: GeoLocation;
+    contact?: Contact;
+}
+
+interface ResearchArea {
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    superResearchArea?: ResearchArea;
+}
 
 interface Contact {
     contactEmail: string;

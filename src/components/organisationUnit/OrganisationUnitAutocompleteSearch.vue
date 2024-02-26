@@ -15,7 +15,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col v-if="userRole === 'ADMIN'" cols="1" style="margin-top: 20px;">
-            <organisation-unit-submission-modal></organisation-unit-submission-modal>
+            <organisation-unit-submission-modal @create="selectNewlyAddedOU"></organisation-unit-submission-modal>
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedOrganisationUnit.value !== -1" icon @click="clearInput()">
@@ -32,7 +32,7 @@ import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
-import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
+import type { OrganisationUnitIndex, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitSubmissionModal from './OrganisationUnitSubmissionModal.vue';
 import UserService from '@/services/UserService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
@@ -110,12 +110,32 @@ export default defineComponent({
                 numberOfColumns += 1;
             }
             return numberOfColumns;
-        }
+        };
+
+        const selectNewlyAddedOU = (organisationUnit: OrganisationUnitResponse) => {
+            let title: string | undefined;
+            organisationUnit.name.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title = multilingualContent.content;
+                    return;
+                }
+            });
+            
+            if (!title && organisationUnit.name.length > 0) {
+                title = organisationUnit.name[0].content;
+            }
+
+            const toSelect = {title: `${title} | ${organisationUnit.nameAbbreviation}`, value: organisationUnit.id as number};
+            organisationUnits.value.push(toSelect);
+            selectedOrganisationUnit.value = toSelect;
+            sendContentToParent();
+        };
 
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth,
-            sendContentToParent, clearInput, userRole
+            sendContentToParent, clearInput, userRole,
+            selectNewlyAddedOU
         };
     }
 });

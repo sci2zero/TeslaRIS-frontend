@@ -14,7 +14,7 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <publisher-submission-form ref="submissionFormRef" in-modal></publisher-submission-form>
+                        <publisher-submission-form ref="submissionFormRef" in-modal @create="emitToParent"></publisher-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -35,17 +35,24 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import PublisherSubmissionForm from "@/components/publisher/PublisherSubmissionForm.vue";
+import type { Publisher } from "@/models/PublisherModel";
 
 
 export default defineComponent({
     name: "SubmitPublisherModal",
     components: { PublisherSubmissionForm },
-    setup() {
+    emits: ["create"],
+    setup(_, { emit }) {
         const dialog = ref(false);
 
         const submissionFormRef = ref<typeof PublisherSubmissionForm>();
 
-        return {dialog, submissionFormRef};
+        const emitToParent = (publisher: Publisher) => {
+            emit("create", publisher)
+            dialog.value = false;
+        }
+
+        return {dialog, submissionFormRef, emitToParent};
     }
 });
 </script>

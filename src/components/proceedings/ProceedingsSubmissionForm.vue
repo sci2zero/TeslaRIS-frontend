@@ -9,7 +9,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
+                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required :read-only="conference.value > 0"></event-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>

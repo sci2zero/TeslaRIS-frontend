@@ -3,6 +3,7 @@
         <v-col :cols="allowManualClearing && selectedEvent.value !== -1 ? 10 : 11">
             <v-autocomplete
                 v-model="selectedEvent"
+                :readonly="readOnly"
                 :label="$t('conferenceLabel') + (required ? '*' : '')"
                 :items="events"
                 :custom-filter="((): boolean => true)"
@@ -15,7 +16,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col cols="1" style="margin-top: 20px;">
-            <conference-submission-modal></conference-submission-modal>
+            <conference-submission-modal :read-only="readOnly" @create="selectNewlyAddedEvent"></conference-submission-modal>
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedEvent.value !== -1" icon @click="clearInput()">
@@ -30,7 +31,7 @@ import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import EventService from '@/services/EventService';
-import type { EventIndex } from '@/models/EventModel';
+import type { Conference, EventIndex } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import ConferenceSubmissionModal from './ConferenceSubmissionModal.vue';
@@ -42,6 +43,10 @@ export default defineComponent({
     components: { ConferenceSubmissionModal },
     props: {
         required: {
+            type: Boolean,
+            default: false
+        },
+        readOnly: {
             type: Boolean,
             default: false
         },
@@ -86,9 +91,9 @@ export default defineComponent({
                     const listOfEvents: { title: string, value: number, date?: string }[] = [];
                     response.data.content.forEach((conference: EventIndex) => {
                         if (i18n.locale.value === "sr") {
-                            listOfEvents.push({title: conference.nameSr, value: conference.databaseId, date: conference.dateFromTo});
+                            listOfEvents.push({title: `${conference.nameSr} | ${extractDate(conference.dateFromTo)}`, value: conference.databaseId, date: conference.dateFromTo});
                         } else {
-                            listOfEvents.push({title: conference.nameOther, value: conference.databaseId, date: conference.dateFromTo});
+                            listOfEvents.push({title: `${conference.nameOther} | ${extractDate(conference.dateFromTo)}`, value: conference.databaseId, date: conference.dateFromTo});
                         }
                     })
                     events.value = listOfEvents;
@@ -105,10 +110,52 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectNewlyAddedEvent = (event: Conference) => {
+            let title: string | undefined;
+            event.name.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title = multilingualContent.content;
+                    return;
+                }
+            });
+
+            event.nameAbbreviation.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title += " " + multilingualContent.content;
+                    return;
+                }
+            });
+
+            if (!title && event.name.length > 0) {
+                title = event.name[0].content;
+                if (event.nameAbbreviation.length > 0) {
+                    title += " " + event.nameAbbreviation[0].content
+                }
+            }
+            
+            const toSelect = {title: `${title} | ${extractDate(event.dateFrom)}`, value: event.id as number};
+            events.value.push(toSelect);
+            selectedEvent.value = toSelect;
+            sendContentToParent();
+        };
+
+        const extractDate = (text: string): string => {
+            const yyyy_mm_dd_regex = /\b\d{4}-\d{2}-\d{2}\b/g;
+            
+            let match;
+            
+            while ((match = yyyy_mm_dd_regex.exec(text)) !== null) {
+                return match[0].split("-")[0];
+            }
+
+            return text.split(".")[2];
+        };
+
         return {
             events, selectedEvent, searchEvents,
             requiredSelectionRules,
-            sendContentToParent, clearInput
+            sendContentToParent, clearInput,
+            selectNewlyAddedEvent
         };
     }
 });

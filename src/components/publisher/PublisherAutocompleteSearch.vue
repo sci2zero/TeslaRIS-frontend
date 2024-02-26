@@ -14,7 +14,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col cols="1" style="margin-top: 20px;">
-            <publisher-submission-modal></publisher-submission-modal>
+            <publisher-submission-modal @create="selectNewlyAddedPublisher"></publisher-submission-modal>
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedPublisher.value !== -1" icon @click="clearInput()">
@@ -29,7 +29,7 @@ import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import PublisherService from '@/services/PublisherService';
-import type { PublisherIndex } from '@/models/PublisherModel';
+import type { Publisher, PublisherIndex } from '@/models/PublisherModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import PublisherSubmissionModal from './PublisherSubmissionModal.vue';
@@ -97,9 +97,26 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectNewlyAddedPublisher = (publisher: Publisher) => {
+            let title: string | undefined;
+            publisher.name.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title = multilingualContent.content;
+                    return;
+                }
+            });
+            if (!title && publisher.name.length > 0) {
+                title = publisher.name[0].content;
+            }
+            const toSelect = {title: title as string, value: publisher.id as number};
+            publishers.value.push(toSelect);
+            selectedPublisher.value = toSelect;
+            sendContentToParent();
+        };
+
         return {
             publishers, selectedPublisher, searchPublishers,
-            sendContentToParent, clearInput
+            sendContentToParent, clearInput, selectNewlyAddedPublisher
         };
     }
 });

@@ -14,7 +14,7 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <publication-series-submission-form ref="submissionFormRef" :input-type="inputType" in-modal></publication-series-submission-form>
+                        <publication-series-submission-form ref="submissionFormRef" :input-type="inputType" in-modal @create="emitToParent"></publication-series-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -35,6 +35,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import PublicationSeriesSubmissionForm from "@/components/publicationSeries/PublicationSeriesSubmissionForm.vue";
+import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 
 
 export default defineComponent({
@@ -46,12 +47,18 @@ export default defineComponent({
             required: true
         },
     },
-    setup() {
+    emits: ["create"],
+    setup(_, { emit }) {
         const dialog = ref(false);
 
         const submissionFormRef = ref<typeof PublicationSeriesSubmissionForm>();
 
-        return {dialog, submissionFormRef};
+        const emitToParent = (publicationSeries: PublicationSeries) => {
+            emit("create", publicationSeries)
+            dialog.value = false;
+        }
+
+        return {dialog, submissionFormRef, emitToParent};
     }
 });
 </script>

@@ -80,7 +80,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(props, { emit }) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -111,7 +112,12 @@ export default defineComponent({
                 contact: {contactEmail: email.value, phoneNumber: phoneNumber.value}
             };
 
-            OrganisationUnitService.createOrganisationUnit(newOu).then(() => {
+            OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
+                if (props.inModal) {
+                    emit("create", response.data);
+                    return;
+                }
+
                 if (stayOnPage) {
                     nameRef.value?.clearInput();
                     keywordsRef.value?.clearInput();

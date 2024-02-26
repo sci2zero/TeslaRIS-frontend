@@ -15,7 +15,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col cols="1" style="margin-top: 20px;">
-            <publication-series-submission-modal :input-type="inputType"></publication-series-submission-modal>
+            <publication-series-submission-modal :input-type="inputType" @create="selectNewlyAddedBookSeries"></publication-series-submission-modal>
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedBookSeries.value !== -1" icon @click="clearInput()">
@@ -32,7 +32,7 @@ import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import BookSeriesService from '@/services/BookSeriesService';
-import type { BookSeriesIndex } from '@/models/BookSeriesModel';
+import type { BookSeries, BookSeriesIndex } from '@/models/BookSeriesModel';
 import type { PropType } from 'vue';
 import { watch } from 'vue';
 import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
@@ -131,10 +131,28 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectNewlyAddedBookSeries = (newBookSeries: BookSeries) => {
+            let title: string | undefined;
+            newBookSeries.title.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title = multilingualContent.content;
+                    return;
+                }
+            });
+            if (!title && newBookSeries.title.length > 0) {
+                title = newBookSeries.title[0].content;
+            }
+            const toSelect = {title: title as string, value: newBookSeries.id as number};
+            bookSeries.value.push(toSelect);
+            selectedBookSeries.value = toSelect;
+            sendContentToParent();
+        };
+
         return {
             bookSeries, selectedBookSeries, searchBookSeries,
             requiredSelectionRules, externalValidationRules,
-            sendContentToParent, clearInput, inputType
+            sendContentToParent, clearInput, inputType,
+            selectNewlyAddedBookSeries
         };
     }
 });

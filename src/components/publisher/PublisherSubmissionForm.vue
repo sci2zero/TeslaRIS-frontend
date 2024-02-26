@@ -66,7 +66,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(props, { emit }) {
         const isFormValid = ref(false);
 
         const snackbar = ref(false);
@@ -131,7 +132,12 @@ export default defineComponent({
                 place: place.value
             }
 
-            PublisherService.createPublisher(newPublisher).then(() => {
+            PublisherService.createPublisher(newPublisher).then((response) => {
+                if (props.inModal) {
+                    emit("create", response.data);
+                    return;
+                }
+
                 if (stayOnPage) {
                 nameRef.value?.clearInput();
                 state.value = null;

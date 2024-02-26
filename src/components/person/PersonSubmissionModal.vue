@@ -14,7 +14,7 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <person-submission-form ref="submissionFormRef" in-modal></person-submission-form>
+                        <person-submission-form ref="submissionFormRef" in-modal @create="emitToParent"></person-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -35,17 +35,24 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import PersonSubmissionForm from "@/components/person/PersonSubmissionForm.vue";
+import type { BasicPerson } from "@/models/PersonModel";
 
 
 export default defineComponent({
     name: "SubmitPersonModal",
     components: { PersonSubmissionForm },
-    setup() {
+    emits: ["create"],
+    setup(_, { emit }) {
         const dialog = ref(false);
 
         const submissionFormRef = ref<typeof PersonSubmissionForm>();
 
-        return {dialog, submissionFormRef};
+        const emitToParent = (person: BasicPerson) => {
+            emit("create", person)
+            dialog.value = false;
+        }
+
+        return {dialog, submissionFormRef, emitToParent};
     }
 });
 </script>
