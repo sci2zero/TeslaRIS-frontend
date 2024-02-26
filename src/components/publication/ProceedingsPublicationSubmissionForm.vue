@@ -259,6 +259,8 @@ export default defineComponent({
 
         watch(selectedEvent, (newValue) => {
             listPublications(newValue);
+            availableProceedings.value = [];
+            selectedProceedings.value = searchPlaceholder;
             fetchProceedings(newValue);
         });
 
@@ -273,7 +275,7 @@ export default defineComponent({
             if (!title && proceedings.title.length > 0) {
                 title = proceedings.title[0].content;
             }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number };
+            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
             availableProceedings.value.push(toSelect);
             selectedProceedings.value = toSelect;
         };

@@ -122,7 +122,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(props, { emit }) {
         const isFormValid = ref(false);
         const timePeriodInput = ref(false);
         const additionalFields = ref(false);
@@ -213,7 +214,12 @@ export default defineComponent({
                 contributions: []
             }
 
-            EventService.createConference(newConference).then(() => {
+            EventService.createConference(newConference).then((response) => {
+                if (props.inModal) {
+                    emit("create", response.data);
+                    return;
+                }
+
                 if (stayOnPage) {
                     nameRef.value?.clearInput();
                     abbreviationRef.value?.clearInput();

@@ -14,7 +14,7 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <organisation-unit-submission-form ref="submissionFormRef" in-modal></organisation-unit-submission-form>
+                        <organisation-unit-submission-form ref="submissionFormRef" in-modal @create="emitToParent"></organisation-unit-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -35,17 +35,24 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import OrganisationUnitSubmissionForm from "@/components/organisationUnit/OrganisationUnitSubmissionForm.vue";
+import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 
 
 export default defineComponent({
     name: "SubmitOrganisationUnitModal",
     components: { OrganisationUnitSubmissionForm },
-    setup() {
+    emits: ["create"],
+    setup(_, { emit }) {
         const dialog = ref(false);
 
         const submissionFormRef = ref<typeof OrganisationUnitSubmissionForm>();
 
-        return {dialog, submissionFormRef};
+        const emitToParent = (organisationUnit: OrganisationUnitResponse) => {
+            emit("create", organisationUnit)
+            dialog.value = false;
+        }
+
+        return {dialog, submissionFormRef, emitToParent};
     }
 });
 </script>

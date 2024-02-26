@@ -4,7 +4,7 @@
             <template #activator="scope">
                 <v-btn
                     color="primary" icon v-bind="scope.props" style="margin-bottom: 20px;"
-                    v-on="scope.isActive">
+                    :disabled="readOnly" v-on="scope.isActive">
                     <v-icon>mdi-pencil-plus-outline</v-icon>
                 </v-btn>
             </template>
@@ -14,7 +14,7 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <conference-submission-form ref="submissionFormRef" in-modal></conference-submission-form>
+                        <conference-submission-form ref="submissionFormRef" in-modal @create="emitToParent"></conference-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -35,17 +35,30 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import ConferenceSubmissionForm from "@/components/event/ConferenceSubmissionForm.vue";
+import type { Conference } from "@/models/EventModel";
 
 
 export default defineComponent({
     name: "SubmitConferenceModal",
     components: { ConferenceSubmissionForm },
-    setup() {
+    props: {
+        readOnly: {
+            type: Boolean,
+            default: false
+        },
+    },
+    emits: ["create"],
+    setup(_, { emit }) {
         const dialog = ref(false);
 
         const submissionFormRef = ref<typeof ConferenceSubmissionForm>();
 
-        return {dialog, submissionFormRef};
+        const emitToParent = (conference: Conference) => {
+            emit("create", conference)
+            dialog.value = false;
+        }
+
+        return {dialog, submissionFormRef, emitToParent};
     }
 });
 </script>

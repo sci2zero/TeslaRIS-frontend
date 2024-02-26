@@ -89,7 +89,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup(props) {
+    emits: ["create"],
+    setup(props, { emit }) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -137,7 +138,12 @@ export default defineComponent({
 
             switch(props.inputType) {
                 case PublicationSeriesType.JOURNAL.toString():
-                    JournalService.createJournal(newPublicationSeries).then(() => {
+                    JournalService.createJournal(newPublicationSeries).then((response) => {
+                        if (props.inModal) {
+                            emit("create", response.data);
+                            return;
+                        }
+
                         if (stayOnPage) {
                             titleRef.value?.clearInput();
                             abbreviationsRef.value?.clearInput();
@@ -156,7 +162,12 @@ export default defineComponent({
                     });
                     break;
                 case PublicationSeriesType.BOOK_SERIES.toString():
-                    BookSeriesService.createBookSeries(newPublicationSeries).then(() => {
+                    BookSeriesService.createBookSeries(newPublicationSeries).then((response) => {
+                        if (props.inModal) {
+                            emit("create", response.data);
+                            return;
+                        }
+                        
                         if (stayOnPage) {
                             titleRef.value?.clearInput();
                             abbreviationsRef.value?.clearInput();

@@ -15,7 +15,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col cols="1" style="margin-top: 20px;">
-            <publication-series-submission-modal :input-type="inputType"></publication-series-submission-modal>
+            <publication-series-submission-modal :input-type="inputType" @create="selectNewlyAddedJournal"></publication-series-submission-modal>
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedJournal.value !== -1" icon @click="clearInput()">
@@ -32,7 +32,7 @@ import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import JournalService from '@/services/JournalService';
-import type { JournalIndex } from '@/models/JournalModel';
+import type { Journal, JournalIndex } from '@/models/JournalModel';
 import { watch } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
@@ -129,10 +129,28 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectNewlyAddedJournal = (journal: Journal) => {
+            let title: string | undefined;
+            journal.title.forEach(multilingualContent => {
+                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    title = multilingualContent.content;
+                    return;
+                }
+            });
+            if (!title && journal.title.length > 0) {
+                title = journal.title[0].content;
+            }
+            const toSelect = {title: title as string, value: journal.id as number};
+            journals.value.push(toSelect);
+            selectedJournal.value = toSelect;
+            sendContentToParent();
+        };
+
         return {
             journals, selectedJournal, searchJournals,
             requiredSelectionRules, externalValidationRules,
-            sendContentToParent, clearInput, inputType
+            sendContentToParent, clearInput, inputType,
+            selectNewlyAddedJournal
         };
     }
 });

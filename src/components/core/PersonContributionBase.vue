@@ -15,7 +15,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col cols="1" style="margin-top: 20px;">
-            <person-submission-modal></person-submission-modal>
+            <person-submission-modal @create="selectNewlyAddedPerson"></person-submission-modal>
         </v-col>
     </v-row>
     <v-row v-if="personOtherNames.length > 0">
@@ -59,7 +59,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import PersonService from "@/services/PersonService";
-import type { PersonIndex } from "@/models/PersonModel";
+import type { BasicPerson, PersonIndex } from "@/models/PersonModel";
 import { useI18n } from "vue-i18n";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import MultilingualTextInput from "./MultilingualTextInput.vue";
@@ -119,7 +119,7 @@ export default defineComponent({
                         if (i18n.locale.value === "sr") {
                             listOfPersons.push({title: `${person.name} | ${person.birthdate ? person.birthdate : "NA"} | ${person.employmentsSr}`, value: person.databaseId});
                         } else {
-                            listOfPersons.push({title: `${person.name} | ${person.birthdate} | ${person.employmentsOther}`, value: person.databaseId});
+                            listOfPersons.push({title: `${person.name} | ${person.birthdate ? person.birthdate : "NA"} | ${person.employmentsOther}`, value: person.databaseId});
                         }
                     })
                     persons.value = listOfPersons;
@@ -170,6 +170,13 @@ export default defineComponent({
             personOtherNames.value = [];
         };
 
+        const selectNewlyAddedPerson = (person: BasicPerson) => {
+            const toSelect = {title: `${person.personName.firstname} ${person.personName.otherName} ${person.personName.lastname} | ${person.localBirthDate ? person.localBirthDate : "NA"}`, value: person.id as number};
+            persons.value.push(toSelect);
+            selectedPerson.value = toSelect;
+            sendContentToParent();
+        };
+
         return {persons,
                 firstName, middleName, lastName,
                 selectedPerson, customNameInput,
@@ -178,7 +185,8 @@ export default defineComponent({
                 contributionDescription, affiliationStatement,
                 sendContentToParent, clearInput, onPersonSelect,
                 descriptionRef, affiliationStatementRef,
-                personOtherNames, selectedOtherName};
+                personOtherNames, selectedOtherName,
+                selectNewlyAddedPerson};
     }
 });
 </script>
