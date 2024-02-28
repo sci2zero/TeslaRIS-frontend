@@ -1,74 +1,73 @@
 <template>
-    <div id="login-page">
-        <div class="animation">
-            <canvas id="projector">Your browser does not support the Canvas element.</canvas>
-        </div>
-        <div class="login-wrapper">
-            <h2 class="login-title">
-                {{ forgotPasswordForm ? $t('passwordRecoveryInstructions') : $t('loginLabel') }}
-            </h2>
-            <v-form v-if="!forgotPasswordSubmissionSent" v-model="isFormValid" @submit.prevent>
-                <div v-if="!forgotPasswordForm">
-                    <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
-                    <v-text-field
-                        v-model="password" :rules="passwordFieldRules" name="password" type="password"
-                        :label="$t('passwordLabel')"></v-text-field>
+    <v-container>
+        <div id="login-page">
+            <div class="login-wrapper">
+                <h2 class="login-title">
+                    {{ forgotPasswordForm ? $t('passwordRecoveryInstructions') : $t('loginLabel') }}
+                </h2>
+                <v-form v-if="!forgotPasswordSubmissionSent" v-model="isFormValid" @submit.prevent>
+                    <div v-if="!forgotPasswordForm">
+                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="password" :rules="passwordFieldRules" name="password" type="password"
+                            :label="$t('passwordLabel')"></v-text-field>
 
-                    <br />
-                    <v-btn
-                        class="login-submit" block type="submit" :disabled="!isFormValid"
-                        @click="login">
-                        {{ $t('loginLabel') }}
-                    </v-btn>
-                    <br />
-                    <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
-                </div>
-                <div v-else>
-                    <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
-                    <br />
-                    <v-btn
-                        class="login-submit" block type="submit" :disabled="!isFormValid"
-                        @click="forgotPassword">
-                        {{ $t('resetPasswordLabel') }}
-                    </v-btn>
-                    <br />
-                    <a href="#" class="forgot-password-link" @click="forgotPasswordForm = false;">{{ $t("knowPasswordLabel") }}</a>
-                </div>
-                <br />
-                <localized-link to="register">
-                    {{ $t("registerFromLoginLabel") }}
-                </localized-link>
-            </v-form>
-            <div v-else>
-                <h4>{{ $t("passwordRecoveryEmailSentMessage", [email]) }}</h4>
-                <v-row>
-                    <v-col cols="10">
+                        <br />
                         <v-btn
-                            class="login-submit" block type="submit" :disabled="!isFormValid || cooldown"
-                            @click="forgotPassword">
-                            {{ $t('resendLabel') }}
+                            class="login-submit" block type="submit" :disabled="!isFormValid"
+                            @click="login">
+                            {{ $t('loginLabel') }}
                         </v-btn>
-                    </v-col>
-                    <v-col cols="2" style="margin-top: 15px;">
-                        <v-progress-circular v-if="cooldown" :model-value="progress"></v-progress-circular>
-                    </v-col>
-                </v-row>
+                        <br />
+                        <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
+                    </div>
+                    <div v-else>
+                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
+                        <br />
+                        <v-btn
+                            class="login-submit" block type="submit" :disabled="!isFormValid"
+                            @click="forgotPassword">
+                            {{ $t('resetPasswordLabel') }}
+                        </v-btn>
+                        <br />
+                        <a href="#" class="forgot-password-link" @click="forgotPasswordForm = false;">{{ $t("knowPasswordLabel") }}</a>
+                    </div>
+                    <br />
+                    <localized-link to="register">
+                        {{ $t("registerFromLoginLabel") }}
+                    </localized-link>
+                </v-form>
+                <div v-else>
+                    <h4>{{ $t("passwordRecoveryEmailSentMessage", [email]) }}</h4>
+                    <v-row>
+                        <v-col cols="10">
+                            <v-btn
+                                class="login-submit" block type="submit" :disabled="!isFormValid || cooldown"
+                                @click="forgotPassword">
+                                {{ $t('resendLabel') }}
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="2" style="margin-top: 15px;">
+                            <v-progress-circular v-if="cooldown" :model-value="progress"></v-progress-circular>
+                        </v-col>
+                    </v-row>
+                </div>
             </div>
         </div>
-    </div>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ $t("emailOrPasswordIncorrectError") }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="timeout">
+            {{ $t("emailOrPasswordIncorrectError") }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
+    </v-container>
 </template>
 
 

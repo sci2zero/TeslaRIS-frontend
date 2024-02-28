@@ -1,15 +1,17 @@
 <template>
-    <h1>{{ $t("publisherListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <v-btn color="primary" @click="addPublisher">
-        {{ $t("addPublisherLabel") }}
-    </v-btn>
-    <br />
-    <br />
-    <publisher-table-component :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
+    <v-container>
+        <h1>{{ $t("publisherListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn color="primary" @click="addPublisher">
+            {{ $t("addPublisherLabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <publisher-table-component :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

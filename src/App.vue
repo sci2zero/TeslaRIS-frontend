@@ -2,10 +2,9 @@
     <v-app>
         <v-main>
             <navbar />
-            <v-container>
-                <router-view />
-            </v-container>
+            <router-view />
         </v-main>
+        <footerbar />
     </v-app>
 </template>
 
@@ -19,10 +18,11 @@ import { useLoginStore } from '@/stores/loginStore';
 import { jwtDecode } from "jwt-decode";
 import i18n, {defaultLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
+import footerbar from "./components/core/FooterBar.vue";
 
 export default defineComponent({
     name: "App",
-    components: {navbar},
+    components: {navbar, footerbar},
     beforeMount() {
         const router = useRouter();
         const loginStore = useLoginStore();

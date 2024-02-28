@@ -7,6 +7,7 @@
             v-model="searchInput"
             density="compact"
             variant="solo"
+            class="pa-3"
             :label="$t('searchBarPlaceholder')"
             append-inner-icon="mdi-magnify"
             single-line
@@ -24,9 +25,15 @@ import { defineComponent } from 'vue';
 export default defineComponent(
     {
         name: "SearchBarComponent",
+        props: {
+            searchInput: {
+                type: String,
+                default: ""
+            }
+        },
         emits: ["search"],
         setup(props, {emit}) {
-            const searchInput = ref("");
+            const searchInput = ref(props.searchInput);
 
             const onSearch = () => {
                 let tokens: string[] = searchInput.value.trim().split(" ");

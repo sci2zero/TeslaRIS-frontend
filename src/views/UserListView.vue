@@ -1,12 +1,14 @@
 <template>
-    <h1>{{ $t("userListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <br />
-    <br />
-    <user-table-component :users="users" :total-users="totalUsers" @switch-page="switchPage"></user-table-component>
+    <v-container>
+        <h1>{{ $t("userListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <br />
+        <br />
+        <user-table-component :users="users" :total-users="totalUsers" @switch-page="switchPage"></user-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

@@ -1,11 +1,13 @@
 <template>
-    <h1>Activating account...</h1>
-    <h1 v-if="accountSuccessfullyActivated">
-        {{ $t("accountActivationSuccessMessage") }}
-    </h1>
-    <h1 v-if="accountActivationFailed">
-        {{ $t("accountActivationFailedMessage") }}
-    </h1>
+    <v-container>
+        <h1>Activating account...</h1>
+        <h1 v-if="accountSuccessfullyActivated">
+            {{ $t("accountActivationSuccessMessage") }}
+        </h1>
+        <h1 v-if="accountActivationFailed">
+            {{ $t("accountActivationFailedMessage") }}
+        </h1>
+    </v-container>
 </template>
 
 <script lang="ts">

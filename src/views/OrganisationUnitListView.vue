@@ -1,15 +1,17 @@
 <template>
-    <h1>{{ $t("ouListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
-        {{ $t("addOULabel") }}
-    </v-btn>
-    <br />
-    <br />
-    <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+    <v-container>
+        <h1>{{ $t("ouListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
+            {{ $t("addOULabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

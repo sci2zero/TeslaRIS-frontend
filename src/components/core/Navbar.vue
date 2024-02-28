@@ -1,6 +1,6 @@
 <template>
     <div id="navbar">
-        <v-navigation-drawer v-model="sidebar" app>
+        <!-- <v-navigation-drawer v-model="sidebar" app>
             <v-list>
                 <v-list-tile v-for="item in menuItems" :key="item.title">
                     <localized-link :to="item.pathName">
@@ -11,10 +11,10 @@
                     </localized-link>
                 </v-list-tile>
             </v-list>
-        </v-navigation-drawer>
+        </v-navigation-drawer> -->
 
-        <v-toolbar app>
-            <div class="wide-container">
+        <v-toolbar app height="auto">
+            <div class="wide-container flex-wrap" style="min-height: 64px;">
                 <span class="hidden-sm-and-up">
                     <v-toolbar-side-icon @click="sidebar = !sidebar">
                     </v-toolbar-side-icon>
@@ -27,7 +27,7 @@
                     </v-toolbar-title>
 
                     <!-- Menu -->
-                    <div class="d-flex ps-5">
+                    <div class="d-flex ps-5 flex-wrap">
                         <div v-for="item in leftMenuItems" :key="item.title" class="text-center">
                             <template v-if="item.type == 'menu'">
                                 <v-menu v-if="item.condition == undefined || item.condition" open-on-hover open-delay="0">
@@ -361,8 +361,9 @@ export default defineComponent(
                 { title: undefined, type:'icon', icon: 'mdi-bell', condition: userLoggedIn, badge: 2 },
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !userLoggedIn.value), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !userLoggedIn.value), variant: 'outlined', color:'primary' },
-                { title: computed(() => userName.value + " (" + userRole.value + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn },
-                { title: logoutLabel, type:'icon-link', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
+                { title: computed(() => userName.value + " (" + userRole.value + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn, variant: 'flat', color:'primary' },
+                // { title: "logoutLabel", type:'icon-link', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
+                { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
             ])
 
 
@@ -387,6 +388,5 @@ export default defineComponent(
     .nav-items {
         margin-inline: 5px;
     }
-
 }
 </style>

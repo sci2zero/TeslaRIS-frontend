@@ -28,6 +28,9 @@ import SubmitPatentView from "@/views/SubmitPatentView.vue";
 import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 
+import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
+
+
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
 
@@ -217,13 +220,27 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "persons",
-                    name: "persons",
-                    component: PersonListView,
-                    meta: {
-                        authenticated: false,
-                        authorities: [],
-                    },
+                    path: "persons",                    
+                    children: [
+                        {
+                            path: "",
+                            name: "persons",
+                            component: PersonListView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "researcherLandingPage",
+                            component: ResearcherLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        }
+                    ]
                 },
                 {
                     path: "organisation-units",

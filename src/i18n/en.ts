@@ -13,6 +13,7 @@ export default {
     registerLabel: "Register",
     registerFromLoginLabel: "Don't have an account? Register.",
     homeLabel: "Home Page",
+    contactLabel: "Contact",
     userPageLabel: "Users",
     userListLabel: "Registered Users",
     logoutLabel: "Logout",

@@ -1,15 +1,17 @@
 <template>
-    <h1>{{ $t("personListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <v-btn v-if="userRole === 'ADMIN' || userRole === 'INSTITUTIONAL_EDITOR'" color="primary" @click="addPerson">
-        {{ $t("addPersonLabel") }}
-    </v-btn>
-    <br />
-    <br />
-    <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+    <v-container>
+        <h1>{{ $t("personListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn v-if="userRole === 'ADMIN' || userRole === 'INSTITUTIONAL_EDITOR'" color="primary" @click="addPerson">
+            {{ $t("addPersonLabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

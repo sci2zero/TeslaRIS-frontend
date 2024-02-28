@@ -1,22 +1,24 @@
 <template>
-    <v-sheet class="text-center">
-        <h1>{{ $t("addSoftwareLabel") }}</h1>
-    </v-sheet>
-    <br />
-    <br />
-    <software-submission-form ref="submissionFormRef"></software-submission-form>
-    <v-row justify="center">
-        <v-col cols="1">
-            <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitSoftware(false)">
-                {{ $t("saveLabel") }}
-            </v-btn>
-        </v-col>
-        <v-col cols="3">
-            <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitSoftware(true)">
-                {{ $t("saveAndAddAnotherLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
+    <v-container>
+        <v-sheet class="text-center">
+            <h1>{{ $t("addSoftwareLabel") }}</h1>
+        </v-sheet>
+        <br />
+        <br />
+        <software-submission-form ref="submissionFormRef"></software-submission-form>
+        <v-row justify="center">
+            <v-col cols="1">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitSoftware(false)">
+                    {{ $t("saveLabel") }}
+                </v-btn>
+            </v-col>
+            <v-col cols="3">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitSoftware(true)">
+                    {{ $t("saveAndAddAnotherLabel") }}
+                </v-btn>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script lang="ts">

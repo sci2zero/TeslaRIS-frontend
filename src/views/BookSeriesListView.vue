@@ -1,15 +1,17 @@
 <template>
-    <h1>{{ $t("bookSeriesListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <v-btn color="primary" @click="addBookSeries">
-        {{ $t("addBookSeriesLabel") }}
-    </v-btn>
-    <br />
-    <br />
-    <book-series-table-component :book-series="bookSeries" :total-book-series="totalBookSeries" @switch-page="switchPage"></book-series-table-component>
+    <v-container>
+        <h1>{{ $t("bookSeriesListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn color="primary" @click="addBookSeries">
+            {{ $t("addBookSeriesLabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <book-series-table-component :book-series="bookSeries" :total-book-series="totalBookSeries" @switch-page="switchPage"></book-series-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

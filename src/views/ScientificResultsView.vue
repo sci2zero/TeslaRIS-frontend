@@ -1,35 +1,37 @@
 <template>
-    <h1>{{ $t("scientificResultsListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <v-menu
-        v-if="userRole"
-        open-on-hover
-    >
-        <template #activator="{ props }">
-            <v-btn
-                color="primary"
-                v-bind="props"
-            >
-                {{ $t("addNewEntityLabel") }}
-            </v-btn>
-        </template>
+    <v-container>
+        <h1>{{ $t("scientificResultsListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-menu
+            v-if="userRole"
+            open-on-hover
+        >
+            <template #activator="{ props }">
+                <v-btn
+                    color="primary"
+                    v-bind="props"
+                >
+                    {{ $t("addNewEntityLabel") }}
+                </v-btn>
+            </template>
 
-        <v-list>
-            <v-list-item
-                v-for="(item, index) in items"
-                :key="index"
-                @click="navigateToPage(item.value)"
-            >
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-        </v-list>
-    </v-menu>
-    <br />
-    <br />
-    <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+            <v-list>
+                <v-list-item
+                    v-for="(item, index) in items"
+                    :key="index"
+                    @click="navigateToPage(item.value)"
+                >
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+        <br />
+        <br />
+        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

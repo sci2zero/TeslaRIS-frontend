@@ -3,7 +3,7 @@
         <v-menu
             v-model="menu"
             :close-on-content-click="true"
-            location="end"
+            location="bottom"
         >
             <template #activator="{ props }">
                 <v-btn

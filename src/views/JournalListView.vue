@@ -1,15 +1,17 @@
 <template>
-    <h1>{{ $t("journalListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <v-btn color="primary" @click="addJournal">
-        {{ $t("addJournalLabel") }}
-    </v-btn>
-    <br />
-    <br />
-    <journal-table-component :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+    <v-container>
+        <h1>{{ $t("journalListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn color="primary" @click="addJournal">
+            {{ $t("addJournalLabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <journal-table-component :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">

@@ -13,6 +13,7 @@ export default {
     registerLabel: "Registracija",
     registerFromLoginLabel: "Nemate nalog? Registrujte se.",
     homeLabel: "Početna Stranica",
+    contactLabel: "Kontakt",
     userPageLabel: "Korisnici",
     userListLabel: "Registrovani Korisnici",
     logoutLabel: "Izloguj se",
