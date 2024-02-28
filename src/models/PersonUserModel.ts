@@ -99,6 +99,7 @@ export enum Sex {
 }
 
 export interface PersonResponse {
+    id?: number;
     personName: PersonName;
     personOtherNames: PersonName[];
     personalInfo: PersonalInfo;

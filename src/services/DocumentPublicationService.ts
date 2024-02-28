@@ -44,6 +44,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}/my-publications`);
   }
 
+  async findResearcherPublications(researcherId: number, tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `document/for-researcher/${researcherId}?${tokens}`);
+  }
+
   async deleteDocumentPublication(documentPublicationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `document/${documentPublicationId}`);
   }

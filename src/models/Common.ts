@@ -26,8 +26,13 @@ export interface LanguageTagResponse {
 }
 
 export interface ExternalValidation {
-    passed: boolean,
-    message: string
+    passed: boolean;
+    message: string;
+}
+
+export interface Country {
+    code: string;
+    name: MultilingualContent[];
 }
 
 export enum ApproveStatus {

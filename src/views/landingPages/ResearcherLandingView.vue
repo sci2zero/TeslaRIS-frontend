@@ -36,55 +36,71 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div>BirthDate:</div>
-                                <div class="response">
+                                <div v-if="personalInfo.localBirthDate">
+                                    BirthDate:
+                                </div>
+                                <div v-if="personalInfo.localBirthDate" class="response">
                                     {{ personalInfo.localBirthDate }}
                                 </div>
-                                <div>Sex:</div>
-                                <div class="response">
+                                <div v-if="personalInfo.sex">
+                                    Sex:
+                                </div>
+                                <div v-if="personalInfo.localBirthDate" class="response">
                                     {{ personalInfo.sex }}
                                 </div>
-                                <div>Country:</div>
-                                <div class="response">
-                                    {{ personalInfo.countryId }}
+                                <div v-if="personalInfo.country">
+                                    Country:
+                                </div>
+                                <div v-if="personalInfo.sex" class="response">
+                                    {{ personalInfo.country }}
                                 </div>
                                 <div>APVNT:</div>
                                 <div class="response">
-                                    {{ personalInfo.apvnt }}
+                                    {{ personalInfo.apvnt ? personalInfo.apvnt : $t("notYetSetMessage") }}
                                 </div>
                                 <div>MNID:</div>
                                 <div class="response">
-                                    {{ personalInfo.mnid }}
+                                    {{ personalInfo.mnid ? personalInfo.mnid : $t("notYetSetMessage") }}
                                 </div>
                                 <div>ORCID:</div>
                                 <div class="response">
-                                    {{ personalInfo.orcid }}
+                                    {{ personalInfo.orcid ? personalInfo.orcid : $t("notYetSetMessage") }}
                                 </div>
                                 <div>Scopus Author ID:</div>
                                 <div class="response">
-                                    {{ personalInfo.scopusAuthorId }}
+                                    {{ personalInfo.scopusAuthorId ? personalInfo.scopusAuthorId : $t("notYetSetMessage") }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
-                                <div>Street and Number:</div>
-                                <div class="response">
+                                <div v-if="personalInfo.streetAndNumber">
+                                    Street and Number:
+                                </div>
+                                <div v-if="personalInfo.streetAndNumber" class="response">
                                     {{ personalInfo.streetAndNumber }}
                                 </div>
-                                <div>City:</div>
-                                <div class="response">
+                                <div v-if="personalInfo.city">
+                                    City:
+                                </div>
+                                <div v-if="personalInfo.city" class="response">
                                     {{ personalInfo.city }}
                                 </div>
-                                <div>Place of Birth:</div>
-                                <div class="response">
+                                <div v-if="personalInfo.placeOfBrith">
+                                    Place of Birth:
+                                </div>
+                                <div v-if="personalInfo.placeOfBrith" class="response">
                                     {{ personalInfo.placeOfBrith }}
                                 </div>
-                                <div>Contact Email:</div>
-                                <div class="response">
-                                    {{ personalInfo.contactEmail }}
+                                <div v-if="personalInfo.contact.contactEmail">
+                                    Contact Email:
                                 </div>
-                                <div>Phone Number:</div>
-                                <div class="response">
-                                    {{ personalInfo.phoneNumber }}
+                                <div v-if="personalInfo.contact.contactEmail" class="response">
+                                    {{ personalInfo.contact.contactEmail }}
+                                </div>
+                                <div v-if="personalInfo.contact.phoneNumber">
+                                    Phone Number:
+                                </div>
+                                <div v-if="personalInfo.contact.phoneNumber" class="response">
+                                    {{ personalInfo.contact.phoneNumber }}
                                 </div>
                             </v-col>
                         </v-row>
@@ -238,197 +254,199 @@
         </v-row> -->
 
         <!-- Publication Table -->
-        <v-btn class="mt-5 mb-1">
-            Add Publication
-        </v-btn>
-
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3">
-                    <v-card-title><b>Publication Table</b></v-card-title>
-                    <v-data-table :headers="headers" :items="publications" item-key="id">
-                        <template #items="props">
-                            <td>{{ props.item.title }}</td>
-                            <td>{{ props.item.authors }}</td>
-                            <td>{{ props.item.year }}</td>
-                        </template>
-                    </v-data-table>
-                </v-card>
-            </v-col>
-        </v-row>
+        <br />
+        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
     </v-container>
 </template>
 
 <script lang="ts">
 
+import type { MultilingualContent, Country, Page } from '@/models/Common';
+import PersonService from '@/services/PersonService';
+import CountryService from '@/services/CountryService';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import type { PersonResponse } from '@/models/PersonUserModel';
+import { watch } from 'vue';
+import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import DocumentPublicationService from "@/services/DocumentPublicationService";
+
 
 export default defineComponent({
     name: "ResearcherLandingPage",
+    components: { PublicationTableComponent },
     setup() {
         const router = useRouter();
-      const researcherName = ref('Milos Popovic')
-      const accountIcon = ref('mdi-account-circle')
-      const personalInfo = ref({
-        localBirthDate: '2000-01-25',
-        placeOfBrith: 'Sabac, Servia',
-        sex: 'Male',
-        countryId: 'Serbia',
-        streetAndNumber: 'Bulevar Depsota Stefana 7',
-        city: 'Novi Sad',
-        contactEmail: 'milospopovic@uns.ac.rs',
-        phoneNumber: '0631453860',
-        apvnt: '5213',
-        mnid: '/',
-        orcid: '0008-0006-6373-1632',
-        scopusAuthorId: '999'
-      })
-      const keywords = ref(["Cybersecurity", "Research", "Machine learning", "Teaching Assistant", "Montenegro"])
-      const biography = ref('Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa aut est! Tempore animi velit necessitatibus nesciunt voluptas soluta voluptatibus non doloremque excepturi illum ipsam, ducimus odio quasi asperiores saepe aliquam tenetur! Illo quibusdam pariatur repellendus id consequatur alias excepturi.')
-      const expertises = ref([
-        {
-            title: "CyberSecurity",
-            desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-            attachments: [
-                {name: "attahment1"},
-                {name: "attahment1"}
-            ]
-        },
-        {
-            title: "CyberSecurity 2",
-            desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-            attachments: [
-                {name: "attahment1"}
-            ]
-        },
-      ])
+        const currentRoute = useRoute();
 
-      const involvements = ref([
-      {
-            title: "FTN",
-            yearStart: "2020",
-            yearEnd: "Present",
-            desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-            attachments: [
-                {name: "Diploma BSc"},
-                {name: "Diploma MSc"}
-            ]
-        },
-        {
-            title: "FZŽ",
-            yearStart: "2020",
-            yearEnd: "Present",
-            desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-            attachments: [
-                {name: "Dipl"},
-            ]
-        },
-      ])
+        const person = ref<PersonResponse>();
+        const country = ref<Country>();
 
-      const publications = ref([{
-        title: "Quantum Insights",
-        authors: "Ivan Mrsulja, Milos Popovic",
-        year: 2024,
-      },
-      {
-        title: "Tech Trends Today",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Nature's Chronicles",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Innovation Insight Journal",
-        authors: "Milos Popovic",
-        year: 2023,
-      },{
-        title: "Quantum Insights",
-        authors: "Ivan Mrsulja, Milos Popovic",
-        year: 2024,
-      },
-      {
-        title: "Tech Trends Today",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Nature's Chronicles",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Innovation Insight Journal",
-        authors: "Milos Popovic",
-        year: 2023,
-      },{
-        title: "Quantum Insights",
-        authors: "Ivan Mrsulja, Milos Popovic",
-        year: 2024,
-      },
-      {
-        title: "Tech Trends Today",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Nature's Chronicles",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Innovation Insight Journal",
-        authors: "Milos Popovic",
-        year: 2023,
-      },{
-        title: "Quantum Insights",
-        authors: "Ivan Mrsulja, Milos Popovic",
-        year: 2024,
-      },
-      {
-        title: "Tech Trends Today",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Nature's Chronicles",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-      {
-        title: "Innovation Insight Journal",
-        authors: "Milos Popovic",
-        year: 2023,
-      },
-    ])
-      const headers = ref([
-        { text: 'Title', value: 'title' },
-        { text: 'Authors', value: 'authors' },
-        { text: 'Year', value: 'year' }
-      ])
+        const publications = ref<DocumentPublicationIndex[]>([]);
+        const totalPublications = ref<number>(0);
+        const page = ref(0);
+        const size = ref(1);
+        const sort = ref("");
+        const direction = ref("");
 
-      const searchKeyword = (keyword) => {
-        router.push({name:"advancedSearch", query: { searchQuery: keyword  }})        
+        const i18n = useI18n();
 
-      }
+        const researcherName = ref("");
+        const accountIcon = ref('mdi-account-circle')
 
-      return {researcherName,
+        const personalInfo = ref<any>({contact: {}});
+        
+        const keywords = ref();
+        const biography = ref();
+        const expertises = ref([
+            {
+                title: "CyberSecurity",
+                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
+                attachments: [
+                    {name: "attahment1"},
+                    {name: "attahment1"}
+                ]
+            },
+            {
+                title: "CyberSecurity 2",
+                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
+                attachments: [
+                    {name: "attahment1"}
+                ]
+            },
+        ])
+
+        const involvements = ref([
+            {
+                title: "FTN",
+                yearStart: "2020",
+                yearEnd: "Present",
+                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
+                attachments: [
+                    {name: "Diploma BSc"},
+                    {name: "Diploma MSc"}
+                ]
+            },
+            {
+                title: "FZŽ",
+                yearStart: "2020",
+                yearEnd: "Present",
+                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
+                attachments: [
+                    {name: "Dipl"},
+                ]
+            },
+        ]);
+
+        onMounted(() => {
+            PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
+                console.log(response.data);
+                person.value = response.data;
+                if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
+                    researcherName.value = `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;
+                } else {
+                    researcherName.value = `${response.data.personName.firstname} ${response.data.personName.lastname}`;
+                }
+
+                fetchPublications();                
+                populateData();
+            });
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const populateData = () => {
+            if (person.value === undefined) {
+                return;
+            }
+
+            personalInfo.value = person.value.personalInfo;
+                personalInfo.value.streetAndNumber = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.streetAndNumber as MultilingualContent[]);
+                personalInfo.value.city = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.city as MultilingualContent[]);
+
+                fetchAndSetCountryInfo();
+
+                // TODO: Improve this!!!
+                keywords.value = returnCurrentLocaleContent(person.value.keyword)?.split(",") as string[];
+
+                biography.value = returnCurrentLocaleContent(person.value.biography);
+        }
+
+        const fetchAndSetCountryInfo = () => {
+            if (country.value !== undefined) {
+                personalInfo.value.country = returnCurrentLocaleContent(country.value.name);
+                return;
+            }
+
+            CountryService.readCountry(person.value?.personalInfo.postalAddress?.countryId as number).then((response) => {
+                console.log(response.data)
+                country.value = response.data;
+                personalInfo.value.country = returnCurrentLocaleContent(response.data.name);
+            });
+        };
+
+        const returnCurrentLocaleContent = (multilingualContentList: MultilingualContent[]): string | null => {
+            let selectedContent: MultilingualContent | null = null;
+            
+            multilingualContentList.forEach((multilingualContent) => {
+                if (multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                    selectedContent = multilingualContent;
+                }
+            });
+
+            if (selectedContent) {
+                return (selectedContent as MultilingualContent).content;
+            } else {
+
+                if (multilingualContentList.length === 0) {
+                    return null;
+                }
+
+                const maxPriorityContent = multilingualContentList.reduce((prev, current) => {
+                    return (prev.priority > current.priority) ? prev : current;
+                });
+                
+                return maxPriorityContent.content;
+            }
+        };
+
+        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            page.value = nextPage;
+            size.value = pageSize;
+            sort.value = sortField;
+            direction.value = sortDir;
+            fetchPublications();
+        };
+
+        const fetchPublications = () => {
+            DocumentPublicationService.findResearcherPublications(person.value?.id as number, `page=${page.value}&size=${size.value}`).then((publicationResponse) => {
+                publications.value = publicationResponse.data.content;
+                totalPublications.value = publicationResponse.data.totalElements
+            });
+        };
+
+        const searchKeyword = (keyword: string) => {
+            router.push({name:"advancedSearch", query: { searchQuery: keyword  }})        
+        };
+
+        return {researcherName,
                 accountIcon,
                 personalInfo,
                 keywords,
                 biography,
                 expertises,
                 involvements,
-                publications,
-                headers,
+                publications, 
+                totalPublications,
+                switchPage,
                 searchKeyword
-                }
-    }
-    
-})
+        };
+}})
 
 </script>
 

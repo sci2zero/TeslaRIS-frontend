@@ -273,7 +273,6 @@ export default defineComponent(
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
-            const logoutLabel = computed(() => i18n.t("logoutLabel"));
             const userLoggedIn = ref(false);
 
 
@@ -311,10 +310,6 @@ export default defineComponent(
                 loginStore.userLoggedOut();
                 router.push({ name: "login" });
             };
-
-            const test = () => {
-                alert("alert")
-            }
 
             watchEffect(() => {
                 if (loginStore.userLoggedIn) {

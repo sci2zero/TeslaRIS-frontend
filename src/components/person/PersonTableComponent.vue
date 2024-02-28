@@ -29,7 +29,11 @@
                         hide-details
                     />
                 </td>
-                <td>{{ row.item.name }}</td>
+                <td>
+                    <localized-link :to="'persons/' + row.item.databaseId">
+                        {{ row.item.name }}
+                    </localized-link>
+                </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.employmentsSr }}
                 </td>
@@ -61,9 +65,12 @@ import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
 import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PersonTableComponent",
+    components: { LocalizedLink },
     props: {
         persons: {
             type: Array<PersonIndex>,

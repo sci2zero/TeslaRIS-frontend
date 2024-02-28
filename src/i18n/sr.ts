@@ -155,5 +155,6 @@ export default {
     patentNumberLabel: "Broj patenta",
     internalNumberLabel: "Interni broj",
     addNewEntityLabel: "Dodaj novi...",
-    noAvailableProceedingsMessage: "Nema dostupnih zbornika radova."
+    noAvailableProceedingsMessage: "Nema dostupnih zbornika radova.",
+    notYetSetMessage: "Nije unešeno."
 }

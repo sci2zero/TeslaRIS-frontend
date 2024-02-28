@@ -106,7 +106,7 @@ export interface PersonResponse {
     approveStatus: ApproveStatus;
 }
 
-interface PersonalInfo {
+export interface PersonalInfo {
     localBirthDate: string;
     placeOfBirth?: string;
     sex: Sex;

@@ -155,5 +155,6 @@ export default {
     patentNumberLabel: "Patent Number",
     internalNumberLabel: "Internal Number",
     addNewEntityLabel: "Add new...",
-    noAvailableProceedingsMessage: "No Available Proceedings."
+    noAvailableProceedingsMessage: "No Available Proceedings.",
+    notYetSetMessage: "Not yet set."
 }
