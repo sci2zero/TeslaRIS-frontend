@@ -35,7 +35,7 @@
 
                 <v-card
                     class="mx-auto"
-                    title="Nijedan od ponnuđenih"
+                    title="Nijedan od ponuđenih"
                     :subtitle="newFirstNameTitle"
                     link
                     @click="registrationNextStep"
@@ -50,8 +50,6 @@ import { useI18n } from "vue-i18n";
 import { computed, defineComponent, ref } from "vue";
 import lodash from "lodash";
 import PersonService from "@/services/PersonService";
-import type { PersonIndex } from "@/models/PersonModel";
-import UserService from "@/services/UserService";
 import { useRouter } from "vue-router";
 import { useRegisterStore } from '@/stores/registerStore';
 
@@ -59,15 +57,14 @@ import { useRegisterStore } from '@/stores/registerStore';
 export default defineComponent({
     name: "RegistrationFirstStep",
     emits: ["registration-next-step"],
-
-    setup(props,{emit}) {
+    setup(_, { emit }) {
         const i18n = useI18n();
         const router = useRouter();
         const firstName = ref("")
         const lastName = ref("")
 
         const registerStore = useRegisterStore();
-        const suggestions = ref<PersonService[]>([]);
+        const suggestions = ref<typeof PersonService[]>([]);
 
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
         const firstNameRules = [
@@ -101,7 +98,6 @@ export default defineComponent({
                 const token = input
                 const params = `tokens=${token}&page=0&size=7`
                 PersonService.searchResearchers(params).then((response) => {
-                    console.log(response);
                     suggestions.value = response.data.content;
                     // const listOfOUs: { title: string, value: number }[] = [];
                     // response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {

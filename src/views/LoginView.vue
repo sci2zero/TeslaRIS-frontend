@@ -75,7 +75,7 @@
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import AuthenticationService from "@/services/AuthenticationService";
 import {useLoginStore} from "@/stores/loginStore"
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";

@@ -25,7 +25,7 @@
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
                         <div class="edit-pen">
-                            <v-btn icon variant="outline"> 
+                            <v-btn icon variant="outlined"> 
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
@@ -115,7 +115,7 @@
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div class="edit-pen">
-                            <v-btn icon variant="outline" size="small"> 
+                            <v-btn icon variant="outlined" size="small"> 
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
@@ -135,7 +135,7 @@
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div class="edit-pen">
-                            <v-btn icon variant="outline" size="small"> 
+                            <v-btn icon variant="outlined" size="small"> 
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
@@ -153,7 +153,7 @@
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div class="edit-pen">
-                            <v-btn icon variant="outline" size="small"> 
+                            <v-btn icon variant="outlined" size="small"> 
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
@@ -182,7 +182,7 @@
                                         <v-icon icon="mdi-file-document-outline"></v-icon>
                                     </template>
 
-                                    <v-list-item-title v-text="attachment.name"></v-list-item-title>
+                                    <v-list-item-title>{{ attachment.name }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                             <v-divider v-if="index < expertises.length-1 " class="mt-10"></v-divider>
@@ -194,7 +194,7 @@
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div class="edit-pen">
-                            <v-btn icon variant="outline" size="small"> 
+                            <v-btn icon variant="outlined" size="small"> 
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
@@ -227,7 +227,7 @@
                                         <v-icon icon="mdi-file-document-outline"></v-icon>
                                     </template>
 
-                                    <v-list-item-title v-text="attachment.name"></v-list-item-title>
+                                    <v-list-item-title>{{ attachment.name }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                             <v-divider v-if="index < involvements.length-1 " class="mt-10"></v-divider>
@@ -261,7 +261,7 @@
 
 <script lang="ts">
 
-import type { MultilingualContent, Country, Page } from '@/models/Common';
+import type { MultilingualContent, Country } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
 import { onMounted } from 'vue';
@@ -431,7 +431,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword  }})        
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
         };
 
         return {researcherName,

@@ -48,11 +48,11 @@ export default defineComponent({
     name: "RegistrationSecondStep",
     components: {OrganisationUnitAutocompleteSearch, PasswordInputWithMeter},
     props: {
-        firstName: {
+        firstname: {
             type: String,
             default: ""
         },
-        lastName: {
+        lastname: {
             type: String,
             default: ""
         }
@@ -62,8 +62,8 @@ export default defineComponent({
         const registerStore = useRegisterStore();
 
         const i18n = useI18n();
-        const firstName = ref(props.firstName || registerStore.registerPersonData?.personName.firstname);
-        const lastName = ref(props.lastName || registerStore.registerPersonData?.personName.lastname);
+        const firstName = ref(props.firstname || registerStore.registerPersonData?.personName.firstname);
+        const lastName = ref(props.lastname || registerStore.registerPersonData?.personName.lastname);
         const email = ref("");
         const password = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);

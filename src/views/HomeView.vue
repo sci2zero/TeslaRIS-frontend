@@ -53,6 +53,10 @@ import { useI18n } from "vue-i18n";
 import SearchBarComponent from "../components/core/SearchBarComponent.vue";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
+import PersonService from "@/services/PersonService";
+import { onMounted } from "vue";
+import OrganisationUnitService from "@/services/OrganisationUnitService";
+import DocumentPublicationService from "@/services/DocumentPublicationService";
 
 export default defineComponent({
     name: "HomeView",
@@ -66,12 +70,21 @@ export default defineComponent({
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));
         const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-        // const search = ref('');
+
+        const researcherCount = ref(0);
+        const ouCount = ref(0);
+        const publicationCount = ref(0);
+
+        onMounted(() => {
+            PersonService.getResearcherCount().then((response) => researcherCount.value = response.data);
+            OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data);
+            DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data);
+        });
 
         const cardsData = ref([
-            {name: personListLabel, value: 16252, path:'persons'},
-            {name: ouListLabel, value: 132, path: 'organisation-units'},
-            {name: scientificResultsListLabel, value: 95042, path:'scientific-results'},
+            {name: personListLabel, value: researcherCount, path:'persons'},
+            {name: ouListLabel, value: ouCount, path: 'organisation-units'},
+            {name: scientificResultsListLabel, value: publicationCount, path:'scientific-results'},
         ])
 
         const search = (tokenParams: string) => {

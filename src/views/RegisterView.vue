@@ -6,17 +6,16 @@
             </h2>
 
             <v-stepper
-        
                 v-model="stepperValue" :items="['Step 1', 'Step 2']">
-                <template #item.1>
+                <template #[`item.1`]>
                     <div class="reg-step">
                         <registration-first-step @registration-next-step="nextStep"></registration-first-step>
                     </div>
                 </template>
 
-                <template #item.2>
+                <template #[`item.2`]>
                     <div class="reg-step">
-                        <registration-second-step :first-name="userDetails.firstName" :last-name="userDetails.lastName"></registration-second-step>
+                        <registration-second-step :firstname="userDetails.firstName" :lastname="userDetails.lastName"></registration-second-step>
                     </div>
                 </template>
             </v-stepper>

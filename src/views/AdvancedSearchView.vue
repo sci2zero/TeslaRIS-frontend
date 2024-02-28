@@ -3,7 +3,7 @@
         <h1>{{ $t("advancedSearchLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component :search-input="searchParams" @search="search"></search-bar-component>
+        <search-bar-component :preset-search-input="searchParams" @search="search"></search-bar-component>
         <br />
         <br />
         <br />
@@ -62,13 +62,11 @@ import { useRoute } from "vue-router";
 export default defineComponent({
     name: "AdvancedSearchVuew",
     components: {SearchBarComponent, OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent},
-
     setup() {
-
         const route = useRoute()
         const currentTab = ref("persons");
 
-        const searchParams = ref(route.query.searchQuery || '');
+        const searchParams = ref(route.query.searchQuery as string);
 
         const organisationUnits = ref<OrganisationUnitIndex[]>([]);
         const persons = ref<PersonIndex[]>([]);
@@ -125,7 +123,7 @@ export default defineComponent({
                     sortPublication.value = sortField;
                     break;
             }
-            search(searchParams.value);
+            search(searchParams.value as string);
         }
 
         return {currentTab, persons, organisationUnits, publications, totalPersons, totalOUs, totalPublications, search, switchPage, searchParams};

@@ -26,14 +26,14 @@ export default defineComponent(
     {
         name: "SearchBarComponent",
         props: {
-            searchInput: {
+            presetSearchInput: {
                 type: String,
                 default: ""
             }
         },
         emits: ["search"],
         setup(props, {emit}) {
-            const searchInput = ref(props.searchInput);
+            const searchInput = ref(props.presetSearchInput);
 
             const onSearch = () => {
                 let tokens: string[] = searchInput.value.trim().split(" ");
