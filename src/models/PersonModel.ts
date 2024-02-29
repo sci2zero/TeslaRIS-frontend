@@ -110,6 +110,7 @@ export interface PersonResponse {
     educationIds: number[];
     membershipIds: number[];
     expertisesOrSkills: ExpertiseOrSkillResponse[];
+    prizes: PrizeResponse[];
 }
 
 export interface PersonalInfo {
@@ -128,4 +129,11 @@ interface ExpertiseOrSkillResponse {
     name: MultilingualContent[];
     description: MultilingualContent[];
     documentFiles: DocumentFileResponse[];
+}
+
+interface PrizeResponse {
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    proofs: DocumentFileResponse[];
+    date: Date;
 }

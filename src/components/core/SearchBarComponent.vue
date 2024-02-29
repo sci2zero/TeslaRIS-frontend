@@ -19,6 +19,7 @@
 </template>
 
 <script lang="ts">
+import { onMounted } from 'vue';
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
 
@@ -34,6 +35,12 @@ export default defineComponent(
         emits: ["search"],
         setup(props, {emit}) {
             const searchInput = ref(props.presetSearchInput);
+
+            onMounted(() => {
+                if (props.presetSearchInput !== "") {
+                    onSearch();
+                }
+            });
 
             const onSearch = () => {
                 let tokens: string[] = searchInput.value.trim().split(" ");
