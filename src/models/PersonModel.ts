@@ -1,4 +1,5 @@
 import type { ApproveStatus, MultilingualContent } from "./Common";
+import type { DocumentFileResponse } from "./DocumentFileModel";
 
 export interface PersonIndex {
     id: string;
@@ -98,12 +99,17 @@ export enum Sex {
 }
 
 export interface PersonResponse {
+    id?: number;
     personName: PersonName;
     personOtherNames: PersonName[];
     personalInfo: PersonalInfo;
     biography: MultilingualContent[];
     keyword: MultilingualContent[];
     approveStatus: ApproveStatus;
+    employmentIds: number[];
+    educationIds: number[];
+    membershipIds: number[];
+    expertisesOrSkills: ExpertiseOrSkillResponse[];
 }
 
 export interface PersonalInfo {
@@ -116,4 +122,10 @@ export interface PersonalInfo {
     mnid?: string;
     orcid?: string;
     scopusAuthorId?: string;
+}
+
+interface ExpertiseOrSkillResponse {
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    documentFiles: DocumentFileResponse[];
 }

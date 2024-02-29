@@ -1,4 +1,5 @@
 export default {
+    homePageMessage: "CRIS UNS is the information system of scientific research activities at the University of Novi Sad. In this system, you can find information about researchers, organisation units, and scientific results of this university. The information system is based on the TeslaRIS open-source platform.",
     emailLabel: "Email",
     passwordLabel: "Password",
     loginLabel: "Login",
@@ -41,6 +42,7 @@ export default {
     superOUColumn: "super_ou_name_other",
     superOULabel: "Super Organisation Unit",
     birthdateLabel: "Birthdate",
+    placeOfBirthLabel: "Place of Birth",
     employmentColumn: "employmentsOther",
     resources: "Resources",
     manage: "Manage",
@@ -69,6 +71,7 @@ export default {
     eventListLabel: "Events",
     conferenceLabel: "Conference",
     eventDateLabel: "Event Date",
+    countryLabel: "Country",
     stateLabel: "State",
     stateColumn: "stateOther",
     placeLabel: "Place",
@@ -156,5 +159,10 @@ export default {
     internalNumberLabel: "Internal Number",
     addNewEntityLabel: "Add new...",
     noAvailableProceedingsMessage: "No Available Proceedings.",
-    notYetSetMessage: "Not yet set."
+    notYetSetMessage: "Not yet set.",
+    researcherLabel: "Researcher",
+    personalInfoLabel: "Personal Info",
+    biographyLabel: "Biography",
+    expertisesAndSkillsLabel: "Expertises and Skills",
+    involvementsLabel: "Involvements"
 }

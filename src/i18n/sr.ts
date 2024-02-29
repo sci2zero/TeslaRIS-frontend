@@ -1,4 +1,5 @@
 export default {
+    homePageMessage: "CRIS UNS je informacioni sistem naučno-istraživačke delatnosti Univerziteta u Novom Sadu. U ovom sistemu možete pronaći informacije o istraživačima, organizacionim jedinicama i objavljenim rezultatima ovog univerziteta. Informacioni sistem je barizan na TeslaRIS open-source platformi.",
     emailLabel: "Email",
     passwordLabel: "Lozinka",
     loginLabel: "Uloguj se",
@@ -41,6 +42,7 @@ export default {
     superOUColumn: "super_ou_name_sr",
     superOULabel: "Organizaciona nad-jedinica",
     birthdateLabel: "Datum rođenja",
+    placeOfBirthLabel: "Mesto rođenja",
     employmentColumn: "employmentsSr",
     resources: "Resursi",
     manage: "Upravljanje",
@@ -69,6 +71,7 @@ export default {
     eventListLabel: "Događaji",
     conferenceLabel: "Konferencija",
     eventDateLabel: "Datum održavanja",
+    countryLabel: "Zemlja",
     stateLabel: "Zemlja",
     stateColumn: "stateSr",
     placeLabel: "Mesto",
@@ -156,5 +159,10 @@ export default {
     internalNumberLabel: "Interni broj",
     addNewEntityLabel: "Dodaj novi...",
     noAvailableProceedingsMessage: "Nema dostupnih zbornika radova.",
-    notYetSetMessage: "Nije unešeno."
+    notYetSetMessage: "Nije unešeno.",
+    researcherLabel: "Istraživač",
+    personalInfoLabel: "Lični podaci",
+    biographyLabel: "Biografija",
+    expertisesAndSkillsLabel: "Expertize i veštine",
+    involvementsLabel: "Učešća",
 }

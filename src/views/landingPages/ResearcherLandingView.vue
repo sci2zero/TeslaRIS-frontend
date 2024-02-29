@@ -8,7 +8,7 @@
                         {{ researcherName }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        Researcher
+                        {{ $t("researcherLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
@@ -32,24 +32,24 @@
 
                         <!-- Personal Info -->
                         <div class="mb-5">
-                            <b>Personal Info</b>
+                            <b>{{ $t("personalInfoLabel") }}</b>
                         </div>
                         <v-row>
                             <v-col cols="6">
                                 <div v-if="personalInfo.localBirthDate">
-                                    BirthDate:
+                                    {{ $t("birthdateLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.localBirthDate" class="response">
                                     {{ personalInfo.localBirthDate }}
                                 </div>
                                 <div v-if="personalInfo.sex">
-                                    Sex:
+                                    {{ $t("sexLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.localBirthDate" class="response">
                                     {{ personalInfo.sex }}
                                 </div>
                                 <div v-if="personalInfo.country">
-                                    Country:
+                                    {{ $t("countryLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.sex" class="response">
                                     {{ personalInfo.country }}
@@ -73,31 +73,31 @@
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="personalInfo.streetAndNumber">
-                                    Street and Number:
+                                    {{ $t("streetAndNumberLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.streetAndNumber" class="response">
                                     {{ personalInfo.streetAndNumber }}
                                 </div>
                                 <div v-if="personalInfo.city">
-                                    City:
+                                    {{ $t("cityLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.city" class="response">
                                     {{ personalInfo.city }}
                                 </div>
                                 <div v-if="personalInfo.placeOfBrith">
-                                    Place of Birth:
+                                    {{ $t("placeOfBirthLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.placeOfBrith" class="response">
                                     {{ personalInfo.placeOfBrith }}
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail">
-                                    Contact Email:
+                                    {{ $t("emailLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail" class="response">
                                     {{ personalInfo.contact.contactEmail }}
                                 </div>
                                 <div v-if="personalInfo.contact.phoneNumber">
-                                    Phone Number:
+                                    {{ $t("phoneNumberLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
@@ -120,7 +120,7 @@
                             </v-btn>
                         </div>
 
-                        <div><b>Keywords</b></div>
+                        <div><b>{{ $t("keywordsLabel") }}</b></div>
                         <v-chip v-for="(keyword, index) in keywords" :key="index" outlined @click="searchKeyword(keyword)">
                             {{ keyword }}
                         </v-chip>
@@ -140,7 +140,7 @@
                             </v-btn>
                         </div>
 
-                        <div><b>Biography</b></div>
+                        <div><b>{{ $t("biographyLabel") }}</b></div>
                         <p>{{ biography }}</p>
                     </v-card-text>
                 </v-card>
@@ -157,39 +157,38 @@
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
-                        <div><b>Expertises and Skills</b></div>
+                        <div><b>{{ $t("expertisesAndSkillsLabel") }}</b></div>
                         
-                        <div v-for="(expertise, index) in expertises" :key="index" class="py-5">
-                            <h4><strong>{{ expertise.title }}</strong></h4>
-                            <p>{{ expertise.desc }}</p>
+                        <div v-for="(expertise, index) in person?.expertisesOrSkills" :key="index" class="py-5">
+                            <h4><strong>{{ returnCurrentLocaleContent(expertise.name) }}</strong></h4>
+                            <p>{{ returnCurrentLocaleContent(expertise.description) }}</p>
                             
-                            <!-- <v-list dense>
-                                <v-list-item v-for="(attachment, attachmentIndex) in expertise.attachments" :key="attachmentIndex">
-                                    <v-list-item-content>{{ attachment.name }}</v-list-item-content>
-                                </v-list-item>
-                            </v-list> -->
+                            <br />
                             <v-list
                                 :lines="false"
                                 density="compact"
                                 class="pa-0"
                             >
                                 <v-list-item
-                                    v-for="(attachment, attachmentIndex) in expertise.attachments" :key="attachmentIndex"
-                                    :value="attachment.name"
+                                    v-for="(attachment, attachmentIndex) in expertise.documentFiles" :key="attachmentIndex"
+                                    :value="attachment.serverFilename"
                                     color="primary"
                                 >
                                     <template #prepend>
                                         <v-icon icon="mdi-file-document-outline"></v-icon>
                                     </template>
 
-                                    <v-list-item-title>{{ attachment.name }}</v-list-item-title>
+                                    <v-list-item-title>{{ attachment.fileName }} ({{ attachment.sizeInMb }}MB)</v-list-item-title>
                                 </v-list-item>
                             </v-list>
-                            <v-divider v-if="index < expertises.length-1 " class="mt-10"></v-divider>
+                            <v-divider v-if="index < (person?.expertisesOrSkills ? person?.expertisesOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
                 </v-card>
             </v-col>
+
+
+            <!-- Involvements -->
             <v-col cols="6">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
@@ -198,7 +197,7 @@
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
-                        <div><b>Involvements</b></div>
+                        <div><b>{{ $t("involvementsLabel") }}</b></div>
                         <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
                             <h4>
                                 <strong>{{ involvement.title }}</strong>
@@ -206,13 +205,7 @@
                                 </v-icon>
                                 {{ involvement.yearStart }} - {{ involvement.yearEnd }} 
                             </h4>
-                            <p>{{ involvement.desc }}</p>
-                            
-                            <!-- <v-list dense>
-                                <v-list-item v-for="(attachment, attachmentIndex) in expertise.attachments" :key="attachmentIndex">
-                                    <v-list-item-content>{{ attachment.name }}</v-list-item-content>
-                                </v-list-item>
-                            </v-list> -->
+                            <p>{{ involvement.desc }}</p>       
                             <v-list
                                 :lines="false"
                                 density="compact"
@@ -237,22 +230,6 @@
             </v-col>
         </v-row>
 
-        <!-- Involvements -->
-        <!-- <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text>
-                        <div><b>Involvements</b></div>
-                        <v-list dense>
-                            <v-list-item v-for="(involvement, index) in involvements" :key="index">
-                                <v-list-item-content>{{ involvement }}</v-list-item-content>
-                            </v-list-item>
-                        </v-list>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row> -->
-
         <!-- Publication Table -->
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
@@ -268,7 +245,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PersonResponse } from '@/models/PersonUserModel';
+import type { PersonResponse } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -301,23 +278,6 @@ export default defineComponent({
         
         const keywords = ref();
         const biography = ref();
-        const expertises = ref([
-            {
-                title: "CyberSecurity",
-                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-                attachments: [
-                    {name: "attahment1"},
-                    {name: "attahment1"}
-                ]
-            },
-            {
-                title: "CyberSecurity 2",
-                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-                attachments: [
-                    {name: "attahment1"}
-                ]
-            },
-        ])
 
         const involvements = ref([
             {
@@ -424,6 +384,10 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
+            if (!person.value?.id) {
+                return;
+            }
+
             DocumentPublicationService.findResearcherPublications(person.value?.id as number, `page=${page.value}&size=${size.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
@@ -436,15 +400,16 @@ export default defineComponent({
 
         return {researcherName,
                 accountIcon,
+                person,
                 personalInfo,
                 keywords,
                 biography,
-                expertises,
                 involvements,
                 publications, 
                 totalPublications,
                 switchPage,
-                searchKeyword
+                searchKeyword,
+                returnCurrentLocaleContent
         };
 }})
 

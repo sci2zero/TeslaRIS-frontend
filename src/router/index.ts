@@ -27,7 +27,7 @@ import ResetPasswordView from "@/views/ResetPasswordView.vue";
 import SubmitPatentView from "@/views/SubmitPatentView.vue";
 import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
-
+import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
 
 
@@ -303,6 +303,13 @@ const router = createRouter({
                     meta: {
                         authenticated: false,
                         authorities: [],
+                    },
+                },
+                {
+                    path: 'contact',
+                    component: ExternalRedirect,
+                    props: {
+                      url: 'http://dosird.uns.ac.rs/contact',
                     },
                 },
             ]
