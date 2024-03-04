@@ -29,6 +29,7 @@ import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
+import OrgUnitLandingView from "@/views/landingPages/OrgUnitLandingView.vue";
 
 
 
@@ -243,13 +244,28 @@ const router = createRouter({
                     ]
                 },
                 {
-                    path: "organisation-units",
-                    name: "organisationUnits",
-                    component: OrganisationUnitListView,
-                    meta: {
-                        authenticated: false,
-                        authorities: [],
-                    },
+                    path: "organisation-units",                 
+                    children: [
+                        {
+                            path: "",
+                            name: "organisationUnits",
+                            component: OrganisationUnitListView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "organisationUnitLandingPage",
+                            component: OrgUnitLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        }
+                    ]
+                    
                 },
                 {
                     path: "scientific-results",

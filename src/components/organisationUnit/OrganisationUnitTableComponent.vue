@@ -30,10 +30,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.nameSr }}
+                    <localized-link :to="'organisation-units/' + row.item.databaseId">
+                        {{ row.item.nameSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.nameOther }}
+                    <localized-link :to="'organisation-units/' + row.item.databaseId">
+                        {{ row.item.nameOther }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.superOUNameSr }}
@@ -76,9 +80,11 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
+    components: { LocalizedLink },
     props: {
         organisationUnits: {
             type: Array<OrganisationUnitIndex>,

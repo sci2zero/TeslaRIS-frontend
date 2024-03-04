@@ -1,8 +1,9 @@
 <template>
     <v-text-field
+        v-if="showInput" 
         v-model="address" :readonly="readOnly" :label="$t('addressLabel')" :placeholder="$t('addressLabel')"
         @update:focused="onAddressChange"></v-text-field>
-    <div ref="map" class="openlayers-map"></div>
+    <div ref="map" :style="'height: ' + height" class="openlayers-map"></div>
 </template>
 
 <script lang="ts">
@@ -11,12 +12,16 @@ import { ref, onMounted, defineComponent } from 'vue';
 import { Map, View, Feature } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import { Point } from 'ol/geom';
+import { Circle, Point } from 'ol/geom';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import lodash from "lodash";
 import TileJSON from 'ol/source/TileJSON.js';
+import Style from 'ol/style/Style';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
+import CircleStyle from 'ol/style/Circle.js';
 
 
 export default defineComponent({
@@ -25,7 +30,24 @@ export default defineComponent({
         readOnly: {
             type: Boolean,
             required: true
-        }},
+        },
+        showInput: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
+        initCordinates: {
+            type: Array<number>,
+            required: false,
+            default: () => {[20,40]},
+        },
+        height: {
+            type: String,
+            required: false,
+            default: "300px",
+        }
+    },
+
     setup(props) {
         const map = ref<Map | null>(null);
         const marker = ref();
@@ -38,6 +60,15 @@ export default defineComponent({
 
         onMounted(() => {
             initializeMap(map.value);
+
+            if (props.initCordinates) {
+                
+                setMarker(props.initCordinates);
+                view.setCenter(fromLonLat([props.initCordinates[0],props.initCordinates[1]]));
+                view.setZoom(15);
+
+
+            }
         });
 
         const initializeMap = (mapElement: any) => {
@@ -70,6 +101,22 @@ export default defineComponent({
 
         const setMarker = (position: any) => {
             marker.value = new Feature(new Point(fromLonLat(position)));
+            const biggerPointSize = 25;
+            const biggerPointStyle = new Style({
+                image: new CircleStyle({
+                    radius: biggerPointSize,
+                    fill: new Fill({
+                        color: 'rgba(255, 255, 255, 0.5)',
+                    }),
+                    stroke: new Stroke({
+                        color: 'rgba(255, 0, 0, 0.8)',
+                        width: 2,
+                    }),
+                }),
+            });
+
+            // Set the style for the marker
+            marker.value.setStyle(biggerPointStyle);
             vectorSource.addFeature(marker.value);
         }
 
