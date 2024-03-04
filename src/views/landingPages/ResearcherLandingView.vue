@@ -8,13 +8,13 @@
                         {{ researcherName }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        Researcher
+                        {{ $t("researcherLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- Account Info -->
+        <!-- Researrcher Info -->
         <v-row>
             <v-col cols="3" class="text-center">
                 <v-icon size="x-large" class="large-researcher-icon">
@@ -32,26 +32,26 @@
 
                         <!-- Personal Info -->
                         <div class="mb-5">
-                            <b>Personal Info</b>
+                            <b>{{ $t("personalInfoLabel") }}</b>
                         </div>
                         <v-row>
                             <v-col cols="6">
                                 <div v-if="personalInfo.localBirthDate">
-                                    BirthDate:
+                                    {{ $t("birthdateLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.localBirthDate" class="response">
                                     {{ personalInfo.localBirthDate }}
                                 </div>
                                 <div v-if="personalInfo.sex">
-                                    Sex:
+                                    {{ $t("sexLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.localBirthDate" class="response">
+                                <div v-if="personalInfo.sex" class="response">
                                     {{ personalInfo.sex }}
                                 </div>
                                 <div v-if="personalInfo.country">
-                                    Country:
+                                    {{ $t("countryLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.sex" class="response">
+                                <div v-if="personalInfo.country" class="response">
                                     {{ personalInfo.country }}
                                 </div>
                                 <div>APVNT:</div>
@@ -73,31 +73,31 @@
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="personalInfo.streetAndNumber">
-                                    Street and Number:
+                                    {{ $t("streetAndNumberLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.streetAndNumber" class="response">
                                     {{ personalInfo.streetAndNumber }}
                                 </div>
                                 <div v-if="personalInfo.city">
-                                    City:
+                                    {{ $t("cityLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.city" class="response">
                                     {{ personalInfo.city }}
                                 </div>
                                 <div v-if="personalInfo.placeOfBrith">
-                                    Place of Birth:
+                                    {{ $t("placeOfBirthLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.placeOfBrith" class="response">
                                     {{ personalInfo.placeOfBrith }}
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail">
-                                    Contact Email:
+                                    {{ $t("emailLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail" class="response">
                                     {{ personalInfo.contact.contactEmail }}
                                 </div>
                                 <div v-if="personalInfo.contact.phoneNumber">
-                                    Phone Number:
+                                    {{ $t("phoneNumberLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
@@ -120,7 +120,8 @@
                             </v-btn>
                         </div>
 
-                        <div><b>Keywords</b></div>
+                        <div><b>{{ $t("keywordsLabel") }}</b></div>
+                        <strong v-if="!keywords || keywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
                         <v-chip v-for="(keyword, index) in keywords" :key="index" outlined @click="searchKeyword(keyword)">
                             {{ keyword }}
                         </v-chip>
@@ -140,7 +141,8 @@
                             </v-btn>
                         </div>
 
-                        <div><b>Biography</b></div>
+                        <div><b>{{ $t("biographyLabel") }}</b></div>
+                        <strong v-if="!biography">{{ $t("notYetSetMessage") }}</strong>
                         <p>{{ biography }}</p>
                     </v-card-text>
                 </v-card>
@@ -157,39 +159,45 @@
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
-                        <div><b>Expertises and Skills</b></div>
-                        
-                        <div v-for="(expertise, index) in expertises" :key="index" class="py-5">
-                            <h4><strong>{{ expertise.title }}</strong></h4>
-                            <p>{{ expertise.desc }}</p>
-                            
-                            <!-- <v-list dense>
-                                <v-list-item v-for="(attachment, attachmentIndex) in expertise.attachments" :key="attachmentIndex">
-                                    <v-list-item-content>{{ attachment.name }}</v-list-item-content>
-                                </v-list-item>
-                            </v-list> -->
-                            <v-list
-                                :lines="false"
-                                density="compact"
-                                class="pa-0"
-                            >
-                                <v-list-item
-                                    v-for="(attachment, attachmentIndex) in expertise.attachments" :key="attachmentIndex"
-                                    :value="attachment.name"
-                                    color="primary"
-                                >
-                                    <template #prepend>
-                                        <v-icon icon="mdi-file-document-outline"></v-icon>
-                                    </template>
+                        <div><b>{{ $t("expertisesAndSkillsLabel") }}</b></div>
+                        <strong v-if="person?.expertisesOrSkills.length === 0">{{ $t("notYetSetMessage") }}</strong>
 
-                                    <v-list-item-title>{{ attachment.name }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                            <v-divider v-if="index < expertises.length-1 " class="mt-10"></v-divider>
+                        
+                        <div v-for="(expertise, index) in person?.expertisesOrSkills" :key="index" class="py-5">
+                            <h4><strong>{{ returnCurrentLocaleContent(expertise.name) }}</strong></h4>
+                            <p>{{ returnCurrentLocaleContent(expertise.description) }}</p>
+                            
+                            <br />
+                            <attachment-list :attachments="expertise.documentFiles"></attachment-list>
+                            <v-divider v-if="index < (person?.expertisesOrSkills ? person?.expertisesOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
+                        </div>
+                    </v-card-text>
+                </v-card>
+                <br />
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div class="edit-pen">
+                            <v-btn icon variant="outlined" size="small"> 
+                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                            </v-btn>
+                        </div>
+                        <div><b>{{ $t("prizesLabel") }}</b></div>
+                        <strong v-if="person?.prizes.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                        
+                        <div v-for="(prize, index) in person?.prizes" :key="index" class="py-5">
+                            <h4><strong>{{ returnCurrentLocaleContent(prize.title) }}</strong></h4>
+                            <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
+                            
+                            <br />
+                            <attachment-list :attachments="prize.proofs"></attachment-list>
+                            <v-divider v-if="index < (person?.prizes ? person?.prizes.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
                 </v-card>
             </v-col>
+
+
+            <!-- Involvements -->
             <v-col cols="6">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
@@ -198,60 +206,63 @@
                                 <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                             </v-btn>
                         </div>
-                        <div><b>Involvements</b></div>
-                        <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
+                        <div><h2>{{ $t("involvementsLabel") }}</h2></div>
+                        <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                        <br />
+                        <div v-if="employments.length > 0">
+                            <h3>{{ $t("employmentsLabel") }}</h3>
+                        </div>
+                        <div v-for="(employment, index) in employments" :key="index" class="py-5">
                             <h4>
-                                <strong>{{ involvement.title }}</strong>
+                                <strong>{{ returnCurrentLocaleContent(employment.organisationUnitName as MultilingualContent[]) }}</strong>
                                 <v-icon icon="mdi-circle-small">
                                 </v-icon>
-                                {{ involvement.yearStart }} - {{ involvement.yearEnd }} 
+                                <strong>{{ employment.employmentPosition }} ({{ employment.involvementType }})</strong>
+                                <v-icon icon="mdi-circle-small">
+                                </v-icon>
+                                {{ employment.dateFrom ? `${employment.dateFrom} - ${employment.dateTo ? employment.dateTo : $t("presentLabel")}` : $t("currentLabel") }} 
                             </h4>
-                            <p>{{ involvement.desc }}</p>
-                            
-                            <!-- <v-list dense>
-                                <v-list-item v-for="(attachment, attachmentIndex) in expertise.attachments" :key="attachmentIndex">
-                                    <v-list-item-content>{{ attachment.name }}</v-list-item-content>
-                                </v-list-item>
-                            </v-list> -->
-                            <v-list
-                                :lines="false"
-                                density="compact"
-                                class="pa-0"
-                            >
-                                <v-list-item
-                                    v-for="(attachment, attachmentIndex) in involvement.attachments" :key="attachmentIndex"
-                                    :value="attachment.name"
-                                    color="primary"
-                                >
-                                    <template #prepend>
-                                        <v-icon icon="mdi-file-document-outline"></v-icon>
-                                    </template>
-
-                                    <v-list-item-title>{{ attachment.name }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                            <v-divider v-if="index < involvements.length-1 " class="mt-10"></v-divider>
+                            <p>{{ returnCurrentLocaleContent(employment.role as MultilingualContent[]) }}</p>       
+                            <attachment-list :attachments="employment.proofs ? employment.proofs : []"></attachment-list>
+                        </div>
+                        <div v-if="education.length > 0">
+                            <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                        </div>
+                        <div v-for="(educationStep, index) in education" :key="index" class="py-5">
+                            <h4>
+                                <strong>{{ returnCurrentLocaleContent(educationStep.organisationUnitName as MultilingualContent[]) }}</strong>
+                                <v-icon icon="mdi-circle-small">
+                                </v-icon>
+                                <strong>{{ returnCurrentLocaleContent(educationStep.title as MultilingualContent[]) }}</strong>
+                                <v-icon icon="mdi-circle-small">
+                                </v-icon>
+                                {{ educationStep.dateFrom }} - {{ educationStep.dateTo ? educationStep.dateTo : $t("presentLabel") }} 
+                            </h4>
+                            <p v-if="educationStep.thesisTitle">
+                                {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent(educationStep.thesisTitle as MultilingualContent[]) }}
+                            </p>       
+                            <attachment-list :attachments="educationStep.proofs ? educationStep.proofs : []"></attachment-list>
+                        </div>
+                        <div v-if="memberships.length > 0">
+                            <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                        </div>
+                        <div v-for="(membership, index) in memberships" :key="index" class="py-5">
+                            <h4>
+                                <strong>{{ returnCurrentLocaleContent(membership.organisationUnitName as MultilingualContent[]) }}</strong>
+                                <v-icon icon="mdi-circle-small">
+                                </v-icon>
+                                <strong>{{ returnCurrentLocaleContent(membership.role as MultilingualContent[]) }}</strong>
+                                <v-icon icon="mdi-circle-small">
+                                </v-icon>
+                                {{ membership.dateFrom }} - {{ membership.dateTo ? membership.dateTo : $t("presentLabel") }} 
+                            </h4>
+                            <p>{{ returnCurrentLocaleContent(membership.contributionDescription as MultilingualContent[]) }}</p>    
+                            <attachment-list :attachments="membership.proofs ? membership.proofs : []"></attachment-list>
                         </div>
                     </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
-
-        <!-- Involvements -->
-        <!-- <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text>
-                        <div><b>Involvements</b></div>
-                        <v-list dense>
-                            <v-list-item v-for="(involvement, index) in involvements" :key="index">
-                                <v-list-item-content>{{ involvement }}</v-list-item-content>
-                            </v-list-item>
-                        </v-list>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row> -->
 
         <!-- Publication Table -->
         <br />
@@ -268,16 +279,19 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PersonResponse } from '@/models/PersonUserModel';
+import type { PersonResponse } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import InvolvementService from '@/services/InvolvementService';
+import type { Employment, Education, Membership } from '@/models/InvolvementModel';
+import AttachmentList from '@/components/core/AttachmentList.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, AttachmentList },
     setup() {
         const router = useRouter();
         const currentRoute = useRoute();
@@ -301,45 +315,10 @@ export default defineComponent({
         
         const keywords = ref();
         const biography = ref();
-        const expertises = ref([
-            {
-                title: "CyberSecurity",
-                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-                attachments: [
-                    {name: "attahment1"},
-                    {name: "attahment1"}
-                ]
-            },
-            {
-                title: "CyberSecurity 2",
-                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-                attachments: [
-                    {name: "attahment1"}
-                ]
-            },
-        ])
 
-        const involvements = ref([
-            {
-                title: "FTN",
-                yearStart: "2020",
-                yearEnd: "Present",
-                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-                attachments: [
-                    {name: "Diploma BSc"},
-                    {name: "Diploma MSc"}
-                ]
-            },
-            {
-                title: "FZŽ",
-                yearStart: "2020",
-                yearEnd: "Present",
-                desc: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ipsum deserunt voluptatum deleniti neque beatae itaque, dignissimos eveniet possimus sit ipsa",
-                attachments: [
-                    {name: "Dipl"},
-                ]
-            },
-        ]);
+        const employments = ref<Employment[]>([]);
+        const education = ref<Education[]>([]);
+        const memberships = ref<Membership[]>([]);
 
         onMounted(() => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -350,6 +329,24 @@ export default defineComponent({
                 } else {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.lastname}`;
                 }
+
+                response.data.employmentIds.forEach(employmentId => {
+                    InvolvementService.getEmployment(employmentId).then(response => {
+                        employments.value.push(response.data);
+                    });
+                });
+
+                response.data.educationIds.forEach(educationId => {
+                    InvolvementService.getEducation(educationId).then(response => {
+                        education.value.push(response.data);
+                    });
+                });
+
+                response.data.membershipIds.forEach(membershipId => {
+                    InvolvementService.getMembership(membershipId).then(response => {
+                        memberships.value.push(response.data);
+                    });
+                });
 
                 fetchPublications();                
                 populateData();
@@ -366,15 +363,15 @@ export default defineComponent({
             }
 
             personalInfo.value = person.value.personalInfo;
-                personalInfo.value.streetAndNumber = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.streetAndNumber as MultilingualContent[]);
-                personalInfo.value.city = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.city as MultilingualContent[]);
+            personalInfo.value.streetAndNumber = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.streetAndNumber as MultilingualContent[]);
+            personalInfo.value.city = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.city as MultilingualContent[]);
 
-                fetchAndSetCountryInfo();
+            fetchAndSetCountryInfo();
 
-                // TODO: Improve this!!!
-                keywords.value = returnCurrentLocaleContent(person.value.keyword)?.split(",") as string[];
+            // TODO: Improve this!!!
+            keywords.value = returnCurrentLocaleContent(person.value.keyword)?.split(",") as string[];
 
-                biography.value = returnCurrentLocaleContent(person.value.biography);
+            biography.value = returnCurrentLocaleContent(person.value.biography);
         }
 
         const fetchAndSetCountryInfo = () => {
@@ -383,8 +380,11 @@ export default defineComponent({
                 return;
             }
 
+            if (person.value?.personalInfo.postalAddress?.countryId === null) {
+                return;
+            }
+
             CountryService.readCountry(person.value?.personalInfo.postalAddress?.countryId as number).then((response) => {
-                console.log(response.data)
                 country.value = response.data;
                 personalInfo.value.country = returnCurrentLocaleContent(response.data.name);
             });
@@ -424,7 +424,11 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            DocumentPublicationService.findResearcherPublications(person.value?.id as number, `page=${page.value}&size=${size.value}`).then((publicationResponse) => {
+            if (!person.value?.id) {
+                return;
+            }
+
+            DocumentPublicationService.findResearcherPublications(person.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
@@ -434,17 +438,19 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
         };
 
-        return {researcherName,
-                accountIcon,
-                personalInfo,
-                keywords,
-                biography,
-                expertises,
-                involvements,
-                publications, 
-                totalPublications,
-                switchPage,
-                searchKeyword
+        return {
+            researcherName,
+            accountIcon,
+            person,
+            personalInfo,
+            keywords,
+            biography,
+            publications, 
+            totalPublications,
+            switchPage,
+            searchKeyword,
+            returnCurrentLocaleContent,
+            employments, education, memberships
         };
 }})
 

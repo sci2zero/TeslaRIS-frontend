@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { defaultLocale } from '@/i18n'
+
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
@@ -27,10 +28,10 @@ import ResetPasswordView from "@/views/ResetPasswordView.vue";
 import SubmitPatentView from "@/views/SubmitPatentView.vue";
 import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
-
+import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
 import OrgUnitLandingView from "@/views/landingPages/OrgUnitLandingView.vue";
-
+import JournalLandingView from "@/views/landingPages/JournalLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -158,13 +159,27 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "journals",
-                    name: "journals",
-                    component: JournalListView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin],
-                    },
+                    path: "journals",                    
+                    children: [
+                        {
+                            path: "",
+                            name: "journals",
+                            component: JournalListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "journalLandingPage",
+                            component: JournalLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        }
+                    ]
                 },
                 {
                     path: "submit-journal",
@@ -319,6 +334,13 @@ const router = createRouter({
                     meta: {
                         authenticated: false,
                         authorities: [],
+                    },
+                },
+                {
+                    path: 'contact',
+                    component: ExternalRedirect,
+                    props: {
+                      url: 'http://dosird.uns.ac.rs/contact',
                     },
                 },
             ]

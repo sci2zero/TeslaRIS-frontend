@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedEvents"
+        v-model:sort-by="tableOptions.sortBy"
         :items="events"
         :headers="headers"
         item-value="row"
@@ -96,7 +97,7 @@ export default defineComponent({
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
@@ -173,7 +174,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedEvents, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedEvents, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>
