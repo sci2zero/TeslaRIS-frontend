@@ -164,5 +164,13 @@ export default {
     personalInfoLabel: "Personal Info",
     biographyLabel: "Biography",
     expertisesAndSkillsLabel: "Expertises and Skills",
-    involvementsLabel: "Involvements"
+    involvementsLabel: "Involvements",
+    employmentsLabel: "Employments and Work Experience",
+    educationLabel: "Education",
+    membershipsLabel: "Memberships",
+    presentLabel: "Present",
+    currentLabel: "Current",
+    thesisTitleLabel: "Thesis Title",
+    prizesLabel: "Prizes",
+    basicInfoLabel: "Basic Info"
 }

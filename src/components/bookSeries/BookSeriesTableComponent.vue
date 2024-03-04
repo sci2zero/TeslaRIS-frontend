@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedBookSeries"
+        v-model:sort-by="tableOptions.sortBy"
         :items="bookSeries"
         :headers="headers"
         item-value="row"
@@ -36,7 +37,7 @@
                     {{ row.item.titleOther }}
                 </td>
                 <td>
-                    {{ row.item.eissn }}
+                    {{ row.item.eISSN }}
                 </td>
                 <td>
                     {{ row.item.printISSN }}
@@ -90,7 +91,7 @@ export default defineComponent({
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
@@ -155,7 +156,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedBookSeries, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedBookSeries, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>

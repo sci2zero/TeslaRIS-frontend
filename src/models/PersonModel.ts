@@ -132,7 +132,7 @@ interface ExpertiseOrSkillResponse {
 }
 
 interface PrizeResponse {
-    name: MultilingualContent[];
+    title: MultilingualContent[];
     description: MultilingualContent[];
     proofs: DocumentFileResponse[];
     date: Date;

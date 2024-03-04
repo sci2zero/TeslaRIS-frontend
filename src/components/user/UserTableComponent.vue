@@ -1,6 +1,7 @@
 <template>
     <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
     <v-data-table-server
+        v-model:sort-by="tableOptions.sortBy"
         :items="users"
         :headers="headers"
         :items-length="totalUsers"
@@ -87,7 +88,7 @@ export default defineComponent({
 
         const ouColumn = computed(() => i18n.t("organisationUnitNameColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
 
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},

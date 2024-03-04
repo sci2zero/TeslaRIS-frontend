@@ -12,6 +12,10 @@ export class JournalService extends BaseService {
     return super.sendRequest(axios.get, `journal/simple-search?${tokens}`);
   }
 
+  async readJournal(journalId: number): Promise<AxiosResponse<Journal>> {
+    return super.sendRequest(axios.get, `journal/${journalId}`);
+  }
+
   async createJournal(body: Journal): Promise<AxiosResponse<Journal>> {
     return super.sendRequest(axios.post, "journal", body, JournalService.idempotencyKey);
   }

@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedOUs"
+        v-model:sort-by="tableOptions.sortBy"
         :items="organisationUnits"
         :headers="headers"
         item-value="row"
@@ -108,7 +109,7 @@ export default defineComponent({
         const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
         const superOUColumn = computed(() => i18n.t("superOUColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
@@ -178,7 +179,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedOUs, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedOUs, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>

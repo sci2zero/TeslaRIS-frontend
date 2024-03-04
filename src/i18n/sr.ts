@@ -165,4 +165,12 @@ export default {
     biographyLabel: "Biografija",
     expertisesAndSkillsLabel: "Expertize i veštine",
     involvementsLabel: "Učešća",
+    employmentsLabel: "Zaposlenja i radno iskustvo",
+    educationLabel: "Edukacija",
+    membershipsLabel: "Članstva",
+    presentLabel: "Sadašnjost",
+    currentLabel: "Trenutno",
+    thesisTitleLabel: "Naslov završnog rada",
+    prizesLabel: "Nagrade",
+    basicInfoLabel: "Osnovni podaci"
 }

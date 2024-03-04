@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedJournals"
+        v-model:sort-by="tableOptions.sortBy"
         :items="journals"
         :headers="headers"
         item-value="row"
@@ -30,13 +31,17 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.titleSr }}
+                    <localized-link :to="'journals/' + row.item.databaseId">
+                        {{ row.item.titleSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.titleOther }}
+                    <localized-link :to="'journals/' + row.item.databaseId">
+                        {{ row.item.titleOther }}
+                    </localized-link>
                 </td>
                 <td>
-                    {{ row.item.eissn }}
+                    {{ row.item.eISSN }}
                 </td>
                 <td>
                     {{ row.item.printISSN }}
@@ -64,9 +69,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type {JournalIndex} from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "JournalTableComponent",
+    components: { LocalizedLink },
     props: {
         journals: {
             type: Array<JournalIndex>,
@@ -90,7 +98,7 @@ export default defineComponent({
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
@@ -155,7 +163,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedJournals, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedJournals, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>
