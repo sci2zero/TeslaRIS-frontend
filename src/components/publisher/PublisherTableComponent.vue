@@ -10,7 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedPublishers"
-        v-model:sort-by="tableOptions.sortBy"
+        :sort-by="tableOptions.sortBy"
         :items="publishers"
         :headers="headers"
         item-value="row"

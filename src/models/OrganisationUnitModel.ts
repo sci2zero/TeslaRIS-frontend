@@ -38,7 +38,7 @@ export interface OrganisationUnitResponse {
     contact?: Contact;
 }
 
-interface ResearchArea {
+export interface ResearchArea {
     name: MultilingualContent[];
     description: MultilingualContent[];
     superResearchArea?: ResearchArea;

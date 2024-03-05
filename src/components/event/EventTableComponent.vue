@@ -10,7 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedEvents"
-        v-model:sort-by="tableOptions.sortBy"
+        :sort-by="tableOptions.sortBy"
         :items="events"
         :headers="headers"
         item-value="row"

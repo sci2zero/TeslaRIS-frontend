@@ -10,7 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedPersons"
-        v-model:sort-by="tableOptions.sortBy"
+        :sort-by="tableOptions.sortBy"
         :items="persons"
         :headers="headers"
         item-value="row"
@@ -121,6 +121,7 @@ export default defineComponent({
             }
 
             tableOptions.value = event;
+            console.log(tableOptions.value)
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
             if (event.sortBy.length > 0) {

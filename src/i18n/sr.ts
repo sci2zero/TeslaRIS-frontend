@@ -172,5 +172,6 @@ export default {
     currentLabel: "Trenutno",
     thesisTitleLabel: "Naslov završnog rada",
     prizesLabel: "Nagrade",
-    basicInfoLabel: "Osnovni podaci"
+    basicInfoLabel: "Osnovni podaci",
+    relationsLabel: "Relacije"
 }

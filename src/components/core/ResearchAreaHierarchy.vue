@@ -1,72 +1,72 @@
 <template>
     <ul class="tree">
-        <tree-hierarchy-recursive :research-area="researchAreaDataRoots"></tree-hierarchy-recursive>
+        <tree-hierarchy-recursive :preset-research-area="researchAreaDataRoots"></tree-hierarchy-recursive>
     </ul>
 </template>
 
 
 <script lang="ts">
-import { ref } from 'vue';
-import { defineComponent, computed } from 'vue'
+import { ref, type PropType } from 'vue';
+import { defineComponent } from 'vue'
 import TreeHierarchyRecursive from '../hierarchy/TreeHierarchyRecursive.vue';
+import type { ResearchArea } from '@/models/OrganisationUnitModel';
 
 export default defineComponent({
     name: 'ResearchAreaHierarchy',
     components: {TreeHierarchyRecursive},
     props: {
-      
-        researchArea: {
-            type: Object,
+        researchAreas: {
+            type: Object as PropType<ResearchArea[]>,
             required: true
         }
     },
     setup(props) {
-        const researchAreaData = ref(props.researchArea)
-        const researchAreaDataRoots = ref([])
+        const researchAreaData = ref<ResearchArea[]>(props.researchAreas);
+        const researchAreaDataRoots = ref<any>([]);
 
-
-        const reorganiseParent = (data) => {
-            const nodeMap = {}
-            const root = []
-            data.forEach(element => {
-                let current = element
-
-                while (current['superResearchArea']) {
-                    nodeMap[current.id] = current
-
-                    current = current['superResearchArea']
-
-                }
-                
-                nodeMap[current.id] = current
-                root.push(current)
-                
-
-            });
-
-            for (const [key, value] of Object.entries(nodeMap)) {
-                if (value.children == undefined)  value.children = []
-
-                if (value['superResearchArea']) {
-                    if (value['superResearchArea'].children == undefined)  value['superResearchArea'].children = []
-
-                    value['superResearchArea'].children.push(value)
-                    value['superResearchArea'] = undefined
-                }
+        const reorganiseParent = (data: any) => {
+            if (!data) {
+                return;
             }
 
-            console.log(root)
-            return root
+            const nodeMap: any = {};
+            const root: any[] = [];
+            data.forEach((element: any) => {
+                let current = element;
 
+                while (current['superResearchArea']) {
+                    nodeMap[current.id] = current;
+                    current = current['superResearchArea'];
+
+                }
+                
+                nodeMap[current.id] = current;
+                root.push(current);
+            });
+
+            for (const value of Object.entries(nodeMap)) {
+                if (value.children == undefined) {
+                    value.children = [];
+                }
+
+                if (value['superResearchArea']) {
+                    if (value['superResearchArea'].children == undefined)  value['superResearchArea'].children = [];
+
+                    value['superResearchArea'].children.push(value);
+                    value['superResearchArea'] = undefined;
+                }
+            }
+            return root;
         }
 
-        researchAreaDataRoots.value = reorganiseParent(researchAreaData.value)
+        researchAreaDataRoots.value = reorganiseParent(researchAreaData.value);
 
 
-        return {researchAreaDataRoots}
+        return {researchAreaDataRoots};
     },
 })
 </script>
+
 
 <style>
   .tree{

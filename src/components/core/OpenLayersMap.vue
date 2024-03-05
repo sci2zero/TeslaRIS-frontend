@@ -8,11 +8,11 @@
 
 <script lang="ts">
 import 'ol/ol.css';
-import { ref, onMounted, defineComponent } from 'vue';
+import { ref, onMounted, defineComponent, watch } from 'vue';
 import { Map, View, Feature } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import { Circle, Point } from 'ol/geom';
+import { Point } from 'ol/geom';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
@@ -36,10 +36,10 @@ export default defineComponent({
             required: false,
             default: true,
         },
-        initCordinates: {
+        initCoordinates: {
             type: Array<number>,
             required: false,
-            default: () => {[20,40]},
+            default: () => {[19.8335, 45.2671]},
         },
         height: {
             type: String,
@@ -55,20 +55,20 @@ export default defineComponent({
         const vectorSource = new VectorSource({});
         const vectorLayer = new VectorLayer({source: vectorSource});
         const view = new View({center: fromLonLat([19.8335, 45.2671]), zoom: 4});
-
+        console.log(props.initCoordinates)
         const address = ref("");
 
         onMounted(() => {
             initializeMap(map.value);
+        });
 
-            if (props.initCordinates) {
-                
-                setMarker(props.initCordinates);
-                view.setCenter(fromLonLat([props.initCordinates[0],props.initCordinates[1]]));
-                view.setZoom(15);
-
-
+        watch(() => props.initCoordinates, (position) => {
+            if(position[0] === null || position[1] === null) {
+                return;
             }
+            view.setCenter(fromLonLat(position));
+            view.setZoom(15);
+            setMarker(position)
         });
 
         const initializeMap = (mapElement: any) => {

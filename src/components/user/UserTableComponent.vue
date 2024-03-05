@@ -1,7 +1,7 @@
 <template>
     <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
     <v-data-table-server
-        v-model:sort-by="tableOptions.sortBy"
+        :sort-by="tableOptions.sortBy"
         :items="users"
         :headers="headers"
         :items-length="totalUsers"

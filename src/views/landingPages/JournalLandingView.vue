@@ -89,7 +89,7 @@
 
 <script lang="ts">
 
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -101,6 +101,7 @@ import DocumentPublicationService from "@/services/DocumentPublicationService";
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
+import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 
 
 export default defineComponent({
@@ -144,35 +145,6 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-        }
-
-        const returnCurrentLocaleContent = (multilingualContentList: MultilingualContent[]): string | null => {
-            let selectedContent: MultilingualContent | null = null;
-
-            if (!multilingualContentList) {
-                return null;
-            }
-            
-            multilingualContentList.forEach((multilingualContent) => {
-                if (multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                    selectedContent = multilingualContent;
-                }
-            });
-
-            if (selectedContent) {
-                return (selectedContent as MultilingualContent).content;
-            } else {
-
-                if (multilingualContentList.length === 0) {
-                    return null;
-                }
-
-                const maxPriorityContent = multilingualContentList.reduce((prev, current) => {
-                    return (prev.priority > current.priority) ? prev : current;
-                });
-                
-                return maxPriorityContent.content;
-            }
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {

@@ -172,5 +172,6 @@ export default {
     currentLabel: "Current",
     thesisTitleLabel: "Thesis Title",
     prizesLabel: "Prizes",
-    basicInfoLabel: "Basic Info"
+    basicInfoLabel: "Basic Info",
+    relationsLabel: "Relations"
 }

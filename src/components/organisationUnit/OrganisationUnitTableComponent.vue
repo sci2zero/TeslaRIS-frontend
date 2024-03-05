@@ -10,7 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedOUs"
-        v-model:sort-by="tableOptions.sortBy"
+        :sort-by="tableOptions.sortBy"
         :items="organisationUnits"
         :headers="headers"
         item-value="row"

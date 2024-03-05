@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { OrganisationUnitRequest, OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
+import type { OrganisationUnitRequest, OrganisationUnitIndex, OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 
 export class OrganisationUnitService extends BaseService {
 
@@ -10,6 +10,10 @@ export class OrganisationUnitService extends BaseService {
 
   async getOUCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "organisation-unit/count");
+  }
+
+  async readOU(organisationUnitId: number): Promise<AxiosResponse<OrganisationUnitResponse>> {
+    return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}`);
   }
 
   async searchOUs(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {

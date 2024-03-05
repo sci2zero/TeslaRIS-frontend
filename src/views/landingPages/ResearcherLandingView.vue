@@ -287,6 +287,7 @@ import DocumentPublicationService from "@/services/DocumentPublicationService";
 import InvolvementService from '@/services/InvolvementService';
 import type { Employment, Education, Membership } from '@/models/InvolvementModel';
 import AttachmentList from '@/components/core/AttachmentList.vue';
+import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 
 
 export default defineComponent({
@@ -388,31 +389,6 @@ export default defineComponent({
                 country.value = response.data;
                 personalInfo.value.country = returnCurrentLocaleContent(response.data.name);
             });
-        };
-
-        const returnCurrentLocaleContent = (multilingualContentList: MultilingualContent[]): string | null => {
-            let selectedContent: MultilingualContent | null = null;
-            
-            multilingualContentList.forEach((multilingualContent) => {
-                if (multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                    selectedContent = multilingualContent;
-                }
-            });
-
-            if (selectedContent) {
-                return (selectedContent as MultilingualContent).content;
-            } else {
-
-                if (multilingualContentList.length === 0) {
-                    return null;
-                }
-
-                const maxPriorityContent = multilingualContentList.reduce((prev, current) => {
-                    return (prev.priority > current.priority) ? prev : current;
-                });
-                
-                return maxPriorityContent.content;
-            }
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {

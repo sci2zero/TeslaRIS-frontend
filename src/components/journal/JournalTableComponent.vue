@@ -10,7 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedJournals"
-        v-model:sort-by="tableOptions.sortBy"
+        :sort-by="tableOptions.sortBy"
         :items="journals"
         :headers="headers"
         item-value="row"
