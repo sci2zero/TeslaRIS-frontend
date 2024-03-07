@@ -63,7 +63,7 @@ export default defineComponent({
     name: "AdvancedSearchVuew",
     components: {SearchBarComponent, OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent},
     setup() {
-        const route = useRoute()
+        const route = useRoute();
         const currentTab = ref("persons");
 
         const searchParams = ref(route.query.searchQuery as string);

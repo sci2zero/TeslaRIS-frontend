@@ -16,6 +16,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}`);
   }
 
+  async readOURelationsChain(organisationUnitLeafId: number): Promise<AxiosResponse<OrganisationUnitResponse[]>> {
+    return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
+  }
+
   async searchOUs(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
   }

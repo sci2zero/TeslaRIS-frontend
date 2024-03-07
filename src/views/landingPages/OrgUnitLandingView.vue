@@ -152,6 +152,7 @@ export default defineComponent({
         const currentRoute = useRoute();
 
         const organisationUnit = ref<OrganisationUnitResponse>();
+        const relationChain = ref<OrganisationUnitResponse[]>();
 
         const keywords = ref<string[]>([]);
         const ouIcon = ref('mdi-city')
@@ -172,6 +173,10 @@ export default defineComponent({
                 fetchPublications();                
                 populateData();
             });
+            OrganisationUnitService.readOURelationsChain(parseInt(currentRoute.params.id as string)).then((response) => {
+                console.log(response.data);
+                relationChain.value = response.data;
+            })
         });
 
         watch(i18n.locale, () => {

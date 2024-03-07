@@ -39,7 +39,7 @@ export interface EventIndex {
     eventType: EventType;
 }
   
-export interface PersonEventContributionDTO extends PersonContribution {
+interface PersonEventContribution extends PersonContribution {
     eventContributionType: EventContributionType;
 }
   
@@ -54,7 +54,7 @@ interface Event {
     dateTo: string;
     state: MultilingualContent[];
     place: MultilingualContent[];
-    contributions?: PersonEventContributionDTO[];
+    contributions?: PersonEventContribution[];
 }
 
 export interface Conference extends Event {

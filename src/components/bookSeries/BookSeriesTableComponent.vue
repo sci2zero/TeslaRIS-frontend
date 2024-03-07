@@ -31,10 +31,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.titleSr }}
+                    <localized-link :to="'book-series/' + row.item.databaseId">
+                        {{ row.item.titleSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.titleOther }}
+                    <localized-link :to="'book-series/' + row.item.databaseId">
+                        {{ row.item.titleOther }}
+                    </localized-link>
                 </td>
                 <td>
                     {{ row.item.eISSN }}
@@ -63,11 +67,14 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type {BookSeriesIndex} from '@/models/BookSeriesIndex';
+import type {BookSeriesIndex} from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "BookSeriesTableComponent",
+    components: { LocalizedLink },
     props: {
         bookSeries: {
             type: Array<BookSeriesIndex>,

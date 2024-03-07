@@ -1,23 +1,23 @@
 <template>
-    <v-container id="journal">
+    <v-container id="conference">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                        {{ returnCurrentLocaleContent(conference?.name) + (conference?.nameAbbreviation && conference.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(conference?.nameAbbreviation) + ")" : "") }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ $t("journalLabel") }}
+                        {{ $t("conferenceLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- Journal Info -->
+        <!-- Conference Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-journal-icon">
+                <v-icon size="x-large" class="large-conference-icon">
                     {{ icon }}
                 </v-icon>
             </v-col>
@@ -36,21 +36,39 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div>eISSN:</div>
+                                <div>{{ $t("eventDateLabel") }}:</div>
                                 <div class="response">
-                                    {{ journal?.eissn ? journal.eissn : $t("notYetSetMessage") }}
+                                    {{ getDates(conference?.dateFrom as string, conference?.dateTo as string) }}
                                 </div>
-                                <div>Print ISSN:</div>
-                                <div class="response">
-                                    {{ journal?.printISSN ? journal.printISSN : $t("notYetSetMessage") }}
+                                <div v-if="conference?.description && conference.description.length > 0">
+                                    {{ $t("descriptionLabel") }}:
                                 </div>
-                                <div>
-                                    {{ $t("languageLabel") }}:
+                                <div v-if="conference?.description && conference.description.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(conference?.description) }}
                                 </div>
-                                <div>
-                                    <v-chip v-for="(languageTagId, index) in journal?.languageTagIds" :key="index" outlined>
-                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                <div v-if="conference?.state && conference.state.length > 0">
+                                    {{ $t("stateLabel") }}:
+                                </div>
+                                <div v-if="conference?.state && conference.state.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(conference?.state) }}
+                                </div>
+                                <div v-if="conference?.place && conference.place.length > 0">
+                                    {{ $t("placeLabel") }}:
+                                </div>
+                                <div v-if="conference?.place && conference.place.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(conference?.place) }}
+                                </div>
+                                <div v-if="keywords && keywords.length > 0">
+                                    {{ $t("keywordsLabel") }}:
+                                </div>
+                                <div v-if="keywords && keywords.length > 0">
+                                    <v-chip v-for="(keyword, index) in keywords" :key="index" outlined @click="searchKeyword(keyword)">
+                                        {{ keyword }}
                                     </v-chip>
+                                </div>
+                                <br />
+                                <div>
+                                    <h2>{{ conference?.serialEvent ? $t("isSerialEventMessage") : $t("isOneTimeEventMessage") }}</h2>
                                 </div>
                             </v-col>
                         </v-row>
@@ -69,12 +87,12 @@
                             </v-btn>
                         </div>
                         <div><b>{{ $t("contributionsLabel") }}</b></div>
-                        <strong v-if="journal?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                        <strong v-if="conference?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                         
-                        <div v-for="(contribution, index) in journal?.contributions" :key="index" class="py-5">
+                        <div v-for="(contribution, index) in conference?.contributions" :key="index" class="py-5">
                             <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
-                            <p>{{ contribution.dateFrom ? `${contribution.dateFrom} - ${contribution.dateTo ? contribution.dateTo : $t("presentLabel")}` : $t("currentLabel") }}</p>
-                            <v-divider v-if="index < (journal?.contributions ? journal?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
+                            <p>{{ contribution.eventContributionType }}</p>
+                            <v-divider v-if="index < (conference?.contributions ? conference?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -88,30 +106,26 @@
 </template>
 
 <script lang="ts">
-
-import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import type { Journal } from '@/models/JournalModel';
-import JournalService from '@/services/JournalService';
-import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import type { Conference } from "@/models/EventModel";
+import EventService from '@/services/EventService';
 
 
 export default defineComponent({
-    name: "JournalLandingPage",
+    name: "ConferenceLandingPage",
     components: { PublicationTableComponent },
     setup() {
         const currentRoute = useRoute();
-
-        const journal = ref<Journal>();
-        const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const conference = ref<Conference>();
+        const keywords = ref<string[]>([]);
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -121,13 +135,14 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
+        const router = useRouter();
 
-        const icon = ref("mdi-book-open-blank-variant")
+        const icon = ref("mdi-presentation")
 
         onMounted(() => {
-            JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
+            EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
                 console.log(response.data);
-                journal.value = response.data;
+                conference.value = response.data;
 
                 fetchPublications();                
                 populateData();
@@ -139,11 +154,7 @@ export default defineComponent({
         });
 
         const populateData = () => {
-            LanguageService.getAllLanguageTags().then(response => {
-                response.data.forEach(languageTag => {
-                    languageTagMap.value.set(languageTag.id, languageTag);
-                })
-            });
+            keywords.value = returnCurrentLocaleContent(conference.value?.keywords)?.split(",") as string[];
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -155,34 +166,58 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!journal.value?.id) {
+            if (!conference.value?.id) {
                 return;
             }
 
-            DocumentPublicationService.findPublicationsInJournal(journal.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((publicationResponse) => {
+            DocumentPublicationService.findPublicationsInEvent(conference.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
         };
 
+        const getDates = (from: string, to: string): string => {
+            if(!from || !to) {
+                return "";
+            }
+
+            const fromDate = new Date(Date.parse(from));
+            const toDate = new Date(Date.parse(to));
+
+            const diffInMonths = Math.abs((toDate.getMonth() - fromDate.getMonth()) + 
+                      12 * (toDate.getFullYear() - fromDate.getFullYear()));
+
+            if (diffInMonths > 3) {
+                return fromDate.getFullYear().toString();
+            }
+
+            return `${fromDate.toLocaleDateString("sr")} - ${toDate.toLocaleDateString("sr")}`;
+        };
+
+        const searchKeyword = (keyword: string) => {
+            router.push({name:"events", query: { searchQuery: keyword.trim() }})        
+        };
+
         return {
-            journal, icon,
+            conference, icon,
             publications, 
             totalPublications,
             switchPage,
-            returnCurrentLocaleContent,
-            languageTagMap
+            keywords,
+            searchKeyword,
+            getDates,
+            returnCurrentLocaleContent
         };
 }})
 
 </script>
 
 <style scoped>
-    #journal .large-journal-icon {
+    #conference .large-conference-icon {
         font-size: 10em;
     }
 
-    #journal .response {
+    #conference .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

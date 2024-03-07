@@ -173,5 +173,7 @@ export default {
     thesisTitleLabel: "Naslov završnog rada",
     prizesLabel: "Nagrade",
     basicInfoLabel: "Osnovni podaci",
-    relationsLabel: "Relacije"
+    relationsLabel: "Relacije",
+    isSerialEventMessage: "Ovo je serijski događaj.",
+    isOneTimeEventMessage: "Ovaj događaj se održao jedanput."
 }

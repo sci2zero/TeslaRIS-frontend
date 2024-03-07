@@ -1,23 +1,23 @@
 <template>
-    <v-container id="journal">
+    <v-container id="bookSeries">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                        {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ $t("journalLabel") }}
+                        {{ $t("bookSeriesLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- Journal Info -->
+        <!-- BookSeries Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-journal-icon">
+                <v-icon size="x-large" class="large-bookSeries-icon">
                     {{ icon }}
                 </v-icon>
             </v-col>
@@ -38,17 +38,17 @@
                             <v-col cols="6">
                                 <div>eISSN:</div>
                                 <div class="response">
-                                    {{ journal?.eissn ? journal.eissn : $t("notYetSetMessage") }}
+                                    {{ bookSeries?.eissn ? bookSeries.eissn : $t("notYetSetMessage") }}
                                 </div>
                                 <div>Print ISSN:</div>
                                 <div class="response">
-                                    {{ journal?.printISSN ? journal.printISSN : $t("notYetSetMessage") }}
+                                    {{ bookSeries?.printISSN ? bookSeries.printISSN : $t("notYetSetMessage") }}
                                 </div>
                                 <div>
                                     {{ $t("languageLabel") }}:
                                 </div>
                                 <div>
-                                    <v-chip v-for="(languageTagId, index) in journal?.languageTagIds" :key="index" outlined>
+                                    <v-chip v-for="(languageTagId, index) in bookSeries?.languageTagIds" :key="index" outlined>
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
@@ -69,12 +69,12 @@
                             </v-btn>
                         </div>
                         <div><b>{{ $t("contributionsLabel") }}</b></div>
-                        <strong v-if="journal?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                        <strong v-if="bookSeries?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                         
-                        <div v-for="(contribution, index) in journal?.contributions" :key="index" class="py-5">
+                        <div v-for="(contribution, index) in bookSeries?.contributions" :key="index" class="py-5">
                             <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
                             <p>{{ contribution.dateFrom ? `${contribution.dateFrom} - ${contribution.dateTo ? contribution.dateTo : $t("presentLabel")}` : $t("currentLabel") }}</p>
-                            <v-divider v-if="index < (journal?.contributions ? journal?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
+                            <v-divider v-if="index < (bookSeries?.contributions ? bookSeries?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -88,7 +88,6 @@
 </template>
 
 <script lang="ts">
-
 import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -97,20 +96,19 @@ import { useRoute } from 'vue-router';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
-import DocumentPublicationService from "@/services/DocumentPublicationService";
-import type { Journal } from '@/models/JournalModel';
-import JournalService from '@/services/JournalService';
+import type { BookSeries } from '@/models/BookSeriesModel';
+import BookSeriesService from '@/services/BookSeriesService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 
 
 export default defineComponent({
-    name: "JournalLandingPage",
+    name: "BookSeriesLandingPage",
     components: { PublicationTableComponent },
     setup() {
         const currentRoute = useRoute();
 
-        const journal = ref<Journal>();
+        const bookSeries = ref<BookSeries>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -122,12 +120,12 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-book-open-blank-variant")
+        const icon = ref("mdi-bookshelf")
 
         onMounted(() => {
-            JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
+            BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
                 console.log(response.data);
-                journal.value = response.data;
+                bookSeries.value = response.data;
 
                 fetchPublications();                
                 populateData();
@@ -155,18 +153,15 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!journal.value?.id) {
+            if (!bookSeries.value?.id) {
                 return;
             }
 
-            DocumentPublicationService.findPublicationsInJournal(journal.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((publicationResponse) => {
-                publications.value = publicationResponse.data.content;
-                totalPublications.value = publicationResponse.data.totalElements
-            });
+            // TODO: do we need this?
         };
 
         return {
-            journal, icon,
+            bookSeries, icon,
             publications, 
             totalPublications,
             switchPage,
@@ -178,11 +173,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    #journal .large-journal-icon {
+    #bookSeries .large-bookSeries-icon {
         font-size: 10em;
     }
 
-    #journal .response {
+    #bookSeries .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

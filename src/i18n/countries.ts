@@ -265,7 +265,6 @@ export const countriesEn: string[] = [
     "Guinea-Bissau",
     "Guyana",
     "Haiti",
-    "Holy See",
     "Honduras",
     "Hungary",
     "Iceland",

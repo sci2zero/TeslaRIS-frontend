@@ -13,6 +13,10 @@ export class BookSeriesService extends BaseService {
     return super.sendRequest(axios.get, `book-series/simple-search?${tokens}`);
   }
 
+  async readBookSeries(bookSeriesId: number): Promise<AxiosResponse<BookSeries>> {
+    return super.sendRequest(axios.get, `book-series/${bookSeriesId}`);
+  }
+
   async createBookSeries(body: BookSeries): Promise<AxiosResponse<PublicationSeries>> {
     return super.sendRequest(axios.post, "book-series", body, BookSeriesService.idempotencyKey);
   }

@@ -31,10 +31,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.nameSr }}
+                    <localized-link :to="'events/conference/' + row.item.databaseId">
+                        {{ row.item.nameSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.nameOther }}
+                    <localized-link :to="'events/conference/' + row.item.databaseId">
+                        {{ row.item.nameOther }}
+                    </localized-link>
                 </td>
                 <td>
                     {{ row.item.dateFromTo }}
@@ -68,9 +72,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import {EventType, type EventIndex} from '@/models/EventModel';
 import EventService from '@/services/EventService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PublicationTableComponent",
+    components: { LocalizedLink },
     props: {
         events: {
             type: Array<EventIndex>,

@@ -32,6 +32,8 @@ import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
 import OrgUnitLandingView from "@/views/landingPages/OrgUnitLandingView.vue";
 import JournalLandingView from "@/views/landingPages/JournalLandingView.vue";
+import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vue";
+import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -96,13 +98,27 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "events",
-                    name: "events",
-                    component: EventListView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin],
-                    },
+                    path: "events",                    
+                    children: [
+                        {
+                            path: "",
+                            name: "events",
+                            component: EventListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "conference/:id",
+                            name: "conferenceLandingPage",
+                            component: ConferenceLandingView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        }
+                    ]
                 },
                 {
                     path: "submit-conference",
@@ -141,13 +157,27 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "book-series",
-                    name: "bookSeries",
-                    component: BookSeriesListView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin],
-                    },
+                    path: "book-series",                    
+                    children: [
+                        {
+                            path: "",
+                            name: "bookSeries",
+                            component: BookSeriesListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "bookSeriesLandingPage",
+                            component: BookSeriesLandingView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        }
+                    ]
                 },
                 {
                     path: "submit-book-series",
@@ -175,8 +205,8 @@ const router = createRouter({
                             name: "journalLandingPage",
                             component: JournalLandingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         }
                     ]

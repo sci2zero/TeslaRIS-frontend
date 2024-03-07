@@ -173,5 +173,7 @@ export default {
     thesisTitleLabel: "Thesis Title",
     prizesLabel: "Prizes",
     basicInfoLabel: "Basic Info",
-    relationsLabel: "Relations"
+    relationsLabel: "Relations",
+    isSerialEventMessage: "This is a serial event.",
+    isOneTimeEventMessage: "This is a one time event."
 }
