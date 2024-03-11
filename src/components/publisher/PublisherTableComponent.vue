@@ -31,10 +31,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.nameSr }}
+                    <localized-link :to="'publishers/' + row.item.databaseId">
+                        {{ row.item.nameSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.nameOther }}
+                    <localized-link :to="'publishers/' + row.item.databaseId">
+                        {{ row.item.nameOther }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.placeSr }}
@@ -71,9 +75,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type { PublisherIndex } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PublisherTableComponent",
+    components: { LocalizedLink },
     props: {
         publishers: {
             type: Array<PublisherIndex>,

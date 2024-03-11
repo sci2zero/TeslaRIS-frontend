@@ -12,6 +12,10 @@ export class PublisherService extends BaseService {
     return super.sendRequest(axios.get, `publisher/simple-search?${tokens}`);
   }
 
+  async readPublisher(publisherId: number): Promise<AxiosResponse<Publisher>> {
+    return super.sendRequest(axios.get, `publisher/${publisherId}`);
+  }
+
   async createPublisher(body: Publisher): Promise<AxiosResponse<Publisher>> {
     return super.sendRequest(axios.post, "publisher", body, PublisherService.idempotencyKey);
   }

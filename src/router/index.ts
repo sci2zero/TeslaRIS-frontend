@@ -34,6 +34,7 @@ import OrgUnitLandingView from "@/views/landingPages/OrgUnitLandingView.vue";
 import JournalLandingView from "@/views/landingPages/JournalLandingView.vue";
 import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vue";
 import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vue";
+import PublisherLandingView from "@/views/landingPages/PublisherLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -257,13 +258,27 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "publishers",
-                    name: "publishers",
-                    component: PublisherListView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin],
-                    },
+                    path: "publishers",                    
+                    children: [
+                        {
+                            path: "",
+                            name: "publishers",
+                            component: PublisherListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "publisherLandingPage",
+                            component: PublisherLandingView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        }
+                    ]
                 },
                 {
                     path: "persons",                    
