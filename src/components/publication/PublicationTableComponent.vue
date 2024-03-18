@@ -31,10 +31,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.titleSr }}
+                    <localized-link :to="'scientific-results/' + getResultType(row.item) + row.item.databaseId">
+                        {{ row.item.titleSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.titleOther }}
+                    <localized-link :to="'scientific-results/' + getResultType(row.item) + row.item.databaseId">
+                        {{ row.item.titleOther }}
+                    </localized-link>
                 </td>
                 <td>
                     {{ row.item.authorNames }}
@@ -71,9 +75,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type {DocumentPublicationIndex} from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PublicationTableComponent",
+    components: { LocalizedLink },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -169,7 +176,23 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedPublications, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
+        const getResultType = (result: DocumentPublicationIndex): string => {
+            switch (result.type) {
+                case "JOURNAL_PUBLICATION":
+                    return "journal-publication/";
+                case "PROCEEDINGS_PUBLICATION":
+                    return "proceedings-publication/";
+                case "PATENT":
+                    return "patent/";
+                case "DATASET":
+                    return "dataset/";
+                case "SOFTWARE":
+                    return "software/";
+            }
+            return "";
+        }
+
+        return {selectedPublications, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions, getResultType};
     }
 });
 </script>

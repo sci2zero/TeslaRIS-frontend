@@ -1,4 +1,5 @@
 import type { MultilingualContent } from "./Common";
+import type { DocumentFileResponse } from "./DocumentFileModel";
 import type { PersonContribution } from "./PersonModel";
 
 export interface DocumentPublicationIndex {
@@ -55,6 +56,8 @@ export interface Document {
     doi?: string;
     scopusId?: string;
     eventId?: number;
+    fileItems: DocumentFileResponse[];
+    proofs: DocumentFileResponse[];
 }
 
 export interface JournalPublication extends Document {

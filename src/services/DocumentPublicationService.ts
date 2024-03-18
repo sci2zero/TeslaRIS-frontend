@@ -16,6 +16,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/simple-search?${tokens}`);
   }
 
+  async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {
+    return super.sendRequest(axios.get, `journal-publication/${journalPublicationId}`);
+  }
+
   async findMyPublicationsInJournal(journalId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
     return super.sendRequest(axios.get, `journal-publication/journal/${journalId}/my-publications`);
   }

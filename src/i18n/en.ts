@@ -134,7 +134,8 @@ export default {
     noRecentPublicationsJournalLabel: "You don't have any publications in this journal yet.",
     noRecentPublicationsconferenceLabel: "You don't have any publications in this conference yet.",
     uriInputLabel: "Available on",
-    mainContributorLabel: "Is Main Contributor",
+    mainContributorLabel: "Main Contributor",
+    correspondingContributorLabel: "Corresponding Contributor",
     authorsLabel: "Authors",
     proceedingsLabel: "Proceedings",
     addProceedingsLabel: "Add Proceedings",
@@ -175,5 +176,6 @@ export default {
     basicInfoLabel: "Basic Info",
     relationsLabel: "Relations",
     isSerialEventMessage: "This is a serial event.",
-    isOneTimeEventMessage: "This is a one time event."
+    isOneTimeEventMessage: "This is a one time event.",
+    journalPublicationLabel: "Journal Publication"
 }

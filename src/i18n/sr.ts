@@ -135,6 +135,7 @@ export default {
     noRecentPublicationsconferenceLabel: "Nemate ni jednu publikaciju u ovoj konferenciji.",
     uriInputLabel: "Dostupno na",
     mainContributorLabel: "Glavni kontributor",
+    correspondingContributorLabel: "Odgovarajući kontributor",
     authorsLabel: "Autori",
     proceedingsLabel: "Zbornik radova",
     addProceedingsLabel: "Dodaj zbornik radova",
@@ -175,5 +176,6 @@ export default {
     basicInfoLabel: "Osnovni podaci",
     relationsLabel: "Relacije",
     isSerialEventMessage: "Ovo je serijski događaj.",
-    isOneTimeEventMessage: "Ovaj događaj se održao jedanput."
+    isOneTimeEventMessage: "Ovaj događaj se održao jedanput.",
+    journalPublicationLabel: "Rad u časopisu"
 }

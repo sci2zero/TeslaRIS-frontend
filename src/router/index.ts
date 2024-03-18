@@ -35,6 +35,7 @@ import JournalLandingView from "@/views/landingPages/JournalLandingView.vue";
 import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vue";
 import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vue";
 import PublisherLandingView from "@/views/landingPages/PublisherLandingView.vue";
+import JournalPublicationLandingView from "@/views/landingPages/JournalPublicationLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -328,13 +329,28 @@ const router = createRouter({
                     
                 },
                 {
-                    path: "scientific-results",
-                    name: "scientificResults",
-                    component: ScientificResultsView,
-                    meta: {
-                        authenticated: false,
-                        authorities: [],
-                    },
+                    path: "scientific-results",                
+                    children: [
+                        {
+                            path: "",
+                            name: "scientificResults",
+                            component: ScientificResultsView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "journal-publication/:id",
+                            name: "journalPublicationLandingPage",
+                            component: JournalPublicationLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        }
+                    ]
+                    
                 },
                 {
                     path: "submit-proceedings",

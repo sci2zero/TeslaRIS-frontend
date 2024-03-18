@@ -111,11 +111,6 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
-                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col cols="10">
                             <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
                         </v-col>
@@ -184,7 +179,6 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
-        const placeRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
 
@@ -201,7 +195,6 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
-        const place = ref([]);
         const contributions = ref([]);
         const volume = ref("");
         const issue = ref("");
@@ -282,7 +275,6 @@ export default defineComponent({
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
-                    placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
                     eventAutocompleteRef.value?.clearInput();
@@ -320,7 +312,7 @@ export default defineComponent({
             articleNumber, numberOfPages,
             description, descriptionRef,
             keywords, keywordsRef,
-            place, placeRef, uris, urisRef,
+            uris, urisRef,
             selectedJournal, journalAutocompleteRef, myPublications,
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType,

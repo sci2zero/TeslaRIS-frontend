@@ -1,5 +1,5 @@
 <template>
-    <v-container id="bookSeries">
+    <v-container id="publisher">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
@@ -8,16 +8,16 @@
                         {{ returnCurrentLocaleContent(publisher?.name) }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ $t("bookSeriesLabel") }}
+                        {{ $t("publisherLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- BookSeries Info -->
+        <!-- Publisher Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-bookSeries-icon">
+                <v-icon size="x-large" class="large-publisher-icon">
                     {{ icon }}
                 </v-icon>
             </v-col>
@@ -30,7 +30,7 @@
                             </v-btn>
                         </div>
 
-                        <!-- Personal Info -->
+                        <!-- Basic Info -->
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
@@ -39,7 +39,7 @@
                                 <div v-if="publisher?.state && publisher?.state.length > 0">
                                     {{ $t("stateLabel") }}:
                                 </div>
-                                <div v-if="publisher?.state && publisher?.state.length > 0">
+                                <div v-if="publisher?.state && publisher?.state.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(publisher?.state) }}
                                 </div>
                             </v-col>
@@ -47,7 +47,7 @@
                                 <div v-if="publisher?.place && publisher?.place.length > 0">
                                     {{ $t("placeLabel") }}:
                                 </div>
-                                <div v-if="publisher?.place && publisher?.place.length > 0">
+                                <div v-if="publisher?.place && publisher?.place.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(publisher?.place) }}
                                 </div>
                             </v-col>
@@ -80,7 +80,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
-    name: "BookSeriesLandingPage",
+    name: "PublisherSeriesLandingPage",
     components: { PublicationTableComponent },
     setup() {
         const currentRoute = useRoute();
@@ -153,11 +153,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    #bookSeries .large-bookSeries-icon {
+    #publisher .large-publisher-icon {
         font-size: 10em;
     }
 
-    #bookSeries .response {
+    #publisher .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;
