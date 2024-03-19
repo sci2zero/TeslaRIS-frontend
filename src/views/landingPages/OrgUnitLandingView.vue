@@ -65,25 +65,7 @@
         </v-row>
 
         <!-- Keywords -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-
-                        <div><b>{{ $t("keywordsLabel") }}</b></div>
-                        <strong v-if="!keywords || keywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <v-chip v-for="(keyword, index) in keywords" :key="index" outlined @click="searchKeyword(keyword)">
-                            {{ keyword }}
-                        </v-chip>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+        <keyword-list :keywords="keywords" @search-keyword="searchKeyword($event)"></keyword-list>
 
         <!-- Research Area -->
         <v-row>

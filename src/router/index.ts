@@ -36,6 +36,9 @@ import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vu
 import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vue";
 import PublisherLandingView from "@/views/landingPages/PublisherLandingView.vue";
 import JournalPublicationLandingView from "@/views/landingPages/JournalPublicationLandingView.vue";
+import SoftwareLandingView from "@/views/landingPages/SoftwareLandingView.vue";
+import DatasetLandingView from "@/views/landingPages/DatasetLandingView.vue";
+import PatentLandingView from "@/views/landingPages/PatentLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -344,6 +347,33 @@ const router = createRouter({
                             path: "journal-publication/:id",
                             name: "journalPublicationLandingPage",
                             component: JournalPublicationLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "software/:id",
+                            name: "softwareLandingPage",
+                            component: SoftwareLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "dataset/:id",
+                            name: "datasetLandingPage",
+                            component: DatasetLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "patent/:id",
+                            name: "patentLandingPage",
+                            component: PatentLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

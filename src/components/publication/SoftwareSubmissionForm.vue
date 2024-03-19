@@ -58,11 +58,6 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
-                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col cols="10">
                             <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
                         </v-col>
@@ -126,7 +121,6 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
-        const placeRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
@@ -138,7 +132,6 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
-        const place = ref([]);
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
@@ -169,7 +162,6 @@ export default defineComponent({
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
-                    placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
@@ -199,8 +191,7 @@ export default defineComponent({
             publisherAutocompleteRef,
             selectedPublisher, softwareNumber,
             description, descriptionRef,
-            keywords, keywordsRef,
-            place, placeRef, uris, urisRef,
+            keywords, keywordsRef, uris, urisRef,
             contributions, contributionsRef,
             requiredFieldRules, submitSoftware
         };

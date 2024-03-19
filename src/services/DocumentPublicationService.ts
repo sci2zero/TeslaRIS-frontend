@@ -20,6 +20,18 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `journal-publication/${journalPublicationId}`);
   }
 
+  async readSoftware(softwareId: number): Promise<AxiosResponse<Software>> {
+    return super.sendRequest(axios.get, `software/${softwareId}`);
+  }
+
+  async readDataset(datasetId: number): Promise<AxiosResponse<Software>> {
+    return super.sendRequest(axios.get, `dataset/${datasetId}`);
+  }
+
+  async readPatent(patentId: number): Promise<AxiosResponse<Patent>> {
+    return super.sendRequest(axios.get, `patent/${patentId}`);
+  }
+
   async findMyPublicationsInJournal(journalId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
     return super.sendRequest(axios.get, `journal-publication/journal/${journalId}/my-publications`);
   }

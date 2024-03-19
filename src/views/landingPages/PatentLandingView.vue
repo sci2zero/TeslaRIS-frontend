@@ -1,25 +1,25 @@
 <template>
-    <v-container id="journalPublication">
+    <v-container id="patent">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(journalPublication?.title) }}
+                        {{ returnCurrentLocaleContent(patent?.title) }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(journalPublication?.subTitle) }}
+                        {{ returnCurrentLocaleContent(patent?.subTitle) }}
                         <br />
-                        {{ $t("journalPublicationLabel") }}
+                        {{ $t("patentLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- JournalPublication Info -->
+        <!-- Patent Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-journalPublication-icon">
+                <v-icon size="x-large" class="large-patent-icon">
                     {{ icon }}
                 </v-icon>
             </v-col>
@@ -38,67 +38,37 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div v-if="journalPublication?.volume">
-                                    {{ $t("volumeLabel") }}:
+                                <div v-if="patent?.number">
+                                    {{ $t("patentNumberLabel") }}:
                                 </div>
-                                <div v-if="journalPublication?.volume" class="response">
-                                    {{ journalPublication.volume }}
+                                <div v-if="patent?.number" class="response">
+                                    {{ patent.number }}
                                 </div>
-                                <div v-if="journalPublication?.issue">
-                                    {{ $t("issueLabel") }}:
-                                </div>
-                                <div v-if="journalPublication?.issue" class="response">
-                                    {{ journalPublication.issue }}
-                                </div>
-                                <div v-if="journalPublication?.startPage">
-                                    {{ $t("startPageLabel") }}:
-                                </div>
-                                <div v-if="journalPublication?.startPage" class="response">
-                                    {{ journalPublication.startPage }}
-                                </div>
-                                <div v-if="journalPublication?.endPage">
-                                    {{ $t("endPageLabel") }}:
-                                </div>
-                                <div v-if="journalPublication?.endPage" class="response">
-                                    {{ journalPublication.endPage }}
-                                </div>
-                                <div v-if="journalPublication?.documentDate">
+                                <div v-if="patent?.documentDate">
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
-                                <div v-if="journalPublication?.documentDate" class="response">
-                                    {{ journalPublication.documentDate }}
+                                <div v-if="patent?.documentDate" class="response">
+                                    {{ patent.documentDate }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
-                                <div v-if="journalPublication?.scopusId">
+                                <div v-if="patent?.scopusId">
                                     Scopus ID:
                                 </div>
-                                <div v-if="journalPublication?.scopusId" class="response">
-                                    {{ journalPublication.scopusId }}
+                                <div v-if="patent?.scopusId" class="response">
+                                    {{ patent.scopusId }}
                                 </div>
-                                <div v-if="journalPublication?.doi">
+                                <div v-if="patent?.doi">
                                     DOI:
                                 </div>
-                                <div v-if="journalPublication?.doi" class="response">
-                                    {{ journalPublication.doi }}
+                                <div v-if="patent?.doi" class="response">
+                                    {{ patent.doi }}
                                 </div>
-                                <div v-if="journalPublication?.articleNumber">
-                                    {{ $t("articleNumberLabel") }}:
-                                </div>
-                                <div v-if="journalPublication?.articleNumber" class="response">
-                                    {{ journalPublication.articleNumber }}
-                                </div>
-                                <div v-if="journalPublication?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
-                                </div>
-                                <div v-if="journalPublication?.numberOfPages" class="response">
-                                    {{ journalPublication.numberOfPages }}
-                                </div>
-                                <div v-if="journalPublication?.uris && journalPublication?.uris.length > 0">
+                                <div v-if="patent?.uris && patent?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in journalPublication?.uris" :key="uri">
+                                    <div v-for="uri in patent?.uris" :key="uri">
                                         <v-btn
                                             variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
                                             target="_blank">
@@ -117,15 +87,15 @@
         <keyword-list :keywords="keywords" @search-keyword="searchKeyword($event)"></keyword-list>
 
         <!-- Description -->
-        <description-section :description="journalPublication?.description"></description-section>
+        <description-section :description="patent?.description"></description-section>
 
-        <person-document-contribution-list :contribution-list="journalPublication?.contributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="patent?.contributions"></person-document-contribution-list>
 
         <v-row>
-            <attachment-list :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []"></attachment-list>
+            <attachment-list :attachments="patent?.fileItems ? patent.fileItems : []"></attachment-list>
         </v-row>
         <v-row>
-            <attachment-list :attachments="journalPublication?.proofs ? journalPublication.proofs : []"></attachment-list>
+            <attachment-list :attachments="patent?.proofs ? patent.proofs : []"></attachment-list>
         </v-row>
     </v-container>
 </template>
@@ -140,21 +110,21 @@ import { watch } from 'vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
-import type { JournalPublication } from '@/models/PublicationModel';
+import type { Patent } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
-import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 
+
 export default defineComponent({
-    name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection },
+    name: "PatentLandingPage",
+    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection },
     setup() {
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const journalPublication = ref<JournalPublication>();
+        const patent = ref<Patent>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -163,14 +133,14 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-newspaper-variant")
+        const icon = ref("mdi-seal-variant")
 
         onMounted(() => {
-            DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readPatent(parseInt(currentRoute.params.id as string)).then((response) => {
                 console.log(response.data);
-                journalPublication.value = response.data;
+                patent.value = response.data;
 
-                journalPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                patent.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
                 populateData();
             });
@@ -187,7 +157,7 @@ export default defineComponent({
                 })
             });
 
-            keywords.value = returnCurrentLocaleContent(journalPublication.value?.keywords)?.split(",") as string[];
+            keywords.value = returnCurrentLocaleContent(patent.value?.keywords)?.split(",") as string[];
         };
 
         const searchKeyword = (keyword: string) => {
@@ -199,7 +169,7 @@ export default defineComponent({
         }
 
         return {
-            journalPublication, icon,
+            patent, icon,
             publications, 
             totalPublications,
             returnCurrentLocaleContent,
@@ -211,11 +181,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    #journalPublication .large-journalPublication-icon {
+    #patent .large-patent-icon {
         font-size: 10em;
     }
 
-    #journalPublication .response {
+    #patent .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;
