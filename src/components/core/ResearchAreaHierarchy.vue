@@ -6,23 +6,29 @@
 
 
 <script lang="ts">
-import { ref, type PropType } from 'vue';
+import { ref, type PropType, watch } from 'vue';
 import { defineComponent } from 'vue'
 import TreeHierarchyRecursive from '../hierarchy/TreeHierarchyRecursive.vue';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
+
 
 export default defineComponent({
     name: 'ResearchAreaHierarchy',
     components: {TreeHierarchyRecursive},
     props: {
         researchAreas: {
-            type: Object as PropType<ResearchArea[]>,
+            type: Object as PropType<ResearchArea[] | undefined>,
             required: true
         }
     },
     setup(props) {
-        const researchAreaData = ref<ResearchArea[]>(props.researchAreas);
+        const researchAreaData = ref<ResearchArea[] | undefined>(props.researchAreas);
         const researchAreaDataRoots = ref<any>([]);
+
+        watch(() => props.researchAreas, () => {
+            researchAreaData.value = props.researchAreas;
+            researchAreaDataRoots.value = reorganiseParent(researchAreaData.value);
+        });
 
         const reorganiseParent = (data: any) => {
             if (!data) {
@@ -55,12 +61,15 @@ export default defineComponent({
                     value['superResearchArea'].children.push(value);
                     value['superResearchArea'] = undefined;
                 }
+
+                console.log(value)
             }
+
+            console.log(nodeMap)
             return root;
         }
 
         researchAreaDataRoots.value = reorganiseParent(researchAreaData.value);
-
 
         return {researchAreaDataRoots};
     },

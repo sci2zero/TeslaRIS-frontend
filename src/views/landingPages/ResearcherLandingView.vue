@@ -305,7 +305,6 @@ export default defineComponent({
 
         onMounted(() => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 person.value = response.data;
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;

@@ -44,7 +44,6 @@ export default defineComponent({
         const nextStep = (data: {firstName: string, lastName: string}) => {
             if (data.firstName) userDetails.firstName = data.firstName
             if (data.lastName) userDetails.lastName = data.lastName
-            console.log(data);
             stepperValue.value = 2;
         };
 

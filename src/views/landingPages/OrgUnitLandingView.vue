@@ -156,7 +156,6 @@ export default defineComponent({
                 populateData();
             });
             OrganisationUnitService.readOURelationsChain(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 relationChain.value = response.data;
             })
         });

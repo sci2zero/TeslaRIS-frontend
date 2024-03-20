@@ -137,7 +137,6 @@ export default defineComponent({
 
         onMounted(() => {
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 software.value = response.data;
 
                 software.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);

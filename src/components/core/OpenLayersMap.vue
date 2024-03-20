@@ -55,7 +55,6 @@ export default defineComponent({
         const vectorSource = new VectorSource({});
         const vectorLayer = new VectorLayer({source: vectorSource});
         const view = new View({center: fromLonLat([19.8335, 45.2671]), zoom: 4});
-        console.log(props.initCoordinates)
         const address = ref("");
 
         onMounted(() => {

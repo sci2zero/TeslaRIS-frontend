@@ -126,7 +126,6 @@ export default defineComponent({
 
         onMounted(() => {
             JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 journal.value = response.data;
 
                 fetchPublications();                

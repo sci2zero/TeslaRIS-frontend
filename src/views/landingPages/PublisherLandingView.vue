@@ -101,7 +101,6 @@ export default defineComponent({
 
         onMounted(() => {
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 publisher.value = response.data;
 
                 fetchPublications();     

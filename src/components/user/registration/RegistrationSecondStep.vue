@@ -58,7 +58,6 @@ export default defineComponent({
         }
     },
     setup(props) {
-        console.log(props)
         const registerStore = useRegisterStore();
 
         const i18n = useI18n();
@@ -102,9 +101,8 @@ export default defineComponent({
                     organisationUnitId: selectedOrganisationUnit.value.value
 
                 }
-            AuthenticationService.registerResearcher(requestBody).then((response) => {
-                console.log(response);
-                
+            AuthenticationService.registerResearcher(requestBody).then(() => {
+                // TODO: Improve this
             }).catch(() => {
                 alert("error")
             });

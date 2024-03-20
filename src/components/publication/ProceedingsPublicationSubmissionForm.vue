@@ -298,8 +298,6 @@ export default defineComponent({
                 scopusId: scopus.value
             };
 
-            console.log(newProceedingsPublication, stayOnPage, router)
-
             DocumentPublicationService.createJProceedingsPublication(newProceedingsPublication).then(() => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();

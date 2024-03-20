@@ -124,7 +124,6 @@ export default defineComponent({
 
         onMounted(() => {
             BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 bookSeries.value = response.data;
 
                 fetchPublications();                

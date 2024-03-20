@@ -90,7 +90,6 @@ export default defineComponent({
 
         const updatedData = () => {
             const token: string = firstName.value + " " + lastName.value;
-            console.log(token)
             searchResearchers(token)
         }
 
@@ -118,10 +117,7 @@ export default defineComponent({
         }
 
         const personClick = (person : any) => {
-            console.log(person);
-
             PersonService.getPersonWithUser(person.databaseId).then(response => {
-                console.log(response);
                 if (response.data.user) {
                     const email = response.data.user.email;
                     router.push({name:"login", path:'/login/', query: { "email": email }})
@@ -129,8 +125,8 @@ export default defineComponent({
                     registerStore.setRegisterPersonData(response.data)
                     emit("registration-next-step", {});
                 }
-            }).catch(exception => {
-                console.log(exception)
+            }).catch(() => {
+                
             })
             
         }

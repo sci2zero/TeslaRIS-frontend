@@ -267,8 +267,6 @@ export default defineComponent({
                 eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value
             };
 
-            console.log(newJournalPublication)
-
             DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();

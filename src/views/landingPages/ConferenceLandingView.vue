@@ -141,7 +141,6 @@ export default defineComponent({
 
         onMounted(() => {
             EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 conference.value = response.data;
 
                 fetchPublications();                

@@ -137,7 +137,6 @@ export default defineComponent({
 
         onMounted(() => {
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 dataset.value = response.data;
 
                 dataset.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);

@@ -163,8 +163,6 @@ export default defineComponent({
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value
             };
 
-            console.log(newPatent);
-
             DocumentPublicationService.createPatent(newPatent).then(() => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();

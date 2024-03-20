@@ -7,29 +7,28 @@
             </p>
         </li>
 
-        <!-- <li v-if="researchArea.children.length > 0" class="container">
+        <li v-if="researchArea.children.length > 0" class="container">
             <component :is="treeHierarchyRecursive" :research-area="researchArea.children"></component>
-        </li> -->
+        </li>
     </ul>
 </template>
 
 
 <script lang="ts">
 import { defineComponent, ref, type PropType } from 'vue'
-import type { ResearchArea } from '@/models/OrganisationUnitModel';
 
 
 export default defineComponent({
     name: "TreeHierarchyRecursive",
-    // components: {TreeHierarchyRecursive : () => import('@/componens/hierarchy/TreeHierarchyRecursive.vue')},
+    components: {TreeHierarchyRecursive : () => import('@/componens/hierarchy/TreeHierarchyRecursive.vue')},
     props: {
         presetResearchArea: {
-            type: Object as PropType<ResearchArea[]>,
+            type: Object as PropType<any[]>,
             required: true
         },
     },
     setup(props) {
-        const researchAreas = ref<ResearchArea[]>(props.presetResearchArea)
+        const researchAreas = ref<any[]>(props.presetResearchArea)
         // const treeHierarchyRecursive = shallowRef(TreeHierarchyRecursive)
 
         return {researchAreas}

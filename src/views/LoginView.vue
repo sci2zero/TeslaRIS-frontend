@@ -88,9 +88,8 @@ export default defineComponent(
         name: "LoginView",
         components: { LocalizedLink },
         setup() {
-            const route = useRoute()
-            const router = useRouter()
-            console.log(route)
+            const route = useRoute();
+            const router = useRouter();
 
             const isFormValid = ref(false);
             const snackbar = ref(false);
@@ -161,8 +160,7 @@ export default defineComponent(
                         return;
                     }
                     router.push({ name: "home" });
-                }).catch((error) => {
-                    console.log(error)
+                }).catch(() => {
                     snackbar.value = true;
                 });
             };

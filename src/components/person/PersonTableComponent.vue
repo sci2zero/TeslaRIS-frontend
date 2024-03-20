@@ -121,7 +121,6 @@ export default defineComponent({
             }
 
             tableOptions.value = event;
-            console.log(tableOptions.value)
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
             if (event.sortBy.length > 0) {
