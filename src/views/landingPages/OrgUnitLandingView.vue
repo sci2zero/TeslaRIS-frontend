@@ -98,7 +98,7 @@
                         </div>
 
                         <div><b>{{ $t("relationsLabel") }}</b></div>
-                        <relations-graph></relations-graph>
+                        <relations-graph :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -125,16 +125,18 @@ import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { MultilingualContent } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import KeywordList from '@/components/core/KeywordList.vue';
+
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList },
     setup() {
         const router = useRouter();
         const currentRoute = useRoute();
 
         const organisationUnit = ref<OrganisationUnitResponse>();
-        const relationChain = ref<OrganisationUnitResponse[]>();
+        const relationChain = ref();
 
         const keywords = ref<string[]>([]);
         const ouIcon = ref('mdi-city')
@@ -155,8 +157,9 @@ export default defineComponent({
                 fetchPublications();                
                 populateData();
             });
-            OrganisationUnitService.readOURelationsChain(parseInt(currentRoute.params.id as string)).then((response) => {
+            OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
                 relationChain.value = response.data;
+                console.log(response.data)
             })
         });
 
@@ -185,13 +188,13 @@ export default defineComponent({
         };
 
         return {
-                organisationUnit,
-                keywords, ouIcon,
-                publications, 
-                totalPublications,
-                switchPage,
-                searchKeyword,
-                returnCurrentLocaleContent
+            organisationUnit,
+            keywords, ouIcon,
+            publications, 
+            totalPublications,
+            switchPage,
+            searchKeyword, relationChain,
+            returnCurrentLocaleContent
         };
 }})
 

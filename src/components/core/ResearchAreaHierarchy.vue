@@ -61,11 +61,7 @@ export default defineComponent({
                     value['superResearchArea'].children.push(value);
                     value['superResearchArea'] = undefined;
                 }
-
-                console.log(value)
             }
-
-            console.log(nodeMap)
             return root;
         }
 

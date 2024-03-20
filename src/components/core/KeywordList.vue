@@ -28,7 +28,7 @@ export default defineComponent({
     name: "KeywordList",
     props: {
         keywords: {
-            type: Array as PropType<string[]>,
+            type: Object as PropType<string[] | undefined>,
             required: true
         }
     },

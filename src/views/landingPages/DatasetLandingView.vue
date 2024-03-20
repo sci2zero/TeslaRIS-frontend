@@ -50,6 +50,12 @@
                                 <div v-if="dataset?.documentDate" class="response">
                                     {{ dataset.documentDate }}
                                 </div>
+                                <div v-if="dataset?.publisherId">
+                                    {{ $t("publisherLabel") }}:
+                                </div>
+                                <div v-if="dataset?.publisherId" class="response">
+                                    {{ returnCurrentLocaleContent(publisher?.name) }}
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="dataset?.scopusId">
@@ -115,6 +121,8 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import PublisherService from '@/services/PublisherService';
+import type { Publisher } from '@/models/PublisherModel';
 
 
 export default defineComponent({
@@ -125,6 +133,7 @@ export default defineComponent({
         const router = useRouter();
 
         const dataset = ref<Dataset>();
+        const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -140,6 +149,12 @@ export default defineComponent({
                 dataset.value = response.data;
 
                 dataset.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+
+                if(dataset.value.publisherId) {
+                    PublisherService.readPublisher(dataset.value.publisherId).then((publisherResponse) => {
+                        publisher.value = publisherResponse.data;
+                    })
+                }
     
                 populateData();
             });
@@ -170,7 +185,7 @@ export default defineComponent({
         return {
             dataset, icon,
             publications, 
-            totalPublications,
+            totalPublications, publisher,
             returnCurrentLocaleContent,
             languageTagMap, keywords,
             searchKeyword, goToURL

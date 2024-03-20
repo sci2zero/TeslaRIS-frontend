@@ -50,6 +50,12 @@
                                 <div v-if="patent?.documentDate" class="response">
                                     {{ patent.documentDate }}
                                 </div>
+                                <div v-if="patent?.publisherId">
+                                    {{ $t("publisherLabel") }}:
+                                </div>
+                                <div v-if="patent?.publisherId" class="response">
+                                    {{ returnCurrentLocaleContent(publisher?.name) }}
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="patent?.scopusId">
@@ -115,6 +121,8 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import PublisherService from '@/services/PublisherService';
+import type { Publisher } from '@/models/PublisherModel';
 
 
 export default defineComponent({
@@ -125,6 +133,7 @@ export default defineComponent({
         const router = useRouter();
 
         const patent = ref<Patent>();
+        const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -140,6 +149,12 @@ export default defineComponent({
                 patent.value = response.data;
 
                 patent.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+
+                if(patent.value.publisherId) {
+                    PublisherService.readPublisher(patent.value.publisherId).then((publisherResponse) => {
+                        publisher.value = publisherResponse.data;
+                    })
+                }
     
                 populateData();
             });
@@ -170,7 +185,7 @@ export default defineComponent({
         return {
             patent, icon,
             publications, 
-            totalPublications,
+            totalPublications, publisher,
             returnCurrentLocaleContent,
             languageTagMap, keywords,
             searchKeyword, goToURL

@@ -68,6 +68,12 @@
                                 <div v-if="journalPublication?.documentDate" class="response">
                                     {{ journalPublication.documentDate }}
                                 </div>
+                                <div v-if="journalPublication?.eventId">
+                                    {{ $t("conferenceLabel") }}:
+                                </div>
+                                <div v-if="journalPublication?.eventId" class="response">
+                                    {{ returnCurrentLocaleContent(event?.name) }}
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="journalPublication?.scopusId">
@@ -146,6 +152,8 @@ import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import type { Conference } from '@/models/EventModel';
+import EventService from '@/services/EventService';
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
@@ -156,6 +164,7 @@ export default defineComponent({
 
         const journalPublication = ref<JournalPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const event = ref<Conference>();
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -170,6 +179,13 @@ export default defineComponent({
                 journalPublication.value = response.data;
 
                 journalPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                console.log(journalPublication.value)
+
+                if(journalPublication.value.eventId) {
+                    EventService.readConference(journalPublication.value.eventId).then((eventResponse) => {
+                        event.value = eventResponse.data;
+                    })
+                }
     
                 populateData();
             });
@@ -199,7 +215,7 @@ export default defineComponent({
 
         return {
             journalPublication, icon,
-            publications, 
+            publications, event,
             totalPublications,
             returnCurrentLocaleContent,
             languageTagMap, keywords,

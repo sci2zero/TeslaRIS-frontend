@@ -177,5 +177,6 @@ export default {
     relationsLabel: "Relations",
     isSerialEventMessage: "This is a serial event.",
     isOneTimeEventMessage: "This is a one time event.",
-    journalPublicationLabel: "Journal Publication"
+    journalPublicationLabel: "Journal Publication",
+    softwareLabel: "Software"
 }

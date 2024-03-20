@@ -177,5 +177,6 @@ export default {
     relationsLabel: "Relacije",
     isSerialEventMessage: "Ovo je serijski događaj.",
     isOneTimeEventMessage: "Ovaj događaj se održao jedanput.",
-    journalPublicationLabel: "Rad u časopisu"
+    journalPublicationLabel: "Rad u časopisu",
+    softwareLabel: "Softver"
 }

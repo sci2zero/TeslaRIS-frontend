@@ -50,6 +50,12 @@
                                 <div v-if="software?.documentDate" class="response">
                                     {{ software.documentDate }}
                                 </div>
+                                <div v-if="software?.publisherId">
+                                    {{ $t("publisherLabel") }}:
+                                </div>
+                                <div v-if="software?.publisherId" class="response">
+                                    {{ returnCurrentLocaleContent(publisher?.name) }}
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="software?.scopusId">
@@ -115,6 +121,8 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import PublisherService from '@/services/PublisherService';
+import type { Publisher } from '@/models/PublisherModel';
 
 
 export default defineComponent({
@@ -125,6 +133,7 @@ export default defineComponent({
         const router = useRouter();
 
         const software = ref<Software>();
+        const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -140,6 +149,12 @@ export default defineComponent({
                 software.value = response.data;
 
                 software.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+
+                if(software.value.publisherId) {
+                    PublisherService.readPublisher(software.value.publisherId).then((publisherResponse) => {
+                        publisher.value = publisherResponse.data;
+                    })
+                }
     
                 populateData();
             });
@@ -169,7 +184,7 @@ export default defineComponent({
 
         return {
             software, icon,
-            publications, 
+            publications, publisher,
             totalPublications,
             returnCurrentLocaleContent,
             languageTagMap, keywords,

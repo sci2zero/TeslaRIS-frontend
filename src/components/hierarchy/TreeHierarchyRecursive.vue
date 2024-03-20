@@ -15,7 +15,7 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, type PropType } from 'vue'
+import { defineComponent, ref, type PropType } from 'vue';
 
 
 export default defineComponent({

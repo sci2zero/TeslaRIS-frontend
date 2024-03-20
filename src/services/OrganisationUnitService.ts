@@ -16,7 +16,7 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}`);
   }
 
-  async readOURelationsChain(organisationUnitLeafId: number): Promise<AxiosResponse<OrganisationUnitResponse[]>> {
+  async readOURelationsGraph(organisationUnitLeafId: number): Promise<AxiosResponse<any>> {
     return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
 
