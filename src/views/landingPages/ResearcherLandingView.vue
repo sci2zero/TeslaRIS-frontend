@@ -205,7 +205,7 @@
                                 {{ employment.dateFrom ? `${employment.dateFrom} - ${employment.dateTo ? employment.dateTo : $t("presentLabel")}` : $t("currentLabel") }} 
                             </h4>
                             <p>{{ returnCurrentLocaleContent(employment.role as MultilingualContent[]) }}</p>       
-                            <attachment-list :attachments="employment.proofs ? employment.proofs : []"></attachment-list>
+                            <attachment-list :attachments="employment.proofs ? employment.proofs : []" is-proof @create="addInvolvementProof($event, employment)" @delete="deleteInvolvementProof(employment, $event)"></attachment-list>
                         </div>
                         <div v-if="education.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
@@ -223,7 +223,7 @@
                             <p v-if="educationStep.thesisTitle">
                                 {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent(educationStep.thesisTitle as MultilingualContent[]) }}
                             </p>       
-                            <attachment-list :attachments="educationStep.proofs ? educationStep.proofs : []"></attachment-list>
+                            <attachment-list :attachments="educationStep.proofs ? educationStep.proofs : []" is-proof @create="addInvolvementProof($event, educationStep)" @delete="deleteInvolvementProof(educationStep, $event)"></attachment-list>
                         </div>
                         <div v-if="memberships.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
@@ -239,7 +239,7 @@
                                 {{ membership.dateFrom }} - {{ membership.dateTo ? membership.dateTo : $t("presentLabel") }} 
                             </h4>
                             <p>{{ returnCurrentLocaleContent(membership.contributionDescription as MultilingualContent[]) }}</p>    
-                            <attachment-list :attachments="membership.proofs ? membership.proofs : []"></attachment-list>
+                            <attachment-list :attachments="membership.proofs ? membership.proofs : []" is-proof @create="addInvolvementProof($event, membership)" @delete="deleteInvolvementProof(membership, $event)"></attachment-list>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -253,7 +253,6 @@
 </template>
 
 <script lang="ts">
-
 import type { MultilingualContent, Country } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
@@ -270,6 +269,8 @@ import InvolvementService from '@/services/InvolvementService';
 import type { Employment, Education, Membership } from '@/models/InvolvementModel';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import type { DocumentFile } from '@/models/DocumentFileModel';
+import DocumentFileService from '@/services/DocumentFileService';
 
 
 export default defineComponent({
@@ -395,6 +396,20 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
         };
 
+        const addInvolvementProof = (proof: DocumentFile, involvement: Membership | Education | Employment) => {
+            DocumentFileService.addInvolvementProof(proof, involvement.id as number, person.value?.id as number).then((response => {
+                involvement.proofs?.push(response.data);
+            }));
+        };
+
+        const deleteInvolvementProof = (involvement: Membership | Education | Employment, proofId: number) => {
+            DocumentFileService.deleteInvolvementProof(proofId, involvement.id as number, person.value?.id as number).then(() => {
+                if (involvement.proofs) {
+                    involvement.proofs = involvement.proofs.filter(proof => proof.id !== proofId);
+                }
+            });
+        };
+
         return {
             researcherName,
             accountIcon,
@@ -407,7 +422,8 @@ export default defineComponent({
             switchPage,
             searchKeyword,
             returnCurrentLocaleContent,
-            employments, education, memberships
+            employments, education, memberships,
+            addInvolvementProof, deleteInvolvementProof
         };
 }})
 

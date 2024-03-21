@@ -178,5 +178,11 @@ export default {
     isSerialEventMessage: "Ovo je serijski događaj.",
     isOneTimeEventMessage: "Ovaj događaj se održao jedanput.",
     journalPublicationLabel: "Rad u časopisu",
-    softwareLabel: "Softver"
+    softwareLabel: "Softver",
+    addProofLabel: "Dodaj dokaz",
+    addDocumentFileLabel: "Dodaj fajl",
+    fileLabel: "Fajl",
+    resourceTypeLabel: "Tip resursa",
+    licenseLabel: "Licenca",
+    noFilesUploadedMessage: "Nisu priloženi fajlovi."
 }

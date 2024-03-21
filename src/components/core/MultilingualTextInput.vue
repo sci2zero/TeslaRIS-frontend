@@ -40,6 +40,7 @@ import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
 import UserService from '@/services/UserService';
 import type { UserResponse } from '@/models/UserModel';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -61,6 +62,11 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] | undefined>,
             required: true,
+        },
+        initialValue: {
+            type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] | undefined>,
+            required: false,
+            default: undefined
         }
     },
     emits: ["update:modelValue"],
@@ -71,17 +77,7 @@ export default defineComponent({
 
         onMounted(() => {
             setInitialState();
-            if(props.modelValue && props.modelValue.length > 0 && props.modelValue[0].text !== "") {
-                inputs.value = [];
-                props.modelValue.forEach(input => {
-                    let languageChoice = supportedLanguages.value;
-                    inputs.value.forEach((input) => {
-                        languageChoice = languageChoice.filter(item => item.value !== input.language.value);
-                    });
-                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: languageChoice });
-                    filterFromInputChoices(input.language);
-                });
-            }
+            setInitialModelValue();
         });
 
         const setInitialState = () => {
@@ -99,6 +95,25 @@ export default defineComponent({
                 });
             });
         };
+
+        const setInitialModelValue = () => {
+            console.log(props.modelValue)
+            if(props.initialValue && props.initialValue.length > 0 && props.initialValue[0].text !== "") {
+                inputs.value = [];
+                props.initialValue.forEach(input => {
+                    let languageChoice = supportedLanguages.value;
+                    inputs.value.forEach((input) => {
+                        languageChoice = languageChoice.filter(item => item.value !== input.language.value);
+                    });
+                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: languageChoice });
+                    filterFromInputChoices(input.language);
+                });
+            }
+        };
+
+        watch(() => props.initialValue, () => {
+            console.log(props.initialValue);
+        })
 
         const addInput = () => {
             let languageChoice = supportedLanguages.value;
@@ -147,7 +162,7 @@ export default defineComponent({
                     input.supportedLanguages.push(selectedLanguage);
                 }
             });
-        }
+        };
 
         const clearInput = () => {
             inputs.value = [];

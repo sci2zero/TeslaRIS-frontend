@@ -1,44 +1,94 @@
 <template>
-    <v-list
-        :lines="false"
-        density="compact"
-        class="pa-0"
-    >
-        <v-list-item
-            v-for="(attachment, attachmentIndex) in attachments" :key="attachmentIndex"
-            :value="attachment.serverFilename"
-            color="primary"
-            @click="download(attachment)"
-        >
-            <template #prepend>
-                <v-icon icon="mdi-file-document-outline"></v-icon>
-            </template>
+    <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+        <v-card-text class="edit-pen-container">
+            <document-file-submission-modal :is-proof="isProof" @create="sendDataToParent"></document-file-submission-modal>
 
-            <v-list-item-title>{{ attachment.fileName }} ({{ attachment.sizeInMb }}MB)</v-list-item-title>
-        </v-list-item>
-    </v-list>
+            <v-row>
+                <v-list
+                    v-if="attachments && attachments.length > 0"
+                    :lines="false"
+                    density="compact"
+                    class="pa-0"
+                >
+                    <v-list-item
+                        v-for="(attachment, attachmentIndex) in attachments" :key="attachmentIndex"
+                        :value="attachment.serverFilename"
+                        color="primary"
+                    >
+                        <template #prepend>
+                            <v-icon icon="mdi-file-document-outline"></v-icon>
+                        </template>
+
+                        <v-list-item-title @click="download(attachment)">
+                            {{ attachment.fileName }} ({{ attachment.sizeInMb }}MB)
+                        </v-list-item-title>
+
+
+                        <template #append>
+                            <v-row>
+                                <v-col>
+                                    <v-btn
+                                        icon variant="outlined" size="x-small" color="primary"
+                                        style="margin-left: 10px;" @click="sendDeleteRequestToParent(attachment.id)">
+                                        <v-icon size="x-large" icon="mdi-delete"></v-icon>
+                                    </v-btn>
+                                </v-col>
+                                <v-col>
+                                    <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment"></document-file-submission-modal>
+                                </v-col>
+                            </v-row>
+                        </template>
+                    </v-list-item>
+                </v-list>
+                <h4 v-else>
+                    {{ $t("noFilesUploadedMessage") }}
+                </h4>
+            </v-row>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script lang="ts">
-import type { DocumentFileResponse } from '@/models/DocumentFileModel';
+import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
+import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
 
 
 export default defineComponent({
     name: "AttachmentList",
+    components: { DocumentFileSubmissionModal },
     props: {
         attachments: {
             type: Object as PropType<DocumentFileResponse[]>,
             required: true
+        },
+        isProof: {
+            type: Boolean,
+            default: false
         }
     },
-    setup() {
+    emits: ["create", "delete"],
+    setup(_, { emit }) {
         const download = (attachment: DocumentFileResponse) => {
-            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".")[-1]);
+            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string);
         };
 
-        return {download};
+        const sendDataToParent = (documentFile: DocumentFile) => {
+            emit("create", documentFile);
+        }
+
+        const sendDeleteRequestToParent = (attachmentId: number) => {
+            emit("delete", attachmentId);
+        }
+
+        return {download, sendDataToParent, sendDeleteRequestToParent};
     }
 });
 </script>
+
+<style scoped>
+    .edit-pen-container {
+        position:relative;
+    }
+</style>

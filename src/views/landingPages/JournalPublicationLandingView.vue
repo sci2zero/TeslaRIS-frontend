@@ -131,7 +131,9 @@
             <attachment-list :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []"></attachment-list>
         </v-row>
         <v-row>
-            <attachment-list :attachments="journalPublication?.proofs ? journalPublication.proofs : []"></attachment-list>
+            <v-col cols="6">
+                <attachment-list :attachments="journalPublication?.proofs ? journalPublication.proofs : []"></attachment-list>
+            </v-col>
         </v-row>
     </v-container>
 </template>

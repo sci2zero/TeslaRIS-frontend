@@ -178,5 +178,11 @@ export default {
     isSerialEventMessage: "This is a serial event.",
     isOneTimeEventMessage: "This is a one time event.",
     journalPublicationLabel: "Journal Publication",
-    softwareLabel: "Software"
+    softwareLabel: "Software",
+    addProofLabel: "Add Proof",
+    addDocumentFileLabel: "Add File",
+    fileLabel: "File",
+    resourceTypeLabel: "Resource Type",
+    licenseLabel: "License",
+    noFilesUploadedMessage: "No Files Provided."
 }

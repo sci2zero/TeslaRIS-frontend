@@ -1,15 +1,16 @@
 import type { MultilingualContent } from "./Common";
 
-enum ResourceType {
+export enum ResourceType {
     PREPRINT,
     OFFICIAL_PUBLICATION,
     SUPPLEMENT,
 }
 
-enum License {
+export enum License {
     BSD,
     CREATIVE_COMMONS,
     APACHE,
+    OPEN_ACCESS
 }
 
 export interface DocumentFileResponse {
@@ -20,4 +21,12 @@ export interface DocumentFileResponse {
     resourceType: ResourceType;
     license: License;
     sizeInMb: number;
+}
+
+export interface DocumentFile {
+    id?: number;
+    file: File;
+    description: MultilingualContent[];
+    resourceType: ResourceType;
+    license: License;
 }

@@ -1,6 +1,5 @@
-import type { MultilingualContent } from "@/models/Common";
+import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
 import i18n from ".";
-
 
 export const returnCurrentLocaleContent = (multilingualContentList: MultilingualContent[] | undefined): string | null => {
     let selectedContent: MultilingualContent | null = null;
@@ -38,3 +37,21 @@ export const returnCurrentLocaleContent = (multilingualContentList: Multilingual
         return maxPriorityContent.content;
     }
 };
+
+export const toMultilingualTextInput = (multilingualContentArray: MultilingualContent[] | undefined, supportedLanguages: LanguageTagResponse[]): { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] => {
+    const presetInput: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] = [];
+
+    if (!multilingualContentArray) {
+        return presetInput;
+    }
+
+    const filteredLanguages = supportedLanguages.filter(language => !multilingualContentArray.some(mc => mc.languageTag === language.languageCode));
+
+    const mappedFilteredLanguages = filteredLanguages.map(language => ({ title: language.languageCode, value: language.id }));
+
+    multilingualContentArray.forEach(mc => {
+        presetInput.push({language: {title: mc.languageTag, value: mc.languageTagId}, text: mc.content, supportedLanguages: mappedFilteredLanguages});
+    });
+
+    return presetInput;
+}
