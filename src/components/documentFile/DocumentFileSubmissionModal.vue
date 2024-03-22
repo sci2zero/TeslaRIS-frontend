@@ -23,7 +23,9 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <document-file-submission-form ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" @create="emitToParent"></document-file-submission-form>
+                        <document-file-submission-form
+                            ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" @create="emitCreateToParent"
+                            @update="emitUpdateToParent"></document-file-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -69,18 +71,23 @@ export default defineComponent({
             default: undefined
         },
     },
-    emits: ["create"],
+    emits: ["create", "update"],
     setup(_, { emit }) {
         const dialog = ref(false);
 
         const submissionFormRef = ref<typeof DocumentFileSubmissionForm>();
 
-        const emitToParent = (documentFile: DocumentFile) => {
+        const emitCreateToParent = (documentFile: DocumentFile) => {
             emit("create", documentFile)
             dialog.value = false;
-        }
+        };
 
-        return {dialog, submissionFormRef, emitToParent};
+        const emitUpdateToParent = (documentFile: DocumentFile) => {
+            emit("update", documentFile);
+            dialog.value = false;
+        };
+
+        return {dialog, submissionFormRef, emitCreateToParent, emitUpdateToParent};
     }
 });
 </script>

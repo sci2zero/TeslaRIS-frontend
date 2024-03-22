@@ -75,9 +75,10 @@ export default defineComponent({
         const supportedLanguages = ref<{title: string, value: number}[]>([]);
         const inputs = ref<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]>([]);
 
+        const initialValueSet = ref(false);
+
         onMounted(() => {
             setInitialState();
-            setInitialModelValue();
         });
 
         const setInitialState = () => {
@@ -89,7 +90,9 @@ export default defineComponent({
                         supportedLanguages.value.push({title: language.languageCode, value: language.id});
                         if (language.languageCode === userPreferredLanguage.value.tag) {
                             userPreferredLanguage.value.id = language.id;
-                            inputs.value.push({ language: {title: language.languageCode, value: language.id}, text: "", supportedLanguages: supportedLanguages.value });
+                            if(inputs.value.length === 0) {
+                                inputs.value.push({ language: {title: language.languageCode, value: language.id}, text: "", supportedLanguages: supportedLanguages.value });
+                            }
                         }
                     });
                 });
@@ -97,22 +100,23 @@ export default defineComponent({
         };
 
         const setInitialModelValue = () => {
-            console.log(props.modelValue)
             if(props.initialValue && props.initialValue.length > 0 && props.initialValue[0].text !== "") {
                 inputs.value = [];
                 props.initialValue.forEach(input => {
-                    let languageChoice = supportedLanguages.value;
-                    inputs.value.forEach((input) => {
-                        languageChoice = languageChoice.filter(item => item.value !== input.language.value);
-                    });
-                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: languageChoice });
+                    input.supportedLanguages.push(input.language);
+                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
                     filterFromInputChoices(input.language);
                 });
+                sendContentToParent();
             }
         };
 
         watch(() => props.initialValue, () => {
-            console.log(props.initialValue);
+            if(!initialValueSet.value && props.initialValue && props.initialValue.length > 0 && props.initialValue[0].supportedLanguages.length > 0) {
+                setInitialModelValue();
+                initialValueSet.value = true;
+            }
+            
         })
 
         const addInput = () => {
@@ -173,6 +177,9 @@ export default defineComponent({
         const sendContentToParent = () => {
             const returnObject: MultilingualContent[] = [];
             inputs.value.forEach((input, index) => {
+                if(input.text.trim() === "") {
+                    return;
+                }
                 returnObject.push({content: input.text, 
                                 languageTag: input.language.title, 
                                 languageTagId: input.language.value, 

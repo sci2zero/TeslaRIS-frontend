@@ -98,10 +98,16 @@
         <person-document-contribution-list :contribution-list="software?.contributions"></person-document-contribution-list>
 
         <v-row>
-            <attachment-list :attachments="software?.fileItems ? software.fileItems : []"></attachment-list>
+            <h2>{{ $t("proofsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="software?.fileItems ? software.fileItems : []"></attachment-list>
+            </v-col>
         </v-row>
         <v-row>
-            <attachment-list :attachments="software?.proofs ? software.proofs : []"></attachment-list>
+            <h2>{{ $t("fileItemsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="software?.proofs ? software.proofs : []" is-proof></attachment-list>
+            </v-col>
         </v-row>
     </v-container>
 </template>

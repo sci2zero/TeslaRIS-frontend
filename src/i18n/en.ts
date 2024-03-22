@@ -184,5 +184,7 @@ export default {
     fileLabel: "File",
     resourceTypeLabel: "Resource Type",
     licenseLabel: "License",
-    noFilesUploadedMessage: "No Files Provided."
+    noFilesUploadedMessage: "No Files Provided.",
+    proofsLabel: "Proofs",
+    fileItemsLabel: "File Items"
 }

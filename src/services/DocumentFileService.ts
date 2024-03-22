@@ -20,6 +20,16 @@ export class DocumentFileService extends BaseService {
         return super.sendMultipartFormDataRequest(axios.patch, `involvement/${involvementId}/${personId}`, proof, DocumentFileService.idempotencyKey);
     }
 
+    async updateInvolvementProof(proof: any, proofId: any, involvementId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        if (typeof proof.license === "number") {
+            proof.license = getNameFromOrdinal(License, proof.license);
+        }
+        if (typeof proof.resourceType === "number") {
+            proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        }
+        return super.sendMultipartFormDataRequest(axios.patch, `involvement/${involvementId}/${personId}/${proofId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
     async deleteInvolvementProof(proofId: any, involvementId: number, personId: number): Promise<void> {
         return super.sendRequest(axios.delete, `involvement/${involvementId}/${personId}/${proofId}`);
     }

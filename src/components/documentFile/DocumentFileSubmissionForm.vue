@@ -92,7 +92,7 @@ export default defineComponent({
             default: undefined
         },
     },
-    emits: ["create"],
+    emits: ["create", "update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
@@ -107,7 +107,7 @@ export default defineComponent({
             if(props.edit && props.presetDocumentFile) {
                     file.value.push(new File([], props.presetDocumentFile.fileName));
                     selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.license };
-                    selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.license };
+                    selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
             } 
         });
 
@@ -140,7 +140,12 @@ export default defineComponent({
                 license: selectedLicense.value.value
             }
 
-            emit("create", newDocumentFile);
+            if(props.edit) {
+                emit("update", newDocumentFile);
+            } else {
+                emit("create", newDocumentFile);
+            }
+            
         };
 
         return {isFormValid, snackbar, file,

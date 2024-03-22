@@ -98,10 +98,16 @@
         <person-document-contribution-list :contribution-list="dataset?.contributions"></person-document-contribution-list>
 
         <v-row>
-            <attachment-list :attachments="dataset?.fileItems ? dataset.fileItems : []"></attachment-list>
+            <h2>{{ $t("proofsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="dataset?.fileItems ? dataset.fileItems : []"></attachment-list>
+            </v-col>
         </v-row>
         <v-row>
-            <attachment-list :attachments="dataset?.proofs ? dataset.proofs : []"></attachment-list>
+            <h2>{{ $t("fileItemsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="dataset?.proofs ? dataset.proofs : []" is-proof></attachment-list>
+            </v-col>
         </v-row>
     </v-container>
 </template>

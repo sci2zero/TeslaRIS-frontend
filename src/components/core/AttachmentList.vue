@@ -34,7 +34,7 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col>
-                                    <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment"></document-file-submission-modal>
+                                    <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment" @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
                                 </v-col>
                             </v-row>
                         </template>
@@ -68,7 +68,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ["create", "delete"],
+    emits: ["create", "delete", "update"],
     setup(_, { emit }) {
         const download = (attachment: DocumentFileResponse) => {
             DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string);
@@ -76,13 +76,18 @@ export default defineComponent({
 
         const sendDataToParent = (documentFile: DocumentFile) => {
             emit("create", documentFile);
-        }
+        };
+
+        const sendUpdateRequestToParent = (documentFile: DocumentFile, attachmentId: number) => {
+            documentFile.id = attachmentId;
+            emit("update", documentFile);
+        };
 
         const sendDeleteRequestToParent = (attachmentId: number) => {
             emit("delete", attachmentId);
-        }
+        };
 
-        return {download, sendDataToParent, sendDeleteRequestToParent};
+        return {download, sendDataToParent, sendDeleteRequestToParent, sendUpdateRequestToParent};
     }
 });
 </script>

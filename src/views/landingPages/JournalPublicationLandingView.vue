@@ -128,11 +128,15 @@
         <person-document-contribution-list :contribution-list="journalPublication?.contributions"></person-document-contribution-list>
 
         <v-row>
-            <attachment-list :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []"></attachment-list>
+            <h2>{{ $t("proofsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []"></attachment-list>
+            </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
-                <attachment-list :attachments="journalPublication?.proofs ? journalPublication.proofs : []"></attachment-list>
+            <h2>{{ $t("fileItemsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="journalPublication?.proofs ? journalPublication.proofs : []" is-proof></attachment-list>
             </v-col>
         </v-row>
     </v-container>
@@ -181,7 +185,6 @@ export default defineComponent({
                 journalPublication.value = response.data;
 
                 journalPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
-                console.log(journalPublication.value)
 
                 if(journalPublication.value.eventId) {
                     EventService.readConference(journalPublication.value.eventId).then((eventResponse) => {

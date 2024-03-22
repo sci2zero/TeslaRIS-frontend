@@ -184,5 +184,7 @@ export default {
     fileLabel: "Fajl",
     resourceTypeLabel: "Tip resursa",
     licenseLabel: "Licenca",
-    noFilesUploadedMessage: "Nisu priloženi fajlovi."
+    noFilesUploadedMessage: "Nisu priloženi fajlovi.",
+    proofsLabel: "Dokazi",
+    fileItemsLabel: "Fajlovi"
 }

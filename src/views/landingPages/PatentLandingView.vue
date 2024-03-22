@@ -98,10 +98,16 @@
         <person-document-contribution-list :contribution-list="patent?.contributions"></person-document-contribution-list>
 
         <v-row>
-            <attachment-list :attachments="patent?.fileItems ? patent.fileItems : []"></attachment-list>
+            <h2>{{ $t("proofsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="patent?.fileItems ? patent.fileItems : []"></attachment-list>
+            </v-col>
         </v-row>
         <v-row>
-            <attachment-list :attachments="patent?.proofs ? patent.proofs : []"></attachment-list>
+            <h2>{{ $t("fileItemsLabel") }}</h2>
+            <v-col cols="12">
+                <attachment-list :attachments="patent?.proofs ? patent.proofs : []" is-proof></attachment-list>
+            </v-col>
         </v-row>
     </v-container>
 </template>

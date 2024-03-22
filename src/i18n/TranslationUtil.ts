@@ -50,7 +50,7 @@ export const toMultilingualTextInput = (multilingualContentArray: MultilingualCo
     const mappedFilteredLanguages = filteredLanguages.map(language => ({ title: language.languageCode, value: language.id }));
 
     multilingualContentArray.forEach(mc => {
-        presetInput.push({language: {title: mc.languageTag, value: mc.languageTagId}, text: mc.content, supportedLanguages: mappedFilteredLanguages});
+        presetInput.push({language: {title: mc.languageTag, value: mc.languageTagId}, text: mc.content, supportedLanguages: [...mappedFilteredLanguages]});
     });
 
     return presetInput;

@@ -205,7 +205,9 @@
                                 {{ employment.dateFrom ? `${employment.dateFrom} - ${employment.dateTo ? employment.dateTo : $t("presentLabel")}` : $t("currentLabel") }} 
                             </h4>
                             <p>{{ returnCurrentLocaleContent(employment.role as MultilingualContent[]) }}</p>       
-                            <attachment-list :attachments="employment.proofs ? employment.proofs : []" is-proof @create="addInvolvementProof($event, employment)" @delete="deleteInvolvementProof(employment, $event)"></attachment-list>
+                            <attachment-list
+                                :attachments="employment.proofs ? employment.proofs : []" is-proof @create="addInvolvementProof($event, employment)" @delete="deleteInvolvementProof(employment, $event)"
+                                @update="updateInvolvementProof(employment, $event)"></attachment-list>
                         </div>
                         <div v-if="education.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
@@ -223,7 +225,9 @@
                             <p v-if="educationStep.thesisTitle">
                                 {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent(educationStep.thesisTitle as MultilingualContent[]) }}
                             </p>       
-                            <attachment-list :attachments="educationStep.proofs ? educationStep.proofs : []" is-proof @create="addInvolvementProof($event, educationStep)" @delete="deleteInvolvementProof(educationStep, $event)"></attachment-list>
+                            <attachment-list
+                                :attachments="educationStep.proofs ? educationStep.proofs : []" is-proof @create="addInvolvementProof($event, educationStep)" @delete="deleteInvolvementProof(educationStep, $event)"
+                                @update="updateInvolvementProof(educationStep, $event)"></attachment-list>
                         </div>
                         <div v-if="memberships.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
@@ -239,7 +243,9 @@
                                 {{ membership.dateFrom }} - {{ membership.dateTo ? membership.dateTo : $t("presentLabel") }} 
                             </h4>
                             <p>{{ returnCurrentLocaleContent(membership.contributionDescription as MultilingualContent[]) }}</p>    
-                            <attachment-list :attachments="membership.proofs ? membership.proofs : []" is-proof @create="addInvolvementProof($event, membership)" @delete="deleteInvolvementProof(membership, $event)"></attachment-list>
+                            <attachment-list
+                                :attachments="membership.proofs ? membership.proofs : []" is-proof @create="addInvolvementProof($event, membership)" @delete="deleteInvolvementProof(membership, $event)"
+                                @update="updateInvolvementProof(membership, $event)"></attachment-list>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -402,6 +408,15 @@ export default defineComponent({
             }));
         };
 
+        const updateInvolvementProof = (involvement: Membership | Education | Employment, proof: DocumentFile) => {
+            DocumentFileService.updateInvolvementProof(proof, proof.id, involvement.id as number, person.value?.id as number).then((response) => {
+                if (involvement.proofs) {
+                    involvement.proofs = involvement.proofs.filter(proof => proof.id !== proof.id);
+                }
+                involvement.proofs?.push(response.data);
+            });
+        };
+
         const deleteInvolvementProof = (involvement: Membership | Education | Employment, proofId: number) => {
             DocumentFileService.deleteInvolvementProof(proofId, involvement.id as number, person.value?.id as number).then(() => {
                 if (involvement.proofs) {
@@ -423,7 +438,7 @@ export default defineComponent({
             searchKeyword,
             returnCurrentLocaleContent,
             employments, education, memberships,
-            addInvolvementProof, deleteInvolvementProof
+            addInvolvementProof, deleteInvolvementProof, updateInvolvementProof
         };
 }})
 
