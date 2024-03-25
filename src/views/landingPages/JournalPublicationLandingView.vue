@@ -130,13 +130,17 @@
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
             <v-col cols="12">
-                <attachment-list :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []"></attachment-list>
+                <attachment-list
+                    :attachments="journalPublication?.proofs ? journalPublication.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, journalPublication)"
+                    @delete="deleteAttachment($event, true, journalPublication)" @update="updateAttachment($event, true, journalPublication)"></attachment-list>
             </v-col>
         </v-row>
         <v-row>
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <v-col cols="12">
-                <attachment-list :attachments="journalPublication?.proofs ? journalPublication.proofs : []" is-proof></attachment-list>
+                <attachment-list
+                    :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, journalPublication)" @delete="deleteAttachment($event, false, journalPublication)"
+                    @update="updateAttachment($event, false, journalPublication)"></attachment-list>
             </v-col>
         </v-row>
     </v-container>
@@ -160,6 +164,8 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
+import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
+
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
@@ -167,6 +173,8 @@ export default defineComponent({
     setup() {
         const currentRoute = useRoute();
         const router = useRouter();
+
+        const canEdit = ref(false);
 
         const journalPublication = ref<JournalPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
@@ -181,6 +189,10 @@ export default defineComponent({
         const icon = ref("mdi-newspaper-variant")
 
         onMounted(() => {
+            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 journalPublication.value = response.data;
 
@@ -224,7 +236,8 @@ export default defineComponent({
             totalPublications,
             returnCurrentLocaleContent,
             languageTagMap, keywords,
-            searchKeyword, goToURL
+            searchKeyword, goToURL, canEdit,
+            addAttachment, deleteAttachment, updateAttachment
         };
 }})
 

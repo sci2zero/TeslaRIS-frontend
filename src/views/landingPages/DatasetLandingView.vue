@@ -100,13 +100,17 @@
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
             <v-col cols="12">
-                <attachment-list :attachments="dataset?.fileItems ? dataset.fileItems : []"></attachment-list>
+                <attachment-list
+                    :attachments="dataset?.proofs ? dataset.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, dataset)"
+                    @delete="deleteAttachment($event, true, dataset)" @update="updateAttachment($event, true, dataset)"></attachment-list>
             </v-col>
         </v-row>
         <v-row>
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <v-col cols="12">
-                <attachment-list :attachments="dataset?.proofs ? dataset.proofs : []" is-proof></attachment-list>
+                <attachment-list
+                    :attachments="dataset?.fileItems ? dataset.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, dataset)" @delete="deleteAttachment($event, false, dataset)"
+                    @update="updateAttachment($event, false, dataset)"></attachment-list>
             </v-col>
         </v-row>
     </v-container>
@@ -129,6 +133,7 @@ import PersonDocumentContributionList from '@/components/core/PersonDocumentCont
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
+import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 
 
 export default defineComponent({
@@ -146,11 +151,17 @@ export default defineComponent({
         const totalPublications = ref<number>(0);
         const keywords = ref();
 
+        const canEdit = ref(false);
+
         const i18n = useI18n();
 
         const icon = ref("mdi-database")
 
         onMounted(() => {
+            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
                 dataset.value = response.data;
 
@@ -194,7 +205,8 @@ export default defineComponent({
             totalPublications, publisher,
             returnCurrentLocaleContent,
             languageTagMap, keywords,
-            searchKeyword, goToURL
+            searchKeyword, goToURL, canEdit,
+            addAttachment, updateAttachment, deleteAttachment
         };
 }})
 

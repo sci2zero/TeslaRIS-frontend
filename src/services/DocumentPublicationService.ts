@@ -79,6 +79,10 @@ export class DocumentPublicationService extends BaseService {
   async deleteDocumentPublication(documentPublicationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `document/${documentPublicationId}`);
   }
+
+  async canEdit(publicationId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `document/${publicationId}/can-edit`);
+  }
 }
 
 export default new DocumentPublicationService();

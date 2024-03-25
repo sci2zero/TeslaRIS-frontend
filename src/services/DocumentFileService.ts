@@ -30,8 +30,28 @@ export class DocumentFileService extends BaseService {
         return super.sendMultipartFormDataRequest(axios.patch, `involvement/${involvementId}/${personId}/${proofId}`, proof, DocumentFileService.idempotencyKey);
     }
 
-    async deleteInvolvementProof(proofId: any, involvementId: number, personId: number): Promise<void> {
+    async deleteInvolvementProof(proofId: number, involvementId: number, personId: number): Promise<void> {
         return super.sendRequest(axios.delete, `involvement/${involvementId}/${personId}/${proofId}`);
+    }
+
+    async addDocumentFileAttachment(attachment: any, publicationId: number, isProof: boolean): Promise<AxiosResponse<DocumentFileResponse>> {
+        attachment.license = getNameFromOrdinal(License, attachment.license);
+        attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
+        return super.sendMultipartFormDataRequest(axios.patch, `document/${publicationId}?isProof=${isProof}`, attachment, DocumentFileService.idempotencyKey);
+    }
+
+    async updateDocumentFileAttachment(attachment: any): Promise<AxiosResponse<DocumentFileResponse>> {
+        if (typeof attachment.license === "number") {
+            attachment.license = getNameFromOrdinal(License, attachment.license);
+        }
+        if (typeof attachment.resourceType === "number") {
+            attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
+        }
+        return super.sendMultipartFormDataRequest(axios.patch, "document-file", attachment);
+    }
+
+    async deleteDocumentFileAttachment(publicationId: number, documentFileId: number): Promise<void> {
+        return super.sendRequest(axios.delete, `document/${publicationId}/${documentFileId}`);
     }
 }
 

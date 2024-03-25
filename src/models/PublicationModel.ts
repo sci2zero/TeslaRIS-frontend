@@ -56,8 +56,8 @@ export interface Document {
     doi?: string;
     scopusId?: string;
     eventId?: number;
-    fileItems: DocumentFileResponse[];
-    proofs: DocumentFileResponse[];
+    fileItems: DocumentFileResponse[] | undefined;
+    proofs: DocumentFileResponse[] | undefined;
 }
 
 export interface JournalPublication extends Document {

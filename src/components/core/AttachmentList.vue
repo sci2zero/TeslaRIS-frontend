@@ -1,7 +1,7 @@
 <template>
     <v-card class="pa-3" variant="flat" color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-            <document-file-submission-modal :is-proof="isProof" @create="sendDataToParent"></document-file-submission-modal>
+            <document-file-submission-modal v-if="canEdit" :is-proof="isProof" @create="sendDataToParent"></document-file-submission-modal>
 
             <v-row>
                 <v-list
@@ -23,9 +23,13 @@
                             {{ attachment.fileName }} ({{ attachment.sizeInMb }}MB)
                         </v-list-item-title>
 
+                        <v-list-item-subtitle>
+                            {{ returnCurrentLocaleContent(attachment.description) }}
+                        </v-list-item-subtitle>
+
 
                         <template #append>
-                            <v-row>
+                            <v-row v-if="canEdit">
                                 <v-col>
                                     <v-btn
                                         icon variant="outlined" size="x-small" color="primary"
@@ -53,6 +57,7 @@ import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileMo
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
 import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
+import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 
 
 export default defineComponent({
@@ -64,6 +69,10 @@ export default defineComponent({
             required: true
         },
         isProof: {
+            type: Boolean,
+            default: false
+        },
+        canEdit: {
             type: Boolean,
             default: false
         }
@@ -87,7 +96,7 @@ export default defineComponent({
             emit("delete", attachmentId);
         };
 
-        return {download, sendDataToParent, sendDeleteRequestToParent, sendUpdateRequestToParent};
+        return {download, sendDataToParent, sendDeleteRequestToParent, sendUpdateRequestToParent, returnCurrentLocaleContent};
     }
 });
 </script>

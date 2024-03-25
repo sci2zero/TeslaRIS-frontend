@@ -100,13 +100,17 @@
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
             <v-col cols="12">
-                <attachment-list :attachments="patent?.fileItems ? patent.fileItems : []"></attachment-list>
+                <attachment-list
+                    :attachments="patent?.proofs ? patent.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, patent)"
+                    @delete="deleteAttachment($event, true, patent)" @update="updateAttachment($event, true, patent)"></attachment-list>
             </v-col>
         </v-row>
         <v-row>
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <v-col cols="12">
-                <attachment-list :attachments="patent?.proofs ? patent.proofs : []" is-proof></attachment-list>
+                <attachment-list
+                    :attachments="patent?.fileItems ? patent.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, patent)" @delete="deleteAttachment($event, false, patent)"
+                    @update="updateAttachment($event, false, patent)"></attachment-list>
             </v-col>
         </v-row>
     </v-container>
@@ -129,6 +133,7 @@ import PersonDocumentContributionList from '@/components/core/PersonDocumentCont
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
+import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 
 
 export default defineComponent({
@@ -146,11 +151,17 @@ export default defineComponent({
         const totalPublications = ref<number>(0);
         const keywords = ref();
 
+        const canEdit = ref(false);
+
         const i18n = useI18n();
 
         const icon = ref("mdi-seal-variant")
 
         onMounted(() => {
+            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.id as string)).then((response) => {
                 patent.value = response.data;
 
@@ -194,7 +205,8 @@ export default defineComponent({
             totalPublications, publisher,
             returnCurrentLocaleContent,
             languageTagMap, keywords,
-            searchKeyword, goToURL
+            searchKeyword, goToURL, canEdit,
+            addAttachment, updateAttachment, deleteAttachment
         };
 }})
 

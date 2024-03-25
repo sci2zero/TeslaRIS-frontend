@@ -150,7 +150,7 @@
                             <p>{{ returnCurrentLocaleContent(expertise.description) }}</p>
                             
                             <br />
-                            <attachment-list :attachments="expertise.documentFiles"></attachment-list>
+                            <attachment-list :attachments="expertise.documentFiles" :can-edit="canEdit"></attachment-list>
                             <v-divider v-if="index < (person?.expertisesOrSkills ? person?.expertisesOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
@@ -171,7 +171,7 @@
                             <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
                             
                             <br />
-                            <attachment-list :attachments="prize.proofs"></attachment-list>
+                            <attachment-list :attachments="prize.proofs" :can-edit="canEdit"></attachment-list>
                             <v-divider v-if="index < (person?.prizes ? person?.prizes.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
@@ -206,8 +206,8 @@
                             </h4>
                             <p>{{ returnCurrentLocaleContent(employment.role as MultilingualContent[]) }}</p>       
                             <attachment-list
-                                :attachments="employment.proofs ? employment.proofs : []" is-proof @create="addInvolvementProof($event, employment)" @delete="deleteInvolvementProof(employment, $event)"
-                                @update="updateInvolvementProof(employment, $event)"></attachment-list>
+                                :attachments="employment.proofs ? employment.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, employment)"
+                                @delete="deleteInvolvementProof(employment, $event)" @update="updateInvolvementProof(employment, $event)"></attachment-list>
                         </div>
                         <div v-if="education.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
@@ -226,8 +226,8 @@
                                 {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent(educationStep.thesisTitle as MultilingualContent[]) }}
                             </p>       
                             <attachment-list
-                                :attachments="educationStep.proofs ? educationStep.proofs : []" is-proof @create="addInvolvementProof($event, educationStep)" @delete="deleteInvolvementProof(educationStep, $event)"
-                                @update="updateInvolvementProof(educationStep, $event)"></attachment-list>
+                                :attachments="educationStep.proofs ? educationStep.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, educationStep)"
+                                @delete="deleteInvolvementProof(educationStep, $event)" @update="updateInvolvementProof(educationStep, $event)"></attachment-list>
                         </div>
                         <div v-if="memberships.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
@@ -244,8 +244,8 @@
                             </h4>
                             <p>{{ returnCurrentLocaleContent(membership.contributionDescription as MultilingualContent[]) }}</p>    
                             <attachment-list
-                                :attachments="membership.proofs ? membership.proofs : []" is-proof @create="addInvolvementProof($event, membership)" @delete="deleteInvolvementProof(membership, $event)"
-                                @update="updateInvolvementProof(membership, $event)"></attachment-list>
+                                :attachments="membership.proofs ? membership.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, membership)"
+                                @delete="deleteInvolvementProof(membership, $event)" @update="updateInvolvementProof(membership, $event)"></attachment-list>
                         </div>
                     </v-card-text>
                 </v-card>
@@ -310,7 +310,13 @@ export default defineComponent({
         const education = ref<Education[]>([]);
         const memberships = ref<Membership[]>([]);
 
+        const canEdit = ref(false);
+
         onMounted(() => {
+            PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
                 person.value = response.data;
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
@@ -438,7 +444,8 @@ export default defineComponent({
             searchKeyword,
             returnCurrentLocaleContent,
             employments, education, memberships,
-            addInvolvementProof, deleteInvolvementProof, updateInvolvementProof
+            addInvolvementProof, deleteInvolvementProof, updateInvolvementProof,
+            canEdit
         };
 }})
 

@@ -29,6 +29,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, `person/${personId}`);
   }
 
+  async canEdit(personId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `person/${personId}/can-edit`);
+  }
+
   async getPersonWithUser(personId: number): Promise<AxiosResponse<PersonUserResponse>> {
     return super.sendRequest(axios.get, `person/${personId}/person-user`);
   }
