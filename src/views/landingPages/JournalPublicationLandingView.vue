@@ -72,7 +72,9 @@
                                     {{ $t("conferenceLabel") }}:
                                 </div>
                                 <div v-if="journalPublication?.eventId" class="response">
-                                    {{ returnCurrentLocaleContent(event?.name) }}
+                                    <localized-link :to="'events/conference/' + journalPublication?.eventId">
+                                        {{ returnCurrentLocaleContent(event?.name) }}
+                                    </localized-link>
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -165,11 +167,12 @@ import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection },
+    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink },
     setup() {
         const currentRoute = useRoute();
         const router = useRouter();
@@ -223,7 +226,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications" }});
         };
 
         const goToURL = (uri: string) => {

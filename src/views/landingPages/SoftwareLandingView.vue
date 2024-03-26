@@ -54,7 +54,9 @@
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="software?.publisherId" class="response">
-                                    {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    <localized-link :to="'publishers/' + software?.publisherId">
+                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -134,11 +136,13 @@ import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import KeywordList from '@/components/core/KeywordList.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection },
+    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList },
     setup() {
         const currentRoute = useRoute();
         const router = useRouter();
@@ -192,7 +196,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications" }});
         };
 
         const goToURL = (uri: string) => {

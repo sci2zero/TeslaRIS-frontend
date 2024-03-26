@@ -57,13 +57,16 @@ import PersonService from "@/services/PersonService";
 import type { PersonIndex } from "@/models/PersonModel";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { onMounted } from "vue";
+
 
 export default defineComponent({
     name: "AdvancedSearchVuew",
     components: {SearchBarComponent, OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent},
     setup() {
         const route = useRoute();
+        const router = useRouter();
         const currentTab = ref("persons");
 
         const searchParams = ref(route.query.searchQuery as string);
@@ -83,9 +86,14 @@ export default defineComponent({
         const sortOU = ref("");
         const sortPublication = ref("");
         const direction = ref("");
+
+        onMounted(() => {
+            currentTab.value = route.query.tab as string
+        });
     
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
+            router.push({name:"advancedSearch", query: { searchQuery: tokenParams.split("=")[1], tab: currentTab.value }})
             switch(currentTab.value) {
                 case "persons":
                     PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`).then((response) => {

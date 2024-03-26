@@ -277,11 +277,12 @@ import AttachmentList from '@/components/core/AttachmentList.vue';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
+import KeywordList from '@/components/core/KeywordList.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList },
+    components: { PublicationTableComponent, AttachmentList, KeywordList },
     setup() {
         const router = useRouter();
         const currentRoute = useRoute();
@@ -405,7 +406,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons" }});
         };
 
         const addInvolvementProof = (proof: DocumentFile, involvement: Membership | Education | Employment) => {

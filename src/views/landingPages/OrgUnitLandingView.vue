@@ -184,7 +184,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }})        
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }});
         };
 
         return {
