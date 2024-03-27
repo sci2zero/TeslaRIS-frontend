@@ -150,12 +150,16 @@
                             <p>{{ returnCurrentLocaleContent(expertise.description) }}</p>
                             
                             <br />
-                            <attachment-list :attachments="expertise.documentFiles" :can-edit="canEdit"></attachment-list>
+                            <attachment-list
+                                :attachments="expertise.proofs" :can-edit="canEdit" is-proof @create="addExpertiseOrSkillProof($event, expertise)"
+                                @delete="deleteExpertiseOrSkillProof(expertise, $event)" @update="updateExpertiseOrSkillProof(expertise, $event)"></attachment-list>
                             <v-divider v-if="index < (person?.expertisesOrSkills ? person?.expertisesOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
                 </v-card>
                 <br />
+
+                <!-- Prizes -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div class="edit-pen">
@@ -171,7 +175,9 @@
                             <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
                             
                             <br />
-                            <attachment-list :attachments="prize.proofs" :can-edit="canEdit"></attachment-list>
+                            <attachment-list
+                                :attachments="prize.proofs" :can-edit="canEdit" is-proof @create="addPrizeProof($event, prize)"
+                                @update="updatePrizeProof(prize, $event)" @delete="deletePrizeProof(prize, $event)"></attachment-list>
                             <v-divider v-if="index < (person?.prizes ? person?.prizes.length : 1) - 1 " class="mt-10"></v-divider>
                         </div>
                     </v-card-text>
@@ -266,7 +272,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PersonResponse } from '@/models/PersonModel';
+import type { PersonResponse, ExpertiseOrSkillResponse, PrizeResponse } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -320,6 +326,7 @@ export default defineComponent({
 
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
                 person.value = response.data;
+                console.log(person.value)
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;
                 } else {
@@ -418,7 +425,7 @@ export default defineComponent({
         const updateInvolvementProof = (involvement: Membership | Education | Employment, proof: DocumentFile) => {
             DocumentFileService.updateInvolvementProof(proof, proof.id, involvement.id as number, person.value?.id as number).then((response) => {
                 if (involvement.proofs) {
-                    involvement.proofs = involvement.proofs.filter(proof => proof.id !== proof.id);
+                    involvement.proofs = involvement.proofs.filter(proof => proof.id !== response.data.id);
                 }
                 involvement.proofs?.push(response.data);
             });
@@ -428,6 +435,52 @@ export default defineComponent({
             DocumentFileService.deleteInvolvementProof(proofId, involvement.id as number, person.value?.id as number).then(() => {
                 if (involvement.proofs) {
                     involvement.proofs = involvement.proofs.filter(proof => proof.id !== proofId);
+                }
+            });
+        };
+
+        const addExpertiseOrSkillProof = (proof: DocumentFile, expertiseOrSkill: ExpertiseOrSkillResponse) => {
+            DocumentFileService.addExpertiseOrSkillProof(proof, expertiseOrSkill.id as number, person.value?.id as number).then((response => {
+                expertiseOrSkill.proofs?.push(response.data);
+            }));
+        };
+
+        const updateExpertiseOrSkillProof = (expertiseOrSkill: ExpertiseOrSkillResponse, proof: DocumentFile) => {
+            DocumentFileService.updateExpertiseOrSkillProof(proof, person.value?.id as number).then((response) => {
+                if (expertiseOrSkill.proofs) {
+                    expertiseOrSkill.proofs = expertiseOrSkill.proofs.filter(proof => proof.id !== response.data.id);
+                }
+                expertiseOrSkill.proofs?.push(response.data);
+            });
+        };
+
+        const deleteExpertiseOrSkillProof = (expertiseOrSkill: ExpertiseOrSkillResponse, proofId: number) => {
+            DocumentFileService.deleteExpertiseOrSkillProof(proofId, expertiseOrSkill.id as number, person.value?.id as number).then(() => {
+                if (expertiseOrSkill.proofs) {
+                    expertiseOrSkill.proofs = expertiseOrSkill.proofs.filter(proof => proof.id !== proofId);
+                }
+            });
+        };
+
+        const addPrizeProof = (proof: DocumentFile, prize: PrizeResponse) => {
+            DocumentFileService.addPrizeProof(proof, prize.id as number, person.value?.id as number).then((response => {
+                prize.proofs?.push(response.data);
+            }));
+        };
+
+        const updatePrizeProof = (prize: PrizeResponse, proof: DocumentFile) => {
+            DocumentFileService.updatePrizeProof(proof, person.value?.id as number).then((response) => {
+                if (prize.proofs) {
+                    prize.proofs = prize.proofs.filter(proof => proof.id !== response.data.id);
+                }
+                prize.proofs?.push(response.data);
+            });
+        };
+
+        const deletePrizeProof = (prize: PrizeResponse, proofId: number) => {
+            DocumentFileService.deletePrizeProof(proofId, prize.id as number, person.value?.id as number).then(() => {
+                if (prize.proofs) {
+                    prize.proofs = prize.proofs.filter(proof => proof.id !== proofId);
                 }
             });
         };
@@ -443,10 +496,11 @@ export default defineComponent({
             totalPublications,
             switchPage,
             searchKeyword,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, canEdit,
             employments, education, memberships,
             addInvolvementProof, deleteInvolvementProof, updateInvolvementProof,
-            canEdit
+            addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
+            addPrizeProof, updatePrizeProof, deletePrizeProof
         };
 }})
 

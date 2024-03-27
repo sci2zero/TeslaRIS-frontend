@@ -125,13 +125,15 @@ export interface PersonalInfo {
     scopusAuthorId?: string;
 }
 
-interface ExpertiseOrSkillResponse {
+export interface ExpertiseOrSkillResponse {
+    id: number;
     name: MultilingualContent[];
     description: MultilingualContent[];
-    documentFiles: DocumentFileResponse[];
+    proofs: DocumentFileResponse[];
 }
 
-interface PrizeResponse {
+export interface PrizeResponse {
+    id: number;
     title: MultilingualContent[];
     description: MultilingualContent[];
     proofs: DocumentFileResponse[];

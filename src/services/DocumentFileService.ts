@@ -53,6 +53,46 @@ export class DocumentFileService extends BaseService {
     async deleteDocumentFileAttachment(publicationId: number, documentFileId: number): Promise<void> {
         return super.sendRequest(axios.delete, `document/${publicationId}/${documentFileId}`);
     }
+
+    async addExpertiseOrSkillProof(proof: any, expertiseOrSkillId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        proof.license = getNameFromOrdinal(License, proof.license);
+        proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        return super.sendMultipartFormDataRequest(axios.patch, `expertise-or-skill/${personId}/${expertiseOrSkillId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
+    async updateExpertiseOrSkillProof(proof: any, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        if (typeof proof.license === "number") {
+            proof.license = getNameFromOrdinal(License, proof.license);
+        }
+        if (typeof proof.resourceType === "number") {
+            proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        }
+        return super.sendMultipartFormDataRequest(axios.patch, `expertise-or-skill/${personId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
+    async deleteExpertiseOrSkillProof(proofId: number, expertiseOrSkillId: number, personId: number): Promise<void> {
+        return super.sendRequest(axios.delete, `expertise-or-skill/${personId}/${expertiseOrSkillId}/${proofId}`);
+    }
+
+    async addPrizeProof(proof: any, prizeId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        proof.license = getNameFromOrdinal(License, proof.license);
+        proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        return super.sendMultipartFormDataRequest(axios.patch, `prize/${personId}/${prizeId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
+    async updatePrizeProof(proof: any, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        if (typeof proof.license === "number") {
+            proof.license = getNameFromOrdinal(License, proof.license);
+        }
+        if (typeof proof.resourceType === "number") {
+            proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        }
+        return super.sendMultipartFormDataRequest(axios.patch, `prize/${personId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
+    async deletePrizeProof(proofId: number, prizeId: number, personId: number): Promise<void> {
+        return super.sendRequest(axios.delete, `prize/${personId}/${prizeId}/${proofId}`);
+    }
 }
 
 export default new DocumentFileService();
