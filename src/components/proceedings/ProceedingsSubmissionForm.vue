@@ -197,7 +197,7 @@ export default defineComponent({
                     }
                 })
             });
-        })
+        });
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
@@ -273,7 +273,7 @@ export default defineComponent({
             } else {
                 publicationSeriesExternalValidation.value = { passed: true, message: "" };
             }
-        }
+        };
 
         watch([selectedJournal, selectedBookSeries], () => {
             validatePublicationSeriesSelection();
@@ -308,6 +308,8 @@ export default defineComponent({
                 publicationSeriesVolume: publicationSeriesVolume.value,
                 publisherId: selectedPublisher.value?.value !== -1 ? selectedPublisher.value?.value : undefined,
                 scopusId: scopus.value,
+                fileItems: [],
+                proofs: []
             };
 
             ProceedingsService.createProceedings(newProceedings).then((response) => {
@@ -335,7 +337,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "scientificResults" });
+                    router.push({ name: "proceedingsLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;

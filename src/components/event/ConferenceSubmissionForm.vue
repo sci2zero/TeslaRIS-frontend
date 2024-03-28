@@ -238,8 +238,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    // TODO: this should redirect to conference landing page
-                    router.push({ name: "events" });
+                    router.push({ name: "conferenceLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;

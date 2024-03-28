@@ -154,7 +154,7 @@ export default defineComponent({
                             error.value = false;
                             snackbar.value = true;
                         } else {
-                            router.push({ name: "journals" });
+                            router.push({ name: "journalLandingPage", params: {id: response.data.id} });
                         }
                     }).catch(() => {
                         error.value = true;
@@ -178,7 +178,7 @@ export default defineComponent({
                             error.value = false;
                             snackbar.value = true;
                         } else {
-                            router.push({ name: "bookSeries" });
+                            router.push({ name: "bookSeriesLandingPage", params: {id: response.data.id} });
                         }
                     }).catch(() => {
                         error.value = true;

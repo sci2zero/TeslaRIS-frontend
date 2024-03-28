@@ -24,7 +24,7 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
   }
 
-  async createOrganisationUnit(body: OrganisationUnitRequest): Promise<AxiosResponse<OrganisationUnitRequest>> {
+  async createOrganisationUnit(body: OrganisationUnitRequest): Promise<AxiosResponse<OrganisationUnitResponse>> {
     return super.sendRequest(axios.post, "organisation-unit", body, OrganisationUnitService.idempotencyKey);
   }
 

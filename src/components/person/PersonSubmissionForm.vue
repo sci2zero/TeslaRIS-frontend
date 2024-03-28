@@ -287,7 +287,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "persons" });
+                    router.push({ name: "researcherLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;

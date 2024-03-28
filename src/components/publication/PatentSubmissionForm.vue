@@ -160,10 +160,12 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value
+                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                fileItems: [],
+                proofs: []
             };
 
-            DocumentPublicationService.createPatent(newPatent).then(() => {
+            DocumentPublicationService.createPatent(newPatent).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -181,7 +183,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "scientificResults" });
+                    router.push({ name: "patentLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;

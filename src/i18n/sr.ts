@@ -147,6 +147,7 @@ export default {
     bookSeriesListLabel: "Serije knjiga",
     bookSeriesLabel: "Serija knjiga",
     addBookSeriesLabel: "Dodaj seriju knjiga",
+    proceedingsPublicationLabel: "Rad u zborniku radova / Rad sa konferencije",
     addProceedingsPublicationLabel: "Dodaj rad u zborniku radova",
     selectConferenceMessage: "Izaberite konferenciju da bi ste mogli izabrati ovo.",
     selectOnePublicationSeriesMessage: "Možete selektovati samo jedan tip serije publikacija.",

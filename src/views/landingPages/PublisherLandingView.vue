@@ -97,7 +97,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-newspaper-variant-multiple-outline")
+        const icon = ref("mdi-account-group");
 
         onMounted(() => {
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {

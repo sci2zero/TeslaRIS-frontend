@@ -147,6 +147,7 @@ export default {
     bookSeriesListLabel: "Book Series",
     bookSeriesLabel: "Book Series",
     addBookSeriesLabel: "Add Book Series",
+    proceedingsPublicationLabel: "Proceedings Publication",
     addProceedingsPublicationLabel: "Add Proceedings Publication",
     selectConferenceMessage: "Select Conference in order to select this.",
     selectOnePublicationSeriesMessage: "You can only select one type of publication series.",

@@ -39,6 +39,8 @@ import JournalPublicationLandingView from "@/views/landingPages/JournalPublicati
 import SoftwareLandingView from "@/views/landingPages/SoftwareLandingView.vue";
 import DatasetLandingView from "@/views/landingPages/DatasetLandingView.vue";
 import PatentLandingView from "@/views/landingPages/PatentLandingView.vue";
+import ProceedingsPublicationsLandingView from "@/views/landingPages/ProceedingsPublicationsLandingView.vue";
+import ProceedingsLandingView from "@/views/landingPages/ProceedingsLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -353,6 +355,15 @@ const router = createRouter({
                             },
                         },
                         {
+                            path: "proceedings-publication/:id",
+                            name: "proceedingsPublicationLandingPage",
+                            component: ProceedingsPublicationsLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
                             path: "software/:id",
                             name: "softwareLandingPage",
                             component: SoftwareLandingView,
@@ -389,6 +400,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "proceedings/:id",
+                    name: "proceedingsLandingPage",
+                    component: ProceedingsLandingView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
                     },
                 },
                 {

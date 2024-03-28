@@ -20,6 +20,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `journal-publication/${journalPublicationId}`);
   }
 
+  async readProceedingsPublication(proceedingsPublicationId: number): Promise<AxiosResponse<ProceedingsPublication>> {
+    return super.sendRequest(axios.get, `proceedings-publication/${proceedingsPublicationId}`);
+  }
+
   async readSoftware(softwareId: number): Promise<AxiosResponse<Software>> {
     return super.sendRequest(axios.get, `software/${softwareId}`);
   }
@@ -44,23 +48,23 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/for-publisher/${publisherId}?${pageable}`);
   }
 
-  async createJournalPublication(body: JournalPublication): Promise<AxiosResponse<void>> {
+  async createJournalPublication(body: JournalPublication): Promise<AxiosResponse<JournalPublication>> {
     return super.sendRequest(axios.post, "journal-publication", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createJProceedingsPublication(body: ProceedingsPublication): Promise<AxiosResponse<void>> {
+  async createJProceedingsPublication(body: ProceedingsPublication): Promise<AxiosResponse<ProceedingsPublication>> {
     return super.sendRequest(axios.post, "proceedings-publication", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createPatent(body: Patent): Promise<AxiosResponse<void>> {
+  async createPatent(body: Patent): Promise<AxiosResponse<Patent>> {
     return super.sendRequest(axios.post, "patent", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createSoftware(body: Software): Promise<AxiosResponse<void>> {
+  async createSoftware(body: Software): Promise<AxiosResponse<Software>> {
     return super.sendRequest(axios.post, "software", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createDataset(body: Dataset): Promise<AxiosResponse<void>> {
+  async createDataset(body: Dataset): Promise<AxiosResponse<Dataset>> {
     return super.sendRequest(axios.post, "dataset", body, DocumentPublicationService.idempotencyKey);
   }
 

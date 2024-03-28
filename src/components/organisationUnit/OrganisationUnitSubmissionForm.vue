@@ -129,7 +129,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "organisationUnits" });
+                    router.push({ name: "organisationUnitLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;

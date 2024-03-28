@@ -146,7 +146,7 @@ export default defineComponent({
                 error.value = false;
                 snackbar.value = true;
             } else {
-                router.push({ name: "publishers" });
+                router.push({ name: "publisherLandingPage", params: {id: response.data.id} });
             }
             }).catch(() => {
                 error.value = true;

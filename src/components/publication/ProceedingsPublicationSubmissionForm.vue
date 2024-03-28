@@ -142,9 +142,8 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { ProceedingsPublicationType } from "@/models/PublicationModel";
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
-import type { DocumentPublicationIndex } from "@/models/PublicationModel";
+import type { DocumentPublicationIndex, ProceedingsPublicationType } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
@@ -154,6 +153,7 @@ import ProceedingsService from '@/services/ProceedingsService';
 import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModal.vue';
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
 
 
 export default defineComponent({
@@ -206,28 +206,6 @@ export default defineComponent({
 
         const i18n = useI18n();
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
-
-        const proceedingsPublicationTypeEn = [
-            { title: "Regular Full Article", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
-            { title: "Invited Full Article", value: ProceedingsPublicationType.INVITED_FULL_ARTICLE },
-            { title: "Invited Abstract Article", value: ProceedingsPublicationType.INVITED_ABSTRACT_ARTICLE },
-            { title: "Regular Abstract Article", value: ProceedingsPublicationType.REGULAR_ABSTRACT_ARTICLE },
-            { title: "Preface", value: ProceedingsPublicationType.PREFACE },
-            { title: "Lexicographic Unit", value: ProceedingsPublicationType.LEXICOGRAPHIC_UNIT },
-            { title: "Polemics", value: ProceedingsPublicationType.POLEMICS },
-            { title: "Scientific Critic", value: ProceedingsPublicationType.SCIENTIFIC_CRITIC },
-        ];
-
-        const proceedingsPublicationTypeSr = [
-            { title: "Saopštenje sa skupa štampano u celini", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
-            { title: "Predavanje po pozivu štampano u celini", value: ProceedingsPublicationType.INVITED_FULL_ARTICLE },
-            { title: "Predavanje po pozivu štampano u izvodu", value: ProceedingsPublicationType.INVITED_ABSTRACT_ARTICLE },
-            { title: "Saopštenje sa skupa štampano u izvodu", value: ProceedingsPublicationType.REGULAR_ABSTRACT_ARTICLE },
-            { title: "Predgovor", value: ProceedingsPublicationType.PREFACE },
-            { title: "Leksikografska jedinica", value: ProceedingsPublicationType.LEXICOGRAPHIC_UNIT },
-            { title: "Polemika", value: ProceedingsPublicationType.POLEMICS },
-            { title: "Naučna kritika", value: ProceedingsPublicationType.SCIENTIFIC_CRITIC },
-        ];
 
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
@@ -295,7 +273,10 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: contributions.value,
                 doi: doi.value,
-                scopusId: scopus.value
+                scopusId: scopus.value,
+                eventId: selectedEvent.value.value,
+                fileItems: [],
+                proofs: []
             };
 
             DocumentPublicationService.createJProceedingsPublication(newProceedingsPublication).then(() => {

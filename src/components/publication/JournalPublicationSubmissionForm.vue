@@ -264,10 +264,12 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value
+                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
+                fileItems: [],
+                proofs: []
             };
 
-            DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
+            DocumentPublicationService.createJournalPublication(newJournalPublication).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -291,7 +293,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "scientificResults" });
+                    router.push({ name: "journalPublicationLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;
