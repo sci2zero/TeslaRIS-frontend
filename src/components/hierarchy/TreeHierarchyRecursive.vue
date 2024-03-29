@@ -33,7 +33,6 @@ export default defineComponent({
 
         watch(() => props.presetResearchArea, () => {
             researchAreas.value = props.presetResearchArea;
-            console.log(researchAreas.value)
         });
 
         return {researchAreas, returnCurrentLocaleContent}

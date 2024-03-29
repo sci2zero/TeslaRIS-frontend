@@ -59,8 +59,6 @@ export default defineComponent({
                     parent.children.push(value);
                 }
             }
-
-            console.log(root)
             return root;
         };
 
