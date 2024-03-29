@@ -195,7 +195,6 @@ export default defineComponent({
 
             ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedings.value = response.data;
-                console.log(proceedings.value)
 
                 proceedings.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 

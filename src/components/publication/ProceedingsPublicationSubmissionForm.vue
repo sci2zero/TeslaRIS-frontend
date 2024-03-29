@@ -123,7 +123,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ !error ? $t("savedMessage") : errorMessage }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -154,6 +154,8 @@ import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModa
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
+import type { ErrorResponse } from '@/models/Common';
+import type { AxiosError } from 'axios';
 
 
 export default defineComponent({
@@ -205,6 +207,8 @@ export default defineComponent({
         const uris = ref<string[]>([]);
 
         const i18n = useI18n();
+        const errorMessage = ref(i18n.t("genericErrorMessage"));
+
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
@@ -304,7 +308,13 @@ export default defineComponent({
                 } else {
                     router.push({ name: "scientificResults" });
                 }
-            }).catch(() => {
+            }).catch((axiosError: AxiosError<ErrorResponse>) => {
+                const message = i18n.t(axiosError.response?.data.message as string);
+                if (message !== axiosError.response?.data.message) {
+                    errorMessage.value = message;
+                } else {
+                    errorMessage.value = i18n.t("genericErrorMessage");
+                }
                 error.value = true;
                 snackbar.value = true;
             });
@@ -327,7 +337,8 @@ export default defineComponent({
             publicationTypes, selectedpublicationType,
             contributions, contributionsRef,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
-            availableProceedings, selectedProceedings, selectNewlyAddedProceedings
+            availableProceedings, selectedProceedings, 
+            selectNewlyAddedProceedings, errorMessage
         };
     }
 });

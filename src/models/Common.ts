@@ -40,3 +40,12 @@ export enum ApproveStatus {
     APPROVED,
     DECLINED,
 }
+
+export interface ErrorResponse {
+    errors: Record<string, any>; // Dynamic keys and values
+    message: string;
+    path: string;
+    statusCode: number;
+    statusReason: string;
+    timestamp: string;
+  }

@@ -151,7 +151,6 @@ export default defineComponent({
 
         onMounted(() => {
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
-                console.log(response.data);
                 organisationUnit.value = response.data;
                 
                 fetchPublications();                
@@ -159,7 +158,6 @@ export default defineComponent({
             });
             OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
                 relationChain.value = response.data;
-                console.log(response.data)
             })
         });
 

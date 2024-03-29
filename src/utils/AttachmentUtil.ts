@@ -5,7 +5,6 @@ import DocumentFileService from "@/services/DocumentFileService";
 
 export const addAttachment = (attachment: DocumentFile, isProof: boolean, document?: Document) => {
     DocumentFileService.addDocumentFileAttachment(attachment, document?.id as number, isProof).then((response => {
-        console.log(response)
         if(isProof) {
             document?.proofs?.push(response.data);
         } else {

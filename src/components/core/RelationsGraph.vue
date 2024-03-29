@@ -44,7 +44,6 @@ export default defineComponent({
         });
     
         function createForceLayout(container: any) {
-            console.log(props.links, props.nodes)
             if(!props.nodes || !props.links || rendered.value) {
                 return;
             }

@@ -326,7 +326,6 @@ export default defineComponent({
 
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
                 person.value = response.data;
-                console.log(person.value)
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;
                 } else {

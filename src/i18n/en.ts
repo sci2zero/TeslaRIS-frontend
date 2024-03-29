@@ -187,5 +187,6 @@ export default {
     licenseLabel: "License",
     noFilesUploadedMessage: "No Files Provided.",
     proofsLabel: "Proofs",
-    fileItemsLabel: "File Items"
+    fileItemsLabel: "File Items",
+    unauthorizedPublicationEditAttemptMessage: "You can't submit or edit publications where you are not a contributor."
 }

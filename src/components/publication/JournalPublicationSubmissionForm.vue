@@ -127,7 +127,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ !error ? $t("savedMessage") : errorMessage }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -155,6 +155,8 @@ import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import type { AxiosError } from 'axios';
+import type { ErrorResponse } from '@/models/Common';
 
 
 export default defineComponent({
@@ -208,6 +210,8 @@ export default defineComponent({
         const uris = ref<string[]>([]);
 
         const i18n = useI18n();
+        const errorMessage = ref(i18n.t("genericErrorMessage"));
+
         const { requiredFieldRules } = useValidationUtils();
 
         const journalPublicationTypeEn = [
@@ -295,7 +299,13 @@ export default defineComponent({
                 } else {
                     router.push({ name: "journalPublicationLandingPage", params: {id: response.data.id} });
                 }
-            }).catch(() => {
+            }).catch((axiosError: AxiosError<ErrorResponse>) => {
+                const message = i18n.t(axiosError.response?.data.message as string);
+                if (message !== axiosError.response?.data.message) {
+                    errorMessage.value = message;
+                } else {
+                    errorMessage.value = i18n.t("genericErrorMessage");
+                }
                 error.value = true;
                 snackbar.value = true;
             });
@@ -317,7 +327,7 @@ export default defineComponent({
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType,
             contributions, contributionsRef,
-            requiredFieldRules, submitJournalPublication
+            requiredFieldRules, submitJournalPublication, errorMessage
         };
     }
 });

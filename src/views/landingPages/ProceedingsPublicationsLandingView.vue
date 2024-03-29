@@ -206,7 +206,6 @@ export default defineComponent({
 
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedingsPublication.value = response.data;
-                console.log(proceedingsPublication.value)
 
                 proceedingsPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 

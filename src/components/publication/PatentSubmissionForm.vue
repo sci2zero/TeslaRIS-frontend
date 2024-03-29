@@ -79,7 +79,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ !error ? $t("savedMessage") : errorMessage }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -102,6 +102,9 @@ import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Patent } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import type { AxiosError } from 'axios';
+import type { ErrorResponse } from '@/models/Common';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -121,6 +124,9 @@ export default defineComponent({
         const error = ref(false);
 
         const router = useRouter();
+
+        const i18n = useI18n();
+        const errorMessage = ref(i18n.t("genericErrorMessage"));
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
@@ -185,7 +191,13 @@ export default defineComponent({
                 } else {
                     router.push({ name: "patentLandingPage", params: {id: response.data.id} });
                 }
-            }).catch(() => {
+            }).catch((axiosError: AxiosError<ErrorResponse>) => {
+                const message = i18n.t(axiosError.response?.data.message as string);
+                if (message !== axiosError.response?.data.message) {
+                    errorMessage.value = message;
+                } else {
+                    errorMessage.value = i18n.t("genericErrorMessage");
+                }
                 error.value = true;
                 snackbar.value = true;
             });
@@ -204,7 +216,7 @@ export default defineComponent({
             keywords, keywordsRef,
             place, placeRef, uris, urisRef,
             contributions, contributionsRef,
-            requiredFieldRules, submitPatent
+            requiredFieldRules, submitPatent, errorMessage
         };
     }
 });

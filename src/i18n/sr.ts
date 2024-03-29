@@ -187,5 +187,6 @@ export default {
     licenseLabel: "Licenca",
     noFilesUploadedMessage: "Nisu priloženi fajlovi.",
     proofsLabel: "Dokazi",
-    fileItemsLabel: "Fajlovi"
+    fileItemsLabel: "Fajlovi",
+    unauthorizedPublicationEditAttemptMessage: "Ne možete dodati/izmeniti publikaciju u kojoj niste u listi autora."
 }

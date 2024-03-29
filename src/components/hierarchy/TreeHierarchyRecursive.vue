@@ -1,26 +1,27 @@
 <template>
     <ul v-for="(researchArea, index) in researchAreas" :key="index">
         <li class="item">
-            <h4>{{ researchArea.name[0].content }}</h4>
-            <p v-if="researchArea.description[0]">
-                {{ researchArea.description[0].content }}
+            <h4>{{ returnCurrentLocaleContent(researchArea.name) }}</h4>
+            <p>
+                {{ returnCurrentLocaleContent(researchArea.description) }}
             </p>
         </li>
 
-        <li v-if="researchArea.children.length > 0" class="container">
-            <component :is="treeHierarchyRecursive" :research-area="researchArea.children"></component>
+        <li>
+            <tree-hierarchy-recursive :preset-research-area="researchArea.children"></tree-hierarchy-recursive>
         </li>
     </ul>
 </template>
 
 
 <script lang="ts">
+import { watch } from 'vue';
 import { defineComponent, ref, type PropType } from 'vue';
+import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 
 
 export default defineComponent({
     name: "TreeHierarchyRecursive",
-    components: {TreeHierarchyRecursive : () => import('@/componens/hierarchy/TreeHierarchyRecursive.vue')},
     props: {
         presetResearchArea: {
             type: Object as PropType<any[]>,
@@ -29,9 +30,13 @@ export default defineComponent({
     },
     setup(props) {
         const researchAreas = ref<any[]>(props.presetResearchArea)
-        // const treeHierarchyRecursive = shallowRef(TreeHierarchyRecursive)
 
-        return {researchAreas}
+        watch(() => props.presetResearchArea, () => {
+            researchAreas.value = props.presetResearchArea;
+            console.log(researchAreas.value)
+        });
+
+        return {researchAreas, returnCurrentLocaleContent}
     },
 })
 </script>
