@@ -3,15 +3,11 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <div class="edit-pen">
-                        <v-btn icon variant="outlined" size="small"> 
-                            <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                        </v-btn>
-                    </div>
+                    <keyword-update-modal :preset-keywords="keywords ? keywords : []" :read-only="!canEdit" @update="emitToParent"></keyword-update-modal>
 
                     <div><b>{{ $t("keywordsLabel") }}</b></div>
-                    <strong v-if="!keywords || keywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <v-chip v-for="(keyword, index) in keywords" :key="index" outlined @click="searchKeyword(keyword)">
+                    <strong v-if="!parsedKeywords || parsedKeywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                    <v-chip v-for="(keyword, index) in parsedKeywords" :key="index" outlined @click="searchKeyword(keyword)">
                         {{ keyword }}
                     </v-chip>
                 </v-card-text>
@@ -22,24 +18,43 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
+import KeywordUpdateModal from './update/KeywordUpdateModal.vue';
+import type { MultilingualContent } from '@/models/Common';
+import { watch } from 'vue';
+import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { ref } from 'vue';
 
 
 export default defineComponent({
     name: "KeywordList",
+    components: { KeywordUpdateModal },
     props: {
+        canEdit: {
+            type: Boolean,
+            default: false
+        },
         keywords: {
-            type: Object as PropType<string[] | undefined>,
+            type: Object as PropType<MultilingualContent[]>,
             required: true
-        }
+        },
     },
-    emits: ["searchKeyword"],
-    setup(_, { emit }) {
+    emits: ["searchKeyword", "update"],
+    setup(props, { emit }) {
+        const parsedKeywords = ref<string[]>([]); 
         
         const searchKeyword = (keyword: string) => {
             emit("searchKeyword", keyword)
         };
 
-        return { searchKeyword };
+        const emitToParent = (keywords: MultilingualContent[]) => {
+            emit("update", keywords);
+        }
+
+        watch(() => props.keywords, () => {
+            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split(",") as string[];
+        });
+
+        return { searchKeyword, parsedKeywords, emitToParent };
     },
 });
 </script>

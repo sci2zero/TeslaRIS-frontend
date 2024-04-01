@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="primary">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(organisationUnit?.name as MultilingualContent[]) }}
+                        {{ returnCurrentLocaleContent(organisationUnit?.name) }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("organisationUnitLabel") }}
@@ -65,7 +65,7 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="keywords" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
 
         <!-- Research Area -->
         <v-row>
@@ -113,9 +113,7 @@
 <script lang="ts">
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
@@ -123,7 +121,6 @@ import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
-import type { MultilingualContent } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 
@@ -138,7 +135,6 @@ export default defineComponent({
         const organisationUnit = ref<OrganisationUnitResponse>();
         const relationChain = ref();
 
-        const keywords = ref<string[]>([]);
         const ouIcon = ref('mdi-city')
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -147,27 +143,22 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
-        const i18n = useI18n();
+        const canEdit = ref(false);
 
         onMounted(() => {
+            OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 organisationUnit.value = response.data;
                 
-                fetchPublications();                
-                populateData();
+                fetchPublications();
             });
             OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
                 relationChain.value = response.data;
             })
         });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
-
-        const populateData = () => {
-            keywords.value = returnCurrentLocaleContent(organisationUnit.value?.keyword as MultilingualContent[])?.split(",") as string[];
-        }
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
@@ -187,12 +178,12 @@ export default defineComponent({
 
         return {
             organisationUnit,
-            keywords, ouIcon,
+            ouIcon,
             publications, 
             totalPublications,
             switchPage,
             searchKeyword, relationChain,
-            returnCurrentLocaleContent
+            returnCurrentLocaleContent, canEdit
         };
 }})
 

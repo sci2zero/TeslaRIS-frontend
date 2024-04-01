@@ -14,7 +14,7 @@
             </v-col>
         </v-row>
 
-        <!-- Researrcher Info -->
+        <!-- Researcher Info -->
         <v-row>
             <v-col cols="3" class="text-center">
                 <v-icon size="x-large" class="large-researcher-icon">
@@ -110,26 +110,10 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="keywords" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Biography -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-
-                        <div><b>{{ $t("biographyLabel") }}</b></div>
-                        <strong v-if="!biography">{{ $t("notYetSetMessage") }}</strong>
-                        <p>{{ biography }}</p>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+        <description-section :description="biography" :can-edit="canEdit" is-biography></description-section>
 
         <!-- Expertises and Skills -->
         <v-row>
@@ -284,11 +268,12 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import KeywordList from '@/components/core/KeywordList.vue';
+import DescriptionSection from '@/components/core/DescriptionSection.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection },
     setup() {
         const router = useRouter();
         const currentRoute = useRoute();
@@ -310,8 +295,8 @@ export default defineComponent({
 
         const personalInfo = ref<any>({contact: {}});
         
-        const keywords = ref();
-        const biography = ref();
+        const keywords = ref<MultilingualContent[]>([]);
+        const biography = ref<MultilingualContent[]>([]);
 
         const employments = ref<Employment[]>([]);
         const education = ref<Education[]>([]);
@@ -331,6 +316,9 @@ export default defineComponent({
                 } else {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.lastname}`;
                 }
+
+                keywords.value = person.value.keyword;
+                biography.value = person.value.biography;
 
                 response.data.employmentIds.forEach(employmentId => {
                     InvolvementService.getEmployment(employmentId).then(response => {
@@ -369,11 +357,6 @@ export default defineComponent({
             personalInfo.value.city = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.city as MultilingualContent[]);
 
             fetchAndSetCountryInfo();
-
-            // TODO: Improve this!!!
-            keywords.value = returnCurrentLocaleContent(person.value.keyword)?.split(",") as string[];
-
-            biography.value = returnCurrentLocaleContent(person.value.biography);
         }
 
         const fetchAndSetCountryInfo = () => {
@@ -484,6 +467,10 @@ export default defineComponent({
             });
         };
 
+        const updateKeywords = (keywords: MultilingualContent[]) => {
+            console.log(keywords);
+        };
+
         return {
             researcherName,
             accountIcon,
@@ -499,7 +486,7 @@ export default defineComponent({
             employments, education, memberships,
             addInvolvementProof, deleteInvolvementProof, updateInvolvementProof,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
-            addPrizeProof, updatePrizeProof, deletePrizeProof
+            addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords
         };
 }})
 

@@ -7,10 +7,12 @@ export enum ResourceType {
 }
 
 export enum License {
-    BSD,
+    ALL_RIGHTS_RESERVED,
     CREATIVE_COMMONS,
-    APACHE,
-    OPEN_ACCESS
+    EMBARGOED_ACCESS,
+    OPEN_ACCESS,
+    PUBLIC_DOMAIN,
+    SUBSCRIPTION_BASED_ACCESS
 }
 
 export interface DocumentFileResponse {

@@ -124,10 +124,10 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="keywords" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
 
         <!-- Description -->
-        <description-section :description="proceedingsPublication?.description"></description-section>
+        <description-section :description="proceedingsPublication?.description" :can-edit="canEdit"></description-section>
 
         <person-document-contribution-list :contribution-list="proceedingsPublication?.contributions"></person-document-contribution-list>
 
@@ -192,7 +192,6 @@ export default defineComponent({
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
-        const keywords = ref();
 
         const i18n = useI18n();
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
@@ -231,8 +230,6 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-
-            keywords.value = returnCurrentLocaleContent(proceedingsPublication.value?.keywords)?.split(",") as string[];
         };
 
         const searchKeyword = (keyword: string) => {
@@ -248,7 +245,7 @@ export default defineComponent({
             publications, event,
             totalPublications,
             returnCurrentLocaleContent,
-            languageTagMap, keywords,
+            languageTagMap,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes
         };

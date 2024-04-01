@@ -121,10 +121,12 @@ export default defineComponent({
         const selectedResourceType = ref(selectionPlaceholder);
 
         const licenses = [
-            { title: "BSD", value: License.BSD },
             { title: "Creative Commons", value: License.CREATIVE_COMMONS },
-            { title: "Apache", value: License.APACHE },
+            { title: "Embargoed Access", value: License.EMBARGOED_ACCESS },
+            { title: "Public Domain", value: License.PUBLIC_DOMAIN },
             { title: "Open Access", value: License.OPEN_ACCESS },
+            { title: "All Rights Reserved", value: License.ALL_RIGHTS_RESERVED },
+            { title: "Subscription-Based Access", value: License.SUBSCRIPTION_BASED_ACCESS },
         ];
 
         const selectedLicense = ref({ title: "Open Access", value: License.OPEN_ACCESS });

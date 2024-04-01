@@ -92,10 +92,10 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="keywords" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
 
         <!-- Description -->
-        <description-section :description="patent?.description"></description-section>
+        <description-section :description="patent?.description" :can-edit="canEdit"></description-section>
 
         <person-document-contribution-list :contribution-list="patent?.contributions"></person-document-contribution-list>
 
@@ -153,7 +153,6 @@ export default defineComponent({
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
-        const keywords = ref();
 
         const canEdit = ref(false);
 
@@ -191,8 +190,6 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-
-            keywords.value = returnCurrentLocaleContent(patent.value?.keywords)?.split(",") as string[];
         };
 
         const searchKeyword = (keyword: string) => {
@@ -208,7 +205,7 @@ export default defineComponent({
             publications, 
             totalPublications, publisher,
             returnCurrentLocaleContent,
-            languageTagMap, keywords,
+            languageTagMap,
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment
         };

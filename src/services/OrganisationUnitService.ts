@@ -31,6 +31,10 @@ export class OrganisationUnitService extends BaseService {
   async deleteOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `organisation-unit/${organisationUnitId}`);
   }
+
+  async canEdit(organisationUnitId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}/can-edit`);
+  }
 }
 
 export default new OrganisationUnitService();

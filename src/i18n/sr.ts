@@ -188,5 +188,9 @@ export default {
     noFilesUploadedMessage: "Nisu priloženi fajlovi.",
     proofsLabel: "Dokazi",
     fileItemsLabel: "Fajlovi",
-    unauthorizedPublicationEditAttemptMessage: "Ne možete dodati/izmeniti publikaciju u kojoj niste u listi autora."
+    unauthorizedPublicationEditAttemptMessage: "Ne možete dodati/izmeniti publikaciju u kojoj niste u listi autora.",
+    loginToViewDocumentMessage: "Dokument nije javno dostupan, morate se ulogovati kako biste ga videli.",
+    updateKeywordsLabel: "Ažuriraj ključne reči",
+    updateDescriptionLabel: "Ažuriraj opis",
+    updateBiographyLabel: "Ažuriraj biografiju"
 }

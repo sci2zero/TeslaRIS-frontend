@@ -188,5 +188,9 @@ export default {
     noFilesUploadedMessage: "No Files Provided.",
     proofsLabel: "Proofs",
     fileItemsLabel: "File Items",
-    unauthorizedPublicationEditAttemptMessage: "You can't submit or edit publications where you are not a contributor."
+    unauthorizedPublicationEditAttemptMessage: "You can't submit or edit publications where you are not a contributor.",
+    loginToViewDocumentMessage: "Document is not publicly available, please login to be able to view it.",
+    updateKeywordsLabel: "Update Keywords",
+    updateDescriptionLabel: "Update Description",
+    updateBiographyLabel: "Update Biography"
 }

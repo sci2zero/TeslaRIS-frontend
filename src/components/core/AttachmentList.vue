@@ -20,7 +20,7 @@
                         </template>
 
                         <v-list-item-title @click="download(attachment)">
-                            {{ attachment.fileName }} ({{ attachment.sizeInMb }}MB)
+                            {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
                         </v-list-item-title>
 
                         <v-list-item-subtitle>
@@ -50,6 +50,20 @@
             </v-row>
         </v-card-text>
     </v-card>
+
+    <v-snackbar
+        v-model="snackbar"
+        :timeout="5000">
+        {{ errorMessage }}
+        <template #actions>
+            <v-btn
+                color="blue"
+                variant="text"
+                @click="snackbar = false">
+                {{ $t("closeLabel") }}
+            </v-btn>
+        </template>
+    </v-snackbar>
 </template>
 
 <script lang="ts">
@@ -58,6 +72,8 @@ import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
 import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -79,8 +95,20 @@ export default defineComponent({
     },
     emits: ["create", "delete", "update"],
     setup(_, { emit }) {
+        const errorMessage = ref("");
+        const snackbar = ref(false);
+
+        const i18n = useI18n();
+
         const download = (attachment: DocumentFileResponse) => {
-            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string);
+            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string).catch((error) => {
+                if(error.response.status === 451) {
+                    errorMessage.value = i18n.t("loginToViewDocumentMessage");
+                } else {
+                    errorMessage.value = i18n.t("genericErrorMessage");
+                }
+                snackbar.value = true;
+            });
         };
 
         const sendDataToParent = (documentFile: DocumentFile) => {
@@ -96,7 +124,9 @@ export default defineComponent({
             emit("delete", attachmentId);
         };
 
-        return {download, sendDataToParent, sendDeleteRequestToParent, sendUpdateRequestToParent, returnCurrentLocaleContent};
+        return {download, sendDataToParent, sendDeleteRequestToParent, 
+                sendUpdateRequestToParent, returnCurrentLocaleContent, 
+                errorMessage, snackbar};
     }
 });
 </script>
