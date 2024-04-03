@@ -113,7 +113,7 @@
         <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Biography -->
-        <description-section :description="biography" :can-edit="canEdit" is-biography></description-section>
+        <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
 
         <!-- Expertises and Skills -->
         <v-row>
@@ -245,6 +245,20 @@
         <!-- Publication Table -->
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+    
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -275,6 +289,9 @@ export default defineComponent({
     name: "ResearcherLandingPage",
     components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+        
         const router = useRouter();
         const currentRoute = useRoute();
 
@@ -467,8 +484,26 @@ export default defineComponent({
             });
         };
 
-        const updateKeywords = (keywords: MultilingualContent[]) => {
-            console.log(keywords);
+        const updateKeywords = (updatedKeywords: MultilingualContent[]) => {
+            keywords.value = updatedKeywords;
+            PersonService.updateKeywords(person.value?.id as number, updatedKeywords).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
+        const updateBiography = (updatedBiography: MultilingualContent[]) => {
+            biography.value = updatedBiography;
+            PersonService.updateBiography(person.value?.id as number, updatedBiography).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
         };
 
         return {
@@ -486,7 +521,8 @@ export default defineComponent({
             employments, education, memberships,
             addInvolvementProof, deleteInvolvementProof, updateInvolvementProof,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
-            addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords
+            addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords, updateBiography,
+            snackbar, snackbarMessage
         };
 }})
 

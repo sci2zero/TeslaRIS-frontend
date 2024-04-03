@@ -24,11 +24,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <publisher-update-modal :read-only="!canEdit" :preset-publisher="publisher"></publisher-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -77,11 +73,12 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import PublisherUpdateModal from '@/components/publisher/update/PublisherUpdateModal.vue';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, PublisherUpdateModal },
     setup() {
         const currentRoute = useRoute();
 
@@ -99,7 +96,13 @@ export default defineComponent({
 
         const icon = ref("mdi-account-group");
 
+        const canEdit = ref(false);
+
         onMounted(() => {
+            PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
                 publisher.value = response.data;
 
@@ -145,7 +148,7 @@ export default defineComponent({
             totalPublications,
             switchPage,
             returnCurrentLocaleContent,
-            languageTagMap
+            languageTagMap, canEdit
         };
 }})
 

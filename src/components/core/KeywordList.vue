@@ -23,6 +23,7 @@ import type { MultilingualContent } from '@/models/Common';
 import { watch } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -40,7 +41,9 @@ export default defineComponent({
     },
     emits: ["searchKeyword", "update"],
     setup(props, { emit }) {
-        const parsedKeywords = ref<string[]>([]); 
+        const parsedKeywords = ref<string[]>([]);
+
+        const i18n = useI18n();
         
         const searchKeyword = (keyword: string) => {
             emit("searchKeyword", keyword)
@@ -51,6 +54,10 @@ export default defineComponent({
         }
 
         watch(() => props.keywords, () => {
+            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split(",") as string[];
+        });
+
+        watch(i18n.locale, () => {
             parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split(",") as string[];
         });
 

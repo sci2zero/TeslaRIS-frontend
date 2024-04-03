@@ -1,10 +1,12 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col :cols="inModal ? 12 : 8">
+            <v-col cols="12">
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetPublisher?.name, languageList)"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -14,7 +16,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" :initial-value="toMultilingualTextInput(presetPublisher?.place, languageList)"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -26,27 +28,13 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import MultilingualTextInput from '../core/MultilingualTextInput.vue';
+import { defineComponent, type PropType } from 'vue';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { countriesSr, countriesEn } from "@/i18n/countries";
-import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
@@ -54,26 +42,25 @@ import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Publisher } from "@/models/PublisherModel";
-import PublisherService from "@/services/PublisherService";
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 
 export default defineComponent({
-    name: "SubmitPublisher",
+    name: "PublisherUpdateForm",
     components: {MultilingualTextInput},
     props: {
-        inModal: {
-            type: Boolean,
-            default: false
+        presetPublisher: {
+            type: Object as PropType<Publisher | undefined>,
+            required: true
         }
     },
-    emits: ["create"],
+    emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
         const snackbar = ref(false);
         const error = ref(false);
 
-        const router = useRouter();
         const i18n = useI18n();
 
         const countryList = computed(() => {
@@ -84,24 +71,24 @@ export default defineComponent({
             }
         });
 
-        const languageList = ref<LanguageTagResponse[]>();
+        const languageList = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageList.value = response.data;
             });
-        })
+        });
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
 
         const name = ref([]);
-        const state = ref();
+        const state = ref(returnCurrentLocaleContent(props.presetPublisher?.state));
         const place = ref([]);
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const submitPublisher = (stayOnPage: boolean) => {
+        const updatePublisher = () => {
             const multilingualState: MultilingualContent[] = [];
             if (state.value) {
                 let stateContentIndex = -1;
@@ -126,32 +113,15 @@ export default defineComponent({
                 });
             }
 
-            const newPublisher: Publisher = {
+            const updatedPublisher: Publisher = {
                 name: name.value,
                 state: multilingualState,
                 place: place.value
-            };
-
-            PublisherService.createPublisher(newPublisher).then((response) => {
-                if (props.inModal) {
-                    emit("create", response.data);
-                    return;
-                }
-
-                if (stayOnPage) {
-                nameRef.value?.clearInput();
-                state.value = null;
-                placeRef.value?.clearInput();
-
-                error.value = false;
-                snackbar.value = true;
-            } else {
-                router.push({ name: "publisherLandingPage", params: {id: response.data.id} });
             }
-            }).catch(() => {
-                error.value = true;
-                snackbar.value = true;
-            });
+
+            console.log(updatedPublisher);
+
+            emit("update", updatedPublisher);
         };
 
         return {
@@ -161,7 +131,9 @@ export default defineComponent({
             state, countryList,
             place, placeRef,
             requiredFieldRules,
-            submitPublisher
+            updatePublisher,
+            toMultilingualTextInput,
+            languageList
         };
     }
 });

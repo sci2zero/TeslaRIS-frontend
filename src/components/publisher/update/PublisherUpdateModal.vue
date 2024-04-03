@@ -13,11 +13,11 @@
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("updateKeywordsLabel") }}</span>
+                    <span class="text-h5">{{ $t("updatePublisherLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <keyword-update-form ref="updateFormRef" :preset-keywords="presetKeywords" @update="emitToParent"></keyword-update-form>
+                        <publisher-update-form ref="updateFormRef" :preset-publisher="presetPublisher" @update="emitToParent"></publisher-update-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -25,7 +25,7 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" @click="updateFormRef?.updateKeywords()">
+                    <v-btn color="blue darken-1" :disabled="!updateFormRef?.isFormValid" @click="updateFormRef?.updatePublisher()">
                         {{ $t("updateLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -37,21 +37,21 @@
 <script lang="ts">
 import { ref } from "vue";
 import { defineComponent } from "vue";
-import KeywordUpdateForm from "./KeywordUpdateForm.vue";
-import type { MultilingualContent } from "@/models/Common";
+import PublisherUpdateForm from "./PublisherUpdateForm.vue";
 import type { PropType } from "vue";
+import type { Publisher } from "@/models/PublisherModel";
 
 
 export default defineComponent({
-    name: "KeywordUpdateModal",
-    components: { KeywordUpdateForm },
+    name: "PublisherUpdateModal",
+    components: { PublisherUpdateForm },
     props: {
         readOnly: {
             type: Boolean,
             default: false
         },
-        presetKeywords: {
-            type: Object as PropType<MultilingualContent[]>,
+        presetPublisher: {
+            type: Object as PropType<Publisher | undefined>,
             required: true
         }
     },
@@ -59,10 +59,10 @@ export default defineComponent({
     setup(_, { emit }) {
         const dialog = ref(false);
 
-        const updateFormRef = ref<typeof KeywordUpdateForm>();
+        const updateFormRef = ref<typeof PublisherUpdateForm>();
 
-        const emitToParent = (keywords: MultilingualContent[]) => {
-            emit("update", keywords)
+        const emitToParent = (publisher: Publisher) => {
+            emit("update", publisher)
             dialog.value = false;
         }
 

@@ -65,7 +65,7 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Research Area -->
         <v-row>
@@ -107,6 +107,19 @@
         <!-- Publication Table -->
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -119,16 +132,21 @@ import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
+import type { OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
+import { useI18n } from 'vue-i18n';
+import type { MultilingualContent } from '@/models/Common';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
     components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+        
         const router = useRouter();
         const currentRoute = useRoute();
 
@@ -144,6 +162,8 @@ export default defineComponent({
         const direction = ref("");
 
         const canEdit = ref(false);
+
+        const i18n = useI18n();
 
         onMounted(() => {
             OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -172,8 +192,32 @@ export default defineComponent({
             
         };
 
+        const updateKeywords = (keywords: MultilingualContent[]) => {
+            organisationUnit.value!.keyword = keywords;
+            performUpdate();
+        };
+
+        const performUpdate = () => {
+            const updateRequest: OrganisationUnitRequest = {
+                name: organisationUnit.value!.name,
+                nameAbbreviation: organisationUnit.value?.nameAbbreviation,
+                keyword: organisationUnit.value!.keyword,
+                researchAreasId: organisationUnit.value!.researchAreas.map(leafResearchArea => leafResearchArea.id as number),
+                location: organisationUnit.value?.location,
+                contact: organisationUnit.value?.contact
+            }
+
+            OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim() }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "organisationUnits" }});
         };
 
         return {
@@ -183,7 +227,9 @@ export default defineComponent({
             totalPublications,
             switchPage,
             searchKeyword, relationChain,
-            returnCurrentLocaleContent, canEdit
+            returnCurrentLocaleContent, canEdit,
+            updateKeywords,
+            snackbar, snackbarMessage
         };
 }})
 

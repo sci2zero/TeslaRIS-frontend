@@ -108,10 +108,10 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
-        <description-section :description="proceedings?.description" :can-edit="canEdit"></description-section>
+        <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
         <person-document-contribution-list :contribution-list="proceedings?.contributions"></person-document-contribution-list>
 
@@ -131,11 +131,25 @@
                     @update="updateAttachment($event, false, proceedings)"></attachment-list>
             </v-col>
         </v-row>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -166,6 +180,9 @@ export default defineComponent({
     name: "ProceedingsLandingPage",
     components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
         const router = useRouter();
 
@@ -244,6 +261,26 @@ export default defineComponent({
             window.open(uri, '_blank');
         };
 
+        const updateKeywords = (keywords: MultilingualContent[]) => {
+            proceedings.value!.keywords = keywords;
+            performUpdate();
+        };
+
+        const updateDescription = (description: MultilingualContent[]) => {
+            proceedings.value!.description = description;
+            performUpdate();
+        };
+
+        const performUpdate = () => {
+            ProceedingsService.updateProceedings(proceedings.value?.id as number, proceedings.value as Proceedings).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
             proceedings, icon,
             publications, event,
@@ -251,7 +288,8 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap, publicationSeriesType,
             searchKeyword, goToURL, canEdit, publisher,
-            addAttachment, deleteAttachment, updateAttachment
+            addAttachment, deleteAttachment, updateAttachment,
+            updateKeywords, updateDescription, snackbar, snackbarMessage
         };
 }})
 

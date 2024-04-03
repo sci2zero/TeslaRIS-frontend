@@ -39,6 +39,7 @@ export interface OrganisationUnitResponse {
 }
 
 export interface ResearchArea {
+    id? : number;
     name: MultilingualContent[];
     description: MultilingualContent[];
     superResearchArea?: ResearchArea;
