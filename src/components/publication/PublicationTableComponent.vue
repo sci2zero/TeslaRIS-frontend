@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedPublications"
+        :sort-by="tableOptions.sortBy"
         :items="publications"
         :headers="headers"
         item-value="row"
@@ -30,19 +31,23 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.titleSr }}
+                    <localized-link :to="'scientific-results/' + getResultType(row.item) + row.item.databaseId">
+                        {{ row.item.titleSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.titleOther }}
-                </td>
-                <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.keywordsSr }}
-                </td>
-                <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.keywordsOther }}
+                    <localized-link :to="'scientific-results/' + getResultType(row.item) + row.item.databaseId">
+                        {{ row.item.titleOther }}
+                    </localized-link>
                 </td>
                 <td>
-                    {{ row.item.year }}
+                    {{ row.item.authorNames }}
+                </td>
+                <td>
+                    {{ row.item.year !== -1 ? row.item.year : "" }}
+                </td>
+                <td>
+                    {{ row.item.type }}
                 </td>
                 <td>
                     {{ row.item.doi }}
@@ -70,9 +75,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type {DocumentPublicationIndex} from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PublicationTableComponent",
+    components: { LocalizedLink },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -83,7 +91,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedPublications = ref([]);
 
         const i18n = useI18n();
@@ -91,20 +99,19 @@ export default defineComponent({
         const notifications = ref<Map<string, string>>(new Map());
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
-        const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
+        const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
-        const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
-          { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
+          { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
           { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
           { title: typeOfPublicationLabel, align: "start", sortable: true, key: "type"},
           { title: "DOI", align: "start", sortable: true, key: "doi"},
@@ -113,8 +120,7 @@ export default defineComponent({
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
             ["titleOther", "title_other_sortable"],
-            ["keywordsSr", "keywords_sr"],
-            ["keywordsOther", "keywords_other"],
+            ["authorNames", "author_names_sortable"],
             ["year", "year"],
             ["type", "type"],
             ["doi", "doi"],
@@ -137,7 +143,7 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
-                return DocumentPublicationService.deleteDocumentPublication(publication.databaseId)
+                return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
                     .then(() => {
                         if (i18n.locale.value === "sr") {
                             addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
@@ -170,7 +176,23 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedPublications, headers, notifications, refreshTable, userRole, deleteSelection};
+        const getResultType = (result: DocumentPublicationIndex): string => {
+            switch (result.type) {
+                case "JOURNAL_PUBLICATION":
+                    return "journal-publication/";
+                case "PROCEEDINGS_PUBLICATION":
+                    return "proceedings-publication/";
+                case "PATENT":
+                    return "patent/";
+                case "DATASET":
+                    return "dataset/";
+                case "SOFTWARE":
+                    return "software/";
+            }
+            return "";
+        }
+
+        return {selectedPublications, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions, getResultType};
     }
 });
 </script>

@@ -1,45 +1,47 @@
 <template>
-    <h1>{{ $t("advancedSearchLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <br />
-    <br />
-    <v-card>
-        <v-tabs
-            v-model="currentTab"
-            bg-color="blue-grey-lighten-5"
-            color="deep-purple-accent-4"
-            align-tabs="center"
-        >
-            <v-tab value="persons" @click="search(searchParams)">
-                {{ $t("personListLabel") }}
-            </v-tab>
-            <v-tab value="organisationUnits" @click="search(searchParams)">
-                {{ $t("ouListLabel") }}
-            </v-tab>
-            <v-tab value="publications" @click="search(searchParams)">
-                {{ $t("scientificResultsListLabel") }}
-            </v-tab>
-        </v-tabs>
+    <v-container>
+        <h1>{{ $t("advancedSearchLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component :preset-search-input="searchParams" @search="search"></search-bar-component>
+        <br />
+        <br />
+        <br />
+        <v-card>
+            <v-tabs
+                v-model="currentTab"
+                bg-color="blue-grey-lighten-5"
+                color="deep-purple-accent-4"
+                align-tabs="center"
+            >
+                <v-tab value="persons" @click="search(searchParams)">
+                    {{ $t("personListLabel") }}
+                </v-tab>
+                <v-tab value="organisationUnits" @click="search(searchParams)">
+                    {{ $t("ouListLabel") }}
+                </v-tab>
+                <v-tab value="publications" @click="search(searchParams)">
+                    {{ $t("scientificResultsListLabel") }}
+                </v-tab>
+            </v-tabs>
   
-        <v-card-text>
-            <v-window v-model="currentTab">
-                <v-window-item value="persons">
-                    <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
-                </v-window-item>
+            <v-card-text>
+                <v-window v-model="currentTab">
+                    <v-window-item value="persons">
+                        <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+                    </v-window-item>
   
-                <v-window-item value="organisationUnits">
-                    <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
-                </v-window-item>
+                    <v-window-item value="organisationUnits">
+                        <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+                    </v-window-item>
   
-                <v-window-item value="publications">
-                    <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
-                </v-window-item>
-            </v-window>
-        </v-card-text>
-    </v-card>
+                    <v-window-item value="publications">
+                        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+                    </v-window-item>
+                </v-window>
+            </v-card-text>
+        </v-card>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -55,13 +57,19 @@ import PersonService from "@/services/PersonService";
 import type { PersonIndex } from "@/models/PersonModel";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import { useRoute, useRouter } from "vue-router";
+import { onMounted } from "vue";
+
 
 export default defineComponent({
     name: "AdvancedSearchVuew",
     components: {SearchBarComponent, OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent},
     setup() {
+        const route = useRoute();
+        const router = useRouter();
         const currentTab = ref("persons");
-        const searchParams = ref("tokens=");
+
+        const searchParams = ref(route.query.searchQuery as string);
 
         const organisationUnits = ref<OrganisationUnitIndex[]>([]);
         const persons = ref<PersonIndex[]>([]);
@@ -78,9 +86,17 @@ export default defineComponent({
         const sortOU = ref("");
         const sortPublication = ref("");
         const direction = ref("");
+
+        onMounted(() => {
+            currentTab.value = route.query.tab as string
+        });
     
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
+            if(tokenParams) {
+                router.push({name:"advancedSearch", query: { searchQuery: tokenParams.split("=")[1], tab: currentTab.value }});
+            }
+            
             switch(currentTab.value) {
                 case "persons":
                     PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`).then((response) => {
@@ -118,7 +134,7 @@ export default defineComponent({
                     sortPublication.value = sortField;
                     break;
             }
-            search(searchParams.value);
+            search(searchParams.value as string);
         }
 
         return {currentTab, persons, organisationUnits, publications, totalPersons, totalOUs, totalPublications, search, switchPage, searchParams};

@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedPublishers"
+        :sort-by="tableOptions.sortBy"
         :items="publishers"
         :headers="headers"
         item-value="row"
@@ -30,10 +31,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.nameSr }}
+                    <localized-link :to="'publishers/' + row.item.databaseId">
+                        {{ row.item.nameSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.nameOther }}
+                    <localized-link :to="'publishers/' + row.item.databaseId">
+                        {{ row.item.nameOther }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.placeSr }}
@@ -70,9 +75,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import type { PublisherIndex } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PublisherTableComponent",
+    components: { LocalizedLink },
     props: {
         publishers: {
             type: Array<PublisherIndex>,
@@ -83,7 +91,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedPublishers = ref([]);
 
         const i18n = useI18n();
@@ -100,7 +108,7 @@ export default defineComponent({
         const placeColumn = computed(() => i18n.t("placeColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
@@ -167,7 +175,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedPublishers, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedPublishers, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>

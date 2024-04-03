@@ -2,20 +2,38 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
+import type { OrganisationUnitRequest, OrganisationUnitIndex, OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 
 export class OrganisationUnitService extends BaseService {
 
+  private static idempotencyKey: string = super.generateIdempotencyKey();
+
   async getOUCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "organisation-unit/count");
+  }
+
+  async readOU(organisationUnitId: number): Promise<AxiosResponse<OrganisationUnitResponse>> {
+    return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}`);
+  }
+
+  async readOURelationsGraph(organisationUnitLeafId: number): Promise<AxiosResponse<any>> {
+    return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
 
   async searchOUs(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
   }
 
+  async createOrganisationUnit(body: OrganisationUnitRequest): Promise<AxiosResponse<OrganisationUnitResponse>> {
+    return super.sendRequest(axios.post, "organisation-unit", body, OrganisationUnitService.idempotencyKey);
+  }
+
   async deleteOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `organisation-unit/${organisationUnitId}`);
+  }
+
+  async canEdit(organisationUnitId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}/can-edit`);
   }
 }
 

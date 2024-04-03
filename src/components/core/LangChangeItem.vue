@@ -3,14 +3,13 @@
         <v-menu
             v-model="menu"
             :close-on-content-click="true"
-            location="end"
+            location="bottom"
         >
             <template #activator="{ props }">
                 <v-btn
-                    color="indigo"
                     v-bind="props"
+                    icon="mdi-translate"
                 >
-                    {{ selectedLocale.short }}
                 </v-btn>
             </template>
 
@@ -22,7 +21,7 @@
                         v-for="(item, i) in langItems"
                         :key="i"
                         :value="item"
-                        :color="item.value === selectedLocale.value ? '' : 'primary' "
+                        :color="item.value === selectedLocale.value ? '' : 'secondary' "
                         :class="{ 'selected': item.value === selectedLocale.value }"
                         @click="switchLang(item)"
                     >
@@ -126,7 +125,7 @@
   }
 
   .selected {
-    background: #515fb3;
+    background: #494c5f;
     color: white;
   }
   </style>

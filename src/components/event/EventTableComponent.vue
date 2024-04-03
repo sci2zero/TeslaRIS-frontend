@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedEvents"
+        :sort-by="tableOptions.sortBy"
         :items="events"
         :headers="headers"
         item-value="row"
@@ -30,10 +31,14 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.nameSr }}
+                    <localized-link :to="'events/conference/' + row.item.databaseId">
+                        {{ row.item.nameSr }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    {{ row.item.nameOther }}
+                    <localized-link :to="'events/conference/' + row.item.databaseId">
+                        {{ row.item.nameOther }}
+                    </localized-link>
                 </td>
                 <td>
                     {{ row.item.dateFromTo }}
@@ -67,9 +72,12 @@ import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import {EventType, type EventIndex} from '@/models/EventModel';
 import EventService from '@/services/EventService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PublicationTableComponent",
+    components: { LocalizedLink },
     props: {
         events: {
             type: Array<EventIndex>,
@@ -96,7 +104,7 @@ export default defineComponent({
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
@@ -173,7 +181,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedEvents, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedEvents, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>

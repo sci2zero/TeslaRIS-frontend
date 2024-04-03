@@ -1,3 +1,5 @@
+import type { MultilingualContent } from "./Common";
+
 export interface PublisherIndex {
     id: string;
     nameSr: string;
@@ -13,4 +15,11 @@ export interface PublisherIndex {
     stateOther: string;
     stateOtherSortable: string;
     databaseId: number;
+}
+
+export interface Publisher {
+    id?: number;
+    name: MultilingualContent[];
+    state: MultilingualContent[];
+    place: MultilingualContent[];
 }

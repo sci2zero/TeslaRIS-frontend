@@ -1,3 +1,5 @@
+import type { MultilingualContent } from "./Common";
+
 export interface UserResponse {
     id: number;
     email: string;
@@ -7,6 +9,7 @@ export interface UserResponse {
     canTakeRole: boolean;
     preferredLanguage: string;
     organisationUnitId: number;
+    organisationUnitName: MultilingualContent[];
 }
 
 export interface UserAccountIndex {
@@ -27,4 +30,14 @@ export interface TakeRoleOfUserRequest {
 
 export interface ActivateAccountRequest {
     activationToken: string;
-  }
+}
+
+export interface UserUpdateRequest {
+    email: string;
+    oldPassword: string;
+    newPassword: string;
+    firstname: string;
+    lastName: string;
+    preferredLanguageId: number;
+    organisationUnitId?: number;
+}

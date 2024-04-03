@@ -1,44 +1,73 @@
 <template>
-    <div id="login-page">
-        <div class="login-wrapper">
-            <h2 class="login-title">
-                {{ $t('loginLabel') }}
-            </h2>
-            <v-form v-model="isFormValid" @submit.prevent>
-                <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
-                <v-text-field
-                    v-model="password" :rules="passwordFieldRules" name="password" type="password"
-                    :label="$t('passwordLabel')"></v-text-field>
+    <v-container>
+        <div id="login-page">
+            <div class="login-wrapper">
+                <h2 class="login-title">
+                    {{ forgotPasswordForm ? $t('passwordRecoveryInstructions') : $t('loginLabel') }}
+                </h2>
+                <v-form v-if="!forgotPasswordSubmissionSent" v-model="isFormValid" @submit.prevent>
+                    <div v-if="!forgotPasswordForm">
+                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="password" :rules="passwordFieldRules" name="password" type="password"
+                            :label="$t('passwordLabel')"></v-text-field>
 
-                <br />
-                <v-btn
-                    class="login-submit" block type="submit" :disabled="!isFormValid"
-                    @click="login">
-                    {{ $t('loginLabel') }}
-                </v-btn>
-
-                <br />
-                <a href="#" class="forgot-password-link">{{ $t("forgotPasswordLabel") }}</a>
-                <br />
-                <localized-link to="register">
-                    {{ $t("registerFromLoginLabel") }}
-                </localized-link>
-            </v-form>
+                        <br />
+                        <v-btn
+                            class="login-submit" block type="submit" :disabled="!isFormValid"
+                            @click="login">
+                            {{ $t('loginLabel') }}
+                        </v-btn>
+                        <br />
+                        <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
+                    </div>
+                    <div v-else>
+                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
+                        <br />
+                        <v-btn
+                            class="login-submit" block type="submit" :disabled="!isFormValid"
+                            @click="forgotPassword">
+                            {{ $t('resetPasswordLabel') }}
+                        </v-btn>
+                        <br />
+                        <a href="#" class="forgot-password-link" @click="forgotPasswordForm = false;">{{ $t("knowPasswordLabel") }}</a>
+                    </div>
+                    <br />
+                    <localized-link to="register">
+                        {{ $t("registerFromLoginLabel") }}
+                    </localized-link>
+                </v-form>
+                <div v-else>
+                    <h4>{{ $t("passwordRecoveryEmailSentMessage", [email]) }}</h4>
+                    <v-row>
+                        <v-col cols="10">
+                            <v-btn
+                                class="login-submit" block type="submit" :disabled="!isFormValid || cooldown"
+                                @click="forgotPassword">
+                                {{ $t('resendLabel') }}
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="2" style="margin-top: 15px;">
+                            <v-progress-circular v-if="cooldown" :model-value="progress"></v-progress-circular>
+                        </v-col>
+                    </v-row>
+                </div>
+            </div>
         </div>
-    </div>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ $t("emailOrPasswordIncorrectError") }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="timeout">
+            {{ $t("emailOrPasswordIncorrectError") }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
+    </v-container>
 </template>
 
 
@@ -50,23 +79,59 @@ import { computed } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { useRouteStore } from "@/stores/routeStore";
+
 
 export default defineComponent(
     {
         name: "LoginView",
         components: { LocalizedLink },
         setup() {
+            const route = useRoute();
+            const router = useRouter();
+
             const isFormValid = ref(false);
             const snackbar = ref(false);
             const timeout = 5000;
-            const email = ref("");
-            const password = ref("");
+            const email = ref(route.query.email || '');
+            const password = ref();
             const loginStore = useLoginStore();
-            const router = useRouter();
             const i18n = useI18n();
             const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
             const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
+
+            const forgotPasswordForm = ref(false);
+            const forgotPasswordSubmissionSent = ref(false);
+
+            const routeStore = useRouteStore();
+
+            const totalTime = 11 * 60 * 1000; // 11 minutes
+            const elapsedTime = ref(0);
+            const progress = ref(0);
+            const cooldown = ref(false);
+
+            const startCooldown = () => {
+                const interval = 1000; // 1 second
+                elapsedTime.value = 0;
+                progress.value = 0;
+                
+                cooldown.value = true;
+
+                setTimeout(() => {
+                    cooldown.value = false;
+                }, totalTime);
+
+                setInterval(() => {
+                    elapsedTime.value += interval;
+
+                    if (elapsedTime.value >= totalTime) {
+                        elapsedTime.value = totalTime;
+                    }
+
+                    progress.value = (elapsedTime.value / totalTime) * 100;
+                }, interval);
+            };
 
             const emailFieldRules = [
                 (value: string) => {
@@ -90,13 +155,29 @@ export default defineComponent(
                     sessionStorage.setItem("refreshToken", response.data.refreshToken);
 
                     loginStore.emitLoginSuccess();
+                    if (routeStore.nextRoute != null) {
+                        router.push({ name: routeStore.fetchAndClearRoute() });
+                        return;
+                    }
                     router.push({ name: "home" });
                 }).catch(() => {
                     snackbar.value = true;
                 });
             };
 
-            return {email, emailFieldRules, password, passwordFieldRules, snackbar, timeout, isFormValid, login};
+            const forgotPassword = () => {
+                AuthenticationService.submitForgottenPassword({userEmail: email.value}).then(() => {
+                    forgotPasswordSubmissionSent.value = true;
+                });
+                startCooldown();
+            };
+
+            return {email, emailFieldRules, 
+                    password, passwordFieldRules, 
+                    snackbar, timeout, isFormValid, login,
+                    forgotPasswordForm, forgotPassword,
+                    forgotPasswordSubmissionSent, progress, cooldown
+                };
         }
     }
 );
@@ -139,13 +220,8 @@ export default defineComponent(
         }
 
         .forgot-password-link {
-            text-align: right;
+            text-align: left;
             display: block;
-        }
-
-        .register-link {
-            display: block;
-            text-align: center;
         }
     }
 

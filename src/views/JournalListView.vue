@@ -1,12 +1,17 @@
 <template>
-    <h1>{{ $t("journalListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <br />
-    <br />
-    <journal-table-component :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+    <v-container>
+        <h1>{{ $t("journalListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn color="primary" @click="addJournal">
+            {{ $t("addJournalLabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <journal-table-component :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -16,6 +21,7 @@ import JournalService from '@/services/JournalService';
 import JournalTableComponent from '@/components/journal/JournalTableComponent.vue';
 import { ref } from 'vue';
 import type { JournalIndex } from '@/models/JournalModel';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "JournalListView",
@@ -28,6 +34,8 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +53,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, journals, totalJournals, switchPage};
+        const addJournal = () => {
+            router.push({name: "submitJournal"});
+        }
+
+        return {search, journals, totalJournals, switchPage, addJournal};
     }
 });
 </script>

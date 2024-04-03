@@ -19,41 +19,34 @@
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="name"
-                                        :label="$t('firstNameLabel')"
+                                        :label="$t('firstNameLabel') + '*'"
                                         :rules="requiredFieldRules"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="surname"
-                                        :label="$t('surnameLabel')"
+                                        :label="$t('surnameLabel') + '*'"
                                         :rules="requiredFieldRules"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="email"
-                                        :label="$t('emailLabel')"
+                                        :label="$t('emailLabel') + '*'"
                                         :rules="emailFieldRules"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-select
                                         v-model="selectedLanguage"
-                                        :label="$t('preferredLanguageLabel')"
+                                        :label="$t('preferredLanguageLabel') + '*'"
                                         :items="languages"
+                                        return-object
                                     ></v-select>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-autocomplete
-                                        v-model="selectedOrganisationUnit"
-                                        :label="$t('organisationUnitLabel')"
-                                        :items="organisationUnits"
-                                        :custom-filter="filterOUs"
-                                        :auto-select-first="true"
-                                        :rules="requiredSelectionRules"
-                                        @update:search="searchOUs($event)"
-                                    ></v-autocomplete>
+                                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-textarea
@@ -64,14 +57,20 @@
                             </v-row>
                         </v-form>
                     </v-container>
+                    <p style="margin-left: 20px;">
+                        {{ $t("requiredFieldsMessage") }}
+                    </p>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="registerEmployee()">
+                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="registerEmployee(false)">
                         {{ $t("saveLabel") }}
+                    </v-btn>
+                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="registerEmployee(true)">
+                        {{ $t("saveAndAddAnotherLabel") }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -83,18 +82,20 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import LanguageService from "@/services/LanguageService";
-import OrganisationUnitService from "@/services/OrganisationUnitService";
 import AuthenticationService from "@/services/AuthenticationService";
 import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageResponse } from "@/models/Common";
-import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import type { EmployeeRegistrationRequest } from "@/models/AuthenticationModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import { useValidationUtils } from "@/utils/ValidationUtils";
+
 
 export default defineComponent({
     name: "RegisterEmployeeModal",
+    components: { OrganisationUnitAutocompleteSearch },
     emits: ["success", "failure"],
     setup(_, {emit}) {
         const dialog = ref(false);
@@ -105,10 +106,10 @@ export default defineComponent({
         const email = ref("")
         const note = ref("")
         const languages = ref<{ title: string, value: number }[]>([]);
-        const selectedLanguage = ref<{ title: string, value: number } | number>({title: "SR", value: -1});
-        const organisationUnits = ref<{ title: string, value: number }[]>([]);
-        const ouPlaceholder = {title: "", value: -1};
-        const selectedOrganisationUnit = ref<{ title: string, value: number } | number>(ouPlaceholder);
+        const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
+
+        const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
         const i18n = useI18n();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
@@ -123,54 +124,16 @@ export default defineComponent({
             }
         ];
 
-        const requiredFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
-        const requiredSelectionRules = [
-            (value: { title: string, value: number } | number) => {
-                if (!value || value as number == -1 || (value as { title: string, value: number }).value === -1) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-
-        const searchOUs = (input: string) => {
-            if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params).then((response) => {
-                    const listOfOUs: { title: string, value: number }[] = [];
-                    response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfOUs.push({title: organisationUnit.nameSr, value: organisationUnit.databaseId});
-                        } else {
-                            listOfOUs.push({title: organisationUnit.nameOther, value: organisationUnit.databaseId});
-                        }
-                    })
-                    organisationUnits.value = listOfOUs;
-                });
-            }
-        }
-
-        const filterOUs = (): boolean => {
-            return true;
-        }
-
-        const registerEmployee = () => {
+        const registerEmployee = (stayOnPage: boolean) => {
             const newEmployee: EmployeeRegistrationRequest = {
                 name: name.value,
                 surname: surname.value,
                 email: email.value,
                 note: note.value,
-                preferredLanguageId: selectedLanguage.value as number,
-                organisationUnitId: selectedOrganisationUnit.value as number
+                preferredLanguageId: selectedLanguage.value.value,
+                organisationUnitId: selectedOrganisationUnit.value.value
             }
             AuthenticationService.registerEmployee(newEmployee).then(() => {
                 emit("success");
@@ -178,8 +141,10 @@ export default defineComponent({
                 surname.value = "";
                 email.value = "";
                 note.value = "";
-                selectedOrganisationUnit.value = ouPlaceholder;
-                dialog.value = false;
+                ouAutocompleteRef.value?.clearInput();
+                if (!stayOnPage) {
+                    dialog.value = false;   
+                }
             }).catch((error: AxiosError<any, any>) => {
                 emit("failure", error.response?.data.message)
             })
@@ -192,7 +157,7 @@ export default defineComponent({
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
                     if (language.languageCode === "SR") {
-                        selectedLanguage.value = language.id;
+                        selectedLanguage.value = { title: language.languageCode, value: language.id };
                     }
                 })
             })
@@ -201,11 +166,10 @@ export default defineComponent({
         return {dialog, 
                 name, 
                 surname, 
-                organisationUnits, 
+                ouAutocompleteRef, 
                 selectedOrganisationUnit, 
                 email, note,
                 languages, selectedLanguage, 
-                searchOUs, filterOUs, 
                 registerEmployee, 
                 emailFieldRules, requiredFieldRules, requiredSelectionRules,
                 isFormValid};

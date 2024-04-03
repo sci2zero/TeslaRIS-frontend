@@ -1,12 +1,17 @@
 <template>
-    <h1>{{ $t("ouListLabel") }}</h1>
-    <br />
-    <br />
-    <search-bar-component @search="search"></search-bar-component>
-    <br />
-    <br />
-    <br />
-    <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+    <v-container>
+        <h1>{{ $t("ouListLabel") }}</h1>
+        <br />
+        <br />
+        <search-bar-component @search="search"></search-bar-component>
+        <br />
+        <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
+            {{ $t("addOULabel") }}
+        </v-btn>
+        <br />
+        <br />
+        <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -16,6 +21,8 @@ import OrganisationUnitService from '@/services/OrganisationUnitService';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import { ref } from 'vue';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
+import { useRouter } from 'vue-router';
+import UserService from '@/services/UserService';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
@@ -28,6 +35,9 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const router = useRouter();
+        const userRole = UserService.provideUserRole();
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -45,7 +55,11 @@ export default defineComponent({
             search(searchParams.value);
         }
 
-        return {search, organisationUnits, totalOUs, switchPage};
+        const addOU = () => {
+            router.push({name: "submitOrganisationUnit"});
+        }
+
+        return {search, organisationUnits, totalOUs, switchPage, addOU, userRole};
     }
 });
 </script>

@@ -10,6 +10,7 @@
     </v-btn>
     <v-data-table-server
         v-model="selectedPersons"
+        :sort-by="tableOptions.sortBy"
         :items="persons"
         :headers="headers"
         item-value="row"
@@ -29,7 +30,11 @@
                         hide-details
                     />
                 </td>
-                <td>{{ row.item.name }}</td>
+                <td>
+                    <localized-link :to="'persons/' + row.item.databaseId">
+                        {{ row.item.name }}
+                    </localized-link>
+                </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.employmentsSr }}
                 </td>
@@ -61,9 +66,12 @@ import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
 import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+
 
 export default defineComponent({
     name: "PersonTableComponent",
+    components: { LocalizedLink },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -74,7 +82,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedPersons = ref([]);
 
         const i18n = useI18n();
@@ -89,7 +97,7 @@ export default defineComponent({
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
 
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "name"},
@@ -149,7 +157,7 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedPersons, headers, notifications, refreshTable, userRole, deleteSelection};
+        return {selectedPersons, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
     }
 });
 </script>

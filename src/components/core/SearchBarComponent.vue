@@ -7,25 +7,40 @@
             v-model="searchInput"
             density="compact"
             variant="solo"
+            class="pa-3"
             :label="$t('searchBarPlaceholder')"
             append-inner-icon="mdi-magnify"
             single-line
             hide-details
             @click:append-inner="onSearch"
+            @keydown.enter="onSearch"
         ></v-text-field>
     </v-card>
 </template>
 
 <script lang="ts">
+import { onMounted } from 'vue';
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent(
     {
         name: "SearchBarComponent",
+        props: {
+            presetSearchInput: {
+                type: String,
+                default: ""
+            }
+        },
         emits: ["search"],
         setup(props, {emit}) {
-            const searchInput = ref("");
+            const searchInput = ref(props.presetSearchInput);
+
+            onMounted(() => {
+                if (props.presetSearchInput !== "") {
+                    onSearch();
+                }
+            });
 
             const onSearch = () => {
                 let tokens: string[] = searchInput.value.trim().split(" ");

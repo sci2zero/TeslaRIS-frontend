@@ -27,3 +27,12 @@ export interface EmployeeRegistrationRequest {
 export interface RefreshTokenRequest {
     refreshTokenValue: string;
 }
+
+export interface ForgotPasswordRequest {
+    userEmail: string;
+}
+
+export interface ResetPasswordRequest {
+    resetToken: string;
+    newPassword: string;
+}

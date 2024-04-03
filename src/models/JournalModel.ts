@@ -1,3 +1,5 @@
+import type { PublicationSeries } from "./PublicationSeriesModel";
+
 export interface JournalIndex {
     id: string;
     titleSr: string;
@@ -7,4 +9,7 @@ export interface JournalIndex {
     eISSN: string;
     printISSN: string;
     databaseId: number;
+}
+
+export interface Journal extends PublicationSeries {
 }

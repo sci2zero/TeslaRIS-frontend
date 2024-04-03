@@ -1,6 +1,7 @@
 <template>
     <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
     <v-data-table-server
+        :sort-by="tableOptions.sortBy"
         :items="users"
         :headers="headers"
         :items-length="totalUsers"
@@ -11,7 +12,12 @@
             <tr>
                 <td>{{ row.item.fullName }}</td>
                 <td>{{ row.item.email }}</td>
-                <td>{{ row.item.organisationUnitNameSr }}</td>
+                <td v-if="$i18n.locale == 'sr'">
+                    {{ row.item.organisationUnitNameSr }}
+                </td>
+                <td v-if="$i18n.locale == 'en'">
+                    {{ row.item.organisationUnitNameOther }}
+                </td>
                 <td>{{ row.item.userRole }}</td>
                 <td>
                     <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
@@ -82,7 +88,7 @@ export default defineComponent({
 
         const ouColumn = computed(() => i18n.t("organisationUnitNameColumn"));
 
-        const tableOptions = ref({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
 
         const headers = [
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},
