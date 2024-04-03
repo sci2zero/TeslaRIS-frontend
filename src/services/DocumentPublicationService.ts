@@ -4,6 +4,7 @@ import axios from "axios";
 import type { Page } from "@/models/Common";
 import type { Dataset, DocumentPublicationIndex, JournalPublication, Patent, ProceedingsPublication, Software } from "@/models/PublicationModel";
 
+
 export class DocumentPublicationService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
@@ -86,6 +87,26 @@ export class DocumentPublicationService extends BaseService {
 
   async canEdit(publicationId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `document/${publicationId}/can-edit`);
+  }
+
+  async updateSoftware(softwareId: number, updatedSoftware: Software): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `software/${softwareId}`, updatedSoftware);
+  }
+
+  async updateDataset(datasetId: number, updatedDataset: Dataset): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `dataset/${datasetId}`, updatedDataset);
+  }
+
+  async updatePatent(patentId: number, updatedPatent: Patent): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `patent/${patentId}`, updatedPatent);
+  }
+
+  async updateProceedingsPublication(proceedingsPublicationId: number, updatedProceedingsPublication: ProceedingsPublication): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `proceedings-publication/${proceedingsPublicationId}`, updatedProceedingsPublication);
+  }
+
+  async updateJournalPublication(journalPublicationId: number, updatedJournalPublication: JournalPublication): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `journal-publication/${journalPublicationId}`, updatedJournalPublication);
   }
 }
 

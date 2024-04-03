@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Page } from "@/models/Common";
+import type { MultilingualContent, Page } from "@/models/Common";
 import type { BasicPerson, PersonIndex, PersonResponse } from "@/models/PersonModel";
 import type { PersonUserResponse } from "@/models/PersonUserModel";
 
@@ -35,6 +35,14 @@ export class PersonService extends BaseService {
 
   async getPersonWithUser(personId: number): Promise<AxiosResponse<PersonUserResponse>> {
     return super.sendRequest(axios.get, `person/${personId}/person-user`);
+  }
+
+  async updateKeywords(personId: number, biography: MultilingualContent[]): Promise<AxiosResponse<PersonUserResponse>> {
+    return super.sendRequest(axios.patch, `person/keywords/${personId}`, biography);
+  }
+
+  async updateBiography(personId: number, keywords: MultilingualContent[]): Promise<AxiosResponse<PersonUserResponse>> {
+    return super.sendRequest(axios.patch, `person/biography/${personId}`, keywords);
   }
 }
 

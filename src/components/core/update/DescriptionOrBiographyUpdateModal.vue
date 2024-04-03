@@ -26,7 +26,7 @@
                         {{ $t("closeLabel") }}
                     </v-btn>
                     <v-btn color="blue darken-1" @click="updateFormRef?.updateKeywords()">
-                        {{ $t("saveLabel") }}
+                        {{ $t("updateLabel") }}
                     </v-btn>
                 </v-card-actions>
             </v-card>

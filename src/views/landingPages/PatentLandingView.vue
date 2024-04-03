@@ -92,10 +92,10 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
-        <description-section :description="patent?.description" :can-edit="canEdit"></description-section>
+        <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
         <person-document-contribution-list :contribution-list="patent?.contributions"></person-document-contribution-list>
 
@@ -115,11 +115,25 @@
                     @update="updateAttachment($event, false, patent)"></attachment-list>
             </v-col>
         </v-row>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -144,6 +158,9 @@ export default defineComponent({
     name: "PatentLandingPage",
     components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
         const router = useRouter();
 
@@ -198,7 +215,27 @@ export default defineComponent({
 
         const goToURL = (uri: string) => {
             window.open(uri, '_blank');
-        }
+        };
+
+        const updateKeywords = (keywords: MultilingualContent[]) => {
+            patent.value!.keywords = keywords;
+            performUpdate();
+        };
+
+        const updateDescription = (description: MultilingualContent[]) => {
+            patent.value!.description = description;
+            performUpdate();
+        };
+
+        const performUpdate = () => {
+            DocumentPublicationService.updatePatent(patent.value?.id as number, patent.value as Patent).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
 
         return {
             patent, icon,
@@ -207,7 +244,8 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap,
             searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment
+            addAttachment, updateAttachment, deleteAttachment,
+            updateKeywords, updateDescription, snackbar, snackbarMessage
         };
 }})
 

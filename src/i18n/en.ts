@@ -192,5 +192,8 @@ export default {
     loginToViewDocumentMessage: "Document is not publicly available, please login to be able to view it.",
     updateKeywordsLabel: "Update Keywords",
     updateDescriptionLabel: "Update Description",
-    updateBiographyLabel: "Update Biography"
+    updateBiographyLabel: "Update Biography",
+    updatedSuccessMessage: "Updated successfully.",
+    updatePublisherLabel: "Update Publisher",
+    updateLabel: "Update"
 }

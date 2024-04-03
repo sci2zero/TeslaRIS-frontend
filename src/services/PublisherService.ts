@@ -23,6 +23,10 @@ export class PublisherService extends BaseService {
   async deletePublisher(publisherId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `publisher/${publisherId}`);
   }
+
+  async canEdit(publisherId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `publisher/${publisherId}/can-edit`);
+  }
 }
 
 export default new PublisherService();

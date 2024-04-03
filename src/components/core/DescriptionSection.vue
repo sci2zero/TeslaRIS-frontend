@@ -3,7 +3,7 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <description-or-biography-update-modal :preset-description-or-biography="description ? description : []" :is-biography="isBiography" :read-only="!canEdit"></description-or-biography-update-modal>
+                    <description-or-biography-update-modal :preset-description-or-biography="description ? description : []" :is-biography="isBiography" :read-only="!canEdit" @update="emitToParent"></description-or-biography-update-modal>
 
                     <div><b>{{ $t("descriptionLabel") }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
@@ -38,14 +38,14 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ["searchKeyword"],
+    emits: ["update"],
     setup(_, { emit }) {
         
-        const searchKeyword = (keyword: string) => {
-            emit("searchKeyword", keyword)
+        const emitToParent = (description: MultilingualContent[]) => {
+            emit("update", description)
         };
 
-        return { searchKeyword, returnCurrentLocaleContent };
+        return { emitToParent, returnCurrentLocaleContent };
     },
 });
 </script>

@@ -92,10 +92,10 @@
         </v-row>
 
         <!-- Keywords -->
-        <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)"></keyword-list>
+        <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
-        <description-section :description="software?.description" :can-edit="canEdit"></description-section>
+        <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
         <person-document-contribution-list :contribution-list="software?.contributions"></person-document-contribution-list>
 
@@ -115,11 +115,25 @@
                     @update="updateAttachment($event, false, software)"></attachment-list>
             </v-col>
         </v-row>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -144,6 +158,9 @@ export default defineComponent({
     name: "SoftwareLandingPage",
     components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
         const router = useRouter();
 
@@ -200,6 +217,26 @@ export default defineComponent({
             window.open(uri, '_blank');
         }
 
+        const updateKeywords = (keywords: MultilingualContent[]) => {
+            software.value!.keywords = keywords;
+            performUpdate();
+        };
+
+        const updateDescription = (description: MultilingualContent[]) => {
+            software.value!.description = description;
+            performUpdate();
+        };
+
+        const performUpdate = () => {
+            DocumentPublicationService.updateSoftware(software.value?.id as number, software.value as Software).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
             software, icon,
             publications, publisher,
@@ -207,7 +244,9 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap,
             searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment
+            addAttachment, updateAttachment, deleteAttachment,
+            updateKeywords, updateDescription,
+            snackbar, snackbarMessage
         };
 }})
 

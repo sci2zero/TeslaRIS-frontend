@@ -192,5 +192,8 @@ export default {
     loginToViewDocumentMessage: "Dokument nije javno dostupan, morate se ulogovati kako biste ga videli.",
     updateKeywordsLabel: "Ažuriraj ključne reči",
     updateDescriptionLabel: "Ažuriraj opis",
-    updateBiographyLabel: "Ažuriraj biografiju"
+    updateBiographyLabel: "Ažuriraj biografiju",
+    updatedSuccessMessage: "Uspešno ažurirano.",
+    updatePublisherLabel: "Ažuriraj izdavača",
+    updateLabel: "Ažuriraj"
 }

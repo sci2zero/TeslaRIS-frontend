@@ -18,6 +18,10 @@ export class ProceedingsService extends BaseService {
   async readProceedingsForEvent(eventId: number): Promise<AxiosResponse<ProceedingsResponse[]>> {
     return super.sendRequest(axios.get, `proceedings/for-event/${eventId}`);
   }
+
+  async updateProceedings(proceedingsId: number, updatedProceedings: Proceedings): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `proceedings/${proceedingsId}`, updatedProceedings);
+  }
 }
 
 export default new ProceedingsService();
