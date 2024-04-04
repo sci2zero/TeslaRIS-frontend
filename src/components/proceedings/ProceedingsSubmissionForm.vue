@@ -33,30 +33,12 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-select
-                                v-model="selectedpublicationType"
-                                :items="publicationTypes"
-                                :label="$t('typeOfPublicationLabel')"
-                                return-object>
-                            </v-select>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
                             <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -72,6 +54,11 @@
                                 :items="languageList"
                                 multiple
                             ></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -148,7 +135,6 @@ import UriInput from '../core/UriInput.vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
-import { ProceedingsPublicationType } from "@/models/PublicationModel";
 import type { Proceedings } from "@/models/ProceedingsModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
@@ -201,7 +187,6 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
-        const placeRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
@@ -219,7 +204,6 @@ export default defineComponent({
 
         const title = ref([]);
         const subtitle = ref([]);
-        const place = ref([]);
         const uris = ref([]);
         const keywords = ref([]);
         const description = ref([]);
@@ -231,31 +215,6 @@ export default defineComponent({
         const scopus = ref("");
         const publicationSeriesVolume = ref("");
         const publicationSeriesIssue = ref("");
-
-        const publicationTypeSr = [
-            { title: "Redovan članak - pun tekst", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
-            { title: "Pozvani članak - pun tekst", value: ProceedingsPublicationType.INVITED_FULL_ARTICLE },
-            { title: "Pozvani članak - sažetak", value: ProceedingsPublicationType.INVITED_ABSTRACT_ARTICLE },
-            { title: "Redovan članak - sažetak", value: ProceedingsPublicationType.REGULAR_ABSTRACT_ARTICLE },
-            { title: "Predgovor", value: ProceedingsPublicationType.PREFACE },
-            { title: "Leksikografska jedinica", value: ProceedingsPublicationType.LEXICOGRAPHIC_UNIT },
-            { title: "Polemika", value: ProceedingsPublicationType.POLEMICS },
-            { title: "Naučna kritika", value: ProceedingsPublicationType.SCIENTIFIC_CRITIC },
-        ];
-
-        const publicationTypeEn = [
-            { title: "Regular Full Article", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
-            { title: "Invited Full Article", value: ProceedingsPublicationType.INVITED_FULL_ARTICLE },
-            { title: "Invited Abstract Article", value: ProceedingsPublicationType.INVITED_ABSTRACT_ARTICLE },
-            { title: "Regular Abstract Article", value: ProceedingsPublicationType.REGULAR_ABSTRACT_ARTICLE },
-            { title: "Preface", value: ProceedingsPublicationType.PREFACE },
-            { title: "Lexicographic Unit", value: ProceedingsPublicationType.LEXICOGRAPHIC_UNIT },
-            { title: "Polemics", value: ProceedingsPublicationType.POLEMICS },
-            { title: "Scientific Critic", value: ProceedingsPublicationType.SCIENTIFIC_CRITIC },
-        ];
-
-        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? publicationTypeSr : publicationTypeEn);
-        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
 
         const setPublicationYear = (date: string) => {
             const year = /\d{4}/.exec(date);
@@ -323,10 +282,8 @@ export default defineComponent({
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
-                    placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     eventAutocompleteRef.value?.clearInput();
-                    selectedpublicationType.value = {title: "", value: null};
                     doi.value = "";
                     scopus.value = "";
                     numberOfPages.value = null;
@@ -350,15 +307,13 @@ export default defineComponent({
             snackbar, error,
             title, titleRef, subtitle, subtitleRef,
             eventAutocompleteRef, selectedEvent,
-            journalAutocompleteRef, selectedJournal,
-            place, placeRef, uris, urisRef,
+            journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
             description, descriptionRef,
             publicationYear, doi, scopus, numberOfPages,
             keywords, keywordsRef, setPublicationYear,
             publicationSeriesVolume, publicationSeriesIssue,
             publisherAutocompleteRef, selectedPublisher,
-            publicationTypes, selectedpublicationType,
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submitProceedings

@@ -195,5 +195,7 @@ export default {
     updateBiographyLabel: "Ažuriraj biografiju",
     updatedSuccessMessage: "Uspešno ažurirano.",
     updatePublisherLabel: "Ažuriraj izdavača",
-    updateLabel: "Ažuriraj"
+    updateLabel: "Ažuriraj",
+    updateJournalLabel: "Ažuriraj časopis",
+    updateBookSeriesLabel: "Ažuriraj seriju knjiga"
 }

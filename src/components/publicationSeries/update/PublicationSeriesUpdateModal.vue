@@ -13,11 +13,11 @@
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("updatePublisherLabel") }}</span>
+                    <span class="text-h5">{{ inputType === "0" ? $t("updateJournalLabel") : $t("updateBookSeriesLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <publisher-update-form ref="updateFormRef" :preset-publisher="presetPublisher" @update="emitToParent"></publisher-update-form>
+                        <publication-series-update-form ref="updateFormRef" :input-type="inputType" :preset-publication-series="presetPublicationSeries" @update="emitToParent"></publication-series-update-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -25,7 +25,7 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!updateFormRef?.isFormValid" @click="updateFormRef?.updatePublisher()">
+                    <v-btn color="blue darken-1" :disabled="!updateFormRef?.isFormValid" @click="updateFormRef?.updatePublicationSeries()">
                         {{ $t("updateLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -37,32 +37,37 @@
 <script lang="ts">
 import { ref } from "vue";
 import { defineComponent } from "vue";
-import PublisherUpdateForm from "./PublisherUpdateForm.vue";
 import type { PropType } from "vue";
-import type { Publisher } from "@/models/PublisherModel";
+import PublicationSeriesUpdateForm from "./PublicationSeriesUpdateForm.vue";
+import type { Journal } from "@/models/JournalModel";
+import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 
 
 export default defineComponent({
-    name: "PublisherUpdateModal",
-    components: { PublisherUpdateForm },
+    name: "PublicationSeriesUpdateModal",
+    components: { PublicationSeriesUpdateForm },
     props: {
         readOnly: {
             type: Boolean,
             default: false
         },
-        presetPublisher: {
-            type: Object as PropType<Publisher | undefined>,
+        presetPublicationSeries: {
+            type: Object as PropType<PublicationSeries | undefined>,
             required: true
-        }
+        },
+        inputType: {
+            type: String,
+            required: true
+        },
     },
     emits: ["update"],
     setup(_, { emit }) {
         const dialog = ref(false);
 
-        const updateFormRef = ref<typeof PublisherUpdateForm>();
+        const updateFormRef = ref<typeof PublicationSeriesUpdateForm>();
 
-        const emitToParent = (publisher: Publisher) => {
-            emit("update", publisher)
+        const emitToParent = (publicationSeries: Journal) => {
+            emit("update", publicationSeries)
             dialog.value = false;
         };
 

@@ -31,12 +31,12 @@
                     />
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    <localized-link :to="'scientific-results/' + getResultType(row.item) + row.item.databaseId">
+                    <localized-link :to="(getResultType(row.item) !== 'proceedings/' ? 'scientific-results/' : '') + getResultType(row.item) + row.item.databaseId">
                         {{ row.item.titleSr }}
                     </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'en'">
-                    <localized-link :to="'scientific-results/' + getResultType(row.item) + row.item.databaseId">
+                    <localized-link :to="(getResultType(row.item) !== 'proceedings/' ? 'scientific-results/' : '') + getResultType(row.item) + row.item.databaseId">
                         {{ row.item.titleOther }}
                     </localized-link>
                 </td>
@@ -184,6 +184,8 @@ export default defineComponent({
                     return "proceedings-publication/";
                 case "PATENT":
                     return "patent/";
+                case "PROCEEDINGS":
+                    return "proceedings/";
                 case "DATASET":
                     return "dataset/";
                 case "SOFTWARE":
