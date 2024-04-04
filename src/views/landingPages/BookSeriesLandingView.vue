@@ -24,11 +24,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <publication-series-update-modal :read-only="!canEdit" :preset-publication-series="bookSeries" input-type="BOOK_SERIES" @update="updateBasicInfo"></publication-series-update-modal>
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -44,7 +40,7 @@
                                 <div class="response">
                                     {{ bookSeries?.printISSN ? bookSeries.printISSN : $t("notYetSetMessage") }}
                                 </div>
-                                <div>
+                                <div v-if="bookSeries?.languageTagIds && bookSeries?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
                                 <div>
@@ -84,6 +80,20 @@
         <!-- Publication Table -->
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -100,12 +110,17 @@ import type { BookSeries } from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
+import ProceedingsService from '@/services/ProceedingsService';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, PublicationSeriesUpdateModal },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
 
         const bookSeries = ref<BookSeries>();
@@ -120,9 +135,15 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-bookshelf")
+        const icon = ref("mdi-bookshelf");
+
+        const canEdit = ref(false);
 
         onMounted(() => {
+            BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
+                canEdit.value = response.data;
+            });
+
             BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
                 bookSeries.value = response.data;
 
@@ -156,7 +177,30 @@ export default defineComponent({
                 return;
             }
 
-            // TODO: do we need this?
+            ProceedingsService.findProceedingsForBookSeries(bookSeries.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
+                publications.value = response.data.content;
+                totalPublications.value = response.data.totalElements
+            });
+        };
+
+        const updateBasicInfo = (updatedBookSeries: BookSeries) => {
+            bookSeries.value!.title = updatedBookSeries.title;
+            bookSeries.value!.nameAbbreviation = updatedBookSeries.nameAbbreviation;
+            bookSeries.value!.eissn = updatedBookSeries.eissn;
+            bookSeries.value!.printISSN = updatedBookSeries.printISSN;
+            bookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+
+            performUpdate();
+        };
+
+        const performUpdate = () => {
+            BookSeriesService.updateBookSeries(bookSeries.value?.id as number, bookSeries.value as BookSeries).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
         };
 
         return {
@@ -165,7 +209,8 @@ export default defineComponent({
             totalPublications,
             switchPage,
             returnCurrentLocaleContent,
-            languageTagMap
+            languageTagMap, canEdit,
+            updateBasicInfo, snackbar, snackbarMessage
         };
 }})
 

@@ -21,8 +21,16 @@ export class BookSeriesService extends BaseService {
     return super.sendRequest(axios.post, "book-series", body, BookSeriesService.idempotencyKey);
   }
 
+  async updateBookSeries(bookSeriesId: number, updatedBookSeries: BookSeries): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `book-series/${bookSeriesId}`, updatedBookSeries);
+  }
+
   async deleteBookSeries(bookSeriesId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `book-series/${bookSeriesId}`);
+  }
+
+  async canEdit(bookSeriesId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `book-series/${bookSeriesId}/can-edit`);
   }
 }
 

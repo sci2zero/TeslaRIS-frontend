@@ -24,13 +24,9 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <publication-series-update-modal :read-only="!canEdit" :preset-publication-series="journal" input-type="JOURNAL" @update="updateBasicInfo"></publication-series-update-modal>
 
-                        <!-- Personal Info -->
+                        <!-- Basic Info -->
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
@@ -44,7 +40,7 @@
                                 <div class="response">
                                     {{ journal?.printISSN ? journal.printISSN : $t("notYetSetMessage") }}
                                 </div>
-                                <div>
+                                <div v-if="journal?.languageTagIds && journal?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
                                 <div>
@@ -84,6 +80,20 @@
         <!-- Publication Table -->
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -102,12 +112,16 @@ import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, PublicationSeriesUpdateModal },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
 
         const journal = ref<Journal>();
@@ -122,9 +136,15 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-book-open-blank-variant")
+        const icon = ref("mdi-book-open-blank-variant");
+
+        const canEdit = ref(false);
 
         onMounted(() => {
+            JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
+                canEdit.value = response.data;
+            });
+
             JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
                 journal.value = response.data;
 
@@ -164,13 +184,34 @@ export default defineComponent({
             });
         };
 
+        const updateBasicInfo = (updatedJournal: Journal) => {
+            journal.value!.title = updatedJournal.title;
+            journal.value!.nameAbbreviation = updatedJournal.nameAbbreviation;
+            journal.value!.eissn = updatedJournal.eissn;
+            journal.value!.printISSN = updatedJournal.printISSN;
+            journal.value!.languageTagIds = updatedJournal.languageTagIds;
+
+            performUpdate();
+        };
+
+        const performUpdate = () => {
+            JournalService.updateJournal(journal.value?.id as number, journal.value as Journal).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
             journal, icon,
             publications, 
             totalPublications,
-            switchPage,
+            switchPage, canEdit,
             returnCurrentLocaleContent,
-            languageTagMap
+            languageTagMap, updateBasicInfo,
+            snackbar, snackbarMessage
         };
 }})
 

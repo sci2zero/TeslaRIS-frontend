@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <proceedings-update-modal :preset-proceedings="proceedings" :read-only="false"></proceedings-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -59,7 +55,7 @@
                                 </div>
                                 <div v-if="proceedings?.publicationSeriesId" class="response">
                                     <localized-link :to="`${publicationSeriesType.toString() === '0' ? 'journals' : 'book-series'}/` + proceedings?.publicationSeriesId">
-                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                        {{ returnCurrentLocaleContent(publicationSeries?.title) }}
                                     </localized-link>
                                 </div>
                                 <div v-if="proceedings?.documentDate">
@@ -68,8 +64,40 @@
                                 <div v-if="proceedings?.documentDate" class="response">
                                     {{ proceedings.documentDate }}
                                 </div>
+                                <div v-if="proceedings?.publicationSeriesVolume">
+                                    {{ $t("publicationSeriesVolumeLabel") }}:
+                                </div>
+                                <div v-if="proceedings?.publicationSeriesVolume" class="response">
+                                    {{ proceedings.publicationSeriesVolume }}
+                                </div>
+                                <div v-if="proceedings?.publicationSeriesIssue">
+                                    {{ $t("publicationSeriesIssueLabel") }}:
+                                </div>
+                                <div v-if="proceedings?.publicationSeriesIssue" class="response">
+                                    {{ proceedings.publicationSeriesIssue }}
+                                </div>
+                                <div v-if="proceedings?.languageTagIds && proceedings?.languageTagIds.length > 0">
+                                    {{ $t("languageLabel") }}:
+                                </div>
+                                <div>
+                                    <v-chip v-for="(languageTagId, index) in proceedings?.languageTagIds" :key="index" outlined>
+                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                    </v-chip>
+                                </div>
                             </v-col>
                             <v-col cols="6">
+                                <div v-if="proceedings?.eISBN">
+                                    E-ISBN:
+                                </div>
+                                <div v-if="proceedings?.eISBN" class="response">
+                                    {{ proceedings.eISBN }}
+                                </div>
+                                <div v-if="proceedings?.printISBN">
+                                    Print ISBN:
+                                </div>
+                                <div v-if="proceedings?.printISBN" class="response">
+                                    {{ proceedings.printISBN }}
+                                </div>
                                 <div v-if="proceedings?.scopusId">
                                     Scopus ID:
                                 </div>
@@ -174,11 +202,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
+import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsUpdateModal.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink },
+    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -272,6 +301,10 @@ export default defineComponent({
         };
 
         const performUpdate = () => {
+            if (proceedings.value?.publicationSeriesId === 0) {
+                proceedings.value.publicationSeriesId = undefined;
+            }
+
             ProceedingsService.updateProceedings(proceedings.value?.id as number, proceedings.value as Proceedings).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
@@ -289,7 +322,8 @@ export default defineComponent({
             languageTagMap, publicationSeriesType,
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
-            updateKeywords, updateDescription, snackbar, snackbarMessage
+            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            publicationSeries
         };
 }})
 

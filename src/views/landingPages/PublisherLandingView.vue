@@ -24,7 +24,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <publisher-update-modal :read-only="!canEdit" :preset-publisher="publisher"></publisher-update-modal>
+                        <publisher-update-modal :read-only="!canEdit" :preset-publisher="publisher" @update="updateBasicInfo"></publisher-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -56,6 +56,20 @@
         <!-- Publication Table -->
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -80,6 +94,9 @@ export default defineComponent({
     name: "PublisherSeriesLandingPage",
     components: { PublicationTableComponent, PublisherUpdateModal },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
 
         const publisher = ref<Publisher>();
@@ -142,13 +159,28 @@ export default defineComponent({
             })
         };
 
+        const updateBasicInfo = (updatedBasicInfo: Publisher) => {
+            publisher.value!.name = updatedBasicInfo.name;
+            publisher.value!.place = updatedBasicInfo.place;
+            publisher.value!.state = updatedBasicInfo.state;
+
+            PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
             publisher, icon,
             publications, 
             totalPublications,
             switchPage,
             returnCurrentLocaleContent,
-            languageTagMap, canEdit
+            languageTagMap, canEdit,
+            updateBasicInfo, snackbar, snackbarMessage
         };
 }})
 

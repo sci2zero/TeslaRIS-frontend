@@ -2,6 +2,8 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Proceedings, ProceedingsResponse } from "@/models/ProceedingsModel";
+import type { Page } from "@/models/Common";
+import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 
 export class ProceedingsService extends BaseService {
 
@@ -21,6 +23,10 @@ export class ProceedingsService extends BaseService {
 
   async updateProceedings(proceedingsId: number, updatedProceedings: Proceedings): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `proceedings/${proceedingsId}`, updatedProceedings);
+  }
+
+  async findProceedingsForBookSeries(bookSeriesId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `proceedings/book-series/${bookSeriesId}?${pageable}`);
   }
 }
 

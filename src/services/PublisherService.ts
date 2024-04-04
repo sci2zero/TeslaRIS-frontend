@@ -20,6 +20,10 @@ export class PublisherService extends BaseService {
     return super.sendRequest(axios.post, "publisher", body, PublisherService.idempotencyKey);
   }
 
+  async updatePublisher(publisherId: number, updatedPublisher: Publisher): Promise<AxiosResponse<Publisher>> {
+    return super.sendRequest(axios.put, `publisher/${publisherId}`, updatedPublisher);
+  }
+
   async deletePublisher(publisherId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `publisher/${publisherId}`);
   }

@@ -195,5 +195,7 @@ export default {
     updateBiographyLabel: "Update Biography",
     updatedSuccessMessage: "Updated successfully.",
     updatePublisherLabel: "Update Publisher",
-    updateLabel: "Update"
+    updateLabel: "Update",
+    updateJournalLabel: "Update Journal",
+    updateBookSeriesLabel: "Update Book Series"
 }
