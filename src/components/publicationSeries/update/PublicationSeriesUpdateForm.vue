@@ -107,8 +107,6 @@ export default defineComponent({
                 contributions: []
             };
 
-            console.log(updatedPublicationSeries);
-
             emit("update", updatedPublicationSeries);
         };
 

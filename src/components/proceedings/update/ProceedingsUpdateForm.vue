@@ -124,8 +124,13 @@ import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocom
 import BookSeriesAutocompleteSearch from '@/components/bookSeries/BookSeriesAutocompleteSearch.vue';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import UriInput from '@/components/core/UriInput.vue';
+import JournalService from '@/services/JournalService';
+import BookSeriesService from '@/services/BookSeriesService';
+import EventService from '@/services/EventService';
+import PublisherService from '@/services/PublisherService';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -156,6 +161,26 @@ export default defineComponent({
                     languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
                 })
             });
+            
+            EventService.readConference(props.presetProceedings?.eventId as number).then((response) => {
+                selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: props.presetProceedings?.eventId as number};
+            });
+
+            if(props.presetProceedings?.publisherId) {
+                PublisherService.readPublisher(props.presetProceedings.publisherId).then((response) => {
+                    selectedPublisher.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: props.presetProceedings?.publisherId as number};
+                });
+            }
+
+            if(props.presetProceedings?.publicationSeriesId) {
+                JournalService.readJournal(props.presetProceedings?.publicationSeriesId).then((journalResponse) => {
+                    selectedJournal.value = {title: returnCurrentLocaleContent(journalResponse.data.title) as string, value: journalResponse.data.id as number};
+                }).catch(() => {
+                    BookSeriesService.readBookSeries(props.presetProceedings?.publicationSeriesId as number).then((bookSeriesResponse) => {
+                        selectedBookSeries.value = {title: returnCurrentLocaleContent(bookSeriesResponse.data.title) as string, value: bookSeriesResponse.data.id as number};
+                    });
+                });
+            }
         });
 
         const titleRef = ref<typeof MultilingualTextInput>();
@@ -199,6 +224,10 @@ export default defineComponent({
                 publicationSeriesExternalValidation.value = { passed: true, message: "" };
             }
         };
+
+        watch([selectedJournal, selectedBookSeries], () => {
+            validatePublicationSeriesSelection();
+        });
         
         const updateProceedings = () => {
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
@@ -228,8 +257,6 @@ export default defineComponent({
                 fileItems: [],
                 proofs: []
             };
-
-            console.log(updatedProceedings);
 
             emit("update", updatedProceedings);
         };

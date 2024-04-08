@@ -51,8 +51,11 @@
     </v-row>
     <multilingual-text-input
         v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')"
+        :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
         is-area></multilingual-text-input>
-    <multilingual-text-input v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"></multilingual-text-input>
+    <multilingual-text-input
+        v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+        :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"></multilingual-text-input>
 </template>
 
 <script lang="ts">
@@ -67,6 +70,11 @@ import lodash from "lodash";
 import { watch } from "vue";
 import type { PersonName } from "@/models/PersonModel";
 import PersonSubmissionModal from "../person/PersonSubmissionModal.vue";
+import type { PropType } from "vue";
+import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
+import { toMultilingualTextInput } from "@/i18n/TranslationUtil";
+import { onMounted } from "vue";
+import LanguageService from "@/services/LanguageService";
 
 export default defineComponent({
     name: "PersonContributionBase",
@@ -75,10 +83,19 @@ export default defineComponent({
         basic: {
             type: Boolean,
             default: false
+        },
+        presetContributionValue: {
+            type: Object as PropType<{personId: number, description: MultilingualContent[], affiliationStatement: MultilingualContent[], selectedOtherName: string[]}>,
+            default: () => ({
+                personId: -1,
+                description: [],
+                affiliationStatement: [],
+                selectedOtherName: []
+            })
         }
     },
     emits: ["setInput"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
 
@@ -101,6 +118,14 @@ export default defineComponent({
 
         const personOtherNames = ref<{ title: string, value: PersonName | number }[]>([]);
         const selectedOtherName = ref<{ title: string, value: PersonName | number }>(personOtherNamePlaceholder.value);
+
+        const languageTags = ref<LanguageTagResponse[]>([]);
+
+        onMounted(() => {
+            LanguageService.getAllLanguageTags().then(response => {
+                languageTags.value = response.data;
+            });
+        });
 
         const searchPersons = lodash.debounce((input: string) => {
             if (input.includes("|")) {
@@ -131,6 +156,37 @@ export default defineComponent({
             return true;
         };
 
+        watch(() => props.presetContributionValue, () => {
+            if(props.presetContributionValue && props.presetContributionValue.selectedOtherName[0]) {
+                const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
+                
+                if(props.presetContributionValue.personId) {
+                    PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
+                        selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
+                        personOtherNames.value = [{title: selectedPerson.value.title, value: -1}];
+                        personResponse.data.personOtherNames.forEach((otherName) => {
+                            personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName})
+                        });
+
+                        const foundName = personOtherNames.value.find(otherName => {
+                            return otherName.title === selectedPersonName;
+                        });
+
+                        if(foundName) {
+                            selectedOtherName.value = foundName;
+                        } else {props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]} ` : ""
+                            customNameInput.value = true;
+                            firstName.value = props.presetContributionValue.selectedOtherName[0];
+                            middleName.value = props.presetContributionValue.selectedOtherName[1];
+                            lastName.value = props.presetContributionValue.selectedOtherName[2];
+                        }
+                    });
+
+                    sendContentToParent();
+                }
+            }
+        });
+
         const onPersonSelect = (selection: {title: string, value: number}) => {
             PersonService.readPerson(selection.value).then((response) => {
                 personOtherNames.value = [{title: selection.title.split("|")[0], value: -1}];
@@ -157,6 +213,7 @@ export default defineComponent({
                 affiliationStatement: affiliationStatement.value,
                 selectedOtherName: otherName
             };
+            
             emit("setInput", returnObject);
         };
 
@@ -186,7 +243,8 @@ export default defineComponent({
                 sendContentToParent, clearInput, onPersonSelect,
                 descriptionRef, affiliationStatementRef,
                 personOtherNames, selectedOtherName,
-                selectNewlyAddedPerson};
+                selectNewlyAddedPerson, toMultilingualTextInput,
+                languageTags};
     }
 });
 </script>

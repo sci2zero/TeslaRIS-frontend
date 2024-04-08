@@ -95,6 +95,12 @@ export default defineComponent({
             ];
         });
 
+        watch(() => props.modelValue, () => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedJournal.value = props.modelValue;
+            }
+        });
+
         const searchJournals = lodash.debounce((input: string) => {
             if (input.includes("|")) {
                 return;

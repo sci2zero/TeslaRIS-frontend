@@ -117,9 +117,7 @@ export default defineComponent({
                 name: name.value,
                 state: multilingualState,
                 place: place.value
-            }
-
-            console.log(updatedPublisher);
+            };
 
             emit("update", updatedPublisher);
         };

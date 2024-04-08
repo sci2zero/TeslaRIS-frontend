@@ -26,7 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <proceedings-update-modal :preset-proceedings="proceedings" :read-only="false"></proceedings-update-modal>
+                        <proceedings-update-modal :preset-proceedings="proceedings" :read-only="!canEdit" @update="updateBasicInfo"></proceedings-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -242,30 +242,9 @@ export default defineComponent({
                 proceedings.value = response.data;
 
                 proceedings.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
-
-                EventService.readConference(proceedings.value.eventId as number).then((eventResponse) => {
-                    event.value = eventResponse.data;
-                });
-
-                if(proceedings.value.publisherId) {
-                    PublisherService.readPublisher(proceedings.value.publisherId).then((response) => {
-                        publisher.value = response.data;
-                    });
-                }
-
-                // TODO: Maybe find a more elagant way of handling this
-                if(proceedings.value.publicationSeriesId) {
-                    JournalService.readJournal(proceedings.value.publicationSeriesId).then((journalResponse) => {
-                        publicationSeries.value = journalResponse.data;
-                        publicationSeriesType.value = PublicationSeriesType.JOURNAL;
-                    }).catch(() => {
-                        BookSeriesService.readBookSeries(proceedings.value?.publicationSeriesId as number).then((bookSeriesResponse) => {
-                            publicationSeries.value = bookSeriesResponse.data;
-                            publicationSeriesType.value = PublicationSeriesType.BOOK_SERIES;
-                        });
-                    });
-                }
     
+                fetchConnectedEntities();
+
                 populateData();
             });
         });
@@ -282,12 +261,57 @@ export default defineComponent({
             });
         };
 
+        const fetchConnectedEntities = () => {
+            EventService.readConference(proceedings.value?.eventId as number).then((eventResponse) => {
+                    event.value = eventResponse.data;
+                });
+
+                if(proceedings.value?.publisherId) {
+                    PublisherService.readPublisher(proceedings.value.publisherId).then((response) => {
+                        publisher.value = response.data;
+                    });
+                }
+
+                if(proceedings.value?.publicationSeriesId) {
+                    JournalService.readJournal(proceedings.value.publicationSeriesId).then((journalResponse) => {
+                        publicationSeries.value = journalResponse.data;
+                        publicationSeriesType.value = PublicationSeriesType.JOURNAL;
+                    }).catch(() => {
+                        BookSeriesService.readBookSeries(proceedings.value?.publicationSeriesId as number).then((bookSeriesResponse) => {
+                            publicationSeries.value = bookSeriesResponse.data;
+                            publicationSeriesType.value = PublicationSeriesType.BOOK_SERIES;
+                        });
+                    });
+                }
+        };
+
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications" }});
         };
 
         const goToURL = (uri: string) => {
             window.open(uri, '_blank');
+        };
+
+        const updateBasicInfo = (updatedInfo: Proceedings) => {
+            proceedings.value!.title = updatedInfo.title;
+            proceedings.value!.subTitle = updatedInfo.subTitle;
+            proceedings.value!.description = updatedInfo.description;
+            proceedings.value!.keywords = updatedInfo.keywords;
+            proceedings.value!.uris = updatedInfo.uris;
+            proceedings.value!.documentDate = updatedInfo.documentDate;
+            proceedings.value!.doi = updatedInfo.doi;
+            proceedings.value!.eISBN = updatedInfo.eISBN;
+            proceedings.value!.eventId = updatedInfo.eventId;
+            proceedings.value!.languageTagIds = updatedInfo.languageTagIds;
+            proceedings.value!.numberOfPages = updatedInfo.numberOfPages;
+            proceedings.value!.printISBN = updatedInfo.printISBN;
+            proceedings.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
+            proceedings.value!.publicationSeriesIssue = updatedInfo.publicationSeriesIssue;
+            proceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
+            proceedings.value!.publisherId = updatedInfo.publisherId;
+            proceedings.value!.scopusId = updatedInfo.scopusId;
+            performUpdate();
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -308,6 +332,7 @@ export default defineComponent({
             ProceedingsService.updateProceedings(proceedings.value?.id as number, proceedings.value as Proceedings).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                fetchConnectedEntities();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -323,7 +348,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            publicationSeries
+            publicationSeries, updateBasicInfo
         };
 }})
 
