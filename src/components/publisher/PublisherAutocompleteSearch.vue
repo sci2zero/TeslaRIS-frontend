@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import PublisherService from '@/services/PublisherService';
@@ -91,6 +91,12 @@ export default defineComponent({
         const sendContentToParent = () => {
             emit("update:modelValue", selectedPublisher.value);
         };
+
+        watch(() => props.modelValue, () => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedPublisher.value = props.modelValue;
+            }
+        });
 
         const clearInput = () => {
             selectedPublisher.value = searchPlaceholder;

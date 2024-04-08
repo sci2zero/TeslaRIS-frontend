@@ -197,5 +197,6 @@ export default {
     updatePublisherLabel: "Ažuriraj izdavača",
     updateLabel: "Ažuriraj",
     updateJournalLabel: "Ažuriraj časopis",
-    updateBookSeriesLabel: "Ažuriraj seriju knjiga"
+    updateBookSeriesLabel: "Ažuriraj seriju knjiga",
+    updateContributionsLabel: "Ažuriraj kontributore"
 }

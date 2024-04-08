@@ -96,6 +96,12 @@ export default defineComponent({
             ];
         });
 
+        watch(() => props.modelValue, () => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedBookSeries.value = props.modelValue;
+            }
+        });
+
         const searchBookSeries = lodash.debounce((input: string) => {
             if (input.includes("|")) {
                 return;

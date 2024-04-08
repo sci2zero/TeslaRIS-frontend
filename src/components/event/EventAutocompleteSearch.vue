@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import EventService from '@/services/EventService';
@@ -104,6 +104,12 @@ export default defineComponent({
         const sendContentToParent = () => {
             emit("update:modelValue", selectedEvent.value);
         };
+
+        watch(() => props.modelValue, () => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedEvent.value = props.modelValue;
+            }
+        });
 
         const clearInput = () => {
             selectedEvent.value = searchPlaceholder;

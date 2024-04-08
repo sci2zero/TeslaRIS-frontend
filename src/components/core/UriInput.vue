@@ -34,6 +34,7 @@ export default defineComponent({
 
         onMounted(() => {
             if (props.modelValue && props.modelValue.length > 0) {
+                uris.value = [];
                 props.modelValue.forEach((uri) => {
                     uris.value.push({value: uri});
                 });

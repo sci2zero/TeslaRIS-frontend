@@ -3,11 +3,8 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <div class="edit-pen">
-                        <v-btn icon variant="outlined" size="small"> 
-                            <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                        </v-btn>
-                    </div>
+                    <publication-contribution-update-modal :read-only="false" :preset-document-contributions="contributionList" @update="sendToParent"></publication-contribution-update-modal>
+
                     <div><b>{{ $t("authorsLabel") }}</b></div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     
@@ -30,19 +27,25 @@
 import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import { defineComponent, type PropType } from 'vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import PublicationContributionUpdateModal from '@/components/publication/update/PublicationContributionUpdateModal.vue';
 
 
 export default defineComponent({
     name: "PersonDocumentContributionList",
-    components: { LocalizedLink },
+    components: { LocalizedLink, PublicationContributionUpdateModal },
     props: {
         contributionList: {
             type: Array as PropType<PersonDocumentContribution[] | undefined>,
             required: true
         }
     },
-    setup() {
-        //
+    emits: ["update"],
+    setup(_, { emit }) {
+        const sendToParent = (contributions: any[]) => {
+            emit("update", contributions);
+        };
+
+        return { sendToParent };
     },
 });
 </script>
