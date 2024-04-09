@@ -1,6 +1,6 @@
 <template>
     <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="600px">
+        <v-dialog v-model="dialog" persistent max-width="800px">
             <template #activator="scope">
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
@@ -63,12 +63,32 @@ export default defineComponent({
 
         const dialog = ref(false);
 
-        const contributions = ref();
+        const contributions = ref<any[]>([]);
 
         const updateFormRef = ref<typeof PersonPublicationContribution>();
 
         const emitToParent = () => {
-            emit("update", contributions.value);
+            const personDocumentContributions: PersonDocumentContribution[] = [];
+
+            contributions.value.forEach(contribution => {
+                personDocumentContributions.push({
+                    personId: contribution.personId,
+                    contributionDescription: contribution.contributionDescription,
+                    orderNumber: contribution.orderNumber,
+                    institutionIds: [],
+                    displayAffiliationStatement: contribution.displayAffiliationStatement,
+                    personName: {
+                                    firstname: contribution.personName.firstname, 
+                                    otherName: contribution.personName.otherName, 
+                                    lastname: contribution.personName.lastname
+                                },
+                    contributionType: contribution.contributionType,
+                    isMainContributor: contribution.isMainContributor,
+                    isCorrespondingContributor: contribution.isCorrespondingContributor
+                });
+
+            });
+            emit("update", personDocumentContributions);
             dialog.value = false;
         };
 

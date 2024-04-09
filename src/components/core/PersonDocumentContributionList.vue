@@ -3,12 +3,12 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <publication-contribution-update-modal :read-only="false" :preset-document-contributions="contributionList" @update="sendToParent"></publication-contribution-update-modal>
+                    <publication-contribution-update-modal :read-only="readOnly" :preset-document-contributions="contributionList" @update="sendToParent"></publication-contribution-update-modal>
 
                     <div><b>{{ $t("authorsLabel") }}</b></div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     
-                    <div v-for="(contribution, index) in contributionList" :key="index" class="py-5">
+                    <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
                         <localized-link :to="'persons/' + contribution.personId">
                             <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isMainContributor ? ` (${$t("mainContributorLabel")})` : "") + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") }}</strong></h4>
                         </localized-link>
@@ -37,7 +37,11 @@ export default defineComponent({
         contributionList: {
             type: Array as PropType<PersonDocumentContribution[] | undefined>,
             required: true
-        }
+        },
+        readOnly: {
+            type: Boolean,
+            default: false
+        },
     },
     emits: ["update"],
     setup(_, { emit }) {

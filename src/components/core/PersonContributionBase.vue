@@ -49,13 +49,23 @@
             </v-btn>
         </v-col>
     </v-row>
-    <multilingual-text-input
-        v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')"
-        :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
-        is-area></multilingual-text-input>
-    <multilingual-text-input
-        v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
-        :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"></multilingual-text-input>
+    <v-row>
+        <v-col>
+            <multilingual-text-input
+                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
+                is-area
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row>
+    <v-row>
+        <v-col>
+            <multilingual-text-input
+                v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -121,6 +131,8 @@ export default defineComponent({
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
+        const valueSet = ref(false);
+
         onMounted(() => {
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
@@ -157,9 +169,15 @@ export default defineComponent({
         };
 
         watch(() => props.presetContributionValue, () => {
-            if(props.presetContributionValue && props.presetContributionValue.selectedOtherName[0]) {
+            if(props.presetContributionValue && !valueSet.value) {
+                valueSet.value = true;
+
                 const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
                 
+                firstName.value = props.presetContributionValue.selectedOtherName[0];
+                middleName.value = props.presetContributionValue.selectedOtherName[1];
+                lastName.value = props.presetContributionValue.selectedOtherName[2];
+
                 if(props.presetContributionValue.personId) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
                         selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
@@ -174,15 +192,17 @@ export default defineComponent({
 
                         if(foundName) {
                             selectedOtherName.value = foundName;
-                        } else {props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]} ` : ""
+                        } else if(selectedPersonName.trim() === "") {
+                            customNameInput.value = false;
+                            selectedOtherName.value = personOtherNames.value[0];
+                        } else {
                             customNameInput.value = true;
-                            firstName.value = props.presetContributionValue.selectedOtherName[0];
-                            middleName.value = props.presetContributionValue.selectedOtherName[1];
-                            lastName.value = props.presetContributionValue.selectedOtherName[2];
                         }
-                    });
 
-                    sendContentToParent();
+                        sendContentToParent();
+                    });
+                } else {
+                    customNameInput.value = true;
                 }
             }
         });
@@ -244,7 +264,7 @@ export default defineComponent({
                 descriptionRef, affiliationStatementRef,
                 personOtherNames, selectedOtherName,
                 selectNewlyAddedPerson, toMultilingualTextInput,
-                languageTags};
+                languageTags, valueSet};
     }
 });
 </script>
