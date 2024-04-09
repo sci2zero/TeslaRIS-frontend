@@ -27,10 +27,10 @@
         </v-row>
         <v-row v-if="!basic">
             <v-col>
-                <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @click="sendContentToParent"></v-checkbox>
+                <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
             <v-col>
-                <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @click="sendContentToParent"></v-checkbox>
+                <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
         </v-row>
     </v-container>
@@ -82,7 +82,8 @@ export default defineComponent({
                                                     }, 
                     contributionType: contribution.contributionType, 
                     isMainContributor: contribution.isMainContributor, 
-                    isCorrespondingContributor: contribution.isCorrespondingContributor});
+                    isCorrespondingContributor: contribution.isCorrespondingContributor,
+                    id: contribution.id});
                 });
             }
         });
@@ -104,11 +105,18 @@ export default defineComponent({
         const contributionTypes = computed(() => i18n.locale.value === "sr" ? contributionTypesSr : contributionTypesEn);
 
         const addInput = () => {
-            inputs.value.push({contributionType:  DocumentContributionType.AUTHOR, isMainContributor: false});
+            inputs.value.push({contributionType:  DocumentContributionType.AUTHOR, isMainContributor: false, isCorrespondingContributor: false});
         };
 
         const removeInput = (index: number) => {
             inputs.value.splice(index, 1);
+
+            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+                ref.valueSet = false;
+            });
+
+            inputs.value = [...inputs.value];
+            sendContentToParent();
         };
 
         const clearInput = () => {
@@ -137,7 +145,7 @@ export default defineComponent({
                                     personName: personName,
                                     contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType,
                                     isMainContributor: props.basic ? index === 0 : input.isMainContributor,
-                                    isCorrespondingContributor: props.basic ? false : input.isMainContributor});
+                                    isCorrespondingContributor: props.basic ? false : input.isCorrespondingContributor});
             });
             emit("setInput", returnObject);
         };

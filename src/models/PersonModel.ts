@@ -51,6 +51,7 @@ interface Contact {
 }
 
 export interface PersonContribution {
+    id?: number;
     personId: number;
     contributionDescription: MultilingualContent[];
     orderNumber: number;

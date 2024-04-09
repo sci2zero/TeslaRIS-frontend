@@ -97,7 +97,7 @@
         <!-- Description -->
         <description-section :description="dataset?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="dataset?.contributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="dataset?.contributions" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -139,7 +139,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Dataset } from '@/models/PublicationModel';
@@ -182,6 +182,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchDataset();
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const fetchDataset = () => {
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
                 dataset.value = response.data;
 
@@ -195,11 +203,7 @@ export default defineComponent({
     
                 populateData();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -227,13 +231,20 @@ export default defineComponent({
             performUpdate();
         };
 
+        const updateContributions = (contributions: PersonDocumentContribution[]) => {
+            dataset.value!.contributions = contributions;
+            performUpdate();
+        };
+
         const performUpdate = () => {
             DocumentPublicationService.updateDataset(dataset.value?.id as number, dataset.value as Dataset).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                fetchDataset();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                fetchDataset();
             });
         };
 
@@ -245,7 +256,8 @@ export default defineComponent({
             languageTagMap,
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
-            updateKeywords, updateDescription, snackbar, snackbarMessage
+            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateContributions
         };
 }})
 
