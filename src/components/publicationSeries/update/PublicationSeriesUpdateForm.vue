@@ -83,7 +83,7 @@ export default defineComponent({
                 
                 response.data.forEach((languageTag: LanguageTagResponse) => {
                     languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                })
+                });
             });
         });
 

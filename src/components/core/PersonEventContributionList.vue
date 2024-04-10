@@ -3,18 +3,16 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <publication-contribution-update-modal :read-only="readOnly" :preset-document-contributions="contributionList" @update="sendToParent"></publication-contribution-update-modal>
+                    <event-contribution-update-modal :read-only="readOnly" :preset-event-contributions="contributionList" @update="sendToParent"></event-contribution-update-modal>
 
-                    <div><b>{{ $t("authorsLabel") }}</b></div>
+                    <div><b>{{ $t("contributionsLabel") }}</b></div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    
+                        
                     <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
                         <localized-link :to="'persons/' + contribution.personId">
-                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isMainContributor ? ` (${$t("mainContributorLabel")})` : "") + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") }}</strong></h4>
+                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
                         </localized-link>
-                        <h5 v-if="contribution.contact?.contactEmail">
-                            <strong>{{ `${$t("emailLabel")}: ${contribution.contact?.contactEmail}` }}</strong>
-                        </h5>
+                        <p>{{ getTitleFromValueAutoLocale(contribution.eventContributionType, $i18n.locale) }}</p>
                         <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
                     </div>
                 </v-card-text>
@@ -24,18 +22,18 @@
 </template>
 
 <script lang="ts">
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import { defineComponent, type PropType } from 'vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
-import PublicationContributionUpdateModal from '@/components/publication/update/PublicationContributionUpdateModal.vue';
-
+import EventContributionUpdateModal from '../event/update/EventContributionUpdateModal.vue';
+import type { PersonEventContribution } from '@/models/EventModel';
+import { getTitleFromValueAutoLocale } from '@/i18n/eventContributionType';
 
 export default defineComponent({
-    name: "PersonDocumentContributionList",
-    components: { LocalizedLink, PublicationContributionUpdateModal },
+    name: "PersonEventContributionList",
+    components: { LocalizedLink, EventContributionUpdateModal },
     props: {
         contributionList: {
-            type: Array as PropType<PersonDocumentContribution[]>,
+            type: Array as PropType<PersonEventContribution[]>,
             required: true
         },
         readOnly: {
@@ -49,7 +47,7 @@ export default defineComponent({
             emit("update", contributions);
         };
 
-        return { sendToParent };
+        return { sendToParent, getTitleFromValueAutoLocale };
     },
 });
 </script>

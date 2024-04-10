@@ -129,7 +129,7 @@
         <!-- Description -->
         <description-section :description="proceedingsPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="proceedingsPublication?.contributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -171,7 +171,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, ProceedingsPublicationType } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
@@ -220,6 +220,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchProceedingsPublication();
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const fetchProceedingsPublication = () => {
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedingsPublication.value = response.data;
 
@@ -235,11 +243,7 @@ export default defineComponent({
     
                 populateData();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -259,21 +263,32 @@ export default defineComponent({
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             proceedingsPublication.value!.keywords = keywords;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
             proceedingsPublication.value!.description = description;
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateContributions = (contributions: PersonDocumentContribution[]) => {
+            proceedingsPublication.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateProceedingsPublication(proceedings.value?.id as number, proceedingsPublication.value as ProceedingsPublication).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchProceedingsPublication();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchProceedingsPublication();
+                }
             });
         };
 
@@ -285,7 +300,8 @@ export default defineComponent({
             languageTagMap,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,
-            updateKeywords, updateDescription, snackbar, snackbarMessage
+            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateContributions
         };
 }})
 

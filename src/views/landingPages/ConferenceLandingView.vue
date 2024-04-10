@@ -61,11 +61,6 @@
                                 <div v-if="keywords && keywords.length > 0">
                                     {{ $t("keywordsLabel") }}:
                                 </div>
-                                <div v-if="keywords && keywords.length > 0">
-                                    <v-chip v-for="(keyword, index) in keywords" :key="index" outlined @click="searchKeyword(keyword)">
-                                        {{ keyword }}
-                                    </v-chip>
-                                </div>
                                 <br />
                                 <div>
                                     <h2>{{ conference?.serialEvent ? $t("isSerialEventMessage") : $t("isOneTimeEventMessage") }}</h2>
@@ -77,27 +72,9 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-                        <div><b>{{ $t("contributionsLabel") }}</b></div>
-                        <strong v-if="conference?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        
-                        <div v-for="(contribution, index) in conference?.contributions" :key="index" class="py-5">
-                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
-                            <p>{{ contribution.eventContributionType }}</p>
-                            <v-divider v-if="index < (conference?.contributions ? conference?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+        <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
+
+        <person-event-contribution-list :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-list>
 
         <!-- Publication Table -->
         <br />
@@ -109,20 +86,25 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
-import { watch } from 'vue';
+import { useRoute } from 'vue-router';
+import KeywordList from '@/components/core/KeywordList.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
-import type { Conference } from "@/models/EventModel";
+import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
+import PersonEventContributionList from '@/components/core/PersonEventContributionList.vue';
+import type { MultilingualContent } from '@/models/Common';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, PersonEventContributionList, KeywordList },
     setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
         const currentRoute = useRoute();
         const conference = ref<Conference>();
         const keywords = ref<string[]>([]);
@@ -135,25 +117,25 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
-        const router = useRouter();
 
-        const icon = ref("mdi-presentation")
+        const icon = ref("mdi-presentation");
+
+        const canEdit = ref(false);
 
         onMounted(() => {
+            EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+
+            fetchConference();
+        });
+
+        const fetchConference = () => {
             EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
                 conference.value = response.data;
 
-                fetchPublications();                
-                populateData();
+                fetchPublications();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
-
-        const populateData = () => {
-            keywords.value = returnCurrentLocaleContent(conference.value?.keywords)?.split(",") as string[];
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -193,19 +175,39 @@ export default defineComponent({
             return `${fromDate.toLocaleDateString("sr")} - ${toDate.toLocaleDateString("sr")}`;
         };
 
-        const searchKeyword = (keyword: string) => {
-            router.push({name:"events", query: { searchQuery: keyword.trim() }})        
+        const updateKeywords = (keywords: MultilingualContent[]) => {
+            conference.value!.keywords = keywords;
+            performUpdate(false);
+        };
+
+        const updateContributions = (contributions: PersonEventContribution[]) => {
+            conference.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
+            EventService.updateConference(conference.value?.id as number, conference.value as Conference).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+                if(reload) {
+                    fetchConference();
+                }
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+                if(reload) {
+                    fetchConference();
+                }
+            });
         };
 
         return {
-            conference, icon,
-            publications, 
-            totalPublications,
-            switchPage,
-            keywords,
-            searchKeyword,
-            getDates,
-            returnCurrentLocaleContent
+            conference, icon, publications, 
+            totalPublications, switchPage,
+            keywords, getDates,
+            canEdit, returnCurrentLocaleContent,
+            updateContributions, updateKeywords,
+            snackbar, snackbarMessage
         };
 }})
 

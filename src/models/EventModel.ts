@@ -39,7 +39,7 @@ export interface EventIndex {
     eventType: EventType;
 }
   
-interface PersonEventContribution extends PersonContribution {
+export interface PersonEventContribution extends PersonContribution {
     eventContributionType: EventContributionType;
 }
   

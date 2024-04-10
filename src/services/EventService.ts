@@ -23,6 +23,14 @@ export class EventService extends BaseService {
   async createConference(body: Conference): Promise<AxiosResponse<Conference>> {
     return super.sendRequest(axios.post, "conference", body, EventService.idempotencyKey);
   }
+
+  async updateConference(conferenceId: number, updatedConference: Conference): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `conference/${conferenceId}`, updatedConference);
+  }
+
+  async canEdit(conferenceId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `conference/${conferenceId}/can-edit`);
+  }
 }
 
 export default new EventService();

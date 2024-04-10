@@ -97,7 +97,7 @@
         <!-- Description -->
         <description-section :description="dataset?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="dataset?.contributions" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -223,28 +223,32 @@ export default defineComponent({
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             dataset.value!.keywords = keywords;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
             dataset.value!.description = description;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateContributions = (contributions: PersonDocumentContribution[]) => {
             dataset.value!.contributions = contributions;
-            performUpdate();
+            performUpdate(true);
         };
 
-        const performUpdate = () => {
+        const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateDataset(dataset.value?.id as number, dataset.value as Dataset).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-                fetchDataset();
+                if(reload) {
+                    fetchDataset();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
-                fetchDataset();
+                if(reload) {
+                    fetchDataset();
+                }
             });
         };
 
