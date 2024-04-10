@@ -199,5 +199,6 @@ export default {
     updateJournalLabel: "Ažuriraj časopis",
     updateBookSeriesLabel: "Ažuriraj seriju knjiga",
     updateContributionsLabel: "Ažuriraj kontributore",
-    datasetLabel: "Skup podataka"
+    datasetLabel: "Skup podataka",
+    updateSoftwareLabel: "Ažuriraj softver"
 }

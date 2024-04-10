@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <software-update-modal :preset-software="software" :read-only="!canEdit"></software-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -97,7 +93,7 @@
         <!-- Description -->
         <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="software?.contributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -139,7 +135,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Software } from '@/models/PublicationModel';
@@ -152,11 +148,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
+import SoftwareUpdateModal from '@/components/publication/update/SoftwareUpdateModal.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList },
+    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -182,6 +179,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchSoftware();
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const fetchSoftware = () => {
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.id as string)).then((response) => {
                 software.value = response.data;
 
@@ -195,11 +200,7 @@ export default defineComponent({
     
                 populateData();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -219,21 +220,32 @@ export default defineComponent({
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             software.value!.keywords = keywords;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
             software.value!.description = description;
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateContributions = (contributions: PersonDocumentContribution[]) => {
+            software.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateSoftware(software.value?.id as number, software.value as Software).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchSoftware();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchSoftware();
+                }
             });
         };
 
@@ -246,7 +258,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
-            snackbar, snackbarMessage
+            snackbar, snackbarMessage, updateContributions
         };
 }})
 

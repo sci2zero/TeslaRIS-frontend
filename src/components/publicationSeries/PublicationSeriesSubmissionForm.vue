@@ -69,9 +69,8 @@ import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import type { Journal } from "@/models/JournalModel";
 import JournalService from '@/services/JournalService';
-import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
+import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 
@@ -127,7 +126,7 @@ export default defineComponent({
         const { requiredFieldRules } = useValidationUtils();
 
         const submitPublicationSeries = (stayOnPage: boolean) => {
-            const newPublicationSeries: Journal = {
+            const newPublicationSeries: PublicationSeries = {
                 title: title.value,
                 eissn: eIssn.value,
                 printISSN: printIssn.value,

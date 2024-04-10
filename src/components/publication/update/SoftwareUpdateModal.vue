@@ -13,11 +13,11 @@
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ inputType === "0" ? $t("updateJournalLabel") : $t("updateBookSeriesLabel") }}</span>
+                    <span class="text-h5">{{ $t("updateSoftwareLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <publication-series-update-form ref="updateFormRef" :input-type="inputType" :preset-publication-series="presetPublicationSeries" @update="emitToParent"></publication-series-update-form>
+                        <software-update-form ref="updateFormRef" :preset-software="presetSoftware" @update="emitToParent"></software-update-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -38,35 +38,31 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import PublicationSeriesUpdateForm from "./PublicationSeriesUpdateForm.vue";
-import type { PublicationSeries } from "@/models/PublicationSeriesModel";
+import type { Software } from "@/models/PublicationModel";
+import SoftwareUpdateForm from "./SoftwareUpdateForm.vue";
 
 
 export default defineComponent({
-    name: "PublicationSeriesUpdateModal",
-    components: { PublicationSeriesUpdateForm },
+    name: "SoftwareUpdateModal",
+    components: { SoftwareUpdateForm },
     props: {
         readOnly: {
             type: Boolean,
             default: false
         },
-        presetPublicationSeries: {
-            type: Object as PropType<PublicationSeries | undefined>,
+        presetSoftware: {
+            type: Object as PropType<Software | undefined>,
             required: true
-        },
-        inputType: {
-            type: String,
-            required: true
-        },
+        }
     },
     emits: ["update"],
     setup(_, { emit }) {
         const dialog = ref(false);
 
-        const updateFormRef = ref<typeof PublicationSeriesUpdateForm>();
+        const updateFormRef = ref<typeof SoftwareUpdateForm>();
 
-        const emitToParent = (publicationSeries: PublicationSeries) => {
-            emit("update", publicationSeries)
+        const emitToParent = (software: Software) => {
+            emit("update", software)
             dialog.value = false;
         };
 

@@ -141,7 +141,7 @@
         <!-- Description -->
         <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="proceedings?.contributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -182,7 +182,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -238,6 +238,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchProceedings();
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const fetchProceedings = () => {
             ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedings.value = response.data;
 
@@ -247,11 +255,7 @@ export default defineComponent({
 
                 populateData();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -311,20 +315,25 @@ export default defineComponent({
             proceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             proceedings.value!.publisherId = updatedInfo.publisherId;
             proceedings.value!.scopusId = updatedInfo.scopusId;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             proceedings.value!.keywords = keywords;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
             proceedings.value!.description = description;
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateContributions = (contributions: PersonDocumentContribution[]) => {
+            proceedings.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
             if (proceedings.value?.publicationSeriesId === 0) {
                 proceedings.value.publicationSeriesId = undefined;
             }
@@ -333,9 +342,15 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 fetchConnectedEntities();
+                if(reload) {
+                    fetchProceedings();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchProceedings();
+                }
             });
         };
 
@@ -348,7 +363,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            publicationSeries, updateBasicInfo
+            publicationSeries, updateBasicInfo, updateContributions
         };
 }})
 

@@ -127,7 +127,7 @@
         <!-- Description -->
         <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="journalPublication?.contributions"></person-document-contribution-list>
+        <person-document-contribution-list :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -169,7 +169,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
@@ -212,6 +212,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchJournalPublication();
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const fetchJournalPublication = () => {
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 journalPublication.value = response.data;
 
@@ -225,11 +233,7 @@ export default defineComponent({
     
                 populateData();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -249,21 +253,32 @@ export default defineComponent({
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             journalPublication.value!.keywords = keywords;
-            performUpdate();
+            performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
             journalPublication.value!.description = description;
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateContributions = (contributions: PersonDocumentContribution[]) => {
+            journalPublication.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateJournalPublication(journalPublication.value?.id as number, journalPublication.value as JournalPublication).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchJournalPublication();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchJournalPublication();
+                }
             });
         };
 
@@ -275,7 +290,8 @@ export default defineComponent({
             languageTagMap,
             searchKeyword, goToURL, canEdit,
             addAttachment, deleteAttachment, updateAttachment,
-            updateKeywords, updateDescription, snackbar, snackbarMessage
+            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateContributions
         };
 }})
 

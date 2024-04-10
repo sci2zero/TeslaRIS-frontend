@@ -2,7 +2,7 @@
     <v-container v-for="(input, index) in inputs" :key="index" style="margin-bottom: 20px;">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="false" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -15,22 +15,14 @@
                 </v-col>
             </v-col>
         </v-row>
-        <v-row v-if="!basic">
+        <v-row>
             <v-col>
                 <v-select
-                    v-model="input.contributionType"
+                    v-model="input.eventContributionType"
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     @update:model-value="sendContentToParent">
                 </v-select>
-            </v-col>
-        </v-row>
-        <v-row v-if="!basic">
-            <v-col>
-                <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
-            </v-col>
-            <v-col>
-                <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
         </v-row>
     </v-container>
@@ -39,30 +31,26 @@
 <script lang="ts">
 import { ref } from "vue";
 import { defineComponent } from "vue";
+import { EventContributionType, type PersonEventContribution } from "@/models/EventModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
-import { DocumentContributionType, type PersonDocumentContribution } from "@/models/PublicationModel";
 import type { PropType } from "vue";
 import { onMounted } from "vue";
-import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from "@/i18n/documentContributionType";
+import { contributionTypesSr, contributionTypesEn, getTitleFromValue } from "@/i18n/eventContributionType";
 
 export default defineComponent({
-    name: "PersonPublicationContribution",
-    components: { PersonContributionBase },
+    name: "PersonEventContributionForm",
+    components: {PersonContributionBase},
     props: {
-        basic: {
-            type: Boolean,
-            default: false
-        },
         presetContributions: {
-            type: Array as PropType<PersonDocumentContribution[]>,
+            type: Array as PropType<PersonEventContribution[]>,
             default: () => []
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: DocumentContributionType.AUTHOR, isMainContributor: false, isCorrespondingContributor: false}]);
+        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: EventContributionType.CHAIR}]);
         const baseContributionRef = ref<any>([]);
 
         const i18n = useI18n();
@@ -81,18 +69,16 @@ export default defineComponent({
                                                                 contribution.personName?.lastname
                                                             ]
                                                     }, 
-                    contributionType: getTitleFromValueAutoLocale(contribution.contributionType, i18n.locale.value), 
-                    isMainContributor: contribution.isMainContributor, 
-                    isCorrespondingContributor: contribution.isCorrespondingContributor,
+                    eventContributionType: getTitleFromValue(contribution.eventContributionType, contributionTypes.value),
                     id: contribution.id});
                 });
             }
         });
 
-        const contributionTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
+        const contributionTypes = computed(() => i18n.locale.value === "sr" ? contributionTypesSr : contributionTypesEn);
 
         const addInput = () => {
-            inputs.value.push({contributionType:  DocumentContributionType.AUTHOR, isMainContributor: false, isCorrespondingContributor: false});
+            inputs.value.push({eventContributionType: EventContributionType.CHAIR});
         };
 
         const removeInput = (index: number) => {
@@ -107,7 +93,7 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            inputs.value = [{contribution: {}, contributionType:  DocumentContributionType.AUTHOR, isMainContributor: false, isCorrespondingContributor: false}];
+            inputs.value = [{contribution: {}, eventContributionType: EventContributionType.CHAIR}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
@@ -115,7 +101,7 @@ export default defineComponent({
         };
 
         const sendContentToParent = () => {
-            const returnObject: PersonDocumentContribution[] = [];
+            const returnObject: PersonEventContribution[] = [];
             inputs.value.forEach((input, index) => {
                 let personName = undefined;
                 if (input.contribution.selectedOtherName) {
@@ -130,14 +116,14 @@ export default defineComponent({
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
                                     personName: personName,
-                                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType,
-                                    isMainContributor: props.basic ? index === 0 : input.isMainContributor,
-                                    isCorrespondingContributor: props.basic ? false : input.isCorrespondingContributor});
+                                    eventContributionType: input.eventContributionType});
             });
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent, baseContributionRef, clearInput}
+        return {inputs, addInput, removeInput, 
+                contributionTypes, baseContributionRef,
+                sendContentToParent, clearInput}
     }
 });
 </script>
