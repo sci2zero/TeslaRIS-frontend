@@ -55,27 +55,7 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-                        <div><b>{{ $t("contributionsLabel") }}</b></div>
-                        <strong v-if="bookSeries?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        
-                        <div v-for="(contribution, index) in bookSeries?.contributions" :key="index" class="py-5">
-                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
-                            <p>{{ contribution.dateFrom ? `${contribution.dateFrom} - ${contribution.dateTo ? contribution.dateTo : $t("presentLabel")}` : $t("currentLabel") }}</p>
-                            <v-divider v-if="index < (bookSeries?.contributions ? bookSeries?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+        <person-publication-series-contribution-list :contribution-list="bookSeries?.contributions ? bookSeries.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-list>
 
         <!-- Publication Table -->
         <br />
@@ -112,11 +92,13 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
 import ProceedingsService from '@/services/ProceedingsService';
+import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
+import PersonPublicationSeriesContributionList from '@/components/core/PersonPublicationSeriesContributionList.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal },
+    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -144,17 +126,23 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
-            BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
-                bookSeries.value = response.data;
-
-                fetchPublications();                
-                populateData();
-            });
+            fetchBookSeries();
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchBookSeries = () => {
+            BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
+                bookSeries.value = response.data;
+
+                bookSeries.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+
+                fetchPublications();                
+                populateData();
+            });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -190,16 +178,27 @@ export default defineComponent({
             bookSeries.value!.printISSN = updatedBookSeries.printISSN;
             bookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
 
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateContributions = (contributions: PersonPublicationSeriesContribution[]) => {
+            bookSeries.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
             BookSeriesService.updateBookSeries(bookSeries.value?.id as number, bookSeries.value as BookSeries).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchBookSeries();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchBookSeries();
+                }
             });
         };
 
@@ -210,7 +209,8 @@ export default defineComponent({
             switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit,
-            updateBasicInfo, snackbar, snackbarMessage
+            updateBasicInfo, snackbar,
+            snackbarMessage, updateContributions
         };
 }})
 

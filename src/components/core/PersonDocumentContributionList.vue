@@ -10,7 +10,7 @@
                     
                     <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
                         <localized-link :to="'persons/' + contribution.personId">
-                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isMainContributor ? ` (${$t("mainContributorLabel")})` : "") + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") }}</strong></h4>
+                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isMainContributor ? ` (${$t("mainContributorLabel")})` : "") + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType, $i18n.locale)}` }}</strong></h4>
                         </localized-link>
                         <h5 v-if="contribution.contact?.contactEmail">
                             <strong>{{ `${$t("emailLabel")}: ${contribution.contact?.contactEmail}` }}</strong>
@@ -28,6 +28,7 @@ import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import { defineComponent, type PropType } from 'vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import PublicationContributionUpdateModal from '@/components/publication/update/PublicationContributionUpdateModal.vue';
+import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
 
 
 export default defineComponent({
@@ -49,7 +50,7 @@ export default defineComponent({
             emit("update", contributions);
         };
 
-        return { sendToParent };
+        return { sendToParent, getTitleFromValueAutoLocale };
     },
 });
 </script>

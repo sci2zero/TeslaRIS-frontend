@@ -21,6 +21,7 @@
                     v-model="input.eventContributionType"
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
+                    return-object
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
@@ -37,7 +38,7 @@ import { computed } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import type { PropType } from "vue";
 import { onMounted } from "vue";
-import { contributionTypesSr, contributionTypesEn, getTitleFromValue } from "@/i18n/eventContributionType";
+import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/eventContributionType";
 
 export default defineComponent({
     name: "PersonEventContributionForm",
@@ -50,10 +51,10 @@ export default defineComponent({
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: EventContributionType.CHAIR}]);
-        const baseContributionRef = ref<any>([]);
-
         const i18n = useI18n();
+
+        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: {title: getTitleFromValueAutoLocale(EventContributionType.CHAIR, i18n.locale.value), value: EventContributionType.CHAIR}}]);
+        const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
             if(props.presetContributions && props.presetContributions.length > 0) {
@@ -69,16 +70,21 @@ export default defineComponent({
                                                                 contribution.personName?.lastname
                                                             ]
                                                     }, 
-                    eventContributionType: getTitleFromValue(contribution.eventContributionType, contributionTypes.value),
+                    eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType, i18n.locale.value), value: contribution.eventContributionType},
                     id: contribution.id});
                 });
             }
         });
 
-        const contributionTypes = computed(() => i18n.locale.value === "sr" ? contributionTypesSr : contributionTypesEn);
+        const contributionTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
 
         const addInput = () => {
-            inputs.value.push({eventContributionType: EventContributionType.CHAIR});
+            inputs.value.push({eventContributionType: {
+                    title: getTitleFromValueAutoLocale(EventContributionType.CHAIR, i18n.locale.value), 
+                    value: EventContributionType.CHAIR
+                }
+            });
+            console.log(inputs.value)
         };
 
         const removeInput = (index: number) => {
@@ -93,7 +99,10 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            inputs.value = [{contribution: {}, eventContributionType: EventContributionType.CHAIR}];
+            inputs.value = [{contribution: {}, eventContributionType: {
+                    title: getTitleFromValueAutoLocale(EventContributionType.CHAIR, i18n.locale.value), 
+                    value: EventContributionType.CHAIR
+                }}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
@@ -116,7 +125,7 @@ export default defineComponent({
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
                                     personName: personName,
-                                    eventContributionType: input.eventContributionType});
+                                    eventContributionType: input.eventContributionType.value});
             });
             emit("setInput", returnObject);
         };

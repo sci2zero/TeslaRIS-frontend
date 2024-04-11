@@ -4,12 +4,12 @@
             <v-col>
                 <multilingual-text-input
                     ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetSoftware?.title, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetDataset?.title, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetSoftware?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetDataset?.subTitle, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
@@ -27,7 +27,7 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="softwareNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
+                <v-text-field v-model="datasetNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -56,7 +56,7 @@ import { ref } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Software } from '@/models/PublicationModel';
+import type { Dataset } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -66,11 +66,11 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 
 export default defineComponent({
-    name: "SoftwareUpdateForm",
+    name: "DatasetUpdateForm",
     components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
     props: {
-        presetSoftware: {
-            type: Object as PropType<Software | undefined>,
+        presetDataset: {
+            type: Object as PropType<Dataset | undefined>,
             required: true
         }
     },
@@ -83,8 +83,8 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
-            if(props.presetSoftware?.publisherId) {
-                PublisherService.readPublisher(props.presetSoftware.publisherId).then((response) => {
+            if(props.presetDataset?.publisherId) {
+                PublisherService.readPublisher(props.presetDataset.publisherId).then((response) => {
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
@@ -106,23 +106,23 @@ export default defineComponent({
 
         const title = ref([]);
         const subtitle = ref([]);
-        const publicationYear = ref(props.presetSoftware?.documentDate);
-        const doi = ref(props.presetSoftware?.doi);
-        const scopus = ref(props.presetSoftware?.scopusId);
-        const softwareNumber = ref(props.presetSoftware?.internalNumber);
-        const uris = ref<string[]>(props.presetSoftware?.uris as string[]);
+        const publicationYear = ref(props.presetDataset?.documentDate);
+        const doi = ref(props.presetDataset?.doi);
+        const scopus = ref(props.presetDataset?.scopusId);
+        const datasetNumber = ref(props.presetDataset?.internalNumber);
+        const uris = ref<string[]>(props.presetDataset?.uris as string[]);
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const updateSoftware = () => {
-            const updatedSoftware: Software = {
+        const updateDataset = () => {
+            const updatedDataset: Dataset = {
                 title: title.value as MultilingualContent[],
-                internalNumber: softwareNumber.value as string,
-                description: props.presetSoftware?.description as MultilingualContent[],
-                keywords: props.presetSoftware?.keywords as MultilingualContent[],
+                internalNumber: datasetNumber.value as string,
+                description: props.presetDataset?.description as MultilingualContent[],
+                keywords: props.presetDataset?.keywords as MultilingualContent[],
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
-                contributions: props.presetSoftware?.contributions,
+                contributions: props.presetDataset?.contributions,
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
@@ -131,7 +131,7 @@ export default defineComponent({
                 proofs: []
             };
 
-            emit("update", updatedSoftware);
+            emit("update", updatedDataset);
         };
 
         return {
@@ -140,10 +140,10 @@ export default defineComponent({
             subtitle, subtitleRef,
             publicationYear, doi, scopus,
             publisherAutocompleteRef,
-            selectedPublisher, softwareNumber,
+            selectedPublisher, datasetNumber,
             descriptionRef, uris, 
             urisRef, requiredFieldRules,
-            updateSoftware, toMultilingualTextInput,
+            updateDataset, toMultilingualTextInput,
             languageTags
         };
     }

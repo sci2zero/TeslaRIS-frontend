@@ -200,5 +200,6 @@ export default {
     updateBookSeriesLabel: "Update Book Series",
     updateContributionsLabel: "Update Contributions",
     datasetLabel: "Dataset",
-    updateSoftwareLabel: "Update Software"
+    updateSoftwareLabel: "Update Software",
+    updateDatasetLabel: "Update Dataset"
 }

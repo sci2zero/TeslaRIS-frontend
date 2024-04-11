@@ -55,27 +55,7 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-                        <div><b>{{ $t("contributionsLabel") }}</b></div>
-                        <strong v-if="journal?.contributions?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        
-                        <div v-for="(contribution, index) in journal?.contributions" :key="index" class="py-5">
-                            <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
-                            <p>{{ contribution.dateFrom ? `${contribution.dateFrom} - ${contribution.dateTo ? contribution.dateTo : $t("presentLabel")}` : $t("currentLabel") }}</p>
-                            <v-divider v-if="index < (journal?.contributions ? journal?.contributions.length : 1) - 1 " class="mt-10"></v-divider>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+        <person-publication-series-contribution-list :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-list>
 
         <!-- Publication Table -->
         <br />
@@ -113,11 +93,12 @@ import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
-
+import PersonPublicationSeriesContributionList from '@/components/core/PersonPublicationSeriesContributionList.vue';
+import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal },
+    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -145,17 +126,23 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
-            JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
-                journal.value = response.data;
-
-                fetchPublications();                
-                populateData();
-            });
+            fetchJournal();
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchJournal = () => {
+            JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
+                journal.value = response.data;
+
+                journal.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+
+                fetchPublications();                
+                populateData();
+            });
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -191,16 +178,27 @@ export default defineComponent({
             journal.value!.printISSN = updatedJournal.printISSN;
             journal.value!.languageTagIds = updatedJournal.languageTagIds;
 
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateContributions = (contributions: PersonPublicationSeriesContribution[]) => {
+            journal.value!.contributions = contributions;
+            performUpdate(true);
+        };
+
+        const performUpdate = (reload: boolean) => {
             JournalService.updateJournal(journal.value?.id as number, journal.value as Journal).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchJournal();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchJournal();
+                }
             });
         };
 
@@ -211,7 +209,8 @@ export default defineComponent({
             switchPage, canEdit,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
-            snackbar, snackbarMessage
+            snackbar, snackbarMessage,
+            updateContributions
         };
 }})
 

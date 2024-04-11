@@ -11,13 +11,13 @@ export interface PublicationSeries {
     nameAbbreviation: MultilingualContent[];
 }
 
-interface PersonPublicationSeriesContribution extends PersonContribution {
+export interface PersonPublicationSeriesContribution extends PersonContribution {
     contributionType: PublicationSeriesContributionType;
     dateFrom?: string;
     dateTo?: string;
 }
 
-enum PublicationSeriesContributionType {
+export enum PublicationSeriesContributionType {
     EDITOR,
     ASSOCIATE_EDITOR,
     REVIEWER,
