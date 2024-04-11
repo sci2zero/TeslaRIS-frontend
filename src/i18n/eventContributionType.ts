@@ -34,5 +34,19 @@ export const getTitleFromValueAutoLocale = (value: EventContributionType, locale
     if (locale == "sr") {
         resourceTypeArray = contributionTypesSr;
     }
+
+    if(typeof value === "number") {
+        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    }
+
     return (resourceTypeArray.find(item => getNameFromOrdinal(EventContributionType, item.value) === value.toString()) || {}).title;
 };
+
+export const getTypesForGivenLocale = (locale: string) => {
+    switch(locale) {
+        case "sr":
+            return contributionTypesSr;
+        case "en":
+            return contributionTypesEn;
+    }
+}

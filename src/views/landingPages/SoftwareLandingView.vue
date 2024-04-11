@@ -26,7 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <software-update-modal :preset-software="software" :read-only="!canEdit"></software-update-modal>
+                        <software-update-modal :preset-software="software" :read-only="!canEdit" @update="updateBasicInfo"></software-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -233,6 +233,18 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateBasicInfo = (basicInfo: Software) => {
+            software.value!.title = basicInfo.title;
+            software.value!.subTitle = basicInfo.subTitle;
+            software.value!.documentDate = basicInfo.documentDate;
+            software.value!.doi = basicInfo.doi;
+            software.value!.scopusId = basicInfo.scopusId;
+            software.value!.uris = basicInfo.uris;
+            software.value!.publisherId = basicInfo.publisherId;
+
+            performUpdate(true);
+        };
+
         const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateSoftware(software.value?.id as number, software.value as Software).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -258,7 +270,8 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
-            snackbar, snackbarMessage, updateContributions
+            snackbar, snackbarMessage, updateContributions,
+            updateBasicInfo
         };
 }})
 

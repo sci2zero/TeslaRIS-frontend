@@ -200,5 +200,6 @@ export default {
     updateBookSeriesLabel: "Ažuriraj seriju knjiga",
     updateContributionsLabel: "Ažuriraj kontributore",
     datasetLabel: "Skup podataka",
-    updateSoftwareLabel: "Ažuriraj softver"
+    updateSoftwareLabel: "Ažuriraj softver",
+    updateDatasetLabel: "Ažuriraj skup podataka"
 }

@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <dataset-update-modal :preset-dataset="dataset" :read-only="!canEdit" @update="updateBasicInfo"></dataset-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -152,11 +148,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
+import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateModal.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList },
+    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -236,6 +233,18 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateBasicInfo = (basicInfo: Dataset) => {
+            dataset.value!.title = basicInfo.title;
+            dataset.value!.subTitle = basicInfo.subTitle;
+            dataset.value!.documentDate = basicInfo.documentDate;
+            dataset.value!.doi = basicInfo.doi;
+            dataset.value!.scopusId = basicInfo.scopusId;
+            dataset.value!.uris = basicInfo.uris;
+            dataset.value!.publisherId = basicInfo.publisherId;
+
+            performUpdate(true);
+        };
+
         const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateDataset(dataset.value?.id as number, dataset.value as Dataset).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -261,7 +270,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions
+            updateContributions, updateBasicInfo
         };
 }})
 

@@ -2,7 +2,7 @@
     <v-container v-for="(input, index) in inputs" :key="index" style="margin-bottom: 20px;">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="false" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -15,7 +15,7 @@
                 </v-col>
             </v-col>
         </v-row>
-        <v-row v-if="!basic">
+        <v-row>
             <v-col>
                 <v-select
                     v-model="input.contributionType"
@@ -26,12 +26,12 @@
                 </v-select>
             </v-col>
         </v-row>
-        <v-row v-if="!basic">
-            <v-col>
-                <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+        <v-row>
+            <v-col cols="6">
+                <v-text-field v-model="input.dateFrom" type="date" :label="$t('fromLabel')" @update:model-value="sendContentToParent"></v-text-field>
             </v-col>
-            <v-col>
-                <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+            <v-col cols="6">
+                <v-text-field v-model="input.dateTo" type="date" :label="$t('toLabel')" @update:model-value="sendContentToParent"></v-text-field>
             </v-col>
         </v-row>
     </v-container>
@@ -43,21 +43,17 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
-import { DocumentContributionType, type PersonDocumentContribution } from "@/models/PublicationModel";
 import type { PropType } from "vue";
 import { onMounted } from "vue";
-import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from "@/i18n/documentContributionType";
+import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/publicationSeriesContributionType";
+import { PublicationSeriesContributionType, type PersonPublicationSeriesContribution } from "@/models/PublicationSeriesModel";
 
 export default defineComponent({
-    name: "PersonPublicationContribution",
-    components: { PersonContributionBase },
+    name: "PersonPublicationSeriesContributionForm",
+    components: {PersonContributionBase},
     props: {
-        basic: {
-            type: Boolean,
-            default: false
-        },
         presetContributions: {
-            type: Array as PropType<PersonDocumentContribution[]>,
+            type: Array as PropType<PersonPublicationSeriesContribution[]>,
             default: () => []
         }
     },
@@ -65,7 +61,7 @@ export default defineComponent({
     setup(props, {emit}) {
         const i18n = useI18n();
 
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR, i18n.locale.value), value: DocumentContributionType.AUTHOR}, isMainContributor: false, isCorrespondingContributor: false}]);
+        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR, i18n.locale.value), value: PublicationSeriesContributionType.EDITOR}}]);
         const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
@@ -82,9 +78,9 @@ export default defineComponent({
                                                                 contribution.personName?.lastname
                                                             ]
                                                     }, 
-                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType, i18n.locale.value), value: contribution.contributionType}, 
-                    isMainContributor: contribution.isMainContributor, 
-                    isCorrespondingContributor: contribution.isCorrespondingContributor,
+                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType, i18n.locale.value), value: contribution.contributionType},
+                    dateFrom: contribution.dateFrom,
+                    dateTo: contribution.dateTo,
                     id: contribution.id});
                 });
             }
@@ -93,13 +89,12 @@ export default defineComponent({
         const contributionTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
 
         const addInput = () => {
-            inputs.value.push({
-                contributionType: {
-                    title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR, i18n.locale.value), 
-                    value: DocumentContributionType.AUTHOR
-                }, 
-                isMainContributor: false, 
-                isCorrespondingContributor: false});
+            inputs.value.push({contributionType: {
+                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR, i18n.locale.value), 
+                    value: PublicationSeriesContributionType.EDITOR
+                }
+            });
+            console.log(inputs.value)
         };
 
         const removeInput = (index: number) => {
@@ -114,14 +109,10 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            inputs.value = [{
-                contributionType: {
-                    title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR, i18n.locale.value), 
-                    value: DocumentContributionType.AUTHOR
-                }, 
-                isMainContributor: false, 
-                isCorrespondingContributor: false
-            }];
+            inputs.value = [{contribution: {}, contributionType: {
+                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR, i18n.locale.value), 
+                    value: PublicationSeriesContributionType.EDITOR
+                }}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
@@ -129,7 +120,7 @@ export default defineComponent({
         };
 
         const sendContentToParent = () => {
-            const returnObject: PersonDocumentContribution[] = [];
+            const returnObject: PersonPublicationSeriesContribution[] = [];
             inputs.value.forEach((input, index) => {
                 let personName = undefined;
                 if (input.contribution.selectedOtherName) {
@@ -144,14 +135,16 @@ export default defineComponent({
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
                                     personName: personName,
-                                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
-                                    isMainContributor: props.basic ? index === 0 : input.isMainContributor,
-                                    isCorrespondingContributor: props.basic ? false : input.isCorrespondingContributor});
+                                    contributionType: input.contributionType.value,
+                                    dateFrom: input.dateFrom,
+                                    dateTo: input.dateTo});
             });
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent, baseContributionRef, clearInput}
+        return {inputs, addInput, removeInput, 
+                contributionTypes, baseContributionRef,
+                sendContentToParent, clearInput}
     }
 });
 </script>
