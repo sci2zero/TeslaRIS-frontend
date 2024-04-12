@@ -15,7 +15,7 @@
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.organisationUnitNameSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.organisationUnitNameOther }}
                 </td>
                 <td>{{ row.item.userRole }}</td>

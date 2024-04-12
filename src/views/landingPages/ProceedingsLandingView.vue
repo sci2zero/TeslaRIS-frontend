@@ -383,21 +383,4 @@ export default defineComponent({
     .edit-pen-container {
         position:relative;
     }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
 </style>

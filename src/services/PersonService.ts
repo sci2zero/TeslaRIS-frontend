@@ -44,6 +44,10 @@ export class PersonService extends BaseService {
   async updateBiography(personId: number, keywords: MultilingualContent[]): Promise<AxiosResponse<PersonUserResponse>> {
     return super.sendRequest(axios.patch, `person/biography/${personId}`, keywords);
   }
+
+  async findEmployeesForOU(organisationUnitId: number): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/employed-at/${organisationUnitId}`);
+  }
 }
 
 export default new PersonService();

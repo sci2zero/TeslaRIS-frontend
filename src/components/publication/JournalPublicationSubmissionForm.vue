@@ -146,10 +146,9 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { JournalPublicationType } from "@/models/PublicationModel";
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
-import type { DocumentPublicationIndex, JournalPublication } from "@/models/PublicationModel";
+import type { DocumentPublicationIndex, JournalPublication, JournalPublicationType } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
@@ -157,6 +156,7 @@ import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
+import { getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 
 
 export default defineComponent({
@@ -214,29 +214,7 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const journalPublicationTypeEn = [
-            { title: "Review Article", value: JournalPublicationType.REVIEW_ARTICLE },
-            { title: "Research Article", value: JournalPublicationType.RESEARCH_ARTICLE },
-            { title: "Preface", value: JournalPublicationType.PREFACE },
-            { title: "Comment", value: JournalPublicationType.COMMENT },
-            { title: "Correction", value: JournalPublicationType.CORRECTION },
-            { title: "Lexicographic Unit", value: JournalPublicationType.LEXICOGRAPHIC_UNIT },
-            { title: "Polemics", value: JournalPublicationType.POLEMICS },
-            { title: "Scientific Critic", value: JournalPublicationType.SCIENTIFIC_CRITIC },
-        ];
-
-        const journalPublicationTypeSr = [
-            { title: "Pregledni članak", value: JournalPublicationType.REVIEW_ARTICLE },
-            { title: "Istraživački članak", value: JournalPublicationType.RESEARCH_ARTICLE },
-            { title: "Predgovor", value: JournalPublicationType.PREFACE },
-            { title: "Komentar", value: JournalPublicationType.COMMENT },
-            { title: "Ispravka", value: JournalPublicationType.CORRECTION },
-            { title: "Leksikografska jedinica", value: JournalPublicationType.LEXICOGRAPHIC_UNIT },
-            { title: "Polemika", value: JournalPublicationType.POLEMICS },
-            { title: "Naučna kritika", value: JournalPublicationType.SCIENTIFIC_CRITIC },
-        ];
-
-        const publicationTypes = computed((): { title: string, value: JournalPublicationType | null }[] => i18n.locale.value === "sr" ? journalPublicationTypeSr : journalPublicationTypeEn);
+        const publicationTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
 
         const listPublications = (journal: { title: string, value: number }) => {
