@@ -35,7 +35,7 @@
                         {{ row.item.nameSr }}
                     </localized-link>
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     <localized-link :to="'organisation-units/' + row.item.databaseId">
                         {{ row.item.nameOther }}
                     </localized-link>
@@ -43,19 +43,19 @@
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.superOUNameSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.superOUNameOther }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.keywordsSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.keywordsOther }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.researchAreasSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.researchAreasOther }}
                 </td>
             </tr>

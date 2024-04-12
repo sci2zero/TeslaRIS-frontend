@@ -38,7 +38,7 @@
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.employmentsSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.employmentsOther }}
                 </td>
                 <td>{{ row.item.birthdate }}</td>

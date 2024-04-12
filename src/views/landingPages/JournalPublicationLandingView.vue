@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <journal-publication-update-modal :preset-journal-publication="journalPublication" :read-only="!canEdit" @update="updateBasicInfo"></journal-publication-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -38,6 +34,12 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <div v-if="journalPublication?.journalPublicationType">
+                                    {{ $t("typeOfPublicationLabel") }}:
+                                </div>
+                                <div v-if="journalPublication?.journalPublicationType" class="response">
+                                    {{ getTitleFromValueAutoLocale(journalPublication.journalPublicationType, $i18n.locale) }}
+                                </div>
                                 <div v-if="journalPublication?.volume">
                                     {{ $t("volumeLabel") }}:
                                 </div>
@@ -182,11 +184,13 @@ import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import JournalPublicationUpdateModal from '@/components/publication/update/JournalPublicationUpdateModal.vue';
+import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink },
+    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -266,6 +270,26 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateBasicInfo = (basicInfo: JournalPublication) => {
+            journalPublication.value!.title = basicInfo.title;
+            journalPublication.value!.subTitle = basicInfo.subTitle;
+            journalPublication.value!.documentDate = basicInfo.documentDate;
+            journalPublication.value!.doi = basicInfo.doi;
+            journalPublication.value!.scopusId = basicInfo.scopusId;
+            journalPublication.value!.uris = basicInfo.uris;
+            journalPublication.value!.eventId = basicInfo.eventId;
+            journalPublication.value!.journalId = basicInfo.journalId;
+            journalPublication.value!.startPage = basicInfo.startPage;
+            journalPublication.value!.endPage = basicInfo.endPage;
+            journalPublication.value!.volume = basicInfo.volume;
+            journalPublication.value!.issue = basicInfo.issue;
+            journalPublication.value!.numberOfPages = basicInfo.numberOfPages;
+            journalPublication.value!.articleNumber = basicInfo.articleNumber;
+            journalPublication.value!.journalPublicationType = basicInfo.journalPublicationType;
+
+            performUpdate(true);
+        };
+
         const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updateJournalPublication(journalPublication.value?.id as number, journalPublication.value as JournalPublication).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -291,7 +315,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions
+            updateContributions, updateBasicInfo, getTitleFromValueAutoLocale
         };
 }})
 

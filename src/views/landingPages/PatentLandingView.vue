@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <patent-update-modal :preset-patent="patent" :read-only="!canEdit" @update="updateBasicInfo"></patent-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -152,11 +148,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
+import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList },
+    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -236,6 +233,19 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateBasicInfo = (basicInfo: Patent) => {
+            patent.value!.title = basicInfo.title;
+            patent.value!.subTitle = basicInfo.subTitle;
+            patent.value!.documentDate = basicInfo.documentDate;
+            patent.value!.doi = basicInfo.doi;
+            patent.value!.scopusId = basicInfo.scopusId;
+            patent.value!.uris = basicInfo.uris;
+            patent.value!.publisherId = basicInfo.publisherId;
+            patent.value!.number = basicInfo.number;
+
+            performUpdate(true);
+        };
+
         const performUpdate = (reload: boolean) => {
             DocumentPublicationService.updatePatent(patent.value?.id as number, patent.value as Patent).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -261,7 +271,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions
+            updateContributions, updateBasicInfo
         };
 }})
 
@@ -280,22 +290,6 @@ export default defineComponent({
 
     .edit-pen-container {
         position:relative;
-    }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
     }
 
 </style>

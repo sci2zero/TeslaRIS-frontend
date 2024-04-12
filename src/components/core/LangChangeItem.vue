@@ -60,7 +60,7 @@
       const selectedLocale: any = ref({});
       const langItems = [
         {
-          title: 'Serbian',
+          title: 'Srpski',
           short: "SR",
           value: 'sr',
         },

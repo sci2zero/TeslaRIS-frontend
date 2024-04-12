@@ -35,7 +35,7 @@
                         {{ row.item.titleSr }}
                     </localized-link>
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     <localized-link :to="'book-series/' + row.item.databaseId">
                         {{ row.item.titleOther }}
                     </localized-link>

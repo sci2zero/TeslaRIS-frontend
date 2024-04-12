@@ -104,9 +104,15 @@
             </v-col>
         </v-row>
 
+        <!-- Employee Table -->
+        <br />
+        <h1>{{ $t("employeesLabel") }}</h1>
+        <person-table-component :persons="employees" :total-persons="totalEmployees" @switch-page="switchEmployeesPage"></person-table-component>
+
         <!-- Publication Table -->
         <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <h1>{{ $t("publicationsLabel") }}</h1>
+        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -138,11 +144,13 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
 import type { MultilingualContent } from '@/models/Common';
-
+import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
+import type { PersonIndex } from '@/models/PersonModel';
+import PersonService from '@/services/PersonService';
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -154,12 +162,22 @@ export default defineComponent({
         const relationChain = ref();
 
         const ouIcon = ref('mdi-city')
+        
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
-        const page = ref(0);
-        const size = ref(1);
-        const sort = ref("");
-        const direction = ref("");
+
+        const employees = ref<PersonIndex[]>([]);
+        const totalEmployees = ref<number>(0);
+
+        const publicationsPage = ref(0);
+        const publicationsSize = ref(1);
+        const publicationsSort = ref("");
+        const publicationsDirection = ref("");
+
+        const employeesPage = ref(0);
+        const employeesSize = ref(1);
+        const employeesSort = ref("");
+        const employeesDirection = ref("");
 
         const canEdit = ref(false);
 
@@ -173,6 +191,7 @@ export default defineComponent({
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 organisationUnit.value = response.data;
                 
+                fetchEmployees();
                 fetchPublications();
             });
             OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -180,16 +199,31 @@ export default defineComponent({
             })
         });
 
-        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
-            page.value = nextPage;
-            size.value = pageSize;
-            sort.value = sortField;
-            direction.value = sortDir;
+        const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            publicationsPage.value = nextPage;
+            publicationsSize.value = pageSize;
+            publicationsSort.value = sortField;
+            publicationsDirection.value = sortDir;
             fetchPublications();
+        };
+
+        const switchEmployeesPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            employeesPage.value = nextPage;
+            employeesSize.value = pageSize;
+            employeesSort.value = sortField;
+            employeesDirection.value = sortDir;
+            fetchEmployees();
         };
 
         const fetchPublications = () => {
             
+        };
+
+        const fetchEmployees = () => {
+            PersonService.findEmployeesForOU(parseInt(currentRoute.params.id as string)).then((response) => {
+                employees.value = response.data.content;
+                totalEmployees.value = response.data.totalElements;
+            });
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -225,7 +259,9 @@ export default defineComponent({
             ouIcon,
             publications, 
             totalPublications,
-            switchPage,
+            employees, totalEmployees,
+            switchPublicationsPage,
+            switchEmployeesPage,
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,
             updateKeywords,

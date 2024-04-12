@@ -35,7 +35,7 @@
                         {{ row.item.nameSr }}
                     </localized-link>
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     <localized-link :to="'publishers/' + row.item.databaseId">
                         {{ row.item.nameOther }}
                     </localized-link>
@@ -43,13 +43,13 @@
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.placeSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.placeOther }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ row.item.stateSr }}
                 </td>
-                <td v-if="$i18n.locale == 'en'">
+                <td v-else>
                     {{ row.item.stateOther }}
                 </td>
             </tr>
