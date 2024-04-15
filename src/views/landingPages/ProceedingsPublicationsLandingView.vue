@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <proceedings-publication-update-modal :preset-proceedings-publication="proceedingsPublication" :read-only="!canEdit" @update="updateBasicInfo"></proceedings-publication-update-modal>
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -187,11 +183,12 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn, getTitleFromValue } from "@/i18n/proceedingsPublicationType";
+import ProceedingsPublicationUpdateModal from '@/components/publication/update/ProceedingsPublicationUpdateModal.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink },
+    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink, ProceedingsPublicationUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -276,8 +273,25 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateBasicInfo = (basicInfo: ProceedingsPublication) => {
+            proceedingsPublication.value!.title = basicInfo.title;
+            proceedingsPublication.value!.subTitle = basicInfo.subTitle;
+            proceedingsPublication.value!.doi = basicInfo.doi;
+            proceedingsPublication.value!.scopusId = basicInfo.scopusId;
+            proceedingsPublication.value!.uris = basicInfo.uris;
+            proceedingsPublication.value!.eventId = basicInfo.eventId;
+            proceedingsPublication.value!.proceedingsId = basicInfo.proceedingsId;
+            proceedingsPublication.value!.startPage = basicInfo.startPage;
+            proceedingsPublication.value!.endPage = basicInfo.endPage;
+            proceedingsPublication.value!.numberOfPages = basicInfo.numberOfPages;
+            proceedingsPublication.value!.articleNumber = basicInfo.articleNumber;
+            proceedingsPublication.value!.proceedingsPublicationType = basicInfo.proceedingsPublicationType;
+
+            performUpdate(true);
+        };
+
         const performUpdate = (reload: boolean) => {
-            DocumentPublicationService.updateProceedingsPublication(proceedings.value?.id as number, proceedingsPublication.value as ProceedingsPublication).then(() => {
+            DocumentPublicationService.updateProceedingsPublication(proceedingsPublication.value?.id as number, proceedingsPublication.value as ProceedingsPublication).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
@@ -301,7 +315,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions
+            updateContributions, updateBasicInfo
         };
 }})
 
@@ -321,21 +335,4 @@ export default defineComponent({
     .edit-pen-container {
         position:relative;
     }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
 </style>

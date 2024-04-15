@@ -21,7 +21,12 @@ export const getTitleFromValueAutoLocale = (value: DocumentContributionType, loc
     if (locale == "sr") {
         resourceTypeArray = contributionTypesSr;
     }
-    return (resourceTypeArray.find(item => getNameFromOrdinal(DocumentContributionType, item.value) === value.toString()) || {}).title;
+
+    if (typeof value === "number") {
+        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    } else if (typeof value === "string") {
+        return (resourceTypeArray.find(item => getNameFromOrdinal(DocumentContributionType, item.value) === value) || {}).title;
+    }
 };
 
 export const getTypesForGivenLocale = (locale: string) => {

@@ -33,11 +33,11 @@ export const getTitleFromValueAutoLocale = (value: JournalPublicationType, local
         resourceTypeArray = journalPublicationTypeSr;
     }
 
-    if(typeof value === "number") {
+    if (typeof value === "number") {
         return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    } else if (typeof value === "string") {
+        return (resourceTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value) || {}).title;
     }
-
-    return (resourceTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value.toString()) || {}).title;
 };
 
 export const getTypesForGivenLocale = (locale: string) => {
@@ -45,6 +45,6 @@ export const getTypesForGivenLocale = (locale: string) => {
         case "sr":
             return journalPublicationTypeSr;
         case "en":
-            return journalPublicationTypeSr;
+            return journalPublicationTypeEn;
     }
 }

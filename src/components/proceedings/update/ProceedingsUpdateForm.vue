@@ -31,20 +31,6 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input
-                            ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"
-                            :initial-value="toMultilingualTextInput(presetProceedings?.description, languageTags)"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area
-                            :initial-value="toMultilingualTextInput(presetProceedings?.keywords, languageTags)"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
                         <uri-input ref="urisRef" v-model="uris"></uri-input>
                     </v-col>
                 </v-row>
@@ -112,7 +98,7 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { ExternalValidation, LanguageTagResponse } from '@/models/Common';
+import type { ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -186,8 +172,6 @@ export default defineComponent({
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof MultilingualTextInput>();
-        const descriptionRef = ref<typeof MultilingualTextInput>();
-        const keywordsRef = ref<typeof MultilingualTextInput>();
 
         const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
@@ -202,9 +186,7 @@ export default defineComponent({
 
         const title = ref([]);
         const subtitle = ref([]);
-        const uris = ref(props.presetProceedings?.uris);
-        const keywords = ref([]);
-        const description = ref([]);
+        const uris = ref(props.presetProceedings?.uris as string[]);
         const eIsbn = ref(props.presetProceedings?.eISBN);
         const printIsbn = ref(props.presetProceedings?.printISBN);
         const numberOfPages = ref(props.presetProceedings?.numberOfPages);
@@ -236,12 +218,12 @@ export default defineComponent({
             }
 
             const updatedProceedings: Proceedings = {
-                description: description.value,
-                keywords: keywords.value,
+                description: props.presetProceedings?.description as MultilingualContent[],
+                keywords: props.presetProceedings?.keywords as MultilingualContent[],
                 subTitle: subtitle.value,
                 title: title.value,
                 uris: uris.value as string[],
-                contributions: [],
+                contributions: props.presetProceedings?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 eISBN: eIsbn.value,
@@ -267,10 +249,8 @@ export default defineComponent({
             eventAutocompleteRef, selectedEvent,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
-            description, descriptionRef, languageTags,
-            publicationYear, doi, scopus, numberOfPages,
-            keywords, keywordsRef, toMultilingualTextInput,
-            publicationSeriesVolume, publicationSeriesIssue,
+            languageTags, publicationYear, doi, scopus, numberOfPages,
+            toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
             publisherAutocompleteRef, selectedPublisher,
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
