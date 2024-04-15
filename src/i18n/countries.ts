@@ -387,3 +387,12 @@ export const countriesEn: string[] = [
     "Zambia",
     "Zimbabwe",
 ];
+
+export const getCountriesForGivenLocale = (locale: string) => {
+    switch(locale) {
+        case "sr":
+            return countriesSr;
+        case "en":
+            return countriesEn;
+    }
+};

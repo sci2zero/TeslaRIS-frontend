@@ -25,11 +25,11 @@ export const getTitleFromValueAutoLocale = (value: PublicationSeriesContribution
         resourceTypeArray = contributionTypesSr;
     }
 
-    if(typeof value === "number") {
+    if (typeof value === "number") {
         return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    } else if (typeof value === "string") {
+        return (resourceTypeArray.find(item => getNameFromOrdinal(PublicationSeriesContributionType, item.value) === value) || {}).title;
     }
-
-    return (resourceTypeArray.find(item => getNameFromOrdinal(PublicationSeriesContributionType, item.value) === value.toString()) || {}).title;
 };
 
 export const getTypesForGivenLocale = (locale: string) => {

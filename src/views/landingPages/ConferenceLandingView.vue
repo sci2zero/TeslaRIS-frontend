@@ -24,11 +24,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <event-update-modal :preset-event="conference" :read-only="!canEdit" @update="updateBasicInfo"></event-update-modal>
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -57,6 +53,18 @@
                                 </div>
                                 <div v-if="conference?.place && conference.place.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(conference?.place) }}
+                                </div>
+                                <div v-if="conference?.number">
+                                    {{ $t("conferenceNumberLabel") }}:
+                                </div>
+                                <div v-if="conference?.number" class="response">
+                                    {{ conference.number }}
+                                </div>
+                                <div v-if="conference?.fee">
+                                    {{ $t("entryFeeLabel") }}:
+                                </div>
+                                <div v-if="conference?.fee" class="response">
+                                    {{ conference.fee }}
                                 </div>
                                 <div v-if="keywords && keywords.length > 0">
                                     {{ $t("keywordsLabel") }}:
@@ -96,11 +104,12 @@ import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionList from '@/components/core/PersonEventContributionList.vue';
 import type { MultilingualContent } from '@/models/Common';
+import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionList, KeywordList },
+    components: { PublicationTableComponent, PersonEventContributionList, KeywordList, EventUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -185,6 +194,20 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateBasicInfo = (basicInfo: Conference) => {
+            conference.value!.name = basicInfo.name;
+            conference.value!.nameAbbreviation = basicInfo.nameAbbreviation;
+            conference.value!.dateFrom = basicInfo.dateFrom;
+            conference.value!.dateTo = basicInfo.dateTo;
+            conference.value!.state = basicInfo.state;
+            conference.value!.place = basicInfo.place;
+            conference.value!.serialEvent = basicInfo.serialEvent;
+            conference.value!.fee = basicInfo.fee;
+            conference.value!.number = basicInfo.number;
+
+            performUpdate(false);
+        };
+
         const performUpdate = (reload: boolean) => {
             EventService.updateConference(conference.value?.id as number, conference.value as Conference).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -204,7 +227,7 @@ export default defineComponent({
         return {
             conference, icon, publications, 
             totalPublications, switchPage,
-            keywords, getDates,
+            keywords, getDates, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage

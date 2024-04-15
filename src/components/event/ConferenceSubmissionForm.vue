@@ -211,6 +211,8 @@ export default defineComponent({
                 state: multilingualState,
                 place: place.value,
                 serialEvent: serialEvent.value,
+                fee: entryFee.value,
+                number: conferenceNumber.value,
                 contributions: []
             }
 

@@ -26,3 +26,25 @@ export const proceedingsPublicationTypeSr = [
 export const getTitleFromValue = (value: ProceedingsPublicationType, resourceTypeArray: {title: string, value: ProceedingsPublicationType}[]) => {
     return (resourceTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value.toString()) || {}).title;
 };
+
+export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType, locale: string) => {
+    let resourceTypeArray = proceedingsPublicationTypeEn;
+    if (locale == "sr") {
+        resourceTypeArray = proceedingsPublicationTypeSr;
+    }
+
+    if (typeof value === "number") {
+        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    } else if (typeof value === "string") {
+        return (resourceTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value) || {}).title;
+    }
+};
+
+export const getTypesForGivenLocale = (locale: string) => {
+    switch(locale) {
+        case "sr":
+            return proceedingsPublicationTypeSr;
+        case "en":
+            return proceedingsPublicationTypeEn;
+    }
+}
