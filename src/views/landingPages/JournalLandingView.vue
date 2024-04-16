@@ -55,7 +55,7 @@
             </v-col>
         </v-row>
 
-        <person-publication-series-contribution-list :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-list>
+        <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
 
         <!-- Publication Table -->
         <br />
@@ -93,12 +93,12 @@ import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
-import PersonPublicationSeriesContributionList from '@/components/core/PersonPublicationSeriesContributionList.vue';
+import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionList },
+    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

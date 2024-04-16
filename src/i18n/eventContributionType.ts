@@ -21,7 +21,7 @@ export const contributionTypesSr = [
     { title: "Član Programskog Odbora", value: EventContributionType.PROGRAMME_BOARD_MEMBER },
     { title: "Recenzent", value: EventContributionType.REVIEWER },
     { title: "Govornik", value: EventContributionType.SPEAKER },
-    { title: "Član Odbora", value: EventContributionType.CHAIR },
+    { title: "Presedavajući", value: EventContributionType.CHAIR },
     { title: "Demonstrator", value: EventContributionType.DEMONSTRATOR },
 ];
 

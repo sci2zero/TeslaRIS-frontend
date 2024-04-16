@@ -141,7 +141,7 @@
         <!-- Description -->
         <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
+        <person-document-contribution-tabs :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -187,7 +187,7 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
-import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
+import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
@@ -207,7 +207,7 @@ import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsU
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

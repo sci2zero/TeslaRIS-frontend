@@ -78,10 +78,10 @@ export interface PersonDocumentContribution extends PersonContribution {
 }
 
 export enum DocumentContributionType {
-    AUTHOR,
-    EDITOR,
-    REVIEWER,
-    ADVISOR,
+    AUTHOR = "AUTHOR",
+    EDITOR = "EDITOR",
+    REVIEWER = "REVIEWER",
+    ADVISOR = "ADVISOR",
 }
 
 export interface ProceedingsPublication extends Document {

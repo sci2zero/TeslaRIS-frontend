@@ -93,7 +93,7 @@
         <!-- Description -->
         <description-section :description="dataset?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
+        <person-document-contribution-tabs :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -141,7 +141,7 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Dataset } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
-import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
+import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
@@ -153,7 +153,7 @@ import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateMod
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

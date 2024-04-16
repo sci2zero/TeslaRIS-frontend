@@ -135,8 +135,11 @@ export default {
     noRecentPublicationsconferenceLabel: "Nemate ni jednu publikaciju u ovoj konferenciji.",
     uriInputLabel: "Dostupno na",
     mainContributorLabel: "Glavni kontributor",
-    correspondingContributorLabel: "Odgovarajući kontributor",
+    correspondingContributorLabel: "Korespondentni kontributor",
     authorsLabel: "Autori",
+    editorsLabel: "Urednici",
+    reviewersLabel: "Recenzenti",
+    advisorsLabel: "Savetnici",
     proceedingsLabel: "Zbornik radova",
     addProceedingsLabel: "Dodaj zbornik radova",
     publicationSeriesLabel: "Serija publikacija",
@@ -201,5 +204,8 @@ export default {
     updateContributionsLabel: "Ažuriraj kontributore",
     datasetLabel: "Skup podataka",
     updateSoftwareLabel: "Ažuriraj softver",
-    updateDatasetLabel: "Ažuriraj skup podataka"
+    updateDatasetLabel: "Ažuriraj skup podataka",
+    employeesLabel: "Zaposleni",
+    publicationsLabel: "Publikacije",
+    patentLabel: "Patent"
 }

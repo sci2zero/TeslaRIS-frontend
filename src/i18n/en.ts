@@ -137,6 +137,9 @@ export default {
     mainContributorLabel: "Main Contributor",
     correspondingContributorLabel: "Corresponding Contributor",
     authorsLabel: "Authors",
+    editorsLabel: "Editors",
+    reviewersLabel: "Reviewers",
+    advisorsLabel: "Advisors",
     proceedingsLabel: "Proceedings",
     addProceedingsLabel: "Add Proceedings",
     publicationSeriesLabel: "Publication Series",
@@ -201,5 +204,8 @@ export default {
     updateContributionsLabel: "Update Contributions",
     datasetLabel: "Dataset",
     updateSoftwareLabel: "Update Software",
-    updateDatasetLabel: "Update Dataset"
+    updateDatasetLabel: "Update Dataset",
+    employeesLabel: "Employees",
+    publicationsLabel: "Publications",
+    patentLabel: "Patent"
 }

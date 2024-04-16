@@ -1,5 +1,4 @@
 import { DocumentContributionType } from "@/models/PublicationModel";
-import { getNameFromOrdinal } from "@/utils/EnumUtil";
 
 
 export const contributionTypesEn = [
@@ -22,11 +21,7 @@ export const getTitleFromValueAutoLocale = (value: DocumentContributionType, loc
         resourceTypeArray = contributionTypesSr;
     }
 
-    if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
-    } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(DocumentContributionType, item.value) === value) || {}).title;
-    }
+    return (resourceTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getTypesForGivenLocale = (locale: string) => {
