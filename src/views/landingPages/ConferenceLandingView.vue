@@ -82,7 +82,9 @@
 
         <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
 
-        <person-event-contribution-list :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-list>
+        <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
+
+        <person-event-contribution-tabs :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
 
         <!-- Publication Table -->
         <br />
@@ -102,14 +104,15 @@ import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
-import PersonEventContributionList from '@/components/core/PersonEventContributionList.vue';
+import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
 import type { MultilingualContent } from '@/models/Common';
 import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
+import DescriptionSection from '@/components/core/DescriptionSection.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionList, KeywordList, EventUpdateModal },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -189,6 +192,11 @@ export default defineComponent({
             performUpdate(false);
         };
 
+        const updateDescription = (description: MultilingualContent[]) => {
+            conference.value!.description = description;
+            performUpdate(false);
+        };
+
         const updateContributions = (contributions: PersonEventContribution[]) => {
             conference.value!.contributions = contributions;
             performUpdate(true);
@@ -230,7 +238,7 @@ export default defineComponent({
             keywords, getDates, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
-            snackbar, snackbarMessage
+            snackbar, snackbarMessage, updateDescription
         };
 }})
 

@@ -93,7 +93,7 @@
         <!-- Description -->
         <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
+        <person-document-contribution-tabs :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -141,7 +141,7 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Patent } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
-import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
+import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
@@ -153,7 +153,7 @@ import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

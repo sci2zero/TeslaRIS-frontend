@@ -186,7 +186,9 @@
                         </div>
                         <div v-for="(employment, index) in employments" :key="index" class="py-5">
                             <h4>
-                                <strong>{{ returnCurrentLocaleContent(employment.organisationUnitName as MultilingualContent[]) }}</strong>
+                                <localized-link :to="'organisation-units/' + employment.organisationUnitId">
+                                    <strong>{{ returnCurrentLocaleContent(employment.organisationUnitName as MultilingualContent[]) }}</strong>
+                                </localized-link>
                                 <v-icon icon="mdi-circle-small">
                                 </v-icon>
                                 <strong>{{ employment.employmentPosition }} ({{ employment.involvementType }})</strong>
@@ -204,7 +206,9 @@
                         </div>
                         <div v-for="(educationStep, index) in education" :key="index" class="py-5">
                             <h4>
-                                <strong>{{ returnCurrentLocaleContent(educationStep.organisationUnitName as MultilingualContent[]) }}</strong>
+                                <localized-link :to="'organisation-units/' + educationStep.organisationUnitId">
+                                    <strong>{{ returnCurrentLocaleContent(educationStep.organisationUnitName as MultilingualContent[]) }}</strong>
+                                </localized-link>
                                 <v-icon icon="mdi-circle-small">
                                 </v-icon>
                                 <strong>{{ returnCurrentLocaleContent(educationStep.title as MultilingualContent[]) }}</strong>
@@ -224,7 +228,9 @@
                         </div>
                         <div v-for="(membership, index) in memberships" :key="index" class="py-5">
                             <h4>
-                                <strong>{{ returnCurrentLocaleContent(membership.organisationUnitName as MultilingualContent[]) }}</strong>
+                                <localized-link :to="'organisation-units/' + membership.organisationUnitId">
+                                    <strong>{{ returnCurrentLocaleContent(membership.organisationUnitName as MultilingualContent[]) }}</strong>
+                                </localized-link>
                                 <v-icon icon="mdi-circle-small">
                                 </v-icon>
                                 <strong>{{ returnCurrentLocaleContent(membership.role as MultilingualContent[]) }}</strong>
@@ -283,11 +289,12 @@ import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, LocalizedLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

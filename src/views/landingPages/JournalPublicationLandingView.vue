@@ -129,7 +129,7 @@
         <!-- Description -->
         <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
+        <person-document-contribution-tabs :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -177,7 +177,7 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
-import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
+import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
@@ -190,7 +190,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -29,7 +29,7 @@ import type { PersonEventContribution } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/eventContributionType';
 
 export default defineComponent({
-    name: "PersonEventContributionList",
+    name: "PersonEventContributionTabs",
     components: { LocalizedLink, EventContributionUpdateModal },
     props: {
         contributionList: {

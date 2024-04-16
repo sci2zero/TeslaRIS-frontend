@@ -31,7 +31,7 @@ import PublicationSeriesContributionUpdateModal from "@/components/publicationSe
 
 
 export default defineComponent({
-    name: "PersonPublicationSeriesContributionList",
+    name: "PersonPublicationSeriesContributionTabs",
     components: { LocalizedLink, PublicationSeriesContributionUpdateModal },
     props: {
         contributionList: {

@@ -27,10 +27,10 @@
             </v-col>
         </v-row>
         <v-row v-if="!basic">
-            <v-col>
+            <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
-            <v-col>
+            <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
         </v-row>
@@ -145,8 +145,8 @@ export default defineComponent({
                                     orderNumber: index + 1,
                                     personName: personName,
                                     contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
-                                    isMainContributor: props.basic ? index === 0 : input.isMainContributor,
-                                    isCorrespondingContributor: props.basic ? false : input.isCorrespondingContributor});
+                                    isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
+                                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false});
             });
             emit("setInput", returnObject);
         };

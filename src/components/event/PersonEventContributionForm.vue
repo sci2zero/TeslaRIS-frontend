@@ -53,7 +53,7 @@ export default defineComponent({
     setup(props, {emit}) {
         const i18n = useI18n();
 
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: {title: getTitleFromValueAutoLocale(EventContributionType.CHAIR, i18n.locale.value), value: EventContributionType.CHAIR}}]);
+        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: {title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER, i18n.locale.value), value: EventContributionType.PROGRAMME_BOARD_MEMBER}}]);
         const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
@@ -80,8 +80,8 @@ export default defineComponent({
 
         const addInput = () => {
             inputs.value.push({eventContributionType: {
-                    title: getTitleFromValueAutoLocale(EventContributionType.CHAIR, i18n.locale.value), 
-                    value: EventContributionType.CHAIR
+                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER, i18n.locale.value), 
+                    value: EventContributionType.PROGRAMME_BOARD_MEMBER
                 }
             });
             console.log(inputs.value)
@@ -100,8 +100,8 @@ export default defineComponent({
 
         const clearInput = () => {
             inputs.value = [{contribution: {}, eventContributionType: {
-                    title: getTitleFromValueAutoLocale(EventContributionType.CHAIR, i18n.locale.value), 
-                    value: EventContributionType.CHAIR
+                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER, i18n.locale.value), 
+                    value: EventContributionType.PROGRAMME_BOARD_MEMBER
                 }}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();

@@ -93,7 +93,7 @@
         <!-- Description -->
         <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-list :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-list>
+        <person-document-contribution-tabs :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
@@ -141,7 +141,7 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Software } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
-import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
+import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
@@ -153,7 +153,7 @@ import SoftwareUpdateModal from '@/components/publication/update/SoftwareUpdateM
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentList, PersonDocumentContributionList, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
