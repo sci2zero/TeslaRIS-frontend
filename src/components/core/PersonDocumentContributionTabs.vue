@@ -74,7 +74,7 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
-        const currentTab = ref("persons");
+        const currentTab = ref("authors");
 
         const authorList = ref<PersonDocumentContribution[]>([]);
         const editorList = ref<PersonDocumentContribution[]>([]);

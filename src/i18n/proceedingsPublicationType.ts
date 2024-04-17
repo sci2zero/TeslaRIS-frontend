@@ -47,4 +47,4 @@ export const getTypesForGivenLocale = (locale: string) => {
         case "en":
             return proceedingsPublicationTypeEn;
     }
-}
+};

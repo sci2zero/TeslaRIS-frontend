@@ -207,5 +207,17 @@ export default {
     updateDatasetLabel: "Ažuriraj skup podataka",
     employeesLabel: "Zaposleni",
     publicationsLabel: "Publikacije",
-    patentLabel: "Patent"
+    patentLabel: "Patent",
+    associateEditorsLabel: "Urednik-saradnik",
+    scientificBoardMembersLabel: "Članovi naučnog odbora",
+    orgBoardChairLabel: "Predsednici Organizacionog Odbora",
+    orgBoardMembersLabel: "Članovi Organizacionog Odbora",
+    progBoardMembersLabel: "Programme Board Members",
+    speakersLabel: "Govornici",
+    panelistsLabel: "Panelisti",
+    chairLabel: "Presedavajući",
+    audienceLabel: "Publika",
+    demonstratorsLabel: "Demonstratori",
+    updateOULabel: "Ažuriraj organizacionu jedinicu",
+    updateOURelationLabel: "Ažuriraj relacije organizacione jedinice"
 }

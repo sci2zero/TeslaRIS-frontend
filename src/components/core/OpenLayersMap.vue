@@ -67,7 +67,11 @@ export default defineComponent({
             }
             view.setCenter(fromLonLat(position));
             view.setZoom(15);
-            setMarker(position)
+            setMarker(position);
+
+            currentPosition.value.lat = parseFloat(position.toString().split(",")[1]);
+            currentPosition.value.lon = parseFloat(position.toString().split(",")[0]);
+            reverseGeolocation(position);
         });
 
         const initializeMap = (mapElement: any) => {
@@ -114,8 +118,8 @@ export default defineComponent({
                 }),
             });
 
-            // Set the style for the marker
             marker.value.setStyle(biggerPointStyle);
+            vectorSource.clear();
             vectorSource.addFeature(marker.value);
         }
 

@@ -207,5 +207,17 @@ export default {
     updateDatasetLabel: "Update Dataset",
     employeesLabel: "Employees",
     publicationsLabel: "Publications",
-    patentLabel: "Patent"
+    patentLabel: "Patent",
+    associateEditorsLabel: "Associate Editors",
+    scientificBoardMembersLabel: "Scientific Board Members",
+    orgBoardChairLabel: "Organisation Board Chair",
+    orgBoardMembersLabel: "Organisation Board Members",
+    progBoardMembersLabel: "Programme Board Members",
+    speakersLabel: "Speakers",
+    panelistsLabel: "Panelists",
+    chairLabel: "Chair",
+    audienceLabel: "Audience",
+    demonstratorsLabel: "Demonstrators",
+    updateOULabel: "Update Organisation Unit",
+    updateOURelationLabel: "Update Organisation Unit Relations"
 }
