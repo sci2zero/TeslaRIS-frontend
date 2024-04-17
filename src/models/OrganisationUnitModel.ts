@@ -1,4 +1,5 @@
 import type { MultilingualContent } from "./Common";
+import type { DocumentFileResponse } from "./DocumentFileModel";
 
 export interface OrganisationUnitIndex {
     id: string;
@@ -36,6 +37,35 @@ export interface OrganisationUnitResponse {
     researchAreas: ResearchArea[];
     location?: GeoLocation;
     contact?: Contact;
+}
+
+export enum OrganisationUnitsRelationType {
+    BELONGS_TO = "BELONGS_TO",
+    MEMBER_OF = "MEMBER_OF",
+}
+
+export interface OrganisationUnitRelationResponse {
+    id: number;
+    sourceAffiliationStatement: MultilingualContent[];
+    targetAffiliationStatement: MultilingualContent[];
+    relationType: OrganisationUnitsRelationType;
+    dateFrom: string;
+    dateTo: string;
+    proofs: DocumentFileResponse[];
+    sourceOrganisationUnitName: MultilingualContent[];
+    sourceOrganisationUnitId: number;
+    targetOrganisationUnitName: MultilingualContent[];
+    targetOrganisationUnitId: number;
+}
+
+export interface OrganisationUnitRelationRequest {
+    sourceAffiliationStatement: MultilingualContent[];
+    targetAffiliationStatement: MultilingualContent[];
+    relationType: OrganisationUnitsRelationType;
+    dateFrom: string;
+    dateTo: string;
+    sourceOrganisationUnitId: number;
+    targetOrganisationUnitId: number;
 }
 
 export interface ResearchArea {

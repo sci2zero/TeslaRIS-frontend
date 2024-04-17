@@ -58,9 +58,6 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const snackbar = ref(false);
-        const error = ref(false);
-
         const i18n = useI18n();
 
         const countryList = computed(() => {
@@ -124,7 +121,6 @@ export default defineComponent({
 
         return {
             isFormValid,
-            snackbar, error,
             name, nameRef,
             state, countryList,
             place, placeRef,

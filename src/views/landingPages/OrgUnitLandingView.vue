@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="primary">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(organisationUnit?.name) }}
+                        {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${organisationUnit?.nameAbbreviation})` : "" }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("organisationUnitLabel") }}
@@ -26,11 +26,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <organisation-unit-update-modal :preset-o-u="organisationUnit" :read-only="!canEdit" @update="updateBasicInfo"></organisation-unit-update-modal>
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -38,6 +34,12 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <div>
+                                    {{ $t("addressLabel") }}:
+                                </div>
+                                <div class="response">
+                                    {{ organisationUnit?.location?.address ? organisationUnit?.location?.address : $t("notYetSetMessage") }}
+                                </div>
                                 <div>
                                     {{ $t("emailLabel") }}:
                                 </div>
@@ -91,11 +93,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <organisation-unit-relation-update-modal :relations="[]"></organisation-unit-relation-update-modal>
 
                         <div><b>{{ $t("relationsLabel") }}</b></div>
                         <relations-graph :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
@@ -147,10 +145,13 @@ import type { MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
+import OrganisationUnitUpdateModal from '@/components/organisationUnit/update/OrganisationUnitUpdateModal.vue';
+import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
+
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -188,16 +189,21 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchOU();
+
+            OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
+                relationChain.value = response.data;
+            })
+        });
+
+        const fetchOU = () => {
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 organisationUnit.value = response.data;
                 
                 fetchEmployees();
                 fetchPublications();
             });
-            OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
-                relationChain.value = response.data;
-            })
-        });
+        }
 
         const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             publicationsPage.value = nextPage;
@@ -228,10 +234,18 @@ export default defineComponent({
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             organisationUnit.value!.keyword = keywords;
-            performUpdate();
+            performUpdate(false);
         };
 
-        const performUpdate = () => {
+        const updateBasicInfo = (basicInfo: OrganisationUnitRequest) => {
+            organisationUnit.value!.name = basicInfo.name;
+            organisationUnit.value!.nameAbbreviation = basicInfo.nameAbbreviation;
+            organisationUnit.value!.location = basicInfo.location;
+            organisationUnit.value!.contact = basicInfo.contact;
+            performUpdate(false);
+        };
+
+        const performUpdate = (reload: boolean) => {
             const updateRequest: OrganisationUnitRequest = {
                 name: organisationUnit.value!.name,
                 nameAbbreviation: organisationUnit.value?.nameAbbreviation,
@@ -244,9 +258,15 @@ export default defineComponent({
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchOU();
+                }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
+                if(reload) {
+                    fetchOU();
+                }
             });
         };
 
@@ -264,7 +284,7 @@ export default defineComponent({
             switchEmployeesPage,
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,
-            updateKeywords,
+            updateKeywords, updateBasicInfo,
             snackbar, snackbarMessage
         };
 }})
@@ -301,6 +321,4 @@ export default defineComponent({
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
     }
-
-
 </style>
