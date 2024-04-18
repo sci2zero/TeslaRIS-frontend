@@ -49,6 +49,8 @@ export default defineComponent({
             }
 
             rendered.value = true;
+
+            d3.select(container).select("svg").remove();
     
             const height = 500;
 
@@ -157,7 +159,7 @@ export default defineComponent({
         };
     
         return {
-            svgContainer,
+            svgContainer, rendered
         };
     },
 });

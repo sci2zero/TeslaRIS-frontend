@@ -1,11 +1,11 @@
 import { OrganisationUnitsRelationType } from "@/models/OrganisationUnitModel";
 
-export const relationTypeSr = [
+export const relationTypeEn = [
     { title: "Belongs To", value: OrganisationUnitsRelationType.BELONGS_TO },
     { title: "Member Of", value: OrganisationUnitsRelationType.MEMBER_OF }
 ];
 
-export const relationTypeEn = [
+export const relationTypeSr = [
     { title: "Pripada", value: OrganisationUnitsRelationType.BELONGS_TO },
     { title: "Član", value: OrganisationUnitsRelationType.MEMBER_OF }
 ];

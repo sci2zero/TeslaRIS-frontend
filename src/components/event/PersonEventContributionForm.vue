@@ -84,7 +84,6 @@ export default defineComponent({
                     value: EventContributionType.PROGRAMME_BOARD_MEMBER
                 }
             });
-            console.log(inputs.value)
         };
 
         const removeInput = (index: number) => {

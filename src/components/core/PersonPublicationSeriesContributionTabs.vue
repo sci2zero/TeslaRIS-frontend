@@ -86,8 +86,6 @@ export default defineComponent({
             associateEditorList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.ASSOCIATE_EDITOR]);
             reviewerList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.REVIEWER]);
             scientificBoardMemberList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER]);
-        
-            console.log(editorList.value)
         });
 
         const sendToParent = (contributions: any[]) => {

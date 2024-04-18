@@ -94,7 +94,6 @@ export default defineComponent({
                     value: PublicationSeriesContributionType.EDITOR
                 }
             });
-            console.log(inputs.value)
         };
 
         const removeInput = (index: number) => {

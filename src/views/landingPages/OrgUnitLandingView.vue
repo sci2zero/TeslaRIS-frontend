@@ -93,10 +93,10 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <organisation-unit-relation-update-modal :relations="[]"></organisation-unit-relation-update-modal>
+                        <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit" @update="updateRelations"></organisation-unit-relation-update-modal>
 
                         <div><b>{{ $t("relationsLabel") }}</b></div>
-                        <relations-graph :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
+                        <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -136,7 +136,7 @@ import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import type { OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
+import type { OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
@@ -160,9 +160,11 @@ export default defineComponent({
         const currentRoute = useRoute();
 
         const organisationUnit = ref<OrganisationUnitResponse>();
+
+        const graphRef = ref<typeof RelationsGraph>();
         const relationChain = ref();
 
-        const ouIcon = ref('mdi-city')
+        const ouIcon = ref('mdi-city');
         
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -184,6 +186,8 @@ export default defineComponent({
 
         const i18n = useI18n();
 
+        const relations = ref<OrganisationUnitRelationResponse[]>([]);
+
         onMounted(() => {
             OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
@@ -191,9 +195,11 @@ export default defineComponent({
 
             fetchOU();
 
-            OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
-                relationChain.value = response.data;
-            })
+            fetchRelations();
+
+            OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
+                relations.value = response.data;
+            });
         });
 
         const fetchOU = () => {
@@ -203,7 +209,16 @@ export default defineComponent({
                 fetchEmployees();
                 fetchPublications();
             });
-        }
+        };
+
+        const fetchRelations = () => {
+            OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
+                relationChain.value = response.data;
+                if(graphRef.value) {
+                    graphRef.value.rendered = false;
+                }
+            });
+        };
 
         const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             publicationsPage.value = nextPage;
@@ -243,6 +258,47 @@ export default defineComponent({
             organisationUnit.value!.location = basicInfo.location;
             organisationUnit.value!.contact = basicInfo.contact;
             performUpdate(false);
+        };
+
+        const updateRelations = (newRelations: OrganisationUnitRelationRequest[]) => {
+            const relationsForUpdate = newRelations.filter(relation => relation.id);
+            const relationsToAdd = newRelations.filter(relation => !relation.id);
+
+            console.log(relationsForUpdate, relationsToAdd);
+
+            if(relationsForUpdate.length === 0) {
+                addNewRelations(newRelations);
+                return;
+            }
+
+            relationsForUpdate.forEach((relation, index) => {
+                OrganisationUnitService.updateOURelation(relation, relation.id).then(() => {
+                    if(index === relationsForUpdate.length - 1) {
+                        if (relationsToAdd.length > 0) {
+                            addNewRelations(relationsToAdd);
+                            return;
+                        }
+                        fetchRelations();
+                        OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
+                            relations.value = response.data;
+                        });
+                    }
+                });
+            });
+        };
+
+        const addNewRelations = (relationsToAdd: OrganisationUnitRelationRequest[]) => {
+            console.log("AAAAAAAAAAAAAAAA", relationsToAdd);
+            relationsToAdd.forEach((relation, index) => {
+                OrganisationUnitService.createOURelation(relation).then(() => {
+                    if(index === relationsToAdd.length - 1) {
+                        fetchRelations();
+                        OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
+                            relations.value = response.data;
+                        });
+                    }
+                });
+            });
         };
 
         const performUpdate = (reload: boolean) => {
@@ -285,7 +341,8 @@ export default defineComponent({
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
-            snackbar, snackbarMessage
+            snackbar, snackbarMessage, relations,
+            updateRelations, graphRef
         };
 }})
 

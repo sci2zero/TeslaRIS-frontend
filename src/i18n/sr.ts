@@ -219,5 +219,6 @@ export default {
     audienceLabel: "Publika",
     demonstratorsLabel: "Demonstratori",
     updateOULabel: "Ažuriraj organizacionu jedinicu",
-    updateOURelationLabel: "Ažuriraj relacije organizacione jedinice"
+    updateOURelationLabel: "Ažuriraj relacije organizacione jedinice",
+    relationTypeLabel: "Tip relacije"
 }
