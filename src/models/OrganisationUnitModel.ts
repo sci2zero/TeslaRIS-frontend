@@ -59,6 +59,7 @@ export interface OrganisationUnitRelationResponse {
 }
 
 export interface OrganisationUnitRelationRequest {
+    id: number,
     sourceAffiliationStatement: MultilingualContent[];
     targetAffiliationStatement: MultilingualContent[];
     relationType: OrganisationUnitsRelationType;

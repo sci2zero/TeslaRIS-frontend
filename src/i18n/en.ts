@@ -219,5 +219,6 @@ export default {
     audienceLabel: "Audience",
     demonstratorsLabel: "Demonstrators",
     updateOULabel: "Update Organisation Unit",
-    updateOURelationLabel: "Update Organisation Unit Relations"
+    updateOURelationLabel: "Update Organisation Unit Relations",
+    relationTypeLabel: "Relation Type"
 }

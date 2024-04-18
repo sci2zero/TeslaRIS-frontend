@@ -1,9 +1,6 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row v-for="(relation, index) in data" :key="relation.id">
-            <v-col cols="7">
-                <organisation-unit-autocomplete-search :ref="(el) => (autocompleteSearchRef[index] = el)" v-model:model-value="relation.targetOrganisationUnit" required></organisation-unit-autocomplete-search>
-            </v-col>
             <v-col cols="3">
                 <v-select
                     v-model="relation.relationType"
@@ -11,6 +8,9 @@
                     :label="$t('relationTypeLabel')"
                     return-object>
                 </v-select>
+            </v-col>
+            <v-col cols="7">
+                <organisation-unit-autocomplete-search :ref="(el) => (autocompleteSearchRef[index] = el)" v-model:model-value="relation.targetOrganisationUnit" required></organisation-unit-autocomplete-search>
             </v-col>
             <v-col cols="2">
                 <v-btn v-if="index > 0" icon @click="removeRelation(index)">
@@ -33,8 +33,8 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
-import { OrganisationUnitsRelationType, type OrganisationUnitRelationRequest, type OrganisationUnitRelationResponse } from '@/models/OrganisationUnitModel';
-import { getTypesForGivenLocale } from '@/i18n/organisationUnitRelationType';
+import { OrganisationUnitsRelationType, type OrganisationUnitRelationRequest, type OrganisationUnitRelationResponse, type OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
+import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/organisationUnitRelationType';
 import OrganisationUnitAutocompleteSearch from '../OrganisationUnitAutocompleteSearch.vue';
 import { useI18n } from 'vue-i18n';
 
@@ -42,6 +42,10 @@ export default defineComponent({
     name: "OrganisationUnitRelationUpdateForm",
     components: { OrganisationUnitAutocompleteSearch },
     props: {
+        sourceOU: {
+            type: Object as PropType<OrganisationUnitResponse | undefined>,
+            required: true
+        },
         relations: {
             type: Object as PropType<OrganisationUnitRelationResponse[] | undefined>,
             required: true
@@ -53,7 +57,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const autocompleteSearchRef = ref<any>([]);
-        const data = ref<any[]>([{relationType: OrganisationUnitsRelationType.BELONGS_TO, targetOrganisationUnit: {title: "", value: -1}}]);
+        const data = ref<any[]>([{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO, i18n.locale.value), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}]);
 
         const languageList = ref<LanguageTagResponse[]>([]);
 
@@ -62,14 +66,18 @@ export default defineComponent({
                 languageList.value = response.data;
             });
 
-            props.relations?.forEach(relation => {
-                data.value.push({
-                    relationType: relation.relationType,
-                    dateFrom: "",
-                    dateTo: "",
-                    targetOrganisationUnit: {title: returnCurrentLocaleContent(relation.targetOrganisationUnitName), value: relation.targetOrganisationUnitId}
+            if(props.relations && props.relations.length > 0) {
+                data.value = [];
+                props.relations?.forEach(relation => {
+                    data.value.push({
+                        id: relation.id,
+                        relationType: {title: getTitleFromValueAutoLocale(relation.relationType, i18n.locale.value), value: relation.relationType},
+                        dateFrom: "",
+                        dateTo: "",
+                        targetOrganisationUnit: {title: returnCurrentLocaleContent(relation.targetOrganisationUnitName), value: relation.targetOrganisationUnitId}
+                    });
                 });
-            });
+            }
         });
 
         const { requiredFieldRules } = useValidationUtils();
@@ -78,13 +86,14 @@ export default defineComponent({
             const updatedOURelations: OrganisationUnitRelationRequest[] = [];
             data.value.forEach(relation => {
                 updatedOURelations.push({
-                    relationType: relation.relationType,
+                    id: relation.id,
+                    relationType: relation.relationType.value,
                     dateFrom: "",
                     dateTo: "",
                     sourceAffiliationStatement: [],
                     targetAffiliationStatement: [],
-                    sourceOrganisationUnitId: 0,
-                    targetOrganisationUnitId: relation.targetOrganisationUnit.value.value
+                    sourceOrganisationUnitId: props.sourceOU?.id as number,
+                    targetOrganisationUnitId: relation.targetOrganisationUnit.value
                 });
             });
 
@@ -94,7 +103,7 @@ export default defineComponent({
         const relationTypes = getTypesForGivenLocale(i18n.locale.value);
 
         const addRelation = () => {
-            data.value.push({value: ""});
+            data.value.push({relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO, i18n.locale.value), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}});
         };
 
         const removeRelation = (index: number) => {

@@ -17,7 +17,7 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <organisation-unit-relation-update-form :relations="relations"></organisation-unit-relation-update-form>
+                        <organisation-unit-relation-update-form ref="updateFormRef" :relations="relations" :source-o-u="sourceOU" @update="emitToParent"></organisation-unit-relation-update-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -39,7 +39,7 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import OrganisationUnitRelationUpdateForm from "./OrganisationUnitRelationUpdateForm.vue";
-import type { OrganisationUnitRelationResponse, OrganisationUnitRelationRequest } from "@/models/OrganisationUnitModel";
+import type { OrganisationUnitRelationResponse, OrganisationUnitRelationRequest, OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 
 
 export default defineComponent({
@@ -49,6 +49,10 @@ export default defineComponent({
         readOnly: {
             type: Boolean,
             default: false
+        },
+        sourceOU: {
+            type: Object as PropType<OrganisationUnitResponse | undefined>,
+            required: true
         },
         relations: {
             type: Object as PropType<OrganisationUnitRelationResponse[] | undefined>,
