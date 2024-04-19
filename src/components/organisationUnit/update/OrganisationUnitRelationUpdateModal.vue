@@ -65,8 +65,8 @@ export default defineComponent({
 
         const updateFormRef = ref<typeof OrganisationUnitRelationUpdateForm>();
 
-        const emitToParent = (organisationUnit: OrganisationUnitRelationRequest) => {
-            emit("update", organisationUnit)
+        const emitToParent = (organisationUnitRelations: OrganisationUnitRelationRequest[], toDelete: number[]) => {
+            emit("update", organisationUnitRelations, toDelete)
             dialog.value = false;
         };
 

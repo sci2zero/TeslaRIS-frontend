@@ -260,45 +260,36 @@ export default defineComponent({
             performUpdate(false);
         };
 
-        const updateRelations = (newRelations: OrganisationUnitRelationRequest[]) => {
+        const updateRelations = async (newRelations: OrganisationUnitRelationRequest[], toDelete: number[]) => {
+            await Promise.all(toDelete.map(relationIdToDelete => OrganisationUnitService.deleteOURelation(relationIdToDelete)));
+
             const relationsForUpdate = newRelations.filter(relation => relation.id);
             const relationsToAdd = newRelations.filter(relation => !relation.id);
 
-            console.log(relationsForUpdate, relationsToAdd);
-
-            if(relationsForUpdate.length === 0) {
-                addNewRelations(newRelations);
+            if (relationsForUpdate.length === 0) {
+                await addNewRelations(relationsToAdd);
                 return;
             }
 
-            relationsForUpdate.forEach((relation, index) => {
-                OrganisationUnitService.updateOURelation(relation, relation.id).then(() => {
-                    if(index === relationsForUpdate.length - 1) {
-                        if (relationsToAdd.length > 0) {
-                            addNewRelations(relationsToAdd);
-                            return;
-                        }
-                        fetchRelations();
-                        OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
-                            relations.value = response.data;
-                        });
-                    }
-                });
-            });
+            await Promise.all(relationsForUpdate.map(relation => OrganisationUnitService.updateOURelation(relation, relation.id)));
+
+            if (relationsToAdd.length > 0) {
+                await addNewRelations(relationsToAdd);
+            }
+
+            await fetchAndSetRelations();
         };
 
-        const addNewRelations = (relationsToAdd: OrganisationUnitRelationRequest[]) => {
-            console.log("AAAAAAAAAAAAAAAA", relationsToAdd);
-            relationsToAdd.forEach((relation, index) => {
-                OrganisationUnitService.createOURelation(relation).then(() => {
-                    if(index === relationsToAdd.length - 1) {
-                        fetchRelations();
-                        OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
-                            relations.value = response.data;
-                        });
-                    }
-                });
-            });
+        const addNewRelations = async (relationsToAdd: OrganisationUnitRelationRequest[]) => {
+            await Promise.all(relationsToAdd.map(relation => OrganisationUnitService.createOURelation(relation)));
+            await fetchAndSetRelations();
+        };
+
+        const fetchAndSetRelations = async () => {
+            await fetchRelations();
+            const sourceOUId = parseInt(currentRoute.params.id as string);
+            const response = await OrganisationUnitService.getAllRelationsForSourceOU(sourceOUId);
+            relations.value = response.data;
         };
 
         const performUpdate = (reload: boolean) => {
