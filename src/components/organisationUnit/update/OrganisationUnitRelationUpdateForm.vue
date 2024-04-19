@@ -13,10 +13,10 @@
                 <organisation-unit-autocomplete-search :ref="(el) => (autocompleteSearchRef[index] = el)" v-model:model-value="relation.targetOrganisationUnit" required></organisation-unit-autocomplete-search>
             </v-col>
             <v-col cols="2">
-                <v-btn v-if="index > 0" icon @click="removeRelation(index)">
+                <v-btn v-if="relation.id || index > 0" icon @click="removeRelation(index, relation.id)">
                     <v-icon>mdi-delete</v-icon>
                 </v-btn>
-                <v-btn icon @click="addRelation">
+                <v-btn v-if="index === data.length - 1" icon @click="addRelation">
                     <v-icon>mdi-plus</v-icon>
                 </v-btn>
             </v-col>
@@ -60,6 +60,7 @@ export default defineComponent({
         const data = ref<any[]>([{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO, i18n.locale.value), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}]);
 
         const languageList = ref<LanguageTagResponse[]>([]);
+        const toDelete = ref<number[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
@@ -97,7 +98,7 @@ export default defineComponent({
                 });
             });
 
-            emit("update", updatedOURelations);
+            emit("update", updatedOURelations, toDelete.value);
         };
 
         const relationTypes = getTypesForGivenLocale(i18n.locale.value);
@@ -106,8 +107,14 @@ export default defineComponent({
             data.value.push({relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO, i18n.locale.value), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}});
         };
 
-        const removeRelation = (index: number) => {
+        const removeRelation = (index: number, relationId: number) => {
             data.value.splice(index, 1);
+            if (relationId) {
+                toDelete.value.push(relationId);
+            }
+            if(data.value.length === 0) {
+                emit("update", [], toDelete.value);
+            }
         };
 
         return {

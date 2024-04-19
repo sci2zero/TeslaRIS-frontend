@@ -40,13 +40,24 @@ export default defineComponent({
         watch(i18n.locale, () => {
             d3.select(svgContainer.value).selectAll("*").remove();
             rendered.value = false;
-            createForceLayout(svgContainer.value)
+            createForceLayout(svgContainer.value);
         });
+
+        const removeDuplicates = (nodes: any) => {
+            const index: any = [];
+            return nodes.filter(function (item: any) {
+                const k = JSON.stringify(item);
+                return index.indexOf(k) >= 0 ? false : index.push(k);
+            });
+        };
     
         function createForceLayout(container: any) {
             if(!props.nodes || !props.links || rendered.value) {
                 return;
             }
+            
+            const uniqueNodes = removeDuplicates(props.nodes);
+            console.log(uniqueNodes);
 
             rendered.value = true;
 
@@ -61,7 +72,7 @@ export default defineComponent({
 
             const width = container.clientWidth;
     
-            const simulation = d3.forceSimulation(props.nodes)
+            const simulation = d3.forceSimulation(uniqueNodes)
                 .force('link', d3.forceLink(props.links).id((d: any) => d.id).distance(200).strength(1))
                 .force('charge', d3.forceManyBody().strength(-300))
                 .force('center', d3.forceCenter(width / 2, height / 2))
@@ -98,7 +109,7 @@ export default defineComponent({
                 .attr('font-size', '12px');
     
             const node = svg.selectAll('.node')
-                .data(props.nodes)
+                .data(uniqueNodes)
                 .enter().append('circle')
                 .attr('class', 'node')
                 .attr('r', 70)
@@ -110,7 +121,7 @@ export default defineComponent({
                 .on('click', (event: any, d: any) => seeOUPage(d.id));
     
             const nodeText = svg.selectAll('.node-text')
-                .data(props.nodes)
+                .data(uniqueNodes)
                 .enter().append('text')
                 .attr('class', 'node-text')
                 .text((d: any) => returnCurrentLocaleContent(d.name))

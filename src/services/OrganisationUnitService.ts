@@ -51,6 +51,10 @@ export class OrganisationUnitService extends BaseService {
   async updateOURelation(relation: OrganisationUnitRelationRequest, relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `organisation-unit-relation/${relationId}`, relation);
   }
+
+  async deleteOURelation(relationId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `organisation-unit-relation/${relationId}`);
+  }
 }
 
 export default new OrganisationUnitService();
