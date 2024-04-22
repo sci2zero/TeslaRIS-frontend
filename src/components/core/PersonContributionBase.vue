@@ -19,6 +19,20 @@
         </v-col>
     </v-row>
     <v-row v-if="personOtherNames.length > 0">
+        <v-col cols="10">
+            <v-select
+                v-model="selectedAffiliations"
+                :label="$t('personAffiliationsLabel')"
+                :items="personAffiliations"
+                :auto-select-first="true"
+                :no-data-text="$t('noAffiliationsMessage')"
+                return-object
+                multiple
+                @update:model-value="sendContentToParent"
+            ></v-select>
+        </v-col>
+    </v-row>
+    <v-row v-if="personOtherNames.length > 0">
         <v-col v-if="!customNameInput" cols="10">
             <v-select
                 v-model="selectedOtherName"
@@ -82,9 +96,10 @@ import type { PersonName } from "@/models/PersonModel";
 import PersonSubmissionModal from "../person/PersonSubmissionModal.vue";
 import type { PropType } from "vue";
 import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
-import { toMultilingualTextInput } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/TranslationUtil";
 import { onMounted } from "vue";
 import LanguageService from "@/services/LanguageService";
+import InvolvementService from "@/services/InvolvementService";
 
 export default defineComponent({
     name: "PersonContributionBase",
@@ -95,7 +110,7 @@ export default defineComponent({
             default: false
         },
         presetContributionValue: {
-            type: Object as PropType<{personId: number, description: MultilingualContent[], affiliationStatement: MultilingualContent[], selectedOtherName: string[]}>,
+            type: Object as PropType<{personId: number, description: MultilingualContent[], affiliationStatement: MultilingualContent[], selectedOtherName: string[], institutionIds: number[]}>,
             default: () => ({
                 personId: -1,
                 description: [],
@@ -120,6 +135,10 @@ export default defineComponent({
         const persons = ref<{ title: string, value: number }[]>([]);
         const personPlaceholder = {title: "", value: -1};
         const selectedPerson = ref<{ title: string, value: number }>(personPlaceholder);
+
+        const selectedAffiliations = ref<{ title: string, value: number }[]>([]);
+        const personAffiliations = ref<{ title: string, value: number }[]>([]);
+        const presetAffiliations = ref<number[]>([]);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
@@ -173,7 +192,8 @@ export default defineComponent({
                 valueSet.value = true;
 
                 const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
-                
+                presetAffiliations.value = props.presetContributionValue.institutionIds;
+
                 firstName.value = props.presetContributionValue.selectedOtherName[0];
                 middleName.value = props.presetContributionValue.selectedOtherName[1];
                 lastName.value = props.presetContributionValue.selectedOtherName[2];
@@ -231,7 +251,8 @@ export default defineComponent({
                 personId: selectedPerson.value.value,
                 description: contributionDescription.value,
                 affiliationStatement: affiliationStatement.value,
-                selectedOtherName: otherName
+                selectedOtherName: otherName,
+                institutionIds: selectedAffiliations.value.map(affiliation => affiliation.value)
             };
             
             emit("setInput", returnObject);
@@ -239,6 +260,24 @@ export default defineComponent({
 
         watch(contributionDescription, () => sendContentToParent());
         watch(affiliationStatement, () => sendContentToParent());
+
+        watch(selectedPerson, () => {
+            InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
+                personAffiliations.value = [];
+                response.data.forEach(employment => {
+                    personAffiliations.value.push({title: returnCurrentLocaleContent(employment.organisationUnitName) as string, value: employment.organisationUnitId as number});
+                });
+
+                selectedAffiliations.value = [];
+                personAffiliations.value.forEach(affiliation => {
+                    presetAffiliations.value.forEach(selectedAffiliationId => {
+                        if(affiliation.value === selectedAffiliationId) {
+                            selectedAffiliations.value.push(affiliation);
+                        }
+                    });
+                });
+            });
+        });
 
         const clearInput = () => {
             selectedPerson.value = personPlaceholder;
@@ -264,7 +303,7 @@ export default defineComponent({
                 descriptionRef, affiliationStatementRef,
                 personOtherNames, selectedOtherName,
                 selectNewlyAddedPerson, toMultilingualTextInput,
-                languageTags, valueSet};
+                languageTags, valueSet, selectedAffiliations, personAffiliations};
     }
 });
 </script>

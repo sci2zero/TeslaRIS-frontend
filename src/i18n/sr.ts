@@ -220,5 +220,8 @@ export default {
     demonstratorsLabel: "Demonstratori",
     updateOULabel: "Ažuriraj organizacionu jedinicu",
     updateOURelationLabel: "Ažuriraj relacije organizacione jedinice",
-    relationTypeLabel: "Tip relacije"
+    relationTypeLabel: "Tip relacije",
+    personAffiliationsLabel: "Afilijacije",
+    noAffiliationsMessage: "Nema afilijacija za ovu osobu.",
+    updatePersonLabel: "Ažuriraj osubu"
 }

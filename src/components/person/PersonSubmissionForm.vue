@@ -115,10 +115,11 @@ import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import { EmploymentPosition, Sex } from "@/models/PersonModel";
+import { EmploymentPosition } from "@/models/PersonModel";
 import type { BasicPerson } from "@/models/PersonModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { getSexForGivenLocale } from '@/i18n/sex';
 
 
 export default defineComponent({
@@ -230,22 +231,12 @@ export default defineComponent({
             { title: "Stariji naučni saradnik", value: EmploymentPosition.SENIOR_SCIENTIFIC_COLLABORATOR },
         ];
 
-        const sexSr = [
-            { title: "Muški", value: Sex.MALE },
-            { title: "Ženski", value: Sex.FEMALE },
-        ];
-
-        const sexEn = [
-            { title: "Male", value: Sex.MALE },
-            { title: "Female", value: Sex.FEMALE },
-        ];
-
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
 
         const employmentPositions = computed(() => i18n.locale.value === "sr" ? employmentPositionsSr : employmentPositionsEn);
         const selectedEmploymentPosition = ref(selectionPlaceholder);
 
-        const sexes = computed(() => i18n.locale.value === "sr" ? sexSr : sexEn);
+        const sexes = getSexForGivenLocale(i18n.locale.value);
         const selectedSex = ref(selectionPlaceholder);
 
         const submitPerson = (stayOnPage: boolean) => {

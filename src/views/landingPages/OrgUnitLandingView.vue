@@ -147,6 +147,7 @@ import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
 import OrganisationUnitUpdateModal from '@/components/organisationUnit/update/OrganisationUnitUpdateModal.vue';
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
@@ -237,7 +238,14 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            
+            if (!organisationUnit.value?.id) {
+                return;
+            }
+
+            DocumentPublicationService.findPublicationsForOrganisationUnit(organisationUnit.value?.id as number, `page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`).then((publicationResponse) => {
+                publications.value = publicationResponse.data.content;
+                totalPublications.value = publicationResponse.data.totalElements
+            });
         };
 
         const fetchEmployees = () => {

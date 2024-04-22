@@ -68,7 +68,8 @@ export default defineComponent({
                                                                 contribution.personName?.firstname, 
                                                                 contribution.personName?.otherName, 
                                                                 contribution.personName?.lastname
-                                                            ]
+                                                            ],
+                                                    institutionIds: contribution.institutionIds
                                                     }, 
                     eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType, i18n.locale.value), value: contribution.eventContributionType},
                     id: contribution.id});
@@ -124,7 +125,9 @@ export default defineComponent({
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
                                     personName: personName,
-                                    eventContributionType: input.eventContributionType.value});
+                                    eventContributionType: input.eventContributionType.value,
+                                    institutionIds: input.contribution.institutionIds
+                                });
             });
             emit("setInput", returnObject);
         };

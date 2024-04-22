@@ -76,7 +76,8 @@ export default defineComponent({
                                                                 contribution.personName?.firstname, 
                                                                 contribution.personName?.otherName, 
                                                                 contribution.personName?.lastname
-                                                            ]
+                                                            ],
+                                                    institutionIds: contribution.institutionIds
                                                     }, 
                     contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType, i18n.locale.value), value: contribution.contributionType},
                     dateFrom: contribution.dateFrom,
@@ -136,7 +137,9 @@ export default defineComponent({
                                     personName: personName,
                                     contributionType: input.contributionType.value,
                                     dateFrom: input.dateFrom,
-                                    dateTo: input.dateTo});
+                                    dateTo: input.dateTo,
+                                    institutionIds: input.contribution.institutionIds
+                                });
             });
             emit("setInput", returnObject);
         };

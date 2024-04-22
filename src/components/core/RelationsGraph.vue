@@ -57,7 +57,6 @@ export default defineComponent({
             }
             
             const uniqueNodes = removeDuplicates(props.nodes);
-            console.log(uniqueNodes);
 
             rendered.value = true;
 
