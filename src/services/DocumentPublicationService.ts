@@ -49,6 +49,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/for-publisher/${publisherId}?${pageable}`);
   }
 
+  async findPublicationsForOrganisationUnit(organisationUnitId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `document/for-organisation-unit/${organisationUnitId}?${pageable}`);
+  }
+
   async createJournalPublication(body: JournalPublication): Promise<AxiosResponse<JournalPublication>> {
     return super.sendRequest(axios.post, "journal-publication", body, DocumentPublicationService.idempotencyKey);
   }

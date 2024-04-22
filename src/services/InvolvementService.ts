@@ -16,6 +16,10 @@ export class InvolvementService extends BaseService {
   async getMembership(membershipId: number): Promise<AxiosResponse<Membership>> {
     return super.sendRequest(axios.get, `involvement/membership/${membershipId}`);
   }
+
+  async getPersonEmployments(personId: number): Promise<AxiosResponse<Employment[]>> {
+    return super.sendRequest(axios.get, `involvement/employments/${personId}`);
+  }
 }
 
 export default new InvolvementService();

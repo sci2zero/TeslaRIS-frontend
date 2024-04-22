@@ -220,5 +220,8 @@ export default {
     demonstratorsLabel: "Demonstrators",
     updateOULabel: "Update Organisation Unit",
     updateOURelationLabel: "Update Organisation Unit Relations",
-    relationTypeLabel: "Relation Type"
+    relationTypeLabel: "Relation Type",
+    personAffiliationsLabel: "Affiliations",
+    noAffiliationsMessage: "There are no affiliations for this person.",
+    updatePersonLabel: "Update Person"
 }

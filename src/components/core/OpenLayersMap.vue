@@ -128,6 +128,10 @@ export default defineComponent({
             .then(function(response) {
                 return response.json();
             }).then((json) => {
+                if(!json.address) {
+                    return;
+                }
+
                 if (json.address.house_number == undefined) {
                     if (json.address.building == undefined) {
                         address.value = json.address.road + ", " + json.address.city;

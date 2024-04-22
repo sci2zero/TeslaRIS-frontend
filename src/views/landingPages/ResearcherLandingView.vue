@@ -24,11 +24,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <person-update-modal :preset-person="person" :read-only="!canEdit" @update="updatePersonalInfo"></person-update-modal>
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -276,7 +272,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PersonResponse, ExpertiseOrSkillResponse, PrizeResponse } from '@/models/PersonModel';
+import type { PersonResponse, ExpertiseOrSkillResponse, PrizeResponse, PersonalInfo } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -290,11 +286,12 @@ import DocumentFileService from '@/services/DocumentFileService';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, LocalizedLink },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, LocalizedLink, PersonUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -513,6 +510,10 @@ export default defineComponent({
             });
         };
 
+        const updatePersonalInfo = (updatedInfo: PersonalInfo) => {
+            console.log(updatedInfo);
+        };
+
         return {
             researcherName,
             accountIcon,
@@ -529,7 +530,7 @@ export default defineComponent({
             addInvolvementProof, deleteInvolvementProof, updateInvolvementProof,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords, updateBiography,
-            snackbar, snackbarMessage
+            snackbar, snackbarMessage, updatePersonalInfo
         };
 }})
 

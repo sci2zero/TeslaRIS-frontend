@@ -74,14 +74,14 @@ export default defineComponent({
                     personId: contribution.personId,
                     contributionDescription: contribution.contributionDescription,
                     orderNumber: contribution.orderNumber,
-                    institutionIds: [],
+                    institutionIds: contribution.institutionIds,
                     displayAffiliationStatement: contribution.displayAffiliationStatement,
                     personName: {
                                     firstname: contribution.personName.firstname, 
                                     otherName: contribution.personName.otherName, 
                                     lastname: contribution.personName.lastname
                                 },
-                    eventContributionType: contribution.eventContributionType,
+                    eventContributionType: contribution.eventContributionType
                 });
 
             });

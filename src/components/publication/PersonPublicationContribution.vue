@@ -80,7 +80,8 @@ export default defineComponent({
                                                                 contribution.personName?.firstname, 
                                                                 contribution.personName?.otherName, 
                                                                 contribution.personName?.lastname
-                                                            ]
+                                                            ],
+                                                    institutionIds: contribution.institutionIds
                                                     }, 
                     contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType, i18n.locale.value), value: contribution.contributionType}, 
                     isMainContributor: contribution.isMainContributor, 
@@ -146,7 +147,9 @@ export default defineComponent({
                                     personName: personName,
                                     contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
                                     isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
-                                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false});
+                                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
+                                    institutionIds: input.contribution.institutionIds
+                                });
             });
             emit("setInput", returnObject);
         };
