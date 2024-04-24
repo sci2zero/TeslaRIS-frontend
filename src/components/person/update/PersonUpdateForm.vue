@@ -2,6 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="12">
+                <h3>{{ $t('personalInfoLabel') }}</h3>
                 <v-row>
                     <v-col>
                         <v-select
@@ -15,16 +16,6 @@
                 <v-row>
                     <v-col>
                         <v-text-field v-model="placeOfBirth" :label="$t('placeOfBirthLabel')" :placeholder="$t('placeOfBirthLabel')"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -52,6 +43,39 @@
                         <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID"></v-text-field>
                     </v-col>
                 </v-row>
+                <h3>{{ $t('contactLabel') }}</h3>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <h3>{{ $t('addressLabel') }}</h3>
+                <v-row>
+                    <v-col>
+                        <v-select
+                            v-model="selectedCountry"
+                            hide-details="auto"
+                            :items="countries"
+                            :label="$t('countryLabel')"
+                            return-object
+                        ></v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageList)" :label="$t('cityLabel')"></multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageList)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
 
@@ -66,17 +90,20 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
+import type { Country, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import type { PersonalInfo, PersonResponse, Sex } from '@/models/PersonModel';
-import { useI18n } from 'vue-i18n';
 import { getSexForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/sex';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
+import CountryService from '@/services/CountryService';
+
 
 export default defineComponent({
     name: "PersonUpdateForm",
+    components: { MultilingualTextInput },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
@@ -86,14 +113,25 @@ export default defineComponent({
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
-
-        const i18n = useI18n();
         const languageList = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageList.value = response.data;
             });
+
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id});
+                });
+            });
+
+            if(props.presetPerson?.personalInfo.postalAddress?.countryId) {
+                CountryService.readCountry(props.presetPerson?.personalInfo.postalAddress?.countryId).then(response => {
+                    selectedCountry.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id};
+                });
+            }
         });
 
         const placeOfBirth = ref(props.presetPerson?.personalInfo.placeOfBirth);
@@ -105,8 +143,14 @@ export default defineComponent({
         const apvnt = ref(props.presetPerson?.personalInfo.apvnt);
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
 
-        const sexes = getSexForGivenLocale(i18n.locale.value);
-        const selectedSex = ref({title: getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex, i18n.locale.value) as string, value: props.presetPerson?.personalInfo.sex as Sex});
+        const countries = ref<{title: string, value: number}[]>([]);
+        const selectedCountry = ref<{title: string, value: number}>();
+
+        const city = ref([]);
+        const streetAndNumber = ref([]);
+
+        const sexes = getSexForGivenLocale();
+        const selectedSex = ref({title: getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string, value: props.presetPerson?.personalInfo.sex as Sex});
 
         const updatePerson = () => {
             const updatedPerson: PersonalInfo = {
@@ -117,7 +161,7 @@ export default defineComponent({
                 mnid: mnid.value,
                 orcid: orcid.value,
                 placeOfBirth: placeOfBirth.value,
-                postalAddress: {city: [], countryId: -1, streetAndNumber: []}, // TODO: add this
+                postalAddress: {city: city.value, countryId: selectedCountry.value?.value as number, streetAndNumber: streetAndNumber.value},
                 scopusAuthorId: scopus.value
             };
 
@@ -128,7 +172,7 @@ export default defineComponent({
             isFormValid, email, phoneNumber, birthdate,
             orcid, mnid, apvnt, scopus, sexes, selectedSex,
             toMultilingualTextInput, languageList, updatePerson,
-            placeOfBirth
+            placeOfBirth, city, streetAndNumber, countries, selectedCountry
         };
     }
 });

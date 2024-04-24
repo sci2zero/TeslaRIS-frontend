@@ -33,7 +33,6 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { EventContributionType, type PersonEventContribution } from "@/models/EventModel";
-import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import type { PropType } from "vue";
@@ -51,9 +50,7 @@ export default defineComponent({
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const i18n = useI18n();
-
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: {title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER, i18n.locale.value), value: EventContributionType.PROGRAMME_BOARD_MEMBER}}]);
+        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: {title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER), value: EventContributionType.PROGRAMME_BOARD_MEMBER}}]);
         const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
@@ -71,17 +68,17 @@ export default defineComponent({
                                                             ],
                                                     institutionIds: contribution.institutionIds
                                                     }, 
-                    eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType, i18n.locale.value), value: contribution.eventContributionType},
+                    eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType), value: contribution.eventContributionType},
                     id: contribution.id});
                 });
             }
         });
 
-        const contributionTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
+        const contributionTypes = computed(() => getTypesForGivenLocale());
 
         const addInput = () => {
             inputs.value.push({eventContributionType: {
-                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER, i18n.locale.value), 
+                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER), 
                     value: EventContributionType.PROGRAMME_BOARD_MEMBER
                 }
             });
@@ -100,7 +97,7 @@ export default defineComponent({
 
         const clearInput = () => {
             inputs.value = [{contribution: {}, eventContributionType: {
-                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER, i18n.locale.value), 
+                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER), 
                     value: EventContributionType.PROGRAMME_BOARD_MEMBER
                 }}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {

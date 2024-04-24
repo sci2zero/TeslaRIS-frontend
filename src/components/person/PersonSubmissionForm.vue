@@ -236,7 +236,7 @@ export default defineComponent({
         const employmentPositions = computed(() => i18n.locale.value === "sr" ? employmentPositionsSr : employmentPositionsEn);
         const selectedEmploymentPosition = ref(selectionPlaceholder);
 
-        const sexes = getSexForGivenLocale(i18n.locale.value);
+        const sexes = getSexForGivenLocale();
         const selectedSex = ref(selectionPlaceholder);
 
         const submitPerson = (stayOnPage: boolean) => {

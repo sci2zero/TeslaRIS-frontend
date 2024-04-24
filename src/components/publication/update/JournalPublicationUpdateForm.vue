@@ -103,7 +103,6 @@ import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
-import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -163,9 +162,8 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
         
-        const i18n = useI18n();
-        const publicationTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
-        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType, i18n.locale.value) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
+        const publicationTypes = computed(() => getTypesForGivenLocale());
+        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
 
         const updateJournalPublication = () => {
             const updatedJournalPublication: JournalPublication = {

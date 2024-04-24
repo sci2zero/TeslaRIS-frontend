@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { MultilingualContent, Page } from "@/models/Common";
-import type { BasicPerson, PersonIndex, PersonResponse } from "@/models/PersonModel";
+import type { BasicPerson, PersonIndex, PersonResponse, PersonalInfo } from "@/models/PersonModel";
 import type { PersonUserResponse } from "@/models/PersonUserModel";
 
 export class PersonService extends BaseService {
@@ -43,6 +43,10 @@ export class PersonService extends BaseService {
 
   async updateBiography(personId: number, keywords: MultilingualContent[]): Promise<AxiosResponse<PersonUserResponse>> {
     return super.sendRequest(axios.patch, `person/biography/${personId}`, keywords);
+  }
+
+  async updatePersonalInfo(personId: number, personalInfo: PersonalInfo): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `person/personal-info/${personId}`, personalInfo);
   }
 
   async findEmployeesForOU(organisationUnitId: number): Promise<AxiosResponse<Page<PersonIndex>>> {

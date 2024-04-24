@@ -40,7 +40,6 @@
 <script lang="ts">
 import { ref } from "vue";
 import { defineComponent } from "vue";
-import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import type { PropType } from "vue";
@@ -59,9 +58,7 @@ export default defineComponent({
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const i18n = useI18n();
-
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR, i18n.locale.value), value: PublicationSeriesContributionType.EDITOR}}]);
+        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), value: PublicationSeriesContributionType.EDITOR}}]);
         const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
@@ -79,7 +76,7 @@ export default defineComponent({
                                                             ],
                                                     institutionIds: contribution.institutionIds
                                                     }, 
-                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType, i18n.locale.value), value: contribution.contributionType},
+                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType},
                     dateFrom: contribution.dateFrom,
                     dateTo: contribution.dateTo,
                     id: contribution.id});
@@ -87,11 +84,11 @@ export default defineComponent({
             }
         });
 
-        const contributionTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
+        const contributionTypes = computed(() => getTypesForGivenLocale());
 
         const addInput = () => {
             inputs.value.push({contributionType: {
-                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR, i18n.locale.value), 
+                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), 
                     value: PublicationSeriesContributionType.EDITOR
                 }
             });
@@ -110,7 +107,7 @@ export default defineComponent({
 
         const clearInput = () => {
             inputs.value = [{contribution: {}, contributionType: {
-                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR, i18n.locale.value), 
+                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), 
                     value: PublicationSeriesContributionType.EDITOR
                 }}];
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {

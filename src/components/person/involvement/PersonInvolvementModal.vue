@@ -7,17 +7,17 @@
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" style="margin-bottom: 20px;"
                         :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        <v-icon size="x-large" :icon="edit ? 'mdi-file-edit-outline' : 'mdi-plus'"></v-icon>
                     </v-btn>
                 </div>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("updatePersonLabel") }}</span>
+                    <span class="text-h5">{{ edit ? $t("updateInvolvementLabel") : $t("addInvolvementLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <person-update-form ref="updateFormRef" :preset-person="presetPerson" @update="emitToParent"></person-update-form>
+                        <person-involvement-form ref="formRef" :preset-involvement="presetInvolvement" @create="emitCreateToParent" @update="emitUpdateToParent"></person-involvement-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -25,7 +25,7 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!updateFormRef?.isFormValid" @click="updateFormRef?.updatePerson()">
+                    <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" @click="formRef?.saveInvolvement()">
                         {{ $t("updateLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -38,35 +38,44 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import PersonUpdateForm from "./PersonUpdateForm.vue";
-import type { PersonResponse, PersonalInfo } from "@/models/PersonModel";
+import PersonInvolvementForm from "./PersonInvolvementForm.vue";
+import type { Education, Employment, Membership } from "@/models/InvolvementModel";
 
 
 export default defineComponent({
-    name: "PersonUpdateModal",
-    components: { PersonUpdateForm },
+    name: "PersonInvolvementModal",
+    components: { PersonInvolvementForm },
     props: {
+        edit: {
+            type: Boolean,
+            default: false
+        },
         readOnly: {
             type: Boolean,
             default: false
         },
-        presetPerson: {
-            type: Object as PropType<PersonResponse | undefined>,
-            required: true
+        presetInvolvement: {
+            type: Object as PropType<Education | Membership | Employment | undefined>,
+            default: undefined
         }
     },
-    emits: ["update"],
+    emits: ["update", "create"],
     setup(_, { emit }) {
         const dialog = ref(false);
 
-        const updateFormRef = ref<typeof PersonUpdateForm>();
+        const formRef = ref<typeof PersonInvolvementForm>();
 
-        const emitToParent = (personalInfo: PersonalInfo) => {
-            emit("update", personalInfo)
+        const emitUpdateToParent = (involvement: Education | Membership | Employment) => {
+            emit("update", involvement)
             dialog.value = false;
         };
 
-        return {dialog, updateFormRef, emitToParent};
+        const emitCreateToParent = (involvement: Education | Membership | Employment) => {
+            emit("create", involvement)
+            dialog.value = false;
+        };
+
+        return {dialog, formRef, emitCreateToParent, emitUpdateToParent};
     }
 });
 </script>

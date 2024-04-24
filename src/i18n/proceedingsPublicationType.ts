@@ -1,5 +1,6 @@
 import { ProceedingsPublicationType } from "@/models/PublicationModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import i18n from ".";
 
 export const proceedingsPublicationTypeEn = [
     { title: "Regular Full Article", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
@@ -27,7 +28,9 @@ export const getTitleFromValue = (value: ProceedingsPublicationType, resourceTyp
     return (resourceTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value.toString()) || {}).title;
 };
 
-export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType, locale: string) => {
+export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType) => {
+    const locale = i18n.vueI18n.global.locale;
+
     let resourceTypeArray = proceedingsPublicationTypeEn;
     if (locale == "sr") {
         resourceTypeArray = proceedingsPublicationTypeSr;
@@ -40,8 +43,8 @@ export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType, l
     }
 };
 
-export const getTypesForGivenLocale = (locale: string) => {
-    switch(locale) {
+export const getTypesForGivenLocale = () => {
+    switch(i18n.vueI18n.global.locale) {
         case "sr":
             return proceedingsPublicationTypeSr;
         case "en":

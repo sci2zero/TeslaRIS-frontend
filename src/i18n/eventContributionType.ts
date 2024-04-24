@@ -1,5 +1,6 @@
 import { EventContributionType } from "@/models/EventModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import i18n from ".";
 
 export const contributionTypesEn = [
     {title: "Organisation Board Chair", value: EventContributionType.ORGANIZATION_BOARD_CHAIR},
@@ -29,7 +30,9 @@ export const getTitleFromValue = (value: EventContributionType, resourceTypeArra
     return (resourceTypeArray.find(item => getNameFromOrdinal(EventContributionType, item.value) === value.toString()) || {}).title;
 };
 
-export const getTitleFromValueAutoLocale = (value: EventContributionType, locale: string) => {
+export const getTitleFromValueAutoLocale = (value: EventContributionType) => {
+    const locale = i18n.vueI18n.global.locale;
+
     let resourceTypeArray = contributionTypesEn;
     if (locale == "sr") {
         resourceTypeArray = contributionTypesSr;
@@ -42,8 +45,8 @@ export const getTitleFromValueAutoLocale = (value: EventContributionType, locale
     }
 };
 
-export const getTypesForGivenLocale = (locale: string) => {
-    switch(locale) {
+export const getTypesForGivenLocale = () => {
+    switch(i18n.vueI18n.global.locale) {
         case "sr":
             return contributionTypesSr;
         case "en":

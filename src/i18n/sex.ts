@@ -1,5 +1,6 @@
 import { Sex } from "@/models/PersonModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import i18n from ".";
 
 export const sexSr = [
     { title: "Muški", value: Sex.MALE },
@@ -11,7 +12,9 @@ export const sexEn = [
     { title: "Female", value: Sex.FEMALE },
 ];
 
-export const getTitleFromValueAutoLocale = (value: Sex, locale: string) => {
+export const getTitleFromValueAutoLocale = (value: Sex) => {
+    const locale = i18n.vueI18n.global.locale;
+
     let resourceTypeArray = sexEn;
     if (locale == "sr") {
         resourceTypeArray = sexSr;
@@ -24,8 +27,8 @@ export const getTitleFromValueAutoLocale = (value: Sex, locale: string) => {
     }
 };
 
-export const getSexForGivenLocale = (locale: string) => {
-    switch(locale) {
+export const getSexForGivenLocale = () => {
+    switch(i18n.vueI18n.global.locale) {
         case "sr":
             return sexSr;
         case "en":

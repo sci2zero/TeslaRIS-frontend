@@ -1,13 +1,13 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 
-enum InvolvementType {
-    STUDIED_AT,
-    COMPLETED_COURSE_AT,
-    POSTDOC_AT,
-    MEMBER_OF,
-    EMPLOYED_AT,
-    HIRED_BY,
+export enum InvolvementType {
+    STUDIED_AT = "STUDIED_AT",
+    COMPLETED_COURSE_AT = "COMPLETED_COURSE_AT",
+    POSTDOC_AT = "POSTDOC_AT",
+    MEMBER_OF = "MEMBER_OF",
+    EMPLOYED_AT = "EMPLOYED_AT",
+    HIRED_BY = "HIRED_BY"
 }
 
 enum EmploymentPosition {
@@ -42,7 +42,7 @@ enum EmploymentPosition {
     SENIOR_SCIENTIFIC_COLLABORATOR,
 }
 
-interface Involvement {
+export interface Involvement {
     id?: number;
     dateFrom: string;
     dateTo?: string;
