@@ -223,5 +223,10 @@ export default {
     relationTypeLabel: "Relation Type",
     personAffiliationsLabel: "Affiliations",
     noAffiliationsMessage: "There are no affiliations for this person.",
-    updatePersonLabel: "Update Person"
+    updatePersonLabel: "Update Person",
+    streetAndNumberLabel: "Street and Number",
+    cityLabel: "City",
+    addInvolvementLabel: "Add Involvement",
+    updateInvolvementLabel: "Update Involvement",
+    involvementTypeLabel: "Involvement Type"
 }

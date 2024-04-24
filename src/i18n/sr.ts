@@ -223,5 +223,10 @@ export default {
     relationTypeLabel: "Tip relacije",
     personAffiliationsLabel: "Afilijacije",
     noAffiliationsMessage: "Nema afilijacija za ovu osobu.",
-    updatePersonLabel: "Ažuriraj osubu"
+    updatePersonLabel: "Ažuriraj osubu",
+    streetAndNumberLabel: "Ulica i broj",
+    cityLabel: "Grad",
+    addInvolvementLabel: "Dodaj učešće",
+    updateInvolvementLabel: "Ažuriraj učešće",
+    involvementTypeLabel: "Tip učešća"
 }

@@ -173,8 +173,8 @@ export default defineComponent({
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
         
         const i18n = useI18n();
-        const publicationTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
-        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType }>({title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType, i18n.locale.value) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType});
+        const publicationTypes = computed(() => getTypesForGivenLocale());
+        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType }>({title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType});
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
             let title: string | undefined;

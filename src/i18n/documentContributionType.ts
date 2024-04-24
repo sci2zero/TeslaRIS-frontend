@@ -1,4 +1,5 @@
 import { DocumentContributionType } from "@/models/PublicationModel";
+import i18n from ".";
 
 
 export const contributionTypesEn = [
@@ -15,7 +16,9 @@ export const contributionTypesSr = [
     { title: "Savetnik", value: DocumentContributionType.ADVISOR },
 ];
 
-export const getTitleFromValueAutoLocale = (value: DocumentContributionType, locale: string) => {
+export const getTitleFromValueAutoLocale = (value: DocumentContributionType) => {
+    const locale = i18n.vueI18n.global.locale;
+    
     let resourceTypeArray = contributionTypesEn;
     if (locale == "sr") {
         resourceTypeArray = contributionTypesSr;
@@ -24,8 +27,8 @@ export const getTitleFromValueAutoLocale = (value: DocumentContributionType, loc
     return (resourceTypeArray.find(item => item.value === value) || {}).title;
 };
 
-export const getTypesForGivenLocale = (locale: string) => {
-    switch(locale) {
+export const getTypesForGivenLocale = () => {
+    switch(i18n.vueI18n.global.locale) {
         case "sr":
             return contributionTypesSr;
         case "en":

@@ -36,7 +36,6 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Tran
 import { OrganisationUnitsRelationType, type OrganisationUnitRelationRequest, type OrganisationUnitRelationResponse, type OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/organisationUnitRelationType';
 import OrganisationUnitAutocompleteSearch from '../OrganisationUnitAutocompleteSearch.vue';
-import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "OrganisationUnitRelationUpdateForm",
@@ -54,10 +53,9 @@ export default defineComponent({
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
-        const i18n = useI18n();
 
         const autocompleteSearchRef = ref<any>([]);
-        const data = ref<any[]>([{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO, i18n.locale.value), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}]);
+        const data = ref<any[]>([{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}]);
 
         const languageList = ref<LanguageTagResponse[]>([]);
         const toDelete = ref<number[]>([]);
@@ -72,7 +70,7 @@ export default defineComponent({
                 props.relations?.forEach(relation => {
                     data.value.push({
                         id: relation.id,
-                        relationType: {title: getTitleFromValueAutoLocale(relation.relationType, i18n.locale.value), value: relation.relationType},
+                        relationType: {title: getTitleFromValueAutoLocale(relation.relationType), value: relation.relationType},
                         dateFrom: "",
                         dateTo: "",
                         targetOrganisationUnit: {title: returnCurrentLocaleContent(relation.targetOrganisationUnitName), value: relation.targetOrganisationUnitId}
@@ -101,10 +99,10 @@ export default defineComponent({
             emit("update", updatedOURelations, toDelete.value);
         };
 
-        const relationTypes = getTypesForGivenLocale(i18n.locale.value);
+        const relationTypes = getTypesForGivenLocale();
 
         const addRelation = () => {
-            data.value.push({relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO, i18n.locale.value), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}});
+            data.value.push({relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}});
         };
 
         const removeRelation = (index: number, relationId: number) => {

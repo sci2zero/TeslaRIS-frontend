@@ -169,11 +169,8 @@
             <v-col cols="6">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <person-involvement-modal :read-only="!canEdit"></person-involvement-modal>
+
                         <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                         <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
                         <br />
@@ -287,11 +284,12 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue';
+import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, LocalizedLink, PersonUpdateModal },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, LocalizedLink, PersonUpdateModal, PersonInvolvementModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -330,6 +328,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
+            fetchPerson();
+        });
+
+        watch(i18n.locale, () => {
+            populateData();
+        });
+
+        const fetchPerson = () => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
                 person.value = response.data;
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
@@ -362,11 +368,7 @@ export default defineComponent({
                 fetchPublications();                
                 populateData();
             });
-        });
-
-        watch(i18n.locale, () => {
-            populateData();
-        });
+        };
 
         const populateData = () => {
             if (person.value === undefined) {
@@ -378,7 +380,7 @@ export default defineComponent({
             personalInfo.value.city = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.city as MultilingualContent[]);
 
             fetchAndSetCountryInfo();
-        }
+        };
 
         const fetchAndSetCountryInfo = () => {
             if (country.value !== undefined) {
@@ -512,6 +514,14 @@ export default defineComponent({
 
         const updatePersonalInfo = (updatedInfo: PersonalInfo) => {
             console.log(updatedInfo);
+            PersonService.updatePersonalInfo(person.value?.id as number, updatedInfo).then(() => {
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
         };
 
         return {

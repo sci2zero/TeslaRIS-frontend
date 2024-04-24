@@ -31,6 +31,7 @@ export interface ExternalValidation {
 }
 
 export interface Country {
+    id: number;
     code: string;
     name: MultilingualContent[];
 }

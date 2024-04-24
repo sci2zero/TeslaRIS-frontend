@@ -8,6 +8,10 @@ export class CountryService extends BaseService {
   async readCountry(countryId: number): Promise<AxiosResponse<Country>> {
     return super.sendRequest(axios.get, `country/${countryId}`);
   }
+
+  async readAllCountries(): Promise<AxiosResponse<Country[]>> {
+    return super.sendRequest(axios.get, "country");
+  }
 }
 
 export default new CountryService();

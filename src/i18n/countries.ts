@@ -1,3 +1,5 @@
+import i18n from ".";
+
 export const countriesSr: string[] = [
     "Avganistan",
     "Albanija",
@@ -388,8 +390,8 @@ export const countriesEn: string[] = [
     "Zimbabwe",
 ];
 
-export const getCountriesForGivenLocale = (locale: string) => {
-    switch(locale) {
+export const getCountriesForGivenLocale = () => {
+    switch(i18n.vueI18n.global.locale) {
         case "sr":
             return countriesSr;
         case "en":

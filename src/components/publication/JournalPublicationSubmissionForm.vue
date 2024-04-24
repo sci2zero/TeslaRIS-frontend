@@ -214,7 +214,7 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const publicationTypes = computed(() => getTypesForGivenLocale(i18n.locale.value));
+        const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
 
         const listPublications = (journal: { title: string, value: number }) => {
