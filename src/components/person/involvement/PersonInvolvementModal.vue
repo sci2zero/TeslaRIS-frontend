@@ -17,7 +17,9 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <person-involvement-form ref="formRef" :preset-involvement="presetInvolvement" @create="emitCreateToParent" @update="emitUpdateToParent"></person-involvement-form>
+                        <person-involvement-form
+                            ref="formRef" :edit="edit" :preset-involvement="presetInvolvement" @create="emitCreateToParent"
+                            @update="emitUpdateToParent"></person-involvement-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
