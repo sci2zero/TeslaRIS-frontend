@@ -169,7 +169,7 @@
             <v-col cols="6">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <person-involvement-modal :read-only="!canEdit"></person-involvement-modal>
+                        <person-involvement-modal :read-only="!canEdit" @create="addInvolvement"></person-involvement-modal>
 
                         <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                         <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
@@ -177,65 +177,18 @@
                         <div v-if="employments.length > 0">
                             <h3>{{ $t("employmentsLabel") }}</h3>
                         </div>
-                        <div v-for="(employment, index) in employments" :key="index" class="py-5">
-                            <h4>
-                                <localized-link :to="'organisation-units/' + employment.organisationUnitId">
-                                    <strong>{{ returnCurrentLocaleContent(employment.organisationUnitName as MultilingualContent[]) }}</strong>
-                                </localized-link>
-                                <v-icon icon="mdi-circle-small">
-                                </v-icon>
-                                <strong>{{ employment.employmentPosition }} ({{ employment.involvementType }})</strong>
-                                <v-icon icon="mdi-circle-small">
-                                </v-icon>
-                                {{ employment.dateFrom ? `${employment.dateFrom} - ${employment.dateTo ? employment.dateTo : $t("presentLabel")}` : $t("currentLabel") }} 
-                            </h4>
-                            <p>{{ returnCurrentLocaleContent(employment.role as MultilingualContent[]) }}</p>       
-                            <attachment-list
-                                :attachments="employment.proofs ? employment.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, employment)"
-                                @delete="deleteInvolvementProof(employment, $event)" @update="updateInvolvementProof(employment, $event)"></attachment-list>
-                        </div>
+                        <br />
+                        <involvement-list :involvements="employments" :person="person" :can-edit="canEdit"></involvement-list>
                         <div v-if="education.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
                         </div>
-                        <div v-for="(educationStep, index) in education" :key="index" class="py-5">
-                            <h4>
-                                <localized-link :to="'organisation-units/' + educationStep.organisationUnitId">
-                                    <strong>{{ returnCurrentLocaleContent(educationStep.organisationUnitName as MultilingualContent[]) }}</strong>
-                                </localized-link>
-                                <v-icon icon="mdi-circle-small">
-                                </v-icon>
-                                <strong>{{ returnCurrentLocaleContent(educationStep.title as MultilingualContent[]) }}</strong>
-                                <v-icon icon="mdi-circle-small">
-                                </v-icon>
-                                {{ educationStep.dateFrom }} - {{ educationStep.dateTo ? educationStep.dateTo : $t("presentLabel") }} 
-                            </h4>
-                            <p v-if="educationStep.thesisTitle">
-                                {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent(educationStep.thesisTitle as MultilingualContent[]) }}
-                            </p>       
-                            <attachment-list
-                                :attachments="educationStep.proofs ? educationStep.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, educationStep)"
-                                @delete="deleteInvolvementProof(educationStep, $event)" @update="updateInvolvementProof(educationStep, $event)"></attachment-list>
-                        </div>
+                        <br />
+                        <involvement-list :involvements="education" :person="person" :can-edit="canEdit"></involvement-list>
                         <div v-if="memberships.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
                         </div>
-                        <div v-for="(membership, index) in memberships" :key="index" class="py-5">
-                            <h4>
-                                <localized-link :to="'organisation-units/' + membership.organisationUnitId">
-                                    <strong>{{ returnCurrentLocaleContent(membership.organisationUnitName as MultilingualContent[]) }}</strong>
-                                </localized-link>
-                                <v-icon icon="mdi-circle-small">
-                                </v-icon>
-                                <strong>{{ returnCurrentLocaleContent(membership.role as MultilingualContent[]) }}</strong>
-                                <v-icon icon="mdi-circle-small">
-                                </v-icon>
-                                {{ membership.dateFrom }} - {{ membership.dateTo ? membership.dateTo : $t("presentLabel") }} 
-                            </h4>
-                            <p>{{ returnCurrentLocaleContent(membership.contributionDescription as MultilingualContent[]) }}</p>    
-                            <attachment-list
-                                :attachments="membership.proofs ? membership.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, membership)"
-                                @delete="deleteInvolvementProof(membership, $event)" @update="updateInvolvementProof(membership, $event)"></attachment-list>
-                        </div>
+                        <br />
+                        <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit"></involvement-list>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -282,14 +235,14 @@ import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue';
 import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
+import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, LocalizedLink, PersonUpdateModal, PersonInvolvementModal },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -347,18 +300,21 @@ export default defineComponent({
                 keywords.value = person.value.keyword;
                 biography.value = person.value.biography;
 
+                employments.value = [];
                 response.data.employmentIds.forEach(employmentId => {
                     InvolvementService.getEmployment(employmentId).then(response => {
                         employments.value.push(response.data);
                     });
                 });
 
+                education.value = [];
                 response.data.educationIds.forEach(educationId => {
                     InvolvementService.getEducation(educationId).then(response => {
                         education.value.push(response.data);
                     });
                 });
 
+                memberships.value = [];
                 response.data.membershipIds.forEach(membershipId => {
                     InvolvementService.getMembership(membershipId).then(response => {
                         memberships.value.push(response.data);
@@ -419,29 +375,6 @@ export default defineComponent({
 
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons" }});
-        };
-
-        const addInvolvementProof = (proof: DocumentFile, involvement: Membership | Education | Employment) => {
-            DocumentFileService.addInvolvementProof(proof, involvement.id as number, person.value?.id as number).then((response => {
-                involvement.proofs?.push(response.data);
-            }));
-        };
-
-        const updateInvolvementProof = (involvement: Membership | Education | Employment, proof: DocumentFile) => {
-            DocumentFileService.updateInvolvementProof(proof, proof.id, involvement.id as number, person.value?.id as number).then((response) => {
-                if (involvement.proofs) {
-                    involvement.proofs = involvement.proofs.filter(proof => proof.id !== response.data.id);
-                }
-                involvement.proofs?.push(response.data);
-            });
-        };
-
-        const deleteInvolvementProof = (involvement: Membership | Education | Employment, proofId: number) => {
-            DocumentFileService.deleteInvolvementProof(proofId, involvement.id as number, person.value?.id as number).then(() => {
-                if (involvement.proofs) {
-                    involvement.proofs = involvement.proofs.filter(proof => proof.id !== proofId);
-                }
-            });
         };
 
         const addExpertiseOrSkillProof = (proof: DocumentFile, expertiseOrSkill: ExpertiseOrSkillResponse) => {
@@ -513,7 +446,6 @@ export default defineComponent({
         };
 
         const updatePersonalInfo = (updatedInfo: PersonalInfo) => {
-            console.log(updatedInfo);
             PersonService.updatePersonalInfo(person.value?.id as number, updatedInfo).then(() => {
                 fetchPerson();
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -522,6 +454,22 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
             });
+        };
+
+        const addInvolvement = (involvement: Education | Membership | Employment) => {
+            if("title" in involvement) {
+                InvolvementService.addEducation(involvement, person.value?.id as number).then(() => {
+                    fetchPerson();
+                });
+            } else if("contributionDescription" in involvement) {
+                InvolvementService.addMembership(involvement, person.value?.id as number).then(() => {
+                    fetchPerson();
+                });
+            } else if("employmentPosition" in involvement) {
+                InvolvementService.addEmployment(involvement, person.value?.id as number).then(() => {
+                    fetchPerson();
+                });
+            }
         };
 
         return {
@@ -537,10 +485,9 @@ export default defineComponent({
             searchKeyword,
             returnCurrentLocaleContent, canEdit,
             employments, education, memberships,
-            addInvolvementProof, deleteInvolvementProof, updateInvolvementProof,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords, updateBiography,
-            snackbar, snackbarMessage, updatePersonalInfo
+            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement
         };
 }})
 

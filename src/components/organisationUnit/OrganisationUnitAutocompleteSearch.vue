@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
@@ -68,6 +68,12 @@ export default defineComponent({
                 selectedOrganisationUnit.value = props.modelValue;
             }
             sendContentToParent();
+        });
+
+        watch(() => props.modelValue, () => {
+            if(props.modelValue && props.modelValue.value !== -1) {
+                selectedOrganisationUnit.value = props.modelValue;
+            }
         });
 
         const i18n = useI18n();

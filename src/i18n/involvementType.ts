@@ -23,7 +23,7 @@ export const getTitleFromValue = (value: InvolvementType, resourceTypeArray: {ti
     return (resourceTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
-export const getTitleFromValueAutoLocale = (value: InvolvementType) => {
+export const getInvolvementTypeTitleFromValueAutoLocale = (value: InvolvementType) => {
     const locale = i18n.vueI18n.global.locale;
 
     let resourceTypeArray = involvementTypeEn;

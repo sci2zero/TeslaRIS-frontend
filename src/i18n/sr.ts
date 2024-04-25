@@ -228,5 +228,8 @@ export default {
     cityLabel: "Grad",
     addInvolvementLabel: "Dodaj učešće",
     updateInvolvementLabel: "Ažuriraj učešće",
-    involvementTypeLabel: "Tip učešća"
+    involvementTypeLabel: "Tip učešća",
+    contributionDescriptionLabel: "Opis kontribucije",
+    academicTitleLabel: "Akademsko zvanje",
+    abbreviationTitleLabel: "Skraćenica zvanja"
 }

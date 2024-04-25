@@ -228,5 +228,8 @@ export default {
     cityLabel: "City",
     addInvolvementLabel: "Add Involvement",
     updateInvolvementLabel: "Update Involvement",
-    involvementTypeLabel: "Involvement Type"
+    involvementTypeLabel: "Involvement Type",
+    contributionDescriptionLabel: "Contribution Description",
+    academicTitleLabel: "Academic Title",
+    abbreviationTitleLabel: "Title Abbreviation"
 }
