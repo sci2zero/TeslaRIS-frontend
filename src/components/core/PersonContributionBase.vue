@@ -203,7 +203,11 @@ export default defineComponent({
                         selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
                         personOtherNames.value = [{title: selectedPerson.value.title, value: -1}];
                         personResponse.data.personOtherNames.forEach((otherName) => {
-                            personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName})
+                            if (otherName.dateFrom && otherName.dateTo) {
+                                personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName});
+                            } else {
+                                personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname}`, value: otherName as PersonName});
+                            }
                         });
 
                         const foundName = personOtherNames.value.find(otherName => {

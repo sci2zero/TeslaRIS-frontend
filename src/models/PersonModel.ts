@@ -32,6 +32,7 @@ export interface BasicPerson {
   }
 
 export interface PersonName {
+    id?: number;
     firstname: string;
     otherName: string;
     lastname: string;

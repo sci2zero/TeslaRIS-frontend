@@ -231,5 +231,8 @@ export default {
     involvementTypeLabel: "Involvement Type",
     contributionDescriptionLabel: "Contribution Description",
     academicTitleLabel: "Academic Title",
-    abbreviationTitleLabel: "Title Abbreviation"
+    abbreviationTitleLabel: "Title Abbreviation",
+    otherNamesLabel: "Person Other Names",
+    viewOtherNamesLabel: "View Person Other Names",
+    noOtherNamesMessage: "There are no other names specified."
 }

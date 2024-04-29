@@ -231,5 +231,8 @@ export default {
     involvementTypeLabel: "Tip učešća",
     contributionDescriptionLabel: "Opis kontribucije",
     academicTitleLabel: "Akademsko zvanje",
-    abbreviationTitleLabel: "Skraćenica zvanja"
+    abbreviationTitleLabel: "Skraćenica zvanja",
+    otherNamesLabel: "Drugi oblici imena",
+    viewOtherNamesLabel: "Vidi druge oblike imena",
+    noOtherNamesMessage: "Nema drugih oblika imena."
 }

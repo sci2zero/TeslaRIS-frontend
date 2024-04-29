@@ -35,16 +35,20 @@ export class InvolvementService extends BaseService {
     return super.sendRequest(axios.post, `involvement/membership/${personId}`, membership, InvolvementService.idempotencyKey);
   }
 
-  async updateEmployment(employment: Employment, personId: number, involvementId: number): Promise<AxiosResponse<void>> {
+  async updateEmployment(employment: Employment, involvementId: number, personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `involvement/employment/${involvementId}/${personId}`, employment);
   }
 
-  async updateEducation(education: Education, personId: number, involvementId: number): Promise<AxiosResponse<void>> {
+  async updateEducation(education: Education, involvementId: number, personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `involvement/education/${involvementId}/${personId}`, education);
   }
 
-  async updateMembership(membership: Membership, personId: number, involvementId: number): Promise<AxiosResponse<void>> {
+  async updateMembership(membership: Membership, involvementId: number, personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `involvement/membership/${involvementId}/${personId}`, membership);
+  }
+
+  async deleteInvolvement(personId: number, involvementId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `involvement/${involvementId}/${personId}`);
   }
 }
 

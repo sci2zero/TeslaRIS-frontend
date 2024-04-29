@@ -175,6 +175,7 @@ export default defineComponent({
 
         const saveInvolvement = () => {
             const involvement: Involvement = {
+                id: props.presetInvolvement?.id,
                 dateFrom: dateFrom.value as string,
                 dateTo: dateTo.value as string,
                 involvementType: selectedInvolvementType.value?.value as InvolvementType,
