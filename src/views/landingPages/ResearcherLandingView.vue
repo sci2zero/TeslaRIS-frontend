@@ -32,6 +32,9 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <div class="response">
+                                    <person-other-name-modal :preset-other-names="person?.personOtherNames" :read-only="!canEdit" @update="updateOtherNames" @select-primary="selectPrimaryName"></person-other-name-modal>
+                                </div>
                                 <div v-if="personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
                                 </div>
@@ -178,17 +181,17 @@
                             <h3>{{ $t("employmentsLabel") }}</h3>
                         </div>
                         <br />
-                        <involvement-list :involvements="employments" :person="person" :can-edit="canEdit"></involvement-list>
+                        <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
                         <div v-if="education.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
                         </div>
                         <br />
-                        <involvement-list :involvements="education" :person="person" :can-edit="canEdit"></involvement-list>
+                        <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
                         <div v-if="memberships.length > 0">
                             <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
                         </div>
                         <br />
-                        <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit"></involvement-list>
+                        <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -222,7 +225,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PersonResponse, ExpertiseOrSkillResponse, PrizeResponse, PersonalInfo } from '@/models/PersonModel';
+import type { PersonResponse, ExpertiseOrSkillResponse, PrizeResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -238,11 +241,12 @@ import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue';
 import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
+import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -460,34 +464,63 @@ export default defineComponent({
             if("title" in involvement) {
                 InvolvementService.addEducation(involvement, person.value?.id as number).then(() => {
                     fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                }).catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
                 });
             } else if("contributionDescription" in involvement) {
                 InvolvementService.addMembership(involvement, person.value?.id as number).then(() => {
                     fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                }).catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
                 });
             } else if("employmentPosition" in involvement) {
                 InvolvementService.addEmployment(involvement, person.value?.id as number).then(() => {
                     fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                }).catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
                 });
             }
         };
 
+        const updateOtherNames = (otherNames: PersonName[]) => {
+            PersonService.updateOtherNames(otherNames, person.value?.id as number).then(() => {
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
+        const selectPrimaryName = (personNameId: number) => {
+            PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
-            researcherName,
-            accountIcon,
-            person,
-            personalInfo,
-            keywords,
-            biography,
-            publications, 
-            totalPublications,
-            switchPage,
-            searchKeyword,
-            returnCurrentLocaleContent, canEdit,
-            employments, education, memberships,
+            researcherName, accountIcon, person, personalInfo, keywords,
+            biography, publications,  totalPublications, switchPage, searchKeyword,
+            returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords, updateBiography,
-            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement
+            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson,
+            updateOtherNames, selectPrimaryName
         };
 }})
 

@@ -1,6 +1,9 @@
 <template>
     <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
         <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
+        <v-btn icon @click="deleteInvolvement(involvement.id)">
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
         <h4>
             <localized-link :to="'organisation-units/' + involvement.organisationUnitId">
                 <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
@@ -85,24 +88,35 @@ export default defineComponent({
             });
         };
 
-        const updateInvolvement = (involvement: Education | Membership | Employment) => {
-            if("title" in involvement) {
-                InvolvementService.updateEducation(involvement, involvement.id as number, props.person?.id as number).then(() => {
-                    emit("refreshInvolvements")
-                });
-            } else if("contributionDescription" in involvement) {
-                InvolvementService.updateMembership(involvement, involvement.id as number, props.person?.id as number).then(() => {
-                    emit("refreshInvolvements")
-                });
-            } else if("employmentPosition" in involvement) {
-                InvolvementService.updateEmployment(involvement, involvement.id as number, props.person?.id as number).then(() => {
-                    emit("refreshInvolvements")
+        const deleteInvolvement = (involvementId: number | undefined) => {
+            if(involvementId && props.person?.id) {
+                InvolvementService.deleteInvolvement(props.person.id, involvementId).then(() => {
+                    emit("refreshInvolvements");
                 });
             }
         };
 
+        const updateInvolvement = (involvement: Education | Membership | Employment) => {
+            console.log(involvement)
+            if(involvement.id && props.person?.id) {
+                if("title" in involvement) {
+                    InvolvementService.updateEducation(involvement, involvement.id, props.person.id).then(() => {
+                        emit("refreshInvolvements")
+                    });
+                } else if("contributionDescription" in involvement) {
+                    InvolvementService.updateMembership(involvement, involvement.id, props.person.id).then(() => {
+                        emit("refreshInvolvements")
+                    });
+                } else if("employmentPosition" in involvement) {
+                    InvolvementService.updateEmployment(involvement, involvement.id, props.person.id).then(() => {
+                        emit("refreshInvolvements")
+                    });
+                }
+            }
+        };
+
         return { returnCurrentLocaleContent, addInvolvementProof,
-            deleteInvolvementProof, updateInvolvementProof,
+            deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement };
     }
 });

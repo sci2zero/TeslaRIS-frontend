@@ -101,10 +101,10 @@ export default defineComponent({
         const dialog = ref(false);
         const isFormValid = ref(false);
 
-        const name = ref("")
-        const surname = ref("")
-        const email = ref("")
-        const note = ref("")
+        const name = ref("");
+        const surname = ref("");
+        const email = ref("");
+        const note = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
 
@@ -134,7 +134,8 @@ export default defineComponent({
                 note: note.value,
                 preferredLanguageId: selectedLanguage.value.value,
                 organisationUnitId: selectedOrganisationUnit.value.value
-            }
+            };
+
             AuthenticationService.registerEmployee(newEmployee).then(() => {
                 emit("success");
                 name.value = "";
@@ -147,7 +148,7 @@ export default defineComponent({
                 }
             }).catch((error: AxiosError<any, any>) => {
                 emit("failure", error.response?.data.message)
-            })
+            });
         };
 
         onMounted(() => {
@@ -159,8 +160,8 @@ export default defineComponent({
                     if (language.languageCode === "SR") {
                         selectedLanguage.value = { title: language.languageCode, value: language.id };
                     }
-                })
-            })
+                });
+            });
         });
 
         return {dialog, 
