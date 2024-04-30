@@ -42,3 +42,28 @@ export const getInvolvementTypesForGivenLocale = () => {
             return involvementTypeEn;
     }
 }
+
+export const getSimilarInvolvementTypes = (type: InvolvementType) => {
+    let resourceTypeArray;
+    switch(i18n.vueI18n.global.locale) {
+        case "sr":
+            resourceTypeArray = involvementTypeSr;
+            break;
+        case "en":
+            resourceTypeArray = involvementTypeEn;
+            break;
+    }
+
+    if(type == InvolvementType.MEMBER_OF) {
+        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.MEMBER_OF);
+    } 
+    else if(type == InvolvementType.HIRED_BY ||
+            type == InvolvementType.EMPLOYED_AT) {
+        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.HIRED_BY || involvementType.value === InvolvementType.EMPLOYED_AT);
+    } 
+    else if(type == InvolvementType.STUDIED_AT ||
+            type == InvolvementType.POSTDOC_AT ||
+            type == InvolvementType.COMPLETED_COURSE_AT) {
+        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.STUDIED_AT || involvementType.value === InvolvementType.POSTDOC_AT || involvementType.value === InvolvementType.COMPLETED_COURSE_AT);
+    }
+}

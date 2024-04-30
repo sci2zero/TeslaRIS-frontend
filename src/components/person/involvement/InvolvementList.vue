@@ -1,9 +1,30 @@
 <template>
     <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
-        <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
-        <v-btn icon @click="deleteInvolvement(involvement.id)">
-            <v-icon>mdi-delete</v-icon>
-        </v-btn>
+        <v-menu
+            v-if="canEdit"
+            v-model="menus[index]"
+            :close-on-content-click="true"
+            location="bottom"
+        >
+            <template #activator="{ props }">
+                <div class="edit-pen">
+                    <v-btn
+                        v-bind="props"
+                        icon="mdi-file-edit-outline"
+                    >
+                    </v-btn>
+                </div>
+            </template>
+
+            <v-card min-width="150">
+                <v-list>
+                    <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
+                    <v-list-item @click="deleteInvolvement(involvement.id)">
+                        <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-card>
+        </v-menu>
         <h4>
             <localized-link :to="'organisation-units/' + involvement.organisationUnitId">
                 <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
@@ -44,6 +65,8 @@ import { defineComponent } from 'vue';
 import PersonInvolvementModal from './PersonInvolvementModal.vue';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import InvolvementService from '@/services/InvolvementService';
+import { ref } from 'vue';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -65,6 +88,17 @@ export default defineComponent({
     },
     emits: ["refreshInvolvements"],
     setup(props, { emit }) {
+        const menus = ref<boolean[]>([]);
+
+        watch(() => props.involvements, () => {
+            if(props.involvements) {
+                menus.value = [];
+                props.involvements.forEach(() => {
+                    menus.value.push(false);
+                });
+            }
+        });
+
         const addInvolvementProof = (proof: DocumentFile, involvement: Membership | Education | Employment) => {
             DocumentFileService.addInvolvementProof(proof, involvement.id as number, props.person?.id as number).then((response => {
                 involvement.proofs?.push(response.data);
@@ -115,9 +149,27 @@ export default defineComponent({
             }
         };
 
-        return { returnCurrentLocaleContent, addInvolvementProof,
+        return { returnCurrentLocaleContent, addInvolvementProof, menus,
             deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement };
     }
 });
 </script>
+
+<style scoped>
+.edit-pen-container .edit-pen {
+    top: 0px;
+    right: 0px;
+    position: absolute;
+    z-index: 10;
+    opacity: 0;
+}
+
+.edit-pen-container:hover .edit-pen {
+    opacity: 0.3;
+}
+
+.edit-pen-container .edit-pen:hover {
+    opacity: 1;
+}
+</style>
