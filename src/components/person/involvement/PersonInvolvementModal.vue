@@ -4,11 +4,17 @@
             <template #activator="scope">
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
+                        v-if="!edit"
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" style="margin-bottom: 20px;"
                         :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" :icon="edit ? 'mdi-file-edit-outline' : 'mdi-plus'"></v-icon>
+                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
                     </v-btn>
+                    <v-list-item
+                        v-else v-bind="scope.props" :disabled="readOnly" style="margin-left: 10px;"
+                        v-on="scope.isActive">
+                        <v-list-item-title>{{ $t("updateInvolvementLabel") }}</v-list-item-title>
+                    </v-list-item>
                 </div>
             </template>
             <v-card>

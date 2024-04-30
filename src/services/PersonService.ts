@@ -4,6 +4,7 @@ import axios from "axios";
 import type { MultilingualContent, Page } from "@/models/Common";
 import type { BasicPerson, PersonIndex, PersonName, PersonResponse, PersonalInfo } from "@/models/PersonModel";
 import type { PersonUserResponse } from "@/models/PersonUserModel";
+import type { Involvement } from "@/models/InvolvementModel";
 
 export class PersonService extends BaseService {
 
@@ -59,6 +60,10 @@ export class PersonService extends BaseService {
 
   async selectPrimaryName(otherNameId: number, personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `person/name/${personId}/${otherNameId}`);
+  }
+
+  async getLatestAffiliation(personId: number): Promise<AxiosResponse<Involvement>> {
+    return super.sendRequest(axios.get, `person/${personId}/latest-involvement`);
   }
 }
 

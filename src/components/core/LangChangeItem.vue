@@ -27,19 +27,6 @@
                     >
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item>
-
-                    <!-- <v-divider></v-divider>
-                    <v-list-subheader>All languages</v-list-subheader>
-
-
-                    <v-list-item
-                        v-for="(item, i) in langItems"
-                        :key="i"
-                        :value="item"
-                        color="primary"
-                    >
-                        <v-list-item-title v-text="item.title"></v-list-item-title>
-                    </v-list-item> -->
                 </v-list>
             </v-card>
         </v-menu>

@@ -107,7 +107,7 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
-import { getInvolvementTypesForGivenLocale, getInvolvementTypeTitleFromValueAutoLocale } from '@/i18n/involvementType';
+import { getInvolvementTypesForGivenLocale, getInvolvementTypeTitleFromValueAutoLocale, getSimilarInvolvementTypes } from '@/i18n/involvementType';
 import { InvolvementType, type Education, type Employment, type Involvement, type Membership } from '@/models/InvolvementModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
@@ -164,7 +164,7 @@ export default defineComponent({
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
 
-        const involvementTypes = getInvolvementTypesForGivenLocale();
+        const involvementTypes = props.edit ? getSimilarInvolvementTypes(props.presetInvolvement?.involvementType as InvolvementType) : getInvolvementTypesForGivenLocale();
         const selectedInvolvementType = ref<{title: string, value: InvolvementType}>(props.presetInvolvement?.involvementType ? {title: getInvolvementTypeTitleFromValueAutoLocale(props.presetInvolvement?.involvementType) as string, value: props.presetInvolvement?.involvementType} : selectionPlaceholder);
 
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
