@@ -278,7 +278,7 @@ export default defineComponent({
                 if(props.basic) {
                     PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
                         if(latestAffiliationResponse.data) {
-                            selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.id as number});
+                            selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
                         }
                     });
                 } else {

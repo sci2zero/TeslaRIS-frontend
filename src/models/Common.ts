@@ -49,4 +49,9 @@ export interface ErrorResponse {
     statusCode: number;
     statusReason: string;
     timestamp: string;
-  }
+}
+
+export interface Notification {
+    id: number;
+    notificationText: string;
+}
