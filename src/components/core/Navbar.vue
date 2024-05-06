@@ -78,7 +78,6 @@
                 </div>
 
                 <v-spacer></v-spacer>
-                <!-- <LangChangeItem /> -->
 
                 <template v-for="(item, index) in menuItems">
                     <template v-if="item.type == 'divider'">
@@ -110,112 +109,9 @@
                         </v-btn>
                     </template>
                 </template>
-                <!-- </v-toolbar-items> -->
             </div>
         </v-toolbar>
     </div>
-    <!-- <div id="navbar">
-        <div class="nav-container">
-            <div class="left-column">
-                <div class="logo">
-                    Logo
-                </div>
-                <div class="navitems">
-                    <ul class="nav-items">
-                        <li>
-                            <div class="link-container">
-                                <localized-link to="">
-                                    {{ $t("homeLabel") }}
-                                </localized-link>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="link-container">
-                                <localized-link to="persons">
-                                    {{ $t("personListLabel") }}
-                                </localized-link>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="link-container">
-                                <localized-link to="organisation-units">
-                                    {{ $t("ouListLabel") }}
-                                </localized-link>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="link-container">
-                                <localized-link to="scientific-results">
-                                    {{ $t("scientificResultsListLabel") }}
-                                </localized-link>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="link-container">
-                                <localized-link to="advanced-search">
-                                    {{ $t("advancedSearchLabel") }}
-                                </localized-link>
-                            </div>
-                        </li>
-                        <li>
-                            <div v-if="userLoggedIn && userRole === 'ADMIN'" class="link-container">
-                                <localized-link to="users">
-                                    {{ $t("userPageLabel") }}
-                                </localized-link>
-                                <localized-link to="events">
-                                    {{ $t("eventListLabel") }}
-                                </localized-link>
-                                <localized-link to="journals">
-                                    {{ $t("journalListLabel") }}
-                                </localized-link>
-                                <localized-link to="book-series">
-                                    {{ $t("bookSeriesListLabel") }}
-                                </localized-link>
-                                <localized-link to="publishers">
-                                    {{ $t("publisherListLabel") }}
-                                </localized-link>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="right-column">
-                <ul class="nav-items">
-                    <li>
-                        <div class="link-container">
-                            <LangChangeItem />
-                        </div>
-                    </li>
-                    <li>
-                        <div v-if="!userLoggedIn" class="link-container">
-                            <localized-link to="login">
-                                {{ $t("loginLabel") }}
-                            </localized-link>
-                        </div>
-                    </li>
-                    <li>
-                        <div v-if="!userLoggedIn" class="link-container">
-                            <localized-link to="register">
-                                {{ $t("registerLabel") }}
-                            </localized-link>
-                        </div>
-                    </li>
-                    <li>
-                        <div v-if="userLoggedIn" class="link-container">
-                            <a href="#" @click="logout">{{ $t("logoutLabel") }}</a>
-                            <localized-link to="user-profile">
-                                {{ $t("userProfileLabel") }}
-                            </localized-link>
-                        </div>
-                    </li>
-                    <p v-if="userLoggedIn">
-                        {{ userName }} ({{ userRole }})
-                    </p>
-                </ul>
-            </div>
-        </div>
-    </div> -->
 </template>
 
 <script lang="ts">
@@ -231,6 +127,8 @@ import { useI18n } from "vue-i18n";
 import type { ComputedRef, Ref } from 'vue';
 import type { Component } from 'vue';
 import { shallowRef } from 'vue';
+import NotificationItem from './NotificationItem.vue';
+import NotificationService from '@/services/NotificationService';
 
 interface MenuItem {
   title?: ComputedRef<string> | string | undefined;
@@ -249,10 +147,13 @@ interface MenuItem {
 export default defineComponent(
     {
         name: "NavbarHeader",
-        components: { LangChangeItem },
+        components: { LangChangeItem, NotificationItem },
         setup() {
 
-            const langChangeItem = shallowRef(LangChangeItem)
+            const langChangeItem = shallowRef(LangChangeItem);
+            const notificationItem = shallowRef(NotificationItem);
+
+            const notificationCount = ref(0);
 
             const i18n = useI18n();
 
@@ -275,24 +176,22 @@ export default defineComponent(
             const registerLabel = computed(() => i18n.t("registerLabel"));
             const userLoggedIn = ref(false);
 
-
-            const appTitle = ref('TeslaRIS');
+            const appTitle = ref("TeslaRIS");
             const sidebar = ref(false);
             const userRole = ref("");
 
 
-            const a = ref(true)
+            const a = ref(true);
             const testData = reactive({
                 test: !a.value,
                 get test2() {
-                    return !a.value
+                    return !a.value;
                 },
                 test3: a,
 
-            })
-            a.value = false
+            });
+            a.value = false;
 
-            
             const loginStore = useLoginStore();
             const userName = ref("");
             const router = useRouter();
@@ -301,6 +200,10 @@ export default defineComponent(
                 UserService.getLoggedInUser().then((response) => {
                     userName.value = response.data.firstname + " " + response.data.lastName;
                     userRole.value = UserService.provideUserRole();
+                });
+
+                NotificationService.getNotificationCount().then(response => {
+                    notificationCount.value = response.data;
                 });
             };
 
@@ -330,7 +233,7 @@ export default defineComponent(
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
                 { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
                 { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
-            ])
+            ]);
 
             const manageMenu = ref<MenuItem[]>([
                 { title: userPageLabel, type:'icon-link', pathName: 'users' },
@@ -338,7 +241,7 @@ export default defineComponent(
                 { title: journalListLabel, type:'icon-link', pathName: 'journals' },
                 { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
                 { title: publisherListLabelIzdavači, type:'icon-link', pathName: 'publishers' }
-            ])
+            ]);
 
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
@@ -346,20 +249,18 @@ export default defineComponent(
                 { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
 
-            ])
+            ]);
 
             const menuItems = ref<MenuItem[]>([
                 { title: undefined, type:'component', icon: 'mdi-translate', condition: true, component: langChangeItem },
-                // { title: undefined, type:'icon', icon: 'mdi-translate', condition: true },
-
                 { type:'divider' },
-                { title: undefined, type:'icon', icon: 'mdi-bell', condition: userLoggedIn, badge: 2 },
+                { title: undefined, type:'icon', icon: 'mdi-bell', condition: userLoggedIn, badge: notificationCount.value, component: notificationItem },
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !userLoggedIn.value), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !userLoggedIn.value), variant: 'outlined', color:'primary' },
+                
                 { title: computed(() => userName.value + " (" + userRole.value + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn, variant: 'flat', color:'primary' },
-                // { title: "logoutLabel", type:'icon-link', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
                 { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
-            ])
+            ]);
 
 
             return { userName, userRole, userLoggedIn, logout, appTitle, sidebar, menuItems, leftMenuItems, testData, a };
