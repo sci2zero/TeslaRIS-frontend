@@ -13,19 +13,19 @@
                     <v-list-item
                         v-else v-bind="scope.props" :disabled="readOnly" style="margin-left: 10px;"
                         v-on="scope.isActive">
-                        <v-list-item-title>{{ $t("updateInvolvementLabel") }}</v-list-item-title>
+                        <v-list-item-title>{{ $t("updatePrizeLabel") }}</v-list-item-title>
                     </v-list-item>
                 </div>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ edit ? $t("updateInvolvementLabel") : $t("addInvolvementLabel") }}</span>
+                    <span class="text-h5">{{ edit ? $t("updatePrizeLabel") : $t("addPrizeLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <person-involvement-form
-                            ref="formRef" :edit="edit" :preset-involvement="presetInvolvement" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></person-involvement-form>
+                        <prize-form
+                            ref="formRef" :edit="edit" :preset-prize="presetPrize" @create="emitCreateToParent"
+                            @update="emitUpdateToParent"></prize-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -33,7 +33,7 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" @click="formRef?.saveInvolvement()">
+                    <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" @click="formRef?.savePrize()">
                         {{ edit ? $t("updateLabel") : $t("saveLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -46,13 +46,13 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import PersonInvolvementForm from "./PersonInvolvementForm.vue";
-import type { Education, Employment, Membership } from "@/models/InvolvementModel";
+import PrizeForm from "./PrizeForm.vue";
+import type { PrizeResponse, Prize } from "@/models/PersonModel";
 
 
 export default defineComponent({
-    name: "PersonInvolvementModal",
-    components: { PersonInvolvementForm },
+    name: "PrizeModal",
+    components: { PrizeForm },
     props: {
         edit: {
             type: Boolean,
@@ -62,8 +62,8 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
-        presetInvolvement: {
-            type: Object as PropType<Education | Membership | Employment | undefined>,
+        presetPrize: {
+            type: Object as PropType<PrizeResponse | undefined>,
             default: undefined
         }
     },
@@ -71,15 +71,15 @@ export default defineComponent({
     setup(_, { emit }) {
         const dialog = ref(false);
 
-        const formRef = ref<typeof PersonInvolvementForm>();
+        const formRef = ref<typeof PrizeForm>();
 
-        const emitUpdateToParent = (involvement: Education | Membership | Employment) => {
-            emit("update", involvement)
+        const emitUpdateToParent = (prize: Prize) => {
+            emit("update", prize)
             dialog.value = false;
         };
 
-        const emitCreateToParent = (involvement: Education | Membership | Employment) => {
-            emit("create", involvement)
+        const emitCreateToParent = (prize: Prize) => {
+            emit("create", prize)
             dialog.value = false;
         };
 

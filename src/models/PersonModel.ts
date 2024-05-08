@@ -139,5 +139,12 @@ export interface PrizeResponse {
     title: MultilingualContent[];
     description: MultilingualContent[];
     proofs: DocumentFileResponse[];
-    date: Date;
+    date: string;
+}
+
+export interface Prize {
+    id?: number,
+    title: MultilingualContent[];
+    description: MultilingualContent[];
+    date: string;
 }

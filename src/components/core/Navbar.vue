@@ -1,18 +1,5 @@
 <template>
     <div id="navbar">
-        <!-- <v-navigation-drawer v-model="sidebar" app>
-            <v-list>
-                <v-list-tile v-for="item in menuItems" :key="item.title">
-                    <localized-link :to="item.pathName">
-                        <v-list-tile-action>
-                            <v-icon>{{ item.icon }}</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-content>{{ item.title }}</v-list-tile-content>
-                    </localized-link>
-                </v-list-tile>
-            </v-list>
-        </v-navigation-drawer> -->
-
         <v-toolbar app height="auto">
             <div class="wide-container flex-wrap" style="min-height: 64px;">
                 <span class="hidden-sm-and-up">
@@ -273,8 +260,6 @@ export default defineComponent(
         color: inherit;
         font-weight: bold;
     }
-
-
 
     .nav-items {
         margin-inline: 5px;
