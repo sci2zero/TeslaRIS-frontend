@@ -234,5 +234,6 @@ export default {
     abbreviationTitleLabel: "Skraćenica zvanja",
     otherNamesLabel: "Drugi oblici imena",
     viewOtherNamesLabel: "Vidi druge oblike imena",
-    noOtherNamesMessage: "Nema drugih oblika imena."
+    noOtherNamesMessage: "Nema drugih oblika imena.",
+    recentNotificationsLabel: "Nedavna obaveštenja"
 }

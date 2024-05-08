@@ -14,11 +14,11 @@ export class LanguageService extends BaseService {
   }
 
   async approveNotification(notificationId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.get, `notification/${notificationId}/approve`);
+    return super.sendRequest(axios.patch, `notification/${notificationId}/approve`);
   }
 
   async rejectNotification(notificationId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.get, `notification/${notificationId}/reject`);
+    return super.sendRequest(axios.delete, `notification/${notificationId}/reject`);
   }
 }
 
