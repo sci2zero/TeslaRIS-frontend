@@ -234,5 +234,6 @@ export default {
     abbreviationTitleLabel: "Title Abbreviation",
     otherNamesLabel: "Person Other Names",
     viewOtherNamesLabel: "View Person Other Names",
-    noOtherNamesMessage: "There are no other names specified."
+    noOtherNamesMessage: "There are no other names specified.",
+    recentNotificationsLabel: "Recent Notifications"
 }

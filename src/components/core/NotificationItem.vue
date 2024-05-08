@@ -10,12 +10,17 @@
                     v-bind="props"
                     icon="mdi-translate"
                 >
+                    <v-badge :content="notificationCount" :model-value="notificationCount > 0">
+                        <v-icon left dark>
+                            mdi-bell
+                        </v-icon>
+                    </v-badge>
                 </v-btn>
             </template>
 
             <v-card min-width="150">
                 <v-list>
-                    <v-list-subheader>Recent notifications</v-list-subheader>
+                    <v-list-subheader>{{ $t("recentNotificationsLabel") }}</v-list-subheader>
 
                     <v-list-item
                         v-for="(notification, i) in notifications"
@@ -23,7 +28,25 @@
                         :value="notification.id"
                         color="secondary"
                     >
-                        <v-list-item-title>{{ notification.notificationText }}</v-list-item-title>
+                        <v-row>
+                            <v-col cols="10">
+                                <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
+                            </v-col>
+                            <v-col cols="1">
+                                <v-list-item-action>
+                                    <v-btn icon @click="approveNotification(notification.id)">
+                                        <v-icon>mdi-check</v-icon>
+                                    </v-btn>
+                                </v-list-item-action>
+                            </v-col>
+                            <v-col cols="1">
+                                <v-list-item-action>
+                                    <v-btn icon @click="rejectNotification(notification.id)">
+                                        <v-icon>mdi-delete</v-icon>
+                                    </v-btn>
+                                </v-list-item-action>
+                            </v-col>    
+                        </v-row>
                     </v-list-item>
                 </v-list>
             </v-card>
@@ -40,25 +63,39 @@ export default defineComponent({
     name: "NotificationItem",
     setup() {
         const notifications = ref<Notification[]>([]);
+        const notificationCount = ref(0);
 
         onMounted(() => {
             NotificationService.getAllNotifications().then(response => {
                 notifications.value = response.data;
             });
+            NotificationService.getNotificationCount().then(response => {
+                    notificationCount.value = response.data;
+            });
         });
     
-        const approveNotification = {
-
+        const approveNotification = (notificationId: number) => {
+            NotificationService.approveNotification(notificationId).then(() => {
+                removeHandledNotification(notificationId);
+            });
         };
 
-        const rejectNotification = {
+        const rejectNotification = (notificationId: number) => {
+            NotificationService.rejectNotification(notificationId).then(() => {
+                removeHandledNotification(notificationId);
+            });
+        };
 
+        const removeHandledNotification = (notificationId: number) => {
+            notifications.value = notifications.value.filter(notification => notification.id != notificationId);
+            notificationCount.value -= 1;
         };
 
         return {
             approveNotification,
             notifications,
-            rejectNotification
+            rejectNotification,
+            notificationCount
         };
 },
 data: () => ({

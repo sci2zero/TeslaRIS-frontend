@@ -87,7 +87,10 @@
                             class="ms-2 me-2"
                             vertical></v-divider>
                     </template>
-                    <template v-else-if="item.type == 'component'">
+                    <template v-else-if="item.type == 'lang_component'">
+                        <component :is="item.component" :key="index"></component>
+                    </template>
+                    <template v-else-if="item.type == 'notification_component' && item.condition">
                         <component :is="item.component" :key="index"></component>
                     </template>
                     <template v-else>
@@ -98,7 +101,7 @@
                             :icon="item.type == 'icon'"
                             @click="item.click"
                         >
-                            <v-badge :content="item.badge" :model-value="item.badge > 0">
+                            <v-badge :content="item.badge" :model-value="false">
                                 <v-icon left dark>
                                     {{ item.icon }}
                                 </v-icon>
@@ -128,7 +131,6 @@ import type { ComputedRef, Ref } from 'vue';
 import type { Component } from 'vue';
 import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
-import NotificationService from '@/services/NotificationService';
 
 interface MenuItem {
   title?: ComputedRef<string> | string | undefined;
@@ -152,8 +154,6 @@ export default defineComponent(
 
             const langChangeItem = shallowRef(LangChangeItem);
             const notificationItem = shallowRef(NotificationItem);
-
-            const notificationCount = ref(0);
 
             const i18n = useI18n();
 
@@ -180,7 +180,6 @@ export default defineComponent(
             const sidebar = ref(false);
             const userRole = ref("");
 
-
             const a = ref(true);
             const testData = reactive({
                 test: !a.value,
@@ -200,10 +199,6 @@ export default defineComponent(
                 UserService.getLoggedInUser().then((response) => {
                     userName.value = response.data.firstname + " " + response.data.lastName;
                     userRole.value = UserService.provideUserRole();
-                });
-
-                NotificationService.getNotificationCount().then(response => {
-                    notificationCount.value = response.data;
                 });
             };
 
@@ -252,9 +247,9 @@ export default defineComponent(
             ]);
 
             const menuItems = ref<MenuItem[]>([
-                { title: undefined, type:'component', icon: 'mdi-translate', condition: true, component: langChangeItem },
+                { title: undefined, type:'lang_component', icon: 'mdi-translate', condition: true, component: langChangeItem },
                 { type:'divider' },
-                { title: undefined, type:'icon', icon: 'mdi-bell', condition: userLoggedIn, badge: notificationCount.value, component: notificationItem },
+                { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: userLoggedIn, component: notificationItem },
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !userLoggedIn.value), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !userLoggedIn.value), variant: 'outlined', color:'primary' },
                 
