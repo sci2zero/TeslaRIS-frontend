@@ -235,5 +235,8 @@ export default {
     otherNamesLabel: "Drugi oblici imena",
     viewOtherNamesLabel: "Vidi druge oblike imena",
     noOtherNamesMessage: "Nema drugih oblika imena.",
-    recentNotificationsLabel: "Nedavna obaveštenja"
+    recentNotificationsLabel: "Nedavna obaveštenja",
+    dateOfAcquisitionLabel: "Datum sticanja",
+    addPrizeLabel: "Dodaj nagradu",
+    updatePrizeLabel: "Ažuriraj nagradu"
 }

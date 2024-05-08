@@ -143,28 +143,7 @@
                 <br />
 
                 <!-- Prizes -->
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-                        <div><b>{{ $t("prizesLabel") }}</b></div>
-                        <strong v-if="person?.prizes.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        
-                        <div v-for="(prize, index) in person?.prizes" :key="index" class="py-5">
-                            <h4><strong>{{ returnCurrentLocaleContent(prize.title) }}</strong></h4>
-                            <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
-                            
-                            <br />
-                            <attachment-list
-                                :attachments="prize.proofs" :can-edit="canEdit" is-proof @create="addPrizeProof($event, prize)"
-                                @update="updatePrizeProof(prize, $event)" @delete="deletePrizeProof(prize, $event)"></attachment-list>
-                            <v-divider v-if="index < (person?.prizes ? person?.prizes.length : 1) - 1 " class="mt-10"></v-divider>
-                        </div>
-                    </v-card-text>
-                </v-card>
+                <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit"></prize-list>
             </v-col>
 
 
@@ -225,7 +204,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PersonResponse, ExpertiseOrSkillResponse, PrizeResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
+import type { PersonResponse, ExpertiseOrSkillResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -242,11 +221,12 @@ import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue'
 import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
+import PrizeList from '@/components/person/prize/PrizeList.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal },
+    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -404,29 +384,6 @@ export default defineComponent({
             });
         };
 
-        const addPrizeProof = (proof: DocumentFile, prize: PrizeResponse) => {
-            DocumentFileService.addPrizeProof(proof, prize.id as number, person.value?.id as number).then((response => {
-                prize.proofs?.push(response.data);
-            }));
-        };
-
-        const updatePrizeProof = (prize: PrizeResponse, proof: DocumentFile) => {
-            DocumentFileService.updatePrizeProof(proof, person.value?.id as number).then((response) => {
-                if (prize.proofs) {
-                    prize.proofs = prize.proofs.filter(proof => proof.id !== response.data.id);
-                }
-                prize.proofs?.push(response.data);
-            });
-        };
-
-        const deletePrizeProof = (prize: PrizeResponse, proofId: number) => {
-            DocumentFileService.deletePrizeProof(proofId, prize.id as number, person.value?.id as number).then(() => {
-                if (prize.proofs) {
-                    prize.proofs = prize.proofs.filter(proof => proof.id !== proofId);
-                }
-            });
-        };
-
         const updateKeywords = (updatedKeywords: MultilingualContent[]) => {
             keywords.value = updatedKeywords;
             PersonService.updateKeywords(person.value?.id as number, updatedKeywords).then(() => {
@@ -518,9 +475,8 @@ export default defineComponent({
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
-            addPrizeProof, updatePrizeProof, deletePrizeProof, updateKeywords, updateBiography,
+            updateKeywords, updateBiography, updateOtherNames, selectPrimaryName,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson,
-            updateOtherNames, selectPrimaryName
         };
 }})
 
@@ -556,6 +512,4 @@ export default defineComponent({
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
     }
-
-
 </style>
