@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Notification } from "@/models/Common";
+import type { Notification, NotificationAction } from "@/models/Common";
 
 export class LanguageService extends BaseService {
 
@@ -13,8 +13,8 @@ export class LanguageService extends BaseService {
     return super.sendRequest(axios.get, "notification/count");
   }
 
-  async approveNotification(notificationId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.patch, `notification/${notificationId}/approve`);
+  async performAction(notificationId: number, action: NotificationAction): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `notification/${notificationId}/perform?action=${action}`);
   }
 
   async rejectNotification(notificationId: number): Promise<AxiosResponse<void>> {

@@ -33,9 +33,14 @@
                                 <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
                             </v-col>
                             <v-col cols="1">
-                                <v-list-item-action>
-                                    <v-btn icon @click="approveNotification(notification.id)">
-                                        <v-icon>mdi-check</v-icon>
+                                <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
+                                    <v-btn icon @click="performAction(notification.id, notificationAction)">
+                                        <v-icon v-if="notificationAction.toString() === 'APPROVE'">
+                                            mdi-check
+                                        </v-icon>
+                                        <v-icon v-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION'">
+                                            mdi-file-remove-outline
+                                        </v-icon>
                                     </v-btn>
                                 </v-list-item-action>
                             </v-col>
@@ -55,7 +60,7 @@
 </template>
   
 <script lang="ts">
-import type { Notification } from '@/models/Common';
+import type { Notification, NotificationAction } from '@/models/Common';
 import NotificationService from '@/services/NotificationService';
 import { defineComponent, onMounted, ref } from 'vue';  
 
@@ -74,8 +79,8 @@ export default defineComponent({
             });
         });
     
-        const approveNotification = (notificationId: number) => {
-            NotificationService.approveNotification(notificationId).then(() => {
+        const performAction = (notificationId: number, action: NotificationAction) => {
+            NotificationService.performAction(notificationId, action).then(() => {
                 removeHandledNotification(notificationId);
             });
         };
@@ -92,7 +97,7 @@ export default defineComponent({
         };
 
         return {
-            approveNotification,
+            performAction,
             notifications,
             rejectNotification,
             notificationCount

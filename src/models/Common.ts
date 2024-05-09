@@ -51,7 +51,13 @@ export interface ErrorResponse {
     timestamp: string;
 }
 
+export enum NotificationAction {
+    APPROVE = "APPROVE",
+    REMOVE_FROM_PUBLICATION = "REMOVE_FROM_PUBLICATION"
+}
+
 export interface Notification {
     id: number;
     notificationText: string;
+    possibleActions: NotificationAction[];
 }
