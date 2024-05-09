@@ -143,7 +143,7 @@
                 <br />
 
                 <!-- Prizes -->
-                <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit"></prize-list>
+                <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit" @crud="fetchPerson"></prize-list>
             </v-col>
 
 

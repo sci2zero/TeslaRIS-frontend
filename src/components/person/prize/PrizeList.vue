@@ -75,7 +75,8 @@ export default defineComponent({
             default: false
         },
     },
-    setup(props) {
+    emits: ["crud"],
+    setup(props, {emit}) {
         const menus = ref<boolean[]>([]);
 
         const addPrizeProof = (proof: DocumentFile, prize: PrizeResponse) => {
@@ -103,20 +104,19 @@ export default defineComponent({
 
         const createPrize = (prize: Prize) => {
             PrizeService.createPrize(prize, props.person?.id as number).then(() => {
-                // TODO: refresh prizes
+                emit("crud");
             });
         };
 
         const updatePrize = (prize: Prize) => {
             PrizeService.updatePrize(prize, props.person?.id as number, prize?.id as number).then(() => {
-                // TODO: refresh prizes
+                emit("crud");
             });
-
         };
 
         const deletePrize = (prizeId: number) => {
             PrizeService.deletePrize(props.person?.id as number, prizeId).then(() => {
-                // TODO: refresh prizes
+                emit("crud");
             });
         };
 
