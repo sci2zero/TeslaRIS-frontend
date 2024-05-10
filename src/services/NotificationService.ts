@@ -17,8 +17,8 @@ export class LanguageService extends BaseService {
     return super.sendRequest(axios.patch, `notification/${notificationId}/perform?action=${action}`);
   }
 
-  async rejectNotification(notificationId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.delete, `notification/${notificationId}/reject`);
+  async dismissNotification(notificationId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `notification/${notificationId}/dismiss`);
   }
 }
 

@@ -71,13 +71,20 @@ export default defineComponent({
         const notificationCount = ref(0);
 
         onMounted(() => {
+            fetchNotificationsAndCounts();
+
+            // Fetch notifications and counts every 5 minutes
+            setInterval(fetchNotificationsAndCounts, 1000 * 60 * 5);
+        });
+
+        const fetchNotificationsAndCounts = () => {
             NotificationService.getAllNotifications().then(response => {
                 notifications.value = response.data;
             });
             NotificationService.getNotificationCount().then(response => {
-                    notificationCount.value = response.data;
+                notificationCount.value = response.data;
             });
-        });
+        };
     
         const performAction = (notificationId: number, action: NotificationAction) => {
             NotificationService.performAction(notificationId, action).then(() => {
@@ -86,7 +93,7 @@ export default defineComponent({
         };
 
         const rejectNotification = (notificationId: number) => {
-            NotificationService.rejectNotification(notificationId).then(() => {
+            NotificationService.dismissNotification(notificationId).then(() => {
                 removeHandledNotification(notificationId);
             });
         };
