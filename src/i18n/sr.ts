@@ -169,6 +169,8 @@ export default {
     personalInfoLabel: "Lični podaci",
     biographyLabel: "Biografija",
     expertisesAndSkillsLabel: "Expertize i veštine",
+    addExpertiseOrSkillLabel: "Dodaj expertizu ili veštinu",
+    updateExpertiseOrSkillLabel: "Ažuriraj expertizu ili veštinu",
     involvementsLabel: "Učešća",
     employmentsLabel: "Zaposlenja i radno iskustvo",
     educationLabel: "Edukacija",
@@ -238,5 +240,7 @@ export default {
     recentNotificationsLabel: "Nedavna obaveštenja",
     dateOfAcquisitionLabel: "Datum sticanja",
     addPrizeLabel: "Dodaj nagradu",
-    updatePrizeLabel: "Ažuriraj nagradu"
+    updatePrizeLabel: "Ažuriraj nagradu",
+    belongsToLabel: "Pripada",
+    memberOfLabel: "Član"
 }

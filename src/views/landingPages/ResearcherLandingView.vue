@@ -114,34 +114,11 @@
         <!-- Biography -->
         <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
 
-        <!-- Expertises and Skills -->
         <v-row>
             <v-col cols="6">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
-                        <div><b>{{ $t("expertisesAndSkillsLabel") }}</b></div>
-                        <strong v-if="person?.expertisesOrSkills.length === 0">{{ $t("notYetSetMessage") }}</strong>
-
-                        
-                        <div v-for="(expertise, index) in person?.expertisesOrSkills" :key="index" class="py-5">
-                            <h4><strong>{{ returnCurrentLocaleContent(expertise.name) }}</strong></h4>
-                            <p>{{ returnCurrentLocaleContent(expertise.description) }}</p>
-                            
-                            <br />
-                            <attachment-list
-                                :attachments="expertise.proofs" :can-edit="canEdit" is-proof @create="addExpertiseOrSkillProof($event, expertise)"
-                                @delete="deleteExpertiseOrSkillProof(expertise, $event)" @update="updateExpertiseOrSkillProof(expertise, $event)"></attachment-list>
-                            <v-divider v-if="index < (person?.expertisesOrSkills ? person?.expertisesOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
-                        </div>
-                    </v-card-text>
-                </v-card>
+                <!-- Expertises and Skills -->
+                <expertise-or-skill-list :expertise-or-skills="person?.expertisesOrSkills" :person="person" :can-edit="canEdit" @crud="fetchPerson"></expertise-or-skill-list>
                 <br />
-
                 <!-- Prizes -->
                 <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit" @crud="fetchPerson"></prize-list>
             </v-col>
@@ -211,7 +188,6 @@ import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import InvolvementService from '@/services/InvolvementService';
 import type { Employment, Education, Membership } from '@/models/InvolvementModel';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
@@ -222,11 +198,12 @@ import PersonInvolvementModal from '@/components/person/involvement/PersonInvolv
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
 import PrizeList from '@/components/person/prize/PrizeList.vue';
+import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, AttachmentList, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

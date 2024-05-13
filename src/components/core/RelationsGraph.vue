@@ -63,6 +63,7 @@ export default defineComponent({
             d3.select(container).select("svg").remove();
     
             const height = 500;
+            const node_width = 85;
 
             const svg = d3.select(container)
                 .append('svg')
@@ -76,47 +77,60 @@ export default defineComponent({
                 .force('charge', d3.forceManyBody().strength(-300))
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .alphaDecay(0.05);
-
-            // svg.append('defs').append('marker')
-            // .attrs({'id':'arrowhead',
-            //     'viewBox':'-0 -5 10 10',
-            //     'refX':13,
-            //     'refY':0,
-            //     'orient':'auto',
-            //     'markerWidth':13,
-            //     'markerHeight':13,
-            //     'xoverflow':'visible'})
-            // .append('svg:path')
-            // .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-            // .attr('fill', '#999')
-            // .style('stroke','none');
     
+            const linkColors = props.links.map((d: any) => {
+                if (d.label === "BELONGS_TO") {
+                    return "#ff0000"; // Red color
+                } else if (d.label === "MEMBER_OF") {
+                    return "#00ff00"; // Green color
+                } else {
+                    return "#999";
+                }
+            });
+
             const link = svg.selectAll('.link')
                 .data(props.links)
                 .enter().append('line')
                 .attr('class', 'link')
-                .attr('stroke', '#999')
                 .attr('stroke-width', '3')
-                .attr('marker-end', 'url(#arrow)');
+                .attr('marker-end', (d: any, i: number) => `url(#arrow-${i})`)
+                .attr('stroke', (_: any, i: number) => linkColors[i]);
+
+                        link.each(function(_: any, i: number) {
+                            const marker = svg.append("marker")
+                                .attr("id", `arrow-${i}`)
+                                .attr("markerUnits", "strokeWidth")
+                                .attr("markerWidth", 12)
+                                .attr("markerHeight", 12)
+                                .attr("viewBox", "0 0 12 12")
+                                .attr("refX", 6)
+                                .attr("refY", 6)
+                                .attr("orient", "auto");
+
+                            marker.append("path")
+                                .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+                                .style("fill", linkColors[i]);
+                        });
     
-            const linkText = svg.selectAll('.link-text')
-                .data(props.links)
-                .enter().append('text')
-                .attr('class', 'link-text')
-                .text((d: any) => d.label)
-                .attr('text-anchor', 'middle')
-                .attr('font-size', '12px');
+            // const linkText = svg.selectAll('.link-text')
+            //     .data(props.links)
+            //     .enter().append('text')
+            //     .attr('class', 'link-text')
+            //     .text((d: any) => d.label)
+            //     .attr('text-anchor', 'middle')
+            //     .attr('font-size', '12px');
     
-            const node = svg.selectAll('.node')
+            const node = svg.selectAll(".node")
                 .data(uniqueNodes)
-                .enter().append('circle')
-                .attr('class', 'node')
-                .attr('r', 70)
-                .attr('fill', '#69b3a2')
+                .enter().append("circle")
+                .attr("class", "node")
+                .attr("r", node_width)
+                .attr("fill", "#69b3a2")
+                .attr("stroke", "black")
                 .call(d3.drag()
-                    .on('start', dragStarted)
-                    .on('drag', dragged)
-                    .on('end', dragEnded))
+                    .on("start", dragStarted)
+                    .on("drag", dragged)
+                    .on("end", dragEnded))
                 .on('click', (event: any, d: any) => seeOUPage(d.id));
     
             const nodeText = svg.selectAll('.node-text')
@@ -126,10 +140,75 @@ export default defineComponent({
                 .text((d: any) => returnCurrentLocaleContent(d.name))
                 .attr('text-anchor', 'middle')
                 .attr('dy', '-0.5em')
+                .attr('width', (d: any) => returnCurrentLocaleContent(d.name)!.length * 1.5)
                 .attr('font-size', '12px')
                 .style('text-wrap', 'stable')
                 .on('click', (event: any, d: any) => seeOUPage(d.id));
-    
+
+            const legend = svg.append('g')
+                .attr('class', 'legend')
+                .attr('transform', `translate(0, ${500 - 70})`);
+
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', 20)
+                .attr('height', 20)
+                .attr("stroke", "black")
+                .attr('fill', '#ff0000');
+
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 30)
+                .attr('width', 20)
+                .attr('height', 20)
+                .attr("stroke", "black")
+                .attr('fill', '#00ff00');
+
+            legend.append('text')
+                .attr('x', 30)
+                .attr('y', 15)
+                .text(i18n.t("belongsToLabel"))
+                .style('font-size', '14px')
+                .attr('alignment-baseline', 'middle');
+
+            legend.append('text')
+                .attr('x', 30)
+                .attr('y', 45)
+                .text(i18n.t("memberOfLabel"))
+                .style('font-size', '14px')
+                .attr('alignment-baseline', 'middle');
+
+            function wrap(text: any) {
+                text.each(function() {
+                    const text = d3.select(this);
+                    const words = returnCurrentLocaleContent(text.data()[0].name)!.split(/\s+/).reverse();
+                    const lineHeight = 20;
+                    const width = parseFloat(text.attr('width'));
+                    const y = parseFloat(text.attr('y'));
+                    const x = text.attr('x');
+                    const anchor = text.attr('text-anchor');
+                
+                    let tspan = text.text(null).append('tspan').attr('x', x).attr('y', y).attr('text-anchor', anchor);
+                    let lineNumber = 0;
+                    let line: string[] = [];
+                    let word = words.pop();
+
+                    while (word) {
+                        line.push(word);
+                        tspan.text(line.join(' '));
+                        if (tspan.node().getComputedTextLength() > width) {
+                            lineNumber += 1;
+                            line.pop();
+                            tspan.text(line.join(' '));
+                            line = [word];
+                            tspan = text.append('tspan').attr('x', x).attr('y', y + lineNumber * lineHeight).attr('anchor', anchor).text(word);
+                        }
+                        word = words.pop();
+                    }
+                });
+            }
+
             function dragStarted(event: any, d: any) {
                 if (!event.active) simulation.alphaTarget(0.1).restart();
                 d.fx = d.x;
@@ -150,17 +229,30 @@ export default defineComponent({
             simulation.on('tick', () => {
                 link.attr('x1', (d: any) => d.source.x)
                     .attr('y1', (d: any) => d.source.y)
-                    .attr('x2', (d: any) => d.target.x)
-                    .attr('y2', (d: any) => d.target.y);
+                    .attr('x2', (d: any) => {
+                        const dx = d.target.x - d.source.x;
+                        const dy = d.target.y - d.source.y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        const offsetX = (dx / length) * (node_width + 10);
+                        return d.target.x - offsetX;
+                    })
+                    .attr('y2', (d: any) => {
+                        const dx = d.target.x - d.source.x;
+                        const dy = d.target.y - d.source.y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        const offsetY = (dy / length) * (node_width + 10);
+                        return d.target.y - offsetY;
+                    });
     
-                linkText.attr('x', (d: any) => (d.source.x + d.target.x) / 2)
-                    .attr('y', (d: any) => (d.source.y + d.target.y) / 2);
+                // linkText.attr('x', (d: any) => (d.source.x + d.target.x) / 2)
+                //     .attr('y', (d: any) => (d.source.y + d.target.y) / 2);
     
                 node.attr('cx', (d: any) => d.x)
                     .attr('cy', (d: any) => d.y);
-    
+
                 nodeText.attr('x', (d: any) => d.x)
-                        .attr('y', (d: any) => d.y);
+                        .attr('y', (d: any) => d.y - 30)
+                        .call(wrap);
             });
         }
 
