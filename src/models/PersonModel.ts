@@ -134,6 +134,12 @@ export interface ExpertiseOrSkillResponse {
     proofs: DocumentFileResponse[];
 }
 
+export interface ExpertiseOrSkill {
+    id?: number;
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+}
+
 export interface PrizeResponse {
     id: number;
     title: MultilingualContent[];

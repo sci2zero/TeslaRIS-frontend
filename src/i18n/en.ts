@@ -169,6 +169,8 @@ export default {
     personalInfoLabel: "Personal Info",
     biographyLabel: "Biography",
     expertisesAndSkillsLabel: "Expertises and Skills",
+    addExpertiseOrSkillLabel: "Add Expertise or Skill",
+    updateExpertiseOrSkillLabel: "Update Expertise or Skill",
     involvementsLabel: "Involvements",
     employmentsLabel: "Employments and Work Experience",
     educationLabel: "Education",
@@ -238,5 +240,7 @@ export default {
     recentNotificationsLabel: "Recent Notifications",
     dateOfAcquisitionLabel: "Date of Acquisition",
     addPrizeLabel: "Add Prize",
-    updatePrizeLabel: "Update Prize"
+    updatePrizeLabel: "Update Prize",
+    belongsToLabel: "Belongs to",
+    memberOfLabel: "Member of"
 }
