@@ -46,31 +46,31 @@
                         
                     <v-window v-model="currentTab">
                         <v-window-item value="orgBoardChair">
-                            <person-event-contribution-list :contribution-list="orgBoardChairList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="orgBoardChairList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="orgBoardMembers">
-                            <person-event-contribution-list :contribution-list="orgBoardMemberList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="orgBoardMemberList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
-                            <person-event-contribution-list :contribution-list="reviewerList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="reviewerList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="progBoardMembers">
-                            <person-event-contribution-list :contribution-list="progBoardMemberList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="progBoardMemberList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="speakers">
-                            <person-event-contribution-list :contribution-list="speakerList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="speakerList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="panelists">
-                            <person-event-contribution-list :contribution-list="panelistList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="panelistList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="chair">
-                            <person-event-contribution-list :contribution-list="chairList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="chairList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="audience">
-                            <person-event-contribution-list :contribution-list="audienceList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="audienceList"></person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="demonstrators">
-                            <person-event-contribution-list :contribution-list="demonstratorList"></person-event-contribution-list>
+                            <person-event-contribution-list :event-id="eventId" :contribution-list="demonstratorList"></person-event-contribution-list>
                         </v-window-item>
                     </v-window>
                 </v-card-text>
@@ -95,6 +95,10 @@ export default defineComponent({
     props: {
         contributionList: {
             type: Array as PropType<PersonEventContribution[]>,
+            required: true
+        },
+        eventId: {
+            type: Object as PropType<number | undefined>,
             required: true
         },
         readOnly: {

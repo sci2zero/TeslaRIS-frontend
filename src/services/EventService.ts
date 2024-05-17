@@ -31,6 +31,10 @@ export class EventService extends BaseService {
   async canEdit(conferenceId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `conference/${conferenceId}/can-edit`);
   }
+
+  async reorderContribution(conferenceId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `conference/${conferenceId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
+  }
 }
 
 export default new EventService();

@@ -112,6 +112,10 @@ export class DocumentPublicationService extends BaseService {
   async updateJournalPublication(journalPublicationId: number, updatedJournalPublication: JournalPublication): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `journal-publication/${journalPublicationId}`, updatedJournalPublication);
   }
+
+  async reorderContribution(publicationId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document/${publicationId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
+  }
 }
 
 export default new DocumentPublicationService();
