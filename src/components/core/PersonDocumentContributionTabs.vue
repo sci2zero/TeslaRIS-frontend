@@ -31,16 +31,16 @@
 
                     <v-window v-model="currentTab">
                         <v-window-item value="authors">
-                            <person-document-contribution-list :contribution-list="authorList"></person-document-contribution-list>
+                            <person-document-contribution-list :document-id="documentId" :contribution-list="authorList"></person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="editors">
-                            <person-document-contribution-list :contribution-list="editorList"></person-document-contribution-list>
+                            <person-document-contribution-list :document-id="documentId" :contribution-list="editorList"></person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
-                            <person-document-contribution-list :contribution-list="reviewerList"></person-document-contribution-list>
+                            <person-document-contribution-list :document-id="documentId" :contribution-list="reviewerList"></person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="advisors">
-                            <person-document-contribution-list :contribution-list="advisorList"></person-document-contribution-list>
+                            <person-document-contribution-list :document-id="documentId" :contribution-list="advisorList"></person-document-contribution-list>
                         </v-window-item>
                     </v-window>
                 </v-card-text>
@@ -65,6 +65,10 @@ export default defineComponent({
     props: {
         contributionList: {
             type: Array as PropType<PersonDocumentContribution[]>,
+            required: true
+        },
+        documentId: {
+            type: Object as PropType<number | undefined>,
             required: true
         },
         readOnly: {
