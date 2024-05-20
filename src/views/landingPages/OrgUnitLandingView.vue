@@ -74,11 +74,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <div class="edit-pen">
-                            <v-btn icon variant="outlined" size="small"> 
-                                <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
-                            </v-btn>
-                        </div>
+                        <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit"></research-ares-update-modal>
 
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
@@ -148,11 +144,12 @@ import PersonService from '@/services/PersonService';
 import OrganisationUnitUpdateModal from '@/components/organisationUnit/update/OrganisationUnitUpdateModal.vue';
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

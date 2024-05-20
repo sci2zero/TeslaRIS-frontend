@@ -45,7 +45,7 @@ export class OrganisationUnitService extends BaseService {
   }
 
   async createOURelation(relation: OrganisationUnitRelationRequest): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.post, "organisation-unit-relation/", relation, OrganisationUnitService.idempotencyKey);
+    return super.sendRequest(axios.post, "organisation-unit-relation", relation, OrganisationUnitService.idempotencyKey);
   }
 
   async updateOURelation(relation: OrganisationUnitRelationRequest, relationId: number): Promise<AxiosResponse<void>> {
