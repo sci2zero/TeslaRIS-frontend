@@ -124,7 +124,7 @@ export default defineComponent({
         }
 
         const reverseGeolocation = (coords: any) => {
-            fetch('http://nominatim.openstreetmap.org/reverse?format=json&lon=' + coords[0] + '&lat=' + coords[1])
+            fetch('https://nominatim.openstreetmap.org/reverse?format=json&lon=' + coords[0] + '&lat=' + coords[1])
             .then(function(response) {
                 return response.json();
             }).then((json) => {
