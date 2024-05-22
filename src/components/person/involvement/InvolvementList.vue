@@ -67,11 +67,12 @@ import AttachmentList from '@/components/core/AttachmentList.vue';
 import InvolvementService from '@/services/InvolvementService';
 import { ref } from 'vue';
 import { watch } from 'vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "InvolvementList",
-    components: { PersonInvolvementModal, AttachmentList },
+    components: { PersonInvolvementModal, AttachmentList, LocalizedLink },
     props: {
         canEdit: {
             type: Boolean,
