@@ -16,13 +16,17 @@
                     <span class="text-h5">{{ $t("updateKeywordsLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
-                    <v-container>
-                        <v-row>
-                            <v-col cols="12">
-                                <treeselect v-model="selectedResearchAreas" :multiple="true" :options="researchAreasSelectable" />
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                    <v-treeview
+                        v-model:selected="selectedResearchAreas"
+                        :items="researchAreasSelectable"
+                        selection-type="leaf"
+                        item-title="title"
+                        item-value="id"
+                        selected-color="indigo"
+                        open-on-click
+                        open-all
+                        selectable
+                    ></v-treeview>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -41,18 +45,15 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 import { defineComponent } from "vue";
-import type { MultilingualContent } from "@/models/Common";
 import type { PropType } from "vue";
 import type { ResearchArea } from "@/models/OrganisationUnitModel";
-import Treeselect from 'vue3-treeselect';
-import 'vue3-treeselect/dist/vue3-treeselect.css';
 import ResearchAreaService from "@/services/ResearchAreaService";
 import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { watch } from "vue";
 
 
 export default defineComponent({
     name: "ResearchAreaUpdateModal",
-    components: { Treeselect },
     props: {
         readOnly: {
             type: Boolean,
@@ -64,18 +65,27 @@ export default defineComponent({
         }
     },
     emits: ["update"],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
         const dialog = ref(false);
 
-        const selectedResearchAreas = ref(null);
+        const selectedResearchAreas = ref<number[]>([]);
         const researchAreasSelectable = ref<any>([]);
 
         onMounted(() => {
             ResearchAreaService.readAllResearchAreas().then((response) => {
                 response.data.forEach((researchAreaResponse) => {
-                    researchAreasSelectable.value.push(reorganiseParent(researchAreaResponse));
+                    researchAreasSelectable.value.push(...reorganiseParent(researchAreaResponse));
                 });
-                console.log(researchAreasSelectable.value)
+            });
+        });
+
+        watch(() => props.researchAreasHierarchy, () => {
+            props.researchAreasHierarchy?.forEach((researchArea) => {
+                selectedResearchAreas.value.push(researchArea.id as number);
+                while(researchArea.superResearchArea) {
+                    selectedResearchAreas.value.push(researchArea.superResearchArea.id as number);
+                    researchArea = researchArea.superResearchArea;
+                }
             });
         });
 
@@ -90,14 +100,16 @@ export default defineComponent({
             let current = data;
             while (current['superResearchArea']) {
                 current["children"] = [];
+                current["title"] = returnCurrentLocaleContent(current.name);
 
                 if(current.name[0].content) {
                     nodeMap[current.name[0].content] = current;
                 }
                 current = current['superResearchArea'];
             }
+
             current["children"] = [];
-            current["label"] = returnCurrentLocaleContent(current.name);
+            current["title"] = returnCurrentLocaleContent(current.name);
             nodeMap[current.name[0].content] = current;
             root.push(current);
 
@@ -114,13 +126,47 @@ export default defineComponent({
             return root;
         };
 
-        const emitToParent = (keywords: MultilingualContent[]) => {
-            emit("update", keywords)
+        const findDeepestNodes = (ids: number[]): number[] => {
+            const idSet = new Set(ids);
+            const result = new Set();
+
+            function traverse(node: any, currentPath: any) {
+                if (!node.children || node.children.length === 0) {
+                    if (idSet.has(node.id)) {
+                        result.add(node.id);
+                    }
+                    return;
+                }
+
+                const isCurrentNodeInIds = idSet.has(node.id);
+                let foundChildInIds = false;
+
+                for (const child of node.children) {
+                    traverse(child, currentPath.concat(node.id));
+                    if (idSet.has(child.id)) {
+                        foundChildInIds = true;
+                    }
+                }
+
+                if (isCurrentNodeInIds && !foundChildInIds) {
+                    result.add(node.id);
+                }
+            }
+
+            for (const item of researchAreasSelectable.value) {
+                traverse(item, []);
+            }
+
+            return Array.from(result) as number[];
+        }
+
+        const emitToParent = (researchAreaIds: number[]) => {
+            emit("update", researchAreaIds)
             dialog.value = false;
         }
 
         const submitSelection = () => {
-            console.log(selectedResearchAreas.value);
+            emitToParent(findDeepestNodes(selectedResearchAreas.value));
         };
 
         return {dialog, researchAreasSelectable,

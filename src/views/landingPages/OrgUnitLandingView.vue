@@ -74,7 +74,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit"></research-ares-update-modal>
+                        <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-ares-update-modal>
 
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
@@ -297,6 +297,27 @@ export default defineComponent({
             relations.value = response.data;
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            const updateRequest: OrganisationUnitRequest = {
+                name: organisationUnit.value!.name,
+                nameAbbreviation: organisationUnit.value?.nameAbbreviation,
+                keyword: organisationUnit.value!.keyword,
+                researchAreasId: researchAreaIds,
+                location: organisationUnit.value?.location,
+                contact: organisationUnit.value?.contact
+            };
+
+            OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+                fetchOU();
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+                fetchOU();
+            });
+        };
+
         const performUpdate = (reload: boolean) => {
             const updateRequest: OrganisationUnitRequest = {
                 name: organisationUnit.value!.name,
@@ -305,7 +326,7 @@ export default defineComponent({
                 researchAreasId: organisationUnit.value!.researchAreas.map(leafResearchArea => leafResearchArea.id as number),
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact
-            }
+            };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
@@ -338,7 +359,7 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
             snackbar, snackbarMessage, relations,
-            updateRelations, graphRef
+            updateRelations, graphRef, updateResearchAreas
         };
 }})
 
