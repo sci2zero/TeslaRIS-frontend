@@ -41,6 +41,8 @@ import DatasetLandingView from "@/views/landingPages/DatasetLandingView.vue";
 import PatentLandingView from "@/views/landingPages/PatentLandingView.vue";
 import ProceedingsPublicationsLandingView from "@/views/landingPages/ProceedingsPublicationsLandingView.vue";
 import ProceedingsLandingView from "@/views/landingPages/ProceedingsLandingView.vue";
+import SubmitMonographView from "@/views/SubmitMonographView.vue";
+import MonographLandingView from "@/views/landingPages/MonographLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -255,6 +257,15 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "submit-monograph",
+                    name: "submitMonograph",
+                    component: SubmitMonographView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
                     path: "submit-dataset",
                     name: "submitDataset",
                     component: SubmitDatasetView,
@@ -385,6 +396,15 @@ const router = createRouter({
                             path: "patent/:id",
                             name: "patentLandingPage",
                             component: PatentLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "monograph/:id",
+                            name: "monographLandingPage",
+                            component: MonographLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

@@ -58,6 +58,7 @@ export default {
     keywordsLabel: "Ključne reči",
     authorNamesLabel: "Autori",
     researchAreasLabel: "Oblasti Istraživanja",
+    researchAreaLabel: "Oblast Istraživanja",
     nameColumn: "nameSr",
     keywordsColumn: "keywordsSr",
     researchAreasColumn: "researchAreasSr",
@@ -242,5 +243,9 @@ export default {
     addPrizeLabel: "Dodaj nagradu",
     updatePrizeLabel: "Ažuriraj nagradu",
     belongsToLabel: "Pripada",
-    memberOfLabel: "Član"
+    memberOfLabel: "Član",
+    monographTypeLabel: "Tip monografije",
+    addMonographLabel: "Dodaj monografiju",
+    numberLabel: "Broj",
+    monographLabel: "Monografija"
 }
