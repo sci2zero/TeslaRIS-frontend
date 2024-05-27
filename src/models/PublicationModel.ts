@@ -120,6 +120,26 @@ export interface ProceedingsPublication extends Document {
     proceedingsId: number;
 }
 
+export enum MonographType {
+    RESEARCH_MONOGRAPH = "RESEARCH_MONOGRAPH",
+    BOOK = "BOOK",
+    BIBLIOGRAPHY = "BIBLIOGRAPHY",
+    TRANSLATION = "TRANSLATION",
+}
+
+export interface Monograph extends Document {
+    id?: number;
+    monographType: MonographType;
+    printISBN?: string;
+    eISBN?: string;
+    numberOfPages?: number;
+    volume?: string;
+    number?: string;
+    publicationSeriesId?: number;
+    languageTagIds?: number[];
+    researchAreaId?: number;
+}
+
 export interface Patent extends Document {
     number: string;
     publisherId?: number;

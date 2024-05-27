@@ -135,7 +135,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import type { Software } from '@/models/PublicationModel';
@@ -164,9 +164,6 @@ export default defineComponent({
         const software = ref<Software>();
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
-
-        const publications = ref<DocumentPublicationIndex[]>([]);
-        const totalPublications = ref<number>(0);
 
         const canEdit = ref(false);
 
@@ -263,12 +260,9 @@ export default defineComponent({
         };
 
         return {
-            software, icon,
-            publications, publisher,
-            totalPublications,
+            software, icon, publisher,
             returnCurrentLocaleContent,
-            languageTagMap,
-            searchKeyword, goToURL, canEdit,
+            languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, updateContributions,

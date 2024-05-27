@@ -58,6 +58,7 @@ export default {
     keywordsLabel: "Keywords",
     authorNamesLabel: "Authors",
     researchAreasLabel: "Research Areas",
+    researchAreaLabel: "Research Area",
     nameColumn: "nameOther",
     keywordsColumn: "keywordsOther",
     researchAreasColumn: "researchAreasOther",
@@ -242,5 +243,9 @@ export default {
     addPrizeLabel: "Add Prize",
     updatePrizeLabel: "Update Prize",
     belongsToLabel: "Belongs to",
-    memberOfLabel: "Member of"
+    memberOfLabel: "Member of",
+    monographTypeLabel: "Monograph Type",
+    addMonographLabel: "Add Monograph",
+    numberLabel: "Number",
+    monographLabel: "Monograph"
 }

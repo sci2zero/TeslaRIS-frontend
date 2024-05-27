@@ -190,6 +190,8 @@ export default defineComponent({
                     return "dataset/";
                 case "SOFTWARE":
                     return "software/";
+                case "MONOGRAPH":
+                    return "monograph/";
             }
             return "";
         }

@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Dataset, DocumentPublicationIndex, JournalPublication, Patent, ProceedingsPublication, Software } from "@/models/PublicationModel";
+import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, Patent, ProceedingsPublication, Software } from "@/models/PublicationModel";
 
 
 export class DocumentPublicationService extends BaseService {
@@ -29,12 +29,16 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `software/${softwareId}`);
   }
 
-  async readDataset(datasetId: number): Promise<AxiosResponse<Software>> {
+  async readDataset(datasetId: number): Promise<AxiosResponse<Dataset>> {
     return super.sendRequest(axios.get, `dataset/${datasetId}`);
   }
 
   async readPatent(patentId: number): Promise<AxiosResponse<Patent>> {
     return super.sendRequest(axios.get, `patent/${patentId}`);
+  }
+
+  async readMonograph(monographId: number): Promise<AxiosResponse<Monograph>> {
+    return super.sendRequest(axios.get, `monograph/${monographId}`);
   }
 
   async findMyPublicationsInJournal(journalId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
@@ -73,6 +77,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "dataset", body, DocumentPublicationService.idempotencyKey);
   }
 
+  async createMonograph(body: Monograph): Promise<AxiosResponse<Monograph>> {
+    return super.sendRequest(axios.post, "monograph", body, DocumentPublicationService.idempotencyKey);
+  }
+
   async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
     return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}/my-publications`);
   }
@@ -103,6 +111,10 @@ export class DocumentPublicationService extends BaseService {
 
   async updatePatent(patentId: number, updatedPatent: Patent): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `patent/${patentId}`, updatedPatent);
+  }
+
+  async updateMonograph(monographId: number, updatedMonograph: Monograph): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `monograph/${monographId}`, updatedMonograph);
   }
 
   async updateProceedingsPublication(proceedingsPublicationId: number, updatedProceedingsPublication: ProceedingsPublication): Promise<AxiosResponse<void>> {
