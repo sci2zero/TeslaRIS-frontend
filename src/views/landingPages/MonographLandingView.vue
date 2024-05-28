@@ -83,6 +83,18 @@
         <!-- Description -->
         <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
+        <!-- Research Area -->
+        <v-row>
+            <v-col cols="12">
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+        
         <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
@@ -137,11 +149,12 @@ import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/Attac
 import KeywordList from '@/components/core/KeywordList.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
+import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -188,6 +201,8 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+
+            console.log(monograph.value)
 
             if (monograph.value?.researchAreaId) {
                 ResearchAreaService.readResearchAreaHierarchy(monograph.value?.researchAreaId).then(response => {
@@ -256,6 +271,7 @@ export default defineComponent({
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, updateContributions,
+            researchAreaHierarchy
         };
 }})
 

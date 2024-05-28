@@ -28,6 +28,7 @@
                             v-model="selectedResearchArea"
                             :label="$t('researchAreaLabel')"
                             :items="researchAreasSelectable"
+                            return-object
                         ></v-select>
                     </v-col>
                 </v-row>
@@ -223,7 +224,7 @@ export default defineComponent({
 
         const allResearchAreas = ref<ResearchArea[]>([]);
         const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
-        const selectedResearchArea = ref<{ title: string, value: number | undefined }>({ title: "", value: undefined });
+        const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -294,7 +295,7 @@ export default defineComponent({
                 monographType: MonographType.BIBLIOGRAPHY,
                 number: number.value,
                 volume: volume.value,
-                researchAreaId: selectedResearchArea.value?.value,
+                researchAreaId: selectedResearchArea.value?.value as number,
                 fileItems: [],
                 proofs: []
             };
