@@ -247,5 +247,6 @@ export default {
     monographTypeLabel: "Tip monografije",
     addMonographLabel: "Dodaj monografiju",
     numberLabel: "Broj",
-    monographLabel: "Monografija"
+    monographLabel: "Monografija",
+    updateMonographLabel: "Ažuriraj monografiju"
 }

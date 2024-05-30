@@ -19,6 +19,7 @@
                             :label="$t('monographTypeLabel') + '*'"
                             :items="monographTypes"
                             :rules="requiredSelectionRules"
+                            return-object
                         ></v-select>
                     </v-col>
                 </v-row>
@@ -30,6 +31,12 @@
                             :items="researchAreasSelectable"
                             return-object
                         ></v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <h2>{{ $t("authorsLabel") }}</h2>
+                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -149,7 +156,7 @@ import type { AxiosResponse } from 'axios';
 import UriInput from '../core/UriInput.vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import { MonographType, type Monograph } from "@/models/PublicationModel";
+import type { MonographType, Monograph } from "@/models/PublicationModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
@@ -157,14 +164,14 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getMonographTypesForGivenLocale } from '@/i18n/monographType';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAreaService from '@/services/ResearchAreaService';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
+import PersonPublicationContribution from './PersonPublicationContribution.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch},
-    emits: ["create"],
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -176,17 +183,17 @@ export default defineComponent({
         const i18n = useI18n();
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
 
+        const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>([]);
-        const defaultLanguage = ref(-1);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 response.data.forEach((languageTag: LanguageTagResponse) => {
+                    languageTags.value.push(languageTag);
                     languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
                     if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
                         selectedLanguages.value.push(languageTag.id);
-                        defaultLanguage.value = languageTag.id;
                     }
                 })
             });
@@ -206,6 +213,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
@@ -228,6 +236,7 @@ export default defineComponent({
 
         const title = ref([]);
         const subtitle = ref([]);
+        const contributions = ref([]);
         const uris = ref([]);
         const keywords = ref([]);
         const description = ref([]);
@@ -282,17 +291,17 @@ export default defineComponent({
                 subTitle: subtitle.value,
                 title: title.value,
                 uris: uris.value,
-                contributions: [],
+                contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
-                eISBN: eIsbn.value,
+                eisbn: eIsbn.value,
                 eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
                 publicationSeriesId: publicationSeriesId as number,
                 scopusId: scopus.value,
-                monographType: MonographType.BIBLIOGRAPHY,
+                monographType: selectedMonographType.value.value as MonographType,
                 number: number.value,
                 volume: volume.value,
                 researchAreaId: selectedResearchArea.value?.value as number,
@@ -340,7 +349,8 @@ export default defineComponent({
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submitMonograph,
-            selectedResearchArea
+            selectedResearchArea, toMultilingualTextInput,
+            languageTags, contributionsRef, contributions
         };
     }
 });

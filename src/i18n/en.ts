@@ -247,5 +247,6 @@ export default {
     monographTypeLabel: "Monograph Type",
     addMonographLabel: "Add Monograph",
     numberLabel: "Number",
-    monographLabel: "Monograph"
+    monographLabel: "Monograph",
+    updateMonographLabel: "Update Monograph"
 }

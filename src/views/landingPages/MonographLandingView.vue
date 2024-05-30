@@ -26,23 +26,63 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
+                        <monograph-update-modal :read-only="!canEdit" :preset-monograph="monograph" @update="updateBasicInfo"></monograph-update-modal>
+
                         <!-- Basic Info -->
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div v-if="monograph?.number">
-                                    {{ $t("numberLabel") }}:
+                                <div v-if="monograph?.monographType">
+                                    {{ $t("monographTypeLabel") }}:
                                 </div>
-                                <div v-if="monograph?.number" class="response">
-                                    {{ monograph.number }}
+                                <div v-if="monograph?.monographType" class="response">
+                                    {{ getMonographTypeTitleFromValueAutoLocale(monograph.monographType) }}
                                 </div>
                                 <div v-if="monograph?.documentDate">
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monograph?.documentDate" class="response">
                                     {{ monograph.documentDate }}
+                                </div>
+                                <div v-if="monograph?.eisbn">
+                                    eISBN:
+                                </div>
+                                <div v-if="monograph?.eisbn" class="response">
+                                    {{ monograph.eisbn }}
+                                </div>
+                                <div v-if="monograph?.printISBN">
+                                    Print ISBN:
+                                </div>
+                                <div v-if="monograph?.printISBN" class="response">
+                                    {{ monograph.printISBN }}
+                                </div>
+                                <div v-if="monograph?.numberOfPages">
+                                    {{ $t("numberOfPagesLabel") }}:
+                                </div>
+                                <div v-if="monograph?.numberOfPages" class="response">
+                                    {{ monograph.numberOfPages }}
+                                </div>
+                                <div v-if="monograph?.volume">
+                                    {{ $t("volumeLabel") }}:
+                                </div>
+                                <div v-if="monograph?.volume" class="response">
+                                    {{ monograph.volume }}
+                                </div>
+                                <div v-if="monograph?.number">
+                                    {{ $t("numberLabel") }}:
+                                </div>
+                                <div v-if="monograph?.number" class="response">
+                                    {{ monograph.number }}
+                                </div>
+                                <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
+                                    {{ $t("languageLabel") }}:
+                                </div>
+                                <div>
+                                    <v-chip v-for="(languageTagId, index) in monograph?.languageTagIds" :key="index" outlined>
+                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                    </v-chip>
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -57,6 +97,22 @@
                                 </div>
                                 <div v-if="monograph?.doi" class="response">
                                     {{ monograph.doi }}
+                                </div>
+                                <div v-if="monograph?.eventId">
+                                    {{ $t("conferenceLabel") }}:
+                                </div>
+                                <div v-if="monograph?.eventId" class="response">
+                                    <localized-link :to="'events/conference/' + monograph?.eventId">
+                                        {{ returnCurrentLocaleContent(event?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-if="monograph?.publicationSeriesId">
+                                    {{ $t("publicationSeriesLabel") }}:
+                                </div>
+                                <div v-if="monograph?.publicationSeriesId" class="response">
+                                    <localized-link :to="`${publicationSeriesType.toString() === '0' ? 'journals' : 'book-series'}/` + monograph?.publicationSeriesId">
+                                        {{ returnCurrentLocaleContent(publicationSeries?.title) }}
+                                    </localized-link>
                                 </div>
                                 <div v-if="monograph?.uris && monograph?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -150,11 +206,19 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
+import MonographUpdateModal from '@/components/publication/update/MonographUpdateModal.vue';
+import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
+import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
+import EventService from '@/services/EventService';
+import type { Conference } from '@/models/EventModel';
+import JournalService from '@/services/JournalService';
+import BookSeriesService from '@/services/BookSeriesService';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -172,6 +236,10 @@ export default defineComponent({
         const researchAreaHierarchy = ref<ResearchArea>();
 
         const icon = ref("mdi-book-open-page-variant");
+
+        const event = ref<Conference>();
+        const publicationSeries = ref<PublicationSeries>();
+        const publicationSeriesType = ref<PublicationSeriesType>(PublicationSeriesType.JOURNAL);
 
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -191,6 +259,8 @@ export default defineComponent({
 
                 monograph.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
+                fetchConnectedEntities();
+
                 populateData();
             });
         };
@@ -202,13 +272,31 @@ export default defineComponent({
                 })
             });
 
-            console.log(monograph.value)
-
             if (monograph.value?.researchAreaId) {
                 ResearchAreaService.readResearchAreaHierarchy(monograph.value?.researchAreaId).then(response => {
                     researchAreaHierarchy.value = response.data;
                 });
             }  
+        };
+
+        const fetchConnectedEntities = () => {
+            if (monograph.value?.eventId) {
+                EventService.readConference(monograph.value?.eventId as number).then((eventResponse) => {
+                    event.value = eventResponse.data;
+                });
+            }
+
+            if(monograph.value?.publicationSeriesId) {
+                JournalService.readJournal(monograph.value.publicationSeriesId).then((journalResponse) => {
+                    publicationSeries.value = journalResponse.data;
+                    publicationSeriesType.value = PublicationSeriesType.JOURNAL;
+                }).catch(() => {
+                    BookSeriesService.readBookSeries(monograph.value?.publicationSeriesId as number).then((bookSeriesResponse) => {
+                        publicationSeries.value = bookSeriesResponse.data;
+                        publicationSeriesType.value = PublicationSeriesType.BOOK_SERIES;
+                    });
+                });
+            }
         };
 
         const searchKeyword = (keyword: string) => {
@@ -243,6 +331,12 @@ export default defineComponent({
             monograph.value!.uris = basicInfo.uris;
             monograph.value!.number = basicInfo.number;
             monograph.value!.volume = basicInfo.volume;
+            monograph.value!.researchAreaId = basicInfo.researchAreaId;
+            monograph.value!.languageTagIds = basicInfo.languageTagIds;
+            monograph.value!.publicationSeriesId = basicInfo.publicationSeriesId;
+            monograph.value!.numberOfPages = basicInfo.numberOfPages;
+            monograph.value!.eisbn = basicInfo.eisbn;
+            monograph.value!.printISBN = basicInfo.printISBN;
 
             performUpdate(true);
         };
@@ -270,8 +364,10 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
-            snackbar, snackbarMessage, updateContributions,
-            researchAreaHierarchy
+            snackbar, snackbarMessage, event,
+            researchAreaHierarchy, updateContributions,
+            publicationSeries, publicationSeriesType,
+            getMonographTypeTitleFromValueAutoLocale
         };
 }})
 

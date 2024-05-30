@@ -54,11 +54,11 @@ export default defineComponent({
         }
 
         watch(() => props.keywords, () => {
-            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split(",") as string[];
+            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
         });
 
         watch(i18n.locale, () => {
-            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split(",") as string[];
+            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
         });
 
         return { searchKeyword, parsedKeywords, emitToParent };

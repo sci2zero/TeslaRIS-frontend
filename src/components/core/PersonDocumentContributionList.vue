@@ -37,7 +37,6 @@ export default defineComponent({
     setup(props) {
         const reorderContributors = (event: any) => {
             if(event.moved.newIndex !== event.moved.oldIndex) {
-                console.log(props.contributionList[event.moved.newIndex])
                 DocumentPublicationService.reorderContribution(props.documentId as number, props.contributionList[event.moved.newIndex].id as number, event.moved.oldIndex + 1, event.moved.newIndex + 1);
             }
         };

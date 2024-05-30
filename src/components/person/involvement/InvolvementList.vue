@@ -132,7 +132,6 @@ export default defineComponent({
         };
 
         const updateInvolvement = (involvement: Education | Membership | Employment) => {
-            console.log(involvement)
             if(involvement.id && props.person?.id) {
                 if("title" in involvement) {
                     InvolvementService.updateEducation(involvement, involvement.id, props.person.id).then(() => {
