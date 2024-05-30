@@ -272,15 +272,9 @@ export default defineComponent({
                     personAffiliations.value.push({title: returnCurrentLocaleContent(employment.organisationUnitName) as string, value: employment.organisationUnitId as number});
                 });
 
-                console.log(props.presetContributionValue)
-
                 selectedAffiliations.value = [];
                 if(props.basic) {
-                    PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
-                        if(latestAffiliationResponse.data) {
-                            selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
-                        }
-                    });
+                    selectLatestAffiliation();
                 } else {
                     personAffiliations.value.forEach(affiliation => {
                         presetAffiliations.value.forEach(selectedAffiliationId => {
@@ -289,9 +283,21 @@ export default defineComponent({
                             }
                         });
                     });
+
+                    if (selectedAffiliations.value.length === 0) {
+                        selectLatestAffiliation();
+                    }
                 }
             });
         });
+
+        const selectLatestAffiliation = () => {
+            PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
+                if(latestAffiliationResponse.data) {
+                    selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
+                }
+            });
+        };
 
         const clearInput = () => {
             selectedPerson.value = personPlaceholder;

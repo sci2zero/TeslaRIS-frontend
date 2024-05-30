@@ -131,7 +131,7 @@ export interface Monograph extends Document {
     id?: number;
     monographType: MonographType;
     printISBN?: string;
-    eISBN?: string;
+    eisbn?: string;
     numberOfPages?: number;
     volume?: string;
     number?: string;
