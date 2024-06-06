@@ -248,5 +248,6 @@ export default {
     addMonographLabel: "Dodaj monografiju",
     numberLabel: "Broj",
     monographLabel: "Monografija",
-    updateMonographLabel: "Ažuriraj monografiju"
+    updateMonographLabel: "Ažuriraj monografiju",
+    unknownBirthdateMessage: "Nepoznat datum rođenja"
 }

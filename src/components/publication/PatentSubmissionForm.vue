@@ -67,9 +67,15 @@
                             <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <event-autocomplete-search ref="eventRef" v-model="selectedEvent"></event-autocomplete-search>
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
+        
         <v-row>
             <p style="margin-left: 20px;">
                 {{ $t("requiredFieldsMessage") }}
@@ -105,11 +111,11 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
-
+import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 
 export default defineComponent({
     name: "SubmitPatent",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, EventAutocompleteSearch},
     props: {
         inModal: {
             type: Boolean,
@@ -136,9 +142,11 @@ export default defineComponent({
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
+        const eventRef = ref<typeof EventAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -167,6 +175,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -181,6 +190,7 @@ export default defineComponent({
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
+                    eventRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
                     scopus.value = "";
@@ -213,9 +223,9 @@ export default defineComponent({
             publisherAutocompleteRef,
             selectedPublisher, patentNumber,
             description, descriptionRef,
-            keywords, keywordsRef,
+            keywords, keywordsRef, selectedEvent,
             place, placeRef, uris, urisRef,
-            contributions, contributionsRef,
+            contributions, contributionsRef, eventRef,
             requiredFieldRules, submitPatent, errorMessage
         };
     }

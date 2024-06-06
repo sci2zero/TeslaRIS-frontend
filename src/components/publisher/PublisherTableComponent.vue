@@ -41,16 +41,16 @@
                     </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.placeSr }}
+                    {{ displayTextOrPlaceholder(row.item.placeSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.placeOther }}
+                    {{ displayTextOrPlaceholder(row.item.placeOther) }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.stateSr }}
+                    {{ displayTextOrPlaceholder(row.item.stateSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.stateOther }}
+                    {{ displayTextOrPlaceholder(row.item.stateOther) }}
                 </td>
             </tr>
         </template>
@@ -76,6 +76,7 @@ import UserService from '@/services/UserService';
 import type { PublisherIndex } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -175,7 +176,9 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedPublishers, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
+        return {selectedPublishers, headers, notifications,
+            refreshTable, userRole, deleteSelection,
+            tableOptions, displayTextOrPlaceholder};
     }
 });
 </script>

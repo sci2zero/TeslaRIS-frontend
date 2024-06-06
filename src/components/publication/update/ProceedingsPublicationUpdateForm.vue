@@ -148,11 +148,6 @@ export default defineComponent({
             });
         });
 
-        const titleRef = ref<typeof MultilingualTextInput>();
-        const subtitleRef = ref<typeof MultilingualTextInput>();
-        const descriptionRef = ref<typeof MultilingualTextInput>();
-        const urisRef = ref<typeof UriInput>();
-
         const searchPlaceholderProceedings = {title: returnCurrentLocaleContent(proceedings.value?.title) as string, value: proceedings.value?.id as number};
         const selectedProceedings = ref<{ title: string, value: number }>(searchPlaceholderProceedings);
 
@@ -238,12 +233,11 @@ export default defineComponent({
 
         return {
             isFormValid,
-            title, titleRef,
-            subtitle, subtitleRef,
+            title, subtitle,
             publicationYear, doi, scopus,
             selectedProceedings, articleNumber,
-            descriptionRef, uris, numberOfPages,
-            urisRef, requiredFieldRules, selectedEvent,
+            uris, numberOfPages,
+            requiredFieldRules, selectedEvent,
             updateProceedingsPublication, toMultilingualTextInput,
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,

@@ -4,7 +4,7 @@
             <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
         </localized-link>
         <p>{{ contribution.dateFrom ? `${contribution.dateFrom} - ${contribution.dateTo ? contribution.dateTo : $t("presentLabel")}` : $t("currentLabel") }}</p>
-        <p>{{ getTitleFromValueAutoLocale(contribution.contributionType, $i18n.locale) }}</p>
+        <p>{{ getTitleFromValueAutoLocale(contribution.contributionType) }}</p>
         <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
     </div>
 </template>

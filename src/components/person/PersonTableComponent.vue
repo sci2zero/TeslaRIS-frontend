@@ -36,13 +36,13 @@
                     </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.employmentsSr }}
+                    {{ displayTextOrPlaceholder(row.item.employmentsSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.employmentsOther }}
+                    {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
                 </td>
-                <td>{{ row.item.birthdate }}</td>
-                <td>{{ row.item.orcid }}</td>
+                <td>{{ displayTextOrPlaceholder(row.item.birthdate) }}</td>
+                <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
             </tr>
         </template>
     </v-data-table-server>
@@ -67,6 +67,7 @@ import type { PersonIndex } from '@/models/PersonModel';
 import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -157,7 +158,9 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedPersons, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
+        return {selectedPersons, headers, notifications,
+            refreshTable, userRole, deleteSelection,
+            tableOptions, displayTextOrPlaceholder};
     }
 });
 </script>

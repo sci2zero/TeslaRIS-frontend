@@ -41,16 +41,16 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ row.item.authorNames }}
+                    {{ displayTextOrPlaceholder(row.item.authorNames) }}
                 </td>
                 <td>
-                    {{ row.item.year !== -1 ? row.item.year : "" }}
+                    {{ row.item.year !== -1 ? row.item.year : "-" }}
                 </td>
                 <td>
-                    {{ row.item.type }}
+                    {{ getPublicationTypeTitleFromValueAutoLocale(row.item.type) }}
                 </td>
                 <td>
-                    {{ row.item.doi }}
+                    {{ displayTextOrPlaceholder(row.item.doi) }}
                 </td>
             </tr>
         </template>
@@ -76,6 +76,8 @@ import UserService from '@/services/UserService';
 import type {DocumentPublicationIndex} from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 
 
 export default defineComponent({
@@ -196,7 +198,10 @@ export default defineComponent({
             return "";
         }
 
-        return {selectedPublications, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions, getResultType};
+        return {selectedPublications, headers, notifications,
+            refreshTable, userRole, deleteSelection,
+            tableOptions, getResultType, displayTextOrPlaceholder,
+            getPublicationTypeTitleFromValueAutoLocale};
     }
 });
 </script>

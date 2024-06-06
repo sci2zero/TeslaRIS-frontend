@@ -41,22 +41,22 @@
                     </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.superOUNameSr }}
+                    {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.superOUNameOther }}
+                    {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.keywordsSr }}
+                    {{ displayTextOrPlaceholder(row.item.keywordsSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.keywordsOther }}
+                    {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.researchAreasSr }}
+                    {{ displayTextOrPlaceholder(row.item.researchAreasSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.researchAreasOther }}
+                    {{ displayTextOrPlaceholder(row.item.researchAreasOther) }}
                 </td>
             </tr>
         </template>
@@ -82,6 +82,7 @@ import UserService from '@/services/UserService';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
@@ -185,7 +186,9 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedOUs, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
+        return {selectedOUs, headers, notifications,
+            refreshTable, userRole, deleteSelection,
+            tableOptions, displayTextOrPlaceholder};
     }
 });
 </script>
