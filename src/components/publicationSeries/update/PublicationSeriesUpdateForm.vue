@@ -87,9 +87,6 @@ export default defineComponent({
             });
         });
 
-        const titleRef = ref<typeof MultilingualTextInput>();
-        const abbreviationsRef = ref<typeof MultilingualTextInput>();
-
         const title = ref([]);
         const nameAbbreviations = ref([]);
         const eIssn = ref(props.presetPublicationSeries?.eissn);
@@ -112,7 +109,6 @@ export default defineComponent({
 
         return {
             isFormValid,
-            titleRef, abbreviationsRef,
             title, nameAbbreviations,
             eIssn, printIssn,
             requiredFieldRules,

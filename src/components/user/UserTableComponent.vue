@@ -13,10 +13,10 @@
                 <td>{{ row.item.fullName }}</td>
                 <td>{{ row.item.email }}</td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.organisationUnitNameSr }}
+                    {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.organisationUnitNameOther }}
+                    {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
                 </td>
                 <td>{{ row.item.userRole }}</td>
                 <td>
@@ -54,6 +54,7 @@ import type { UserAccountIndex } from '@/models/UserModel';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 export default defineComponent({
     name: "UserTableComponent",
@@ -154,7 +155,9 @@ export default defineComponent({
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable, tableOptions, changeActivationStatus, takeRoleOfUser, displayFormNotification};
+        return {headers, snackbar, snackbarText, timeout, refreshTable,
+            tableOptions, changeActivationStatus, takeRoleOfUser,
+            displayFormNotification, displayTextOrPlaceholder};
     }
 });
 </script>

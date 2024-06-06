@@ -74,7 +74,6 @@ export default defineComponent({
             });
         });
 
-        const nameRef = ref<typeof MultilingualTextInput>();
         const mapRef = ref<typeof OpenLayersMap>();
 
         const name = ref([]);
@@ -98,8 +97,7 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, name,
-            nameRef, mapRef,
+            isFormValid, name, mapRef,
             nameAbbreviation,
             email, phoneNumber,
             requiredFieldRules, updateOU,

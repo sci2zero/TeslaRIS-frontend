@@ -40,7 +40,12 @@
                 <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
             </v-col>
         </v-row>
-
+        <v-row>
+            <v-col cols="10">
+                <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
+            </v-col>
+        </v-row>
+        
         <v-row>
             <p style="margin-left: 20px;">
                 {{ $t("requiredFieldsMessage") }}
@@ -64,10 +69,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
+import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
+
 
 export default defineComponent({
     name: "PatentUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, EventAutocompleteSearch},
     props: {
         presetPatent: {
             type: Object as PropType<Patent | undefined>,
@@ -95,14 +102,9 @@ export default defineComponent({
             });
         });
 
-        const titleRef = ref<typeof MultilingualTextInput>();
-        const subtitleRef = ref<typeof MultilingualTextInput>();
-        const descriptionRef = ref<typeof MultilingualTextInput>();
-        const urisRef = ref<typeof UriInput>();
-        const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
-
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -127,6 +129,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -136,15 +139,17 @@ export default defineComponent({
 
         return {
             isFormValid,
-            title, titleRef,
-            subtitle, subtitleRef,
-            publicationYear, doi, scopus,
-            publisherAutocompleteRef,
-            selectedPublisher, patentNumber,
-            descriptionRef, uris, 
-            urisRef, requiredFieldRules,
-            updatePatent, toMultilingualTextInput,
-            languageTags
+            title,
+            subtitle,
+            publicationYear, 
+            doi, scopus,
+            selectedPublisher, 
+            patentNumber, uris, 
+            requiredFieldRules,
+            updatePatent,
+            toMultilingualTextInput,
+            languageTags,
+            selectedEvent
         };
     }
 });

@@ -24,13 +24,23 @@ export interface DocumentPublicationIndex {
     advisorIds: number[];
     advisorNames: string;
     year: number | null;
-    type: string;
+    type: PublicationType;
     publicationSeriesId: number | null;
     eventId: number | null;
     publisherId: number | null;
     journalId: number | null;
     databaseId: number | null;
     doi: string;
+}
+
+export enum PublicationType {
+    JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
+    PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION",
+    PATENT = "PATENT",
+    PROCEEDINGS = "PROCEEDINGS",
+    DATASET = "DATASET",
+    SOFTWARE = "SOFTWARE",
+    MONOGRAPH = "MONOGRAPH"
 }
   
 export enum JournalPublicationType {

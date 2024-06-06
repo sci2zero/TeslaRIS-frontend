@@ -169,15 +169,6 @@ export default defineComponent({
             }
         });
 
-        const titleRef = ref<typeof MultilingualTextInput>();
-        const subtitleRef = ref<typeof MultilingualTextInput>();
-        const urisRef = ref<typeof MultilingualTextInput>();
-
-        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
-        const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
-        const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
-        const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
-
         const searchPlaceholder = {title: "", value: -1};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -245,14 +236,11 @@ export default defineComponent({
 
         return {
             isFormValid,
-            title, titleRef, subtitle, subtitleRef,
-            eventAutocompleteRef, selectedEvent,
-            journalAutocompleteRef, selectedJournal, uris, urisRef,
+            title, subtitle, selectedEvent, selectedJournal, uris,
             eIsbn, printIsbn, languageList, selectedLanguages,
             languageTags, publicationYear, doi, scopus, numberOfPages,
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
-            publisherAutocompleteRef, selectedPublisher,
-            bookSeriesAutocompleteRef, selectedBookSeries,
+            selectedPublisher, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, updateProceedings
         };

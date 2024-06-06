@@ -136,11 +136,6 @@ export default defineComponent({
             });
         });
 
-        const titleRef = ref<typeof MultilingualTextInput>();
-        const subtitleRef = ref<typeof MultilingualTextInput>();
-        const descriptionRef = ref<typeof MultilingualTextInput>();
-        const urisRef = ref<typeof UriInput>();
-
         const searchPlaceholderJournal = {title: returnCurrentLocaleContent(journal.value?.title) as string, value: journal.value?.id as number};
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholderJournal);
 
@@ -194,12 +189,11 @@ export default defineComponent({
 
         return {
             isFormValid,
-            title, titleRef,
-            subtitle, subtitleRef,
+            title, subtitle,
             publicationYear, doi, scopus,
             selectedJournal, articleNumber,
-            descriptionRef, uris, numberOfPages,
-            urisRef, requiredFieldRules, selectedEvent,
+            uris, numberOfPages,
+            requiredFieldRules, selectedEvent,
             updateJournalPublication, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType

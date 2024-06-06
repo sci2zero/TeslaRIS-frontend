@@ -41,13 +41,13 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ row.item.dateFromTo }}
+                    {{ displayTextOrPlaceholder(row.item.dateFromTo) }}
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ row.item.stateSr }}
+                    {{ displayTextOrPlaceholder(row.item.stateSr) }}
                 </td>
                 <td v-else>
-                    {{ row.item.stateOther }}
+                    {{ displayTextOrPlaceholder(row.item.stateOther) }}
                 </td>
             </tr>
         </template>
@@ -73,6 +73,7 @@ import UserService from '@/services/UserService';
 import {EventType, type EventIndex} from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -88,7 +89,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
+    setup(_, {emit}) {
         const selectedEvents = ref([]);
 
         const i18n = useI18n();
@@ -181,7 +182,9 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedEvents, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
+        return {selectedEvents, headers, notifications,
+            refreshTable, userRole, deleteSelection,
+            tableOptions, displayTextOrPlaceholder};
     }
 });
 </script>

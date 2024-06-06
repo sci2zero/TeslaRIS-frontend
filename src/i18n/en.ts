@@ -248,5 +248,6 @@ export default {
     addMonographLabel: "Add Monograph",
     numberLabel: "Number",
     monographLabel: "Monograph",
-    updateMonographLabel: "Update Monograph"
+    updateMonographLabel: "Update Monograph",
+    unknownBirthdateMessage: "Unknown birthdate"
 }

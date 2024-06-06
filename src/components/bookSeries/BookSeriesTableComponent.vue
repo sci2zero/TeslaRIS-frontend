@@ -41,10 +41,10 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ row.item.eISSN }}
+                    {{ displayTextOrPlaceholder(row.item.eISSN) }}
                 </td>
                 <td>
-                    {{ row.item.printISSN }}
+                    {{ displayTextOrPlaceholder(row.item.printISSN) }}
                 </td>
             </tr>
         </template>
@@ -70,6 +70,7 @@ import UserService from '@/services/UserService';
 import type {BookSeriesIndex} from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -163,7 +164,9 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         }
 
-        return {selectedBookSeries, headers, notifications, refreshTable, userRole, deleteSelection, tableOptions};
+        return {selectedBookSeries, headers, notifications, 
+            refreshTable, userRole, deleteSelection,
+            tableOptions, displayTextOrPlaceholder};
     }
 });
 </script>
