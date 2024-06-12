@@ -157,7 +157,8 @@ export default defineComponent(
             const eventListLabel = computed(() => i18n.t("eventListLabel"));
             const journalListLabel = computed(() => i18n.t("journalListLabel"));
             const bookSeriesListLabel = computed(() => i18n.t("bookSeriesListLabel"));
-            const publisherListLabelIzdavači = computed(() => i18n.t("publisherListLabel"));
+            const publisherListLabel = computed(() => i18n.t("publisherListLabel"));
+            const importerLabel = computed(() => i18n.t("importerLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -222,13 +223,14 @@ export default defineComponent(
                 { title: eventListLabel, type:'icon-link', pathName: 'events' },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals' },
                 { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
-                { title: publisherListLabelIzdavači, type:'icon-link', pathName: 'publishers' }
+                { title: publisherListLabel, type:'icon-link', pathName: 'publishers' }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
                 { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
+                { title: importerLabel, type: 'icon-link', pathName: 'importer' },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
 
             ]);
