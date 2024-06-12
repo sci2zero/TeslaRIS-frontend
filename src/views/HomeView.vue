@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- <h1>{{ $t('homeLabel') }}</h1> -->
         <v-container>
             <v-row class="mt-10 mb-10">
                 <v-col cols="12" class="text-center">
@@ -58,10 +57,10 @@ import { onMounted } from "vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 
+
 export default defineComponent({
     name: "HomeView",
     components: { SearchBarComponent },
-
     setup() {
 
         const router = useRouter();

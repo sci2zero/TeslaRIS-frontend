@@ -249,5 +249,13 @@ export default {
     numberLabel: "Number",
     monographLabel: "Monograph",
     updateMonographLabel: "Update Monograph",
-    unknownBirthdateMessage: "Unknown birthdate"
+    unknownBirthdateMessage: "Unknown birthdate",
+    importerLabel: "Data import",
+    scanSourcesLabel: "Scan data sources",
+    harvestDataLabel: "Harvest data from external sources",
+    documentsReadyForImportLabel: "Documents ready to be imported",
+    newlyImportedDocumentsCountLabel: "Number of newly found documents",
+    noNewDocumentsMessage: "No new imports found.",
+    startDateLabel: "Start date",
+    endDateLabel: "End date"
 }

@@ -249,5 +249,13 @@ export default {
     numberLabel: "Broj",
     monographLabel: "Monografija",
     updateMonographLabel: "Ažuriraj monografiju",
-    unknownBirthdateMessage: "Nepoznat datum rođenja"
+    unknownBirthdateMessage: "Nepoznat datum rođenja",
+    importerLabel: "Uvoz podataka",
+    scanSourcesLabel: "Skeniraj izvore",
+    harvestDataLabel: "Uvezite podatke sa eksternih izvora",
+    documentsReadyForImportLabel: "Ukupno dokumenata za uvoz",
+    newlyImportedDocumentsCountLabel: "Broj novih pronađenih dokumenata",
+    noNewDocumentsMessage: "Nisu pronađeni novi dokumenti.",
+    startDateLabel: "Početni datum",
+    endDateLabel: "Krajnji datum"
 }
