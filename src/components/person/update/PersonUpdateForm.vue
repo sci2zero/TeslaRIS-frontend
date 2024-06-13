@@ -20,7 +20,11 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="birthdate" type="date" :label="$t('birthdateLabel')"></v-text-field>
+                        <date-picker
+                            v-model="birthdate"
+                            :label="$t('birthdateLabel')"
+                            color="primary"
+                        ></date-picker>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -99,11 +103,12 @@ import type { PersonalInfo, PersonResponse, Sex } from '@/models/PersonModel';
 import { getSexForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/sex';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import CountryService from '@/services/CountryService';
+import DatePicker from '@/components/core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "PersonUpdateForm",
-    components: { MultilingualTextInput },
+    components: { MultilingualTextInput, DatePicker },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
@@ -150,12 +155,12 @@ export default defineComponent({
         const streetAndNumber = ref([]);
 
         const sexes = getSexForGivenLocale();
-        const selectedSex = ref({title: getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string, value: props.presetPerson?.personalInfo.sex as Sex});
+        const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
 
         const updatePerson = () => {
             const updatedPerson: PersonalInfo = {
                 contact: {phoneNumber: phoneNumber.value as string, contactEmail: email.value},
-                localBirthDate: birthdate.value as string,
+                localBirthDate: birthdate.value ? birthdate.value : "",
                 sex: selectedSex.value.value as Sex,
                 apvnt: apvnt.value,
                 mnid: mnid.value,

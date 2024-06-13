@@ -257,5 +257,6 @@ export default {
     newlyImportedDocumentsCountLabel: "Broj novih pronađenih dokumenata",
     noNewDocumentsMessage: "Nisu pronađeni novi dokumenti.",
     startDateLabel: "Početni datum",
-    endDateLabel: "Krajnji datum"
+    endDateLabel: "Krajnji datum",
+    loadNewDocumentsLabel: "Uvezi dokumente"
 }
