@@ -1,51 +1,62 @@
 <template>
     <v-container>
-        <h1 class="d-flex flex-row justify-center">
-            {{ $t("harvestDataLabel") }}
-        </h1>
-        <br />
-        <v-row class="d-flex flex-row justify-center">
-            <v-col cols="4">
-                <date-picker
-                    v-model="startDate"
-                    :label="$t('startDateLabel')"
-                    color="primary"
-                ></date-picker>
-            </v-col>
-            <v-col cols="4">
-                <date-picker
-                    v-model="endDate"
-                    :label="$t('endDateLabel')"
-                    color="primary"
-                ></date-picker>
-            </v-col>
-        </v-row>
-        <v-row class="d-flex flex-row justify-center">
-            <v-col cols="auto">
-                <v-btn @click="startHarvest">
-                    {{ $t("scanSourcesLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-        <v-container class="d-flex flex-row justify-center">
-            <h2>{{ $t("documentsReadyForImportLabel") }}: {{ numberOfHarvestedDocuments }}</h2>
-        </v-container>
-        <v-row v-if="loading" class="d-flex flex-row justify-center" style="margin-top: 50px;">
-            <v-progress-circular
-                :size="70"
-                :width="7"
-                color="blue"
-                indeterminate
-            ></v-progress-circular>
-        </v-row>
-        <v-container v-if="harvestComplete" class="d-flex flex-row justify-center">
-            <h2 v-if="newDocumentsHarvested > 0">
-                {{ $t("newlyImportedDocumentsCountLabel") }}: {{ newDocumentsHarvested }}
-            </h2>
-            <h2 v-else>
-                {{ $t("noNewDocumentsMessage") }}
-            </h2>
-        </v-container>
+        <v-form v-model="isFormValid" @submit.prevent>
+            <h1 class="d-flex flex-row justify-center">
+                {{ $t("harvestDataLabel") }}
+            </h1>
+            <br />
+            <v-row class="d-flex flex-row justify-center">
+                <v-col cols="4">
+                    <date-picker
+                        v-model="startDate"
+                        :label="$t('startDateLabel')"
+                        color="primary"
+                        required
+                    ></date-picker>
+                </v-col>
+                <v-col cols="4">
+                    <date-picker
+                        v-model="endDate"
+                        :label="$t('endDateLabel')"
+                        color="primary"
+                        required
+                    ></date-picker>
+                </v-col>
+            </v-row>
+            <v-row class="d-flex flex-row justify-center">
+                <v-col cols="auto">
+                    <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
+                        {{ $t("scanSourcesLabel") }}
+                    </v-btn>
+                </v-col>
+            </v-row>
+            <v-container class="d-flex flex-row justify-center">
+                <h2>{{ $t("documentsReadyForImportLabel") }}: {{ numberOfHarvestedDocuments }}</h2>
+            </v-container>
+            <v-row v-if="loading" class="d-flex flex-row justify-center" style="margin-top: 20px; margin-bottom: 20px;">
+                <v-progress-circular
+                    :size="70"
+                    :width="7"
+                    color="blue"
+                    indeterminate
+                ></v-progress-circular>
+            </v-row>
+            <v-container v-if="harvestComplete" class="d-flex flex-row justify-center">
+                <h2 v-if="newDocumentsHarvested > 0">
+                    {{ $t("newlyImportedDocumentsCountLabel") }}: {{ newDocumentsHarvested }}
+                </h2>
+                <h2 v-else>
+                    {{ $t("noNewDocumentsMessage") }}
+                </h2>
+            </v-container>
+            <v-row class="d-flex flex-row justify-center">
+                <v-col cols="auto">
+                    <v-btn color="primary" :disabled="loading">
+                        {{ $t("loadNewDocumentsLabel") }}
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-form>
     </v-container>
 </template>
 
@@ -60,6 +71,8 @@ export default defineComponent({
     name: "HarvesterView",
     components: {DatePicker},
     setup() {
+        const isFormValid = ref(false);
+
         const startDate = ref();
         const endDate = ref();
         const loading = ref(false);
@@ -82,6 +95,7 @@ export default defineComponent({
 
         const startHarvest = () => {
             loading.value = true;
+            harvestComplete.value = false;
             ImportService.startHarvest(startDate.value, endDate.value).then(response => {
                 loading.value = false;
                 harvestComplete.value = true;
@@ -95,7 +109,8 @@ export default defineComponent({
             loading, startHarvest,
             numberOfHarvestedDocuments,
             newDocumentsHarvested,
-            harvestComplete
+            harvestComplete,
+            isFormValid
         };
     },
 });

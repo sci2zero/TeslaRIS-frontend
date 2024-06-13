@@ -4,6 +4,7 @@
             <v-text-field
                 :label="label"
                 :model-value="formattedDate"
+                :rules="required ? requiredFieldRules : []"
                 readonly
                 v-bind="props"
                 variant="solo"
@@ -17,6 +18,8 @@
 </template>
 
 <script lang="ts">
+import { useValidationUtils } from "@/utils/ValidationUtils";
+import type { PropType } from "vue";
 import { ref, computed, watch, defineComponent } from "vue";
 
 export default defineComponent({
@@ -30,32 +33,41 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    required: {
+      type: Boolean,
+      default: false
+    },
     modelValue: {
-      type: Date,
+      type: Object as PropType<string | undefined>,
       required: true,
     },
   },
   emits: ["update:modelValue"],
   setup(props, { emit }) {
     const isMenuOpen = ref(false);
-    const selectedDate = ref(props.modelValue);
+    const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
+
+    const { requiredFieldRules } = useValidationUtils();
 
     const formattedDate = computed(() => {
-      return selectedDate.value ? selectedDate.value.toLocaleDateString("en") : "";
+      return selectedDate.value ? new Date(selectedDate.value).toLocaleDateString("en") : "";
     });
 
     watch(() => props.modelValue, (newDate) => {
-      selectedDate.value = newDate;
+      if(newDate) {
+        selectedDate.value = new Date(newDate);
+      }
     });
 
     watch(selectedDate, (newDate) => {
-      emit("update:modelValue", newDate);
+      emit("update:modelValue", newDate?.toISOString().split("T")[0]);
     });
 
     return {
       isMenuOpen,
       selectedDate,
       formattedDate,
+      requiredFieldRules
     };
   },
 });

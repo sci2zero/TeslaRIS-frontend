@@ -257,5 +257,6 @@ export default {
     newlyImportedDocumentsCountLabel: "Number of newly found documents",
     noNewDocumentsMessage: "No new imports found.",
     startDateLabel: "Start date",
-    endDateLabel: "End date"
+    endDateLabel: "End date",
+    loadNewDocumentsLabel: "Load documents"
 }

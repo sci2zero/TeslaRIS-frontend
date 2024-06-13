@@ -103,7 +103,7 @@ export default defineComponent({
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
-        const countryList = getCountriesForGivenLocale(i18n.locale.value);
+        const countryList = getCountriesForGivenLocale();
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {

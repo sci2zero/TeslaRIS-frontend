@@ -56,7 +56,11 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field v-model="birthdate" type="date" :label="$t('birthdateLabel')"></v-text-field>
+                            <date-picker
+                                v-model="birthdate"
+                                :label="$t('birthdateLabel')"
+                                color="primary"
+                            ></date-picker>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -119,11 +123,12 @@ import OrganisationUnitAutocompleteSearch from "../organisationUnit/Organisation
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getSexForGivenLocale } from '@/i18n/sex';
 import { getEmploymentPositionsForGivenLocale } from '@/i18n/employmentPosition';
+import DatePicker from '../core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -157,7 +162,7 @@ export default defineComponent({
 
         const email = ref("");
         const phoneNumber = ref("");
-        const birthdate = ref(null);
+        const birthdate = ref("");
         const orcid = ref("");
         const mnid = ref("");
         const apvnt = ref("");
@@ -198,7 +203,7 @@ export default defineComponent({
                     firstName.value = "";
                     middleName.value = "";
                     lastName.value = "";
-                    birthdate.value = null;
+                    birthdate.value = "";
                     email.value = "";
                     phoneNumber.value = "";
                     apvnt.value = "";

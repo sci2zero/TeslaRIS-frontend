@@ -15,10 +15,20 @@
                 <h3>{{ $t("tookPlaceLabel") }}</h3>
                 <v-row>
                     <v-col v-if="timePeriodInput" cols="3">
-                        <v-text-field v-model="dateFrom" type="date" :label="$t('fromLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                        <date-picker
+                            v-model="dateFrom"
+                            :label="$t('fromLabel') + '*'"
+                            color="primary"
+                            required
+                        ></date-picker>
                     </v-col>
                     <v-col v-if="timePeriodInput" cols="3">
-                        <v-text-field v-model="dateTo" type="date" :label="$t('toLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                        <date-picker
+                            v-model="dateTo"
+                            :label="$t('toLabel') + '*'"
+                            color="primary"
+                            required
+                        ></date-picker>
                     </v-col>
                     <v-col v-if="!timePeriodInput" cols="6">
                         <v-text-field
@@ -112,10 +122,12 @@ import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import DatePicker from '../core/DatePicker.vue';
+
 
 export default defineComponent({
     name: "ConferenceSubmissionForm",
-    components: {MultilingualTextInput},
+    components: {MultilingualTextInput, DatePicker},
     props: {
         inModal: {
             type: Boolean,
