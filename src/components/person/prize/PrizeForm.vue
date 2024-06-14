@@ -14,7 +14,12 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="dateOfAcquisition" type="date" :label="$t('dateOfAcquisitionLabel')"></v-text-field>
+                        <date-picker
+                            v-model="dateOfAcquisition"
+                            :label="$t('dateOfAcquisitionLabel')"
+                            color="primary"
+                            @click.stop
+                        ></date-picker>
                     </v-col>
                 </v-row>
             </v-col>
@@ -39,11 +44,12 @@ import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { PrizeResponse } from '@/models/PersonModel';
 import type { Prize } from '@/models/PersonModel';
+import DatePicker from '@/components/core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "PrizeForm",
-    components: { MultilingualTextInput },
+    components: { MultilingualTextInput, DatePicker },
     props: {
         edit: {
             type: Boolean,

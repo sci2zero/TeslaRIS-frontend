@@ -39,7 +39,7 @@
                                     {{ $t("birthdateLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.localBirthDate" class="response">
-                                    {{ personalInfo.localBirthDate }}
+                                    {{ localiseDate(personalInfo.localBirthDate) }}
                                 </div>
                                 <div v-if="personalInfo.sex">
                                     {{ $t("sexLabel") }}:
@@ -199,6 +199,7 @@ import InvolvementList from '@/components/person/involvement/InvolvementList.vue
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
 import PrizeList from '@/components/person/prize/PrizeList.vue';
 import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -453,7 +454,7 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateOtherNames, selectPrimaryName,
-            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson,
+            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate
         };
 }})
 

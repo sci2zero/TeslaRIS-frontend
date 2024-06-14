@@ -14,10 +14,18 @@
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="dateFrom" type="date" :label="$t('fromLabel')"></v-text-field>
+                        <date-picker
+                            v-model="dateFrom"
+                            :label="$t('fromLabel')"
+                            color="primary"
+                        ></date-picker>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="dateTo" type="date" :label="$t('toLabel')"></v-text-field>
+                        <date-picker
+                            v-model="dateTo"
+                            :label="$t('toLabel')"
+                            color="primary"
+                        ></date-picker>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -113,11 +121,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { getEmploymentPositionsForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import type { EmploymentPosition } from '@/models/PersonModel';
+import DatePicker from '@/components/core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "PersonInvolvementForm",
-    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch },
+    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker },
     props: {
         edit: {
             type: Boolean,

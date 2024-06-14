@@ -118,6 +118,8 @@ import type { ComputedRef, Ref } from 'vue';
 import type { Component } from 'vue';
 import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
+import PersonService from "@/services/PersonService";
+
 
 interface MenuItem {
   title?: ComputedRef<string> | string | undefined;
@@ -138,11 +140,11 @@ export default defineComponent(
         name: "NavbarHeader",
         components: { LangChangeItem, NotificationItem },
         setup() {
-
             const langChangeItem = shallowRef(LangChangeItem);
             const notificationItem = shallowRef(NotificationItem);
 
             const i18n = useI18n();
+            const personId = ref(-1);
 
             const homeLabel = computed(() => i18n.t("homeLabel"));
             
@@ -159,6 +161,7 @@ export default defineComponent(
             const bookSeriesListLabel = computed(() => i18n.t("bookSeriesListLabel"));
             const publisherListLabel = computed(() => i18n.t("publisherListLabel"));
             const importerLabel = computed(() => i18n.t("importerLabel"));
+            const researcherProfileLabel = computed(() => i18n.t("researcherProfileLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -187,6 +190,12 @@ export default defineComponent(
                 UserService.getLoggedInUser().then((response) => {
                     userName.value = response.data.firstname + " " + response.data.lastName;
                     userRole.value = UserService.provideUserRole();
+                });
+                PersonService.getPersonId().then(response => {
+                    console.log("AAAAAAAAAAAAA", response.data)
+                    if(response.data) {
+                        personId.value = response.data;
+                    }
                 });
             };
 
@@ -230,9 +239,9 @@ export default defineComponent(
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
                 { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
-                { title: importerLabel, type: 'icon-link', pathName: 'importer' },
+                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER') },
+                { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER' && personId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
-
             ]);
 
             const menuItems = ref<MenuItem[]>([

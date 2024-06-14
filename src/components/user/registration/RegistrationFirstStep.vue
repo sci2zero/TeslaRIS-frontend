@@ -52,11 +52,12 @@ import lodash from "lodash";
 import PersonService from "@/services/PersonService";
 import { useRouter } from "vue-router";
 import { useRegisterStore } from '@/stores/registerStore';
+import { watch } from "vue";
 
 
 export default defineComponent({
     name: "RegistrationFirstStep",
-    emits: ["registration-next-step"],
+    emits: ["registration-next-step", "field-update"],
     setup(_, { emit }) {
         const i18n = useI18n();
         const router = useRouter();
@@ -88,6 +89,10 @@ export default defineComponent({
             updatedData();
         }
 
+        watch([firstName, lastName], () => {
+            emit("field-update", firstName.value, lastName.value)
+        });
+
         const updatedData = () => {
             const token: string = firstName.value + " " + lastName.value;
             searchResearchers(token)
@@ -98,16 +103,6 @@ export default defineComponent({
                 const params = `tokens=${token}&page=0&size=7`
                 PersonService.searchResearchers(params).then((response) => {
                     suggestions.value = response.data.content;
-                    // const listOfOUs: { title: string, value: number }[] = [];
-                    // response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
-                    //     if (i18n.locale.value === "sr") {
-                    //         listOfOUs.push({title: organisationUnit.nameSr, value: organisationUnit.databaseId});
-                    //     } else {
-                    //         listOfOUs.push({title: organisationUnit.nameOther, value: organisationUnit.databaseId});
-                    //     }
-                    // })
-                    // organisationUnits.value = listOfOUs;
-                // });
                 })
         }, 300);
 
@@ -132,7 +127,9 @@ export default defineComponent({
         }
         
 
-        return {firstNameRules, lastNameRules, firstName, lastName, updatedFirstName, updatedLastName, suggestions, isEmptyData, newFirstNameTitle, registrationNextStep, personClick}
+        return {firstNameRules, lastNameRules, firstName, lastName,
+            updatedFirstName, updatedLastName, suggestions, isEmptyData,
+            newFirstNameTitle, registrationNextStep, personClick}
     }
 })
 </script>
