@@ -14,6 +14,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, "person/count");
   }
 
+  async getPersonId(): Promise<AxiosResponse<number>> {
+    return super.sendRequest(axios.get, "person/for-user");
+  }
+
   async searchResearchers(tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
     return super.sendRequest(axios.get, `person/simple-search?${tokens}`);
   }

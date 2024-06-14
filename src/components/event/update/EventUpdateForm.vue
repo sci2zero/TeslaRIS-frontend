@@ -17,10 +17,18 @@
                 <h3>{{ $t("tookPlaceLabel") }}</h3>
                 <v-row>
                     <v-col v-if="timePeriodInput" cols="3">
-                        <v-text-field v-model="dateFrom" type="date" :label="$t('fromLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                        <date-picker
+                            v-model="dateFrom"
+                            :label="$t('fromLabel') + '*'"
+                            color="primary"
+                        ></date-picker>
                     </v-col>
                     <v-col v-if="timePeriodInput" cols="3">
-                        <v-text-field v-model="dateTo" type="date" :label="$t('toLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                        <date-picker
+                            v-model="dateTo"
+                            :label="$t('toLabel') + '*'"
+                            color="primary"
+                        ></date-picker>
                     </v-col>
                     <v-col v-if="!timePeriodInput" cols="6">
                         <v-text-field
@@ -84,11 +92,12 @@ import type { Conference } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import { getCountriesForGivenLocale, countriesSr, countriesEn } from '@/i18n/countries';
+import DatePicker from '@/components/core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "EventUpdateForm",
-    components: {MultilingualTextInput},
+    components: {MultilingualTextInput, DatePicker},
     props: {
         presetEvent: {
             type: Object as PropType<Conference | undefined>,

@@ -6,16 +6,29 @@
             </h2>
 
             <v-stepper
-                v-model="stepperValue" :items="['Step 1', 'Step 2']">
+                v-model="stepperValue" :items="['Step 1', 'Step 2']"
+                :next-text="$t('nextLabel')"
+                :prev-text="$t('previousLabel')">
                 <template #[`item.1`]>
                     <div class="reg-step">
-                        <registration-first-step @registration-next-step="nextStep"></registration-first-step>
+                        <registration-first-step @registration-next-step="nextStep" @field-update="checkForNextStep"></registration-first-step>
                     </div>
                 </template>
 
                 <template #[`item.2`]>
                     <div class="reg-step">
                         <registration-second-step :firstname="userDetails.firstName" :lastname="userDetails.lastName"></registration-second-step>
+                    </div>
+                </template>
+
+                <template #actions>
+                    <div class="d-flex flex-row justify-between">
+                        <v-btn :disabled="stepperValue === 1" @click="previousStep">
+                            {{ $t('previousLabel') }}
+                        </v-btn>
+                        <v-btn :disabled="stepperValue === 2 || !canAdvance" @click="nextStep">
+                            {{ $t('nextLabel') }}
+                        </v-btn>
                     </div>
                 </template>
             </v-stepper>
@@ -35,20 +48,36 @@ export default defineComponent({
 
     setup() {
         const stepperValue = ref(1);
+        const canAdvance = ref(false);
 
-        const userDetails = {
+        const userDetails = ref({
             firstName: "",
             lastName: ""
-        }
+        });
 
         const nextStep = (data: {firstName: string, lastName: string}) => {
-            if (data.firstName) userDetails.firstName = data.firstName
-            if (data.lastName) userDetails.lastName = data.lastName
+            if (data.firstName) userDetails.value.firstName = data.firstName
+            if (data.lastName) userDetails.value.lastName = data.lastName
             stepperValue.value = 2;
         };
 
+        const previousStep = () => {
+            stepperValue.value -= 1;
+        };
 
-        return {stepperValue, nextStep, userDetails}
+        const checkForNextStep = (firstname: string, lastname: string) => {
+            if(firstname !== "" && lastname !== "") {
+                canAdvance.value = true;
+                userDetails.value.firstName = firstname;
+                userDetails.value.lastName = lastname;
+            } else {
+                canAdvance.value = false;
+            }
+        };
+
+        return {stepperValue, nextStep,
+            userDetails, previousStep,
+            checkForNextStep, canAdvance}
     }
 });
 </script>

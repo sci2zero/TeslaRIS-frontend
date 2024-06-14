@@ -258,5 +258,8 @@ export default {
     noNewDocumentsMessage: "Nisu pronađeni novi dokumenti.",
     startDateLabel: "Početni datum",
     endDateLabel: "Krajnji datum",
-    loadNewDocumentsLabel: "Uvezi dokumente"
+    loadNewDocumentsLabel: "Uvezi dokumente",
+    harvestFailedMessage: "Server trenutno ne može skenirati izvore. Kontaktirajte sistem administratora.",
+    nextLabel: "Sledeće",
+    previousLabel: "Prethodno"
 }

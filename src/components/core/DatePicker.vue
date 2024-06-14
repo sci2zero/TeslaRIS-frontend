@@ -13,6 +13,14 @@
         </template>
         <v-date-picker v-model="selectedDate" hide-actions title="" :color="color">
             <template #header></template>
+            <template #actions>
+                <v-btn @click="clearDate">
+                    {{ $t("deleteLabel") }}
+                </v-btn>
+                <v-btn @click="isMenuOpen = false">
+                    {{ $t("saveLabel") }}
+                </v-btn>
+            </template>
         </v-date-picker>
     </v-menu>
 </template>
@@ -23,7 +31,7 @@ import type { PropType } from "vue";
 import { ref, computed, watch, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "DatePickerComponent",
+  name: "DatePicker",
   props: {
     label: {
       type: String,
@@ -49,9 +57,27 @@ export default defineComponent({
 
     const { requiredFieldRules } = useValidationUtils();
 
+    const toIsoString = (date: Date) => {
+      const pad = function(num : number) {
+              return (num < 10 ? '0' : '') + num;
+        };
+
+        return date.getFullYear() +
+            '-' + pad(date.getMonth() + 1) +
+            '-' + pad(date.getDate()) +
+            'T' + pad(date.getHours()) +
+            ':' + pad(date.getMinutes()) +
+            ':' + pad(date.getSeconds());
+    };
+
+
     const formattedDate = computed(() => {
-      return selectedDate.value ? new Date(selectedDate.value).toLocaleDateString("en") : "";
+      return selectedDate.value ? new Date(selectedDate.value).toLocaleDateString("sr") : "";
     });
+
+    const clearDate = () => {
+      selectedDate.value = undefined;
+    };
 
     watch(() => props.modelValue, (newDate) => {
       if(newDate) {
@@ -60,14 +86,19 @@ export default defineComponent({
     });
 
     watch(selectedDate, (newDate) => {
-      emit("update:modelValue", newDate?.toISOString().split("T")[0]);
+      if (newDate) {
+        emit("update:modelValue", toIsoString(newDate));
+      } else {
+        emit("update:modelValue", "");
+      }
     });
 
     return {
       isMenuOpen,
       selectedDate,
       formattedDate,
-      requiredFieldRules
+      requiredFieldRules,
+      clearDate
     };
   },
 });

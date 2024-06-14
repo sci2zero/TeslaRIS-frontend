@@ -28,10 +28,20 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="input.dateFrom" type="date" :label="$t('fromLabel')" @update:model-value="sendContentToParent"></v-text-field>
+                <date-picker
+                    v-model="input.dateFrom"
+                    :label="$t('fromLabel')"
+                    color="primary"
+                    @update:model-value="sendContentToParent"
+                ></date-picker>
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="input.dateTo" type="date" :label="$t('toLabel')" @update:model-value="sendContentToParent"></v-text-field>
+                <date-picker
+                    v-model="input.dateTo"
+                    :label="$t('toLabel')"
+                    color="primary"
+                    @update:model-value="sendContentToParent"
+                ></date-picker>
             </v-col>
         </v-row>
     </v-container>
@@ -46,10 +56,12 @@ import type { PropType } from "vue";
 import { onMounted } from "vue";
 import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/publicationSeriesContributionType";
 import { PublicationSeriesContributionType, type PersonPublicationSeriesContribution } from "@/models/PublicationSeriesModel";
+import DatePicker from "../core/DatePicker.vue";
+
 
 export default defineComponent({
     name: "PersonPublicationSeriesContributionForm",
-    components: {PersonContributionBase},
+    components: {PersonContributionBase, DatePicker},
     props: {
         presetContributions: {
             type: Array as PropType<PersonPublicationSeriesContribution[]>,

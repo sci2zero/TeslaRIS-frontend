@@ -258,5 +258,8 @@ export default {
     noNewDocumentsMessage: "No new imports found.",
     startDateLabel: "Start date",
     endDateLabel: "End date",
-    loadNewDocumentsLabel: "Load documents"
+    loadNewDocumentsLabel: "Load documents",
+    harvestFailedMessage: "Server is currently unable to scan sources. Please, contact your administrator.",
+    nextLabel: "Next",
+    previousLabel: "Previous"
 }

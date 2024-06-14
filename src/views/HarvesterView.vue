@@ -57,6 +57,20 @@
                 </v-col>
             </v-row>
         </v-form>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ errorMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -66,12 +80,17 @@ import { defineComponent } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import ImportService from "@/services/ImportService";
 import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
     name: "HarvesterView",
     components: {DatePicker},
     setup() {
         const isFormValid = ref(false);
+        
+        const snackbar = ref(false);
+        const errorMessage = ref("");
+        const i18n = useI18n();
 
         const startDate = ref();
         const endDate = ref();
@@ -101,6 +120,14 @@ export default defineComponent({
                 harvestComplete.value = true;
                 newDocumentsHarvested.value = response.data;
                 numberOfHarvestedDocuments.value += newDocumentsHarvested.value;
+            }).catch((error) => {
+                if(error.response.status === 500) {
+                    errorMessage.value = i18n.t("harvestFailedMessage");
+                } else {
+                    errorMessage.value = i18n.t("genericErrorMessage");
+                }
+                snackbar.value = true;
+                loading.value = false;
             });
         };
 
@@ -110,7 +137,8 @@ export default defineComponent({
             numberOfHarvestedDocuments,
             newDocumentsHarvested,
             harvestComplete,
-            isFormValid
+            isFormValid, snackbar,
+            errorMessage
         };
     },
 });

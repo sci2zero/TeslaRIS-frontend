@@ -33,7 +33,11 @@
                     </v-card>
                 </v-menu>
 
-                <h4><strong>{{ returnCurrentLocaleContent(prize.title) }}</strong></h4>
+                <h4>
+                    <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
+                    <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
+                    <strong>{{ localiseDate(prize.date) }}</strong>
+                </h4>
                 <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
                 
                 <br />
@@ -56,6 +60,7 @@ import AttachmentList from '@/components/core/AttachmentList.vue';
 import PrizeModal from './PrizeModal.vue';
 import { ref } from 'vue';
 import PrizeService from '@/services/PrizeService';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -121,7 +126,8 @@ export default defineComponent({
         };
 
         return { addPrizeProof, updatePrizeProof, deletePrizeProof, menus,
-            returnCurrentLocaleContent, createPrize, updatePrize, deletePrize };
+            returnCurrentLocaleContent, createPrize, updatePrize, deletePrize,
+            localiseDate };
     }
 });
 </script>

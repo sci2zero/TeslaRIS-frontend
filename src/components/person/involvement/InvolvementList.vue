@@ -36,7 +36,7 @@
             <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">{{ (involvement as Employment).employmentPosition }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
             <v-icon icon="mdi-circle-small">
             </v-icon>
-            {{ involvement.dateFrom ? `${involvement.dateFrom} - ${involvement.dateTo ? involvement.dateTo : $t("presentLabel")}` : $t("currentLabel") }}
+            {{ involvement.dateFrom ? `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}
         </h4>
         <p v-if="involvement.involvementType === 'MEMBER_OF'">
             {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
@@ -68,6 +68,7 @@ import InvolvementService from '@/services/InvolvementService';
 import { ref } from 'vue';
 import { watch } from 'vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -151,7 +152,8 @@ export default defineComponent({
 
         return { returnCurrentLocaleContent, addInvolvementProof, menus,
             deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
-            getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement };
+            getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement,
+            localiseDate };
     }
 });
 </script>
