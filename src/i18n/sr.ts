@@ -261,5 +261,15 @@ export default {
     loadNewDocumentsLabel: "Uvezi dokumente",
     harvestFailedMessage: "Server trenutno ne može skenirati izvore. Kontaktirajte sistem administratora.",
     nextLabel: "Sledeće",
-    previousLabel: "Prethodno"
+    previousLabel: "Prethodno",
+    researcherProfileLabel: "Profil istraživača",
+    otherDetailsLabel: "Ostali detalji",
+    currentlyLoadingLabel: "Trenutno se učitava",
+    foundAsLabel: "Pronađen kao {0} u sistemu.",
+    createdNewResearcherLabel: "Kreiran {0} u sistemu.",
+    canNotAutoFindResearcherMessage: "Nije moguće automatski pronaći istraživača u sistemu, molimo vas, selektujte iz liste istraživača:",
+    canCreateNewResearcherLabel: "Ukoliko istraživač nije u listi možete kreirati novog:",
+    viewPublicationsLabel: "Vidi publikacije",
+    selectLabel: "Selektuj",
+    skipDocumentLabel: "Preskoči dokument"
 }

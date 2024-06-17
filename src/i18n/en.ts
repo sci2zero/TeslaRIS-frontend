@@ -261,5 +261,15 @@ export default {
     loadNewDocumentsLabel: "Load documents",
     harvestFailedMessage: "Server is currently unable to scan sources. Please, contact your administrator.",
     nextLabel: "Next",
-    previousLabel: "Previous"
+    previousLabel: "Previous",
+    researcherProfileLabel: "Researcher Profile",
+    otherDetailsLabel: "Other details",
+    currentlyLoadingLabel: "Currently loading",
+    foundAsLabel: "Found as {0} in the system.",
+    createdNewResearcherLabel: "Created {0} in the system.",
+    canNotAutoFindResearcherMessage: "Can't automatically find a researcher in the system, please, select researcher from the list:",
+    canCreateNewResearcherLabel: "If the researcher is not in the list zou can create a new one:",
+    viewPublicationsLabel: "View publications",
+    selectLabel: "Select",
+    skipDocumentLabel: "Skip Document"
 }

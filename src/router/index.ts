@@ -44,6 +44,7 @@ import ProceedingsLandingView from "@/views/landingPages/ProceedingsLandingView.
 import SubmitMonographView from "@/views/SubmitMonographView.vue";
 import MonographLandingView from "@/views/landingPages/MonographLandingView.vue";
 import HarvesterView from "@/views/HarvesterView.vue";
+import LoaderView from "@/views/LoaderView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -463,6 +464,15 @@ const router = createRouter({
                     path: "importer",
                     name: "importer",
                     component: HarvesterView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher],
+                    },
+                },
+                {
+                    path: "loader",
+                    name: "loader",
+                    component: LoaderView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.researcher],
