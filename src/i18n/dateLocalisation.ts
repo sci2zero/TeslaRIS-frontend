@@ -1,4 +1,8 @@
-export const localiseDate = (iso8601DateString: string) => {
+export const localiseDate = (iso8601DateString: string | undefined) => {
+    if(!iso8601DateString) {
+        return "";
+    }
+
     const dateParts = iso8601DateString.split('-');
 
     const year = dateParts[0];

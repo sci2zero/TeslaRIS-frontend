@@ -51,7 +51,10 @@
             </v-container>
             <v-row class="d-flex flex-row justify-center">
                 <v-col cols="auto">
-                    <v-btn color="primary" :disabled="loading">
+                    <v-btn
+                        color="primary" 
+                        :disabled="loading"
+                        :to="'/' + $i18n.locale + '/loader'">
                         {{ $t("loadNewDocumentsLabel") }}
                     </v-btn>
                 </v-col>

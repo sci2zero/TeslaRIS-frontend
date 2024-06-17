@@ -42,6 +42,17 @@
                                     </v-list>
                                 </v-menu>
                             </template>
+                            <template v-else-if="item.type == 'dynamic' && item.condition">
+                                <v-btn
+                                    v-if="item.condition"
+                                    :key="item.title"
+                                    size="small"
+                                    :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName + '/' + item.dynamicValue : undefined" :variant="item.variant" :color="item.color" class="no-uppercase nav-items"
+                                    @click="item.click"
+                                >
+                                    {{ item.title }}
+                                </v-btn>
+                            </template>
                             <template v-else>
                                 <v-btn
                                     v-if="item.condition == undefined || item.condition"

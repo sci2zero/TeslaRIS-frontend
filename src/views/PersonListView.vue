@@ -54,11 +54,11 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
         const addPerson = () => {
             router.push({name: "submitPerson"});
-        }
+        };
 
         return {search, persons, totalPersons, switchPage, addPerson, userRole};
     }

@@ -101,5 +101,4 @@ export default defineComponent({
     #registerStepper .v-stepper-header {
         display: none;
     }
-
 </style>
