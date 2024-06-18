@@ -38,7 +38,7 @@
                                     {{ $t("typeOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="journalPublication?.journalPublicationType" class="response">
-                                    {{ getTitleFromValueAutoLocale(journalPublication.journalPublicationType, $i18n.locale) }}
+                                    {{ getTitleFromValueAutoLocale(journalPublication.journalPublicationType) }}
                                 </div>
                                 <div v-if="journalPublication?.volume">
                                     {{ $t("volumeLabel") }}:
@@ -69,6 +69,14 @@
                                 </div>
                                 <div v-if="journalPublication?.documentDate" class="response">
                                     {{ journalPublication.documentDate }}
+                                </div>
+                                <div v-if="journalPublication?.journalId">
+                                    {{ $t("journalLabel") }}:
+                                </div>
+                                <div v-if="journalPublication?.journalId" class="response">
+                                    <localized-link :to="'journals/' + journalPublication?.journalId">
+                                        {{ returnCurrentLocaleContent(journal?.title) }}
+                                    </localized-link>
                                 </div>
                                 <div v-if="journalPublication?.eventId">
                                     {{ $t("conferenceLabel") }}:
@@ -186,6 +194,8 @@ import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/Attac
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import JournalPublicationUpdateModal from '@/components/publication/update/JournalPublicationUpdateModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
+import type { Journal } from '@/models/JournalModel';
+import JournalService from '@/services/JournalService';
 
 
 export default defineComponent({
@@ -203,6 +213,7 @@ export default defineComponent({
         const journalPublication = ref<JournalPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
         const event = ref<Conference>();
+        const journal = ref<Journal>();
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -234,6 +245,10 @@ export default defineComponent({
                         event.value = eventResponse.data;
                     })
                 }
+
+                JournalService.readJournal(journalPublication.value.journalId).then(response => {
+                    journal.value = response.data;
+                });
     
                 populateData();
             });
@@ -311,7 +326,7 @@ export default defineComponent({
             publications, event,
             totalPublications,
             returnCurrentLocaleContent,
-            languageTagMap,
+            languageTagMap, journal,
             searchKeyword, goToURL, canEdit,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
