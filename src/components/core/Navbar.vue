@@ -203,7 +203,6 @@ export default defineComponent(
                     userRole.value = UserService.provideUserRole();
                 });
                 PersonService.getPersonId().then(response => {
-                    console.log("AAAAAAAAAAAAA", response.data)
                     if(response.data) {
                         personId.value = response.data;
                     }

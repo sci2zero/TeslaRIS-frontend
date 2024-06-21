@@ -234,7 +234,11 @@ export default defineComponent({
                         title = proceedingsResponse.title[0].content;
                     }
 
-                    availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number })
+                    if (proceedingsResponse.documentDate) {
+                        availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number });
+                    } else {
+                        availableProceedings.value.push({title: title as string, value: proceedingsResponse.id as number });
+                    }
                 });
             });
         };
@@ -283,7 +287,7 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createJProceedingsPublication(newProceedingsPublication).then(() => {
+            DocumentPublicationService.createJProceedingsPublication(newProceedingsPublication).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -306,7 +310,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "scientificResults" });
+                    router.push({ name: "proceedingsPublicationLandingPage", params: {id: response.data.id} });
                 }
             }).catch((axiosError: AxiosError<ErrorResponse>) => {
                 const message = i18n.t(axiosError.response?.data.message as string);

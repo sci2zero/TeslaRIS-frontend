@@ -70,6 +70,7 @@ import { onMounted } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import PublicationsDialog from "@/components/core/PublicationsDialog.vue"
+import { watch } from "vue";
 
 
 export default defineComponent({
@@ -99,6 +100,15 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
         
         onMounted(() => {
+            startLoadProcess();
+        });
+
+        watch(() => props.personForLoading, () => {
+            setFlagsToDefault();
+            startLoadProcess();
+        });
+
+        const startLoadProcess = () => {
             PersonService.findResearcherByScopusAuthorId(props.personForLoading.scopusAuthorId).then(response => {
                 if(response.data) {
                     selectedResearcher.value = response.data;
@@ -108,13 +118,20 @@ export default defineComponent({
                     searchPotentialMatches();
                 }
             });
-        });
+        };
+
+        const setFlagsToDefault = () => {
+            researcherBinded.value = false;
+            showTable.value = false;
+            hadToBeCreated.value = false;
+        };
 
         const searchPotentialMatches = () => {
             PersonService.searchResearchers(`tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`).then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
                 if (totalPersons.value === 0) {
+                    showTable.value = false;
                     addNew();
                 }
             });
@@ -206,9 +223,10 @@ export default defineComponent({
 
                 hadToBeCreated.value = true;
                 researcherBinded.value = true;
-                showTable.value = false;
-            }).catch(() => {
-            
+            }).catch((error) => {
+                if (error.response.data.message === "idempotencyKeyAlreadyInUse") {
+                    console.log("SEND REQUEST AGAIN WITH OTHER IDEMPOTENCY KEY");
+                }
             });
         };
 
