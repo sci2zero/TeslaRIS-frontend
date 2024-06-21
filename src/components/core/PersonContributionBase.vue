@@ -312,6 +312,8 @@ export default defineComponent({
             const toSelect = {title: `${person.personName.firstname} ${person.personName.otherName} ${person.personName.lastname} | ${person.localBirthDate ? localiseDate(person.localBirthDate) : i18n.t("unknownBirthdateMessage")}`, value: person.id as number};
             persons.value.push(toSelect);
             selectedPerson.value = toSelect;
+            personOtherNames.value = [{title: selectedPerson.value.title.split("|")[0], value: -1}];
+            selectedOtherName.value = personOtherNames.value[0];
             sendContentToParent();
         };
 

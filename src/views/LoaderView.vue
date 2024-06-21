@@ -112,6 +112,7 @@ export default defineComponent({
 
         const skipDocument = () => {
             ImportService.skipWizard().then(() => {
+                stepperValue.value = 1;
                 fetchNextRecordForLoading();
             });
         };

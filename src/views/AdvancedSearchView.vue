@@ -93,6 +93,11 @@ export default defineComponent({
     
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
+            
+            if (!currentTab.value) {
+                currentTab.value = "persons";
+            }
+            
             if(tokenParams) {
                 router.push({name:"advancedSearch", query: { searchQuery: tokenParams.split("=")[1], tab: currentTab.value }});
             }
