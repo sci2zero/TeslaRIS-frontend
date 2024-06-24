@@ -55,7 +55,7 @@ export interface PersonLoad {
     scopusAuthorId: string;
 }
 
-interface OrganisationUnitLoad {
+export interface OrganisationUnitLoad {
     name: MultilingualContent[];
     nameAbbreviation: string;
     scopusAfid: string;

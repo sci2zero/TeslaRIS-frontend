@@ -26,7 +26,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, `person/scopus-author?scopusId=${scopusId}`);
   }
 
-  async createPerson(body: BasicPerson): Promise<AxiosResponse<BasicPerson>> {
+  async createPerson(body: BasicPerson, idempotencyKey?: string): Promise<AxiosResponse<BasicPerson>> {
+    if (idempotencyKey) {
+      return super.sendRequest(axios.post, "person/basic", body, idempotencyKey);  
+    }
     return super.sendRequest(axios.post, "person/basic", body, PersonService.idempotencyKey);
   }
 

@@ -9,7 +9,7 @@
             :next-text="$t('nextLabel')"
             :prev-text="$t('previousLabel')">
             <template v-for="(contribution, index) in currentLoadRecord?.contributions" :key="index" #[`item.${index+1}`]>
-                <import-author :person-for-loading="contribution.person"></import-author>
+                <import-author :ref="(el) => (importAuthorsRef[index] = el)" :person-for-loading="contribution.person" :institutions-for-loading="contribution.institutions"></import-author>
             </template>
 
             <template #[`item.${steps.length-1}`]>
@@ -34,6 +34,10 @@
 
         <v-btn style="margin-top: 30px;" @click="skipDocument">
             {{ $t('skipDocumentLabel') }}
+        </v-btn>
+
+        <v-btn style="margin-top: 30px;" @click="smartSkip">
+            {{ $t('smartSkipLabel') }}
         </v-btn>
 
         <v-snackbar
@@ -68,6 +72,8 @@ export default defineComponent({
     name: "LoaderView",
     components: {ImportAuthor},
     setup() {
+        const importAuthorsRef = ref<any[]>([]);
+
         const isFormValid = ref(false);
         
         const snackbar = ref(false);
@@ -117,13 +123,35 @@ export default defineComponent({
             });
         };
 
+        const waitForImportAuthor = (index: number): Promise<void> => {
+            return new Promise(resolve => {
+                const intervalId = setInterval(() => {
+                if (importAuthorsRef.value[index]) {
+                    if (importAuthorsRef.value[index].isReady()) {
+                        clearInterval(intervalId);
+                        resolve();
+                    }
+                }
+                }, 200); // Check every 200 milliseconds
+            });
+        };
+
+        const smartSkip = async () => {
+            let shouldStep = true;
+            while (shouldStep) {
+                nextStep();
+                await waitForImportAuthor(stepperValue.value - 1);
+                shouldStep = importAuthorsRef.value[stepperValue.value - 1].isAutomaticallyHandled();
+            }
+        };
+
         return {
             isFormValid, snackbar,
             errorMessage, currentLoadRecord,
             returnCurrentLocaleContent,
             localiseDate, stepperValue, steps,
             nextStep, previousStep, canAdvance,
-            skipDocument
+            skipDocument, importAuthorsRef, smartSkip
         };
     },
 });

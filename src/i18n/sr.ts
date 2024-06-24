@@ -266,10 +266,13 @@ export default {
     otherDetailsLabel: "Ostali detalji",
     currentlyLoadingLabel: "Trenutno se učitava",
     foundAsLabel: "Pronađen kao {0} u sistemu.",
-    createdNewResearcherLabel: "Kreiran {0} u sistemu.",
+    createdNewEntityLabel: "Kreiran {0} u sistemu.",
     canNotAutoFindResearcherMessage: "Nije moguće automatski pronaći istraživača u sistemu, molimo vas, selektujte iz liste istraživača:",
     canCreateNewResearcherLabel: "Ukoliko istraživač nije u listi možete kreirati novog:",
     viewPublicationsLabel: "Vidi publikacije",
     selectLabel: "Selektuj",
-    skipDocumentLabel: "Preskoči dokument"
+    skipDocumentLabel: "Preskoči dokument",
+    canNotAutoFindOUMessage: "Nije moguće automatski pronaći instituciju u sistemu, molimo vas, selektujte iz liste institucija:",
+    canCreateNewOULabel: "Ukoliko institucija nije u listi možete kreirati novu:",
+    authorAffiliationsLabel: "Afilijacije autora"
 }
