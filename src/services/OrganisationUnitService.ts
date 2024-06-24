@@ -16,6 +16,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}`);
   }
 
+  async findOUByScopusAfid(scopusAfid: string): Promise<AxiosResponse<OrganisationUnitIndex>> {
+    return super.sendRequest(axios.get, `organisation-unit/afid/${scopusAfid}`);
+  }
+
   async readOURelationsGraph(organisationUnitLeafId: number): Promise<AxiosResponse<any>> {
     return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
@@ -24,7 +28,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
   }
 
-  async createOrganisationUnit(body: OrganisationUnitRequest): Promise<AxiosResponse<OrganisationUnitResponse>> {
+  async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
+    if (idempotencyKey) {
+      return super.sendRequest(axios.post, "organisation-unit", body, idempotencyKey);
+    }
     return super.sendRequest(axios.post, "organisation-unit", body, OrganisationUnitService.idempotencyKey);
   }
 

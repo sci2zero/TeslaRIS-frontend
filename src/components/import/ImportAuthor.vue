@@ -7,7 +7,7 @@
         </h2>
 
         <h2 v-if="researcherBinded && hadToBeCreated">
-            {{ $t("createdNewResearcherLabel", [selectedResearcher?.name as string]) }}
+            {{ $t("createdNewEntityLabel", [selectedResearcher?.name as string]) }}
         </h2>
 
         <h2 v-if="showTable" style="margin-top: 20px; margin-bottom: 20px">
@@ -28,9 +28,7 @@
             <template #item="row">
                 <tr>
                     <td>
-                        <localized-link :to="'persons/' + row.item.databaseId">
-                            {{ row.item.name }}
-                        </localized-link>
+                        {{ row.item.name }}
                     </td>
                     <td v-if="$i18n.locale == 'sr'">
                         {{ displayTextOrPlaceholder(row.item.employmentsSr) }}
@@ -55,11 +53,13 @@
                 {{ $t("addPersonLabel") }}
             </v-btn>
         </h3>
+
+        <import-affiliation v-for="(institution, index) in institutionsForLoading" :ref="(el) => (importAffiliationsRef[index] = el)" :key="institution.scopusAfid" :ou-for-loading="institution"></import-affiliation>
     </v-container>
 </template>
 
 <script lang="ts">
-import type { PersonLoad } from "@/models/LoadModel";
+import type { OrganisationUnitLoad, PersonLoad } from "@/models/LoadModel";
 import type { BasicPerson, PersonIndex } from "@/models/PersonModel";
 import PersonService from "@/services/PersonService";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
@@ -71,18 +71,26 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import PublicationsDialog from "@/components/core/PublicationsDialog.vue"
 import { watch } from "vue";
+import ImportAffiliation from "./ImportAffiliation.vue";
 
 
 export default defineComponent({
     name: "ImportAuthorComponent",
-    components: {PublicationsDialog},
+    components: {PublicationsDialog, ImportAffiliation},
     props: {
         personForLoading: {
             type: Object as PropType<PersonLoad>,
             required: true
+        },
+        institutionsForLoading: {
+            type: Object as PropType<OrganisationUnitLoad[]>,
+            required: true
         }
     },
     setup(props) {
+        const importAffiliationsRef = ref<any[]>([]);
+        const automaticProcessCompleted = ref(false);
+
         const researcherBinded = ref(false);
         const selectedResearcher = ref<PersonIndex>();
 
@@ -113,6 +121,7 @@ export default defineComponent({
                 if(response.data) {
                     selectedResearcher.value = response.data;
                     researcherBinded.value = true;
+                    automaticProcessCompleted.value = true;
                 } else {
                     showTable.value = true;
                     searchPotentialMatches();
@@ -133,6 +142,8 @@ export default defineComponent({
                 if (totalPersons.value === 0) {
                     showTable.value = false;
                     addNew();
+                } else {
+                    automaticProcessCompleted.value = true;
                 }
             });
         };
@@ -205,7 +216,7 @@ export default defineComponent({
                 employmentPosition: undefined
             };
 
-            PersonService.createPerson(newPerson).then((response) => {
+            PersonService.createPerson(newPerson, idempotencyKey).then((response) => {
                 selectedResearcher.value = {
                     name: `${props.personForLoading.firstName} ${props.personForLoading.lastName}`,
                     birthdate: "",
@@ -223,11 +234,45 @@ export default defineComponent({
 
                 hadToBeCreated.value = true;
                 researcherBinded.value = true;
-            }).catch((error) => {
-                if (error.response.data.message === "idempotencyKeyAlreadyInUse") {
-                    console.log("SEND REQUEST AGAIN WITH OTHER IDEMPOTENCY KEY");
-                }
+                automaticProcessCompleted.value = true;
             });
+        };
+
+        const generateIdempotencyKey = (): string => {
+            function s4(): string {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+            }
+
+            return (
+                s4() +
+                s4() +
+                '-' +
+                s4() +
+                '-' +
+                s4() +
+                '-' +
+                s4() +
+                '-' +
+                s4() +
+                s4() +
+                s4()
+            );
+        };
+        const idempotencyKey = generateIdempotencyKey();
+
+        const isAutomaticallyHandled = () => {
+            const allAffiliationsBinded = importAffiliationsRef.value
+                .every(importAffiliationRef => importAffiliationRef.affiliationBinded === true);
+            return researcherBinded.value && allAffiliationsBinded;
+        };
+
+        const isReady = () => {
+            const allAffiliationProcessesCompleted = importAffiliationsRef.value
+                .every(importAffiliationRef => importAffiliationRef.automaticProcessCompleted === true);
+
+            return automaticProcessCompleted.value && allAffiliationProcessesCompleted;
         };
 
         return {
@@ -236,7 +281,8 @@ export default defineComponent({
             displayTextOrPlaceholder, totalPersons,
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
-            hadToBeCreated
+            hadToBeCreated, importAffiliationsRef,
+            isAutomaticallyHandled, isReady
         };
     },
 });

@@ -268,8 +268,11 @@ export default {
     foundAsLabel: "Found as {0} in the system.",
     createdNewResearcherLabel: "Created {0} in the system.",
     canNotAutoFindResearcherMessage: "Can't automatically find a researcher in the system, please, select researcher from the list:",
-    canCreateNewResearcherLabel: "If the researcher is not in the list zou can create a new one:",
+    createdNewEntityLabel: "If the researcher is not in the list you can create a new one:",
     viewPublicationsLabel: "View publications",
     selectLabel: "Select",
-    skipDocumentLabel: "Skip Document"
+    skipDocumentLabel: "Skip Document",
+    canNotAutoFindOUMessage: "Can't automatically find an institution in the system, please, select institution from the list:",
+    canCreateNewOULabel: "If the institution is not in the list you can create a new one:",
+    authorAffiliationsLabel: "Author affiliations"
 }

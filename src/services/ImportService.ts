@@ -2,6 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
+import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 
 export class ImportService extends BaseService {
   
@@ -20,7 +21,10 @@ export class ImportService extends BaseService {
     async skipWizard(): Promise<AxiosResponse<void>> {
       return super.sendRequest(axios.patch, "load/skip");
     }
-  
+
+    async createNewInstitution(scopusAfid: string, idempotencyKey: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
+      return super.sendRequest(axios.post, `load/institution/${scopusAfid}`, {}, idempotencyKey);
+    }
   }
   
   export default new ImportService();
