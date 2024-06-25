@@ -41,3 +41,9 @@ export interface UserUpdateRequest {
     preferredLanguageId: number;
     organisationUnitId?: number;
 }
+
+export enum UserRole {
+    ADMIN = "ADMIN",
+    RESEARCHER = "RESEARCHER",
+    INSTITUTIONAL_EDITOR = "INSTITUTIONAL_EDITOR"
+}

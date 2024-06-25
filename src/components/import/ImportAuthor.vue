@@ -201,7 +201,22 @@ export default defineComponent({
             showTable.value = false;
         };
 
-        const addNew = () => {
+        const waitForImportAffiliations = (): Promise<void> => {
+            return new Promise(resolve => {
+                const intervalId = setInterval(() => {
+                    const allAffiliationsBinded = importAffiliationsRef.value
+                        .every(importAffiliationRef => importAffiliationRef.affiliationBinded === true);
+                if (allAffiliationsBinded) {
+                    clearInterval(intervalId);
+                    resolve();
+                }
+                }, 200); // Check every 200 milliseconds
+            });
+        };
+
+        const addNew = async () => {
+            await waitForImportAffiliations();
+
             const newPerson: BasicPerson = {
                 personName: {firstname: props.personForLoading.firstName, otherName: props.personForLoading.middleName, lastname: props.personForLoading.lastName, dateFrom: null, dateTo: null},
                 contactEmail: "",
@@ -212,7 +227,7 @@ export default defineComponent({
                 scopusAuthorId: props.personForLoading.scopusAuthorId,
                 sex: undefined,
                 localBirthDate: "",
-                organisationUnitId: 1, // TODO: add OU
+                organisationUnitId: importAffiliationsRef.value[0].selectedAffiliation.databaseId,
                 employmentPosition: undefined
             };
 

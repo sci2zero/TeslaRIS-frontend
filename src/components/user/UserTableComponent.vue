@@ -18,7 +18,7 @@
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
                 </td>
-                <td>{{ row.item.userRole }}</td>
+                <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
                 <td>
                     <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
                         {{ row.item.active ? "Deactivate" : "Activate" }}
@@ -55,6 +55,7 @@ import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 
 export default defineComponent({
     name: "UserTableComponent",
@@ -157,7 +158,8 @@ export default defineComponent({
 
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, changeActivationStatus, takeRoleOfUser,
-            displayFormNotification, displayTextOrPlaceholder};
+            displayFormNotification, displayTextOrPlaceholder,
+            getTitleFromValueAutoLocale};
     }
 });
 </script>

@@ -61,6 +61,11 @@ export default defineComponent({
 
         const getContent = (researcherId: number) => {
             DocumentPublicationService.findResearcherPublications(researcherId, "page=0&size=10").then(response => {
+                if (response.data.totalElements === 0) {
+                    text.value = i18n.t("noPublicationsForResearcherMessage");
+                    return;
+                }
+                
                 response.data.content.forEach(publication => {
                     if (i18n.locale.value === "sr") {
                         text.value += publication.titleSr + "\n";
