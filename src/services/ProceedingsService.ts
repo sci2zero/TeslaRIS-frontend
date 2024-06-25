@@ -28,6 +28,10 @@ export class ProceedingsService extends BaseService {
   async findProceedingsForBookSeries(bookSeriesId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     return super.sendRequest(axios.get, `proceedings/book-series/${bookSeriesId}?${pageable}`);
   }
+
+  async deleteProceedings(proceedingsId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `proceedings/${proceedingsId}`);
+  }
 }
 
 export default new ProceedingsService();

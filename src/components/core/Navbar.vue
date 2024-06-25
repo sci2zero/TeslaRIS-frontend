@@ -130,6 +130,7 @@ import type { Component } from 'vue';
 import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
+import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 
 
 interface MenuItem {
@@ -261,7 +262,7 @@ export default defineComponent(
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !userLoggedIn.value), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !userLoggedIn.value), variant: 'outlined', color:'primary' },
                 
-                { title: computed(() => userName.value + " (" + userRole.value + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn, variant: 'flat', color:'primary' },
+                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn, variant: 'flat', color:'primary' },
                 { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
             ]);
 

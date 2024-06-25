@@ -274,5 +274,8 @@ export default {
     skipDocumentLabel: "Preskoči dokument",
     canNotAutoFindOUMessage: "Nije moguće automatski pronaći instituciju u sistemu, molimo vas, selektujte iz liste institucija:",
     canCreateNewOULabel: "Ukoliko institucija nije u listi možete kreirati novu:",
-    authorAffiliationsLabel: "Afilijacije autora"
+    authorAffiliationsLabel: "Afilijacije autora",
+    smartImportLabel: "Pametan import",
+    smartImportTooltip: "Kada pokrenete proces automatskog učitavanja, sistem će pokušati automatski da poveže svaki uvezeni resurs sa odgovarajućim resursom u našem sistemu. Ovo se zasniva na unapred definisanim kriterijumima i algoritmima za usklađivanje. Ako sistem pronađe podudaranje, resurs se automatski povezuje i označava kao uspešno obrađen. Za resurse koji ne mogu biti automatski povezani, potreban je unos korisnika za ručno povezivanje tih resursa. Sistem će vam omogućiti da pregledate i ručno povežete ove nepovezane resurse. Nakon rešavanja nepovezanih resursa, možete nastaviti proces automatskog učitavanja. Sistem će zatim nastaviti automatsko povezivanje za preostale resurse, ponavljajući proces dok svi resursi ne budu automatski povezani ili dok ne bude potreban dalji unos korisnika.",
+    noPublicationsForResearcherMessage: "Nema podataka za ovog istraživača."
 }

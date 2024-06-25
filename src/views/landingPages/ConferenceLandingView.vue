@@ -86,9 +86,13 @@
 
         <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
 
-        <!-- Publication Table -->
+        <!-- Proceedings List -->
         <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <proceedings-list :preset-event="conference"></proceedings-list>
+
+        <!-- Publication Table -->
+        <h2>{{ $t("publicationsLabel") }}</h2>
+        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
     </v-container>
 </template>
 
@@ -108,11 +112,13 @@ import PersonEventContributionTabs from '@/components/core/PersonEventContributi
 import type { MultilingualContent } from '@/models/Common';
 import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import { localiseDate } from '@/i18n/dateLocalisation';
+import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -127,7 +133,7 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
-
+        
         const i18n = useI18n();
 
         const icon = ref("mdi-presentation");
@@ -150,7 +156,7 @@ export default defineComponent({
             });
         };
 
-        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+        const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
             size.value = pageSize;
             sort.value = sortField;
@@ -234,11 +240,12 @@ export default defineComponent({
 
         return {
             conference, icon, publications, 
-            totalPublications, switchPage,
+            totalPublications, switchPublicationsPage,
             keywords, getDates, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
-            snackbar, snackbarMessage, updateDescription
+            snackbar, snackbarMessage, updateDescription,
+            localiseDate
         };
 }})
 

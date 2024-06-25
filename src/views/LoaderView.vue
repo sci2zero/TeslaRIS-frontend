@@ -13,7 +13,11 @@
             </template>
 
             <template #[`item.${steps.length-1}`]>
-                <h1>Sredjujem casopis</h1>
+                <import-journal v-if="loadingJournalPublication" :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"></import-journal>
+                
+                <h1 v-if="loadingProceedingsPublication">
+                    Sredjujem zbornik
+                </h1> <!--TODO: import proceedings controller-->
             </template>
 
             <template #[`item.${steps.length}`]>
@@ -36,8 +40,15 @@
             {{ $t('skipDocumentLabel') }}
         </v-btn>
 
+        
         <v-btn style="margin-top: 30px;" @click="smartSkip">
-            {{ $t('smartSkipLabel') }}
+            {{ $t('smartImportLabel') }}
+            <v-tooltip
+                activator="parent"
+                location="bottom"
+            >
+                {{ $t('smartImportTooltip') }}
+            </v-tooltip>
         </v-btn>
 
         <v-snackbar
@@ -66,11 +77,12 @@ import { onMounted } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import ImportAuthor from "@/components/import/ImportAuthor.vue";
+import ImportJournal from "@/components/import/ImportJournal.vue";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: {ImportAuthor},
+    components: {ImportAuthor, ImportJournal},
     setup() {
         const importAuthorsRef = ref<any[]>([]);
 
@@ -82,7 +94,10 @@ export default defineComponent({
 
         const stepperValue = ref(1);
         const canAdvance = ref(true);
-        const steps = ref<string[]>([])
+        const steps = ref<string[]>([]);
+
+        const loadingJournalPublication = ref(false);
+        const loadingProceedingsPublication = ref(false);
         
         const nextStep = () => {
             stepperValue.value += 1;
@@ -99,6 +114,9 @@ export default defineComponent({
         });
 
         const fetchNextRecordForLoading = () => {
+            loadingJournalPublication.value = false;
+            loadingProceedingsPublication.value = false;
+
             ImportService.getNextFromWizard().then(response => {
                 currentLoadRecord.value = response.data;
                 steps.value = [];
@@ -108,8 +126,10 @@ export default defineComponent({
 
                 if ((currentLoadRecord.value as ProceedingsPublicationLoad).proceedingsPublicationType) {
                     steps.value.push(i18n.t("proceedingsLabel"));
+                    loadingProceedingsPublication.value = true;
                 } else if ((currentLoadRecord.value as JournalPublicationLoad).journalPublicationType) {
                     steps.value.push(i18n.t("journalLabel"));
+                    loadingJournalPublication.value = true;
                 }
 
                 steps.value.push(i18n.t("otherDetailsLabel"));
@@ -151,7 +171,9 @@ export default defineComponent({
             returnCurrentLocaleContent,
             localiseDate, stepperValue, steps,
             nextStep, previousStep, canAdvance,
-            skipDocument, importAuthorsRef, smartSkip
+            skipDocument, importAuthorsRef, smartSkip,
+            loadingJournalPublication,
+            loadingProceedingsPublication
         };
     },
 });
