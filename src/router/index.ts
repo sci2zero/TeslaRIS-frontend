@@ -217,7 +217,7 @@ const router = createRouter({
                             component: JournalLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.researcher, roles.institutionalEditor, roles.admin],
                             },
                         }
                     ]
