@@ -13,15 +13,16 @@
             </template>
 
             <template #[`item.${steps.length-1}`]>
-                <import-journal v-if="loadingJournalPublication" :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"></import-journal>
+                <import-journal v-if="loadingJournalPublication" ref="journalImportRef" :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"></import-journal>
                 
                 <h1 v-if="loadingProceedingsPublication">
                     Sredjujem zbornik
-                </h1> <!--TODO: import proceedings controller-->
+                </h1> <!--TODO: import proceedings-->
             </template>
 
             <template #[`item.${steps.length}`]>
-                <h1>Sredjujem detalje</h1>
+                <import-journal-publication-details v-if="loadingJournalPublication" ref="journalPublicationDetailsRef" :preset-metadata="(currentLoadRecord as JournalPublicationLoad)" @update="updateRecord"></import-journal-publication-details>
+                <import-proceedings-publication-details v-if="loadingProceedingsPublication" ref="proceedingsPublicationDetailsRef" :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)" @update="updateRecord"></import-proceedings-publication-details>
             </template>
 
             <template #actions>
@@ -41,7 +42,7 @@
         </v-btn>
 
         
-        <v-btn style="margin-top: 30px;" @click="smartSkip">
+        <v-btn style="margin-top: 30px; margin-left: 30px;" @click="smartSkip">
             {{ $t('smartImportLabel') }}
             <v-tooltip
                 activator="parent"
@@ -49,6 +50,10 @@
             >
                 {{ $t('smartImportTooltip') }}
             </v-tooltip>
+        </v-btn>
+
+        <v-btn style="margin-top: 30px; margin-left: 30px" @click="finishLoad">
+            {{ $t('finishLoadLabel') }}
         </v-btn>
 
         <v-snackbar
@@ -78,13 +83,19 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import ImportAuthor from "@/components/import/ImportAuthor.vue";
 import ImportJournal from "@/components/import/ImportJournal.vue";
+import ImportJournalPublicationDetails from "@/components/import/ImportJournalPublicationDetails.vue";
+import ImportProceedingsPublicationDetails from "@/components/import/ImportProceedingsPublicationDetails.vue";
+import type { JournalPublication, PersonDocumentContribution } from "@/models/PublicationModel";
+import DocumentPublicationService from "@/services/DocumentPublicationService";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: {ImportAuthor, ImportJournal},
+    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails},
     setup() {
         const importAuthorsRef = ref<any[]>([]);
+        const journalImportRef = ref<typeof ImportJournal>();
+        const journalPublicationDetailsRef = ref<typeof ImportJournalPublicationDetails>();
 
         const isFormValid = ref(false);
         
@@ -156,12 +167,155 @@ export default defineComponent({
             });
         };
 
+        const waitForImportJournal = (): Promise<void> => {
+            return new Promise(resolve => {
+                const intervalId = setInterval(() => {
+                if (journalImportRef.value) {
+                    clearInterval(intervalId);
+                    resolve();
+                }
+                }, 200); // Check every 200 milliseconds
+            });
+        };
+
         const smartSkip = async () => {
             let shouldStep = true;
             while (shouldStep) {
                 nextStep();
-                await waitForImportAuthor(stepperValue.value - 1);
-                shouldStep = importAuthorsRef.value[stepperValue.value - 1].isAutomaticallyHandled();
+                if (stepperValue.value <= currentLoadRecord.value!.contributions.length) {
+                    await waitForImportAuthor(stepperValue.value - 1);
+                    shouldStep = importAuthorsRef.value[stepperValue.value - 1].isHandled();
+                } else if (stepperValue.value === currentLoadRecord.value!.contributions.length + 1) {
+                    if (loadingJournalPublication.value) {
+                        await waitForImportJournal();
+                        shouldStep = journalImportRef.value!.journalBinded;
+                    } else if (loadingProceedingsPublication.value) {
+                        // TODO: to be implemented
+                    } else {
+                        shouldStep = false;
+                    }
+                } else {
+                    shouldStep = false;
+                }
+                
+            }
+        };
+
+        const updateRecord = (updatedRecord: JournalPublicationLoad | ProceedingsPublicationLoad) => {
+            currentLoadRecord.value!.subTitle = updatedRecord.subTitle;
+            currentLoadRecord.value!.description = updatedRecord.description;
+            currentLoadRecord.value!.startPage = updatedRecord.startPage;
+            currentLoadRecord.value!.endPage = updatedRecord.endPage;
+            currentLoadRecord.value!.numberOfPages = updatedRecord.numberOfPages;
+            currentLoadRecord.value!.articleNumber = updatedRecord.articleNumber;
+            currentLoadRecord.value!.keywords = updatedRecord.keywords;
+            currentLoadRecord.value!.uris = updatedRecord.uris;
+            currentLoadRecord.value!.documentDate = updatedRecord.documentDate;
+            currentLoadRecord.value!.scopusId = updatedRecord.scopusId;
+            currentLoadRecord.value!.doi = updatedRecord.doi;
+            
+            if (loadingJournalPublication.value) {
+                (currentLoadRecord.value as JournalPublicationLoad)!.volume = (updatedRecord as JournalPublicationLoad).volume;
+                (currentLoadRecord.value as JournalPublicationLoad)!.issue = (updatedRecord as JournalPublicationLoad).issue;
+                (currentLoadRecord.value as JournalPublicationLoad)!.journalPublicationType = (updatedRecord as JournalPublicationLoad).journalPublicationType;
+            } else if (loadingProceedingsPublication.value) {
+                (currentLoadRecord.value as ProceedingsPublicationLoad)!.proceedingsPublicationType = (updatedRecord as ProceedingsPublicationLoad).proceedingsPublicationType;
+            }
+
+            submitNewPublication();
+        };
+
+        const finishLoad = () => {
+            if (importAuthorsRef.value.length !== currentLoadRecord.value?.contributions.length) {
+                errorMessage.value = i18n.t("authorBindNotFinishedMessage");
+                snackbar.value = true;
+                return;
+            }
+
+            const unbindedAuthors: string[] = [];
+            importAuthorsRef.value.forEach(contribution => {
+                if (!contribution.isHandled()) {
+                    unbindedAuthors.push(`${contribution.personForLoading.firstName} ${contribution.personForLoading.lastName}`)
+                }
+            });
+
+            if (unbindedAuthors.length !== 0) {
+                errorMessage.value = i18n.t("authorsNotBindedMessage", unbindedAuthors);
+                snackbar.value = true;
+                return;
+            }
+            
+            if (loadingJournalPublication.value) {
+                if (!journalImportRef.value?.journalBinded) {
+                    errorMessage.value = i18n.t("journalNotBindedMessage");
+                    snackbar.value = true;
+                    return;
+                }
+
+                if (!journalPublicationDetailsRef.value) {
+                    errorMessage.value = i18n.t("detailsNotReviewedMessage");
+                    snackbar.value = true;
+                    return;
+                }
+                
+                journalPublicationDetailsRef.value?.updateJournalPublication();
+            
+            } else if (loadingProceedingsPublication.value) {
+                // TODO: to be implemented
+            }
+        };
+
+        const submitNewPublication = () => {
+            const contributions: PersonDocumentContribution[] = [];
+            currentLoadRecord.value?.contributions.forEach((contribution, index) => {
+                contributions.push({
+                    contributionDescription: contribution.contributionDescription,
+                    contributionType: contribution.contributionType,
+                    displayAffiliationStatement: [],
+                    isCorrespondingContributor: contribution.isCorrespondingContributor ? true : false,
+                    isMainContributor: contribution.isMainContributor ? true : false,
+                    orderNumber: contribution.orderNumber as number,
+                    personId: importAuthorsRef.value[index].selectedResearcher.databaseId,
+                    personName: {
+                        firstname: contribution.person.firstName,
+                        lastname: contribution.person.lastName,
+                        otherName: "",
+                    }
+                });
+            });
+
+            if (loadingJournalPublication.value) {
+                const newJournalPublication: JournalPublication = {
+                    title: currentLoadRecord.value!.title,
+                    articleNumber: currentLoadRecord.value!.articleNumber,
+                    description: currentLoadRecord.value!.description,
+                    startPage: currentLoadRecord.value!.startPage,
+                    endPage: currentLoadRecord.value!.endPage,
+                    volume: (currentLoadRecord.value as JournalPublicationLoad)!.volume,
+                    issue: (currentLoadRecord.value as JournalPublicationLoad)!.issue,
+                    journalId: journalImportRef.value!.selectedJournal.databaseId,
+                    journalPublicationType: (currentLoadRecord.value as JournalPublicationLoad)!.journalPublicationType,
+                    keywords: currentLoadRecord.value!.keywords,
+                    numberOfPages: currentLoadRecord.value!.numberOfPages as number,
+                    subTitle: currentLoadRecord.value!.subTitle,
+                    uris: currentLoadRecord.value!.uris,
+                    contributions: contributions,
+                    documentDate: currentLoadRecord.value!.documentDate,
+                    scopusId: currentLoadRecord.value!.scopusId,
+                    doi: currentLoadRecord.value!.doi,
+                    eventId: undefined, // is this ok?
+                    fileItems: [],
+                    proofs: []
+                };
+
+                DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
+                    stepperValue.value = 1;
+                    ImportService.markCurrentAsLoaded().then(() => {
+                        fetchNextRecordForLoading();
+                    });
+                });
+            } else if (loadingProceedingsPublication.value) {
+                // TODO: to be implemented
             }
         };
 
@@ -172,8 +326,9 @@ export default defineComponent({
             localiseDate, stepperValue, steps,
             nextStep, previousStep, canAdvance,
             skipDocument, importAuthorsRef, smartSkip,
-            loadingJournalPublication,
-            loadingProceedingsPublication
+            loadingJournalPublication, updateRecord,
+            loadingProceedingsPublication, finishLoad,
+            journalImportRef, journalPublicationDetailsRef
         };
     },
 });

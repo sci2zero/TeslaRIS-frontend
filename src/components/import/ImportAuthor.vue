@@ -277,7 +277,7 @@ export default defineComponent({
         };
         const idempotencyKey = generateIdempotencyKey();
 
-        const isAutomaticallyHandled = () => {
+        const isHandled = () => {
             const allAffiliationsBinded = importAffiliationsRef.value
                 .every(importAffiliationRef => importAffiliationRef.affiliationBinded === true);
             return researcherBinded.value && allAffiliationsBinded;
@@ -297,7 +297,7 @@ export default defineComponent({
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
             hadToBeCreated, importAffiliationsRef,
-            isAutomaticallyHandled, isReady
+            isHandled, isReady
         };
     },
 });

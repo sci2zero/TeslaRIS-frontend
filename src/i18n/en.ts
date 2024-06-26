@@ -274,8 +274,15 @@ export default {
     skipDocumentLabel: "Skip Document",
     canNotAutoFindOUMessage: "Can't automatically find an institution in the system, please, select institution from the list:",
     canCreateNewOULabel: "If the institution is not in the list you can create a new one:",
+    canNotAutoFindJournalMessage: "Can't automatically find a journal in the system, please, select journal from the list:",
+    canCreateNewJournalLabel: "If the journal is not in the list you can create a new one:",
     authorAffiliationsLabel: "Author affiliations",
     smartImportLabel: "Smart import",
     smartImportTooltip: "When you initiate the auto load process, the system will attempt to automatically bind each imported resource to a corresponding resource in our system. This is based on predefined criteria and matching algorithms. If the system finds a match, the resource is automatically bound and marked as successfully processed. For resources that cannot be automatically matched, user input is required to manually bind these resources. The system will prompt you to review and bind these unmatched resources manually. After addressing the unmatched resources, you can continue the auto load process. The system will then resume automatic binding for any remaining resources, repeating the process until all resources are either automatically bound or require further user input.",
-    noPublicationsForResearcherMessage: "There are no publications for this researcher yet."
+    noPublicationsForResearcherMessage: "There are no publications for this researcher yet.",
+    authorBindNotFinishedMessage: "You did not finish the binding process of all authors on this publication.",
+    authorsNotBindedMessage: "You did not finish binding for: {0}",
+    journalNotBindedMessage: "You did not finish binding of journal.",
+    detailsNotReviewedMessage: "You did not review publication details.",
+    finishLoadLabel: "Import"
 }

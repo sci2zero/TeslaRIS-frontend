@@ -23,6 +23,10 @@ export class ImportService extends BaseService {
       return super.sendRequest(axios.patch, "load/skip");
     }
 
+    async markCurrentAsLoaded(): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, "load/mark-as-loaded");
+    }
+
     async createNewInstitution(scopusAfid: string, idempotencyKey: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
       return super.sendRequest(axios.post, `load/institution/${scopusAfid}`, {}, idempotencyKey);
     }

@@ -7,7 +7,7 @@ interface DocumentLoadDTO {
     description: MultilingualContent[];
     keywords: MultilingualContent[];
     contributions: PersonDocumentContributionLoad[];
-    uris: Set<string>;
+    uris: string[];
     documentDate: string;
     doi: string;
     scopusId: string;
