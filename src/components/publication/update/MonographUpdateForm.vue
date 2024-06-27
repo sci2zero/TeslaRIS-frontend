@@ -65,7 +65,7 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="6">
                 <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -211,7 +211,8 @@ export default defineComponent({
         const number = ref(props.presetMonograph?.number);
         const volume = ref(props.presetMonograph?.volume);
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
+
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
             if (selectedBookSeries.value.value !== -1 && selectedJournal.value.value !== -1) {
@@ -271,7 +272,7 @@ export default defineComponent({
             eIsbn, printIsbn, numberOfPages,
             selectedLanguages, languageList,
             requiredSelectionRules, uris,
-            selectedResearchArea
+            selectedResearchArea, doiValidationRules
         };
     }
 });

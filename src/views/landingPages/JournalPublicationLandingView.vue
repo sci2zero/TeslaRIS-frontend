@@ -68,7 +68,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="journalPublication?.documentDate" class="response">
-                                    {{ journalPublication.documentDate }}
+                                    {{ localiseDate(journalPublication.documentDate) }}
                                 </div>
                                 <div v-if="journalPublication?.journalId">
                                     {{ $t("journalLabel") }}:
@@ -116,13 +116,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in journalPublication?.uris" :key="uri">
-                                        <v-btn
-                                            variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
-                                            target="_blank">
-                                            {{ uri }}
-                                        </v-btn>
-                                    </div>
+                                    <uri-list :uris="journalPublication?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -196,11 +190,13 @@ import JournalPublicationUpdateModal from '@/components/publication/update/Journ
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
+import { localiseDate } from '@/i18n/dateLocalisation';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -286,6 +282,7 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: JournalPublication) => {
+            console.log(basicInfo)
             journalPublication.value!.title = basicInfo.title;
             journalPublication.value!.subTitle = basicInfo.subTitle;
             journalPublication.value!.documentDate = basicInfo.documentDate;
@@ -327,7 +324,7 @@ export default defineComponent({
             totalPublications,
             returnCurrentLocaleContent,
             languageTagMap, journal,
-            searchKeyword, goToURL, canEdit,
+            searchKeyword, goToURL, canEdit, localiseDate,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale

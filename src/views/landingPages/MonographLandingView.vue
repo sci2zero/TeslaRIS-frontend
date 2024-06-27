@@ -118,13 +118,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in monograph?.uris" :key="uri">
-                                        <v-btn
-                                            variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
-                                            target="_blank">
-                                            {{ uri }}
-                                        </v-btn>
-                                    </div>
+                                    <uri-list :uris="monograph?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -214,11 +208,12 @@ import type { Conference } from '@/models/EventModel';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -72,13 +72,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in patent?.uris" :key="uri">
-                                        <v-btn
-                                            variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
-                                            target="_blank">
-                                            {{ uri }}
-                                        </v-btn>
-                                    </div>
+                                    <uri-list :uris="patent?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -149,11 +143,12 @@ import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/Attac
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

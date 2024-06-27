@@ -284,5 +284,6 @@ export default {
     authorsNotBindedMessage: "Niste završili povezivanje za: {0}",
     journalNotBindedMessage: "Niste završili povezivanje za časopis.",
     detailsNotReviewedMessage: "Niste završili povezivanje za detalje publikacije.",
-    finishLoadLabel: "Uvezi"
+    finishLoadLabel: "Uvezi",
+    invalidDOIError: "Neispravan DOI format"
 }

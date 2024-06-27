@@ -284,5 +284,6 @@ export default {
     authorsNotBindedMessage: "You did not finish binding for: {0}",
     journalNotBindedMessage: "You did not finish binding of journal.",
     detailsNotReviewedMessage: "You did not review publication details.",
-    finishLoadLabel: "Import"
+    finishLoadLabel: "Import",
+    invalidDOIError: "Invalid DOI format"
 }

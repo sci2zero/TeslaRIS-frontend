@@ -39,7 +39,7 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -165,7 +165,7 @@ export default defineComponent({
         const numberOfPages = ref(props.presetProceedingsPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetProceedingsPublication?.uris as string[]);
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
         
         const i18n = useI18n();
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -236,7 +236,7 @@ export default defineComponent({
             title, subtitle,
             publicationYear, doi, scopus,
             selectedProceedings, articleNumber,
-            uris, numberOfPages,
+            uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
             updateProceedingsPublication, toMultilingualTextInput,
             languageTags, startPage, endPage, requiredSelectionRules,

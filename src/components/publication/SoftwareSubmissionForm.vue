@@ -31,7 +31,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="5">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -153,7 +153,7 @@ export default defineComponent({
         const softwareNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
         const submitSoftware = (stayOnPage: boolean) => {
             const newSoftware: Software = {
@@ -214,7 +214,7 @@ export default defineComponent({
             publicationYear, doi, scopus,
             publisherAutocompleteRef,
             selectedPublisher, softwareNumber,
-            description, descriptionRef,
+            description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef,
             contributions, contributionsRef, eventRef, selectedEvent,
             requiredFieldRules, submitSoftware, errorMessage

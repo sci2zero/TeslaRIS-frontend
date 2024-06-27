@@ -41,7 +41,7 @@
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
                 </td>
-                <td>{{ displayTextOrPlaceholder(row.item.birthdate) }}</td>
+                <td>{{ row.item.birthdate ? localiseDate(row.item.birthdate) : displayTextOrPlaceholder(row.item.birthdate) }}</td>
                 <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
             </tr>
         </template>
@@ -68,6 +68,7 @@ import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -160,7 +161,8 @@ export default defineComponent({
 
         return {selectedPersons, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            localiseDate };
     }
 });
 </script>

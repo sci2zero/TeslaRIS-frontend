@@ -72,7 +72,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.documentDate" class="response">
-                                    {{ proceedingsPublication.documentDate }}
+                                    {{ localiseDate(proceedingsPublication.documentDate) }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -104,13 +104,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in proceedingsPublication?.uris" :key="uri">
-                                        <v-btn
-                                            variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
-                                            target="_blank">
-                                            {{ uri }}
-                                        </v-btn>
-                                    </div>
+                                    <uri-list :uris="proceedingsPublication?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -184,11 +178,13 @@ import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn, getTitleFromValue } from "@/i18n/proceedingsPublicationType";
 import ProceedingsPublicationUpdateModal from '@/components/publication/update/ProceedingsPublicationUpdateModal.vue';
+import { localiseDate } from '@/i18n/dateLocalisation';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsPublicationUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsPublicationUpdateModal, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -311,7 +307,7 @@ export default defineComponent({
             publications, event,
             totalPublications,
             returnCurrentLocaleContent,
-            languageTagMap,
+            languageTagMap, localiseDate,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
