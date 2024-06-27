@@ -6,10 +6,10 @@
                 @input="sendContentToParent"></v-text-field>
         </v-col>
         <v-col cols="2">
-            <v-btn v-if="index > 0" icon @click="removeUri(index)">
+            <v-btn v-if="uris.length > 1 || uris[index].value !== ''" icon @click="removeUri(index)">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
-            <v-btn icon @click="addUri">
+            <v-btn v-if="index === uris.length - 1" icon @click="addUri">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
         </v-col>
@@ -47,6 +47,7 @@ export default defineComponent({
 
         const removeUri = (index: number) => {
             uris.value.splice(index, 1);
+            sendContentToParent();
         };
 
         const sendContentToParent = () => {

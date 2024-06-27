@@ -29,7 +29,7 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
                 <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -90,6 +90,7 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import type { JournalPublicationLoad } from '@/models/LoadModel';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -157,6 +158,8 @@ export default defineComponent({
             emit("update", updatedJournalPublication);
         };
 
+        const { doiValidationRules } = useValidationUtils();
+
         return {
             isFormValid,
             subtitle,
@@ -165,7 +168,7 @@ export default defineComponent({
             updateJournalPublication, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
-            description, keywords
+            description, keywords, doiValidationRules
         };
     }
 });

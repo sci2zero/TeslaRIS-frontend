@@ -49,7 +49,14 @@
                 <td>
                     {{ getPublicationTypeTitleFromValueAutoLocale(row.item.type) }}
                 </td>
-                <td>
+                <td v-if="row.item.doi">
+                    <v-btn
+                        variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="`https://doi.org/${row.item.doi}`"
+                        target="_blank">
+                        {{ row.item.doi }}
+                    </v-btn>
+                </td>
+                <td v-else>
                     {{ displayTextOrPlaceholder(row.item.doi) }}
                 </td>
             </tr>

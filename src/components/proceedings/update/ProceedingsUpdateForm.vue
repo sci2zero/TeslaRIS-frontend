@@ -59,7 +59,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                     </v-col>
                     <v-col cols="6">
                         <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -187,7 +187,7 @@ export default defineComponent({
         const publicationSeriesVolume = ref(props.presetProceedings?.publicationSeriesVolume);
         const publicationSeriesIssue = ref(props.presetProceedings?.publicationSeriesIssue);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -240,7 +240,7 @@ export default defineComponent({
             eIsbn, printIsbn, languageList, selectedLanguages,
             languageTags, publicationYear, doi, scopus, numberOfPages,
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
-            selectedPublisher, selectedBookSeries,
+            selectedPublisher, selectedBookSeries, doiValidationRules,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, updateProceedings
         };

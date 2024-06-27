@@ -71,7 +71,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="6">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="6">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -223,7 +223,7 @@ export default defineComponent({
             }
         };
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -309,7 +309,7 @@ export default defineComponent({
             eventAutocompleteRef, selectedEvent,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
-            description, descriptionRef,
+            description, descriptionRef, doiValidationRules,
             publicationYear, doi, scopus, numberOfPages,
             keywords, keywordsRef, setPublicationYear,
             publicationSeriesVolume, publicationSeriesIssue,

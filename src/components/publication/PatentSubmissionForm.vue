@@ -31,7 +31,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="5">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -160,7 +160,7 @@ export default defineComponent({
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
         const submitPatent = (stayOnPage: boolean) => {
             const newPatent: Patent = {
@@ -226,7 +226,8 @@ export default defineComponent({
             keywords, keywordsRef, selectedEvent,
             place, placeRef, uris, urisRef,
             contributions, contributionsRef, eventRef,
-            requiredFieldRules, submitPatent, errorMessage
+            requiredFieldRules, submitPatent, errorMessage,
+            doiValidationRules
         };
     }
 });

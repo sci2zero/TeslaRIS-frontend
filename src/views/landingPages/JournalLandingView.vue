@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                        {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("journalLabel") }}

@@ -120,13 +120,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in proceedings?.uris" :key="uri">
-                                        <v-btn
-                                            variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
-                                            target="_blank">
-                                            {{ uri }}
-                                        </v-btn>
-                                    </div>
+                                    <uri-list :uris="proceedings?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -203,11 +197,12 @@ import { PublicationSeriesType, type PublicationSeries } from '@/models/Publicat
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsUpdateModal.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

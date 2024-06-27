@@ -52,7 +52,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -209,7 +209,7 @@ export default defineComponent({
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
@@ -336,7 +336,7 @@ export default defineComponent({
             description, descriptionRef,
             keywords, keywordsRef,
             placeRef, uris, urisRef,
-            myPublications,
+            myPublications, doiValidationRules,
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType,
             contributions, contributionsRef,

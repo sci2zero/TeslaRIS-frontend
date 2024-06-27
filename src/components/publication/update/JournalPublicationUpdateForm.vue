@@ -42,7 +42,7 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
                 <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -155,7 +155,7 @@ export default defineComponent({
         const numberOfPages = ref(props.presetJournalPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetJournalPublication?.uris as string[]);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
         
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
@@ -192,7 +192,7 @@ export default defineComponent({
             title, subtitle,
             publicationYear, doi, scopus,
             selectedJournal, articleNumber,
-            uris, numberOfPages,
+            uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
             updateJournalPublication, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,

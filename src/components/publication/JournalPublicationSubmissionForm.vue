@@ -69,7 +69,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI"></v-text-field>
+                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="5">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
@@ -212,7 +212,7 @@ export default defineComponent({
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
@@ -300,7 +300,7 @@ export default defineComponent({
             articleNumber, numberOfPages,
             description, descriptionRef,
             keywords, keywordsRef,
-            uris, urisRef,
+            uris, urisRef, doiValidationRules,
             selectedJournal, journalAutocompleteRef, myPublications,
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType,

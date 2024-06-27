@@ -72,13 +72,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <div v-for="uri in dataset?.uris" :key="uri">
-                                        <v-btn
-                                            variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="uri"
-                                            target="_blank">
-                                            {{ uri }}
-                                        </v-btn>
-                                    </div>
+                                    <uri-list :uris="dataset?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -149,11 +143,12 @@ import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/Attac
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateModal.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
