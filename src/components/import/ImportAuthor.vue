@@ -140,7 +140,6 @@ export default defineComponent({
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
                 if (totalPersons.value === 0) {
-                    showTable.value = false;
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
@@ -250,6 +249,7 @@ export default defineComponent({
                 hadToBeCreated.value = true;
                 researcherBinded.value = true;
                 automaticProcessCompleted.value = true;
+                showTable.value = false;
             });
         };
 

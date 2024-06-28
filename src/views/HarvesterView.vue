@@ -49,7 +49,7 @@
                     {{ $t("noNewDocumentsMessage") }}
                 </h2>
             </v-container>
-            <v-row class="d-flex flex-row justify-center">
+            <v-row v-if="numberOfHarvestedDocuments > 0" class="d-flex flex-row justify-center">
                 <v-col cols="auto">
                     <v-btn
                         color="primary" 

@@ -3,7 +3,7 @@
         <v-col cols="10">
             <v-text-field
                 v-model="element.value" :label="$t('uriInputLabel')" placeholder="URI" outlined
-                @input="sendContentToParent"></v-text-field>
+                :rules="uriValidationRules" @input="sendContentToParent"></v-text-field>
         </v-col>
         <v-col cols="2">
             <v-btn v-if="uris.length > 1 || uris[index].value !== ''" icon @click="removeUri(index)">
@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts">
+import { useValidationUtils } from '@/utils/ValidationUtils';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 
@@ -60,8 +61,12 @@ export default defineComponent({
             uris.value = [];
         };
 
+        const { uriValidationRules } = useValidationUtils();
 
-        return { uris, addUri, removeUri, sendContentToParent, clearInput };
+        return { 
+            uris, addUri, removeUri, 
+            sendContentToParent, clearInput,
+            uriValidationRules };
     },
 });
 </script>

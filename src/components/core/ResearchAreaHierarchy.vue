@@ -1,4 +1,5 @@
 <template>
+    <strong v-if="!researchAreas || researchAreas.length === 0">{{ $t("notYetSetMessage") }}</strong>
     <ul v-for="researchArea in researchAreas" :key="researchArea.name[0].content" class="tree">
         <tree-hierarchy-recursive :preset-research-area="reorganiseParent(researchArea)"></tree-hierarchy-recursive>
     </ul>
