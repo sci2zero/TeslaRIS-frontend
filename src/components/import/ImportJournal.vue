@@ -131,7 +131,6 @@ export default defineComponent({
                 potentialMatches.value = response.data.content;
                 totalJournals.value = response.data.totalElements;
                 if (totalJournals.value === 0) {
-                    showTable.value = false;
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
@@ -202,6 +201,7 @@ export default defineComponent({
                 hadToBeCreated.value = true;
                 journalBinded.value = true;
                 automaticProcessCompleted.value = true;
+                showTable.value = false;
             });
         };
 

@@ -285,5 +285,8 @@ export default {
     journalNotBindedMessage: "Niste završili povezivanje za časopis.",
     detailsNotReviewedMessage: "Niste završili povezivanje za detalje publikacije.",
     finishLoadLabel: "Uvezi",
-    invalidDOIError: "Neispravan DOI format"
+    invalidDOIError: "Neispravan DOI format",
+    potentialDuplicateMessage: "Ovaj dokument je detektovan kao potencijalni duplikat. Selektujte rad u listi ispod ako isti odgovara ovom dokumentu:",
+    loadSuccessMessage: "Uspešno uvezeno.",
+    invalidUriError: "Neispravan URL format"
 }

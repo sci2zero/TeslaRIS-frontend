@@ -45,7 +45,7 @@
                                     {{ $t("sexLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.sex" class="response">
-                                    {{ personalInfo.sex }}
+                                    {{ getTitleFromValueAutoLocale(personalInfo.sex) }}
                                 </div>
                                 <div v-if="personalInfo.country">
                                     {{ $t("countryLabel") }}:
@@ -200,6 +200,7 @@ import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameM
 import PrizeList from '@/components/person/prize/PrizeList.vue';
 import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 
 
 export default defineComponent({
@@ -453,7 +454,7 @@ export default defineComponent({
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
-            updateKeywords, updateBiography, updateOtherNames, selectPrimaryName,
+            updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate
         };
 }})

@@ -3,6 +3,8 @@
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("yearOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
+        <deduplicator :publication-for-loading="currentLoadRecord" @deduplicate="deduplicate"></deduplicator>
+
         <br />
         <v-stepper
             v-model="stepperValue" :items="steps"
@@ -87,11 +89,12 @@ import ImportJournalPublicationDetails from "@/components/import/ImportJournalPu
 import ImportProceedingsPublicationDetails from "@/components/import/ImportProceedingsPublicationDetails.vue";
 import type { JournalPublication, PersonDocumentContribution } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import Deduplicator from "@/components/import/Deduplicator.vue";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails},
+    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator},
     setup() {
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();
@@ -127,6 +130,7 @@ export default defineComponent({
         const fetchNextRecordForLoading = () => {
             loadingJournalPublication.value = false;
             loadingProceedingsPublication.value = false;
+            importAuthorsRef.value = [];
 
             ImportService.getNextFromWizard().then(response => {
                 currentLoadRecord.value = response.data;
@@ -227,6 +231,7 @@ export default defineComponent({
 
         const finishLoad = () => {
             if (importAuthorsRef.value.length !== currentLoadRecord.value?.contributions.length) {
+                console.log(importAuthorsRef.value.length, currentLoadRecord.value?.contributions.length);
                 errorMessage.value = i18n.t("authorBindNotFinishedMessage");
                 snackbar.value = true;
                 return;
@@ -309,14 +314,25 @@ export default defineComponent({
                 };
 
                 DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
-                    stepperValue.value = 1;
-                    ImportService.markCurrentAsLoaded().then(() => {
-                        fetchNextRecordForLoading();
-                    });
+                    markAsLoadedAndFetchNext();
                 });
             } else if (loadingProceedingsPublication.value) {
                 // TODO: to be implemented
             }
+        };
+
+        const deduplicate = () => {
+            markAsLoadedAndFetchNext();
+        };
+
+        const markAsLoadedAndFetchNext = () => {
+            stepperValue.value = 1;
+            ImportService.markCurrentAsLoaded().then(() => {
+                importAuthorsRef.value = [];
+                fetchNextRecordForLoading();
+                errorMessage.value = i18n.t("loadSuccessMessage");
+                snackbar.value = true;
+            });
         };
 
         return {
@@ -328,7 +344,8 @@ export default defineComponent({
             skipDocument, importAuthorsRef, smartSkip,
             loadingJournalPublication, updateRecord,
             loadingProceedingsPublication, finishLoad,
-            journalImportRef, journalPublicationDetailsRef
+            journalImportRef, journalPublicationDetailsRef,
+            deduplicate
         };
     },
 });

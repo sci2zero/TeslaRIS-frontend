@@ -4,6 +4,8 @@ import axios from "axios";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
+import type { Page } from "@/models/Common";
+import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 
 export class ImportService extends BaseService {
   
@@ -33,6 +35,10 @@ export class ImportService extends BaseService {
 
     async createNewJournal(eIssn: string, printIssn: string, idempotencyKey: string): Promise<AxiosResponse<PublicationSeries>> {
       return super.sendRequest(axios.post, `load/journal?eIssn=${eIssn}&printIssn=${printIssn}`, {}, idempotencyKey);
+    }
+
+    async searchForDuplicates(parameters: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+      return super.sendRequest(axios.get, `document/deduplication-search?${parameters}`);
     }
   }
   
