@@ -14,7 +14,7 @@
                 @update:model-value="onPersonSelect($event)"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" style="margin-top: 20px;">
+        <v-col cols="1" class="modal-spacer-top">
             <person-submission-modal @create="selectNewlyAddedPerson"></person-submission-modal>
         </v-col>
     </v-row>

@@ -23,7 +23,7 @@ export class PersonService extends BaseService {
   }
 
   async findResearcherByScopusAuthorId(scopusId: string): Promise<AxiosResponse<PersonIndex | null>> {
-    return super.sendRequest(axios.get, `person/scopus-author?scopusId=${scopusId}`);
+    return super.sendRequest(axios.get, `person/scopus-author/${scopusId}`);
   }
 
   async createPerson(body: BasicPerson, idempotencyKey?: string): Promise<AxiosResponse<BasicPerson>> {

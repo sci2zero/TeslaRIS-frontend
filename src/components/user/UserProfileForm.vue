@@ -88,7 +88,7 @@
             </v-row>
         </v-container>
         <v-row justify="center">
-            <v-btn color="blue darken-1" :disabled="!isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="updateUser">
+            <v-btn color="blue darken-1" :disabled="!isFormValid" class="submission-action" @click="updateUser">
                 {{ $t("saveLabel") }}
             </v-btn>
         </v-row>

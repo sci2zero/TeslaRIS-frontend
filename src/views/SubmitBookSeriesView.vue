@@ -8,12 +8,12 @@
         <publication-series-submission-form ref="submissionFormRef" :input-type="inputType"></publication-series-submission-form>
         <v-row justify="center">
             <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitPublicationSeries(false)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitPublicationSeries(false)">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-col>
             <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitPublicationSeries(true)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitPublicationSeries(true)">
                     {{ $t("saveAndAddAnotherLabel") }}
                 </v-btn>
             </v-col>

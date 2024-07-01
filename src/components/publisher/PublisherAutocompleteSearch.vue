@@ -13,7 +13,7 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" style="margin-top: 20px;">
+        <v-col cols="1" class="modal-spacer-top">
             <publisher-submission-modal @create="selectNewlyAddedPublisher"></publisher-submission-modal>
         </v-col>
         <v-col cols="1">

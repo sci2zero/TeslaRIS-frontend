@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
                 <v-btn
-                    color="primary" dark v-bind="scope.props" style="margin-bottom: 20px;"
+                    color="primary" dark v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
                     {{ $t("addInstitutionEditorLabel") }}
                 </v-btn>
@@ -57,7 +57,7 @@
                             </v-row>
                         </v-form>
                     </v-container>
-                    <p style="margin-left: 20px;">
+                    <p class="required-fields-message">
                         {{ $t("requiredFieldsMessage") }}
                     </p>
                 </v-card-text>

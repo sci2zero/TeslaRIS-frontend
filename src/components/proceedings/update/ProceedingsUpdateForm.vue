@@ -87,7 +87,7 @@
         </v-row>
 
         <v-row>
-            <p style="margin-left: 20px;">
+            <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
             </p>
         </v-row>

@@ -15,7 +15,7 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" style="margin-top: 20px;">
+        <v-col cols="1" class="modal-spacer-top">
             <conference-submission-modal :read-only="readOnly" @create="selectNewlyAddedEvent"></conference-submission-modal>
         </v-col>
         <v-col cols="1">

@@ -1,6 +1,6 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" style="margin-bottom: 20px;" :disabled="selectedPublishers.length === 0"
+        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedPublishers.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
@@ -26,7 +26,7 @@
                     <v-checkbox
                         v-model="selectedPublishers"
                         :value="row.item"
-                        style="margin:0px;padding:0px"
+                        class="table-checkbox"
                         hide-details
                     />
                 </td>
