@@ -47,7 +47,7 @@
                                 {{ $t('resendLabel') }}
                             </v-btn>
                         </v-col>
-                        <v-col cols="2" style="margin-top: 15px;">
+                        <v-col cols="2" class="progress">
                             <v-progress-circular v-if="cooldown" :model-value="progress"></v-progress-circular>
                         </v-col>
                     </v-row>
@@ -223,6 +223,10 @@ export default defineComponent(
             text-align: left;
             display: block;
         }
+    }
+
+    .progress {
+        margin-top: 15px;
     }
 
 </style>

@@ -5,7 +5,7 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedPersons.length !== 2">
+        density="compact" class="compare-button" :disabled="selectedPersons.length !== 2">
         {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server

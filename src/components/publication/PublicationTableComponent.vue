@@ -5,7 +5,7 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedPublications.length !== 2">
+        density="compact" class="compare-button" :disabled="selectedPublications.length !== 2">
         {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server
@@ -50,11 +50,7 @@
                     {{ getPublicationTypeTitleFromValueAutoLocale(row.item.type) }}
                 </td>
                 <td v-if="row.item.doi">
-                    <v-btn
-                        variant="plain" style="opacity: 0.9;" class="no-uppercase m-0 p-0 h-auto" :href="`https://doi.org/${row.item.doi}`"
-                        target="_blank">
-                        {{ row.item.doi }}
-                    </v-btn>
+                    <doi-link :doi="row.item.doi"></doi-link>
                 </td>
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.doi) }}
@@ -85,11 +81,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
+import DoiLink from '../core/DoiLink.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, DoiLink },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,

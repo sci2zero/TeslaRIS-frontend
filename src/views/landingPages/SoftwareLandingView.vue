@@ -66,7 +66,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="software?.doi" class="response">
-                                    {{ software.doi }}
+                                    <doi-link :doi="software.doi"></doi-link>
                                 </div>
                                 <div v-if="software?.uris && software?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -144,11 +144,12 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import SoftwareUpdateModal from '@/components/publication/update/SoftwareUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
+import DoiLink from '@/components/core/DoiLink.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal, UriList },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal, UriList, DoiLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

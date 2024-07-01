@@ -26,6 +26,10 @@ a,
     }
 }
 
+/* Forms */
+.semi-transparent {
+    opacity: 0.9;
+}
 
 /* Forms */
 input {
@@ -57,6 +61,11 @@ label {
     margin-bottom: 20px;
 }
 
+.can-not-find-message {
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
 /* Update modals */
 
 .edit-pen-container .edit-pen {
@@ -84,4 +93,13 @@ label {
 .table-checkbox {
     margin:0px;
     padding:0px
+}
+
+.compare-button {
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+.inline-action {
+    margin-left: 10px;
 }

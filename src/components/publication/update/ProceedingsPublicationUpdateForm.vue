@@ -17,7 +17,7 @@
                     return-object
                 ></v-select>
             </v-col>
-            <v-col style="margin-top: 15px;">
+            <v-col class="proceedings-submission">
                 <proceedings-submission-modal :conference="selectedEvent" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
             </v-col>
         </v-row>
@@ -246,3 +246,11 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.proceedings-submission {
+    margin-top: 15px;
+}
+
+</style>

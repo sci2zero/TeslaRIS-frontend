@@ -96,7 +96,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="monograph?.doi" class="response">
-                                    {{ monograph.doi }}
+                                    <doi-link :doi="monograph.doi"></doi-link>
                                 </div>
                                 <div v-if="monograph?.eventId">
                                     {{ $t("conferenceLabel") }}:
@@ -209,11 +209,12 @@ import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import UriList from '@/components/core/UriList.vue';
+import DoiLink from '@/components/core/DoiLink.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

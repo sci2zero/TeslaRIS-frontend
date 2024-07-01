@@ -23,7 +23,7 @@
                     <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
                         {{ row.item.active ? "Deactivate" : "Activate" }}
                     </v-btn>
-                    <v-btn color="blue" dark style="margin-left: 10px;" @click="takeRoleOfUser(row.item.email)">
+                    <v-btn color="blue" dark class="inline-action" @click="takeRoleOfUser(row.item.email)">
                         Take Role
                     </v-btn>
                 </td>

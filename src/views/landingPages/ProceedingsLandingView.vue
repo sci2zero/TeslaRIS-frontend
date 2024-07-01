@@ -108,7 +108,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="proceedings?.doi" class="response">
-                                    {{ proceedings.doi }}
+                                    <doi-link :doi="proceedings.doi"></doi-link>
                                 </div>
                                 <div v-if="proceedings?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
@@ -198,11 +198,12 @@ import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
+import DoiLink from '@/components/core/DoiLink.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, DoiLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

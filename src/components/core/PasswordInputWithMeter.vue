@@ -14,7 +14,7 @@
         :color="score().color"
         :model-value="score().value"
         :bg-opacity="0.1"
-        style="margin-top: -15px;"
+        class="progress"
     ></v-progress-linear>
 </template>
 
@@ -24,6 +24,7 @@ import { computed } from 'vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import zxcvbn from 'zxcvbn';
+
 
 export default defineComponent({
     name: "PasswordInputWithMeter",
@@ -84,3 +85,11 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+    
+    .progress {
+        margin-top: -15px;
+    }
+
+</style>

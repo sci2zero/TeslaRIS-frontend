@@ -66,7 +66,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="dataset?.doi" class="response">
-                                    {{ dataset.doi }}
+                                    <doi-link :doi="dataset.doi"></doi-link>
                                 </div>
                                 <div v-if="dataset?.uris && dataset?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -144,11 +144,12 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
+import DoiLink from '@/components/core/DoiLink.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, DoiLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -86,7 +86,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="proceedingsPublication?.doi" class="response">
-                                    {{ proceedingsPublication.doi }}
+                                    <doi-link :doi="proceedingsPublication.doi"></doi-link>
                                 </div>
                                 <div v-if="proceedingsPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
@@ -180,11 +180,12 @@ import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn, getTitleFro
 import ProceedingsPublicationUpdateModal from '@/components/publication/update/ProceedingsPublicationUpdateModal.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
+import DoiLink from '@/components/core/DoiLink.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsPublicationUpdateModal, UriList },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsPublicationUpdateModal, UriList, DoiLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -12,7 +12,7 @@
                 :subtitle="potentialMatch.authorNames + (potentialMatch.year ? ` · ${potentialMatch.year}` : '')"
             >
                 <template #append>
-                    <v-btn style="margin-left: 10px;" color="primary" density="compact" @click="handleSelect">
+                    <v-btn class="inline-action" color="primary" density="compact" @click="handleSelect">
                         {{ $t("selectLabel") }}
                     </v-btn>
                 </template>

@@ -33,7 +33,7 @@
                                 <v-col>
                                     <v-btn
                                         icon variant="outlined" size="x-small" color="primary"
-                                        style="margin-left: 10px;" @click="sendDeleteRequestToParent(attachment.id)">
+                                        class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
                                         <v-icon size="x-large" icon="mdi-delete"></v-icon>
                                     </v-btn>
                                 </v-col>

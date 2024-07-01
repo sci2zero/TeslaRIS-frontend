@@ -12,7 +12,7 @@
                 </div>
                 <v-btn
                     v-else icon variant="outlined"
-                    color="primary" v-bind="scope.props" style="margin-top: 13px;"
+                    color="primary" v-bind="scope.props" class="inline-edit-btn"
                     :disabled="readOnly" size="medium" v-on="scope.isActive">
                     <v-icon size="x-large" icon="mdi-pen"></v-icon>
                 </v-btn>
@@ -91,3 +91,11 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.inline-edit-btn {
+    margin-top: 13px;
+}
+
+</style>

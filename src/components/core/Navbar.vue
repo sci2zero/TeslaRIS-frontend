@@ -1,14 +1,14 @@
 <template>
     <div id="navbar">
         <v-toolbar app height="auto">
-            <div class="wide-container flex-wrap" style="min-height: 64px;">
+            <div class="wide-container flex-wrap toolbar-container">
                 <span class="hidden-sm-and-up">
                     <v-toolbar-side-icon @click="sidebar = !sidebar">
                     </v-toolbar-side-icon>
                 </span>
                 <div class="d-flex">
                     <v-toolbar-title>
-                        <router-link to="/" class="logo-link" style="cursor: pointer">
+                        <router-link to="/" class="logo-link app-title">
                             {{ appTitle }}
                         </router-link>
                     </v-toolbar-title>
@@ -287,4 +287,13 @@ export default defineComponent(
         margin-inline: 5px;
     }
 }
+
+.app-title {
+    cursor: pointer;
+}
+
+.toolbar-container {
+    min-height: 64px;
+}
+
 </style>
