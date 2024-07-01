@@ -3,7 +3,7 @@
         <v-col cols="2">
             <h2>{{ $t("proceedingsLabel") }}</h2>  
         </v-col>
-        <v-col style="margin-top: 10px;" cols="3">
+        <v-col class="proceedings-submission" cols="3">
             <proceedings-submission-modal :conference="convertToListEntry(presetEvent)" @create="refreshProceedingsList"></proceedings-submission-modal>
         </v-col>
     </v-row>
@@ -121,3 +121,11 @@ import { useI18n } from 'vue-i18n';
     },
   });
 </script>
+
+<style scoped>
+
+.proceedings-submission {
+    margin-top: 10px;
+}
+
+</style>

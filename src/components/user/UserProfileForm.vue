@@ -19,7 +19,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-        <v-btn v-if="userRole === 'RESEARCHER'" color="blue darken-1" style="margin-top: -15px; margin-bottom: 20px;">
+        <v-btn v-if="userRole === 'RESEARCHER'" color="blue darken-1" class="update-researcher">
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
@@ -312,3 +312,12 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.update-researcher {
+    margin-top: -15px;
+    margin-bottom: 20px;
+}
+
+</style>

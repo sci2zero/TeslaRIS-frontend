@@ -10,7 +10,7 @@
             {{ $t("createdNewEntityLabel", [selectedResearcher?.name as string]) }}
         </h2>
 
-        <h2 v-if="showTable" style="margin-top: 20px; margin-bottom: 20px">
+        <h2 v-if="showTable" class="can-not-find-message">
             {{ $t("canNotAutoFindResearcherMessage") }}
         </h2>
 

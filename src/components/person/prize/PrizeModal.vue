@@ -11,7 +11,7 @@
                         <v-icon size="x-large" icon="mdi-plus"></v-icon>
                     </v-btn>
                     <v-list-item
-                        v-else v-bind="scope.props" :disabled="readOnly" style="margin-left: 10px;"
+                        v-else v-bind="scope.props" :disabled="readOnly" class="inline-action"
                         v-on="scope.isActive">
                         <v-list-item-title>{{ $t("updatePrizeLabel") }}</v-list-item-title>
                     </v-list-item>

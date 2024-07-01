@@ -5,7 +5,7 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" style="margin-bottom: 20px; margin-left: 10px;" :disabled="selectedEvents.length !== 2">
+        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2">
         {{ $t("compareLabel") }}
     </v-btn>
     <v-data-table-server
@@ -77,7 +77,7 @@ import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 
 export default defineComponent({
-    name: "PublicationTableComponent",
+    name: "EventTableComponent",
     components: { LocalizedLink },
     props: {
         events: {

@@ -10,7 +10,7 @@
             {{ $t("createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
         </h2>
 
-        <h2 v-if="showTable" style="margin-top: 20px; margin-bottom: 20px">
+        <h2 v-if="showTable" class="can-not-find-message">
             {{ $t("canNotAutoFindOUMessage") }}
         </h2>
 

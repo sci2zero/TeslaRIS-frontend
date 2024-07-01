@@ -57,7 +57,7 @@
                 v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"
                 @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
-        <v-col cols="2" style="margin-top: 10px;">
+        <v-col cols="2" class="custom-label">
             <v-btn color="primary" @click="customNameInput = !customNameInput">
                 {{ !customNameInput ? $t("addCustomLabel") : $t("selectFromListLabel") }}
             </v-btn>
@@ -331,3 +331,11 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.custom-label {
+    margin-top: 10px;
+}
+
+</style>
