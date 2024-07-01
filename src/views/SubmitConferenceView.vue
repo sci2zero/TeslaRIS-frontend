@@ -8,12 +8,12 @@
         <conference-submission-form ref="submissionFormRef"></conference-submission-form>
         <v-row justify="center">
             <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.addConference(false)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.addConference(false)">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-col>
             <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.addConference(true)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.addConference(true)">
                     {{ $t("saveAndAddAnotherLabel") }}
                 </v-btn>
             </v-col>

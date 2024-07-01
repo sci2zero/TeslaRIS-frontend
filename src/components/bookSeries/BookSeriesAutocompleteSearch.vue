@@ -14,7 +14,7 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" style="margin-top: 20px;">
+        <v-col cols="1" class="modal-spacer-top">
             <publication-series-submission-modal :input-type="inputType" @create="selectNewlyAddedBookSeries"></publication-series-submission-modal>
         </v-col>
         <v-col cols="1">

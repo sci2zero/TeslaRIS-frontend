@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
                 <v-btn
-                    color="primary" icon v-bind="scope.props" style="margin-bottom: 20px;"
+                    color="primary" icon v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
                     <v-icon>mdi-pencil-plus-outline</v-icon>
                 </v-btn>

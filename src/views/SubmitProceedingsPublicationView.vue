@@ -8,12 +8,12 @@
         <proceedings-publication-submission-form ref="submissionFormRef"></proceedings-publication-submission-form>
         <v-row justify="center">
             <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitProceedingsPublication(false)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitProceedingsPublication(false)">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-col>
             <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitProceedingsPublication(true)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitProceedingsPublication(true)">
                     {{ $t("saveAndAddAnotherLabel") }}
                 </v-btn>
             </v-col>

@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" persistent max-width="850px">
             <template #activator="scope">
                 <v-btn
-                    color="primary" dark v-bind="scope.props" style="margin-bottom: 20px;"
+                    color="primary" dark v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
                     {{ $t("viewOtherNamesLabel") }}
                 </v-btn>
@@ -48,7 +48,7 @@
                             </v-row>
                         </v-form>
                     </v-container>
-                    <p v-if="!readOnly" style="margin-left: 20px;">
+                    <p v-if="!readOnly" class="required-fields-message">
                         {{ $t("requiredFieldsMessage") }}
                     </p>
                 </v-card-text>

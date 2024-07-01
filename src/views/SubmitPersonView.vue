@@ -8,12 +8,12 @@
         <person-submission-form ref="submissionFormRef"></person-submission-form>
         <v-row justify="center">
             <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitPerson(false)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitPerson(false)">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-col>
             <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" style="margin-top: 20px; margin-bottom: 20px;" @click="submissionFormRef?.submitPerson(true)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitPerson(true)">
                     {{ $t("saveAndAddAnotherLabel") }}
                 </v-btn>
             </v-col>

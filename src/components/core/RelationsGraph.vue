@@ -112,14 +112,6 @@ export default defineComponent({
                                 .style("fill", linkColors[i]);
                         });
     
-            // const linkText = svg.selectAll('.link-text')
-            //     .data(props.links)
-            //     .enter().append('text')
-            //     .attr('class', 'link-text')
-            //     .text((d: any) => d.label)
-            //     .attr('text-anchor', 'middle')
-            //     .attr('font-size', '12px');
-    
             const node = svg.selectAll(".node")
                 .data(uniqueNodes)
                 .enter().append("circle")
@@ -243,9 +235,6 @@ export default defineComponent({
                         const offsetY = (dy / length) * (node_width + 10);
                         return d.target.y - offsetY;
                     });
-    
-                // linkText.attr('x', (d: any) => (d.source.x + d.target.x) / 2)
-                //     .attr('y', (d: any) => (d.source.y + d.target.y) / 2);
     
                 node.attr('cx', (d: any) => d.x)
                     .attr('cy', (d: any) => d.y);

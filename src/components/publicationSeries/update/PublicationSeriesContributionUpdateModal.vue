@@ -5,7 +5,7 @@
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" style="margin-bottom: 20px;"
+                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         size="small" v-on="scope.isActive">
                         <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                     </v-btn>
@@ -96,21 +96,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-.edit-pen-container .edit-pen {
-    top: 0px;
-    right: 0px;
-    position: absolute;
-    z-index: 10;
-    opacity: 0;
-}
-
-.edit-pen-container:hover .edit-pen {
-    opacity: 0.3;
-}
-
-.edit-pen-container .edit-pen:hover {
-    opacity: 1;
-}
-</style>

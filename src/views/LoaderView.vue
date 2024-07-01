@@ -39,12 +39,12 @@
             </template>
         </v-stepper>
 
-        <v-btn style="margin-top: 30px;" @click="skipDocument">
+        <v-btn class="load-action" @click="skipDocument">
             {{ $t('skipDocumentLabel') }}
         </v-btn>
 
         
-        <v-btn style="margin-top: 30px; margin-left: 30px;" @click="smartSkip">
+        <v-btn class="load-action same-line" @click="smartSkip">
             {{ $t('smartImportLabel') }}
             <v-tooltip
                 activator="parent"
@@ -54,7 +54,7 @@
             </v-tooltip>
         </v-btn>
 
-        <v-btn style="margin-top: 30px; margin-left: 30px" @click="finishLoad">
+        <v-btn class="load-action same-line" @click="finishLoad">
             {{ $t('finishLoadLabel') }}
         </v-btn>
 
@@ -350,3 +350,15 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+
+.load-action {
+    margin-top: 30px;
+}
+
+.same-line {
+    margin-left: 30px;
+}
+
+</style>

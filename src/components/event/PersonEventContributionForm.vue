@@ -1,5 +1,5 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" style="margin-bottom: 20px;">
+    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
         <v-row>
             <v-col cols="10">
                 <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="false" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>

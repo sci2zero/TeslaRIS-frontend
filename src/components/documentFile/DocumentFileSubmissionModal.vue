@@ -5,7 +5,7 @@
                 <div v-if="!edit" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
-                        color="primary" v-bind="scope.props" style="margin-bottom: 20px;"
+                        color="primary" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly" size="medium" v-on="scope.isActive">
                         <v-icon size="x-large" icon="mdi-upload"></v-icon>
                     </v-btn>
@@ -91,21 +91,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-.edit-pen-container .edit-pen {
-    top: 0px;
-    right: 0px;
-    position: absolute;
-    z-index: 10;
-    opacity: 0;
-}
-
-.edit-pen-container:hover .edit-pen {
-    opacity: 0.3;
-}
-
-.edit-pen-container .edit-pen:hover {
-    opacity: 1;
-}
-</style>

@@ -33,7 +33,7 @@
             <v-container class="d-flex flex-row justify-center">
                 <h2>{{ $t("documentsReadyForImportLabel") }}: {{ numberOfHarvestedDocuments }}</h2>
             </v-container>
-            <v-row v-if="loading" class="d-flex flex-row justify-center" style="margin-top: 20px; margin-bottom: 20px;">
+            <v-row v-if="loading" class="d-flex flex-row justify-center submission-action">
                 <v-progress-circular
                     :size="70"
                     :width="7"

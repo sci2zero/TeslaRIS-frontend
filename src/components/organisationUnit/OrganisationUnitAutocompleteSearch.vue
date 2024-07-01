@@ -14,7 +14,7 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="userRole === 'ADMIN'" cols="1" style="margin-top: 20px;">
+        <v-col v-if="userRole === 'ADMIN'" cols="1" class="modal-spacer-top">
             <organisation-unit-submission-modal @create="selectNewlyAddedOU"></organisation-unit-submission-modal>
         </v-col>
         <v-col cols="1">

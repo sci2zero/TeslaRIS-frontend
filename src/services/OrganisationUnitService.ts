@@ -17,7 +17,7 @@ export class OrganisationUnitService extends BaseService {
   }
 
   async findOUByScopusAfid(scopusAfid: string): Promise<AxiosResponse<OrganisationUnitIndex>> {
-    return super.sendRequest(axios.get, `organisation-unit/afid/${scopusAfid}`);
+    return super.sendRequest(axios.get, `organisation-unit/scopus-afid/${scopusAfid}`);
   }
 
   async readOURelationsGraph(organisationUnitLeafId: number): Promise<AxiosResponse<any>> {
