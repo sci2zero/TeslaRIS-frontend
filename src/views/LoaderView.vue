@@ -16,10 +16,7 @@
 
             <template #[`item.${steps.length-1}`]>
                 <import-journal v-if="loadingJournalPublication" ref="journalImportRef" :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"></import-journal>
-                
-                <h1 v-if="loadingProceedingsPublication">
-                    Sredjujem zbornik
-                </h1> <!--TODO: import proceedings-->
+                <import-proceedings v-if="loadingProceedingsPublication" ref="proceedingsImportRef" :publication-for-loading="(currentLoadRecord as ProceedingsPublicationLoad)"></import-proceedings>
             </template>
 
             <template #[`item.${steps.length}`]>
@@ -90,11 +87,12 @@ import ImportProceedingsPublicationDetails from "@/components/import/ImportProce
 import type { JournalPublication, PersonDocumentContribution } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import Deduplicator from "@/components/import/Deduplicator.vue";
+import ImportProceedings from "@/components/import/ImportProceedings.vue";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator},
+    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings},
     setup() {
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();

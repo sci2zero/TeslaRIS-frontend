@@ -288,5 +288,7 @@ export default {
     invalidDOIError: "Invalid DOI format",
     potentialDuplicateMessage: "This document has been detected as a potential duplicate. Select the publication from the list below if it matches this document:",
     loadSuccessMessage: "Successfully loaded.",
-    invalidUriError: "Invalid URL format"
+    invalidUriError: "Invalid URL format",
+    canNotAutoFindEventMessage: "Can't automatically find a conference in the system, please, select conference from the list:",
+    canCreateNewEventLabel: "If the conference is not in the list you can create a new one:"
 }

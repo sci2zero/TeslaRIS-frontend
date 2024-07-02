@@ -12,6 +12,10 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.get, `conference/simple-search?${tokens}`);
   }
 
+  async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {
+    return super.sendRequest(axios.get, `conference/import-search?${parameters}`);
+  }
+
   async readConference(conferenceId: number): Promise<AxiosResponse<Conference>> {
     return super.sendRequest(axios.get, `conference/${conferenceId}`);
   }

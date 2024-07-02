@@ -288,5 +288,7 @@ export default {
     invalidDOIError: "Neispravan DOI format",
     potentialDuplicateMessage: "Ovaj dokument je detektovan kao potencijalni duplikat. Selektujte rad u listi ispod ako isti odgovara ovom dokumentu:",
     loadSuccessMessage: "Uspešno uvezeno.",
-    invalidUriError: "Neispravan URL format"
+    invalidUriError: "Neispravan URL format",
+    canNotAutoFindEventMessage: "Nije moguće automatski pronaći konferenciju u sistemu, molimo vas, selektujte iz liste konferencija:",
+    canCreateNewEventLabel: "Ukoliko konferencija nije u listi možete kreirati novi:"
 }
