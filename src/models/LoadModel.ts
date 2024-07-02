@@ -18,9 +18,15 @@ export interface ProceedingsPublicationLoad extends DocumentLoadDTO {
     proceedingsPublicationType: ProceedingsPublicationType;
     startPage: string;
     endPage: string;
+    eIssn: string;
+    printIssn: string;
+    isbn: string;
     numberOfPages: number | null;
     articleNumber: string;
     proceedingsName: MultilingualContent[];
+    conferenceName: MultilingualContent[];
+    eventDateFrom: string;
+    eventDateTo: string;
 }
 
 export interface JournalPublicationLoad extends DocumentLoadDTO {
