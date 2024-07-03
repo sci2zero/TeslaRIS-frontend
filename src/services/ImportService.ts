@@ -6,6 +6,7 @@ import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import type { Page } from "@/models/Common";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
+import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 
 export class ImportService extends BaseService {
   
@@ -35,6 +36,10 @@ export class ImportService extends BaseService {
 
     async createNewJournal(eIssn: string, printIssn: string, idempotencyKey: string): Promise<AxiosResponse<PublicationSeries>> {
       return super.sendRequest(axios.post, `load/journal?eIssn=${eIssn}&printIssn=${printIssn}`, {}, idempotencyKey);
+    }
+
+    async createNewProceedings(idempotencyKey: string): Promise<AxiosResponse<ProceedingsResponse>> {
+      return super.sendRequest(axios.post, "load/proceedings", {}, idempotencyKey);
     }
 
     async searchForDuplicates(parameters: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
