@@ -33,7 +33,7 @@ export default defineComponent({
             const prevLocale: string = from.params.locale;
 
             if (!supportedLocales.includes(newLocale)) {
-                next({ name: to.name, params: { locale: defaultLocale } });
+                next({ name: to.name, params: { ...to.params, locale: defaultLocale } });
                 return;
             }
 

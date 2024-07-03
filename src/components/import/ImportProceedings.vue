@@ -24,7 +24,7 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[10, 25, 50]"
-            @update:options="refreshTable">
+            hide-default-footer>
             <template #item="row">
                 <tr>
                     <td v-if="$i18n.locale == 'sr'">
@@ -65,8 +65,9 @@ import { useI18n } from "vue-i18n";
 import { watch } from "vue";
 import type { ProceedingsPublicationLoad } from "@/models/LoadModel";
 import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
-import type { EventIndex } from "@/models/EventModel";
+import { EventType, type EventIndex } from "@/models/EventModel";
 import EventService from "@/services/EventService";
+import ImportService from "@/services/ImportService";
 
 
 export default defineComponent({
@@ -89,10 +90,6 @@ export default defineComponent({
         const i18n = useI18n();
 
         const totalEvents = ref(0);
-        const page = ref(0);
-        const size = ref(1);
-        const sort = ref("");
-        const direction = ref("");
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
         
         onMounted(() => {
@@ -105,6 +102,16 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
+            searchPotentialMatches();
+        };
+
+        const setFlagsToDefault = () => {
+            eventBinded.value = false;
+            showTable.value = false;
+            hadToBeCreated.value = false;
+        };
+
+        const searchPotentialMatches = () => {
             let parameters = "";
             props.publicationForLoading.conferenceName.forEach(name => {
                 parameters += `names=${name.content}&`;
@@ -117,38 +124,14 @@ export default defineComponent({
                         selectedEvent.value = response.data.content[0];
                         eventBinded.value = true;
                         automaticProcessCompleted.value = true;
+                    } else if (response.data.totalElements === 0) {
+                        addNew();
                     } else {
+                        potentialMatches.value = response.data.content;
                         showTable.value = true;
-                        searchPotentialMatches();
                     }   
                 }
             });
-        };
-
-        const setFlagsToDefault = () => {
-            eventBinded.value = false;
-            showTable.value = false;
-            hadToBeCreated.value = false;
-        };
-
-        const searchPotentialMatches = () => {
-            // JournalService.searchJournals(`tokens=${props.publicationForLoading.journalName[0].content}&page=0&size=10`).then(response => {
-            //     potentialMatches.value = response.data.content;
-            //     totalJournals.value = response.data.totalElements;
-            //     if (totalJournals.value === 0) {
-            //         addNew();
-            //     } else {
-            //         automaticProcessCompleted.value = true;
-            //     }
-            // });
-        };
-
-        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
-            page.value = nextPage;
-            size.value = pageSize;
-            sort.value = sortField;
-            direction.value = sortDir;
-            searchPotentialMatches();
         };
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
@@ -158,33 +141,10 @@ export default defineComponent({
         const stateColumn = computed(() => i18n.t("stateColumn"));
         
         const headers = [
-          { title: nameLabel, align: "start", sortable: true, key: nameColumn},
-          { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
-          { title: stateLabel, align: "start", sortable: true, key: stateColumn},
+          { title: nameLabel, align: "start", sortable: false, key: nameColumn},
+          { title: eventDateLabel, align: "start", sortable: false, key: "dateFromTo"},
+          { title: stateLabel, align: "start", sortable: false, key: stateColumn},
         ];
-
-        const headersSortableMappings: Map<string, string> = new Map([
-            ["nameSr", "name_sr_sortable"],
-            ["nameOther", "name_other_sortable"],
-            ["dateFromTo", "date_sortable"],
-            ["stateSr", "state_sr_sortable"],
-            ["stateOther", "state_other_sortable"],
-        ]);
-
-        const refreshTable = (event: any) => {
-            if (tableOptions.value.initialCustomConfiguration) {
-                tableOptions.value.initialCustomConfiguration = false;
-                event = tableOptions.value;
-            }
-            tableOptions.value = event;
-            let sortField: string | undefined = "";
-            let sortDir: string | undefined = "";
-            if (event.sortBy.length > 0) {
-                sortField = headersSortableMappings.get(event.sortBy[0].key);
-                sortDir = event.sortBy[0].order.toUpperCase();
-            }
-            switchPage(event.page - 1, event.itemsPerPage, sortField as string, sortDir as string);
-        };
 
         const selectManually = (conference: EventIndex) => {
             selectedEvent.value = conference;
@@ -193,52 +153,62 @@ export default defineComponent({
         };
 
         const addNew = () => {
-            // ImportService.createNewJournal(props.publicationForLoading.journalEIssn, props.publicationForLoading.journalPrintIssn, idempotencyKey).then((response) => {
-            //     selectedEvent.value = {
-            //         titleSr: returnCurrentLocaleContent(response.data.title) as string,
-            //         titleOther: returnCurrentLocaleContent(response.data.title) as string,
-            //         databaseId: response.data.id as number,
-            //         eISSN: response.data.eissn,
-            //         printISSN: response.data.printISSN as string,
-            //         titleOtherSortable: "",
-            //         titleSrSortable: "",
-            //         id: ""
-            //     };
+            ImportService.createNewProceedings(idempotencyKey).then((response) => {
+                selectedEvent.value = {
+                    nameSr: returnCurrentLocaleContent(response.data.eventName) as string,
+                    nameOther: returnCurrentLocaleContent(response.data.eventName) as string,
+                    databaseId: response.data.eventId as number,
+                    nameOtherSortable: "",
+                    nameSrSortable: "",
+                    id: "",
+                    dateFromTo: "",
+                    dateSortable: "",
+                    descriptionSr: "",
+                    descriptionOther: "",
+                    eventType: EventType.CONFERENCE,
+                    keywordsOther: "",
+                    keywordsSr: "",
+                    placeSr: "",
+                    placeOther: "",
+                    stateSr: "",
+                    stateOther: "",
+                    stateSrSortable: "",
+                    stateOtherSortable: ""
+                };
 
-            //     hadToBeCreated.value = true;
-            //     eventBinded.value = true;
-            //     automaticProcessCompleted.value = true;
-            //     showTable.value = false;
-            // });
+                hadToBeCreated.value = true;
+                eventBinded.value = true;
+                automaticProcessCompleted.value = true;
+                showTable.value = false;
+            });
         };
 
-        // const generateIdempotencyKey = (): string => {
-        //     function s4(): string {
-        //         return Math.floor((1 + Math.random()) * 0x10000)
-        //         .toString(16)
-        //         .substring(1);
-        //     }
+        const generateIdempotencyKey = (): string => {
+            function s4(): string {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+            }
 
-        //     return (
-        //         s4() +
-        //         s4() +
-        //         '-' +
-        //         s4() +
-        //         '-' +
-        //         s4() +
-        //         '-' +
-        //         s4() +
-        //         '-' +
-        //         s4() +
-        //         s4() +
-        //         s4()
-        //     );
-        // };
-        // const idempotencyKey = generateIdempotencyKey();
+            return (
+                s4() +
+                s4() +
+                '-' +
+                s4() +
+                '-' +
+                s4() +
+                '-' +
+                s4() +
+                '-' +
+                s4() +
+                s4() +
+                s4()
+            );
+        };
+        const idempotencyKey = generateIdempotencyKey();
 
         return {
-            potentialMatches, switchPage, 
-            tableOptions, headers, refreshTable,
+            potentialMatches, tableOptions, headers,
             displayTextOrPlaceholder, totalEvents,
             selectedEvent, automaticProcessCompleted, 
             showTable, selectManually, addNew, eventBinded,
