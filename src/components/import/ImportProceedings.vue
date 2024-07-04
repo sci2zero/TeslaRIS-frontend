@@ -14,6 +14,20 @@
             {{ $t("canNotAutoFindEventMessage") }}
         </h2>
 
+        <h1>{{ $t("proceedingsLabel") }} - {{ returnCurrentLocaleContent(publicationForLoading.proceedingsName) }}</h1>
+
+        <h2 v-if="proceedingsBinded && !hadToBeCreated">
+            {{ $t("foundAsLabel", [returnCurrentLocaleContent(selectedProceedings?.title)]) }}
+        </h2>
+
+        <h2 v-if="proceedingsBinded && hadToBeCreated">
+            {{ $t("createdNewEntityLabel", [returnCurrentLocaleContent(selectedProceedings?.title)]) }}
+        </h2>
+
+        <h2 v-if="proceedingsBinded && selectedProceedings?.publicationSeriesId">
+            izdato u casopisu: IME CASOPISA
+        </h2>
+
         <v-data-table-server
             v-if="showTable"
             :sort-by="tableOptions.sortBy"
@@ -68,6 +82,8 @@ import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
 import { EventType, type EventIndex } from "@/models/EventModel";
 import EventService from "@/services/EventService";
 import ImportService from "@/services/ImportService";
+import type { ProceedingsResponse } from "@/models/ProceedingsModel";
+import ProceedingsService from "@/services/ProceedingsService";
 
 
 export default defineComponent({
@@ -80,8 +96,11 @@ export default defineComponent({
     },
     setup(props) {
         const eventBinded = ref(false);
+        const proceedingsBinded = ref(false);
         const automaticProcessCompleted = ref(false);
+
         const selectedEvent = ref<EventIndex>();
+        const selectedProceedings = ref<ProceedingsResponse>();
 
         const showTable = ref(false);
         const potentialMatches = ref<EventIndex[]>([]);
@@ -107,6 +126,7 @@ export default defineComponent({
 
         const setFlagsToDefault = () => {
             eventBinded.value = false;
+            proceedingsBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
         };
@@ -123,6 +143,7 @@ export default defineComponent({
                     if (response.data.totalElements === 1) {
                         selectedEvent.value = response.data.content[0];
                         eventBinded.value = true;
+                        selectProceedingsFromConference();
                         automaticProcessCompleted.value = true;
                     } else if (response.data.totalElements === 0) {
                         addNew();
@@ -150,6 +171,38 @@ export default defineComponent({
             selectedEvent.value = conference;
             eventBinded.value = true;
             showTable.value = false;
+            selectProceedingsFromConference();
+        };
+
+        const selectProceedingsFromConference = () => {
+            ProceedingsService.readProceedingsForEvent(selectedEvent.value?.databaseId as number).then(response => {
+                if (response.data.length === 0) {
+                    createNewProceedings();
+                    return;
+                }
+
+                for (const proceedings of response.data) {
+                    if (proceedings.eISBN === props.publicationForLoading.isbn) {
+                        selectedProceedings.value = proceedings;
+                        proceedingsBinded.value = true;
+                        automaticProcessCompleted.value = true;
+                        return;
+                    }
+                }
+
+                for (const proceedings of response.data) {
+                    for (const title of proceedings.title) {
+                        if (title.content === returnCurrentLocaleContent(props.publicationForLoading.proceedingsName)) {
+                            selectedProceedings.value = proceedings;
+                            proceedingsBinded.value = true;
+                            automaticProcessCompleted.value = true;
+                            return;
+                        }
+                    }
+                }
+
+                createNewProceedings();
+            });
         };
 
         const addNew = () => {
@@ -176,8 +229,32 @@ export default defineComponent({
                     stateOtherSortable: ""
                 };
 
+                selectedProceedings.value = response.data;
+
                 hadToBeCreated.value = true;
                 eventBinded.value = true;
+                proceedingsBinded.value = true;
+                automaticProcessCompleted.value = true;
+                showTable.value = false;
+            });
+        };
+
+        const createNewProceedings = () => {
+            ProceedingsService.createProceedings({
+                title: props.publicationForLoading.proceedingsName,
+                eventId: selectedEvent.value?.databaseId,
+                description: [],
+                fileItems: [],
+                keywords: [],
+                proofs: [],
+                subTitle: [],
+                uris: [],
+                contributions: [],
+                languageTagIds: [],
+                eISBN: props.publicationForLoading.isbn
+            }).then(() => {
+                hadToBeCreated.value = true;
+                proceedingsBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
             });
@@ -212,7 +289,8 @@ export default defineComponent({
             displayTextOrPlaceholder, totalEvents,
             selectedEvent, automaticProcessCompleted, 
             showTable, selectManually, addNew, eventBinded,
-            hadToBeCreated, returnCurrentLocaleContent
+            hadToBeCreated, returnCurrentLocaleContent,
+            proceedingsBinded, selectedProceedings
         };
     },
 });

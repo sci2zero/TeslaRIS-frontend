@@ -290,5 +290,7 @@ export default {
     loadSuccessMessage: "Uspešno uvezeno.",
     invalidUriError: "Neispravan URL format",
     canNotAutoFindEventMessage: "Nije moguće automatski pronaći konferenciju u sistemu, molimo vas, selektujte iz liste konferencija:",
-    canCreateNewEventLabel: "Ukoliko konferencija nije u listi možete kreirati novi:"
+    canCreateNewEventLabel: "Ukoliko konferencija nije u listi možete kreirati novi:",
+    eventNotBindedMessage: "Niste završili povezivanje za konferenciju.",
+    proceedingsNotBindedMessage: "Niste završili povezivanje za zbornik radova."
 }

@@ -290,5 +290,7 @@ export default {
     loadSuccessMessage: "Successfully loaded.",
     invalidUriError: "Invalid URL format",
     canNotAutoFindEventMessage: "Can't automatically find a conference in the system, please, select conference from the list:",
-    canCreateNewEventLabel: "If the conference is not in the list you can create a new one:"
+    canCreateNewEventLabel: "If the conference is not in the list you can create a new one:",
+    eventNotBindedMessage: "You did not finish binding of conference.",
+    proceedingsNotBindedMessage: "You did not finish binding of proceedings."
 }

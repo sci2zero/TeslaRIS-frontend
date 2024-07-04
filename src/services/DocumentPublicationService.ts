@@ -61,7 +61,7 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "journal-publication", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createJProceedingsPublication(body: ProceedingsPublication): Promise<AxiosResponse<ProceedingsPublication>> {
+  async createProceedingsPublication(body: ProceedingsPublication): Promise<AxiosResponse<ProceedingsPublication>> {
     return super.sendRequest(axios.post, "proceedings-publication", body, DocumentPublicationService.idempotencyKey);
   }
 

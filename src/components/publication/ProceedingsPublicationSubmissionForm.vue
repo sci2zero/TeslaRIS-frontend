@@ -287,7 +287,7 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createJProceedingsPublication(newProceedingsPublication).then((response) => {
+            DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();

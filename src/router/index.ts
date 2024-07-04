@@ -126,7 +126,7 @@ const router = createRouter({
                             component: ConferenceLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
                         }
                     ]
@@ -185,7 +185,7 @@ const router = createRouter({
                             component: BookSeriesLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
                         }
                     ]
@@ -294,7 +294,7 @@ const router = createRouter({
                             component: PublisherLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
                         }
                     ]

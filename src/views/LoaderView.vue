@@ -84,7 +84,7 @@ import ImportAuthor from "@/components/import/ImportAuthor.vue";
 import ImportJournal from "@/components/import/ImportJournal.vue";
 import ImportJournalPublicationDetails from "@/components/import/ImportJournalPublicationDetails.vue";
 import ImportProceedingsPublicationDetails from "@/components/import/ImportProceedingsPublicationDetails.vue";
-import type { JournalPublication, PersonDocumentContribution } from "@/models/PublicationModel";
+import type { JournalPublication, PersonDocumentContribution, ProceedingsPublication } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import Deduplicator from "@/components/import/Deduplicator.vue";
 import ImportProceedings from "@/components/import/ImportProceedings.vue";
@@ -97,6 +97,9 @@ export default defineComponent({
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();
         const journalPublicationDetailsRef = ref<typeof ImportJournalPublicationDetails>();
+
+        const proceedingsImportRef = ref<typeof ImportProceedings>();
+        const proceedingsPublicationDetailsRef = ref<typeof ImportProceedingsPublicationDetails>();
 
         const isFormValid = ref(false);
         
@@ -152,6 +155,7 @@ export default defineComponent({
         const skipDocument = () => {
             ImportService.skipWizard().then(() => {
                 stepperValue.value = 1;
+                importAuthorsRef.value = [];
                 fetchNextRecordForLoading();
             });
         };
@@ -180,6 +184,17 @@ export default defineComponent({
             });
         };
 
+        const waitForImportProceedings = (): Promise<void> => {
+            return new Promise(resolve => {
+                const intervalId = setInterval(() => {
+                if (proceedingsImportRef.value) {
+                    clearInterval(intervalId);
+                    resolve();
+                }
+                }, 200); // Check every 200 milliseconds
+            });
+        };
+
         const smartSkip = async () => {
             let shouldStep = true;
             while (shouldStep) {
@@ -192,7 +207,8 @@ export default defineComponent({
                         await waitForImportJournal();
                         shouldStep = journalImportRef.value!.journalBinded;
                     } else if (loadingProceedingsPublication.value) {
-                        // TODO: to be implemented
+                        await waitForImportProceedings();
+                        shouldStep = proceedingsImportRef.value!.eventBinded && proceedingsImportRef.value!.proceedingsBinded;
                     } else {
                         shouldStep = false;
                     }
@@ -264,7 +280,19 @@ export default defineComponent({
                 journalPublicationDetailsRef.value?.updateJournalPublication();
             
             } else if (loadingProceedingsPublication.value) {
-                // TODO: to be implemented
+                if (!proceedingsImportRef.value?.eventBinded) {
+                    errorMessage.value = i18n.t("eventNotBindedMessage");
+                    snackbar.value = true;
+                    return;
+                }
+
+                if (!proceedingsImportRef.value?.proceedingsBinded) {
+                    errorMessage.value = i18n.t("proceedingsNotBindedMessage");
+                    snackbar.value = true;
+                    return;
+                }
+
+                proceedingsPublicationDetailsRef.value?.updateProceedingsPublication();
             }
         };
 
@@ -315,7 +343,30 @@ export default defineComponent({
                     markAsLoadedAndFetchNext();
                 });
             } else if (loadingProceedingsPublication.value) {
-                // TODO: to be implemented
+                const newProceedingsPublication: ProceedingsPublication = {
+                    title: currentLoadRecord.value!.title,
+                    articleNumber: currentLoadRecord.value!.articleNumber ? currentLoadRecord.value!.articleNumber : "",
+                    description: currentLoadRecord.value!.description,
+                    startPage: currentLoadRecord.value!.startPage,
+                    endPage: currentLoadRecord.value!.endPage,
+                    proceedingsPublicationType: (currentLoadRecord.value as ProceedingsPublicationLoad)!.proceedingsPublicationType,
+                    keywords: currentLoadRecord.value!.keywords,
+                    numberOfPages: currentLoadRecord.value!.numberOfPages as number,
+                    subTitle: currentLoadRecord.value!.subTitle,
+                    uris: currentLoadRecord.value!.uris,
+                    contributions: contributions,
+                    documentDate: currentLoadRecord.value!.documentDate,
+                    scopusId: currentLoadRecord.value!.scopusId,
+                    doi: currentLoadRecord.value!.doi,
+                    eventId: proceedingsImportRef.value!.selectedEvent.databaseId,
+                    proceedingsId: proceedingsImportRef.value!.selectedProceedings.id,
+                    fileItems: [],
+                    proofs: []
+                };
+
+                DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then(() => {
+                    markAsLoadedAndFetchNext();
+                });
             }
         };
 
@@ -343,7 +394,8 @@ export default defineComponent({
             loadingJournalPublication, updateRecord,
             loadingProceedingsPublication, finishLoad,
             journalImportRef, journalPublicationDetailsRef,
-            deduplicate
+            deduplicate, proceedingsImportRef,
+            proceedingsPublicationDetailsRef
         };
     },
 });
