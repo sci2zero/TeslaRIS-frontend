@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container v-if="!noRecordsRemaining">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("yearOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
@@ -69,6 +69,11 @@
             </template>
         </v-snackbar>
     </v-container>
+    <v-container v-else>
+        <h1 class="d-flex flex-row justify-center">
+            {{ $t("noRecordsRemainingMessage") }}
+        </h1>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -113,6 +118,8 @@ export default defineComponent({
 
         const loadingJournalPublication = ref(false);
         const loadingProceedingsPublication = ref(false);
+
+        const noRecordsRemaining = ref(false);
         
         const nextStep = () => {
             stepperValue.value += 1;
@@ -132,8 +139,14 @@ export default defineComponent({
             loadingJournalPublication.value = false;
             loadingProceedingsPublication.value = false;
             importAuthorsRef.value = [];
+            importAuthorsRef.value.length = 0;
 
             ImportService.getNextFromWizard().then(response => {
+                if(!response.data) {
+                    noRecordsRemaining.value = true;
+                    return;
+                }
+
                 currentLoadRecord.value = response.data;
                 steps.value = [];
                 currentLoadRecord.value.contributions.forEach((contribution) => {
@@ -156,6 +169,7 @@ export default defineComponent({
             ImportService.skipWizard().then(() => {
                 stepperValue.value = 1;
                 importAuthorsRef.value = [];
+                importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();
             });
         };
@@ -244,7 +258,7 @@ export default defineComponent({
         };
 
         const finishLoad = () => {
-            if (importAuthorsRef.value.length !== currentLoadRecord.value?.contributions.length) {
+            if (getAuthorLength() !== currentLoadRecord.value?.contributions.length) {
                 console.log(importAuthorsRef.value.length, currentLoadRecord.value?.contributions.length);
                 errorMessage.value = i18n.t("authorBindNotFinishedMessage");
                 snackbar.value = true;
@@ -253,6 +267,7 @@ export default defineComponent({
 
             const unbindedAuthors: string[] = [];
             importAuthorsRef.value.forEach(contribution => {
+                console.log(contribution.isHandled())
                 if (!contribution.isHandled()) {
                     unbindedAuthors.push(`${contribution.personForLoading.firstName} ${contribution.personForLoading.lastName}`)
                 }
@@ -378,11 +393,20 @@ export default defineComponent({
             stepperValue.value = 1;
             ImportService.markCurrentAsLoaded().then(() => {
                 importAuthorsRef.value = [];
+                importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();
                 errorMessage.value = i18n.t("loadSuccessMessage");
                 snackbar.value = true;
             });
         };
+
+        const getAuthorLength = () => {
+            let counter = 0;
+            importAuthorsRef.value.forEach(() => {
+                counter += 1;
+            });
+            return counter;
+        }
 
         return {
             isFormValid, snackbar,
@@ -395,7 +419,8 @@ export default defineComponent({
             loadingProceedingsPublication, finishLoad,
             journalImportRef, journalPublicationDetailsRef,
             deduplicate, proceedingsImportRef,
-            proceedingsPublicationDetailsRef
+            proceedingsPublicationDetailsRef,
+            noRecordsRemaining
         };
     },
 });
