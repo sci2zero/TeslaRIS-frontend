@@ -25,7 +25,7 @@
         </h2>
 
         <h2 v-if="proceedingsBinded && selectedProceedings?.publicationSeriesId">
-            izdato u casopisu: IME CASOPISA
+            {{ $t("publishedInLabel", [returnCurrentLocaleContent(selectedPublicationSeries?.title)]) }}
         </h2>
 
         <v-data-table-server
@@ -84,6 +84,9 @@ import EventService from "@/services/EventService";
 import ImportService from "@/services/ImportService";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 import ProceedingsService from "@/services/ProceedingsService";
+import JournalService from "@/services/JournalService";
+import type { PublicationSeries } from "@/models/PublicationSeriesModel";
+import BookSeriesService from "@/services/BookSeriesService";
 
 
 export default defineComponent({
@@ -111,6 +114,8 @@ export default defineComponent({
         const totalEvents = ref(0);
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
         
+        const selectedPublicationSeries = ref<PublicationSeries>();
+
         onMounted(() => {
             startLoadProcess();
         });
@@ -284,13 +289,26 @@ export default defineComponent({
         };
         const idempotencyKey = generateIdempotencyKey();
 
+        watch(selectedProceedings, () => {
+            if(selectedProceedings.value && selectedProceedings.value.publicationSeriesId) {
+                JournalService.readJournal(selectedProceedings.value.publicationSeriesId).then((journalResponse) => {
+                    selectedPublicationSeries.value = journalResponse.data;
+                }).catch(() => {
+                    BookSeriesService.readBookSeries(selectedProceedings.value?.publicationSeriesId as number).then((bookSeriesResponse) => {
+                        selectedPublicationSeries.value = bookSeriesResponse.data;
+                    });
+                });
+            }
+        });
+
         return {
             potentialMatches, tableOptions, headers,
             displayTextOrPlaceholder, totalEvents,
             selectedEvent, automaticProcessCompleted, 
             showTable, selectManually, addNew, eventBinded,
             hadToBeCreated, returnCurrentLocaleContent,
-            proceedingsBinded, selectedProceedings
+            proceedingsBinded, selectedProceedings,
+            selectedPublicationSeries
         };
     },
 });

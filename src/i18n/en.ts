@@ -292,5 +292,7 @@ export default {
     canNotAutoFindEventMessage: "Can't automatically find a conference in the system, please, select conference from the list:",
     canCreateNewEventLabel: "If the conference is not in the list you can create a new one:",
     eventNotBindedMessage: "You did not finish binding of conference.",
-    proceedingsNotBindedMessage: "You did not finish binding of proceedings."
+    proceedingsNotBindedMessage: "You did not finish binding of proceedings.",
+    publishedInLabel: "Published in: {0}",
+    noRecordsRemainingMessage: "There are no more documents left to load"
 }

@@ -292,5 +292,7 @@ export default {
     canNotAutoFindEventMessage: "Nije moguće automatski pronaći konferenciju u sistemu, molimo vas, selektujte iz liste konferencija:",
     canCreateNewEventLabel: "Ukoliko konferencija nije u listi možete kreirati novi:",
     eventNotBindedMessage: "Niste završili povezivanje za konferenciju.",
-    proceedingsNotBindedMessage: "Niste završili povezivanje za zbornik radova."
+    proceedingsNotBindedMessage: "Niste završili povezivanje za zbornik radova.",
+    publishedInLabel: "Izdato u: {0}",
+    noRecordsRemainingMessage: "Nema više dokumenata za uvoz"
 }
