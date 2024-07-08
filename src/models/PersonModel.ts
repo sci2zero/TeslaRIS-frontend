@@ -24,7 +24,8 @@ export interface BasicPerson {
     localBirthDate: string | null;
     phoneNumber: string;
     apvnt?: string | null;
-    mnid?: string | null;
+    eCrisId?: string | null;
+    eNaukaId?: string | null;
     orcid?: string | null;
     scopusAuthorId?: string | null;
     organisationUnitId: number;
@@ -122,7 +123,8 @@ export interface PersonalInfo {
     postalAddress?: PostalAddress;
     contact: Contact;
     apvnt?: string;
-    mnid?: string;
+    eCrisId?: string;
+    eNaukaId?: string;
     orcid?: string;
     scopusAuthorId?: string;
 }

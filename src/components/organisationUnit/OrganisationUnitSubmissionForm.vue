@@ -27,6 +27,11 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col>
+                            <v-text-field v-model="scopusAfid" label="Scopus AFID" placeholder="Scopus AFID" :rules="scopusAfidValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="12">
                             <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
                         </v-col>
@@ -49,7 +54,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ message }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -70,6 +75,9 @@ import type { OrganisationUnitRequest } from "@/models/OrganisationUnitModel";
 import OpenLayersMap from '../core/OpenLayersMap.vue';
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import { useI18n } from 'vue-i18n';
+
 
 export default defineComponent({
     name: "SubmitOrganizationUnit",
@@ -86,8 +94,9 @@ export default defineComponent({
         const additionalFields = ref(false);
 
         const snackbar = ref(false);
-        const error = ref(false);
+        const message = ref("");
 
+        const i18n = useI18n();
         const router = useRouter();
 
         const nameRef = ref<typeof MultilingualTextInput>();
@@ -97,10 +106,11 @@ export default defineComponent({
         const name = ref([]);
         const nameAbbreviation = ref("");
         const email = ref("");
+        const scopusAfid = ref("");
         const phoneNumber = ref("");
         const keywords = ref([]);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, scopusAfidValidationRules } = useValidationUtils();
 
         const submitOU = (stayOnPage: boolean) => {
             const newOu: OrganisationUnitRequest = {
@@ -109,7 +119,8 @@ export default defineComponent({
                 keyword: keywords.value,
                 researchAreasId: [],
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
-                contact: {contactEmail: email.value, phoneNumber: phoneNumber.value}
+                contact: {contactEmail: email.value, phoneNumber: phoneNumber.value},
+                scopusAfid: scopusAfid.value
             };
 
             OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
@@ -124,15 +135,16 @@ export default defineComponent({
                     nameAbbreviation.value = "";
                     email.value = "";
                     phoneNumber.value = "";
+                    scopusAfid.value = "";
                     mapRef.value?.clearInput();
 
-                    error.value = false;
+                    message.value = i18n.t("savedMessage");
                     snackbar.value = true;
                 } else {
                     router.push({ name: "organisationUnitLandingPage", params: {id: response.data.id} });
                 }
-            }).catch(() => {
-                error.value = true;
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
             });
         };
@@ -140,13 +152,15 @@ export default defineComponent({
         return {
             isFormValid, 
             additionalFields,
-            snackbar, error,
+            snackbar, message,
             name, nameRef,
             nameAbbreviation,
             email, phoneNumber,
             keywords, keywordsRef,
             requiredFieldRules,
-            submitOU, mapRef
+            submitOU, mapRef,
+            scopusAfid,
+            scopusAfidValidationRules
         };
     }
 });

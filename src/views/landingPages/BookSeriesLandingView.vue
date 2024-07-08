@@ -94,6 +94,7 @@ import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/
 import ProceedingsService from '@/services/ProceedingsService';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -193,8 +194,8 @@ export default defineComponent({
                 if(reload) {
                     fetchBookSeries();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchBookSeries();

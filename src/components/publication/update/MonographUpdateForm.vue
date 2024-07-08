@@ -68,7 +68,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -211,7 +211,8 @@ export default defineComponent({
         const number = ref(props.presetMonograph?.number);
         const volume = ref(props.presetMonograph?.volume);
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -272,7 +273,8 @@ export default defineComponent({
             eIsbn, printIsbn, numberOfPages,
             selectedLanguages, languageList,
             requiredSelectionRules, uris,
-            selectedResearchArea, doiValidationRules
+            selectedResearchArea, doiValidationRules,
+            scopusIdValidationRules
         };
     }
 });

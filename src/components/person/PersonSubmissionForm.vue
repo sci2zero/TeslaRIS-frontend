@@ -65,22 +65,27 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field v-model="orcid" label="ORCID" placeholder="ORCID"></v-text-field>
+                            <v-text-field v-model="orcid" label="ORCID" placeholder="ORCID" :rules="orcidValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field v-model="mnid" label="MNID" placeholder="MNID"></v-text-field>
+                            <v-text-field v-model="eCrisId" label="eCRIS-ID" placeholder="eCRIS-ID" :rules="eCrisIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT"></v-text-field>
+                            <v-text-field v-model="eNaukaId" label="enaukaID" placeholder="enaukaID" :rules="eNaukaIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID"></v-text-field>
+                            <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT" :rules="apvntValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID" :rules="scopusAuthorIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -96,7 +101,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ message }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -124,6 +129,8 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getSexForGivenLocale } from '@/i18n/sex';
 import { getEmploymentPositionsForGivenLocale } from '@/i18n/employmentPosition';
 import DatePicker from '../core/DatePicker.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -141,7 +148,9 @@ export default defineComponent({
         const additionalFields = ref(false);
 
         const snackbar = ref(false);
-        const error = ref(false);
+        const message = ref("");
+
+        const i18n = useI18n();
 
         const router = useRouter();
 
@@ -164,11 +173,13 @@ export default defineComponent({
         const phoneNumber = ref("");
         const birthdate = ref("");
         const orcid = ref("");
-        const mnid = ref("");
+        const eCrisId = ref("");
+        const eNaukaId = ref("");
         const apvnt = ref("");
         const scopus = ref("");
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, apvntValidationRules, eCrisIdValidationRules,
+            eNaukaIdValidationRules, orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
 
@@ -184,7 +195,8 @@ export default defineComponent({
                 contactEmail: email.value,
                 phoneNumber: phoneNumber.value,
                 apvnt: apvnt.value,
-                mnid: mnid.value,
+                eCrisId: eCrisId.value,
+                eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 scopusAuthorId: scopus.value,
                 sex: selectedSex.value.value,
@@ -207,28 +219,31 @@ export default defineComponent({
                     email.value = "";
                     phoneNumber.value = "";
                     apvnt.value = "";
-                    mnid.value = "";
+                    eCrisId.value = "";
+                    eNaukaId.value = "";
                     orcid.value = "";
                     scopus.value = "";
                     selectedSex.value = selectionPlaceholder;
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
                     
-                    error.value = false;
+                    message.value = i18n.t("savedMessage");
                     snackbar.value = true;
                 } else {
                     router.push({ name: "researcherLandingPage", params: {id: response.data.id} });
                 }
-            }).catch(() => {
-                error.value = true;
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
             });
         };
 
-        return {isFormValid, additionalFields, snackbar, error,
-            firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef,
-            email, birthdate, orcid, mnid, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
-            sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submitPerson};
+        return {isFormValid, additionalFields, snackbar, message,
+            firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
+            email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
+            sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submitPerson,
+            apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
+            scopusAuthorIdValidationRules};
     }
 });
 </script>
