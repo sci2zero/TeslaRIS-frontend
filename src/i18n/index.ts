@@ -26,6 +26,19 @@ function setLocale(newLocale: string) {
   _i18n.global.locale = newLocale;
 }
 
+function translationExists(key: string) {
+  const translated = _i18n.global.t(key);
+  return translated !== key;
+}
+
+export function getErrorMessageForErrorKey(key: string): string {
+  if (translationExists(key)) {
+    return _i18n.global.t(key);
+  }
+
+  return _i18n.global.t("genericErrorMessage");
+}
+
 export default {
   get vueI18n() {
     return _i18n;

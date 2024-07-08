@@ -29,22 +29,27 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="orcid" label="ORCID" placeholder="ORCID"></v-text-field>
+                        <v-text-field v-model="orcid" label="ORCID" placeholder="ORCID" :rules="orcidValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="mnid" label="MNID" placeholder="MNID"></v-text-field>
+                        <v-text-field v-model="eCrisId" label="eCRIS-ID" placeholder="eCRIS-ID" :rules="eCrisIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT"></v-text-field>
+                        <v-text-field v-model="eNaukaId" label="enaukaID" placeholder="enaukaID" :rules="eNaukaIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID"></v-text-field>
+                        <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT" :rules="apvntValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID" :rules="scopusAuthorIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <h3>{{ $t('contactLabel') }}</h3>
@@ -104,6 +109,7 @@ import { getSexForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/sex';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import CountryService from '@/services/CountryService';
 import DatePicker from '@/components/core/DatePicker.vue';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
@@ -144,7 +150,8 @@ export default defineComponent({
         const phoneNumber = ref(props.presetPerson?.personalInfo.contact.phoneNumber);
         const birthdate = ref(props.presetPerson?.personalInfo.localBirthDate);
         const orcid = ref(props.presetPerson?.personalInfo.orcid);
-        const mnid = ref(props.presetPerson?.personalInfo.mnid);
+        const eCrisId = ref(props.presetPerson?.personalInfo.eCrisId);
+        const eNaukaId = ref(props.presetPerson?.personalInfo.eNaukaId);
         const apvnt = ref(props.presetPerson?.personalInfo.apvnt);
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
 
@@ -157,13 +164,17 @@ export default defineComponent({
         const sexes = getSexForGivenLocale();
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
 
+        const { apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
+            orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
+
         const updatePerson = () => {
             const updatedPerson: PersonalInfo = {
                 contact: {phoneNumber: phoneNumber.value as string, contactEmail: email.value},
                 localBirthDate: birthdate.value ? birthdate.value : "",
                 sex: selectedSex.value.value as Sex,
                 apvnt: apvnt.value,
-                mnid: mnid.value,
+                eCrisId: eCrisId.value,
+                eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 placeOfBirth: placeOfBirth.value,
                 postalAddress: {city: city.value, countryId: selectedCountry.value?.value as number, streetAndNumber: streetAndNumber.value},
@@ -175,9 +186,11 @@ export default defineComponent({
 
         return {
             isFormValid, email, phoneNumber, birthdate,
-            orcid, mnid, apvnt, scopus, sexes, selectedSex,
+            orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
             toMultilingualTextInput, languageList, updatePerson,
-            placeOfBirth, city, streetAndNumber, countries, selectedCountry
+            placeOfBirth, city, streetAndNumber, countries, selectedCountry,
+            apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
+            orcidValidationRules, scopusAuthorIdValidationRules
         };
     }
 });

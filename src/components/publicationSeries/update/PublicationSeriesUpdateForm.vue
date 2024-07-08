@@ -16,10 +16,10 @@
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN"></v-text-field>
+                        <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN"></v-text-field>
+                        <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -92,7 +92,7 @@ export default defineComponent({
         const eIssn = ref(props.presetPublicationSeries?.eissn);
         const printIssn = ref(props.presetPublicationSeries?.printISSN);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
         const updatePublicationSeries = () => {
             const updatedPublicationSeries: PublicationSeries = {
@@ -115,7 +115,9 @@ export default defineComponent({
             updatePublicationSeries,
             languageList, languageTags,
             selectedLanguages,
-            toMultilingualTextInput
+            toMultilingualTextInput,
+            eIssnValidationRules,
+            printIssnValidationRules
         };
     }
 });

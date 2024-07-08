@@ -51,10 +51,10 @@
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN"></v-text-field>
+                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN"></v-text-field>
+                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -62,7 +62,7 @@
                         <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                        <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -187,7 +187,7 @@ export default defineComponent({
         const publicationSeriesVolume = ref(props.presetProceedings?.publicationSeriesVolume);
         const publicationSeriesIssue = ref(props.presetProceedings?.publicationSeriesIssue);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, isbnValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -235,14 +235,15 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
+            isFormValid, isbnValidationRules,
             title, subtitle, selectedEvent, selectedJournal, uris,
             eIsbn, printIsbn, languageList, selectedLanguages,
             languageTags, publicationYear, doi, scopus, numberOfPages,
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
             selectedPublisher, selectedBookSeries, doiValidationRules,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, updateProceedings
+            publicationSeriesExternalValidation, updateProceedings,
+            scopusIdValidationRules
         };
     }
 });

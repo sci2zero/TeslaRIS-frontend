@@ -22,7 +22,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -114,7 +114,7 @@ export default defineComponent({
         const patentNumber = ref(props.presetPatent?.number);
         const uris = ref<string[]>(props.presetPatent?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const updatePatent = () => {
             const updatedPatent: Patent = {
@@ -150,7 +150,8 @@ export default defineComponent({
             toMultilingualTextInput,
             languageTags,
             selectedEvent,
-            doiValidationRules
+            doiValidationRules,
+            scopusIdValidationRules
         };
     }
 });

@@ -18,10 +18,10 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col cols="6">
-                            <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN"></v-text-field>
+                            <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                            <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN"></v-text-field>
+                            <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -47,7 +47,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ message }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -73,6 +73,7 @@ import JournalService from '@/services/JournalService';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -94,7 +95,7 @@ export default defineComponent({
         const additionalFields = ref(false);
 
         const snackbar = ref(false);
-        const error = ref(false);
+        const message = ref("");
 
         const router = useRouter();
         const i18n = useI18n();
@@ -123,7 +124,7 @@ export default defineComponent({
         const eIssn = ref("");
         const printIssn = ref("");
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
         const submitPublicationSeries = (stayOnPage: boolean) => {
             const newPublicationSeries: PublicationSeries = {
@@ -150,13 +151,13 @@ export default defineComponent({
                             printIssn.value = "";
                             selectedLanguages.value = [defaultLanguage.value];
 
-                            error.value = false;
+                            message.value = i18n.t("savedMessage");
                             snackbar.value = true;
                         } else {
                             router.push({ name: "journalLandingPage", params: {id: response.data.id} });
                         }
-                    }).catch(() => {
-                        error.value = true;
+                    }).catch((error) => {
+                        message.value = getErrorMessageForErrorKey(error.response.data.message);
                         snackbar.value = true;
                     });
                     break;
@@ -174,13 +175,13 @@ export default defineComponent({
                             printIssn.value = "";
                             selectedLanguages.value = [defaultLanguage.value];
 
-                            error.value = false;
+                            message.value = i18n.t("savedMessage");
                             snackbar.value = true;
                         } else {
                             router.push({ name: "bookSeriesLandingPage", params: {id: response.data.id} });
                         }
-                    }).catch(() => {
-                        error.value = true;
+                    }).catch((error) => {
+                        message.value = getErrorMessageForErrorKey(error.response.data.message);
                         snackbar.value = true;
                     });
                     break;
@@ -190,8 +191,8 @@ export default defineComponent({
         return {
             isFormValid, 
             additionalFields,
-            snackbar, error,
-            title, titleRef,
+            snackbar, message, printIssnValidationRules,
+            title, titleRef, eIssnValidationRules,
             eIssn, printIssn, languageList, selectedLanguages,
             nameAbbreviations, abbreviationsRef,
             requiredFieldRules,

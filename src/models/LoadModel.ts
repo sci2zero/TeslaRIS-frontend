@@ -57,7 +57,8 @@ export interface PersonLoad {
     middleName: string;
     lastName: string;
     apvnt: string;
-    mnid: string;
+    eCrisId: string;
+    eNaukaId: string;
     orcid: string;
     scopusAuthorId: string;
 }

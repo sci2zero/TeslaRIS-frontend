@@ -6,6 +6,17 @@ export const useValidationUtils = () => {
     const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
     const invalidDOIMessage = computed(() => i18n.t("invalidDOIError"));
     const invalidURIMessage = computed(() => i18n.t("invalidUriError"));
+    const invalidISBNMessage = computed(() => i18n.t("eisbnFormatError"));
+    const invalidEISSNMessage = computed(() => i18n.t("eissnFormatError"));
+    const invalidPrintISSNMessage = computed(() => i18n.t("printIssnFormatError"));
+    const invalidApvntMessage = computed(() => i18n.t("apvntFormatError"));
+    const invalidECrisIdMessage = computed(() => i18n.t("eCrisIdFormatError"));
+    const invalidENaukaIdMessage = computed(() => i18n.t("eNaukaIdFormatError"));
+    const invalidOrcidIdMessage = computed(() => i18n.t("orcidIdFormatError"));
+    const invalidScopusAuthorIdMessage = computed(() => i18n.t("scopusAuthorIdFormatError"));
+    const invalidScopusAfidMessage = computed(() => i18n.t("scopusAfidFormatError"));
+    const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
+
     
     const requiredFieldRules = [
         (value: string) => {
@@ -30,6 +41,15 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const scopusIdPattern = /^\d{6,11}$/i;
+    const scopusIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (scopusIdPattern.test(value)) return true;
+            return invalidScopusIdMessage.value;
+        }
+    ];
+
     const uriPattern = /^(?:(?:http|https):\/\/)(?:\S+(?::\S*)?@)?(?:(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))|localhost)(?::\d{2,5})?(?:(\/|\?|#)[^\s]*)?$/i;
     const uriValidationRules = [
         (value: string) => {
@@ -39,5 +59,91 @@ export const useValidationUtils = () => {
         }
     ];
 
-    return { requiredFieldRules, requiredSelectionRules, doiValidationRules, uriValidationRules };
+    const isbnPattern = /^(?:(?:\d[ |-]?){9}[\dX]|(?:\d[ |-]?){13})$/i;
+    const isbnValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (isbnPattern.test(value)) return true;
+            return invalidISBNMessage.value;
+        }
+    ];
+
+    const eIssnPattern = /^\d{4}-\d{4}$/i;
+    const eIssnValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (eIssnPattern.test(value)) return true;
+            return invalidEISSNMessage.value;
+        }
+    ];
+
+    const printIssnPattern = /^\d{4}-\d{4}([\dX])?$/i;
+    const printIssnValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (printIssnPattern.test(value)) return true;
+            return invalidPrintISSNMessage.value;
+        }
+    ];
+
+    const scopusAfidPattern = /^\d+$/i;
+    const scopusAfidValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (scopusAfidPattern.test(value)) return true;
+            return invalidScopusAfidMessage.value;
+        }
+    ];
+
+    const apvntPattern = /^\d+$/i;
+    const apvntValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (apvntPattern.test(value)) return true;
+            return invalidApvntMessage.value;
+        }
+    ];
+
+    const eCrisIdPattern = /^\d+$/i;
+    const eCrisIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (eCrisIdPattern.test(value)) return true;
+            return invalidECrisIdMessage.value;
+        }
+    ];
+
+    const eNaukaIdPattern = /^[a-zA-Z]{2}\d+$/i;
+    const eNaukaIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (eNaukaIdPattern.test(value)) return true;
+            return invalidENaukaIdMessage.value;
+        }
+    ];
+
+    const orcidPattern = /^\d{4}-\d{4}-\d{4}-\d{4}$/i;
+    const orcidValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (orcidPattern.test(value)) return true;
+            return invalidOrcidIdMessage.value;
+        }
+    ];
+
+    const scopusAuthorIdPattern = /^\d+$/i;
+    const scopusAuthorIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (scopusAuthorIdPattern.test(value)) return true;
+            return invalidScopusAuthorIdMessage.value;
+        }
+    ];
+
+    return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
+        uriValidationRules, isbnValidationRules, eIssnValidationRules, 
+        printIssnValidationRules, scopusAfidValidationRules,
+        apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
+        orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules
+    };
 };

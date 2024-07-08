@@ -32,7 +32,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -158,7 +158,7 @@ export default defineComponent({
             emit("update", updatedJournalPublication);
         };
 
-        const { doiValidationRules } = useValidationUtils();
+        const { doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         return {
             isFormValid,
@@ -168,7 +168,8 @@ export default defineComponent({
             updateJournalPublication, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
-            description, keywords, doiValidationRules
+            description, keywords, doiValidationRules,
+            scopusIdValidationRules
         };
     }
 });

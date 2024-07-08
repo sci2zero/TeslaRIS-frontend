@@ -45,7 +45,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -155,7 +155,7 @@ export default defineComponent({
         const numberOfPages = ref(props.presetJournalPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetJournalPublication?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
         
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
@@ -196,7 +196,8 @@ export default defineComponent({
             requiredFieldRules, selectedEvent,
             updateJournalPublication, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,
-            publicationTypes, selectedpublicationType
+            publicationTypes, selectedpublicationType,
+            scopusIdValidationRules
         };
     }
 });
