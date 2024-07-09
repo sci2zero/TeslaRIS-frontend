@@ -22,6 +22,8 @@ import { useRouter } from 'vue-router';
 import BookSeriesService from '@/services/BookSeriesService';
 import BookSeriesTableComponent from "@/components/bookSeries/BookSeriesTableComponent.vue";
 import type { BookSeriesIndex } from '@/models/BookSeriesModel';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "BookSeriesListView",
@@ -35,7 +37,12 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const i18n = useI18n();
         const router = useRouter();
+
+        onMounted(() => {
+            document.title = i18n.t("bookSeriesListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

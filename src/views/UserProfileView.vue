@@ -8,13 +8,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import UserProfileForm from '@/components/user/UserProfileForm.vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "UserProfileView",
     components: {UserProfileForm},
     setup() {
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("userProfileLabel");
+        });
     }
 });
 </script>

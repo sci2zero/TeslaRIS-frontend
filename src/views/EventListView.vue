@@ -15,19 +15,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import EventService from '@/services/EventService';
 import EventTableComponent from '@/components/event/EventTableComponent.vue';
 import { ref } from 'vue';
 import type { EventIndex } from '@/models/EventModel';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
     name: "OrganisationUnitListView",
     components: {SearchBarComponent, EventTableComponent},
     setup() {
+        const i18n = useI18n();
         const router = useRouter();
         const route = useRoute();
 
@@ -39,6 +41,10 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        onMounted(() => {
+            document.title = i18n.t("eventListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

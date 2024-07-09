@@ -246,6 +246,8 @@ export default defineComponent({
             ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedings.value = response.data;
 
+                document.title = returnCurrentLocaleContent(proceedings.value.title) as string;
+
                 proceedings.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
                 fetchConnectedEntities();

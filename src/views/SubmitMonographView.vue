@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import MonographSubmissionForm from "@/components/publication/MonographSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitMonographView",
     components: {MonographSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof MonographSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addMonographLabel");
+        });
 
         return {
             submissionFormRef

@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import ProceedingsSubmissionForm from "@/components/proceedings/ProceedingsSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitProceedingsView",
     components: {ProceedingsSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof ProceedingsSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addProceedingsLabel");
+        });
 
         return {
             submissionFormRef

@@ -210,6 +210,8 @@ export default defineComponent({
         const fetchOU = () => {
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 organisationUnit.value = response.data;
+
+                document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                 
                 fetchEmployees();
                 fetchPublications();

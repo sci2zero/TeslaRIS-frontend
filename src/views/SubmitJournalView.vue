@@ -26,6 +26,8 @@ import { defineComponent } from 'vue';
 import PublicationSeriesSubmissionForm from "@/components/publicationSeries/PublicationSeriesSubmissionForm.vue";
 import { ref } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitJournalView",
@@ -33,6 +35,12 @@ export default defineComponent({
     setup() {
         const submissionFormRef = ref<typeof PublicationSeriesSubmissionForm>();
         const inputType = PublicationSeriesType.JOURNAL.toString();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addJournalLabel");
+        });
 
         return {
             submissionFormRef,

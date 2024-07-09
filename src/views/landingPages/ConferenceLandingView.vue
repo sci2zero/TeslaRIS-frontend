@@ -54,6 +54,12 @@
                                 <div v-if="conference?.place && conference.place.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(conference?.place) }}
                                 </div>
+                                <div v-if="conference?.confId">
+                                    Conf ID:
+                                </div>
+                                <div v-if="conference?.confId" class="response">
+                                    {{ conference.confId }}
+                                </div>
                                 <div v-if="conference?.number">
                                     {{ $t("conferenceNumberLabel") }}:
                                 </div>
@@ -93,6 +99,20 @@
         <!-- Publication Table -->
         <h2>{{ $t("publicationsLabel") }}</h2>
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+    
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -152,6 +172,8 @@ export default defineComponent({
         const fetchConference = () => {
             EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
                 conference.value = response.data;
+                
+                document.title = returnCurrentLocaleContent(conference.value.name) as string;
 
                 fetchPublications();
             });
@@ -219,6 +241,7 @@ export default defineComponent({
             conference.value!.serialEvent = basicInfo.serialEvent;
             conference.value!.fee = basicInfo.fee;
             conference.value!.number = basicInfo.number;
+            conference.value!.confId = basicInfo.confId;
 
             performUpdate(false);
         };

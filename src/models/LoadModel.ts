@@ -27,6 +27,7 @@ export interface ProceedingsPublicationLoad extends DocumentLoadDTO {
     conferenceName: MultilingualContent[];
     eventDateFrom: string;
     eventDateTo: string;
+    confId: string;
 }
 
 export interface JournalPublicationLoad extends DocumentLoadDTO {

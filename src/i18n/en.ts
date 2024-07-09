@@ -316,5 +316,10 @@ export default {
     eissnExistsError: "E-ISSN allready in use.",
     printIssnExistsError: "Print ISSN allready in use.",
     scopusIdFormatError: "Invalid Scopus ID format.",
-    scopusIdExistsError: "Scopus ID allready in use."
+    scopusIdExistsError: "Scopus ID allready in use.",
+    confIdFormatError: "Invalid Conf ID format.",
+    confIdExistsError: "Conf ID allready in use.",
+    updateEventLabel: "Update Event",
+    accountActivationInProgressMessage: "Activating account...",
+    accountActivationLabel: "Account Activation"
 }

@@ -16,6 +16,7 @@ export const useValidationUtils = () => {
     const invalidScopusAuthorIdMessage = computed(() => i18n.t("scopusAuthorIdFormatError"));
     const invalidScopusAfidMessage = computed(() => i18n.t("scopusAfidFormatError"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
+    const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
 
     
     const requiredFieldRules = [
@@ -140,9 +141,18 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const confIdPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i;
+    const confIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (confIdPattern.test(value)) return true;
+            return invalidConfIdMessage.value;
+        }
+    ];
+
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
-        printIssnValidationRules, scopusAfidValidationRules,
+        printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules
     };

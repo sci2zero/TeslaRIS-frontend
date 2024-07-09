@@ -236,6 +236,8 @@ export default defineComponent({
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 journalPublication.value = response.data;
 
+                document.title = returnCurrentLocaleContent(journalPublication.value.title) as string;
+
                 journalPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
                 if(journalPublication.value.eventId) {

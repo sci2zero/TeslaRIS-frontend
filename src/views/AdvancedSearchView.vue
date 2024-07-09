@@ -59,12 +59,14 @@ import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
     name: "AdvancedSearchVuew",
     components: {SearchBarComponent, OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent},
     setup() {
+        const i18n = useI18n();
         const route = useRoute();
         const router = useRouter();
         const currentTab = ref("persons");
@@ -88,7 +90,8 @@ export default defineComponent({
         const direction = ref("");
 
         onMounted(() => {
-            currentTab.value = route.query.tab as string
+            currentTab.value = route.query.tab as string;
+            document.title = i18n.t("advancedSearchLabel");
         });
     
         const search = (tokenParams: string) => {
