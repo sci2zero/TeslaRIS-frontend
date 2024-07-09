@@ -284,7 +284,6 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: JournalPublication) => {
-            console.log(basicInfo)
             journalPublication.value!.title = basicInfo.title;
             journalPublication.value!.subTitle = basicInfo.subTitle;
             journalPublication.value!.documentDate = basicInfo.documentDate;
