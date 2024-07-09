@@ -274,8 +274,8 @@ export default defineComponent({
                 newPassword: newPassword.value
             }
             UserService.updateUser(userUpdateRequest).then((response) => {
-                sessionStorage.setItem("jwt", response.data.token);
-                sessionStorage.setItem("refreshToken", response.data.refreshToken);
+                localStorage.setItem("jwt", response.data.token);
+                localStorage.setItem("refreshToken", response.data.refreshToken);
                 snackbarText.value = savedMessage.value;
                 snackbar.value = true;
             }).catch((error: AxiosError<any, any>) => {

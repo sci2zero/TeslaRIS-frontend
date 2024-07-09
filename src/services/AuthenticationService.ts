@@ -32,12 +32,12 @@ class AuthenticationService extends BaseService {
   }
 
   userLoggedIn() {
-    return !!sessionStorage.getItem("jwt");
+    return !!localStorage.getItem("jwt");
   }
 
   logoutUser(): void {
-    sessionStorage.removeItem("jwt");
-    sessionStorage.removeItem("refreshToken");
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("refreshToken");
     UserService.cachedUser = null;
   }
 }
