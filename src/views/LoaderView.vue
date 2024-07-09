@@ -259,7 +259,6 @@ export default defineComponent({
 
         const finishLoad = () => {
             if (getAuthorLength() !== currentLoadRecord.value?.contributions.length) {
-                console.log(importAuthorsRef.value.length, currentLoadRecord.value?.contributions.length);
                 errorMessage.value = i18n.t("authorBindNotFinishedMessage");
                 snackbar.value = true;
                 return;
@@ -267,7 +266,6 @@ export default defineComponent({
 
             const unbindedAuthors: string[] = [];
             importAuthorsRef.value.forEach(contribution => {
-                console.log(contribution.isHandled())
                 if (!contribution.isHandled()) {
                     unbindedAuthors.push(`${contribution.personForLoading.firstName} ${contribution.personForLoading.lastName}`)
                 }
