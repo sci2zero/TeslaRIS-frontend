@@ -66,6 +66,11 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col>
+                            <v-text-field v-model="confId" label="Conf ID" placeholder="Conf ID" :rules="confIdValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="5">
                             <v-text-field
                                 v-model="conferenceNumber"
@@ -171,6 +176,7 @@ export default defineComponent({
         const eventYear = ref();
         const state = ref();
         const place = ref([]);
+        const confId = ref("");
         const conferenceNumber = ref("");
         const entryFee = ref("");
         const serialEvent = ref(false);
@@ -181,7 +187,7 @@ export default defineComponent({
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
 
         const addConference = (stayOnPage: boolean) => {
             if (!timePeriodInput.value) {
@@ -225,7 +231,8 @@ export default defineComponent({
                 serialEvent: serialEvent.value,
                 fee: entryFee.value,
                 number: conferenceNumber.value,
-                contributions: []
+                contributions: [],
+                confId: confId.value
             }
 
             EventService.createConference(newConference).then((response) => {
@@ -243,6 +250,7 @@ export default defineComponent({
                     serialEvent.value = false;
                     entryFee.value = "";
                     conferenceNumber.value = "";
+                    confId.value = "";
                     dateFrom.value = null;
                     dateTo.value = null;
                     eventYear.value = null;
@@ -265,7 +273,8 @@ export default defineComponent({
             dateFrom, dateTo, eventYear, state, countryList,
             place, conferenceNumber, entryFee, serialEvent,
             requiredFieldRules, addConference, timePeriodInput,
-            nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef};
+            nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
+            confIdValidationRules, confId};
     }
 });
 </script>

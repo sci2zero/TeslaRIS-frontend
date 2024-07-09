@@ -254,6 +254,8 @@ export default defineComponent({
             DocumentPublicationService.readMonograph(parseInt(currentRoute.params.id as string)).then((response) => {
                 monograph.value = response.data;
 
+                document.title = returnCurrentLocaleContent(monograph.value.title) as string;
+
                 monograph.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
                 fetchConnectedEntities();

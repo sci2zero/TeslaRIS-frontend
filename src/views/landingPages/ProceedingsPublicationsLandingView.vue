@@ -226,6 +226,8 @@ export default defineComponent({
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedingsPublication.value = response.data;
 
+                document.title = returnCurrentLocaleContent(proceedingsPublication.value.title) as string;
+
                 proceedingsPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
                 EventService.readConference(proceedingsPublication.value.eventId as number).then((eventResponse) => {

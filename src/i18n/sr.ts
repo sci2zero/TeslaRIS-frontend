@@ -316,5 +316,10 @@ export default {
     eissnExistsError: "E-ISSN je već u upotrebi.",
     printIssnExistsError: "Print ISSN je već u upotrebi.",
     scopusIdFormatError: "Pogrešan format Scopus ID-a.",
-    scopusIdExistsError: "Scopus ID je već u upotrebi."
+    scopusIdExistsError: "Scopus ID je već u upotrebi.",
+    confIdFormatError: "Pogrešan format Conf ID-a.",
+    confIdExistsError: "Conf ID je već u upotrebi.",
+    updateEventLabel: "Ažuriraj događaj",
+    accountActivationInProgressMessage: "Aktivacija naloga u toku...",
+    accountActivationLabel: "Aktivacija naloga"
 }

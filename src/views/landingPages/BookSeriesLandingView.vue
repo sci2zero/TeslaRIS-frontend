@@ -138,6 +138,8 @@ export default defineComponent({
             BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
                 bookSeries.value = response.data;
 
+                document.title = returnCurrentLocaleContent(bookSeries.value.title) as string;
+
                 bookSeries.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
                 fetchPublications();                

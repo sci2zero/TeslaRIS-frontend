@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1>Activating account...</h1>
+        <h1>{{ $t("accountActivationInProgressMessage") }}</h1>
         <h1 v-if="accountSuccessfullyActivated">
             {{ $t("accountActivationSuccessMessage") }}
         </h1>
@@ -16,10 +16,12 @@ import { defineComponent } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import UserService from "@/services/UserService";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
     name: "AccountActivationView",
     setup() {
+        const i18n = useI18n();
         const router = useRouter();
         const currentRoute = useRoute();
         const accountSuccessfullyActivated = ref(false);
@@ -36,6 +38,8 @@ export default defineComponent({
                 accountSuccessfullyActivated.value = false;
                 accountActivationFailed.value = true;
             })
+
+            document.title = i18n.t("accountActivationLabel");
         });
 
         return {accountSuccessfullyActivated, accountActivationFailed}

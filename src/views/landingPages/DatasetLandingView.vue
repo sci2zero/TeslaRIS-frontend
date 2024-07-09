@@ -184,6 +184,8 @@ export default defineComponent({
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
                 dataset.value = response.data;
 
+                document.title = returnCurrentLocaleContent(dataset.value.title) as string;
+
                 dataset.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
                 if(dataset.value.publisherId) {

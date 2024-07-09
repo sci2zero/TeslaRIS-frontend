@@ -25,6 +25,8 @@
 import { defineComponent } from 'vue';
 import JournalPublicationSubmissionForm from "@/components/publication/JournalPublicationSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitJournalPublicationView",
@@ -32,6 +34,12 @@ export default defineComponent({
     setup() {
         const submissionFormRef = ref<typeof JournalPublicationSubmissionForm>();
 
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addJournalPublicationLabel");
+        });
+        
         return {
             submissionFormRef
         };

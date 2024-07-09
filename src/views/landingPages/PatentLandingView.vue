@@ -184,6 +184,8 @@ export default defineComponent({
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.id as string)).then((response) => {
                 patent.value = response.data;
 
+                document.title = returnCurrentLocaleContent(patent.value.title) as string;
+
                 patent.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
                 if(patent.value.publisherId) {

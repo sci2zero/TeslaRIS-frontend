@@ -132,6 +132,8 @@ export default defineComponent({
         const currentLoadRecord = ref<JournalPublicationLoad|ProceedingsPublicationLoad>();
 
         onMounted(() => {
+            document.title = i18n.t("harvestDataLabel");
+
             fetchNextRecordForLoading();
         });
 

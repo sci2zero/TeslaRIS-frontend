@@ -54,7 +54,7 @@
 import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue";
 import type { ResetPasswordRequest } from "@/models/AuthenticationModel";
 import AuthenticationService from "@/services/AuthenticationService";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
@@ -62,49 +62,53 @@ import { useRoute, useRouter } from "vue-router";
 
 
 export default defineComponent(
-    {
-        name: "ResetPasswordView",
-        components: { PasswordInputWithMeter },
-        setup() {
-            const showRepeatedPassword = ref(false);
-            const isFormValid = ref(false);
+{
+    name: "ResetPasswordView",
+    components: { PasswordInputWithMeter },
+    setup() {
+        const showRepeatedPassword = ref(false);
+        const isFormValid = ref(false);
 
-            const success = ref<boolean | null>(null); 
+        const success = ref<boolean | null>(null); 
 
-            const newPassword = ref("");
-            const repeatNewPassword = ref("");
+        const newPassword = ref("");
+        const repeatNewPassword = ref("");
 
-            const router = useRouter();
-            const currentRoute = useRoute();
+        const router = useRouter();
+        const currentRoute = useRoute();
 
-            const i18n = useI18n();
-            const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-            const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
+        const i18n = useI18n();
+        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
+        const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
 
-            const repeatPasswordRules = [
-                (value: string) => {
-                    if (!value) return requiredFieldMessage.value;
-                    if (newPassword.value !== repeatNewPassword.value) return passwordsDontMatchMessage.value;
-                    return true;
-                }
-            ];
-
-            const setNewPassword = async () => {
-                await router.isReady();
-                const resetRequest: ResetPasswordRequest = {
-                    newPassword: newPassword.value,
-                    resetToken: currentRoute.params.resetToken as string
-                };
-
-                AuthenticationService.resetPassword(resetRequest).then(() => {
-                    success.value = true;
-                }).catch(() => {
-                    success.value = false;
-                });
+        onMounted(() => {
+            document.title = i18n.t("resetPasswordLabel");
+        });
+        
+        const repeatPasswordRules = [
+            (value: string) => {
+                if (!value) return requiredFieldMessage.value;
+                if (newPassword.value !== repeatNewPassword.value) return passwordsDontMatchMessage.value;
+                return true;
             }
+        ];
 
-            return {isFormValid, showRepeatedPassword, setNewPassword, repeatPasswordRules, newPassword, repeatNewPassword, success};
+        const setNewPassword = async () => {
+            await router.isReady();
+            const resetRequest: ResetPasswordRequest = {
+                newPassword: newPassword.value,
+                resetToken: currentRoute.params.resetToken as string
+            };
+
+            AuthenticationService.resetPassword(resetRequest).then(() => {
+                success.value = true;
+            }).catch(() => {
+                success.value = false;
+            });
         }
+
+        return {isFormValid, showRepeatedPassword, setNewPassword, repeatPasswordRules, newPassword, repeatNewPassword, success};
     }
+}
 );
 </script>

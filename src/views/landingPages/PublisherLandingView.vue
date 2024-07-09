@@ -124,6 +124,8 @@ export default defineComponent({
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
                 publisher.value = response.data;
 
+                document.title = returnCurrentLocaleContent(publisher.value.name) as string;
+
                 fetchPublications();     
                 populateData();
             });

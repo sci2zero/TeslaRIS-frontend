@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import PublicationSeriesSubmissionForm from "@/components/publicationSeries/PublicationSeriesSubmissionForm.vue";
 import { ref } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "SubmitBookSeriesView",
@@ -33,6 +34,12 @@ export default defineComponent({
     setup() {
         const submissionFormRef = ref<typeof PublicationSeriesSubmissionForm>();
         const inputType = PublicationSeriesType.BOOK_SERIES.toString();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addBookSeriesLabel");
+        });
 
         return {
             submissionFormRef,

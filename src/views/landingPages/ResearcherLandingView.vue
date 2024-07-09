@@ -259,6 +259,9 @@ export default defineComponent({
         const fetchPerson = () => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
                 person.value = response.data;
+
+                document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
+
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;
                 } else {

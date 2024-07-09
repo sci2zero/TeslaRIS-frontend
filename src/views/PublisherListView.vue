@@ -22,6 +22,8 @@ import PublisherTableComponent from '@/components/publisher/PublisherTableCompon
 import { ref } from 'vue';
 import type { PublisherIndex } from '@/models/PublisherModel';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "PublisherListView",
@@ -35,7 +37,12 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const i18n = useI18n();
         const router = useRouter();
+
+        onMounted(() => {
+            document.title = i18n.t("publisherListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

@@ -18,6 +18,8 @@ import UserService from '@/services/UserService';
 import UserTableComponent from '@/components/user/UserTableComponent.vue';
 import { ref } from 'vue';
 import type { UserAccountIndex } from '@/models/UserModel';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "UserListView",
@@ -30,6 +32,12 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("userListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

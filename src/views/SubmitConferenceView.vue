@@ -22,15 +22,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import ConferenceSubmissionForm from "@/components/event/ConferenceSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "SubmitConferenceView",
     components: {ConferenceSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof ConferenceSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addConferenceLabel");
+        });
 
         return {
             submissionFormRef
