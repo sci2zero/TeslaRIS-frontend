@@ -59,10 +59,10 @@
                                     {{ organisationUnit?.scopusAfid ? organisationUnit?.scopusAfid : $t("notYetSetMessage") }}
                                 </div>
                             </v-col>
-                            <v-col cols="6">
+                            <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
                                 <div>
                                     <open-layers-map
-                                        ref="mapRef" height="150px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
+                                        ref="mapRef" height="250px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
                                         :show-input="false"></open-layers-map>
                                 </div>
                             </v-col>

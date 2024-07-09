@@ -141,8 +141,17 @@ export default defineComponent({
                 } else {
                     address.value = json.address.road + " " + json.address.house_number + ", " + json.address.city;
                 }
+
+                address.value = removeLeadingAndTrailingCommas(address.value.replace(/undefined/g, ""));
             });
         };
+
+        const removeLeadingAndTrailingCommas = (str: string) => {
+            str = str.trim();
+            str = str.replace(/^,*/, '');
+            str = str.replace(/,*$/, '');
+            return str.trim();
+        }
 
         const getCoordsFromAddress = (address: string) => {
             fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&polygon=1&addressdetails=1`)
