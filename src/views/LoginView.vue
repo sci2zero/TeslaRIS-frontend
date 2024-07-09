@@ -151,8 +151,8 @@ export default defineComponent(
 
             const login = () => {
                 AuthenticationService.login({email: email.value, password: password.value}).then((response) => {
-                    sessionStorage.setItem("jwt", response.data.token);
-                    sessionStorage.setItem("refreshToken", response.data.refreshToken);
+                    localStorage.setItem("jwt", response.data.token);
+                    localStorage.setItem("refreshToken", response.data.refreshToken);
 
                     loginStore.emitLoginSuccess();
                     if (routeStore.nextRoute != null) {

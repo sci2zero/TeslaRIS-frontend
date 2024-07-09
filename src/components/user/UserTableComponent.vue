@@ -145,8 +145,8 @@ export default defineComponent({
 
         const takeRoleOfUser = (email: string) => {
             UserService.takeRoleOfAccount({userEmail: email}).then((response) => {
-                sessionStorage.setItem("jwt", response.data.token);
-                sessionStorage.setItem("refreshToken", response.data.refreshToken);
+                localStorage.setItem("jwt", response.data.token);
+                localStorage.setItem("refreshToken", response.data.refreshToken);
 
                 loginStore.emitLoginSuccess();
                 router.push({ name: "home" });

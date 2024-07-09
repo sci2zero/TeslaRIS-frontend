@@ -44,7 +44,7 @@ export default defineComponent({
             const { authenticated, authorities } = to.meta;
         
             if (authenticated) {
-                const jwt = sessionStorage.getItem("jwt");
+                const jwt = localStorage.getItem("jwt");
                 if (jwt) {
                     const decodedToken: any = jwtDecode(jwt);
                     if (
@@ -72,7 +72,7 @@ export default defineComponent({
         axios.defaults.withCredentials = true;
         axios.interceptors.request.use(
             (config) => {
-            const jwt: string | null = sessionStorage.getItem("jwt");
+            const jwt: string | null = localStorage.getItem("jwt");
             if (jwt) {
                 if (config.headers) {
                     config.headers.Authorization = `Bearer ${jwt}`;
@@ -99,13 +99,13 @@ export default defineComponent({
             if (error.response.status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
         
-                const refreshToken: string | null = sessionStorage.getItem("refreshToken");
+                const refreshToken: string | null = localStorage.getItem("refreshToken");
                 if (refreshToken) {
                     try {
                         const response = await AuthenticationService.refreshToken({refreshTokenValue: refreshToken});
                         
-                        sessionStorage.setItem("jwt", response.data.token);
-                        sessionStorage.setItem("refreshToken", response.data.refreshToken);
+                        localStorage.setItem("jwt", response.data.token);
+                        localStorage.setItem("refreshToken", response.data.refreshToken);
             
                         return axios(originalRequest);
                     } catch (refreshError: any) {
