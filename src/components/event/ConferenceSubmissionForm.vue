@@ -12,34 +12,39 @@
                         <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <h3>{{ $t("tookPlaceLabel") }}</h3>
-                <v-row>
-                    <v-col v-if="timePeriodInput" cols="3">
-                        <date-picker
-                            v-model="dateFrom"
-                            :label="$t('fromLabel') + '*'"
-                            color="primary"
-                            required
-                        ></date-picker>
-                    </v-col>
-                    <v-col v-if="timePeriodInput" cols="3">
-                        <date-picker
-                            v-model="dateTo"
-                            :label="$t('toLabel') + '*'"
-                            color="primary"
-                            required
-                        ></date-picker>
-                    </v-col>
-                    <v-col v-if="!timePeriodInput" cols="6">
-                        <v-text-field
-                            v-model="eventYear" type="number" :min="1950" :max="2030"
-                            :label="$t('eventYearLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
-                    </v-col>
-                    <v-col>
-                        <v-btn color="blue darken-1" compact @click="timePeriodInput = !timePeriodInput">
-                            {{ timePeriodInput ? $t("dontKnowExactDateLabel") : $t("knowExactDateLabel") }}
-                        </v-btn>
-                    </v-col>
+                <div v-if="!serialEvent">
+                    <h3>{{ $t("tookPlaceLabel") }}</h3>
+                    <v-row>
+                        <v-col v-if="timePeriodInput" cols="3">
+                            <date-picker
+                                v-model="dateFrom"
+                                :label="$t('fromLabel') + '*'"
+                                color="primary"
+                                required
+                            ></date-picker>
+                        </v-col>
+                        <v-col v-if="timePeriodInput" cols="3">
+                            <date-picker
+                                v-model="dateTo"
+                                :label="$t('toLabel') + '*'"
+                                color="primary"
+                                required
+                            ></date-picker>
+                        </v-col>
+                        <v-col v-if="!timePeriodInput" cols="6">
+                            <v-text-field
+                                v-model="eventYear" type="number" :min="1950" :max="2030"
+                                :label="$t('eventYearLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                        </v-col>
+                        <v-col>
+                            <v-btn color="blue darken-1" compact @click="timePeriodInput = !timePeriodInput">
+                                {{ timePeriodInput ? $t("dontKnowExactDateLabel") : $t("knowExactDateLabel") }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+                <v-row class="serial-event">
+                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                 </v-row>
                 <v-row>
                     <v-col cols="10">
@@ -78,9 +83,6 @@
                                 :label="$t('entryFeeLabel')"
                             ></v-text-field>
                         </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                     </v-row>
                 </v-container>
             </v-col>
@@ -269,3 +271,11 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.serial-event {
+    margin-left: 10px;
+}
+
+</style>

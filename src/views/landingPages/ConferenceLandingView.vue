@@ -32,8 +32,10 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div>{{ $t("eventDateLabel") }}:</div>
-                                <div class="response">
+                                <div v-if="!conference?.serialEvent">
+                                    {{ $t("eventDateLabel") }}:
+                                </div>
+                                <div v-if="!conference?.serialEvent" class="response">
                                     {{ getDates(conference?.dateFrom as string, conference?.dateTo as string) }}
                                 </div>
                                 <div v-if="conference?.description && conference.description.length > 0">
@@ -87,12 +89,16 @@
         <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
 
         <!-- Proceedings List -->
-        <br />
-        <proceedings-list :preset-event="conference"></proceedings-list>
+        <div v-if="!conference?.serialEvent">
+            <br />
+            <proceedings-list :preset-event="conference"></proceedings-list>
+        </div>
 
         <!-- Publication Table -->
-        <h2>{{ $t("publicationsLabel") }}</h2>
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+        <div v-if="!conference?.serialEvent">
+            <h2>{{ $t("publicationsLabel") }}</h2>
+            <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+        </div>
     </v-container>
 </template>
 

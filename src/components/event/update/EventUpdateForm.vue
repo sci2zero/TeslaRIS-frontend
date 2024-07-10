@@ -14,8 +14,10 @@
                         <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetEvent?.nameAbbreviation, languageTags)"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <h3>{{ $t("tookPlaceLabel") }}</h3>
-                <v-row>
+                <h3 v-if="!serialEvent">
+                    {{ $t("tookPlaceLabel") }}
+                </h3>
+                <v-row v-if="!serialEvent">
                     <v-col v-if="timePeriodInput" cols="3">
                         <date-picker
                             v-model="dateFrom"

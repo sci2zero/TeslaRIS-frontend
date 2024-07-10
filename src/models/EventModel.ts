@@ -37,6 +37,7 @@ export interface EventIndex {
     dateSortable: string;
     databaseId: number;
     eventType: EventType;
+    serialEvent: boolean;
 }
   
 export interface PersonEventContribution extends PersonContribution {
