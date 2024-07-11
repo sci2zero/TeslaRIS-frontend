@@ -4,10 +4,9 @@
             <template #activator="scope">
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
-                        icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                        icon color="primary" v-bind="scope.props" class="bottom-spacer"
+                        :disabled="readOnly" v-on="scope.isActive">
+                        <v-icon icon="mdi-pencil-plus-outline"></v-icon>
                     </v-btn>
                 </div>
             </template>

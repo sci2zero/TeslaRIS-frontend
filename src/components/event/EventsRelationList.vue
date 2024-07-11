@@ -3,7 +3,7 @@
         <v-col cols="4">
             <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
         </v-col>
-        <v-col v-if="!readonly" class="events-relation-submission" cols="3">
+        <v-col v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission" cols="3">
             <events-relation-submission-modal :source-event="presetEvent" @create="refreshRelationsList"></events-relation-submission-modal>
         </v-col>
     </v-row>
