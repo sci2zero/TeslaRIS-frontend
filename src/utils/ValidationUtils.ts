@@ -114,7 +114,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const eNaukaIdPattern = /^[a-zA-Z]{2}\d+$/i;
+    const eNaukaIdPattern = /^[A-Z]{2}\d+$/i;
     const eNaukaIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
