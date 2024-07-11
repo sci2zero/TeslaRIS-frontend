@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, onMounted } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PersonService from '@/services/PersonService';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
@@ -23,6 +23,7 @@ import { ref } from 'vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import { useRouter } from 'vue-router';
 import UserService from '@/services/UserService';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "PersonListView",
@@ -36,9 +37,14 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const i18n = useI18n();
         const router = useRouter();
 
         const userRole = computed(() => UserService.provideUserRole());
+
+        onMounted(() => {
+            document.title = i18n.t("personListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

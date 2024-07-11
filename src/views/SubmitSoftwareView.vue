@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import SoftwareSubmissionForm from "@/components/publication/SoftwareSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitDatasetView",
     components: {SoftwareSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof SoftwareSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addSoftwareLabel");
+        });
 
         return {
             submissionFormRef

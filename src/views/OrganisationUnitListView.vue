@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
@@ -23,6 +23,7 @@ import { ref } from 'vue';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { useRouter } from 'vue-router';
 import UserService from '@/services/UserService';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
@@ -36,8 +37,13 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const i18n = useI18n();
         const router = useRouter();
         const userRole = UserService.provideUserRole();
+
+        onMounted(() => {
+            document.title = i18n.t("ouListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

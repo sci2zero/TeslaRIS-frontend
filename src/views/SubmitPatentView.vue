@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import PatentSubmissionForm from "@/components/publication/PatentSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitPatentView",
     components: {PatentSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof PatentSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addPatentLabel");
+        });
 
         return {
             submissionFormRef

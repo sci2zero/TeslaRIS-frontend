@@ -80,10 +80,10 @@
                     </v-row>
                     <v-row>
                         <v-col cols="6">
-                            <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN"></v-text-field>
+                            <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                            <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN"></v-text-field>
+                            <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -91,7 +91,7 @@
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -130,7 +130,7 @@
     <v-snackbar
         v-model="snackbar"
         :timeout="5000">
-        {{ !error ? $t("savedMessage") : $t("genericErrorMessage") }}
+        {{ message }}
         <template #actions>
             <v-btn
                 color="blue"
@@ -167,6 +167,7 @@ import ResearchAreaService from '@/services/ResearchAreaService';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -177,7 +178,7 @@ export default defineComponent({
         const additionalFields = ref(false);
 
         const snackbar = ref(false);
-        const error = ref(false);
+        const message = ref("");
 
         const router = useRouter();
         const i18n = useI18n();
@@ -256,7 +257,8 @@ export default defineComponent({
             }
         };
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules,
+            isbnValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -324,20 +326,20 @@ export default defineComponent({
                     printIsbn.value = "";
                     publicationYear.value = "";
 
-                    error.value = false;
+                    message.value = i18n.t("savedMessage");
                     snackbar.value = true;
                 } else {
                     router.push({ name: "monographLandingPage", params: {id: response.data.id} });
                 }
-            }).catch(() => {
-                error.value = true;
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
             });
         };
 
         return {
             isFormValid, additionalFields,
-            snackbar, error, researchAreasSelectable,
+            snackbar, message, researchAreasSelectable,
             title, titleRef, subtitle, subtitleRef,
             eventAutocompleteRef, selectedEvent, doiValidationRules,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
@@ -350,7 +352,8 @@ export default defineComponent({
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submitMonograph,
             selectedResearchArea, toMultilingualTextInput,
-            languageTags, contributionsRef, contributions
+            languageTags, contributionsRef, contributions,
+            isbnValidationRules, scopusIdValidationRules
         };
     }
 });

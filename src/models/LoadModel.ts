@@ -27,6 +27,7 @@ export interface ProceedingsPublicationLoad extends DocumentLoadDTO {
     conferenceName: MultilingualContent[];
     eventDateFrom: string;
     eventDateTo: string;
+    confId: string;
 }
 
 export interface JournalPublicationLoad extends DocumentLoadDTO {
@@ -57,7 +58,8 @@ export interface PersonLoad {
     middleName: string;
     lastName: string;
     apvnt: string;
-    mnid: string;
+    eCrisId: string;
+    eNaukaId: string;
     orcid: string;
     scopusAuthorId: string;
 }

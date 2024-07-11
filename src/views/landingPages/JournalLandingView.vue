@@ -95,6 +95,7 @@ import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 export default defineComponent({
     name: "JournalLandingPage",
@@ -136,6 +137,8 @@ export default defineComponent({
         const fetchJournal = () => {
             JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
                 journal.value = response.data;
+
+                document.title = returnCurrentLocaleContent(journal.value.title) as string;
 
                 journal.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
@@ -193,8 +196,8 @@ export default defineComponent({
                 if(reload) {
                     fetchJournal();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchJournal();

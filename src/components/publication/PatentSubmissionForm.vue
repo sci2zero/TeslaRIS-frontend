@@ -34,11 +34,11 @@
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="5">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="5">
+                        <v-col cols="10">
                             <v-text-field v-model="patentNumber" :label="$t('patentNumberLabel')" :placeholder="$t('patentNumberLabel')"></v-text-field>
                         </v-col>
                     </v-row>
@@ -68,7 +68,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <event-autocomplete-search ref="eventRef" v-model="selectedEvent"></event-autocomplete-search>
                         </v-col>
                     </v-row>
@@ -160,7 +160,7 @@ export default defineComponent({
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const submitPatent = (stayOnPage: boolean) => {
             const newPatent: Patent = {
@@ -227,7 +227,7 @@ export default defineComponent({
             place, placeRef, uris, urisRef,
             contributions, contributionsRef, eventRef,
             requiredFieldRules, submitPatent, errorMessage,
-            doiValidationRules
+            doiValidationRules, scopusIdValidationRules
         };
     }
 });

@@ -88,6 +88,7 @@ import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublisherUpdateModal from '@/components/publisher/update/PublisherUpdateModal.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -122,6 +123,8 @@ export default defineComponent({
 
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
                 publisher.value = response.data;
+
+                document.title = returnCurrentLocaleContent(publisher.value.name) as string;
 
                 fetchPublications();     
                 populateData();
@@ -167,8 +170,8 @@ export default defineComponent({
             PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
             });
         };

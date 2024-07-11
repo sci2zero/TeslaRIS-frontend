@@ -145,6 +145,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -182,6 +183,8 @@ export default defineComponent({
         const fetchDataset = () => {
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
                 dataset.value = response.data;
+
+                document.title = returnCurrentLocaleContent(dataset.value.title) as string;
 
                 dataset.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
@@ -246,8 +249,8 @@ export default defineComponent({
                 if(reload) {
                     fetchDataset();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchDataset();

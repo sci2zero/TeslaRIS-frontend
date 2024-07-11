@@ -34,7 +34,7 @@
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                         <v-col cols="5">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -153,7 +153,7 @@ export default defineComponent({
         const softwareNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const submitSoftware = (stayOnPage: boolean) => {
             const newSoftware: Software = {
@@ -217,7 +217,8 @@ export default defineComponent({
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef,
             contributions, contributionsRef, eventRef, selectedEvent,
-            requiredFieldRules, submitSoftware, errorMessage
+            requiredFieldRules, submitSoftware, errorMessage,
+            scopusIdValidationRules
         };
     }
 });

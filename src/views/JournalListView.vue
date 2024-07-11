@@ -15,13 +15,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import JournalService from '@/services/JournalService';
 import JournalTableComponent from '@/components/journal/JournalTableComponent.vue';
 import { ref } from 'vue';
 import type { JournalIndex } from '@/models/JournalModel';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "JournalListView",
@@ -35,7 +36,12 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const i18n = useI18n();
         const router = useRouter();
+
+        onMounted(() => {
+            document.title = i18n.t("journalListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

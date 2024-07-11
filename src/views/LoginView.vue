@@ -3,7 +3,7 @@
         <div id="login-page">
             <div class="login-wrapper">
                 <h2 class="login-title">
-                    {{ forgotPasswordForm ? $t('passwordRecoveryInstructions') : $t('loginLabel') }}
+                    {{ forgotPasswordForm ? $t("passwordRecoveryInstructions") : $t("loginLabel") }}
                 </h2>
                 <v-form v-if="!forgotPasswordSubmissionSent" v-model="isFormValid" @submit.prevent>
                     <div v-if="!forgotPasswordForm">
@@ -16,7 +16,7 @@
                         <v-btn
                             class="login-submit" block type="submit" :disabled="!isFormValid"
                             @click="login">
-                            {{ $t('loginLabel') }}
+                            {{ $t("loginLabel") }}
                         </v-btn>
                         <br />
                         <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
@@ -75,7 +75,7 @@
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import AuthenticationService from "@/services/AuthenticationService";
 import {useLoginStore} from "@/stores/loginStore"
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
@@ -110,6 +110,10 @@ export default defineComponent(
             const elapsedTime = ref(0);
             const progress = ref(0);
             const cooldown = ref(false);
+            
+            onMounted(() => {
+                document.title = i18n.t("loginLabel");
+            });
 
             const startCooldown = () => {
                 const interval = 1000; // 1 second
@@ -151,8 +155,8 @@ export default defineComponent(
 
             const login = () => {
                 AuthenticationService.login({email: email.value, password: password.value}).then((response) => {
-                    sessionStorage.setItem("jwt", response.data.token);
-                    sessionStorage.setItem("refreshToken", response.data.refreshToken);
+                    localStorage.setItem("jwt", response.data.token);
+                    localStorage.setItem("refreshToken", response.data.refreshToken);
 
                     loginStore.emitLoginSuccess();
                     if (routeStore.nextRoute != null) {

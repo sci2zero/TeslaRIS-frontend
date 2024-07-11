@@ -22,7 +22,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -114,7 +114,7 @@ export default defineComponent({
         const softwareNumber = ref(props.presetSoftware?.internalNumber);
         const uris = ref<string[]>(props.presetSoftware?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const updateSoftware = () => {
             const updatedSoftware: Software = {
@@ -144,7 +144,8 @@ export default defineComponent({
             selectedPublisher, softwareNumber,
             uris, requiredFieldRules,
             updateSoftware, toMultilingualTextInput,
-            languageTags, selectedEvent, doiValidationRules
+            languageTags, selectedEvent, doiValidationRules,
+            scopusIdValidationRules
         };
     }
 });

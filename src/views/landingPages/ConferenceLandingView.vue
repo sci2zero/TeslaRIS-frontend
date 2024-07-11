@@ -56,6 +56,12 @@
                                 <div v-if="conference?.place && conference.place.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(conference?.place) }}
                                 </div>
+                                <div v-if="conference?.confId">
+                                    Conf ID:
+                                </div>
+                                <div v-if="conference?.confId" class="response">
+                                    {{ conference.confId }}
+                                </div>
                                 <div v-if="conference?.number">
                                     {{ $t("conferenceNumberLabel") }}:
                                 </div>
@@ -100,10 +106,29 @@
         </div>
 
         <!-- Publication Table -->
+<<<<<<< HEAD
         <div v-if="!conference?.serialEvent">
             <h2>{{ $t("publicationsLabel") }}</h2>
             <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
         </div>
+=======
+        <h2>{{ $t("publicationsLabel") }}</h2>
+        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+    
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
+>>>>>>> main
     </v-container>
 </template>
 
@@ -126,6 +151,7 @@ import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -163,6 +189,8 @@ export default defineComponent({
         const fetchConference = () => {
             EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
                 conference.value = response.data;
+                
+                document.title = returnCurrentLocaleContent(conference.value.name) as string;
 
                 fetchPublications();
             });
@@ -230,6 +258,7 @@ export default defineComponent({
             conference.value!.serialEvent = basicInfo.serialEvent;
             conference.value!.fee = basicInfo.fee;
             conference.value!.number = basicInfo.number;
+            conference.value!.confId = basicInfo.confId;
 
             performUpdate(false);
         };
@@ -241,8 +270,8 @@ export default defineComponent({
                 if(reload) {
                     fetchConference();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchConference();

@@ -57,9 +57,13 @@
                                 <div class="response">
                                     {{ personalInfo.apvnt ? personalInfo.apvnt : $t("notYetSetMessage") }}
                                 </div>
-                                <div>MNID:</div>
+                                <div>eCRIS-ID:</div>
                                 <div class="response">
-                                    {{ personalInfo.mnid ? personalInfo.mnid : $t("notYetSetMessage") }}
+                                    {{ personalInfo.eCrisId ? personalInfo.eCrisId : $t("notYetSetMessage") }}
+                                </div>
+                                <div>enaukaID:</div>
+                                <div class="response">
+                                    {{ personalInfo.eNaukaId ? personalInfo.eNaukaId : $t("notYetSetMessage") }}
                                 </div>
                                 <div>ORCID:</div>
                                 <div class="response">
@@ -201,6 +205,7 @@ import PrizeList from '@/components/person/prize/PrizeList.vue';
 import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -254,6 +259,9 @@ export default defineComponent({
         const fetchPerson = () => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
                 person.value = response.data;
+
+                document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
+
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
                     researcherName.value = `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;
                 } else {
@@ -390,8 +398,8 @@ export default defineComponent({
                 fetchPerson();
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
             });
         };

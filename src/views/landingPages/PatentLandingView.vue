@@ -145,6 +145,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -182,6 +183,8 @@ export default defineComponent({
         const fetchPatent = () => {
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.id as string)).then((response) => {
                 patent.value = response.data;
+
+                document.title = returnCurrentLocaleContent(patent.value.title) as string;
 
                 patent.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
@@ -246,8 +249,8 @@ export default defineComponent({
                 if(reload) {
                     fetchPatent();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchPatent();

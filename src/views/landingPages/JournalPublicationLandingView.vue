@@ -193,6 +193,7 @@ import JournalService from '@/services/JournalService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -234,6 +235,8 @@ export default defineComponent({
         const fetchJournalPublication = () => {
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 journalPublication.value = response.data;
+
+                document.title = returnCurrentLocaleContent(journalPublication.value.title) as string;
 
                 journalPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
@@ -283,7 +286,6 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: JournalPublication) => {
-            console.log(basicInfo)
             journalPublication.value!.title = basicInfo.title;
             journalPublication.value!.subTitle = basicInfo.subTitle;
             journalPublication.value!.documentDate = basicInfo.documentDate;
@@ -310,8 +312,8 @@ export default defineComponent({
                 if(reload) {
                     fetchJournalPublication();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchJournalPublication();

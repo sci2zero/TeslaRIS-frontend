@@ -54,6 +54,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col>
+                        <v-text-field v-model="confId" label="Conf ID" placeholder="Conf ID" :rules="confIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="5">
                         <v-text-field
                             v-model="conferenceNumber"
@@ -137,8 +142,9 @@ export default defineComponent({
         const conferenceNumber = ref(props.presetEvent?.number);
         const entryFee = ref(props.presetEvent?.fee);
         const serialEvent = ref(props.presetEvent?.serialEvent);
+        const confId = ref(props.presetEvent?.confId);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
@@ -184,7 +190,8 @@ export default defineComponent({
                 serialEvent: serialEvent.value as boolean,
                 fee: entryFee.value,
                 number: conferenceNumber.value,
-                contributions: props.presetEvent?.contributions
+                contributions: props.presetEvent?.contributions,
+                confId: confId.value
             }
 
             emit("update", updatedEvent);
@@ -196,7 +203,7 @@ export default defineComponent({
             languageTags, toMultilingualTextInput,
             requiredFieldRules, publicationSeriesExternalValidation, updateEvent,
             dateFrom, dateTo, state, place, conferenceNumber, entryFee, serialEvent,
-            eventYear, countryList, timePeriodInput
+            eventYear, countryList, timePeriodInput, confIdValidationRules, confId
         };
     }
 });

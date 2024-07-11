@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import DatasetSubmissionForm from "@/components/publication/DatasetSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitDatasetView",
     components: {DatasetSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof DatasetSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addDatasetLabel");
+        });
 
         return {
             submissionFormRef

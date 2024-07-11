@@ -22,7 +22,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID"></v-text-field>
+                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -114,7 +114,7 @@ export default defineComponent({
         const datasetNumber = ref(props.presetDataset?.internalNumber);
         const uris = ref<string[]>(props.presetDataset?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const updateDataset = () => {
             const updatedDataset: Dataset = {
@@ -144,7 +144,7 @@ export default defineComponent({
             selectedPublisher, datasetNumber,
             uris, requiredFieldRules, doiValidationRules,
             updateDataset, toMultilingualTextInput,
-            languageTags, selectedEvent
+            languageTags, selectedEvent, scopusIdValidationRules
         };
     }
 });

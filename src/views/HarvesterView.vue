@@ -103,6 +103,8 @@ export default defineComponent({
         const newDocumentsHarvested = ref(0);
 
         onMounted(() => {
+            document.title = i18n.t("harvestDataLabel");
+
             fetchNumberOfHarvestedDocuments();
 
             // Fetch number of imported documents 10 seconds

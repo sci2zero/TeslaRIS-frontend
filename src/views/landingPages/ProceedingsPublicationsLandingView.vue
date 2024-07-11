@@ -181,6 +181,7 @@ import ProceedingsPublicationUpdateModal from '@/components/publication/update/P
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -224,6 +225,8 @@ export default defineComponent({
         const fetchProceedingsPublication = () => {
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedingsPublication.value = response.data;
+
+                document.title = returnCurrentLocaleContent(proceedingsPublication.value.title) as string;
 
                 proceedingsPublication.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
@@ -294,8 +297,8 @@ export default defineComponent({
                 if(reload) {
                     fetchProceedingsPublication();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();

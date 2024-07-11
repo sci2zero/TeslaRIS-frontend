@@ -40,7 +40,8 @@
 import RegistrationFirstStep from '@/components/user/registration/RegistrationFirstStep.vue';
 import RegistrationSecondStep from '@/components/user/registration/RegistrationSecondStep.vue';
 
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "RegisterView",
@@ -49,6 +50,12 @@ export default defineComponent({
     setup() {
         const stepperValue = ref(1);
         const canAdvance = ref(false);
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("registerLabel");
+        });
 
         const userDetails = ref({
             firstName: "",

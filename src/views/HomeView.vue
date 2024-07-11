@@ -78,6 +78,8 @@ export default defineComponent({
             PersonService.getResearcherCount().then((response) => researcherCount.value = response.data);
             OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data);
             DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data);
+
+            document.title = `TeslaRIS - ${i18n.t("homeLabel")}`;
         });
 
         const cardsData = ref([

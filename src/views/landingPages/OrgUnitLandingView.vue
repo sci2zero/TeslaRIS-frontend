@@ -52,11 +52,17 @@
                                 <div class="response">
                                     {{ organisationUnit?.contact?.phoneNumber ? organisationUnit?.contact?.phoneNumber : $t("notYetSetMessage") }}
                                 </div>
+                                <div>
+                                    Scopus AFID:
+                                </div>
+                                <div class="response">
+                                    {{ organisationUnit?.scopusAfid ? organisationUnit?.scopusAfid : $t("notYetSetMessage") }}
+                                </div>
                             </v-col>
-                            <v-col cols="6">
+                            <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
                                 <div>
                                     <open-layers-map
-                                        ref="mapRef" height="150px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
+                                        ref="mapRef" height="250px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
                                         :show-input="false"></open-layers-map>
                                 </div>
                             </v-col>
@@ -145,6 +151,7 @@ import OrganisationUnitUpdateModal from '@/components/organisationUnit/update/Or
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -203,6 +210,8 @@ export default defineComponent({
         const fetchOU = () => {
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 organisationUnit.value = response.data;
+
+                document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                 
                 fetchEmployees();
                 fetchPublications();
@@ -262,6 +271,7 @@ export default defineComponent({
             organisationUnit.value!.nameAbbreviation = basicInfo.nameAbbreviation;
             organisationUnit.value!.location = basicInfo.location;
             organisationUnit.value!.contact = basicInfo.contact;
+            organisationUnit.value!.scopusAfid = basicInfo.scopusAfid;
             performUpdate(false);
         };
 
@@ -325,7 +335,8 @@ export default defineComponent({
                 keyword: organisationUnit.value!.keyword,
                 researchAreasId: organisationUnit.value!.researchAreas.map(leafResearchArea => leafResearchArea.id as number),
                 location: organisationUnit.value?.location,
-                contact: organisationUnit.value?.contact
+                contact: organisationUnit.value?.contact,
+                scopusAfid: organisationUnit.value?.scopusAfid
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -334,8 +345,8 @@ export default defineComponent({
                 if(reload) {
                     fetchOU();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchOU();

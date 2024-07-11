@@ -210,6 +210,7 @@ import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -252,6 +253,8 @@ export default defineComponent({
         const fetchMonograph = () => {
             DocumentPublicationService.readMonograph(parseInt(currentRoute.params.id as string)).then((response) => {
                 monograph.value = response.data;
+
+                document.title = returnCurrentLocaleContent(monograph.value.title) as string;
 
                 monograph.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
@@ -344,8 +347,8 @@ export default defineComponent({
                 if(reload) {
                     fetchMonograph();
                 }
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchMonograph();

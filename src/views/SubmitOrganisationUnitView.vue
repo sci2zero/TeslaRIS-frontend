@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import OrganisationUnitSubmissionForm from "@/components/organisationUnit/OrganisationUnitSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitOrganisationUnitView",
     components: {OrganisationUnitSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof OrganisationUnitSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addOULabel");
+        });
 
         return {
             submissionFormRef

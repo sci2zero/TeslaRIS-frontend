@@ -45,6 +45,7 @@ import { useRouter } from 'vue-router';
 import UserService from '@/services/UserService';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "ScientificResultsListView",
@@ -60,6 +61,10 @@ export default defineComponent({
 
         const router = useRouter();
         const userRole = UserService.provideUserRole();
+
+        onMounted(() => {
+            document.title = i18n.t("scientificResultsListLabel");
+        });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;

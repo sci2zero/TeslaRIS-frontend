@@ -27,6 +27,7 @@ export interface OrganisationUnitRequest {
     researchAreasId: number[];
     location?: GeoLocation;
     contact?: Contact;
+    scopusAfid?: string;
 }
 
 export interface OrganisationUnitResponse {
@@ -37,6 +38,7 @@ export interface OrganisationUnitResponse {
     researchAreas: ResearchArea[];
     location?: GeoLocation;
     contact?: Contact;
+    scopusAfid?: string;
 }
 
 export enum OrganisationUnitsRelationType {

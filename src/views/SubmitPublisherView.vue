@@ -25,12 +25,20 @@
 import { defineComponent } from 'vue';
 import PublisherSubmissionForm from "@/components/publisher/PublisherSubmissionForm.vue";
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 export default defineComponent({
     name: "SubmitPublisherView",
     components: {PublisherSubmissionForm},
     setup() {
         const submissionFormRef = ref<typeof PublisherSubmissionForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("addPublisherLabel");
+        });
 
         return {
             submissionFormRef

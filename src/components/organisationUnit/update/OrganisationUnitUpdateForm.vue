@@ -25,6 +25,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col>
+                        <v-text-field v-model="scopusAfid" label="Scopus AFID" placeholder="Scopus AFID" :rules="scopusAfidValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="12">
                         <open-layers-map ref="mapRef" :read-only="false" :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]"></open-layers-map>
                     </v-col>
@@ -80,8 +85,9 @@ export default defineComponent({
         const nameAbbreviation = ref(props.presetOU?.nameAbbreviation);
         const email = ref(props.presetOU?.contact?.contactEmail);
         const phoneNumber = ref(props.presetOU?.contact?.phoneNumber);
+        const scopusAfid = ref(props.presetOU?.scopusAfid);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, scopusAfidValidationRules } = useValidationUtils();
 
         const updateOU = () => {
             const updatedOU: OrganisationUnitRequest = {
@@ -90,7 +96,8 @@ export default defineComponent({
                 keyword: props.presetOU?.keyword as MultilingualContent[],
                 researchAreasId: [],
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
-                contact: {contactEmail: email.value as string, phoneNumber: phoneNumber.value as string}
+                contact: {contactEmail: email.value as string, phoneNumber: phoneNumber.value as string},
+                scopusAfid: scopusAfid.value
             };
 
             emit("update", updatedOU);
@@ -99,9 +106,10 @@ export default defineComponent({
         return {
             isFormValid, name, mapRef,
             nameAbbreviation,
-            email, phoneNumber,
+            email, phoneNumber, scopusAfid,
             requiredFieldRules, updateOU,
-            toMultilingualTextInput, languageList
+            toMultilingualTextInput, languageList,
+            scopusAfidValidationRules
         };
     }
 });

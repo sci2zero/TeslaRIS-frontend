@@ -183,6 +183,8 @@ export default defineComponent({
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.id as string)).then((response) => {
                 software.value = response.data;
 
+                document.title = returnCurrentLocaleContent(software.value.title) as string;
+
                 software.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
                 if(software.value.publisherId) {
