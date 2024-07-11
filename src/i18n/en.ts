@@ -298,5 +298,6 @@ export default {
     relationDeleteSuccessNotification: "Relation successfully deleted.",
     relationDeleteFailedNotification: "Relation deletion failed.",
     eventsRelationsLabel: "Relations with other events",
-    serialEventsRelationsLabel: "Instances of this conference"
+    serialEventsRelationsLabel: "Instances of this conference",
+    addEventsRelationLabel: "Add events relation"
 }

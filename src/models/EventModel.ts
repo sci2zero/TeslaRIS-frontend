@@ -64,16 +64,17 @@ export interface Conference extends Event {
 }
 
 export interface EventsRelation {
-    id: number;
+    id?: number;
     sourceId: number;
     targetId: number;
     eventsRelationType: EventsRelationType;
-    sourceEventName: MultilingualContent[];
-    targetEventName: MultilingualContent[];
+    sourceEventName?: MultilingualContent[];
+    targetEventName?: MultilingualContent[];
 }
 
 export enum EventsRelationType {
     PART_OF = "PART_OF",
+    HAS_PART = "HAS_PART",
     BELONGS_TO_SERIES = "BELONGS_TO_SERIES",
-    COLLOCATED_WITH = "COLLOCATED_WITH"
+    COLLOCATED_WITH = "COLLOCATED_WITH",
 }

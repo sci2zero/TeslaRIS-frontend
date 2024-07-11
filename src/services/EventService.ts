@@ -48,6 +48,10 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.get, `events-relation/serial-event/${serialEventId}`);
   }
 
+  async createEventsRelation(body: EventsRelation): Promise<AxiosResponse<EventsRelation>> {
+    return super.sendRequest(axios.post, "events-relation", body, EventService.idempotencyKey);
+  }
+
   async deleteEventsRelation(relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `events-relation/${relationId}`);
   }

@@ -298,5 +298,6 @@ export default {
     relationDeleteSuccessNotification: "Relacija uspešno obrisana.",
     relationDeleteFailedNotification: "Brisanje relacije neuspešno.",
     eventsRelationsLabel: "Relacije sa drugim događajima",
-    serialEventsRelationsLabel: "Instance ove konferencije"
+    serialEventsRelationsLabel: "Instance ove konferencije",
+    addEventsRelationLabel: "Dodaj relaciju između događaja"
 }

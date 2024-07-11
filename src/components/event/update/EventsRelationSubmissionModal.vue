@@ -1,0 +1,117 @@
+<template>
+    <v-row justify="start">
+        <v-dialog v-model="dialog" persistent max-width="900px">
+            <template #activator="scope">
+                <div v-if="!readOnly" class="edit-pen">
+                    <v-btn
+                        icon variant="outlined"
+                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
+                        :disabled="readOnly" size="small" v-on="scope.isActive">
+                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                    </v-btn>
+                </div>
+            </template>
+            <v-card>
+                <v-card-title>
+                    <span class="text-h5">{{ $t("addEventsRelationLabel") }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container>
+                        <v-form v-model="isFormValid" @submit.prevent>
+                            <v-row>
+                                <v-col cols="3">
+                                <v-select
+                                    v-model="relationType"
+                                    :items="relationTypes"
+                                    :label="$t('relationTypeLabel') + '*'"
+                                    :rules="requiredSelectionRules"
+                                    return-object>
+                                </v-select>
+                                </v-col>
+                                <v-col cols="7">
+                                    <event-autocomplete-search v-model="selectedEvent" required></event-autocomplete-search>
+                                </v-col>
+                            </v-row>
+                        </v-form>
+
+                        <v-row>
+                            <p class="required-fields-message">
+                                {{ $t("requiredFieldsMessage") }}
+                            </p>
+                        </v-row>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" @click="dialog = false">
+                        {{ $t("closeLabel") }}
+                    </v-btn>
+                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="createRelation">
+                        {{ $t("updateLabel") }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-row>
+</template>
+
+<script lang="ts">
+import { ref } from "vue";
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import type { OrganisationUnitRelationRequest } from "@/models/OrganisationUnitModel";
+import { getEventsRelationTypeForGivenLocale } from "@/i18n/eventsRelationType";
+import EventAutocompleteSearch from "../EventAutocompleteSearch.vue";
+import type { Conference, EventsRelation, EventsRelationType } from "@/models/EventModel";
+import { useValidationUtils } from "@/utils/ValidationUtils";
+import EventService from "@/services/EventService";
+
+
+export default defineComponent({
+    name: "EventsRelationSubmissionModal",
+    components: { EventAutocompleteSearch },
+    props: {
+        readOnly: {
+            type: Boolean,
+            default: false
+        },
+        sourceEvent: {
+            type: Object as PropType<Conference | undefined>,
+            required: true
+        },
+    },
+    emits: ["create"],
+    setup(props, { emit }) {
+        const dialog = ref(false);
+        const isFormValid = ref(false);
+
+        const searchPlaceholder = {title: "", value: -1};
+        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
+        const relationType = ref<{ title: string, value: EventsRelationType | number }>(searchPlaceholder);
+        const relationTypes = getEventsRelationTypeForGivenLocale();
+
+        const { requiredSelectionRules } = useValidationUtils();
+
+        const emitToParent = () => {
+            emit("create");
+            dialog.value = false;
+        };
+
+        const createRelation = () => {
+            let newRelation: EventsRelation = {
+                sourceId: props.sourceEvent?.id as number,
+                targetId: selectedEvent.value.value,
+                eventsRelationType: relationType.value.value as EventsRelationType
+            };
+
+            EventService.createEventsRelation(newRelation).then(() => {
+                emitToParent();
+            })
+        };
+
+        return {dialog, emitToParent, isFormValid, 
+            selectedEvent, relationTypes, relationType,
+            requiredSelectionRules, createRelation};
+    }
+});
+</script>

@@ -4,7 +4,7 @@
             <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
         </v-col>
         <v-col class="events-relation-submission" cols="3">
-            <!-- CREATE COMPONENT GOES HERE -->
+            <events-relation-submission-modal :source-event="presetEvent" @create="refreshRelationsList"></events-relation-submission-modal>
         </v-col>
     </v-row>
     <v-list lines="two">
@@ -45,88 +45,100 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, type PropType } from 'vue';
 import type { Conference, EventsRelation } from "@/models/EventModel";
+import { EventsRelationType } from "@/models/EventModel";
 import { watch } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
 import router from '@/router';
 import { useI18n } from 'vue-i18n';
 import EventService from '@/services/EventService';
 import { getEventsRelationTitleFromValueAutoLocale } from '@/i18n/eventsRelationType';
+import EventsRelationSubmissionModal from './update/EventsRelationSubmissionModal.vue';
 
-  export default defineComponent({
-    name: "EventsRelationList",
-    components: {},
-    props: {
-        presetEvent: {
-            type: Object as PropType<Conference | undefined>,
-            required: true
+
+export default defineComponent({
+name: "EventsRelationList",
+components: { EventsRelationSubmissionModal },
+props: {
+    presetEvent: {
+        type: Object as PropType<Conference | undefined>,
+        required: true
+    }
+},
+setup(props) {
+    const relations = ref<EventsRelation[]>([]);
+
+    const snackbar = ref(false);
+    const message = ref("");
+
+    const i18n = useI18n();
+
+    onMounted(() => {
+        fetchRelations();
+    });
+
+    watch(() => props.presetEvent, () => {
+        fetchRelations();
+    });
+
+    const fetchRelations = () => {
+        if (!props.presetEvent?.id) {
+            return;
         }
-    },
-    setup(props) {
-        const relations = ref<EventsRelation[]>([]);
 
-        const snackbar = ref(false);
-        const message = ref("");
-
-        const i18n = useI18n();
-
-        onMounted(() => {
-            fetchRelations();
-        });
-
-        watch(() => props.presetEvent, () => {
-            fetchRelations();
-        });
-
-        const fetchRelations = () => {
-            if (!props.presetEvent?.id) {
-                return;
-            }
-
-            if (props.presetEvent.serialEvent) {
-                EventService.getRelationsForSerialEvent(props.presetEvent?.id as number).then((response) => {
-                    response.data.forEach(relation => {
+        if (props.presetEvent.serialEvent) {
+            EventService.getRelationsForSerialEvent(props.presetEvent?.id as number).then((response) => {
+                response.data.forEach(relation => {
+                    [relation.sourceEventName, relation.targetEventName] = [relation.targetEventName, relation.sourceEventName];
+                    [relation.sourceId, relation.targetId] = [relation.targetId, relation.sourceId];
+                });
+                relations.value = response.data;
+            });
+        } else {
+            EventService.getRelationsForOneTimeEvent(props.presetEvent?.id as number).then((response) => {
+                response.data.forEach(relation => {
+                    if (relation.sourceId !== props.presetEvent?.id) {
                         [relation.sourceEventName, relation.targetEventName] = [relation.targetEventName, relation.sourceEventName];
                         [relation.sourceId, relation.targetId] = [relation.targetId, relation.sourceId];
-                    });
-                    relations.value = response.data;
+                        if (relation.eventsRelationType === EventsRelationType.PART_OF) {
+                            relation.eventsRelationType = EventsRelationType.HAS_PART;
+                        }
+                    }
                 });
-            } else {
-                EventService.getRelationsForOneTimeEvent(props.presetEvent?.id as number).then((response) => {
-                    relations.value = response.data;
-                });
-            }
-        };
-
-        const navigateToTargetEvent = (eventId: number) => {
-            router.push({ name: "conferenceLandingPage", params: {id: eventId} }).then(() => {
-                router.go(0);
+                relations.value = response.data;
             });
-        };
+        }
+    };
 
-        const refreshRelationsList = () => {
-            relations.value = [];
-            fetchRelations();
-        };
+    const navigateToTargetEvent = (eventId: number) => {
+        router.push({ name: "conferenceLandingPage", params: {id: eventId} }).then(() => {
+            router.go(0);
+        });
+    };
 
-        const deleteRelation = (relation: EventsRelation) => {
-            EventService.deleteEventsRelation(relation.id).then(() => {
-                refreshRelationsList();
-                message.value = i18n.t("relationDeleteSuccessNotification");
-                snackbar.value = true;
-            }).catch(() => {
-                message.value = i18n.t("relationDeleteFailedNotification");
-                snackbar.value = true;
-            });
-        };
+    const refreshRelationsList = () => {
+        relations.value = [];
+        fetchRelations();
+    };
 
-        return {
-            relations, returnCurrentLocaleContent,
-            refreshRelationsList, snackbar, message,
-            deleteRelation, navigateToTargetEvent,
-            getEventsRelationTitleFromValueAutoLocale
-        };
-    },
-  });
+    const deleteRelation = (relation: EventsRelation) => {
+        EventService.deleteEventsRelation(relation.id as number).then(() => {
+            refreshRelationsList();
+            message.value = i18n.t("relationDeleteSuccessNotification");
+            snackbar.value = true;
+        }).catch(() => {
+            message.value = i18n.t("relationDeleteFailedNotification");
+            snackbar.value = true;
+        });
+    };
+
+    return {
+        relations, returnCurrentLocaleContent,
+        refreshRelationsList, snackbar, message,
+        deleteRelation, navigateToTargetEvent,
+        getEventsRelationTitleFromValueAutoLocale
+    };
+},
+});
 </script>
 
 <style scoped>
