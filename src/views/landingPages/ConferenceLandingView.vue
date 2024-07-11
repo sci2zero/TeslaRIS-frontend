@@ -97,24 +97,20 @@
         <!-- Proceedings List -->
         <div v-if="!conference?.serialEvent">
             <br />
-            <proceedings-list :preset-event="conference"></proceedings-list>
+            <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
         </div>
 
         <!-- Relations List -->
         <div>
-            <events-relation-list :preset-event="conference"></events-relation-list>
+            <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
         </div>
 
         <!-- Publication Table -->
-<<<<<<< HEAD
         <div v-if="!conference?.serialEvent">
             <h2>{{ $t("publicationsLabel") }}</h2>
             <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
         </div>
-=======
-        <h2>{{ $t("publicationsLabel") }}</h2>
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
-    
+        
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -128,7 +124,6 @@
                 </v-btn>
             </template>
         </v-snackbar>
->>>>>>> main
     </v-container>
 </template>
 

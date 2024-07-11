@@ -3,7 +3,7 @@
         <v-col cols="4">
             <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
         </v-col>
-        <v-col class="events-relation-submission" cols="3">
+        <v-col v-if="!readonly" class="events-relation-submission" cols="3">
             <events-relation-submission-modal :source-event="presetEvent" @create="refreshRelationsList"></events-relation-submission-modal>
         </v-col>
     </v-row>
@@ -15,7 +15,7 @@
             :subtitle="presetEvent?.serialEvent ? '' : getEventsRelationTitleFromValueAutoLocale(item.eventsRelationType)"
             @click="navigateToTargetEvent(item.targetId as number)"
         >
-            <template #append>
+            <template v-if="!readonly" #append>
                 <v-row>
                     <v-col cols="auto">
                         <v-icon @click.stop="deleteRelation(item)">
@@ -61,6 +61,10 @@ components: { EventsRelationSubmissionModal },
 props: {
     presetEvent: {
         type: Object as PropType<Conference | undefined>,
+        required: true
+    },
+    readonly: {
+        type: Boolean,
         required: true
     }
 },

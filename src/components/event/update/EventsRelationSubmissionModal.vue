@@ -20,16 +20,16 @@
                         <v-form v-model="isFormValid" @submit.prevent>
                             <v-row>
                                 <v-col cols="3">
-                                <v-select
-                                    v-model="relationType"
-                                    :items="relationTypes"
-                                    :label="$t('relationTypeLabel') + '*'"
-                                    :rules="requiredSelectionRules"
-                                    return-object>
-                                </v-select>
+                                    <v-select
+                                        v-model="relationType"
+                                        :items="relationTypes"
+                                        :label="$t('relationTypeLabel') + '*'"
+                                        :rules="requiredSelectionRules"
+                                        return-object>
+                                    </v-select>
                                 </v-col>
                                 <v-col cols="7">
-                                    <event-autocomplete-search v-model="selectedEvent" required></event-autocomplete-search>
+                                    <event-autocomplete-search v-model="selectedEvent" required :return-only-non-serial-events="false"></event-autocomplete-search>
                                 </v-col>
                             </v-row>
                         </v-form>
@@ -52,6 +52,20 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ message }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-row>
 </template>
 
@@ -59,12 +73,12 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { OrganisationUnitRelationRequest } from "@/models/OrganisationUnitModel";
 import { getEventsRelationTypeForGivenLocale } from "@/i18n/eventsRelationType";
 import EventAutocompleteSearch from "../EventAutocompleteSearch.vue";
 import type { Conference, EventsRelation, EventsRelationType } from "@/models/EventModel";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import EventService from "@/services/EventService";
+import { getErrorMessageForErrorKey } from "@/i18n";
 
 
 export default defineComponent({
@@ -85,6 +99,9 @@ export default defineComponent({
         const dialog = ref(false);
         const isFormValid = ref(false);
 
+        const snackbar = ref(false);
+        const message = ref("");
+
         const searchPlaceholder = {title: "", value: -1};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
         const relationType = ref<{ title: string, value: EventsRelationType | number }>(searchPlaceholder);
@@ -98,7 +115,7 @@ export default defineComponent({
         };
 
         const createRelation = () => {
-            let newRelation: EventsRelation = {
+            const newRelation: EventsRelation = {
                 sourceId: props.sourceEvent?.id as number,
                 targetId: selectedEvent.value.value,
                 eventsRelationType: relationType.value.value as EventsRelationType
@@ -106,12 +123,17 @@ export default defineComponent({
 
             EventService.createEventsRelation(newRelation).then(() => {
                 emitToParent();
-            })
+                dialog.value = false;
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
         };
 
         return {dialog, emitToParent, isFormValid, 
             selectedEvent, relationTypes, relationType,
-            requiredSelectionRules, createRelation};
+            requiredSelectionRules, createRelation,
+            message, snackbar};
     }
 });
 </script>

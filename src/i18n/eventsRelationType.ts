@@ -30,8 +30,8 @@ export const getEventsRelationTitleFromValueAutoLocale = (value: EventsRelationT
 export const getEventsRelationTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
-            return eventsRelationTypesSr;
+            return eventsRelationTypesSr.filter(relation => relation.value !== EventsRelationType.HAS_PART);
         case "en":
-            return eventsRelationTypesEn;
+            return eventsRelationTypesEn.filter(relation => relation.value !== EventsRelationType.HAS_PART);
     }
 }
