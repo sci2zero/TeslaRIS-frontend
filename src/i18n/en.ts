@@ -294,5 +294,9 @@ export default {
     eventNotBindedMessage: "You did not finish binding of conference.",
     proceedingsNotBindedMessage: "You did not finish binding of proceedings.",
     publishedInLabel: "Published in: {0}",
-    noRecordsRemainingMessage: "There are no more documents left to load"
+    noRecordsRemainingMessage: "There are no more documents left to load",
+    relationDeleteSuccessNotification: "Relation successfully deleted.",
+    relationDeleteFailedNotification: "Relation deletion failed.",
+    eventsRelationsLabel: "Relations with other events",
+    serialEventsRelationsLabel: "Instances of this conference"
 }

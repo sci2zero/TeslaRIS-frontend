@@ -94,6 +94,11 @@
             <proceedings-list :preset-event="conference"></proceedings-list>
         </div>
 
+        <!-- Relations List -->
+        <div>
+            <events-relation-list :preset-event="conference"></events-relation-list>
+        </div>
+
         <!-- Publication Table -->
         <div v-if="!conference?.serialEvent">
             <h2>{{ $t("publicationsLabel") }}</h2>
@@ -120,11 +125,12 @@ import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
+import EventsRelationList from '@/components/event/EventsRelationList.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList, EventsRelationList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

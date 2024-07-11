@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Conference, EventIndex } from "@/models/EventModel";
+import type { Conference, EventIndex, EventsRelation } from "@/models/EventModel";
 
 export class EventService extends BaseService {
 
@@ -38,6 +38,18 @@ export class EventService extends BaseService {
 
   async reorderContribution(conferenceId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `conference/${conferenceId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
+  }
+
+  async getRelationsForOneTimeEvent(eventId: number): Promise<AxiosResponse<EventsRelation[]>> {
+    return super.sendRequest(axios.get, `events-relation/${eventId}`);
+  }
+
+  async getRelationsForSerialEvent(serialEventId: number): Promise<AxiosResponse<EventsRelation[]>> {
+    return super.sendRequest(axios.get, `events-relation/serial-event/${serialEventId}`);
+  }
+
+  async deleteEventsRelation(relationId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `events-relation/${relationId}`);
   }
 }
 

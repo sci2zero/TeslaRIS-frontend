@@ -89,8 +89,8 @@ import { useI18n } from 'vue-i18n';
         };
 
         const navigateToProceedings = (proceedingsId: number) => {
-                router.push({ name: "proceedingsLandingPage", params: {id: proceedingsId} });
-            };
+            router.push({ name: "proceedingsLandingPage", params: {id: proceedingsId} });
+        };
 
         const refreshProceedingsList = () => {
             proceedings.value = [];

@@ -294,5 +294,9 @@ export default {
     eventNotBindedMessage: "Niste završili povezivanje za konferenciju.",
     proceedingsNotBindedMessage: "Niste završili povezivanje za zbornik radova.",
     publishedInLabel: "Izdato u: {0}",
-    noRecordsRemainingMessage: "Nema više dokumenata za uvoz"
+    noRecordsRemainingMessage: "Nema više dokumenata za uvoz",
+    relationDeleteSuccessNotification: "Relacija uspešno obrisana.",
+    relationDeleteFailedNotification: "Brisanje relacije neuspešno.",
+    eventsRelationsLabel: "Relacije sa drugim događajima",
+    serialEventsRelationsLabel: "Instance ove konferencije"
 }

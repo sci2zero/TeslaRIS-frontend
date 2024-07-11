@@ -62,3 +62,18 @@ export interface Conference extends Event {
     number?: string;
     fee?: string;
 }
+
+export interface EventsRelation {
+    id: number;
+    sourceId: number;
+    targetId: number;
+    eventsRelationType: EventsRelationType;
+    sourceEventName: MultilingualContent[];
+    targetEventName: MultilingualContent[];
+}
+
+export enum EventsRelationType {
+    PART_OF = "PART_OF",
+    BELONGS_TO_SERIES = "BELONGS_TO_SERIES",
+    COLLOCATED_WITH = "COLLOCATED_WITH"
+}
