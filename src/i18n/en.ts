@@ -321,5 +321,9 @@ export default {
     confIdExistsError: "Conf ID allready in use.",
     updateEventLabel: "Update Event",
     accountActivationInProgressMessage: "Activating account...",
-    accountActivationLabel: "Account Activation"
+    accountActivationLabel: "Account Activation",
+    selfRelationEventError: "Event cannot relate to itself.",
+    targetEventNotSerialError: "Target event must be serial event for this relation type.",
+    relationAlreadyExistsError: "Relation with that event already exists.",
+    comparePublicationsLabel: "Compare publications"
 }

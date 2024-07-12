@@ -321,5 +321,9 @@ export default {
     confIdExistsError: "Conf ID je već u upotrebi.",
     updateEventLabel: "Ažuriraj događaj",
     accountActivationInProgressMessage: "Aktivacija naloga u toku...",
-    accountActivationLabel: "Aktivacija naloga"
+    accountActivationLabel: "Aktivacija naloga",
+    selfRelationEventError: "Događaj ne može imati relaciju sa samim sobom.",
+    targetEventNotSerialError: "Ciljni događaj mora biti serijski događaj za ovaj tip relacije.",
+    relationAlreadyExistsError: "Relacija sa tim događajem već postoji.",
+    comparePublicationsLabel: "Uporedi radove."
 }
