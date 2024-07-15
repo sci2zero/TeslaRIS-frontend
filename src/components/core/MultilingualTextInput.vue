@@ -111,6 +111,16 @@ export default defineComponent({
             }
         };
 
+        const forceRefreshModelValue = (modelValue: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]) => {
+            inputs.value = [];
+            modelValue.forEach(input => {
+                input.supportedLanguages.push(input.language);
+                inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
+                filterFromInputChoices(input.language);
+            });
+            sendContentToParent();
+        }
+
         watch(() => props.initialValue, () => {
             if(!initialValueSet.value && props.initialValue && props.initialValue.length > 0 && props.initialValue[0].supportedLanguages.length > 0) {
                 setInitialModelValue();
@@ -195,7 +205,8 @@ export default defineComponent({
             removeInput,
             sendContentToParent,
             clearInput,
-            updatedLanguage
+            updatedLanguage,
+            forceRefreshModelValue
         };
     }
 });

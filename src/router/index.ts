@@ -45,7 +45,8 @@ import SubmitMonographView from "@/views/SubmitMonographView.vue";
 import MonographLandingView from "@/views/landingPages/MonographLandingView.vue";
 import HarvesterView from "@/views/HarvesterView.vue";
 import LoaderView from "@/views/LoaderView.vue";
-import JournalPublicationsComparatorView from "@/views/comparators/JournalPublicationsComparatorView.vue";
+import JournalPublicationsComparatorView from "@/views/comparators/journal/JournalPublicationsComparatorView.vue";
+import JournalMetadataComparatorView from "@/views/comparators/journal/JournalMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -225,6 +226,15 @@ const router = createRouter({
                             path: 'publications-comparator/:leftId/:rightId',
                             name: "journalPublicationsComparator",
                             component: JournalPublicationsComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "journalMetadataComparator",
+                            component: JournalMetadataComparatorView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

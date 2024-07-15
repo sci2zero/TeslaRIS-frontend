@@ -325,5 +325,8 @@ export default {
     selfRelationEventError: "Event cannot relate to itself.",
     targetEventNotSerialError: "Target event must be serial event for this relation type.",
     relationAlreadyExistsError: "Relation with that event already exists.",
-    comparePublicationsLabel: "Compare publications"
+    comparePublicationsLabel: "Compare publications",
+    compareMetadataLabel: "Compare metadata",
+    journalPublicationsComparatorLabel: "Comparing journal publications",
+    journalMetadataComparatorLabel: "Comparing journal metadata"
 }

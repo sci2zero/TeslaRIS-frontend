@@ -6,8 +6,13 @@
     </v-btn>
     <v-btn
         v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedJournals.length !== 2"
-        @click="startComparison">
+        @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedJournals.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedJournals"
@@ -166,8 +171,14 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const startComparison = () => {
+        const startPublicationComparison = () => {
             router.push({name: "journalPublicationsComparator", params: {
+                leftId: selectedJournals.value[0].databaseId, rightId: selectedJournals.value[1].databaseId
+            }});
+        };
+
+        const startMetadataComparison = () => {
+            router.push({name: "journalMetadataComparator", params: {
                 leftId: selectedJournals.value[0].databaseId, rightId: selectedJournals.value[1].databaseId
             }});
         };
@@ -175,7 +186,7 @@ export default defineComponent({
         return {selectedJournals, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startComparison};
+            startPublicationComparison, startMetadataComparison};
     }
 });
 </script>

@@ -1,6 +1,6 @@
 <template>
     <v-container id="journal-publications-comparator">
-        <v-row class="d-flex flex-row align-center justify-center">
+        <v-row class="d-flex flex-row justify-center align-start">
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftJournal?.title) }}
@@ -13,10 +13,10 @@
             </v-col>
 
             <v-col cols="1">
-                <v-btn class="mb-12 middle-arrow" icon @click="moveAll(true)">
+                <v-btn class="mb-1 middle-arrow" icon @click="moveAll(true)">
                     <v-icon>mdi-arrow-right</v-icon>
                 </v-btn>
-                <v-btn class="mt-12 middle-arrow" icon @click="moveAll(false)">
+                <v-btn class="mt-1 middle-arrow" icon @click="moveAll(false)">
                     <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
             </v-col>
@@ -30,6 +30,15 @@
                 <!-- Right Publication Table -->
                 <publication-table-component :publications="rightPublications" :total-publications="rightTotalPublications" in-comparator @switch-page="switchPageRight"></publication-table-component>
             </v-col>
+        </v-row>
+
+        <v-row v-if="loading" class="d-flex flex-row justify-center submission-action">
+            <v-progress-circular
+                :size="70"
+                :width="7"
+                color="blue"
+                indeterminate
+            ></v-progress-circular>
         </v-row>
 
         <v-snackbar
@@ -68,6 +77,7 @@ export default defineComponent({
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
+        const loading = ref(false);
 
         const currentRoute = useRoute();
 
@@ -91,7 +101,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("JournalPublicationsComparatorLabel");
+            document.title = i18n.t("journalPublicationsComparatorLabel");
             fetchJournals();
             fetchPublications();
         });
@@ -154,11 +164,13 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
+            loading.value = true;
             MergeService.switchAllPublicationsToOtherJournal(
                 (fromLeftToRight ? leftJournal.value?.id : rightJournal.value?.id) as number, 
                 (fromLeftToRight ? rightJournal.value?.id : leftJournal.value?.id) as number)
                 .then(() => {
                     fetchPublications();
+                    loading.value = false;
             });
         };
 
@@ -169,7 +181,7 @@ export default defineComponent({
             leftPublications, leftTotalPublications,
             rightPublications, rightTotalPublications,
             leftJournal, rightJournal, handleDrag,
-            moveAll
+            moveAll, loading
         };
 }})
 
