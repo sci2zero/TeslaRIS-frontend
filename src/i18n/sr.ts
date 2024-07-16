@@ -328,5 +328,6 @@ export default {
     comparePublicationsLabel: "Uporedi radove.",
     compareMetadataLabel: "Uporedi metapodatke",
     journalPublicationsComparatorLabel: "Poređenje radova u časopisima",
-    journalMetadataComparatorLabel: "Poređenje metapodataka o časopisima"
+    journalMetadataComparatorLabel: "Poređenje metapodataka o časopisima",
+    allreadyInAuthorListError: "Osoba se već nalazi u listi autora na ovom radu."
 }

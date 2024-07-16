@@ -47,6 +47,8 @@ import HarvesterView from "@/views/HarvesterView.vue";
 import LoaderView from "@/views/LoaderView.vue";
 import JournalPublicationsComparatorView from "@/views/comparators/journal/JournalPublicationsComparatorView.vue";
 import JournalMetadataComparatorView from "@/views/comparators/journal/JournalMetadataComparatorView.vue";
+import PersonPublicationsComparatorView from "@/views/comparators/person/PersonPublicationsComparatorView.vue";
+import PersonMetadataComparatorView from "@/views/comparators/person/PersonMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -339,7 +341,25 @@ const router = createRouter({
                                 authenticated: false,
                                 authorities: [],
                             },
-                        }
+                        },
+                        {
+                            path: 'publications-comparator/:leftId/:rightId',
+                            name: "personPublicationsComparator",
+                            component: PersonPublicationsComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "personMetadataComparator",
+                            component: PersonMetadataComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                 },
                 {

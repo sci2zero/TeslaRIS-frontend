@@ -77,29 +77,23 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageList)" :label="$t('cityLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="cityRef" v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageList)" :label="$t('cityLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageList)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageList)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
-        </v-row>
-
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
         </v-row>
     </v-form>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { Country, LanguageTagResponse } from '@/models/Common';
+import type { Country, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -137,11 +131,11 @@ export default defineComponent({
                     countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id});
                 });
             });
+        });
 
-            if(props.presetPerson?.personalInfo.postalAddress?.countryId) {
-                CountryService.readCountry(props.presetPerson?.personalInfo.postalAddress?.countryId).then(response => {
-                    selectedCountry.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id};
-                });
+        watch(() => props.presetPerson, () => {
+            if (props.presetPerson) {
+                refreshForm();
             }
         });
 
@@ -158,8 +152,11 @@ export default defineComponent({
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>();
 
-        const city = ref([]);
-        const streetAndNumber = ref([]);
+
+        const cityRef = ref<typeof MultilingualTextInput>();
+        const streetAndNumberRef = ref<typeof MultilingualTextInput>();
+        const city = ref<any>([]);
+        const streetAndNumber = ref<any>([]);
 
         const sexes = getSexForGivenLocale();
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
@@ -184,13 +181,44 @@ export default defineComponent({
             emit("update", updatedPerson);
         };
 
+        const refreshForm = () => {
+            console.log(props.presetPerson?.personalInfo)
+            cityRef.value?.clearInput();
+            city.value = props.presetPerson?.personalInfo.postalAddress?.city as MultilingualContent[];
+
+            streetAndNumberRef.value?.clearInput();
+            streetAndNumber.value = props.presetPerson?.personalInfo.postalAddress?.streetAndNumber as MultilingualContent[];
+
+            selectedSex.value = {title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined};
+
+            if(props.presetPerson?.personalInfo.postalAddress?.countryId) {
+                CountryService.readCountry(props.presetPerson?.personalInfo.postalAddress?.countryId).then(response => {
+                    selectedCountry.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id};
+                });
+            }
+
+            placeOfBirth.value = props.presetPerson?.personalInfo.placeOfBirth;
+            email.value = props.presetPerson?.personalInfo.contact.contactEmail;
+            phoneNumber.value = props.presetPerson?.personalInfo.contact.phoneNumber;
+            birthdate.value = props.presetPerson?.personalInfo.localBirthDate;
+            orcid.value = props.presetPerson?.personalInfo.orcid;
+            eCrisId.value = props.presetPerson?.personalInfo.eCrisId;
+            eNaukaId.value = props.presetPerson?.personalInfo.eNaukaId;
+            apvnt.value = props.presetPerson?.personalInfo.apvnt;
+            scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
+
+            cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageList.value));
+            streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageList.value));
+        };
+
         return {
             isFormValid, email, phoneNumber, birthdate,
             orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
             toMultilingualTextInput, languageList, updatePerson,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
-            orcidValidationRules, scopusAuthorIdValidationRules
+            orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
+            streetAndNumberRef, refreshForm
         };
     }
 });
