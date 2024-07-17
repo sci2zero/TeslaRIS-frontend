@@ -21,14 +21,14 @@
         :headers="headers"
         item-value="row"
         :items-length="totalJournals"
-        show-select
+        :show-select="userRole === 'ADMIN'"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td>
+                <td v-if="userRole === 'ADMIN'">
                     <v-checkbox
                         v-model="selectedJournals"
                         :value="row.item"

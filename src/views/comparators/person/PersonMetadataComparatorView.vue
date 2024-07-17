@@ -9,9 +9,9 @@
 
                 <person-update-form ref="updateLeftRef" :preset-person="leftPerson" @update="updateLeft"></person-update-form>
 
-                <description-or-biography-update-form ref="updateLeftBioRef" :preset-description-or-biography="leftPerson?.biography ? leftPerson?.biography : []" @update="updateLeftBiography"></description-or-biography-update-form>
+                <description-or-biography-update-form ref="updateLeftBioRef" :preset-description-or-biography="leftPerson?.biography as MultilingualContent[]" @update="updateLeftBiography"></description-or-biography-update-form>
 
-                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="leftPerson?.keyword ? leftPerson?.keyword : []" @update="updateLeftKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="leftPerson?.keyword as MultilingualContent[]" @update="updateLeftKeywords"></keyword-update-form>
 
                 <br />
 
@@ -64,9 +64,9 @@
 
                 <person-update-form ref="updateRightRef" :preset-person="rightPerson" @update="updateRight"></person-update-form>
 
-                <description-or-biography-update-form ref="updateRightBioRef" :preset-description-or-biography="rightPerson?.biography ? rightPerson?.biography : []" @update="updateRightBiography"></description-or-biography-update-form>
+                <description-or-biography-update-form ref="updateRightBioRef" :preset-description-or-biography="rightPerson?.biography as MultilingualContent[]" @update="updateRightBiography"></description-or-biography-update-form>
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="rightPerson?.keyword ? rightPerson?.keyword : []" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="rightPerson?.keyword as MultilingualContent[]" @update="updateRightKeywords"></keyword-update-form>
 
                 <br />
 
@@ -140,6 +140,8 @@ import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/Expertise
 import PrizeList from '@/components/person/prize/PrizeList.vue';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
+import type { MultilingualContent } from '@/models/Common';
+import MergeService from '@/services/MergeService';
 
 
 export default defineComponent({
@@ -163,6 +165,10 @@ export default defineComponent({
 
         const updateLeftRef = ref<typeof PersonUpdateForm>();
         const updateRightRef = ref<typeof PersonUpdateForm>();
+        const updateRightBioRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateLeftBioRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
+        const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
         
 
         const i18n = useI18n();
@@ -301,10 +307,42 @@ export default defineComponent({
             person1.membershipIds = person1.membershipIds.concat(person2.membershipIds) as number[];
             person2.membershipIds = [];
 
+            person2.biography.forEach(biography => {
+                let merged = false;
+                person1.biography.forEach(currentBiography => {
+                    if (currentBiography.languageTag === biography.languageTag) {
+                        currentBiography.content += " | " + biography.content;
+                        merged = true;
+                    }
+                });
+                if (!merged) {
+                    person1.biography.push(biography);
+                }
+            });
+            person2.biography = [];
+
+            person2.keyword.forEach(keyword => {
+                let merged = false;
+                person1.keyword.forEach(currentKeyword => {
+                    if (currentKeyword.languageTag === keyword.languageTag) {
+                        currentKeyword.content += " | " + keyword.content;
+                        merged = true;
+                    }
+                });
+                if (!merged) {
+                    person1.keyword.push(keyword);
+                }
+            });
+            person2.keyword = [];
+
             return [person1, person2];
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftBioRef.value?.updateDescription();
+            updateRightBioRef.value?.updateDescription();
             updateLeftRef.value?.updatePerson();
             updateRightRef.value?.updatePerson();
 
@@ -321,6 +359,10 @@ export default defineComponent({
 
             updateLeftRef.value?.refreshForm();
             updateRightRef.value?.refreshForm();
+            updateLeftBioRef.value?.refreshForm();
+            updateRightBioRef.value?.refreshForm();
+            updateLeftKeywordsRef.value?.refreshForm();
+            updateRightKeywordsRef.value?.refreshForm();
         };
 
         const leftUpdateComplete = ref(false);
@@ -347,47 +389,81 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftBioRef.value?.updateDescription();
+            updateRightBioRef.value?.updateDescription();
             updateLeftRef.value?.updatePerson();
             updateRightRef.value?.updatePerson();
         };
 
-        const updateLeftBiography = () => {
-            // TODO: implement method
+        const updateLeftBiography = (biography: MultilingualContent[]) => {
+            leftPerson.value!.biography = biography;
         };
 
-        const updateRightBiography = () => {
-            // TODO: implement method
+        const updateRightBiography = (biography: MultilingualContent[]) => {
+            rightPerson.value!.biography = biography;
         };
 
-        const updateLeftKeywords = () => {
-            // TODO: implement method
+        const updateLeftKeywords = (keywords: MultilingualContent[]) => {
+            leftPerson.value!.keyword = keywords;
         };
 
-        const updateRightKeywords = () => {
-            // TODO: implement method
+        const updateRightKeywords = (keywords: MultilingualContent[]) => {
+            rightPerson.value!.keyword = keywords;
         };
 
-        const finishUpdates = () => {
+        const finishUpdates = async () => {
             if (leftUpdateComplete.value && rightUpdateComplete.value) {
                 leftUpdateComplete.value = false;
                 rightUpdateComplete.value = false;
                 update.value = false;
+                
+                try {
+                    PersonService.updatePersonalInfo(leftPerson.value?.id as number, leftPerson.value?.personalInfo as PersonalInfo).then(() => {
+                        PersonService.updatePersonalInfo(rightPerson.value?.id as number, rightPerson.value?.personalInfo as PersonalInfo);
+                    }).catch(() => {
+                        PersonService.updatePersonalInfo(rightPerson.value?.id as number, rightPerson.value?.personalInfo as PersonalInfo).then(() => {
+                            PersonService.updatePersonalInfo(leftPerson.value?.id as number, leftPerson.value?.personalInfo as PersonalInfo);
+                        });
+                    });
 
-                // JournalService.updateJournal(leftJournal.value?.id as number, leftJournal.value as Journal).then(() => {
-                //     snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                //     snackbar.value = true;
-                // }).catch((error) => {
-                //     snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
-                //     snackbar.value = true;
-                // });
+                    await Promise.all([
+                        // Left Person
+                        PersonService.updateKeywords(leftPerson.value?.id as number, leftPerson.value?.keyword as MultilingualContent[]),
+                        PersonService.updateBiography(leftPerson.value?.id as number, leftPerson.value?.biography as MultilingualContent[]),
 
-                // JournalService.updateJournal(rightJournal.value?.id as number, rightJournal.value as Journal).then(() => {
-                //     snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                //     snackbar.value = true;
-                // }).catch((error) => {
-                //     snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
-                //     snackbar.value = true;
-                // });
+                        // Right Person
+                        PersonService.updateKeywords(rightPerson.value?.id as number, rightPerson.value?.keyword as MultilingualContent[]),
+                        PersonService.updateBiography(rightPerson.value?.id as number, rightPerson.value?.biography as MultilingualContent[]),
+
+                        // Merge employments
+                        MergeService.switchInvolvementsToOtherPerson(leftEmployments.value.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
+                        MergeService.switchInvolvementsToOtherPerson(rightEmployments.value.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number),
+
+                        // Merge education
+                        MergeService.switchInvolvementsToOtherPerson(leftEducation.value.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
+                        MergeService.switchInvolvementsToOtherPerson(rightEducation.value.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number),
+
+                        // Merge memberships
+                        MergeService.switchInvolvementsToOtherPerson(leftMemberships.value.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
+                        MergeService.switchInvolvementsToOtherPerson(rightMemberships.value.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number),
+
+                        // Merge prizes
+                        MergeService.switchPrizesToOtherPerson(leftPerson.value?.prizes.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
+                        MergeService.switchPrizesToOtherPerson(rightPerson.value?.prizes.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number),
+
+                        // Merge skills
+                        MergeService.switchSkillsToOtherPerson(leftPerson.value?.expertisesOrSkills.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
+                        MergeService.switchSkillsToOtherPerson(rightPerson.value?.expertisesOrSkills.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number)
+                    ]);
+
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                } catch (error) {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
+                }
             }
         };
 
@@ -400,7 +476,9 @@ export default defineComponent({
             leftEmployments, leftEducation, leftMemberships,
             rightEmployments, rightEducation, rightMemberships,
             updateLeftBiography, updateRightBiography,
-            updateLeftKeywords, updateRightKeywords
+            updateLeftKeywords, updateRightKeywords,
+            updateRightBioRef, updateLeftBioRef,
+            updateRightKeywordsRef, updateLeftKeywordsRef
         };
 }})
 

@@ -25,7 +25,7 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" @click="updateFormRef?.updateKeywords()">
+                    <v-btn color="blue darken-1" @click="updateFormRef?.updateDescription()">
                         {{ $t("updateLabel") }}
                     </v-btn>
                 </v-card-actions>

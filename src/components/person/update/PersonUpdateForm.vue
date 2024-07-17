@@ -182,7 +182,6 @@ export default defineComponent({
         };
 
         const refreshForm = () => {
-            console.log(props.presetPerson?.personalInfo)
             cityRef.value?.clearInput();
             city.value = props.presetPerson?.personalInfo.postalAddress?.city as MultilingualContent[];
 

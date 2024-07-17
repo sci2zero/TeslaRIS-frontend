@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, watch } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
@@ -33,9 +33,9 @@ export default defineComponent({
         }
     },
     emits: ["update"],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
         const keywordsRef = ref<typeof MultilingualTextInput>();
-        const keywords = ref([]);
+        const keywords = ref<any>([]);
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
@@ -49,10 +49,22 @@ export default defineComponent({
             emit("update", keywords.value)
         };
 
+        watch(() => props.presetKeywords, () => {
+            if (props.presetKeywords) {
+                refreshForm();
+            }
+        });
+
+        const refreshForm = () => {
+            keywordsRef.value?.clearInput();
+            keywords.value = props.presetKeywords as MultilingualContent[];
+            keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+        };
+
         return {
             keywords, keywordsRef,
             updateKeywords, toMultilingualTextInput,
-            languageTags
+            languageTags, refreshForm
         };
     }
 });

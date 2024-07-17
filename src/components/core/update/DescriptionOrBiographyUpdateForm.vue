@@ -22,6 +22,7 @@ import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import LanguageService from '@/services/LanguageService';
 import type { PropType } from 'vue';
 import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { watch } from 'vue';
 
 export default defineComponent({
     name: "DescriptionOrBiographyUpdateForm",
@@ -33,9 +34,9 @@ export default defineComponent({
         }
     },
     emits: ["update"],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
         const descriptionRef = ref<typeof MultilingualTextInput>();
-        const description = ref([]);
+        const description = ref<any>([]);
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
@@ -45,14 +46,26 @@ export default defineComponent({
             });
         });
 
-        const updateKeywords = () => {
+        const updateDescription = () => {
             emit("update", description.value)
+        };
+
+        watch(() => props.presetDescriptionOrBiography, () => {
+            if (props.presetDescriptionOrBiography) {
+                refreshForm();
+            }
+        });
+
+        const refreshForm = () => {
+            descriptionRef.value?.clearInput();
+            description.value = props.presetDescriptionOrBiography as MultilingualContent[];
+            descriptionRef.value?.forceRefreshModelValue(toMultilingualTextInput(description.value, languageTags.value));
         };
 
         return {
             description, descriptionRef,
-            updateKeywords, toMultilingualTextInput,
-            languageTags
+            updateDescription, toMultilingualTextInput,
+            languageTags, refreshForm
         };
     }
 });

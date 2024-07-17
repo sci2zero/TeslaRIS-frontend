@@ -231,21 +231,26 @@ export default defineComponent({
                 rightUpdateComplete.value = false;
                 update.value = false;
 
-                JournalService.updateJournal(leftJournal.value?.id as number, leftJournal.value as Journal).then(() => {
-                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                    snackbar.value = true;
-                }).catch((error) => {
-                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
-                    snackbar.value = true;
-                });
+                const updateJournals = (firstId: number, firstJournal: Journal, secondId: number, secondJournal: Journal) => {
+                    return JournalService.updateJournal(firstId, firstJournal)
+                        .then(() => JournalService.updateJournal(secondId, secondJournal))
+                        .then(() => {
+                            snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                            snackbar.value = true;
+                        })
+                        .catch((error) => {
+                            throw error; // Propagate error to handle alternative update order
+                        });
+                };
 
-                JournalService.updateJournal(rightJournal.value?.id as number, rightJournal.value as Journal).then(() => {
-                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                    snackbar.value = true;
-                }).catch((error) => {
-                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
-                    snackbar.value = true;
-                });
+                updateJournals(leftJournal.value?.id as number, leftJournal.value as Journal, rightJournal.value?.id as number, rightJournal.value as Journal)
+                    .catch(() => {
+                        updateJournals(rightJournal.value?.id as number, rightJournal.value as Journal, leftJournal.value?.id as number, leftJournal.value as Journal)
+                            .catch((secondError) => {
+                                snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
+                                snackbar.value = true;
+                            });
+                    });
             }
         };
 
