@@ -26,7 +26,7 @@
                     :list="props.items"
                     tag="tbody"
                     :disabled="!inComparator"
-                    :group="{ name: 'publications', pull: true, put: true }"
+                    group="publications"
                     @change="onDropCallback"
                 >
                     <tr v-for="item in props.items" :key="item.id">

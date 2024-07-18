@@ -1,7 +1,7 @@
 <template>
     <draggable 
         :list="contributionList" item-key="id"
-        :group="{ name: 'publicationContributions', pull: true, put: true }" 
+        group="publicationContributions" 
         :disabled="!inComparator"
         @change="onDropCallback"
     >

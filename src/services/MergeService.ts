@@ -33,6 +33,22 @@ export class MergeService extends BaseService {
       return super.sendRequest(axios.patch, `expertise-or-skill/merge/person/source/${sourcePersonId}/target/${targetPersonId}`, {entityIds: skillIds});
     }
 
+    async switchEmployemntToOtherOU(sourceOUId: number, targetOUId: number, personId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/employment/${sourceOUId}/target/${targetOUId}/person/${personId}`);
+    }
+
+    async switchAllEmploymentsToOtherOU(sourceOUId: number, targetOUId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/employment/${sourceOUId}/target/${targetOUId}`);
+    }
+
+    async switchProceedingsToOtherConference(targetConferenceId: number, proceedingsId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/conference/${targetConferenceId}/proceedings/${proceedingsId}`);
+    }
+
+    async switchAllProceedingsToOtherConference(sourceConferenceId: number, targetConferenceId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/conference/${sourceConferenceId}/target/${targetConferenceId}`);
+    }
+
   }
   
   export default new MergeService();

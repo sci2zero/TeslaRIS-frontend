@@ -329,5 +329,9 @@ export default {
     compareMetadataLabel: "Compare metadata",
     journalPublicationsComparatorLabel: "Comparing journal publications",
     journalMetadataComparatorLabel: "Comparing journal metadata",
-    allreadyInAuthorListError: "Person is allready in the author list for this publication."
+    allreadyInAuthorListError: "Person is allready in the author list for this publication.",
+    compareEmployeesLabel: "Compare employees",
+    compareProceedingsLabel: "Compare proceedings",
+    proceedingsListLabel: "Proceedings list",
+    personMetadataComparatorLabel: "Comparing person metadata"
 }

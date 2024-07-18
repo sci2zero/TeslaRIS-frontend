@@ -5,8 +5,9 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedOUs.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        @click="startEmploymentComparison">
+        {{ $t("compareEmployeesLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedOUs"
@@ -83,6 +84,7 @@ import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
@@ -98,9 +100,10 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedOUs = ref([]);
+        const selectedOUs = ref<OrganisationUnitIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -173,22 +176,29 @@ export default defineComponent({
                 selectedOUs.value = selectedOUs.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
+
+        const startEmploymentComparison = () => {
+            router.push({name: "organisationUnitEmploymentsComparator", params: {
+                leftId: selectedOUs.value[0].databaseId, rightId: selectedOUs.value[1].databaseId
+            }});
+        };
 
         return {selectedOUs, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            startEmploymentComparison};
     }
 });
 </script>

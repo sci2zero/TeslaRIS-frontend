@@ -329,5 +329,9 @@ export default {
     compareMetadataLabel: "Uporedi metapodatke",
     journalPublicationsComparatorLabel: "Poređenje radova u časopisima",
     journalMetadataComparatorLabel: "Poređenje metapodataka o časopisima",
-    allreadyInAuthorListError: "Osoba se već nalazi u listi autora na ovom radu."
+    allreadyInAuthorListError: "Osoba se već nalazi u listi autora na ovom radu.",
+    compareEmployeesLabel: "Uporedi zaposlene",
+    compareProceedingsLabel: "Uporedi zbornike radova",
+    proceedingsListLabel: "Zbornici radova",
+    personMetadataComparatorLabel: "Poređenje metapodataka o osobama"
 }

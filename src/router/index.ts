@@ -49,6 +49,9 @@ import JournalPublicationsComparatorView from "@/views/comparators/journal/Journ
 import JournalMetadataComparatorView from "@/views/comparators/journal/JournalMetadataComparatorView.vue";
 import PersonPublicationsComparatorView from "@/views/comparators/person/PersonPublicationsComparatorView.vue";
 import PersonMetadataComparatorView from "@/views/comparators/person/PersonMetadataComparatorView.vue";
+import OrganisationUnitEmployeeComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitEmployeeComparatorView.vue";
+import EventProceedingsComparatorView from "@/views/comparators/event/EventProceedingsComparatorView.vue";
+import ProceedingsPublicationsComparatorView from "@/views/comparators/proceedings/ProceedingsPublicationsComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -132,7 +135,16 @@ const router = createRouter({
                                 authenticated: true,
                                 authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
-                        }
+                        },
+                        {
+                            path: 'proceedings-comparator/:leftId/:rightId',
+                            name: "eventProceedingsComparator",
+                            component: EventProceedingsComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                 },
                 {
@@ -382,7 +394,16 @@ const router = createRouter({
                                 authenticated: false,
                                 authorities: [],
                             },
-                        }
+                        },
+                        {
+                            path: 'employments-comparator/:leftId/:rightId',
+                            name: "organisationUnitEmploymentsComparator",
+                            component: OrganisationUnitEmployeeComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                     
                 },
@@ -465,13 +486,28 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "proceedings/:id",
-                    name: "proceedingsLandingPage",
-                    component: ProceedingsLandingView,
-                    meta: {
-                        authenticated: false,
-                        authorities: [],
-                    },
+                    path: "proceedings",                 
+                    children: [
+                        {
+                            path: ":id",
+                            name: "proceedingsLandingPage",
+                            component: ProceedingsLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: 'publications-comparator/:leftId/:rightId',
+                            name: "proceedingsPublicationsComparator",
+                            component: ProceedingsPublicationsComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                    ]
+                    
                 },
                 {
                     path: "submit-proceedings-publication",

@@ -5,8 +5,9 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'"
+        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startProceedingsComparison">
+        {{ $t("compareProceedingsLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedEvents"
@@ -74,6 +75,7 @@ import {EventType, type EventIndex} from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -90,9 +92,10 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedEvents = ref([]);
+        const selectedEvents = ref<EventIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -153,7 +156,7 @@ export default defineComponent({
                 selectedEvents.value = selectedEvents.value.filter((event) => failedDeletions.includes(event));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const pushlocalizedMessage = (success: boolean, event: EventIndex) => {
             if (success) {
@@ -169,22 +172,29 @@ export default defineComponent({
                     addNotification(i18n.t("deleteFailedNotification", { name: event.nameOther }));
                 }
             }
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
+
+        const startProceedingsComparison = () => {
+            router.push({name: "eventProceedingsComparator", params: {
+                leftId: selectedEvents.value[0].databaseId, rightId: selectedEvents.value[1].databaseId
+            }});
+        };
 
         return {selectedEvents, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            startProceedingsComparison};
     }
 });
 </script>
