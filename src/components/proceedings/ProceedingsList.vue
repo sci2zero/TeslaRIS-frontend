@@ -10,8 +10,13 @@
     <v-row>
         <v-btn
             v-if="userRole === 'ADMIN'"
-            density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsComparison">
-            {{ $t("compareProceedingsLabel") }}
+            density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsPublicationComparison">
+            {{ $t("comparePublicationsLabel") }}
+        </v-btn>
+        <v-btn
+            v-if="userRole === 'ADMIN'"
+            density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsMetadataComparison">
+            {{ $t("compareMetadataLabel") }}
         </v-btn>
     </v-row>
     <v-list lines="two">
@@ -149,8 +154,14 @@ export default defineComponent({
             emit("dragged", event);
         };
 
-        const startProceedingsComparison = () => {
+        const startProceedingsPublicationComparison = () => {
             router.push({name: "proceedingsPublicationsComparator", params: {
+                leftId: selectedProceedings.value[0].id, rightId: selectedProceedings.value[1].id
+            }});
+        };
+
+        const startProceedingsMetadataComparison = () => {
+            router.push({name: "proceedingsMetadataComparator", params: {
                 leftId: selectedProceedings.value[0].id, rightId: selectedProceedings.value[1].id
             }});
         };
@@ -162,7 +173,8 @@ export default defineComponent({
             refreshProceedingsList, convertToListEntry,
             deleteProceedings, navigateToProceedings,
             snackbar, message, onDropCallback, userRole,
-            selectedProceedings, startProceedingsComparison
+            selectedProceedings, startProceedingsPublicationComparison,
+            startProceedingsMetadataComparison
         };
     },
   });

@@ -325,13 +325,15 @@ export default {
     selfRelationEventError: "Događaj ne može imati relaciju sa samim sobom.",
     targetEventNotSerialError: "Ciljni događaj mora biti serijski događaj za ovaj tip relacije.",
     relationAlreadyExistsError: "Relacija sa tim događajem već postoji.",
-    comparePublicationsLabel: "Uporedi radove.",
+    comparePublicationsLabel: "Uporedi radove",
     compareMetadataLabel: "Uporedi metapodatke",
     journalPublicationsComparatorLabel: "Poređenje radova u časopisima",
     journalMetadataComparatorLabel: "Poređenje metapodataka o časopisima",
     allreadyInAuthorListError: "Osoba se već nalazi u listi autora na ovom radu.",
     compareEmployeesLabel: "Uporedi zaposlene",
-    compareProceedingsLabel: "Uporedi zbornike radova",
     proceedingsListLabel: "Zbornici radova",
-    personMetadataComparatorLabel: "Poređenje metapodataka o osobama"
+    personMetadataComparatorLabel: "Poređenje metapodataka o osobama",
+    proceedingsPublicationsLabel: "Radovi u zborniku",
+    proceedingsMetadataComparatorLabel: "Poređenje metapodataka o zbormicima radova",
+    eventMetadataComparatorLabel: "Poređenje metapodataka o događajima"
 }

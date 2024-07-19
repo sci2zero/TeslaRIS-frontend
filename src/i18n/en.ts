@@ -331,7 +331,9 @@ export default {
     journalMetadataComparatorLabel: "Comparing journal metadata",
     allreadyInAuthorListError: "Person is allready in the author list for this publication.",
     compareEmployeesLabel: "Compare employees",
-    compareProceedingsLabel: "Compare proceedings",
     proceedingsListLabel: "Proceedings list",
-    personMetadataComparatorLabel: "Comparing person metadata"
+    personMetadataComparatorLabel: "Comparing person metadata",
+    proceedingsPublicationsLabel: "Proceedings publications",
+    proceedingsMetadataComparatorLabel: "Comparing proceedings metadata",
+    eventMetadataComparatorLabel: "Comparing event metadata"
 }

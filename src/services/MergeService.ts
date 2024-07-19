@@ -49,6 +49,14 @@ export class MergeService extends BaseService {
       return super.sendRequest(axios.patch, `merge/conference/${sourceConferenceId}/target/${targetConferenceId}`);
     }
 
+    async switchProceedingsPublicationToOtherProceedings(targetProceedingsId: number, publicationId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/proceedings/${targetProceedingsId}/publication/${publicationId}`);
+    }
+
+    async switchAllProceedingsPublicationsToOtherProceedings(sourceProceedingsId: number, targetProceedingsId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/proceedings/${sourceProceedingsId}/target/${targetProceedingsId}`);
+    }
+
   }
   
   export default new MergeService();

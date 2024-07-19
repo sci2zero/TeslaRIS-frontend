@@ -154,6 +154,14 @@
             </v-col>
         </v-row>
 
+        <!-- All Publications Table -->
+        <v-row>
+            <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
+            <v-col cols="12">
+                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+            </v-col>
+        </v-row>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -200,11 +208,12 @@ import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsU
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, DoiLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, DoiLink, PublicationTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -225,6 +234,10 @@ export default defineComponent({
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
+        const page = ref(0);
+        const size = ref(1);
+        const sort = ref("");
+        const direction = ref("");
 
         const i18n = useI18n();
 
@@ -253,6 +266,7 @@ export default defineComponent({
                 fetchConnectedEntities();
 
                 populateData();
+                fetchPublications();
             });
         };
 
@@ -261,6 +275,25 @@ export default defineComponent({
                 response.data.forEach(languageTag => {
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
+            });
+        };
+
+        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            page.value = nextPage;
+            size.value = pageSize;
+            sort.value = sortField;
+            direction.value = sortDir;
+            fetchPublications();
+        };
+
+        const fetchPublications = () => {
+            if (!proceedings.value?.id) {
+                return;
+            }
+
+            DocumentPublicationService.findPublicationsInProceedings(proceedings.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+                publications.value = publicationResponse.data.content;
+                totalPublications.value = publicationResponse.data.totalElements
             });
         };
 
@@ -356,7 +389,7 @@ export default defineComponent({
         return {
             proceedings, icon,
             publications, event,
-            totalPublications,
+            totalPublications, switchPage,
             returnCurrentLocaleContent,
             languageTagMap, publicationSeriesType,
             searchKeyword, goToURL, canEdit, publisher,
