@@ -250,6 +250,7 @@ export default {
     monographLabel: "Monografija",
     updateMonographLabel: "Ažuriraj monografiju",
     unknownBirthdateMessage: "Nepoznat datum rođenja",
+    unknownDateMessage: "Nepoznat datum",
     importerLabel: "Uvoz podataka",
     scanSourcesLabel: "Skeniraj izvore",
     harvestDataLabel: "Uvezite podatke sa eksternih izvora",
@@ -295,6 +296,11 @@ export default {
     proceedingsNotBindedMessage: "Niste završili povezivanje za zbornik radova.",
     publishedInLabel: "Izdato u: {0}",
     noRecordsRemainingMessage: "Nema više dokumenata za uvoz",
+    relationDeleteSuccessNotification: "Relacija uspešno obrisana.",
+    relationDeleteFailedNotification: "Brisanje relacije neuspešno.",
+    eventsRelationsLabel: "Relacije sa drugim događajima",
+    serialEventsRelationsLabel: "Instance ove konferencije",
+    addEventsRelationLabel: "Dodaj relaciju između događaja",
     apvntFormatError: "Pogrešan format APVNT-a.",
     eCrisIdFormatError: "Pogrešan format eCRIS ID-a.",
     eNaukaIdFormatError: "Pogrešan format eNauka ID-a.",
@@ -321,5 +327,8 @@ export default {
     confIdExistsError: "Conf ID je već u upotrebi.",
     updateEventLabel: "Ažuriraj događaj",
     accountActivationInProgressMessage: "Aktivacija naloga u toku...",
-    accountActivationLabel: "Aktivacija naloga"
+    accountActivationLabel: "Aktivacija naloga",
+    selfRelationEventError: "Događaj ne može imati relaciju sa samim sobom.",
+    targetEventNotSerialError: "Ciljni događaj mora biti serijski događaj za ovaj tip relacije.",
+    relationAlreadyExistsError: "Relacija sa tim događajem već postoji."
 }

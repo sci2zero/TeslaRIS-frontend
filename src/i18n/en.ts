@@ -250,6 +250,7 @@ export default {
     monographLabel: "Monograph",
     updateMonographLabel: "Update Monograph",
     unknownBirthdateMessage: "Unknown birthdate",
+    unknownDateMessage: "Unknown date",
     importerLabel: "Data import",
     scanSourcesLabel: "Scan data sources",
     harvestDataLabel: "Harvest data from external sources",
@@ -295,6 +296,11 @@ export default {
     proceedingsNotBindedMessage: "You did not finish binding of proceedings.",
     publishedInLabel: "Published in: {0}",
     noRecordsRemainingMessage: "There are no more documents left to load",
+    relationDeleteSuccessNotification: "Relation successfully deleted.",
+    relationDeleteFailedNotification: "Relation deletion failed.",
+    eventsRelationsLabel: "Relations with other events",
+    serialEventsRelationsLabel: "Instances of this conference",
+    addEventsRelationLabel: "Add events relation",
     apvntFormatError: "Wrong APVNT format.",
     eCrisIdFormatError: "Wrong eCRIS ID format.",
     eNaukaIdFormatError: "Wrong eNauka ID format.",
@@ -321,5 +327,8 @@ export default {
     confIdExistsError: "Conf ID allready in use.",
     updateEventLabel: "Update Event",
     accountActivationInProgressMessage: "Activating account...",
-    accountActivationLabel: "Account Activation"
+    accountActivationLabel: "Account Activation",
+    selfRelationEventError: "Event cannot relate to itself.",
+    targetEventNotSerialError: "Target event must be serial event for this relation type.",
+    relationAlreadyExistsError: "Relation with that event already exists."
 }

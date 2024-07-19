@@ -57,6 +57,10 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
+        },
+        returnOnlyNonSerialEvents: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update:modelValue"],
@@ -87,7 +91,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                EventService.searchConferences(params).then((response) => {
+                EventService.searchConferences(params, props.returnOnlyNonSerialEvents).then((response) => {
                     const listOfEvents: { title: string, value: number, date?: string }[] = [];
                     response.data.content.forEach((conference: EventIndex) => {
                         if (i18n.locale.value === "sr") {
@@ -146,6 +150,10 @@ export default defineComponent({
         };
 
         const extractDate = (text: string): string => {
+            if (!text) {
+                return i18n.t("serialEventLabel");
+            }
+
             const yyyy_mm_dd_regex = /\b\d{4}-\d{2}-\d{2}\b/g;
             
             let match;

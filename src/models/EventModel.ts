@@ -37,6 +37,7 @@ export interface EventIndex {
     dateSortable: string;
     databaseId: number;
     eventType: EventType;
+    serialEvent: boolean;
 }
   
 export interface PersonEventContribution extends PersonContribution {
@@ -61,4 +62,20 @@ export interface Conference extends Event {
     number?: string;
     fee?: string;
     confId?: string;
+}
+
+export interface EventsRelation {
+    id?: number;
+    sourceId: number;
+    targetId: number;
+    eventsRelationType: EventsRelationType;
+    sourceEventName?: MultilingualContent[];
+    targetEventName?: MultilingualContent[];
+}
+
+export enum EventsRelationType {
+    PART_OF = "PART_OF",
+    HAS_PART = "HAS_PART",
+    BELONGS_TO_SERIES = "BELONGS_TO_SERIES",
+    COLLOCATED_WITH = "COLLOCATED_WITH",
 }

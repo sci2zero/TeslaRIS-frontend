@@ -3,11 +3,11 @@
         <v-col cols="2">
             <h2>{{ $t("proceedingsLabel") }}</h2>  
         </v-col>
-        <v-col class="proceedings-submission" cols="3">
+        <v-col v-if="!readonly" class="proceedings-submission" cols="3">
             <proceedings-submission-modal :conference="convertToListEntry(presetEvent)" @create="refreshProceedingsList"></proceedings-submission-modal>
         </v-col>
     </v-row>
-    <v-list lines="two">
+    <v-list v-if="proceedings && proceedings.length > 0" lines="two">
         <v-list-item
             v-for="item in proceedings"
             :key="item.id"
@@ -15,7 +15,7 @@
             :subtitle="item.documentDate ? item.documentDate : presetEvent?.dateTo.split('-')[0]"
             @click="navigateToProceedings(item.id as number)"
         >
-            <template #append>
+            <template v-if="!readonly" #append>
                 <v-row>
                     <v-col cols="auto">
                         <v-icon @click.stop="deleteProceedings(item)">
@@ -26,6 +26,9 @@
             </template>
         </v-list-item>
     </v-list>
+    <h3 v-else class="no-proceedings-message">
+        {{ $t("noAvailableProceedingsMessage") }}
+    </h3>
 
     <v-snackbar
         v-model="snackbar"
@@ -60,6 +63,10 @@ import { useI18n } from 'vue-i18n';
         presetEvent: {
             type: Object as PropType<Conference | undefined>,
             required: true
+        },
+        readonly: {
+            type: Boolean,
+            required: true
         }
     },
     setup(props) {
@@ -89,8 +96,8 @@ import { useI18n } from 'vue-i18n';
         };
 
         const navigateToProceedings = (proceedingsId: number) => {
-                router.push({ name: "proceedingsLandingPage", params: {id: proceedingsId} });
-            };
+            router.push({ name: "proceedingsLandingPage", params: {id: proceedingsId} });
+        };
 
         const refreshProceedingsList = () => {
             proceedings.value = [];
@@ -126,6 +133,10 @@ import { useI18n } from 'vue-i18n';
 
 .proceedings-submission {
     margin-top: 10px;
+}
+
+.no-proceedings-message {
+    margin-bottom: 10px;
 }
 
 </style>
