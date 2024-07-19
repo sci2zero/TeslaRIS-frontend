@@ -5,11 +5,16 @@
         <br />
         <search-bar-component :preset-search-input="presetSearchParams" @search="search"></search-bar-component>
         <br />
-        <v-btn color="primary" @click="addConference">
-            {{ $t("addConferenceLabel") }}
-        </v-btn>
-        <br />
-        <br />
+        <span class="d-flex align-center">
+            <v-btn color="primary" @click="addConference">
+                {{ $t("addConferenceLabel") }}
+            </v-btn>
+            <v-checkbox
+                v-model="returnSerialEvents"
+                :label="$t('showSerialEventsLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+        </span>
         <event-table-component :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
     </v-container>
 </template>
@@ -23,6 +28,7 @@ import { ref } from 'vue';
 import type { EventIndex } from '@/models/EventModel';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -42,13 +48,19 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const returnSerialEvents = ref(true);
+
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
         });
 
+        watch(returnSerialEvents, () => {
+            search(searchParams.value);
+        });
+
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            EventService.searchConferences(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false).then((response) => {
+            EventService.searchConferences(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, !returnSerialEvents.value).then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
             });
@@ -66,7 +78,8 @@ export default defineComponent({
             router.push({name: "submitConference"});
         }
 
-        return {search, events, totalEvents, switchPage, addConference, presetSearchParams};
+        return { search, events, totalEvents, switchPage,
+            addConference, presetSearchParams, returnSerialEvents };
     }
 });
 </script>

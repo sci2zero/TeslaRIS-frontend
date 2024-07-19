@@ -53,6 +53,7 @@ import OrganisationUnitEmployeeComparatorView from "@/views/comparators/organisa
 import EventProceedingsComparatorView from "@/views/comparators/event/EventProceedingsComparatorView.vue";
 import ProceedingsPublicationsComparatorView from "@/views/comparators/proceedings/ProceedingsPublicationsComparatorView.vue";
 import ProceedingsMetadataComparatorView from "@/views/comparators/proceedings/ProceedingsMetadataComparatorView.vue";
+import EventMetadataComparatorView from "@/views/comparators/event/EventMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -141,6 +142,15 @@ const router = createRouter({
                             path: 'proceedings-comparator/:leftId/:rightId',
                             name: "eventProceedingsComparator",
                             component: EventProceedingsComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "eventMetadataComparator",
+                            component: EventMetadataComparatorView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

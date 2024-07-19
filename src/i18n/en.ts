@@ -340,6 +340,10 @@ export default {
     proceedingsListLabel: "Proceedings list",
     personMetadataComparatorLabel: "Comparing person metadata",
     proceedingsPublicationsLabel: "Proceedings publications",
+    proceedingsPublicationsComparatorLabel: "Comparing proceedings publications",
     proceedingsMetadataComparatorLabel: "Comparing proceedings metadata",
-    eventMetadataComparatorLabel: "Comparing event metadata"
+    eventMetadataComparatorLabel: "Comparing event metadata",
+    compareProceedingsLabel: "Compare proceedings",
+    cannotCompareSerialEventsMessage: "Can't compare serial events.",
+    showSerialEventsLabel: "Show serial events"
 }

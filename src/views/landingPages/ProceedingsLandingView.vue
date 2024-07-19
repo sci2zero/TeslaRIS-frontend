@@ -62,7 +62,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="proceedings?.documentDate" class="response">
-                                    {{ proceedings.documentDate }}
+                                    {{ localiseDate(proceedings.documentDate) }}
                                 </div>
                                 <div v-if="proceedings?.publicationSeriesVolume">
                                     {{ $t("publicationSeriesVolumeLabel") }}:
@@ -209,6 +209,7 @@ import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -390,7 +391,7 @@ export default defineComponent({
             proceedings, icon,
             publications, event,
             totalPublications, switchPage,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, localiseDate,
             languageTagMap, publicationSeriesType,
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,

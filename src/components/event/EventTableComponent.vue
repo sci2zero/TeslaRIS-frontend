@@ -9,6 +9,11 @@
         density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startProceedingsComparison">
         {{ $t("compareProceedingsLabel") }}
     </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'"
+        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
+    </v-btn>
     <v-data-table-server
         v-model="selectedEvents"
         :sort-by="tableOptions.sortBy"
@@ -49,6 +54,10 @@
                 </td>
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.stateOther) }}
+                </td>
+                <td>
+                    <v-icon v-if="row.item.serialEvent" icon="mdi-check"></v-icon>
+                    <v-icon v-else icon="mdi-cancel"></v-icon>
                 </td>
             </tr>
         </template>
@@ -102,6 +111,7 @@ export default defineComponent({
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
+        const serialEventLabel = computed(() => i18n.t("serialEventLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
@@ -114,6 +124,7 @@ export default defineComponent({
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
           { title: stateLabel, align: "start", sortable: true, key: stateColumn},
+          { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"},
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -185,8 +196,31 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
+        const isSerialEventInSelection = () => {
+            if (selectedEvents.value[0].serialEvent || selectedEvents.value[1].serialEvent) {
+                addNotification(i18n.t("cannotCompareSerialEventsMessage"));
+                return true;
+            }
+            
+            return false;
+        };
+
         const startProceedingsComparison = () => {
+            if (isSerialEventInSelection()) {
+                return;
+            }
+
             router.push({name: "eventProceedingsComparator", params: {
+                leftId: selectedEvents.value[0].databaseId, rightId: selectedEvents.value[1].databaseId
+            }});
+        };
+
+        const startMetadataComparison = () => {
+            if (isSerialEventInSelection()) {
+                return;
+            }
+
+            router.push({name: "eventMetadataComparator", params: {
                 leftId: selectedEvents.value[0].databaseId, rightId: selectedEvents.value[1].databaseId
             }});
         };
@@ -194,7 +228,7 @@ export default defineComponent({
         return {selectedEvents, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startProceedingsComparison};
+            startProceedingsComparison, startMetadataComparison};
     }
 });
 </script>

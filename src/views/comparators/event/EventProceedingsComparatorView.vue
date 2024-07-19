@@ -7,7 +7,7 @@
                 </h2>
                 <br />
                 <!-- Left Proceedings List -->
-                <proceedings-list :preset-event="leftEvent" in-comparator @dragged="handleDrag"></proceedings-list>
+                <proceedings-list :preset-event="leftEvent" in-comparator :readonly="false" @dragged="handleDrag"></proceedings-list>
             </v-col>
 
             <v-col cols="1">
@@ -26,7 +26,7 @@
 
                 <br />
                 <!-- Right Proceedings List -->
-                <proceedings-list :preset-event="rightEvent" in-comparator></proceedings-list>
+                <proceedings-list :preset-event="rightEvent" in-comparator :readonly="false"></proceedings-list>
             </v-col>
         </v-row>
 

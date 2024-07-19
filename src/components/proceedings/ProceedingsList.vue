@@ -19,7 +19,7 @@
             {{ $t("compareMetadataLabel") }}
         </v-btn>
     </v-row>
-    <v-list v-if="proceedings && proceedings.length > 0" lines="two">
+    <v-list lines="two">
         <draggable 
             :list="proceedings" item-key="id"
             group="proceedings" 
@@ -54,7 +54,7 @@
             </v-list-item>
         </draggable>
     </v-list>
-    <h3 v-else class="no-proceedings-message">
+    <h3 v-if="!proceedings || proceedings.length === 0" class="no-proceedings-message">
         {{ $t("noAvailableProceedingsMessage") }}
     </h3>
 

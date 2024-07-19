@@ -1,5 +1,5 @@
 <template>
-    <draggable :list="contributionList" item-key="id" @change="reorderContributors">
+    <draggable :list="contributionList" item-key="id" group="eventContributions" @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link elementk :to="'persons/' + contribution.personId">
                 <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>

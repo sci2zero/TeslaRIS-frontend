@@ -215,7 +215,7 @@ export default {
     scientificBoardMembersLabel: "Članovi naučnog odbora",
     orgBoardChairLabel: "Predsednici Organizacionog Odbora",
     orgBoardMembersLabel: "Članovi Organizacionog Odbora",
-    progBoardMembersLabel: "Programme Board Members",
+    progBoardMembersLabel: "Članovi Programskog Odbora",
     speakersLabel: "Govornici",
     panelistsLabel: "Panelisti",
     chairLabel: "Presedavajući",
@@ -340,6 +340,10 @@ export default {
     proceedingsListLabel: "Zbornici radova",
     personMetadataComparatorLabel: "Poređenje metapodataka o osobama",
     proceedingsPublicationsLabel: "Radovi u zborniku",
-    proceedingsMetadataComparatorLabel: "Poređenje metapodataka o zbormicima radova",
-    eventMetadataComparatorLabel: "Poređenje metapodataka o događajima"
+    proceedingsPublicationsComparatorLabel: "Poređenje radova u zbornicima radova",
+    proceedingsMetadataComparatorLabel: "Poređenje metapodataka o zbornicima radova",
+    eventMetadataComparatorLabel: "Poređenje metapodataka o događajima",
+    compareProceedingsLabel: "Poredi zbornike radova",
+    cannotCompareSerialEventsMessage: "Nije moguće porediti serijske događaje",
+    showSerialEventsLabel: "Prikaži serijske događaje"
 }

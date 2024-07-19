@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
@@ -127,10 +127,19 @@ export default defineComponent({
             });
         });
 
-        const urisRef = ref<typeof MultilingualTextInput>();
+        watch(() => props.presetEvent, () => {
+            if (props.presetEvent) {
+                refreshForm();
+            }
+        });
 
-        const name = ref([]);
-        const nameAbbreviation = ref([]);
+        const urisRef = ref<typeof MultilingualTextInput>();
+        const nameRef = ref<typeof MultilingualTextInput>();
+        const abbreviationRef = ref<typeof MultilingualTextInput>();
+        const placeRef = ref<typeof MultilingualTextInput>();
+
+        const name = ref<any>([]);
+        const nameAbbreviation = ref<any>([]);
 
         const dateFrom = ref(props.presetEvent?.dateFrom);
         const dateTo = ref(props.presetEvent?.dateTo);
@@ -138,7 +147,7 @@ export default defineComponent({
         const timePeriodInput = ref(!((new Date(dateTo.value as string).getTime() - new Date(dateFrom.value as string).getTime()) > (30 * 24 * 60 * 60 * 1000)));
         
         const state = ref(returnCurrentLocaleContent(props.presetEvent?.state));
-        const place = ref([]);
+        const place = ref<any>([]);
         const conferenceNumber = ref(props.presetEvent?.number);
         const entryFee = ref(props.presetEvent?.fee);
         const serialEvent = ref(props.presetEvent?.serialEvent);
@@ -197,10 +206,34 @@ export default defineComponent({
             emit("update", updatedEvent);
         };
 
+        const refreshForm = () => {
+            nameRef.value?.clearInput();
+            name.value = props.presetEvent?.name as MultilingualContent[];
+
+            abbreviationRef.value?.clearInput();
+            nameAbbreviation.value = props.presetEvent?.nameAbbreviation as MultilingualContent[];
+
+            placeRef.value?.clearInput();
+            place.value = props.presetEvent?.place as MultilingualContent[];
+
+            state.value = returnCurrentLocaleContent(props.presetEvent?.state);
+
+            dateFrom.value = props.presetEvent?.dateFrom;
+            dateTo.value = props.presetEvent?.dateTo;
+            eventYear.value = props.presetEvent?.dateFrom.split("-")[0];
+            serialEvent.value = props.presetEvent?.serialEvent;
+            conferenceNumber.value = props.presetEvent?.number;
+            entryFee.value = props.presetEvent?.fee;
+            confId.value = props.presetEvent?.confId;
+
+            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+            abbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+        };
+
         return {
             isFormValid,
-            name, nameAbbreviation, urisRef,
-            languageTags, toMultilingualTextInput,
+            name, nameAbbreviation, urisRef, refreshForm,
+            languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, updateEvent,
             dateFrom, dateTo, state, place, conferenceNumber, entryFee, serialEvent,
             eventYear, countryList, timePeriodInput, confIdValidationRules, confId
