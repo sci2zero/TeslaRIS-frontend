@@ -3,7 +3,7 @@
         <v-col :cols="inComparator ? 4 : 2">
             <h2>{{ $t("proceedingsListLabel") }}</h2>  
         </v-col>
-        <v-col v-if="userRole === 'ADMIN'" class="proceedings-submission" cols="3">
+        <v-col v-if="!readonly && userRole === 'ADMIN'" class="proceedings-submission" cols="3">
             <proceedings-submission-modal :conference="convertToListEntry(presetEvent)" @create="refreshProceedingsList"></proceedings-submission-modal>
         </v-col>
     </v-row>
@@ -19,7 +19,7 @@
             {{ $t("compareMetadataLabel") }}
         </v-btn>
     </v-row>
-    <v-list lines="two">
+    <v-list v-if="proceedings && proceedings.length > 0" lines="two">
         <draggable 
             :list="proceedings" item-key="id"
             group="proceedings" 
@@ -42,7 +42,7 @@
                         @click.stop
                     />
                 </template>
-                <template v-if="userRole === 'ADMIN'" #append>
+                <template v-if="!readonly && userRole === 'ADMIN'" #append>
                     <v-row>
                         <v-col cols="auto">
                             <v-icon @click.stop="deleteProceedings(item)">
@@ -54,6 +54,9 @@
             </v-list-item>
         </draggable>
     </v-list>
+    <h3 v-else class="no-proceedings-message">
+        {{ $t("noAvailableProceedingsMessage") }}
+    </h3>
 
     <v-snackbar
         v-model="snackbar"
@@ -96,6 +99,10 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        readonly: {
+            type: Boolean,
+            required: true
         }
     },
     emits: ["dragged"],
@@ -127,8 +134,8 @@ export default defineComponent({
         };
 
         const navigateToProceedings = (proceedingsId: number) => {
-                router.push({ name: "proceedingsLandingPage", params: {id: proceedingsId} });
-            };
+            router.push({ name: "proceedingsLandingPage", params: {id: proceedingsId} });
+        };
 
         const refreshProceedingsList = () => {
             proceedings.value = [];
@@ -184,6 +191,10 @@ export default defineComponent({
 
 .proceedings-submission {
     margin-top: 10px;
+}
+
+.no-proceedings-message {
+    margin-bottom: 10px;
 }
 
 </style>

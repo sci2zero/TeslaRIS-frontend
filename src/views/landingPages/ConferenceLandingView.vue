@@ -32,8 +32,10 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div>{{ $t("eventDateLabel") }}:</div>
-                                <div class="response">
+                                <div v-if="!conference?.serialEvent">
+                                    {{ $t("eventDateLabel") }}:
+                                </div>
+                                <div v-if="!conference?.serialEvent" class="response">
                                     {{ getDates(conference?.dateFrom as string, conference?.dateTo as string) }}
                                 </div>
                                 <div v-if="conference?.description && conference.description.length > 0">
@@ -93,13 +95,22 @@
         <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
 
         <!-- Proceedings List -->
-        <br />
-        <proceedings-list :preset-event="conference"></proceedings-list>
+        <div v-if="!conference?.serialEvent">
+            <br />
+            <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
+        </div>
+
+        <!-- Relations List -->
+        <div>
+            <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
+        </div>
 
         <!-- Publication Table -->
-        <h2>{{ $t("publicationsLabel") }}</h2>
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
-    
+        <div v-if="!conference?.serialEvent">
+            <h2>{{ $t("publicationsLabel") }}</h2>
+            <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+        </div>
+        
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -134,12 +145,13 @@ import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
+import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList, EventsRelationList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
