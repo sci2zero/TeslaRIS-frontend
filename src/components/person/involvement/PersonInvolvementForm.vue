@@ -113,7 +113,7 @@ import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { getInvolvementTypesForGivenLocale, getInvolvementTypeTitleFromValueAutoLocale, getSimilarInvolvementTypes } from '@/i18n/involvementType';
 import { InvolvementType, type Education, type Employment, type Involvement, type Membership } from '@/models/InvolvementModel';

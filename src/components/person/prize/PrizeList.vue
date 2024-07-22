@@ -59,7 +59,7 @@
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { PersonResponse, Prize, PrizeResponse } from '@/models/PersonModel';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PrizeModal from './PrizeModal.vue';

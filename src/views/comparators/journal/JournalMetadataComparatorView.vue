@@ -87,7 +87,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import PersonPublicationSeriesContributionList from '@/components/core/PersonPublicationSeriesContributionList.vue';

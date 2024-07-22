@@ -47,7 +47,7 @@ import { defineComponent, onMounted, ref, type PropType } from 'vue';
 import type { Conference, EventsRelation } from "@/models/EventModel";
 import { EventsRelationType } from "@/models/EventModel";
 import { watch } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import router from '@/router';
 import { useI18n } from 'vue-i18n';
 import EventService from '@/services/EventService';

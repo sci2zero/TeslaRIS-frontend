@@ -186,7 +186,7 @@ import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
 import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';

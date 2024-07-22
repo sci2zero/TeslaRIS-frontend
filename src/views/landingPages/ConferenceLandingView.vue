@@ -136,7 +136,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';

@@ -345,5 +345,9 @@ export default {
     eventMetadataComparatorLabel: "Comparing event metadata",
     compareProceedingsLabel: "Compare proceedings",
     cannotCompareSerialEventsMessage: "Can't compare serial events.",
-    showSerialEventsLabel: "Show serial events"
+    showSerialEventsLabel: "Show serial events",
+    actionNotAllowedLabel: "Action is not allowed",
+    cantCompareSerialEventsProceedingsMessage: "It is not possible to compare serial events' proceedings.",
+    cantCompareSerialEventsMetadataMessage: "It is not possible to compare serial events' metadata.",
+    goBackLabel: "Go back"
 }

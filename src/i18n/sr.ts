@@ -345,5 +345,9 @@ export default {
     eventMetadataComparatorLabel: "Poređenje metapodataka o događajima",
     compareProceedingsLabel: "Poredi zbornike radova",
     cannotCompareSerialEventsMessage: "Nije moguće porediti serijske događaje",
-    showSerialEventsLabel: "Prikaži serijske događaje"
+    showSerialEventsLabel: "Prikaži serijske događaje",
+    actionNotAllowedLabel: "Akcija nije dozvoljena",
+    cantCompareSerialEventsProceedingsMessage: "Nije moguće porediti zbornike radova serijskih događaja.",
+    cantCompareSerialEventsMetadataMessage: "Nije moguće porediti metapodatke serijskih događaja.",
+    goBackLabel: "Vrati se nazad"
 }

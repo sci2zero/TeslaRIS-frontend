@@ -29,7 +29,7 @@ import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { ExpertiseOrSkillResponse } from '@/models/PersonModel';

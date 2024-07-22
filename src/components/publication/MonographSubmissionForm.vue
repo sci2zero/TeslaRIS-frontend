@@ -164,7 +164,7 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getMonographTypesForGivenLocale } from '@/i18n/monographType';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAreaService from '@/services/ResearchAreaService';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';

@@ -48,7 +48,7 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { ResearchArea } from "@/models/OrganisationUnitModel";
 import ResearchAreaService from "@/services/ResearchAreaService";
-import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { watch } from "vue";
 
 

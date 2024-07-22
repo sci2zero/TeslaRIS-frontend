@@ -5,7 +5,7 @@
 <script lang="ts">
 import { ref, onMounted, defineComponent, type PropType, watch } from 'vue';
 import * as d3 from 'd3';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({

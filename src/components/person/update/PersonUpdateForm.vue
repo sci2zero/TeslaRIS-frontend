@@ -97,7 +97,7 @@ import type { Country, LanguageTagResponse, MultilingualContent } from '@/models
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PersonalInfo, PersonResponse, Sex } from '@/models/PersonModel';
 import { getSexForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/sex';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';

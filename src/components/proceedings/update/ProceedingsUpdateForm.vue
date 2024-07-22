@@ -110,7 +110,7 @@ import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocom
 import BookSeriesAutocompleteSearch from '@/components/bookSeries/BookSeriesAutocompleteSearch.vue';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import UriInput from '@/components/core/UriInput.vue';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';

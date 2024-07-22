@@ -54,7 +54,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
+                    <v-col cols="10">
                         <v-text-field v-model="confId" label="Conf ID" placeholder="Conf ID" :rules="confIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
@@ -72,7 +72,7 @@
                         ></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="!inComparator">
                     <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                 </v-row>
             </v-col>
@@ -97,7 +97,7 @@ import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Conference } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { getCountriesForGivenLocale, countriesSr, countriesEn } from '@/i18n/countries';
 import DatePicker from '@/components/core/DatePicker.vue';
 
@@ -109,6 +109,10 @@ export default defineComponent({
         presetEvent: {
             type: Object as PropType<Conference | undefined>,
             required: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],

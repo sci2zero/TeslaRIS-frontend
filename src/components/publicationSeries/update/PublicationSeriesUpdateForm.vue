@@ -52,7 +52,7 @@ import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PublicationSeries } from '@/models/PublicationSeriesModel';
 import { watch } from 'vue';
 

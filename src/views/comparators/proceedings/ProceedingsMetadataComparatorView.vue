@@ -11,6 +11,12 @@
 
                 <br />
 
+                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftProceedings?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+
+                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftProceedings?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+
+                <br />
+
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
@@ -40,6 +46,12 @@
                 <br />
 
                 <proceedings-update-form ref="updateRightRef" :preset-proceedings="rightProceedings" in-comparator @update="updateRight"></proceedings-update-form>
+
+                <br />
+
+                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightProceedings?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+
+                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightProceedings?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
 
                 <br />
 
@@ -83,7 +95,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import ProceedingsService from '@/services/ProceedingsService';
 import type { Proceedings } from '@/models/ProceedingsModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
@@ -91,11 +103,13 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
 import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
+import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
+import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 
 
 export default defineComponent({
     name: "ProceedingsMetadataComparator",
-    components: { PersonDocumentContributionList, ProceedingsUpdateForm },
+    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -107,7 +121,10 @@ export default defineComponent({
 
         const updateLeftRef = ref<typeof ProceedingsUpdateForm>();
         const updateRightRef = ref<typeof ProceedingsUpdateForm>();
-        
+        const updateRightDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateLeftDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
+        const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
 
         const i18n = useI18n();
 
@@ -126,26 +143,17 @@ export default defineComponent({
             });
         };
 
-        const mergeMultilingualContentField = (content1: MultilingualContent[], content2: MultilingualContent[]) => {
-            content2.forEach(content => {
-                let merged = false;
-                content1.forEach(currentContent => {
-                    if (currentContent.languageTag === content.languageTag) {
-                        currentContent.content += " | " + content.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    content1.push(content);
-                }
-            });
-        };
-
         const mergeProceedingsMetadata = (proceedings1: Proceedings, proceedings2: Proceedings) => {
             mergeMultilingualContentField(proceedings1.title, proceedings2.title);
 
             mergeMultilingualContentField(proceedings1.subTitle, proceedings2.subTitle);
             proceedings2.subTitle = [];
+
+            mergeMultilingualContentField(proceedings1.keywords, proceedings2.keywords);
+            proceedings2.keywords = [];
+
+            mergeMultilingualContentField(proceedings1.description, proceedings2.description);
+            proceedings2.description = [];
 
             proceedings1.eISBN = proceedings2.eISBN;
             proceedings2.eISBN = "";
@@ -188,6 +196,10 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftDescriptionRef.value?.updateDescription();
+            updateRightDescriptionRef.value?.updateDescription();
             updateLeftRef.value?.updateProceedings();
             updateRightRef.value?.updateProceedings();
 
@@ -199,6 +211,10 @@ export default defineComponent({
 
             updateLeftRef.value?.refreshForm();
             updateRightRef.value?.refreshForm();
+            updateLeftKeywordsRef.value?.refreshForm();
+            updateRightKeywordsRef.value?.refreshForm();
+            updateLeftDescriptionRef.value?.refreshForm();
+            updateRightDescriptionRef.value?.refreshForm();
         };
 
         const leftUpdateComplete = ref(false);
@@ -257,6 +273,10 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftDescriptionRef.value?.updateDescription();
+            updateRightDescriptionRef.value?.updateDescription();
             updateLeftRef.value?.updateProceedings();
             updateRightRef.value?.updateProceedings();
         };
@@ -291,12 +311,32 @@ export default defineComponent({
             }
         };
 
+        const updateLeftDescription = (description: MultilingualContent[]) => {
+            leftProceedings.value!.description = description;
+        };
+
+        const updateRightDescription = (description: MultilingualContent[]) => {
+            rightProceedings.value!.description = description;
+        };
+
+        const updateLeftKeywords = (keywords: MultilingualContent[]) => {
+            leftProceedings.value!.keywords = keywords;
+        };
+
+        const updateRightKeywords = (keywords: MultilingualContent[]) => {
+            rightProceedings.value!.keywords = keywords;
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
             leftProceedings, rightProceedings,
             moveAll, updateAll, updateLeft,
-            updateLeftRef, updateRightRef, updateRight
+            updateLeftRef, updateRightRef, updateRight,
+            updateRightDescriptionRef, updateLeftDescriptionRef,
+            updateRightKeywordsRef, updateLeftKeywordsRef,
+            updateLeftDescription, updateRightDescription,
+            updateLeftKeywords, updateRightKeywords
         };
 }})
 

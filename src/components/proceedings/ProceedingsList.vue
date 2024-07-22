@@ -80,7 +80,7 @@ import ProceedingsSubmissionModal from '@/components/proceedings/ProceedingsSubm
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { watch } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import router from '@/router';
 import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next'

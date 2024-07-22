@@ -52,6 +52,8 @@
                 </v-btn>
             </template>
         </v-snackbar>
+
+        <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsProceedingsMessage')"></persistent-stop-dialog>
     </v-container>
 </template>
 
@@ -62,19 +64,22 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import MergeService from '@/services/MergeService';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
+import PersistentStopDialog from '@/components/core/PersistentStopDialog.vue';
 
 
 export default defineComponent({
     name: "EventProceedingsComparator",
-    components: { ProceedingsList },
+    components: { ProceedingsList, PersistentStopDialog },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
         const loading = ref(false);
+
+        const showStopDialog = ref(false);
 
         const currentRoute = useRoute();
 
@@ -90,10 +95,20 @@ export default defineComponent({
 
         const fetchEvents = () => {
             EventService.readConference(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                if (response.data.serialEvent) {
+                    showStopDialog.value = true;
+                    return;
+                }
+
                 leftEvent.value = response.data;
             });
 
             EventService.readConference(parseInt(currentRoute.params.rightId as string)).then((response) => {
+                if (response.data.serialEvent) {
+                    showStopDialog.value = true;
+                    return;
+                }
+                
                 rightEvent.value = response.data;
             });
         };
@@ -135,7 +150,7 @@ export default defineComponent({
         return {
             snackbar, snackbarMessage,
             leftEvent, rightEvent, handleDrag,
-            moveAll, loading,
+            moveAll, loading, showStopDialog,
             returnCurrentLocaleContent
         };
 }})

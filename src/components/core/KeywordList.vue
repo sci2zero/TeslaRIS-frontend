@@ -21,7 +21,7 @@ import { defineComponent, type PropType } from 'vue';
 import KeywordUpdateModal from './update/KeywordUpdateModal.vue';
 import type { MultilingualContent } from '@/models/Common';
 import { watch } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 

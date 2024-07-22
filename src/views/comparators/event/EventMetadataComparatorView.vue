@@ -7,7 +7,13 @@
                 </h2>
                 <br />
 
-                <event-update-form ref="updateLeftRef" :preset-event="leftConference" @update="updateLeft"></event-update-form>
+                <event-update-form ref="updateLeftRef" :preset-event="leftConference" in-comparator @update="updateLeft"></event-update-form>
+
+                <br />
+
+                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftConference?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+
+                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftConference?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
 
                 <br />
 
@@ -39,7 +45,13 @@
 
                 <br />
 
-                <event-update-form ref="updateRightRef" :preset-event="rightConference" @update="updateRight"></event-update-form>
+                <event-update-form ref="updateRightRef" :preset-event="rightConference" in-comparator @update="updateRight"></event-update-form>
+
+                <br />
+
+                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightConference?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+
+                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightConference?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
 
                 <br />
 
@@ -75,6 +87,8 @@
                 </v-btn>
             </template>
         </v-snackbar>
+
+        <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsMetadataMessage')"></persistent-stop-dialog>
     </v-container>
 </template>
 
@@ -83,18 +97,21 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import type { Conference, PersonEventContribution } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import type { MultilingualContent } from '@/models/Common';
 import PersonEventContributionList from '@/components/core/PersonEventContributionList.vue';
 import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
+import PersistentStopDialog from '@/components/core/PersistentStopDialog.vue';
+import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
+import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 
 
 export default defineComponent({
     name: "ConferenceMetadataComparator",
-    components: { EventUpdateForm, PersonEventContributionList },
+    components: { EventUpdateForm, PersonEventContributionList, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -106,7 +123,12 @@ export default defineComponent({
 
         const updateLeftRef = ref<typeof EventUpdateForm>();
         const updateRightRef = ref<typeof EventUpdateForm>();
-        
+        const updateRightDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateLeftDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
+        const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
+
+        const showStopDialog = ref(false);
 
         const i18n = useI18n();
 
@@ -117,26 +139,21 @@ export default defineComponent({
 
         const fetchConferences = () => {
             EventService.readConference(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                if (response.data.serialEvent) {
+                    showStopDialog.value = true;
+                    return;
+                }
+
                 leftConference.value = response.data;
             });
 
             EventService.readConference(parseInt(currentRoute.params.rightId as string)).then((response) => {
-                rightConference.value = response.data;
-            });
-        };
-
-        const mergeMultilingualContentField = (content1: MultilingualContent[], content2: MultilingualContent[]) => {
-            content2.forEach(content => {
-                let merged = false;
-                content1.forEach(currentContent => {
-                    if (currentContent.languageTag === content.languageTag) {
-                        currentContent.content += " | " + content.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    content1.push(content);
+                if (response.data.serialEvent) {
+                    showStopDialog.value = true;
+                    return;
                 }
+
+                rightConference.value = response.data;
             });
         };
 
@@ -151,6 +168,12 @@ export default defineComponent({
 
             mergeMultilingualContentField(conference1.place, conference2.place);
             conference2.place = [];
+
+            mergeMultilingualContentField(conference1.keywords, conference2.keywords);
+            conference2.keywords = [];
+
+            mergeMultilingualContentField(conference1.description, conference2.description);
+            conference2.description = [];
 
             conference1.dateFrom = conference2.dateFrom;
             conference1.dateTo = conference2.dateTo;
@@ -168,6 +191,10 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftDescriptionRef.value?.updateDescription();
+            updateRightDescriptionRef.value?.updateDescription();
             updateLeftRef.value?.updateEvent();
             updateRightRef.value?.updateEvent();
 
@@ -179,6 +206,10 @@ export default defineComponent({
 
             updateLeftRef.value?.refreshForm();
             updateRightRef.value?.refreshForm();
+            updateLeftKeywordsRef.value?.refreshForm();
+            updateRightKeywordsRef.value?.refreshForm();
+            updateLeftDescriptionRef.value?.refreshForm();
+            updateRightDescriptionRef.value?.refreshForm();
         };
 
         const leftUpdateComplete = ref(false);
@@ -223,6 +254,10 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftDescriptionRef.value?.updateDescription();
+            updateRightDescriptionRef.value?.updateDescription();
             updateLeftRef.value?.updateEvent();
             updateRightRef.value?.updateEvent();
         };
@@ -246,14 +281,30 @@ export default defineComponent({
                 };
 
                 updateConferences(leftConference.value?.id as number, leftConference.value as Conference, rightConference.value?.id as number, rightConference.value as Conference)
-                    .catch(() => {
-                        updateConferences(rightConference.value?.id as number, rightConference.value as Conference, leftConference.value?.id as number, leftConference.value as Conference)
-                            .catch((secondError) => {
-                                snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
-                                snackbar.value = true;
-                            });
-                    });
+                .catch(() => {
+                    updateConferences(rightConference.value?.id as number, rightConference.value as Conference, leftConference.value?.id as number, leftConference.value as Conference)
+                        .catch((secondError) => {
+                            snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
+                            snackbar.value = true;
+                        });
+                });
             }
+        };
+
+        const updateLeftDescription = (description: MultilingualContent[]) => {
+            leftConference.value!.description = description;
+        };
+
+        const updateRightDescription = (description: MultilingualContent[]) => {
+            rightConference.value!.description = description;
+        };
+
+        const updateLeftKeywords = (keywords: MultilingualContent[]) => {
+            leftConference.value!.keywords = keywords;
+        };
+
+        const updateRightKeywords = (keywords: MultilingualContent[]) => {
+            rightConference.value!.keywords = keywords;
         };
 
         return {
@@ -261,7 +312,12 @@ export default defineComponent({
             snackbar, snackbarMessage,
             leftConference, rightConference,
             moveAll, updateAll, updateLeft,
-            updateLeftRef, updateRightRef, updateRight
+            updateLeftRef, updateRightRef,
+            updateRight, showStopDialog,
+            updateLeftDescription, updateRightDescription,
+            updateLeftKeywords, updateRightKeywords,
+            updateLeftKeywordsRef, updateRightKeywordsRef,
+            updateLeftDescriptionRef, updateRightDescriptionRef
         };
 }})
 

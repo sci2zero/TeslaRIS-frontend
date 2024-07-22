@@ -68,7 +68,7 @@ import type { PersonIndex } from '@/models/PersonModel';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 
 

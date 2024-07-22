@@ -9,9 +9,9 @@
 
                 <person-update-form ref="updateLeftRef" :preset-person="leftPerson" @update="updateLeft"></person-update-form>
 
-                <description-or-biography-update-form ref="updateLeftBioRef" :preset-description-or-biography="leftPerson?.biography as MultilingualContent[]" @update="updateLeftBiography"></description-or-biography-update-form>
+                <description-or-biography-update-form ref="updateLeftBioRef" :preset-description-or-biography="(leftPerson?.biography as MultilingualContent[])" @update="updateLeftBiography"></description-or-biography-update-form>
 
-                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="leftPerson?.keyword as MultilingualContent[]" @update="updateLeftKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="(leftPerson?.keyword as MultilingualContent[])" @update="updateLeftKeywords"></keyword-update-form>
 
                 <br />
 
@@ -64,9 +64,9 @@
 
                 <person-update-form ref="updateRightRef" :preset-person="rightPerson" @update="updateRight"></person-update-form>
 
-                <description-or-biography-update-form ref="updateRightBioRef" :preset-description-or-biography="rightPerson?.biography as MultilingualContent[]" @update="updateRightBiography"></description-or-biography-update-form>
+                <description-or-biography-update-form ref="updateRightBioRef" :preset-description-or-biography="(rightPerson?.biography as MultilingualContent[])" @update="updateRightBiography"></description-or-biography-update-form>
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="rightPerson?.keyword as MultilingualContent[]" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightPerson?.keyword as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
 
                 <br />
 
@@ -129,7 +129,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonService from '@/services/PersonService';
@@ -142,6 +142,7 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import type { MultilingualContent } from '@/models/Common';
 import MergeService from '@/services/MergeService';
+import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
@@ -237,32 +238,10 @@ export default defineComponent({
         };
 
         const mergePersonMetadata = (person1: PersonalInfo, person2: PersonalInfo) => {
-            person2.postalAddress?.city.forEach(city => {
-                let merged = false;
-                person1.postalAddress?.city.forEach(currentCity => {
-                    if (currentCity.languageTag === city.languageTag) {
-                        currentCity.content += " | " + city.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    person1.postalAddress?.city.push(city);
-                }
-            });
+            mergeMultilingualContentField(person1.postalAddress!.city, person2.postalAddress!.city);
             person2.postalAddress!.city = [];
 
-            person2.postalAddress?.streetAndNumber.forEach(streetAndNumber => {
-                let merged = false;
-                person1.postalAddress?.streetAndNumber.forEach(currentStreetAndNumber => {
-                    if (currentStreetAndNumber.languageTag === streetAndNumber.languageTag) {
-                        currentStreetAndNumber.content += " | " + streetAndNumber.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    person1.postalAddress?.streetAndNumber.push(streetAndNumber);
-                }
-            });
+            mergeMultilingualContentField(person1.postalAddress!.streetAndNumber, person2.postalAddress!.streetAndNumber);
             person2.postalAddress!.streetAndNumber = [];
 
             person1.placeOfBirth = person2.placeOfBirth;
@@ -307,32 +286,10 @@ export default defineComponent({
             person1.membershipIds = person1.membershipIds.concat(person2.membershipIds) as number[];
             person2.membershipIds = [];
 
-            person2.biography.forEach(biography => {
-                let merged = false;
-                person1.biography.forEach(currentBiography => {
-                    if (currentBiography.languageTag === biography.languageTag) {
-                        currentBiography.content += " | " + biography.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    person1.biography.push(biography);
-                }
-            });
+            mergeMultilingualContentField(person1.biography, person2.biography);
             person2.biography = [];
 
-            person2.keyword.forEach(keyword => {
-                let merged = false;
-                person1.keyword.forEach(currentKeyword => {
-                    if (currentKeyword.languageTag === keyword.languageTag) {
-                        currentKeyword.content += " | " + keyword.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    person1.keyword.push(keyword);
-                }
-            });
+            mergeMultilingualContentField(person1.keyword, person2.keyword);
             person2.keyword = [];
 
             return [person1, person2];
@@ -460,7 +417,7 @@ export default defineComponent({
 
                     snackbarMessage.value = i18n.t("updatedSuccessMessage");
                     snackbar.value = true;
-                } catch (error) {
+                } catch (error: any) {
                     snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                     snackbar.value = true;
                 }

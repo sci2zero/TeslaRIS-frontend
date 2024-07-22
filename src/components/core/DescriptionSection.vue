@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateModal from './update/DescriptionOrBiographyUpdateModal.vue';
 

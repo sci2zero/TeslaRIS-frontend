@@ -21,7 +21,7 @@ import { ref } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import LanguageService from '@/services/LanguageService';
 import type { PropType } from 'vue';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { watch } from 'vue';
 
 export default defineComponent({

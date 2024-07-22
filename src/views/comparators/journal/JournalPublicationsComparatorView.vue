@@ -65,7 +65,7 @@ import { useRoute } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import MergeService from '@/services/MergeService';

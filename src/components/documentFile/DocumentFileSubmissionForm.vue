@@ -75,7 +75,7 @@ import { License, ResourceType } from "@/models/DocumentFileModel";
 import type { PropType } from 'vue';
 import { onMounted } from 'vue';
 import { getNameFromOrdinal } from '@/utils/EnumUtil';
-import { toMultilingualTextInput } from "@/i18n/TranslationUtil";
+import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
 

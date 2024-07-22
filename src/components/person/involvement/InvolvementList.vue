@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getInvolvementTypeTitleFromValueAutoLocale } from '@/i18n/involvementType';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import type { Education, Employment, Membership } from '@/models/InvolvementModel';
