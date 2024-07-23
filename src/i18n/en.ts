@@ -349,5 +349,7 @@ export default {
     actionNotAllowedLabel: "Action is not allowed",
     cantCompareSerialEventsProceedingsMessage: "It is not possible to compare serial events' proceedings.",
     cantCompareSerialEventsMetadataMessage: "It is not possible to compare serial events' metadata.",
-    goBackLabel: "Go back"
+    goBackLabel: "Go back",
+    redirectingToMessage: "You are being redirected to {0}.",
+    doNotCloseMessage: "Please, do not close or leave this page."
 }

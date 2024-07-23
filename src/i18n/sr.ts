@@ -349,5 +349,7 @@ export default {
     actionNotAllowedLabel: "Akcija nije dozvoljena",
     cantCompareSerialEventsProceedingsMessage: "Nije moguće porediti zbornike radova serijskih događaja.",
     cantCompareSerialEventsMetadataMessage: "Nije moguće porediti metapodatke serijskih događaja.",
-    goBackLabel: "Vrati se nazad"
+    goBackLabel: "Vrati se nazad",
+    redirectingToMessage: "Preusmeravamo vas na {0}.",
+    doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu."
 }
