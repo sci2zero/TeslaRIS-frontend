@@ -82,7 +82,7 @@ jobs:
   start-new-frontend:
     runs-on: ubuntu-latest
 
-    needs: deploy-fronetend
+    needs: deploy-frontend
     environment:
       name: test
 
