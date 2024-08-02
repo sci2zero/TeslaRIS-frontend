@@ -7,6 +7,13 @@ on:
         description: 'Skip running tests'
         default: false
         required: false
+      api_url:
+        description: 'Backend API URL (https://testcris.uns.ac.rs/api/)'
+        default: ${{ vars.API_URL || 'https://testcris.uns.ac.rs/api/' }}
+        required: false
+
+env:
+  VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
   push:
     branches:
       - feature/deploy 
