@@ -9,7 +9,7 @@ on:
         type: boolean
       api_url:
         description: 'Backend API URL (https://testcris.uns.ac.rs/api/)'
-        default: ${{ vars.API_URL || 'https://testcris.uns.ac.rs/api/' }}
+        default: ''
         required: false
       environment:
         description: 'Deploy environment'
