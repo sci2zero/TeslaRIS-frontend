@@ -25,6 +25,7 @@ on:
 
 env:
   VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
+  ENVIRONMENT: ${{ inputs.environment || 'test' }} # Set the default value to the environment variable or a fallback value
 
 jobs:
   build-frontend:
@@ -66,7 +67,7 @@ jobs:
     if : ${{ !inputs.without_deploy }}
     needs: build-frontend
     environment:
-      name: ${{ inputs.environment }}
+      name: ${{ env.ENVIRONMENT }}
 
     steps:
 
@@ -100,7 +101,7 @@ jobs:
 
     needs: deploy-frontend
     environment:
-      name: ${{ inputs.environment }}
+      name: ${{ env.ENVIRONMENT }}
 
     steps:
       - name: Apply blue node
