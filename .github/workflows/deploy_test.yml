@@ -25,7 +25,6 @@ on:
 
 env:
   VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
-  ENVIRONMENT: ${{ inputs.environment || 'test' }} # Set the default value to the environment variable or a fallback value
 
 jobs:
   build-frontend:
@@ -101,8 +100,7 @@ jobs:
 
     needs: deploy-frontend
     environment:
-      name: ${{ env.ENVIRONMENT }}
-
+      name: ${{ inputs.environment || 'PROD' }}
     steps:
       - name: Apply blue node
         uses: appleboy/ssh-action@master
