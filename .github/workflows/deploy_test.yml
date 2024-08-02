@@ -6,11 +6,19 @@ on:
       skip_tests:
         description: 'Skip running tests'
         default: false
-        required: false
+        type: boolean
       api_url:
         description: 'Backend API URL (https://testcris.uns.ac.rs/api/)'
         default: ${{ vars.API_URL || 'https://testcris.uns.ac.rs/api/' }}
         required: false
+      environment:
+        description: 'Deploy environment'
+        type: environment
+        required: false
+      without_deploy:
+        description: 'Only build (without deploy)'
+        default: false
+        type: boolean
 
 env:
   VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
@@ -40,12 +48,12 @@ jobs:
       - name: Install package dependencies
         run: npm ci
 
-      - name: Build dist files
-        run: npm run build
-
       - name: Lint project
+        if: ${{ !inputs.skip_tests }}
         run: npm run lint
 
+      - name: Build dist files
+        run: npm run build
 
       - uses: actions/upload-artifact@v4
         with:
@@ -55,10 +63,10 @@ jobs:
 
   deploy-frontend:
     runs-on: ubuntu-latest
-
+    if : ${{ !inputs.without_deploy }}
     needs: build-frontend
     environment:
-      name: test
+      name: ${{ inputs.environment }}
 
     steps:
 
@@ -88,10 +96,11 @@ jobs:
 
   start-new-frontend:
     runs-on: ubuntu-latest
+    if : ${{ !inputs.without_deploy }}
 
     needs: deploy-frontend
     environment:
-      name: test
+      name: ${{ inputs.environment }}
 
     steps:
       - name: Apply blue node
