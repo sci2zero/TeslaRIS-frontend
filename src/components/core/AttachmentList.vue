@@ -71,7 +71,7 @@ import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileMo
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
 import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 

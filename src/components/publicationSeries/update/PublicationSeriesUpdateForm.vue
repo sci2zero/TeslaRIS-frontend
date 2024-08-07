@@ -47,13 +47,14 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PublicationSeries } from '@/models/PublicationSeriesModel';
+import { watch } from 'vue';
 
 export default defineComponent({
     name: "PublicationSeriesUpdateForm",
@@ -72,6 +73,9 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const abbreviationsRef = ref<typeof MultilingualTextInput>();
+
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>(props.presetPublicationSeries?.languageTagIds as number[]);
 
@@ -87,8 +91,14 @@ export default defineComponent({
             });
         });
 
-        const title = ref([]);
-        const nameAbbreviations = ref([]);
+        watch(() => props.presetPublicationSeries, () => {
+            if (props.presetPublicationSeries) {
+                refreshForm();
+            }
+        });
+
+        const title = ref<any[]>([]);
+        const nameAbbreviations = ref<any[]>([]);
         const eIssn = ref(props.presetPublicationSeries?.eissn);
         const printIssn = ref(props.presetPublicationSeries?.printISSN);
 
@@ -107,6 +117,21 @@ export default defineComponent({
             emit("update", updatedPublicationSeries);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetPublicationSeries?.title as MultilingualContent[];
+
+            abbreviationsRef.value?.clearInput();
+            nameAbbreviations.value = props.presetPublicationSeries?.nameAbbreviation as MultilingualContent[];
+
+            selectedLanguages.value = props.presetPublicationSeries?.languageTagIds as number[];
+            eIssn.value = props.presetPublicationSeries?.eissn;
+            printIssn.value = props.presetPublicationSeries?.printISSN;
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            abbreviationsRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviations.value, languageTags.value));
+        };
+
         return {
             isFormValid,
             title, nameAbbreviations,
@@ -117,7 +142,9 @@ export default defineComponent({
             selectedLanguages,
             toMultilingualTextInput,
             eIssnValidationRules,
-            printIssnValidationRules
+            printIssnValidationRules,
+            titleRef, abbreviationsRef,
+            refreshForm
         };
     }
 });

@@ -5,43 +5,48 @@
             <div><b>{{ $t("expertisesAndSkillsLabel") }}</b></div>
             <strong v-if="expertiseOrSkills?.length === 0">{{ $t("notYetSetMessage") }}</strong>
             <br />
-            
-            <div v-for="(expertiseOrSkill, index) in expertiseOrSkills" :key="index" class="py-5">
-                <v-menu
-                    v-if="canEdit"
-                    v-model="menus[index]"
-                    :close-on-content-click="true"
-                    location="bottom"
-                >
-                    <template #activator="{ props }">
-                        <div class="edit-pen">
-                            <v-btn
-                                v-bind="props"
-                                icon="mdi-file-edit-outline"
-                            >
-                            </v-btn>
-                        </div>
-                    </template>
+            <draggable 
+                :list="expertiseOrSkills" item-key="id"
+                group="expertiseOrSkills" 
+                :disabled="!inComparator"
+            >
+                <div v-for="(expertiseOrSkill, index) in expertiseOrSkills" :key="index" class="py-5">
+                    <v-menu
+                        v-if="canEdit"
+                        v-model="menus[index]"
+                        :close-on-content-click="true"
+                        location="bottom"
+                    >
+                        <template #activator="{ props }">
+                            <div class="edit-pen">
+                                <v-btn
+                                    v-bind="props"
+                                    icon="mdi-file-edit-outline"
+                                >
+                                </v-btn>
+                            </div>
+                        </template>
 
-                    <v-card min-width="150">
-                        <v-list>
-                            <expertiseOrSkill-modal :read-only="!canEdit" edit :preset-expertise-or-skill="expertiseOrSkill" @update="updateExpertiseOrSkill"></expertiseOrSkill-modal>
-                            <v-list-item @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
-                                <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-card>
-                </v-menu>
+                        <v-card min-width="150">
+                            <v-list>
+                                <expertiseOrSkill-modal :read-only="!canEdit" edit :preset-expertise-or-skill="expertiseOrSkill" @update="updateExpertiseOrSkill"></expertiseOrSkill-modal>
+                                <v-list-item @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
+                                    <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-card>
+                    </v-menu>
 
-                <h4><strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong></h4>
-                <p>{{ returnCurrentLocaleContent(expertiseOrSkill.description) }}</p>
-                
-                <br />
-                <attachment-list
-                    :attachments="expertiseOrSkill.proofs" :can-edit="canEdit" is-proof @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
-                    @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)" @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)"></attachment-list>
-                <v-divider v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
-            </div>
+                    <h4><strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong></h4>
+                    <p>{{ returnCurrentLocaleContent(expertiseOrSkill.description) }}</p>
+                    
+                    <br />
+                    <attachment-list
+                        :attachments="expertiseOrSkill.proofs" :can-edit="canEdit" is-proof @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
+                        @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)" @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)"></attachment-list>
+                    <v-divider v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
+                </div>
+            </draggable>
         </v-card-text>
     </v-card>
 </template>
@@ -50,17 +55,18 @@
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { PersonResponse, ExpertiseOrSkill, ExpertiseOrSkillResponse } from '@/models/PersonModel';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import ExpertiseOrSkillModal from './ExpertiseOrSkillModal.vue';
 import { ref } from 'vue';
 import ExpertiseOrSkillService from '@/services/ExpertiseOrSkillService';
+import { VueDraggableNext } from 'vue-draggable-next'
 
 
 export default defineComponent({
     name: "ExpertiseOrSkillList",
-    components: { AttachmentList, ExpertiseOrSkillModal },
+    components: { AttachmentList, ExpertiseOrSkillModal, draggable: VueDraggableNext },
     props: {
         expertiseOrSkills: {
             type: Object as PropType<ExpertiseOrSkillResponse[] | undefined>,
@@ -74,6 +80,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        inComparator: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["crud"],
     setup(props, {emit}) {

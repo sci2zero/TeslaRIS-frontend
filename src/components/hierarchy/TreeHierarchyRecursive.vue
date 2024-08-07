@@ -17,7 +17,7 @@
 <script lang="ts">
 import { watch } from 'vue';
 import { defineComponent, ref, type PropType } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({

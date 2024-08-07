@@ -1,5 +1,5 @@
 <template>
-    <draggable :list="contributionList" item-key="id" @change="reorderContributors">
+    <draggable :list="contributionList" group="documentContributions" item-key="id" @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link :to="'persons/' + contribution.personId">
                 <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isMainContributor ? ` (${$t("mainContributorLabel")})` : "") + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType, $i18n.locale)}` }}</strong></h4>

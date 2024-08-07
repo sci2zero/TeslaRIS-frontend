@@ -96,7 +96,7 @@ import type { PersonName } from "@/models/PersonModel";
 import PersonSubmissionModal from "../person/PersonSubmissionModal.vue";
 import type { PropType } from "vue";
 import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
-import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import { onMounted } from "vue";
 import LanguageService from "@/services/LanguageService";
 import InvolvementService from "@/services/InvolvementService";

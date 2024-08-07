@@ -96,7 +96,7 @@ import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { JournalPublication, JournalPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import JournalService from '@/services/JournalService';

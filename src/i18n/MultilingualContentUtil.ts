@@ -54,4 +54,19 @@ export const toMultilingualTextInput = (multilingualContentArray: MultilingualCo
     });
 
     return presetInput;
-}
+};
+
+export const mergeMultilingualContentField = (content1: MultilingualContent[], content2: MultilingualContent[]) => {
+    content2.forEach(content => {
+        let merged = false;
+        content1.forEach(currentContent => {
+            if (currentContent.languageTag === content.languageTag) {
+                currentContent.content += " | " + content.content;
+                merged = true;
+            }
+        });
+        if (!merged) {
+            content1.push(content);
+        }
+    });
+};

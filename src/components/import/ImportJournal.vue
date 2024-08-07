@@ -66,7 +66,7 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { watch } from "vue";
 import type { JournalPublicationLoad } from "@/models/LoadModel";
-import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import type { JournalIndex } from "@/models/JournalModel";
 import JournalService from "@/services/JournalService";
 import ImportService from "@/services/ImportService";

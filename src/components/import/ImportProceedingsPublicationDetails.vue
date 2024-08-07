@@ -77,7 +77,7 @@ import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import type { ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
-import { toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/proceedingsPublicationType';

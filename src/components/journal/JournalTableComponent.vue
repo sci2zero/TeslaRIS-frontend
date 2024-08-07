@@ -5,8 +5,14 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedJournals.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedJournals.length !== 2"
+        @click="startPublicationComparison">
+        {{ $t("comparePublicationsLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedJournals.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedJournals"
@@ -15,14 +21,14 @@
         :headers="headers"
         item-value="row"
         :items-length="totalJournals"
-        show-select
+        :show-select="userRole === 'ADMIN'"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td>
+                <td v-if="userRole === 'ADMIN'">
                     <v-checkbox
                         v-model="selectedJournals"
                         :value="row.item"
@@ -71,6 +77,7 @@ import type {JournalIndex} from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import router from '@/router';
 
 
 export default defineComponent({
@@ -86,8 +93,8 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(props, {emit}) {
-        const selectedJournals = ref([]);
+    setup(_, {emit}) {
+        const selectedJournals = ref<JournalIndex[]>([]);
 
         const i18n = useI18n();
 
@@ -151,22 +158,35 @@ export default defineComponent({
                 selectedJournals.value = selectedJournals.value.filter((journal) => failedDeletions.includes(journal));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
+
+        const startPublicationComparison = () => {
+            router.push({name: "journalPublicationsComparator", params: {
+                leftId: selectedJournals.value[0].databaseId, rightId: selectedJournals.value[1].databaseId
+            }});
+        };
+
+        const startMetadataComparison = () => {
+            router.push({name: "journalMetadataComparator", params: {
+                leftId: selectedJournals.value[0].databaseId, rightId: selectedJournals.value[1].databaseId
+            }});
+        };
 
         return {selectedJournals, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            startPublicationComparison, startMetadataComparison};
     }
 });
 </script>

@@ -1,32 +1,60 @@
 <template>
     <v-row>
-        <v-col cols="2">
-            <h2>{{ $t("proceedingsLabel") }}</h2>  
+        <v-col :cols="inComparator ? 4 : 2">
+            <h2>{{ $t("proceedingsListLabel") }}</h2>  
         </v-col>
-        <v-col v-if="!readonly" class="proceedings-submission" cols="3">
+        <v-col v-if="!readonly && userRole === 'ADMIN'" class="proceedings-submission" cols="3">
             <proceedings-submission-modal :conference="convertToListEntry(presetEvent)" @create="refreshProceedingsList"></proceedings-submission-modal>
         </v-col>
     </v-row>
-    <v-list v-if="proceedings && proceedings.length > 0" lines="two">
-        <v-list-item
-            v-for="item in proceedings"
-            :key="item.id"
-            :title="(returnCurrentLocaleContent(item.title) as string)"
-            :subtitle="item.documentDate ? item.documentDate : presetEvent?.dateTo.split('-')[0]"
-            @click="navigateToProceedings(item.id as number)"
+    <v-row>
+        <v-btn
+            v-if="userRole === 'ADMIN'"
+            density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsPublicationComparison">
+            {{ $t("comparePublicationsLabel") }}
+        </v-btn>
+        <v-btn
+            v-if="userRole === 'ADMIN'"
+            density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsMetadataComparison">
+            {{ $t("compareMetadataLabel") }}
+        </v-btn>
+    </v-row>
+    <v-list lines="two">
+        <draggable 
+            :list="proceedings" item-key="id"
+            group="proceedings" 
+            :disabled="!inComparator"
+            @change="onDropCallback"
         >
-            <template v-if="!readonly" #append>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-icon @click.stop="deleteProceedings(item)">
-                            mdi-delete
-                        </v-icon>
-                    </v-col>
-                </v-row>
-            </template>
-        </v-list-item>
+            <v-list-item
+                v-for="item in proceedings"
+                :key="item.id"
+                :title="(returnCurrentLocaleContent(item.title) as string)"
+                :subtitle="item.documentDate ? item.documentDate : presetEvent?.dateTo.split('-')[0]"
+                @click="navigateToProceedings(item.id as number)"
+            >
+                <template v-if="userRole === 'ADMIN'" #prepend>
+                    <v-checkbox
+                        v-model="selectedProceedings"
+                        :value="item"
+                        class="table-checkbox"
+                        hide-details
+                        @click.stop
+                    />
+                </template>
+                <template v-if="!readonly && userRole === 'ADMIN'" #append>
+                    <v-row>
+                        <v-col cols="auto">
+                            <v-icon @click.stop="deleteProceedings(item)">
+                                mdi-delete
+                            </v-icon>
+                        </v-col>
+                    </v-row>
+                </template>
+            </v-list-item>
+        </draggable>
     </v-list>
-    <h3 v-else class="no-proceedings-message">
+    <h3 v-if="!proceedings || proceedings.length === 0" class="no-proceedings-message">
         {{ $t("noAvailableProceedingsMessage") }}
     </h3>
 
@@ -52,25 +80,35 @@ import ProceedingsSubmissionModal from '@/components/proceedings/ProceedingsSubm
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { watch } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import router from '@/router';
 import { useI18n } from 'vue-i18n';
+import { VueDraggableNext } from 'vue-draggable-next'
+import { computed } from 'vue';
+import UserService from '@/services/UserService';
 
-  export default defineComponent({
+
+export default defineComponent({
     name: "ProceedingsList",
-    components: {ProceedingsSubmissionModal},
+    components: { ProceedingsSubmissionModal, draggable: VueDraggableNext },
     props: {
         presetEvent: {
             type: Object as PropType<Conference | undefined>,
             required: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         },
         readonly: {
             type: Boolean,
             required: true
         }
     },
-    setup(props) {
+    emits: ["dragged"],
+    setup(props, {emit}) {
         const proceedings = ref<ProceedingsResponse[]>([]);
+        const selectedProceedings = ref<ProceedingsResponse[]>([]);
 
         const snackbar = ref(false);
         const message = ref("");
@@ -119,11 +157,31 @@ import { useI18n } from 'vue-i18n';
             });
         };
 
+        const onDropCallback = (event: any) => {
+            emit("dragged", event);
+        };
+
+        const startProceedingsPublicationComparison = () => {
+            router.push({name: "proceedingsPublicationsComparator", params: {
+                leftId: selectedProceedings.value[0].id, rightId: selectedProceedings.value[1].id
+            }});
+        };
+
+        const startProceedingsMetadataComparison = () => {
+            router.push({name: "proceedingsMetadataComparator", params: {
+                leftId: selectedProceedings.value[0].id, rightId: selectedProceedings.value[1].id
+            }});
+        };
+
+        const userRole = computed(() => UserService.provideUserRole());
+
         return {
             proceedings, returnCurrentLocaleContent,
             refreshProceedingsList, convertToListEntry,
             deleteProceedings, navigateToProceedings,
-            snackbar, message
+            snackbar, message, onDropCallback, userRole,
+            selectedProceedings, startProceedingsPublicationComparison,
+            startProceedingsMetadataComparison
         };
     },
   });

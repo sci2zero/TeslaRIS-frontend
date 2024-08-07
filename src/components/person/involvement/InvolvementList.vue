@@ -1,60 +1,66 @@
 <template>
-    <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
-        <v-menu
-            v-if="canEdit"
-            v-model="menus[index]"
-            :close-on-content-click="true"
-            location="bottom"
-        >
-            <template #activator="{ props }">
-                <div class="edit-pen">
-                    <v-btn
-                        v-bind="props"
-                        icon="mdi-file-edit-outline"
-                    >
-                    </v-btn>
-                </div>
-            </template>
+    <draggable 
+        :list="involvements" item-key="id"
+        :group="dragGroup" 
+        :disabled="!inComparator"
+    >
+        <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
+            <v-menu
+                v-if="canEdit"
+                v-model="menus[index]"
+                :close-on-content-click="true"
+                location="bottom"
+            >
+                <template #activator="{ props }">
+                    <div class="edit-pen">
+                        <v-btn
+                            v-bind="props"
+                            icon="mdi-file-edit-outline"
+                        >
+                        </v-btn>
+                    </div>
+                </template>
 
-            <v-card min-width="150">
-                <v-list>
-                    <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
-                    <v-list-item @click="deleteInvolvement(involvement.id)">
-                        <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-card>
-        </v-menu>
-        <h4>
-            <localized-link :to="'organisation-units/' + involvement.organisationUnitId">
-                <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
-            </localized-link>
-            <v-icon icon="mdi-circle-small">
-            </v-icon>
-            <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
-            <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }}</strong>
-            <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">{{ (involvement as Employment).employmentPosition }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
-            <v-icon icon="mdi-circle-small">
-            </v-icon>
-            {{ involvement.dateFrom ? `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}
-        </h4>
-        <p v-if="involvement.involvementType === 'MEMBER_OF'">
-            {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
-        </p>
-        <p v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0">
-            {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).thesisTitle) }}
-        </p>
-        <p v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">
-            {{ returnCurrentLocaleContent((involvement as Employment).role) }}
-        </p>
-        <attachment-list
-            :attachments="involvement.proofs ? involvement.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, involvement)"
-            @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)"></attachment-list>
-    </div>
+                <v-card min-width="150">
+                    <v-list>
+                        <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
+                        <v-list-item @click="deleteInvolvement(involvement.id)">
+                            <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-card>
+            </v-menu>
+            <h4>
+                <localized-link :to="'organisation-units/' + involvement.organisationUnitId">
+                    <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
+                </localized-link>
+                <v-icon icon="mdi-circle-small">
+                </v-icon>
+                <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
+                <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }}</strong>
+                <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">{{ (involvement as Employment).employmentPosition }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
+                <v-icon icon="mdi-circle-small">
+                </v-icon>
+                {{ involvement.dateFrom ? `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}
+            </h4>
+            <p v-if="involvement.involvementType === 'MEMBER_OF'">
+                {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
+            </p>
+            <p v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0">
+                {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).thesisTitle) }}
+            </p>
+            <p v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">
+                {{ returnCurrentLocaleContent((involvement as Employment).role) }}
+            </p>
+            <attachment-list
+                :attachments="involvement.proofs ? involvement.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, involvement)"
+                @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)"></attachment-list>
+        </div>
+    </draggable>
 </template>
 
 <script lang="ts">
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getInvolvementTypeTitleFromValueAutoLocale } from '@/i18n/involvementType';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import type { Education, Employment, Membership } from '@/models/InvolvementModel';
@@ -69,11 +75,12 @@ import { ref } from 'vue';
 import { watch } from 'vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import { VueDraggableNext } from 'vue-draggable-next'
 
 
 export default defineComponent({
     name: "InvolvementList",
-    components: { PersonInvolvementModal, AttachmentList, LocalizedLink },
+    components: { PersonInvolvementModal, AttachmentList, LocalizedLink, draggable: VueDraggableNext },
     props: {
         canEdit: {
             type: Boolean,
@@ -86,9 +93,17 @@ export default defineComponent({
         involvements: {
             type: Object as PropType<(Education | Membership | Employment)[]>,
             required: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
+        },
+        dragGroup: {
+            type: String,
+            default: "involvements"
         }
     },
-    emits: ["refreshInvolvements"],
+    emits: ["refreshInvolvements", "dragged"],
     setup(props, { emit }) {
         const menus = ref<boolean[]>([]);
 

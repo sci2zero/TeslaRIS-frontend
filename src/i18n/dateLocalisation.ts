@@ -9,6 +9,10 @@ export const localiseDate = (iso8601DateString: string | undefined) => {
     const month = dateParts[1];
     const day = dateParts[2];
 
+    if (!month || !day) {
+        return iso8601DateString;
+    }
+
     // Serbian standard
     return `${day}.${month}.${year}.`;
 }

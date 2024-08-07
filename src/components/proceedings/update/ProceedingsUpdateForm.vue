@@ -11,7 +11,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
+                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required :read-only="inComparator"></event-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -110,7 +110,7 @@ import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocom
 import BookSeriesAutocompleteSearch from '@/components/bookSeries/BookSeriesAutocompleteSearch.vue';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import UriInput from '@/components/core/UriInput.vue';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
@@ -126,6 +126,10 @@ export default defineComponent({
         presetProceedings: {
             type: Object as PropType<Proceedings | undefined>,
             required: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
@@ -148,9 +152,15 @@ export default defineComponent({
                 })
             });
             
-            EventService.readConference(props.presetProceedings?.eventId as number).then((response) => {
-                selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: props.presetProceedings?.eventId as number};
-            });
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
+            if (props.presetProceedings?.eventId) {
+                EventService.readConference(props.presetProceedings?.eventId as number).then((response) => {
+                    selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: props.presetProceedings?.eventId as number};
+                });
+            }
 
             if(props.presetProceedings?.publisherId) {
                 PublisherService.readPublisher(props.presetProceedings.publisherId).then((response) => {
@@ -167,6 +177,12 @@ export default defineComponent({
                     });
                 });
             }
+        };
+
+        watch(() => props.presetProceedings, () => {
+            if (props.presetProceedings) {
+                refreshForm();
+            }
         });
 
         const searchPlaceholder = {title: "", value: -1};
@@ -175,8 +191,11 @@ export default defineComponent({
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const uris = ref(props.presetProceedings?.uris as string[]);
         const eIsbn = ref(props.presetProceedings?.eISBN);
         const printIsbn = ref(props.presetProceedings?.printISBN);
@@ -234,6 +253,30 @@ export default defineComponent({
             emit("update", updatedProceedings);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetProceedings?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetProceedings?.subTitle as MultilingualContent[];
+
+            selectedLanguages.value = props.presetProceedings?.languageTagIds as number[];
+            uris.value = props.presetProceedings?.uris as string[];
+            eIsbn.value = props.presetProceedings?.eISBN;
+            printIsbn.value = props.presetProceedings?.printISBN;
+            numberOfPages.value = props.presetProceedings?.numberOfPages;
+            publicationYear.value = props.presetProceedings?.documentDate;
+            doi.value = props.presetProceedings?.doi;
+            scopus.value = props.presetProceedings?.scopusId;
+            publicationSeriesVolume.value = props.presetProceedings?.publicationSeriesVolume;
+            publicationSeriesIssue.value = props.presetProceedings?.publicationSeriesIssue;
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+
+            fetchDetails();
+        };
+
         return {
             isFormValid, isbnValidationRules,
             title, subtitle, selectedEvent, selectedJournal, uris,
@@ -243,7 +286,7 @@ export default defineComponent({
             selectedPublisher, selectedBookSeries, doiValidationRules,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, updateProceedings,
-            scopusIdValidationRules
+            scopusIdValidationRules, refreshForm, titleRef, subtitleRef
         };
     }
 });

@@ -77,7 +77,7 @@
 </template>
 
 <script lang="ts">
-import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { localiseDate } from "@/i18n/dateLocalisation";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import ImportService from "@/services/ImportService";

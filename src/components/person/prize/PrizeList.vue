@@ -5,47 +5,52 @@
             <div><b>{{ $t("prizesLabel") }}</b></div>
             <strong v-if="prizes?.length === 0">{{ $t("notYetSetMessage") }}</strong>
             <br />
-            
-            <div v-for="(prize, index) in prizes" :key="index" class="py-5">
-                <v-menu
-                    v-if="canEdit"
-                    v-model="menus[index]"
-                    :close-on-content-click="true"
-                    location="bottom"
-                >
-                    <template #activator="{ props }">
-                        <div class="edit-pen">
-                            <v-btn
-                                v-bind="props"
-                                icon="mdi-file-edit-outline"
-                            >
-                            </v-btn>
-                        </div>
-                    </template>
+            <draggable 
+                :list="prizes" item-key="id"
+                group="prizes" 
+                :disabled="!inComparator"
+            >
+                <div v-for="(prize, index) in prizes" :key="index" class="py-5">
+                    <v-menu
+                        v-if="canEdit"
+                        v-model="menus[index]"
+                        :close-on-content-click="true"
+                        location="bottom"
+                    >
+                        <template #activator="{ props }">
+                            <div class="edit-pen">
+                                <v-btn
+                                    v-bind="props"
+                                    icon="mdi-file-edit-outline"
+                                >
+                                </v-btn>
+                            </div>
+                        </template>
 
-                    <v-card min-width="150">
-                        <v-list>
-                            <prize-modal :read-only="!canEdit" edit :preset-prize="prize" @update="updatePrize"></prize-modal>
-                            <v-list-item @click="deletePrize(prize.id)">
-                                <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-card>
-                </v-menu>
+                        <v-card min-width="150">
+                            <v-list>
+                                <prize-modal :read-only="!canEdit" edit :preset-prize="prize" @update="updatePrize"></prize-modal>
+                                <v-list-item @click="deletePrize(prize.id)">
+                                    <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-card>
+                    </v-menu>
 
-                <h4>
-                    <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
-                    <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
-                    <strong>{{ localiseDate(prize.date) }}</strong>
-                </h4>
-                <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
-                
-                <br />
-                <attachment-list
-                    :attachments="prize.proofs" :can-edit="canEdit" is-proof @create="addPrizeProof($event, prize)"
-                    @update="updatePrizeProof(prize, $event)" @delete="deletePrizeProof(prize, $event)"></attachment-list>
-                <v-divider v-if="index < (prizes ? prizes.length : 1) - 1 " class="mt-10"></v-divider>
-            </div>
+                    <h4>
+                        <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
+                        <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
+                        <strong>{{ localiseDate(prize.date) }}</strong>
+                    </h4>
+                    <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
+                    
+                    <br />
+                    <attachment-list
+                        :attachments="prize.proofs" :can-edit="canEdit" is-proof @create="addPrizeProof($event, prize)"
+                        @update="updatePrizeProof(prize, $event)" @delete="deletePrizeProof(prize, $event)"></attachment-list>
+                    <v-divider v-if="index < (prizes ? prizes.length : 1) - 1 " class="mt-10"></v-divider>
+                </div>
+            </draggable>
         </v-card-text>
     </v-card>
 </template>
@@ -54,18 +59,19 @@
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { PersonResponse, Prize, PrizeResponse } from '@/models/PersonModel';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import PrizeModal from './PrizeModal.vue';
 import { ref } from 'vue';
 import PrizeService from '@/services/PrizeService';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import { VueDraggableNext } from 'vue-draggable-next'
 
 
 export default defineComponent({
     name: "PrizeList",
-    components: { AttachmentList, PrizeModal },
+    components: { AttachmentList, PrizeModal, draggable: VueDraggableNext },
     props: {
         prizes: {
             type: Object as PropType<PrizeResponse[] | undefined>,
@@ -79,6 +85,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        inComparator: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["crud"],
     setup(props, {emit}) {

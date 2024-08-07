@@ -5,8 +5,14 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'"
+        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startProceedingsComparison">
+        {{ $t("compareProceedingsLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'"
+        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedEvents"
@@ -15,14 +21,14 @@
         :headers="headers"
         item-value="row"
         :items-length="totalEvents"
-        show-select
+        :show-select="userRole === 'ADMIN'"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td>
+                <td v-if="userRole === 'ADMIN'">
                     <v-checkbox
                         v-model="selectedEvents"
                         :value="row.item"
@@ -49,6 +55,10 @@
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.stateOther) }}
                 </td>
+                <td>
+                    <v-icon v-if="row.item.serialEvent" icon="mdi-check"></v-icon>
+                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -74,6 +84,7 @@ import {EventType, type EventIndex} from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -90,15 +101,17 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedEvents = ref([]);
+        const selectedEvents = ref<EventIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
+        const serialEventLabel = computed(() => i18n.t("serialEventLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
@@ -111,6 +124,7 @@ export default defineComponent({
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
           { title: stateLabel, align: "start", sortable: true, key: stateColumn},
+          { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"},
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -153,7 +167,7 @@ export default defineComponent({
                 selectedEvents.value = selectedEvents.value.filter((event) => failedDeletions.includes(event));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const pushlocalizedMessage = (success: boolean, event: EventIndex) => {
             if (success) {
@@ -169,22 +183,52 @@ export default defineComponent({
                     addNotification(i18n.t("deleteFailedNotification", { name: event.nameOther }));
                 }
             }
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
+
+        const isSerialEventInSelection = () => {
+            if (selectedEvents.value[0].serialEvent || selectedEvents.value[1].serialEvent) {
+                addNotification(i18n.t("cannotCompareSerialEventsMessage"));
+                return true;
+            }
+            
+            return false;
+        };
+
+        const startProceedingsComparison = () => {
+            if (isSerialEventInSelection()) {
+                return;
+            }
+
+            router.push({name: "eventProceedingsComparator", params: {
+                leftId: selectedEvents.value[0].databaseId, rightId: selectedEvents.value[1].databaseId
+            }});
+        };
+
+        const startMetadataComparison = () => {
+            if (isSerialEventInSelection()) {
+                return;
+            }
+
+            router.push({name: "eventMetadataComparator", params: {
+                leftId: selectedEvents.value[0].databaseId, rightId: selectedEvents.value[1].databaseId
+            }});
+        };
 
         return {selectedEvents, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            startProceedingsComparison, startMetadataComparison};
     }
 });
 </script>

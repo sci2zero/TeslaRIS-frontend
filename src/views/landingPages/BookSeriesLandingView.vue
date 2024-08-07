@@ -89,7 +89,7 @@ import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import type { BookSeries } from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import LanguageService from '@/services/LanguageService';
-import { returnCurrentLocaleContent } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
 import ProceedingsService from '@/services/ProceedingsService';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';

@@ -26,7 +26,7 @@ import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
-import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { watch } from "vue";
 import { ref } from "vue";
 import ImportService from "@/services/ImportService";

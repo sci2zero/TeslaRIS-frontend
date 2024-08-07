@@ -5,47 +5,64 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedPersons.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        @click="startPublicationComparison">
+        {{ $t("comparePublicationsLabel") }}
     </v-btn>
-    <v-data-table-server
-        v-model="selectedPersons"
-        :sort-by="tableOptions.sortBy"
-        :items="persons"
-        :headers="headers"
-        item-value="row"
-        :items-length="totalPersons"
-        show-select
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        @update:options="refreshTable">
-        <template #item="row">
-            <tr>
-                <td>
-                    <v-checkbox
-                        v-model="selectedPersons"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link :to="'persons/' + row.item.databaseId">
-                        {{ row.item.name }}
-                    </localized-link>
-                </td>
-                <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.employmentsSr) }}
-                </td>
-                <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
-                </td>
-                <td>{{ row.item.birthdate ? localiseDate(row.item.birthdate) : displayTextOrPlaceholder(row.item.birthdate) }}</td>
-                <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
-            </tr>
-        </template>
-    </v-data-table-server>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
+    </v-btn>
+    <div ref="tableWrapper">
+        <v-data-table-server
+            v-model="selectedPersons"
+            :sort-by="tableOptions.sortBy"
+            :items="persons"
+            :headers="headers"
+            item-value="row"
+            :items-length="totalPersons"
+            :show-select="userRole === 'ADMIN'"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            @update:options="refreshTable">
+            <template #body="props">
+                <draggable
+                    :list="props.items"
+                    tag="tbody"
+                    :disabled="!inComparator"
+                    group="persons"
+                    @change="onDropCallback"
+                >
+                    <tr v-for="item in props.items" :key="item.id">
+                        <td v-if="userRole === 'ADMIN'">
+                            <v-checkbox
+                                v-model="selectedPersons"
+                                :value="item"
+                                class="table-checkbox"
+                                hide-details
+                            />
+                        </td>
+                        <td>
+                            <localized-link :to="'persons/' + item.databaseId">
+                                {{ item.name }}
+                            </localized-link>
+                        </td>
+                        <td v-if="$i18n.locale == 'sr'">
+                            {{ displayTextOrPlaceholder(item.employmentsSr) }}
+                        </td>
+                        <td v-else>
+                            {{ displayTextOrPlaceholder(item.employmentsOther) }}
+                        </td>
+                        <td>{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</td>
+                        <td>{{ displayTextOrPlaceholder(item.orcid) }}</td>
+                    </tr>
+                </draggable>
+            </template>
+        </v-data-table-server>
+    </div>
+    
     <div class="notificationContainer">
         <v-slide-y-transition group>
             <v-alert
@@ -69,11 +86,14 @@ import PersonService from '@/services/PersonService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import { useRouter } from 'vue-router';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { watch } from 'vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, draggable: VueDraggableNext },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -82,14 +102,32 @@ export default defineComponent({
         totalPersons: {
             type: Number,
             required: true
-        }},
-    emits: ["switchPage"],
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
+        }
+    },
+    emits: ["switchPage", "dragged"],
     setup(_, {emit}) {
-        const selectedPersons = ref([]);
+        const selectedPersons = ref<PersonIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
+
+        const tableWrapper = ref<any>(null);
+
+        watch(tableWrapper, () => {
+            if (tableWrapper.value) {
+                const table = tableWrapper.value;
+                const sortableTbody = table.querySelector('.v-table__wrapper > table > tbody > tbody')
+                const tbody = table.querySelector('.v-table__wrapper > table > tbody')
+                tbody!.parentNode!.append(sortableTbody!)
+                tbody!.remove()
+            }
+        });
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
@@ -153,16 +191,34 @@ export default defineComponent({
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
+
+        const startPublicationComparison = () => {
+            router.push({name: "personPublicationsComparator", params: {
+                leftId: selectedPersons.value[0].databaseId, rightId: selectedPersons.value[1].databaseId
+            }});
+        };
+
+        const startMetadataComparison = () => {
+            router.push({name: "personMetadataComparator", params: {
+                leftId: selectedPersons.value[0].databaseId, rightId: selectedPersons.value[1].databaseId
+            }});
+        };
+
+        const onDropCallback = (event: any) => {
+            emit("dragged", event);
+        };
 
         return {selectedPersons, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            localiseDate };
+            localiseDate, startPublicationComparison,
+            startMetadataComparison, onDropCallback,
+            tableWrapper };
     }
 });
 </script>

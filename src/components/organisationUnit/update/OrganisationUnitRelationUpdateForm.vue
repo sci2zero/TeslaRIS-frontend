@@ -32,7 +32,7 @@ import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/TranslationUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { OrganisationUnitsRelationType, type OrganisationUnitRelationRequest, type OrganisationUnitRelationResponse, type OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/organisationUnitRelationType';
 import OrganisationUnitAutocompleteSearch from '../OrganisationUnitAutocompleteSearch.vue';

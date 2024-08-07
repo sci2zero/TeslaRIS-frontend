@@ -81,7 +81,7 @@ import type { OrganisationUnitLoad } from "@/models/LoadModel";
 import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import ImportService from "@/services/ImportService";
-import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
 export default defineComponent({

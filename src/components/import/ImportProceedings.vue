@@ -78,7 +78,7 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { watch } from "vue";
 import type { ProceedingsPublicationLoad } from "@/models/LoadModel";
-import { returnCurrentLocaleContent } from "@/i18n/TranslationUtil";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { EventType, type EventIndex } from "@/models/EventModel";
 import EventService from "@/services/EventService";
 import ImportService from "@/services/ImportService";
