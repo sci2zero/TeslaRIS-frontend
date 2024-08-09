@@ -85,7 +85,8 @@
                         <v-select
                             v-model="selectedEmploymentPosition"
                             :items="employmentPositions"
-                            :label="$t('employmentPositionLabel')"
+                            :label="$t('employmentPositionLabel') + '*'"
+                            :rules="requiredSelectionRules"
                             return-object>
                         </v-select>
                     </v-col>
