@@ -80,7 +80,7 @@ export default defineComponent({
                 tokens.forEach((token) => {
                     params += `tokens=${token}&`
                 });
-                // replace last &
+                params = params.slice(0, -1);
                 DocumentPublicationService.searchMonographs(params).then((response) => {
                     const listOfMonographs: { title: string, value: number }[] = [];
                     response.data.content.forEach((monograph: DocumentPublicationIndex) => {
