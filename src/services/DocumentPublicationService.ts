@@ -132,6 +132,10 @@ export class DocumentPublicationService extends BaseService {
   async reorderContribution(publicationId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `document/${publicationId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
   }
+
+  async searchMonographs(tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `monograph/simple-search?${tokens}`);
+  }
 }
 
 export default new DocumentPublicationService();

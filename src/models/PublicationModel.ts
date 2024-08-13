@@ -150,6 +150,24 @@ export interface Monograph extends Document {
     researchAreaId?: number;
 }
 
+export enum MonographPublicationType {
+    CHAPTER,
+    RESEARCH_ARTICLE,
+    PREFACE,
+    LEXICOGRAPHIC_UNIT,
+    POLEMICS,
+    SCIENTIFIC_CRITIC,
+}
+
+export interface MonographPublication extends Document {
+    monographPublicationType: MonographPublicationType;
+    startPage?: string;
+    endPage?: string;
+    numberOfPages?: number;
+    articleNumber?: string;
+    monographId?: number;
+}
+
 export interface Patent extends Document {
     number: string;
     publisherId?: number;
