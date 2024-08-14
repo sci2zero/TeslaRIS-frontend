@@ -54,6 +54,8 @@ import EventProceedingsComparatorView from "@/views/comparators/event/EventProce
 import ProceedingsPublicationsComparatorView from "@/views/comparators/proceedings/ProceedingsPublicationsComparatorView.vue";
 import ProceedingsMetadataComparatorView from "@/views/comparators/proceedings/ProceedingsMetadataComparatorView.vue";
 import EventMetadataComparatorView from "@/views/comparators/event/EventMetadataComparatorView.vue";
+import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationView.vue";
+import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -313,6 +315,15 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "submit-monograph-publication",
+                    name: "submitMonographPublication",
+                    component: SubmitMonographPublicationView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
                     path: "submit-dataset",
                     name: "submitDataset",
                     component: SubmitDatasetView,
@@ -479,6 +490,15 @@ const router = createRouter({
                             path: "monograph/:id",
                             name: "monographLandingPage",
                             component: MonographLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "monograph-publication/:id",
+                            name: "monographPublicationLandingPage",
+                            component: MonographPublicationLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

@@ -16,7 +16,7 @@
             ></v-autocomplete>
         </v-col>
         <v-col cols="1" class="modal-spacer-top">
-            <!-- monograph submission modal -->
+            <monograph-submission-modal :read-only="readOnly" in-modal @create="selectNewlyAddedMonograph"></monograph-submission-modal>
         </v-col>
     </v-row>
 </template>
@@ -30,11 +30,12 @@ import type { DocumentPublicationIndex, Monograph } from '@/models/PublicationMo
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import MonographSubmissionModal from './MonographSubmissionModal.vue';
 
 
 export default defineComponent({
     name: "MonographAutocompleteSearch",
-    components: { },
+    components: { MonographSubmissionModal },
     props: {
         required: {
             type: Boolean,
@@ -85,9 +86,9 @@ export default defineComponent({
                     const listOfMonographs: { title: string, value: number }[] = [];
                     response.data.content.forEach((monograph: DocumentPublicationIndex) => {
                         if (i18n.locale.value === "sr") {
-                            listOfMonographs.push({title: `${monograph.titleSr} | ${monograph.year}`, value: monograph.databaseId as number});
+                            listOfMonographs.push({title: `${monograph.titleSr} | ${monograph.year !== -1 ? monograph.year : i18n.t("unknownDateMessage")}`, value: monograph.databaseId as number});
                         } else {
-                            listOfMonographs.push({title: `${monograph.titleOther} | ${monograph.year}`, value: monograph.databaseId as number});
+                            listOfMonographs.push({title: `${monograph.titleOther} | ${monograph.year !== -1 ? monograph.year : i18n.t("unknownDateMessage")}`, value: monograph.databaseId as number});
                         }
                     })
                     monographs.value = listOfMonographs;
@@ -123,26 +124,10 @@ export default defineComponent({
                 title = monograph.title[0].content;
             }
             
-            const toSelect = {title: `${title} | ${extractDate(monograph.documentDate as string)}`, value: monograph.id as number};
+            const toSelect = {title: `${title} | ${monograph.documentDate}`, value: monograph.id as number};
             monographs.value.push(toSelect);
             selectedMonograph.value = toSelect;
             sendContentToParent();
-        };
-
-        const extractDate = (text: string): string => {
-            if (!text) {
-                return i18n.t("monographLabel");
-            }
-
-            const yyyy_mm_dd_regex = /\b\d{4}-\d{2}-\d{2}\b/g;
-            
-            let match;
-            
-            while ((match = yyyy_mm_dd_regex.exec(text)) !== null) {
-                return match[0].split("-")[0];
-            }
-
-            return text.split(".")[2];
         };
 
         return {

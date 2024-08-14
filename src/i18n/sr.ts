@@ -133,7 +133,7 @@ export default {
     numberOfPagesLabel: "Broj strana",
     recentPublicationsLabel: "Vaše publikacije u ovom časopisu:",
     noRecentPublicationsJournalLabel: "Nemate ni jednu publikaciju u ovom časopisu.",
-    noRecentPublicationsconferenceLabel: "Nemate ni jednu publikaciju u ovoj konferenciji.",
+    noRecentPublicationsConferenceLabel: "Nemate ni jednu publikaciju na ovoj konferenciji.",
     uriInputLabel: "Dostupno na",
     mainContributorLabel: "Glavni kontributor",
     correspondingContributorLabel: "Korespondentni kontributor",
@@ -351,5 +351,10 @@ export default {
     cantCompareSerialEventsMetadataMessage: "Nije moguće porediti metapodatke serijskih događaja.",
     goBackLabel: "Vrati se nazad",
     redirectingToMessage: "Preusmeravamo vas na {0}.",
-    doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu."
+    doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu.",
+    addMonographPublicationLabel: "Dodaj rad u monografiji",
+    monographPublicationsLabel: "Radovi u monografiji",
+    monographPublicationLabel: "Rad u monografiji",
+    updateMonographPublicationLabel: "Ažuriraj rad u monografiji",
+    noRecentPublicationsMonographLabel: "Nemate ni jednu publikaciju u ovoj monografiji."
 }

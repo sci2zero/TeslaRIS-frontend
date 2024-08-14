@@ -29,6 +29,7 @@ export interface DocumentPublicationIndex {
     eventId: number | null;
     publisherId: number | null;
     journalId: number | null;
+    monographId: number | null;
     databaseId: number | null;
     doi: string;
 }
@@ -40,7 +41,8 @@ export enum PublicationType {
     PROCEEDINGS = "PROCEEDINGS",
     DATASET = "DATASET",
     SOFTWARE = "SOFTWARE",
-    MONOGRAPH = "MONOGRAPH"
+    MONOGRAPH = "MONOGRAPH",
+    MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION"
 }
   
 export enum JournalPublicationType {
@@ -151,12 +153,12 @@ export interface Monograph extends Document {
 }
 
 export enum MonographPublicationType {
-    CHAPTER,
-    RESEARCH_ARTICLE,
-    PREFACE,
-    LEXICOGRAPHIC_UNIT,
-    POLEMICS,
-    SCIENTIFIC_CRITIC,
+    CHAPTER = "CHAPTER",
+    RESEARCH_ARTICLE = "RESEARCH_ARTICLE",
+    PREFACE = "PREFACE",
+    LEXICOGRAPHIC_UNIT = "LEXICOGRAPHIC_UNIT",
+    POLEMICS = "POLEMICS",
+    SCIENTIFIC_CRITIC = "SCIENTIFIC_CRITIC",
 }
 
 export interface MonographPublication extends Document {

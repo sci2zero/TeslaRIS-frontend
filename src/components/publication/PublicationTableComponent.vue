@@ -227,6 +227,8 @@ export default defineComponent({
                     return "software/";
                 case "MONOGRAPH":
                     return "monograph/";
+                case "MONOGRAPH_PUBLICATION":
+                    return "monograph-publication/";
             }
             return "";
         };

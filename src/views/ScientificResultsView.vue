@@ -94,6 +94,7 @@ export default defineComponent({
         const addSoftwareLabel = computed(() => i18n.t("addSoftwareLabel"));
         const addDatasetLabel = computed(() => i18n.t("addDatasetLabel"));
         const addMonographLabel = computed(() => i18n.t("addMonographLabel"));
+        const addMonographPublicationLabel = computed(() => i18n.t("addMonographPublicationLabel"));
 
         const items = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
@@ -103,6 +104,7 @@ export default defineComponent({
             { title: addSoftwareLabel, value: "submitSoftware" },
             { title: addDatasetLabel, value: "submitDataset" },
             { title: addMonographLabel, value: "submitMonograph" },
+            { title: addMonographPublicationLabel, value: "submitMonographPublication" },
         ]);
 
         return {search, publications, totalPublications, switchPage, userRole, items, navigateToPage};

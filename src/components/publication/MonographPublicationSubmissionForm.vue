@@ -4,10 +4,10 @@
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
                     <v-col cols="11">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
+                        <monograph-autocomplete-search ref="eventAutocompleteRef" v-model="selectedMonograph" required></monograph-autocomplete-search>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedMonograph.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -19,23 +19,8 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent.value != -1 && myPublications.length == 0">
-                    <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedProceedings"
-                            :items="availableProceedings"
-                            :label="$t('proceedingsLabel') + '*'"
-                            :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
-                            :rules="requiredSelectionRules"
-                            return-object
-                        ></v-select>
-                    </v-col>
-                    <v-col class="proceedings-submission">
-                        <proceedings-submission-modal :conference="selectedEvent" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
-                    </v-col>
+                <v-row v-if="selectedMonograph.value != -1 && myPublications.length == 0">
+                    <v-col><h3>{{ $t("noRecentPublicationsMonographLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
                     <v-col>
@@ -97,6 +82,14 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="5">
+                            <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col>
                             <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
                         </v-col>
@@ -142,25 +135,22 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
-import type { DocumentPublicationIndex, ProceedingsPublicationType } from "@/models/PublicationModel";
+import type { DocumentPublicationIndex, MonographPublicationType } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import type { ProceedingsPublication } from "@/models/PublicationModel";
-import ProceedingsService from '@/services/ProceedingsService';
-import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModal.vue';
-import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
+import type { MonographPublication } from "@/models/PublicationModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
+import { monographPublicationTypeSr, monographPublicationTypeEn } from "@/i18n/monographPublicationType";
 import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
+import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
 
 
 export default defineComponent({
-    name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal},
+    name: "SubmitMonographPublication",
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch },
     props: {
         inModal: {
             type: Boolean,
@@ -180,14 +170,12 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
-        const placeRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
 
-        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
+        const monographAutocompleteRef = ref<typeof MonographAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const myPublications = ref<DocumentPublicationIndex[]>([]);
 
@@ -196,8 +184,8 @@ export default defineComponent({
         const description = ref([]);
         const keywords = ref([]);
         const contributions = ref([]);
-        const availableProceedings = ref<{title: string, value: number}[]>([]);
-        const selectedProceedings = ref(searchPlaceholder);
+        const availableMonograph = ref<{title: string, value: number}[]>([]);
+        const selectedMonograph = ref(searchPlaceholder);
         const startPage = ref("");
         const endPage = ref("");
         const doi = ref("");
@@ -212,70 +200,28 @@ export default defineComponent({
         const { requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
-        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
-        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
+        const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => i18n.locale.value === "sr" ? monographPublicationTypeSr : monographPublicationTypeEn);
+        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
 
         const listPublications = (event: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInEvent(event.value).then((response) => {
+            DocumentPublicationService.findMyPublicationsInMonograph(event.value).then((response) => {
                 myPublications.value = response.data;
             });
         };
 
-        const fetchProceedings = (event: { title: string, value: number }) => {
-            ProceedingsService.readProceedingsForEvent(event.value).then((response) => {
-                response.data.forEach((proceedingsResponse: ProceedingsResponse) => {
-                    let title: string | undefined;
-                    proceedingsResponse.title.forEach(multilingualContent => {
-                        if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                            title = multilingualContent.content;
-                            return;
-                        }
-                    });
-                    if (!title && proceedingsResponse.title.length > 0) {
-                        title = proceedingsResponse.title[0].content;
-                    }
-
-                    if (proceedingsResponse.documentDate) {
-                        availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number });
-                    } else {
-                        availableProceedings.value.push({title: title as string, value: proceedingsResponse.id as number });
-                    }
-                });
-            });
-        };
-
-        watch(selectedEvent, (newValue) => {
+        watch(selectedMonograph, (newValue) => {
             listPublications(newValue);
-            availableProceedings.value = [];
-            selectedProceedings.value = searchPlaceholder;
-            fetchProceedings(newValue);
         });
 
-        const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
-            let title: string | undefined;
-            proceedings.title.forEach(multilingualContent => {
-                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                    title = multilingualContent.content;
-                    return;
-                }
-            });
-            if (!title && proceedings.title.length > 0) {
-                title = proceedings.title[0].content;
-            }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
-            availableProceedings.value.push(toSelect);
-            selectedProceedings.value = toSelect;
-        };
-
-        const submitProceedingsPublication = (stayOnPage: boolean) => {
-            const newProceedingsPublication: ProceedingsPublication = {
+        const submitMonographPublication = (stayOnPage: boolean) => {
+            const newMonographPublication: MonographPublication = {
                 articleNumber: articleNumber.value,
                 description: description.value,
                 endPage: endPage.value,
                 keywords: keywords.value,
                 numberOfPages: numberOfPages.value,
-                proceedingsId: selectedProceedings.value.value,
-                proceedingsPublicationType: selectedpublicationType.value.value as ProceedingsPublicationType,
+                monographId: selectedMonograph.value.value,
+                monographPublicationType: selectedpublicationType.value.value as MonographPublicationType,
                 startPage: startPage.value,
                 subTitle: subtitle.value,
                 title: title.value,
@@ -283,23 +229,21 @@ export default defineComponent({
                 contributions: contributions.value,
                 doi: doi.value,
                 scopusId: scopus.value,
-                eventId: selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
 
-            DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then((response) => {
+            DocumentPublicationService.createMonographPublication(newMonographPublication).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
-                    placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
-                    eventAutocompleteRef.value?.clearInput();
-                    availableProceedings.value = [];
-                    selectedProceedings.value = searchPlaceholder;
+                    monographAutocompleteRef.value?.clearInput();
+                    availableMonograph.value = [];
+                    selectedMonograph.value = searchPlaceholder;
                     selectedpublicationType.value = {title: "", value: null};
                     startPage.value = "";
                     endPage.value = "";
@@ -311,7 +255,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "proceedingsPublicationLandingPage", params: {id: response.data.id} });
+                    router.push({ name: "monographPublicationLandingPage", params: {id: response.data.id} });
                 }
             }).catch((axiosError: AxiosError<ErrorResponse>) => {
                 const message = i18n.t(axiosError.response?.data.message as string);
@@ -326,24 +270,17 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            startPage, endPage,
-            doi, scopus,
-            articleNumber, numberOfPages,
-            description, descriptionRef,
-            keywords, keywordsRef,
-            placeRef, uris, urisRef,
-            myPublications, doiValidationRules,
-            selectedEvent, eventAutocompleteRef, listPublications,
+            isFormValid, additionalFields,
+            snackbar, error, title, titleRef,
+            subtitle, subtitleRef, startPage, endPage,
+            doi, scopus, articleNumber, numberOfPages,
+            description, descriptionRef, keywords, keywordsRef,
+            uris, urisRef, myPublications, doiValidationRules,
+            selectedMonograph, monographAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType,
             contributions, contributionsRef, scopusIdValidationRules,
-            requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
-            availableProceedings, selectedProceedings, 
-            selectNewlyAddedProceedings, errorMessage
+            requiredFieldRules, requiredSelectionRules, submitMonographPublication,
+            availableMonograph, errorMessage
         };
     }
 });
@@ -352,7 +289,7 @@ export default defineComponent({
 
 <style scoped>
 
-.proceedings-submission {
+.monograph-submission {
     margin-top: 15px;
 }
 
