@@ -356,5 +356,6 @@ export default {
     monographPublicationsLabel: "Radovi u monografiji",
     monographPublicationLabel: "Rad u monografiji",
     updateMonographPublicationLabel: "Ažuriraj rad u monografiji",
-    noRecentPublicationsMonographLabel: "Nemate ni jednu publikaciju u ovoj monografiji."
+    noRecentPublicationsMonographLabel: "Nemate ni jednu publikaciju u ovoj monografiji.",
+    journalPublicationsLabel: "Radovi u ovom časopisu"
 }

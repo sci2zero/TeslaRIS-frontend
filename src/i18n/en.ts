@@ -356,5 +356,6 @@ export default {
     monographPublicationsLabel: "Monograph Publications",
     monographPublicationLabel: "Monograph Publication",
     updateMonographPublicationLabel: "Update Monograph Publication",
-    noRecentPublicationsMonographLabel: "You don't have any publications in this monograph yet."
+    noRecentPublicationsMonographLabel: "You don't have any publications in this monograph yet.",
+    journalPublicationsLabel: "Publications in this journal"
 }
