@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software } from "@/models/PublicationModel";
+import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "@/models/PublicationModel";
 
 
 export class DocumentPublicationService extends BaseService {
@@ -155,6 +155,18 @@ export class DocumentPublicationService extends BaseService {
 
   async readMonographPublication(monographPublicationId: number): Promise<AxiosResponse<MonographPublication>> {
     return super.sendRequest(axios.get, `monograph-publication/${monographPublicationId}`);
+  }
+
+  async readThesis(thesisId: number): Promise<AxiosResponse<Thesis>> {
+    return super.sendRequest(axios.get, `thesis/${thesisId}`);
+  }
+
+  async createThesis(body: Thesis): Promise<AxiosResponse<Thesis>> {
+    return super.sendRequest(axios.post, "thesis", body, DocumentPublicationService.idempotencyKey);
+  }
+
+  async updateThesis(thesisId: number, body: Thesis): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.post, `thesis/${thesisId}`, body);
   }
 }
 

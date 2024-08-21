@@ -229,6 +229,8 @@ export default defineComponent({
                     return "monograph/";
                 case "MONOGRAPH_PUBLICATION":
                     return "monograph-publication/";
+                case "THESIS":
+                    return "thesis/";
             }
             return "";
         };

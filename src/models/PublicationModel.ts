@@ -42,7 +42,15 @@ export enum PublicationType {
     DATASET = "DATASET",
     SOFTWARE = "SOFTWARE",
     MONOGRAPH = "MONOGRAPH",
-    MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION"
+    MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
+    THESIS = "THESIS"
+}
+
+export enum ThesisType {
+    BACHELOR = "BACHELOR",
+    MR = "MR",
+    PHD = "PHD",
+    MASTER = "MASTER"
 }
   
 export enum JournalPublicationType {
@@ -183,4 +191,14 @@ export interface Software extends Document {
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
+}
+
+export interface Thesis extends Document {
+    organisationUnitId: number;
+    thesisType: ThesisType;
+    numberOfPages?: number;
+    languageTagIds: number[];
+    researchAreaId?: number;
+    publisherId?: number;
+    languageTagNames?: string[];
 }

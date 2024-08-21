@@ -56,6 +56,7 @@ import ProceedingsMetadataComparatorView from "@/views/comparators/proceedings/P
 import EventMetadataComparatorView from "@/views/comparators/event/EventMetadataComparatorView.vue";
 import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationView.vue";
 import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
+import SubmitThesisView from "@/views/SubmitThesisView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -300,6 +301,15 @@ const router = createRouter({
                     path: "submit-software",
                     name: "submitSoftware",
                     component: SubmitSoftwareView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-thesis",
+                    name: "submitThesis",
+                    component: SubmitThesisView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],

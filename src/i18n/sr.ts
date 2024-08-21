@@ -357,5 +357,8 @@ export default {
     monographPublicationLabel: "Rad u monografiji",
     updateMonographPublicationLabel: "Ažuriraj rad u monografiji",
     noRecentPublicationsMonographLabel: "Nemate ni jednu publikaciju u ovoj monografiji.",
-    journalPublicationsLabel: "Radovi u ovom časopisu"
+    journalPublicationsLabel: "Radovi u ovom časopisu",
+    addThesisLabel: "Dodaj završni rad",
+    thesisLabel: "Završni rad",
+    thesisTypeLabel: "Tip završnog rada"
 }

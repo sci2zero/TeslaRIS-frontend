@@ -9,7 +9,8 @@ const publicationTypeEn = [
     { title: "Dataset", value: PublicationType.DATASET },
     { title: "Software", value: PublicationType.SOFTWARE },
     { title: "Monograph", value: PublicationType.MONOGRAPH },
-    { title: "Monograph publication", value: PublicationType.MONOGRAPH_PUBLICATION }
+    { title: "Monograph publication", value: PublicationType.MONOGRAPH_PUBLICATION },
+    { title: "Thesis", value: PublicationType.THESIS }
 ];
 
 const publicationTypeSr = [
@@ -20,7 +21,8 @@ const publicationTypeSr = [
     { title: "Skup podataka", value: PublicationType.DATASET },
     { title: "Softver", value: PublicationType.SOFTWARE },
     { title: "Monografija", value: PublicationType.MONOGRAPH },
-    { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION }
+    { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION },
+    { title: "Završni rad", value: PublicationType.THESIS }
 ];
 
 export const getTitleFromValue = (value: PublicationType, resourceTypeArray: {title: string, value: PublicationType}[]) => {

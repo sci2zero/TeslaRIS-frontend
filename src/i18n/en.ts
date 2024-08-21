@@ -357,5 +357,8 @@ export default {
     monographPublicationLabel: "Monograph Publication",
     updateMonographPublicationLabel: "Update Monograph Publication",
     noRecentPublicationsMonographLabel: "You don't have any publications in this monograph yet.",
-    journalPublicationsLabel: "Publications in this journal"
+    journalPublicationsLabel: "Publications in this journal",
+    addThesisLabel: "Add Thesis",
+    thesisLabel: "Thesis",
+    thesisTypeLabel: "Thesis type"
 }
