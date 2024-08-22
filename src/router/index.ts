@@ -57,6 +57,7 @@ import EventMetadataComparatorView from "@/views/comparators/event/EventMetadata
 import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationView.vue";
 import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
 import SubmitThesisView from "@/views/SubmitThesisView.vue";
+import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -509,6 +510,15 @@ const router = createRouter({
                             path: "monograph-publication/:id",
                             name: "monographPublicationLandingPage",
                             component: MonographPublicationLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "thesis/:id",
+                            name: "thesisLandingPage",
+                            component: ThesisLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

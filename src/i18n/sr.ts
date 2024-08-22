@@ -360,5 +360,6 @@ export default {
     journalPublicationsLabel: "Radovi u ovom časopisu",
     addThesisLabel: "Dodaj završni rad",
     thesisLabel: "Završni rad",
-    thesisTypeLabel: "Tip završnog rada"
+    thesisTypeLabel: "Tip završnog rada",
+    updateThesisLabel: "Ažuriraj završni rad"
 }

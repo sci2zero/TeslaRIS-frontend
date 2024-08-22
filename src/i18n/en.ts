@@ -360,5 +360,6 @@ export default {
     journalPublicationsLabel: "Publications in this journal",
     addThesisLabel: "Add Thesis",
     thesisLabel: "Thesis",
-    thesisTypeLabel: "Thesis type"
+    thesisTypeLabel: "Thesis type",
+    updateThesisLabel: "Update Thesis"
 }

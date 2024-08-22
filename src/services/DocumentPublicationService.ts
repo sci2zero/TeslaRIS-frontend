@@ -166,7 +166,7 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async updateThesis(thesisId: number, body: Thesis): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.post, `thesis/${thesisId}`, body);
+    return super.sendRequest(axios.put, `thesis/${thesisId}`, body);
   }
 }
 

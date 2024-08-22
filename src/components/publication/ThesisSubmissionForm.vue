@@ -30,7 +30,9 @@
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                        <v-text-field
+                            v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel') + '*'"
+                            :rules="requiredFieldRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -64,7 +66,7 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="numberOfPages" type="number" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
+                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
