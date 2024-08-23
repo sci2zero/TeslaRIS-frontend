@@ -351,5 +351,6 @@ export default {
     cantCompareSerialEventsMetadataMessage: "Nije moguće porediti metapodatke serijskih događaja.",
     goBackLabel: "Vrati se nazad",
     redirectingToMessage: "Preusmeravamo vas na {0}.",
-    doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu."
+    doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu.",
+    notificationPeriodLabel: "Period slanja email notifikacija"
 }
