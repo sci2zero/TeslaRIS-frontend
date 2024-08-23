@@ -10,6 +10,7 @@ export interface UserResponse {
     preferredLanguage: string;
     organisationUnitId: number;
     organisationUnitName: MultilingualContent[];
+    notificationPeriod: UserNotificationPeriod;
 }
 
 export interface UserAccountIndex {
@@ -40,10 +41,17 @@ export interface UserUpdateRequest {
     lastName: string;
     preferredLanguageId: number;
     organisationUnitId?: number;
+    notificationPeriod: UserNotificationPeriod;
 }
 
 export enum UserRole {
     ADMIN = "ADMIN",
     RESEARCHER = "RESEARCHER",
     INSTITUTIONAL_EDITOR = "INSTITUTIONAL_EDITOR"
+}
+
+export enum UserNotificationPeriod {
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    NEVER = "NEVER"
 }
