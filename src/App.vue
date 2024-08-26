@@ -16,7 +16,7 @@ import AuthenticationService from "./services/AuthenticationService";
 import { useRouter } from "vue-router";
 import { useLoginStore } from '@/stores/loginStore';
 import { jwtDecode } from "jwt-decode";
-import i18n, {defaultLocale, supportedLocales} from './i18n';
+import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
 import footerbar from "./components/core/FooterBar.vue";
 
@@ -33,7 +33,7 @@ export default defineComponent({
             const prevLocale: string = from.params.locale;
 
             if (!supportedLocales.includes(newLocale)) {
-                next({ name: to.name, params: { ...to.params, locale: defaultLocale } });
+                next({ name: to.name, params: { ...to.params, locale: fallbackLocale } });
                 return;
             }
 

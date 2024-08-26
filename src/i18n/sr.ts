@@ -352,5 +352,9 @@ export default {
     goBackLabel: "Vrati se nazad",
     redirectingToMessage: "Preusmeravamo vas na {0}.",
     doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu.",
-    notificationPeriodLabel: "Period slanja email notifikacija"
+    notificationPeriodLabel: "Period slanja email notifikacija",
+    notificationsLabel: "Lista obaveštenja",
+    addeddSuccessfullyLabel: "Uspešno dodato.",
+    removedSuccessfullyLabel: "Uspešno Uklonjeno.",
+    noNewNotificationsMessage: "Nemate novih obveštenja"
 }
