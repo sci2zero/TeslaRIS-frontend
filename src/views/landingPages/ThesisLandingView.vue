@@ -124,7 +124,9 @@
         </v-row>
 
         <!-- Contributions -->
-        <person-document-contribution-tabs :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+        <person-document-contribution-tabs
+            :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
+            @update="updateContributions"></person-document-contribution-tabs>
 
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>

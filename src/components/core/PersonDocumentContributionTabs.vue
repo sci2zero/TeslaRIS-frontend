@@ -3,7 +3,7 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <publication-contribution-update-modal :read-only="readOnly" :preset-document-contributions="contributionList" @update="sendToParent"></publication-contribution-update-modal>
+                    <publication-contribution-update-modal :read-only="readOnly" :preset-document-contributions="contributionList" :board-members-allowed="boardMembersAllowed" @update="sendToParent"></publication-contribution-update-modal>
 
                     <div v-if="contributionList?.length === 0">
                         <b>{{ $t("contributionsLabel") }}</b>
@@ -27,6 +27,9 @@
                         <v-tab v-if="advisorList.length > 0" value="advisors">
                             {{ $t("advisorsLabel") }}
                         </v-tab>
+                        <v-tab v-if="boardMemberList.length > 0" value="boardMembers">
+                            {{ $t("boardMembersLabel") }}
+                        </v-tab>
                     </v-tabs>
 
                     <v-window v-model="currentTab">
@@ -41,6 +44,9 @@
                         </v-window-item>
                         <v-window-item value="advisors">
                             <person-document-contribution-list :document-id="documentId" :contribution-list="advisorList"></person-document-contribution-list>
+                        </v-window-item>
+                        <v-window-item value="boardMembers">
+                            <person-document-contribution-list :document-id="documentId" :contribution-list="boardMemberList"></person-document-contribution-list>
                         </v-window-item>
                     </v-window>
                 </v-card-text>
@@ -75,6 +81,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        boardMembersAllowed: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["update"],
     setup(props, { emit }) {
@@ -84,12 +94,14 @@ export default defineComponent({
         const editorList = ref<PersonDocumentContribution[]>([]);
         const reviewerList = ref<PersonDocumentContribution[]>([]);
         const advisorList = ref<PersonDocumentContribution[]>([]);
+        const boardMemberList = ref<PersonDocumentContribution[]>([]);
 
         watch(() => props.contributionList, () => {
             authorList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.AUTHOR]);
             editorList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.EDITOR]);
             reviewerList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.REVIEWER]);
             advisorList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ADVISOR]);
+            boardMemberList.value = props.contributionList.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.BOARD_MEMBER]);
         });
 
         const sendToParent = (contributions: any[]) => {
@@ -98,7 +110,7 @@ export default defineComponent({
 
         return {sendToParent, getTitleFromValueAutoLocale,
                 currentTab, authorList, editorList,
-                reviewerList, advisorList};
+                reviewerList, advisorList, boardMemberList};
     },
 });
 </script>

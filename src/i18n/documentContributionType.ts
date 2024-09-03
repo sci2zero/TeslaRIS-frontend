@@ -7,6 +7,7 @@ export const contributionTypesEn = [
     { title: "Editor", value: DocumentContributionType.EDITOR },
     { title: "Reviewer", value: DocumentContributionType.REVIEWER },
     { title: "Advisor", value: DocumentContributionType.ADVISOR },
+    { title: "Board Member", value: DocumentContributionType.BOARD_MEMBER }
 ];
 
 export const contributionTypesSr = [
@@ -14,6 +15,7 @@ export const contributionTypesSr = [
     { title: "Urednik", value: DocumentContributionType.EDITOR },
     { title: "Recenzent", value: DocumentContributionType.REVIEWER },
     { title: "Savetnik", value: DocumentContributionType.ADVISOR },
+    { title: "Član komisije", value: DocumentContributionType.BOARD_MEMBER }
 ];
 
 export const getTitleFromValueAutoLocale = (value: DocumentContributionType) => {

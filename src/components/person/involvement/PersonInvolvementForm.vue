@@ -85,7 +85,8 @@
                         <v-select
                             v-model="selectedEmploymentPosition"
                             :items="employmentPositions"
-                            :label="$t('employmentPositionLabel')"
+                            :label="$t('employmentPositionLabel') + '*'"
+                            :rules="requiredSelectionRules"
                             return-object>
                         </v-select>
                     </v-col>
@@ -171,7 +172,7 @@ export default defineComponent({
         const abbreviationTitle = ref([]);
         const thesisTitle = ref([]);
 
-        const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
+        const selectionPlaceholder: { title: string, value: any } = { title: "", value: null };
 
         const involvementTypes = props.edit ? getSimilarInvolvementTypes(props.presetInvolvement?.involvementType as InvolvementType) : getInvolvementTypesForGivenLocale();
         const selectedInvolvementType = ref<{title: string, value: InvolvementType}>(props.presetInvolvement?.involvementType ? {title: getInvolvementTypeTitleFromValueAutoLocale(props.presetInvolvement?.involvementType) as string, value: props.presetInvolvement?.involvementType} : selectionPlaceholder);

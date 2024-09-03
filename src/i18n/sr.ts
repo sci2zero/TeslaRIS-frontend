@@ -361,5 +361,11 @@ export default {
     addThesisLabel: "Dodaj završni rad",
     thesisLabel: "Završni rad",
     thesisTypeLabel: "Tip završnog rada",
-    updateThesisLabel: "Ažuriraj završni rad"
+    updateThesisLabel: "Ažuriraj završni rad",
+    notificationPeriodLabel: "Period slanja email notifikacija",
+    notificationsLabel: "Lista obaveštenja",
+    addeddSuccessfullyLabel: "Uspešno dodato.",
+    removedSuccessfullyLabel: "Uspešno Uklonjeno.",
+    noNewNotificationsMessage: "Nemate novih obveštenja",
+    boardMembersLabel: "Članovi komisije"
 }

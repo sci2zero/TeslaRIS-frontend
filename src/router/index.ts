@@ -58,6 +58,7 @@ import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationVi
 import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
 import SubmitThesisView from "@/views/SubmitThesisView.vue";
 import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
+import NotificationsView from "@/views/NotificationsView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -630,6 +631,15 @@ const router = createRouter({
                       url: 'http://dosird.uns.ac.rs/contact',
                     },
                 },
+                {
+                    path: "notifications",
+                    name: "notifications",
+                    component: NotificationsView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin],
+                    },
+                }
             ]
         },
     ],

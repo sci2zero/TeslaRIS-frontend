@@ -361,5 +361,11 @@ export default {
     addThesisLabel: "Add Thesis",
     thesisLabel: "Thesis",
     thesisTypeLabel: "Thesis type",
-    updateThesisLabel: "Update Thesis"
+    updateThesisLabel: "Update Thesis",
+    notificationPeriodLabel: "Email notification send period",
+    notificationsLabel: "Notifications list",
+    addeddSuccessfullyLabel: "Successfuly added.",
+    removedSuccessfullyLabel: "Successfully removed.",
+    noNewNotificationsMessage: "You have no new notifications",
+    boardMembersLabel: "Board members"
 }

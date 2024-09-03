@@ -53,6 +53,16 @@
                 ></v-autocomplete>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedNotificationPeriod"
+                    :items="notificationPeriods"
+                    :label="$t('notificationPeriodLabel')"
+                    return-object>
+                </v-select>
+            </v-col>
+        </v-row>
         <v-btn color="blue darken-1" @click="changePassword = !changePassword">
             {{ $t("changePasswordLabel") }} {{ changePassword ? "▲" : "▼" }}
         </v-btn>
@@ -118,12 +128,13 @@ import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageResponse, MultilingualContent } from "@/models/Common";
 import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
-import type { UserUpdateRequest } from "@/models/UserModel";
+import { UserNotificationPeriod, type UserUpdateRequest } from "@/models/UserModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import UserService from "@/services/UserService";
 import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
+import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriods";
 
 export default defineComponent({
     name: "UserProfileForm",
@@ -160,6 +171,10 @@ export default defineComponent({
         const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
         const savedMessage = computed(() => i18n.t("savedMessage"));
 
+        const selectionPlaceholder: { title: string, value: any } = { title: "", value: UserNotificationPeriod.NEVER };
+        const notificationPeriods = getNotificationPeriodForGivenLocale();
+        const selectedNotificationPeriod = ref(selectionPlaceholder);
+
         const emailFieldRules = [
             (value: string) => {
                 if (!value) return requiredFieldMessage.value;
@@ -185,6 +200,7 @@ export default defineComponent({
                 surname.value = response.data.lastName;
                 email.value = response.data.email;
                 allowAccountTakeover.value = response.data.canTakeRole;
+                selectedNotificationPeriod.value = {title: getTitleFromValueAutoLocale(response.data.notificationPeriod) as string, value: response.data.notificationPeriod};
 
                 userRole.value = UserService.provideUserRole();
                 
@@ -271,8 +287,10 @@ export default defineComponent({
                 preferredLanguageId: selectedLanguage.value.value,
                 organisationUnitId: organisationUnitId,
                 oldPassword: oldPassword.value,
-                newPassword: newPassword.value
-            }
+                newPassword: newPassword.value,
+                notificationPeriod: selectedNotificationPeriod.value.value
+            };
+
             UserService.updateUser(userUpdateRequest).then((response) => {
                 localStorage.setItem("jwt", response.data.token);
                 localStorage.setItem("refreshToken", response.data.refreshToken);
@@ -295,20 +313,18 @@ export default defineComponent({
             populateUserData();
         });
 
-        return {changePassword, 
-                name,
-                surname,
-                organisationUnits, 
-                selectedOrganisationUnit, 
-                email, showOldPassword, showRepeatedPassword,
-                languages, selectedLanguage, 
-                searchOUs, filterOUs,
-                allowAccountTakeover,
-                updateUser, setNewPassword, 
-                emailFieldRules, requiredFieldRules, requiredSelectionRules, repeatPasswordRules,
-                isFormValid, userRole,
-                oldPassword, newPassword, repeatNewPassword,
-                updateAccountTakeoverPermission, snackbar, snackbarText, timeout};
+        return {
+            changePassword, name, surname,
+            organisationUnits, selectedOrganisationUnit, 
+            email, showOldPassword, showRepeatedPassword,
+            languages, selectedLanguage, 
+            searchOUs, filterOUs, allowAccountTakeover,
+            updateUser, setNewPassword, selectedNotificationPeriod,
+            emailFieldRules, requiredFieldRules, requiredSelectionRules, repeatPasswordRules,
+            isFormValid, userRole, notificationPeriods,
+            oldPassword, newPassword, repeatNewPassword,
+            updateAccountTakeoverPermission, snackbar, snackbarText, timeout
+        };
     }
 });
 </script>

@@ -102,6 +102,7 @@ export enum DocumentContributionType {
     EDITOR = "EDITOR",
     REVIEWER = "REVIEWER",
     ADVISOR = "ADVISOR",
+    BOARD_MEMBER = "BOARD_MEMBER"
 }
 
 export interface ProceedingsPublication extends Document {
