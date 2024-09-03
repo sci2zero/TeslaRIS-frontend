@@ -26,7 +26,7 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                            <v-text-field v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>

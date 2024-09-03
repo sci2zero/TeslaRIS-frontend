@@ -54,6 +54,7 @@ import EventProceedingsComparatorView from "@/views/comparators/event/EventProce
 import ProceedingsPublicationsComparatorView from "@/views/comparators/proceedings/ProceedingsPublicationsComparatorView.vue";
 import ProceedingsMetadataComparatorView from "@/views/comparators/proceedings/ProceedingsMetadataComparatorView.vue";
 import EventMetadataComparatorView from "@/views/comparators/event/EventMetadataComparatorView.vue";
+import NotificationsView from "@/views/NotificationsView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -590,6 +591,15 @@ const router = createRouter({
                       url: 'http://dosird.uns.ac.rs/contact',
                     },
                 },
+                {
+                    path: "notifications",
+                    name: "notifications",
+                    component: NotificationsView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin],
+                    },
+                }
             ]
         },
     ],

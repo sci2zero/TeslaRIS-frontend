@@ -351,5 +351,10 @@ export default {
     cantCompareSerialEventsMetadataMessage: "It is not possible to compare serial events' metadata.",
     goBackLabel: "Go back",
     redirectingToMessage: "You are being redirected to {0}.",
-    doNotCloseMessage: "Please, do not close or leave this page."
+    doNotCloseMessage: "Please, do not close or leave this page.",
+    notificationPeriodLabel: "Email notification send period",
+    notificationsLabel: "Notifications list",
+    addeddSuccessfullyLabel: "Successfuly added.",
+    removedSuccessfullyLabel: "Successfully removed.",
+    noNewNotificationsMessage: "You have no new notifications"
 }

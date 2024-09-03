@@ -3,8 +3,9 @@ import en from "./en";
 import sr from "./sr"
 
 
-export const defaultLocale = "sr"
-export const supportedLocales = ["sr", "en"]
+export const defaultLocale = "sr";
+export const fallbackLocale = "en";
+export const supportedLocales = ["sr", "en"];
 
 let _i18n: I18n;
 
