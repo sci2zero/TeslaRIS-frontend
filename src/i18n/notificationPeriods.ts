@@ -8,9 +8,9 @@ export const notificationPeriodSr = [
 ];
 
 export const notificationPeriodEn = [
-    { title: "Dnevno", value: UserNotificationPeriod.DAILY },
-    { title: "Nedeljno", value: UserNotificationPeriod.WEEKLY },
-    { title: "Nikada", value: UserNotificationPeriod.NEVER }
+    { title: "Daily", value: UserNotificationPeriod.DAILY },
+    { title: "Weekly", value: UserNotificationPeriod.WEEKLY },
+    { title: "Never", value: UserNotificationPeriod.NEVER }
 ];
 
 export const getTitleFromValueAutoLocale = (value: UserNotificationPeriod) => {
