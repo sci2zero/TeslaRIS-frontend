@@ -105,6 +105,7 @@ import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
+import MergeService from '@/services/MergeService';
 
 
 export default defineComponent({
@@ -282,33 +283,18 @@ export default defineComponent({
         };
 
         const finishUpdates = () => {
-            console.log(leftUpdateComplete.value, rightUpdateComplete.value)
-            if (leftUpdateComplete.value && rightUpdateComplete.value) {
-                leftUpdateComplete.value = false;
-                rightUpdateComplete.value = false;
-                update.value = false;
-
-                const updateProceedingss = (firstId: number, firstProceedings: Proceedings, secondId: number, secondProceedings: Proceedings) => {
-                    return ProceedingsService.updateProceedings(firstId, firstProceedings)
-                        .then(() => ProceedingsService.updateProceedings(secondId, secondProceedings))
-                        .then(() => {
-                            snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                            snackbar.value = true;
-                        })
-                        .catch((error) => {
-                            throw error; // Propagate error to handle alternative update order
-                        });
-                };
-
-                updateProceedingss(leftProceedings.value?.id as number, leftProceedings.value as Proceedings, rightProceedings.value?.id as number, rightProceedings.value as Proceedings)
-                    .catch(() => {
-                        updateProceedingss(rightProceedings.value?.id as number, rightProceedings.value as Proceedings, leftProceedings.value?.id as number, leftProceedings.value as Proceedings)
-                            .catch((secondError) => {
-                                snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
-                                snackbar.value = true;
-                            });
-                    });
-            }
+            MergeService.saveMergedProceedingsMetadata(
+                leftProceedings.value?.id as number, rightProceedings.value?.id as number,
+                {leftProceedings: leftProceedings.value as Proceedings, 
+                    rightProceedings: rightProceedings.value as Proceedings
+                }).then(() => {
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                })
+                .catch((error) => {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
+                });
         };
 
         const updateLeftDescription = (description: MultilingualContent[]) => {

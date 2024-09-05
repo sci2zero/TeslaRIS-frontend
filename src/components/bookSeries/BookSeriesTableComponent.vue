@@ -151,7 +151,7 @@ export default defineComponent({
                 selectedBookSeries.value = selectedBookSeries.value.filter((bookSeries) => failedDeletions.includes(bookSeries));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();

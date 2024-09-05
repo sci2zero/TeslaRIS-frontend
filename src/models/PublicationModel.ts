@@ -164,3 +164,12 @@ export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
 }
+
+export interface DocumentDeduplicationSuggestion {
+    id: number;
+    leftDocumentId: number;
+    rightDocumentId: number;
+    leftDocumentTitle: MultilingualContent[];
+    rightDocumentTitle: MultilingualContent[];
+    documentPublicationType: PublicationType;
+}

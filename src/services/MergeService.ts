@@ -1,5 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
+import type { MergedProceedings } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -57,6 +58,10 @@ export class MergeService extends BaseService {
       return super.sendRequest(axios.patch, `merge/proceedings/${sourceProceedingsId}/target/${targetProceedingsId}`);
     }
 
+    async saveMergedProceedingsMetadata(leftProceedingsId: number, rightProceedingsId: number, body: MergedProceedings): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/proceedings/metadata/${leftProceedingsId}/${rightProceedingsId}`, body);
+    }
   }
   
   export default new MergeService();
+  

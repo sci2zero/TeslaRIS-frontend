@@ -356,5 +356,16 @@ export default {
     notificationsLabel: "Lista obaveštenja",
     addeddSuccessfullyLabel: "Uspešno dodato.",
     removedSuccessfullyLabel: "Uspešno Uklonjeno.",
-    noNewNotificationsMessage: "Nemate novih obveštenja"
+    noNewNotificationsMessage: "Nemate novih obveštenja",
+    deduplicationPageLabel: "Deduplikacija entiteta",
+    documentsLabel: "Dokumenta",
+    titleLeftLabel: "Naslov",
+    titleRightLabel: "Naslov potencijalnog duplikata",
+    flagAsNotDuplicatesLabel: "Označi da nije duplikat",
+    noDeduplicationSuggestionsMessage: "Nema pronadjenih sugestija za deduplikaciju",
+    startedDeduplicationScanMessage: "Započeto skeniranje duplikata, dobićete obaveštenje kada ovaj proces bude završen.",
+    deduplicationScanInProgressMessage: "Skeniranje duplikata idalje traje, molimo Vas, sačekajte.",
+    scanForDuplicatesLabel: "Skeniraj duplikate",
+    flagSuccessNotification: "Uspešno označio: {name}.",
+    flagFailedNotification: "Neuspešno označio: {name}, molimo Vas, osvežite stranicu i probajte ponovo."
 }

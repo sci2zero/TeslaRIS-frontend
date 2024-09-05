@@ -356,5 +356,16 @@ export default {
     notificationsLabel: "Notifications list",
     addeddSuccessfullyLabel: "Successfuly added.",
     removedSuccessfullyLabel: "Successfully removed.",
-    noNewNotificationsMessage: "You have no new notifications"
+    noNewNotificationsMessage: "You have no new notifications",
+    deduplicationPageLabel: "Deduplication of entities",
+    documentsLabel: "Documents",
+    titleLeftLabel: "Title",
+    titleRightLabel: "Potential duplicate title",
+    flagAsNotDuplicatesLabel: "Flag as not duplicate",
+    noDeduplicationSuggestionsMessage: "There are no deduplication suggestions yet",
+    startedDeduplicationScanMessage: "Started scanning for duplicates, zou will recieve a notification once this process fiinishes.",
+    deduplicationScanInProgressMessage: "Scanning for duplicates is still in progress, please wait.",
+    scanForDuplicatesLabel: "Scan for duplicates",
+    flagSuccessNotification: "Sucessfully flagged: {name}.",
+    flagFailedNotification: "Could not flag: {name}, please refresh the page and try again."
 }

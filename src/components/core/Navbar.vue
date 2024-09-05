@@ -174,6 +174,7 @@ export default defineComponent(
             const publisherListLabel = computed(() => i18n.t("publisherListLabel"));
             const importerLabel = computed(() => i18n.t("importerLabel"));
             const researcherProfileLabel = computed(() => i18n.t("researcherProfileLabel"));
+            const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -253,6 +254,7 @@ export default defineComponent(
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER') },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER' && personId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
+                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
             ]);
 
             const menuItems = ref<MenuItem[]>([
@@ -261,7 +263,6 @@ export default defineComponent(
                 { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: userLoggedIn, component: notificationItem },
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !userLoggedIn.value), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !userLoggedIn.value), variant: 'outlined', color:'primary' },
-                
                 { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn, variant: 'flat', color:'primary' },
                 { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
             ]);
