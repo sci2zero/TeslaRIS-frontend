@@ -168,7 +168,7 @@ export default defineComponent({
                 case "PROCEEDINGS_PUBLICATION":
                     return "proceedingsPublicationMetadataComparator";
                 case "PATENT":
-                    return "patentPublicationMetadataComparator";
+                    return "patentMetadataComparator";
                 case "PROCEEDINGS":
                     return "proceedingsMetadataComparator";
                 case "DATASET":

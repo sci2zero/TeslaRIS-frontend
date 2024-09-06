@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { MergedProceedings } from "@/models/MergeModel";
+import type { MergedConferences, MergedDatasets, MergedJournals, MergedPatents, MergedPersons, MergedProceedings, MergedSoftware } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -60,6 +60,30 @@ export class MergeService extends BaseService {
 
     async saveMergedProceedingsMetadata(leftProceedingsId: number, rightProceedingsId: number, body: MergedProceedings): Promise<AxiosResponse<void>> {
       return super.sendRequest(axios.patch, `merge/proceedings/metadata/${leftProceedingsId}/${rightProceedingsId}`, body);
+    }
+
+    async saveMergedPersonsMetadata(leftPersonId: number, rightPersonId: number, body: MergedPersons): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/person/metadata/${leftPersonId}/${rightPersonId}`, body);
+    }
+
+    async saveMergedConferencesMetadata(leftConferenceId: number, rightConferenceId: number, body: MergedConferences): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/conference/metadata/${leftConferenceId}/${rightConferenceId}`, body);
+    }
+
+    async saveMergedJournalsMetadata(leftJournalId: number, rightJournalId: number, body: MergedJournals): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/journal/metadata/${leftJournalId}/${rightJournalId}`, body);
+    }
+
+    async saveMergedSoftwareMetadata(leftSoftwareId: number, rightSoftwareId: number, body: MergedSoftware): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/software/metadata/${leftSoftwareId}/${rightSoftwareId}`, body);
+    }
+
+    async saveMergedDatasetsMetadata(leftDatasetId: number, rightDatasetId: number, body: MergedDatasets): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/dataset/metadata/${leftDatasetId}/${rightDatasetId}`, body);
+    }
+
+    async saveMergedPatentsMetadata(leftPatentId: number, rightPatentId: number, body: MergedPatents): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/patent/metadata/${leftPatentId}/${rightPatentId}`, body);
     }
   }
   

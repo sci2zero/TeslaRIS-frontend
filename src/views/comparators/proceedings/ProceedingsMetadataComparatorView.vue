@@ -68,11 +68,7 @@
             </v-col>
         </v-row>
 
-        <v-row class="d-flex flex-row justify-center">
-            <v-btn color="blue darken-1" @click="updateAll">
-                {{ $t("updateLabel") }}
-            </v-btn>
-        </v-row>
+        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -94,7 +90,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import ProceedingsService from '@/services/ProceedingsService';
 import type { Proceedings } from '@/models/ProceedingsModel';
@@ -106,16 +102,19 @@ import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
+import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import { ComparisonSide } from '@/models/MergeModel';
 
 
 export default defineComponent({
     name: "ProceedingsMetadataComparator",
-    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm },
+    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
+        const router = useRouter();
 
         const leftProceedings = ref<Proceedings>();
         const rightProceedings = ref<Proceedings>();
@@ -313,6 +312,16 @@ export default defineComponent({
             rightProceedings.value!.keywords = keywords;
         };
 
+        const deleteSide = (side: ComparisonSide) => {
+            ProceedingsService.deleteProceedings(side === ComparisonSide.LEFT ? leftProceedings.value?.id as number : rightProceedings.value?.id as number).then(() => {
+                router.push({ name: "deduplication" });
+            }).catch(() => {
+                const name = side === ComparisonSide.LEFT ? leftProceedings.value?.title : rightProceedings.value?.title;
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+                snackbar.value = true;
+            });
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
@@ -322,17 +331,9 @@ export default defineComponent({
             updateRightDescriptionRef, updateLeftDescriptionRef,
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
-            updateLeftKeywords, updateRightKeywords
+            updateLeftKeywords, updateRightKeywords,
+            deleteSide
         };
 }})
 
 </script>
-
-<style scoped>
-
-    .middle-arrow {
-        margin-left: 25px;
-        margin-top: 120px;
-    }
-
-</style>

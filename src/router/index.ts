@@ -56,6 +56,9 @@ import ProceedingsMetadataComparatorView from "@/views/comparators/proceedings/P
 import EventMetadataComparatorView from "@/views/comparators/event/EventMetadataComparatorView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
+import SoftwareMetadataComparatorView from "@/views/comparators/documents/SoftwareMetadataComparatorView.vue";
+import DatasetMetadataComparatorView from "@/views/comparators/documents/DatasetMetadataComparatorView.vue";
+import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -451,31 +454,73 @@ const router = createRouter({
                             },
                         },
                         {
-                            path: "software/:id",
-                            name: "softwareLandingPage",
-                            component: SoftwareLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "software",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "softwareLandingPage",
+                                    component: SoftwareLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "softwareMetadataComparator",
+                                    component: SoftwareMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
-                            path: "dataset/:id",
-                            name: "datasetLandingPage",
-                            component: DatasetLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "dataset",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "datasetLandingPage",
+                                    component: DatasetLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "datasetMetadataComparator",
+                                    component: DatasetMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
-                            path: "patent/:id",
-                            name: "patentLandingPage",
-                            component: PatentLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "patent",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "patentLandingPage",
+                                    component: PatentLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "patentMetadataComparator",
+                                    component: PatentMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
                             path: "monograph/:id",

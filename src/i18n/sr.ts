@@ -367,5 +367,11 @@ export default {
     deduplicationScanInProgressMessage: "Skeniranje duplikata idalje traje, molimo Vas, sačekajte.",
     scanForDuplicatesLabel: "Skeniraj duplikate",
     flagSuccessNotification: "Uspešno označio: {name}.",
-    flagFailedNotification: "Neuspešno označio: {name}, molimo Vas, osvežite stranicu i probajte ponovo."
+    flagFailedNotification: "Neuspešno označio: {name}, molimo Vas, osvežite stranicu i probajte ponovo.",
+    deleteLeftLabel: "Obriši levi",
+    deleteRightLabel: "Obriši desni",
+    approvedSuccessfullyLabel: "Uspešno dodato",
+    patentMetadataComparatorLabel: "Poređenje patenata",
+    softwareMetadataComparatorLabel: "Poređenje softvera",
+    datasetMetadataComparatorLabel: "Poređenje skupova podataka"
 }

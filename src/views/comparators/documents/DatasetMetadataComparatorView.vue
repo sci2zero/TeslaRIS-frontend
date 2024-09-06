@@ -1,0 +1,319 @@
+<template>
+    <v-container id="dataset-publications-comparator">
+        <v-row class="d-flex flex-row justify-center align-start">
+            <v-col cols="5">
+                <h2 class="d-flex flex-row justify-center">
+                    {{ returnCurrentLocaleContent(leftDataset?.title) }}
+                </h2>
+                <br />
+
+                <dataset-update-form ref="updateLeftRef" :preset-dataset="leftDataset" in-comparator @update="updateLeft"></dataset-update-form>
+
+                <br />
+
+                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftDataset?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+
+                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftDataset?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+
+                <br />
+
+                <!-- Left Contributions Table -->
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div>
+                            <b>{{ $t("contributionsLabel") }}</b>
+                        </div>
+
+                        <person-document-contribution-list :contribution-list="leftDataset?.contributions ? leftDataset.contributions : []" :document-id="leftDataset?.id"></person-document-contribution-list>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+
+            <v-col cols="1">
+                <v-btn class="mb-1 middle-arrow" icon @click="moveAll(true)">
+                    <v-icon>mdi-arrow-right</v-icon>
+                </v-btn>
+                <v-btn class="mt-1 middle-arrow" icon @click="moveAll(false)">
+                    <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
+            </v-col>
+            
+            <v-col cols="5">
+                <h2 class="d-flex flex-row justify-center">
+                    {{ returnCurrentLocaleContent(rightDataset?.title) }}
+                </h2>
+
+                <br />
+
+                <dataset-update-form ref="updateRightRef" :preset-dataset="rightDataset" in-comparator @update="updateRight"></dataset-update-form>
+
+                <br />
+
+                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightDataset?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+
+                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightDataset?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+
+                <br />
+
+                <!-- Right Contributions Table -->
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div>
+                            <b>{{ $t("contributionsLabel") }}</b>
+                        </div>
+
+                        <person-document-contribution-list :contribution-list="rightDataset?.contributions ? rightDataset.contributions : []" :document-id="rightDataset?.id"></person-document-contribution-list>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ snackbarMessage }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
+    </v-container>
+</template>
+
+<script lang="ts">
+import { onMounted } from 'vue';
+import { defineComponent, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
+import type { Dataset } from '@/models/PublicationModel';
+import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
+import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import type { MultilingualContent } from '@/models/Common';
+import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
+import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
+import MergeService from '@/services/MergeService';
+import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import { ComparisonSide } from '@/models/MergeModel';
+
+
+export default defineComponent({
+    name: "DatasetMetadataComparator",
+    components: { PersonDocumentContributionList, DatasetUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    setup() {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
+        const currentRoute = useRoute();
+        const router = useRouter();
+
+        const leftDataset = ref<Dataset>();
+        const rightDataset = ref<Dataset>();
+
+        const updateLeftRef = ref<typeof DatasetUpdateForm>();
+        const updateRightRef = ref<typeof DatasetUpdateForm>();
+        const updateRightDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateLeftDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
+        const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
+
+        const i18n = useI18n();
+
+        onMounted(() => {
+            document.title = i18n.t("datasetMetadataComparatorLabel");
+            fetchDatasets();
+        });
+
+        const fetchDatasets = () => {
+            DocumentPublicationService.readDataset(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                leftDataset.value = response.data;
+            });
+
+            DocumentPublicationService.readDataset(parseInt(currentRoute.params.rightId as string)).then((response) => {
+                rightDataset.value = response.data;
+            });
+        };
+
+        const mergeDatasetMetadata = (dataset1: Dataset, dataset2: Dataset) => {
+            mergeMultilingualContentField(dataset1.title, dataset2.title);
+
+            mergeMultilingualContentField(dataset1.subTitle, dataset2.subTitle);
+            dataset2.subTitle = [];
+
+            mergeMultilingualContentField(dataset1.keywords, dataset2.keywords);
+            dataset2.keywords = [];
+
+            mergeMultilingualContentField(dataset1.description, dataset2.description);
+            dataset2.description = [];
+
+            dataset1.internalNumber = dataset2.internalNumber;
+            dataset2.internalNumber = "";
+            dataset1.doi = dataset2.doi;
+            dataset2.doi = "";
+            dataset1.scopusId = dataset2.scopusId;
+            dataset2.scopusId = "";
+            dataset1.documentDate = dataset2.documentDate;
+
+            dataset1.eventId = dataset2.eventId;
+            dataset1.publisherId = dataset2.publisherId;
+
+            dataset2.uris!.forEach(uri => {
+                if (!dataset1.uris!.includes(uri)) {
+                    dataset1.uris!.push(uri);
+                }
+            });
+            dataset2.uris = [];
+
+            dataset1.contributions = dataset1.contributions?.concat(dataset2.contributions as PersonDocumentContribution[]);
+            dataset2.contributions = [];
+
+            return [dataset1, dataset2];
+        };
+
+        const moveAll = (fromLeftToRight: boolean) => {
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftDescriptionRef.value?.updateDescription();
+            updateRightDescriptionRef.value?.updateDescription();
+            updateLeftRef.value?.updateDataset();
+            updateRightRef.value?.updateDataset();
+
+            if (fromLeftToRight) {
+                [rightDataset.value, leftDataset.value] = mergeDatasetMetadata(rightDataset.value as Dataset, leftDataset.value as Dataset);
+            } else {
+                [leftDataset.value, rightDataset.value] = mergeDatasetMetadata(leftDataset.value as Dataset, rightDataset.value as Dataset);
+            }
+
+            updateLeftRef.value?.refreshForm();
+            updateRightRef.value?.refreshForm();
+            updateLeftKeywordsRef.value?.refreshForm();
+            updateRightKeywordsRef.value?.refreshForm();
+            updateLeftDescriptionRef.value?.refreshForm();
+            updateRightDescriptionRef.value?.refreshForm();
+        };
+
+        const leftUpdateComplete = ref(false);
+        const rightUpdateComplete = ref(false);
+        const update = ref(false);
+
+        const updateLeft = (updatedInfo: Dataset) => {
+            leftDataset.value!.title = updatedInfo.title;
+            leftDataset.value!.subTitle = updatedInfo.subTitle;
+            leftDataset.value!.description = updatedInfo.description;
+            leftDataset.value!.keywords = updatedInfo.keywords;
+            leftDataset.value!.uris = updatedInfo.uris;
+            leftDataset.value!.documentDate = updatedInfo.documentDate;
+            leftDataset.value!.doi = updatedInfo.doi;
+            leftDataset.value!.internalNumber = updatedInfo.internalNumber;
+            leftDataset.value!.eventId = updatedInfo.eventId;
+            leftDataset.value!.publisherId = updatedInfo.publisherId;
+            leftDataset.value!.scopusId = updatedInfo.scopusId;
+            leftUpdateComplete.value = true;
+            
+            if (update.value) {
+                finishUpdates();
+            }
+        };
+
+        const updateRight = (updatedInfo: Dataset) => {
+            rightDataset.value!.title = updatedInfo.title;
+            rightDataset.value!.subTitle = updatedInfo.subTitle;
+            rightDataset.value!.description = updatedInfo.description;
+            rightDataset.value!.keywords = updatedInfo.keywords;
+            rightDataset.value!.uris = updatedInfo.uris;
+            rightDataset.value!.documentDate = updatedInfo.documentDate;
+            rightDataset.value!.doi = updatedInfo.doi;
+            rightDataset.value!.internalNumber = updatedInfo.internalNumber;
+            rightDataset.value!.eventId = updatedInfo.eventId;
+            rightDataset.value!.publisherId = updatedInfo.publisherId;
+            rightDataset.value!.scopusId = updatedInfo.scopusId;
+            rightUpdateComplete.value = true;
+            
+            if (update.value) {
+                finishUpdates();
+            }
+        };
+
+        const updateAll = () => {
+            update.value = true;
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftDescriptionRef.value?.updateDescription();
+            updateRightDescriptionRef.value?.updateDescription();
+            updateLeftRef.value?.updateDataset();
+            updateRightRef.value?.updateDataset();
+        };
+
+        const finishUpdates = () => {
+            if (leftUpdateComplete.value && rightUpdateComplete.value) {
+                leftUpdateComplete.value = false;
+                rightUpdateComplete.value = false;
+                update.value = false;
+            
+                MergeService.saveMergedDatasetsMetadata(
+                    leftDataset.value?.id as number, rightDataset.value?.id as number,
+                    {leftDataset: leftDataset.value as Dataset, 
+                        rightDataset: rightDataset.value as Dataset
+                    }
+                )
+                .then(() => {
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                })
+                .catch((error) => {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
+                });
+            }
+        };
+
+        const updateLeftDescription = (description: MultilingualContent[]) => {
+            leftDataset.value!.description = description;
+        };
+
+        const updateRightDescription = (description: MultilingualContent[]) => {
+            rightDataset.value!.description = description;
+        };
+
+        const updateLeftKeywords = (keywords: MultilingualContent[]) => {
+            leftDataset.value!.keywords = keywords;
+        };
+
+        const updateRightKeywords = (keywords: MultilingualContent[]) => {
+            rightDataset.value!.keywords = keywords;
+        };
+
+        const deleteSide = (side: ComparisonSide) => {
+            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftDataset.value?.id as number : rightDataset.value?.id as number).then(() => {
+                router.push({ name: "deduplication" });
+            }).catch(() => {
+                const name = side === ComparisonSide.LEFT ? leftDataset.value?.title : rightDataset.value?.title;
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+                snackbar.value = true;
+            });
+        };
+
+        return {
+            returnCurrentLocaleContent,
+            snackbar, snackbarMessage,
+            leftDataset, rightDataset,
+            moveAll, updateAll, updateLeft,
+            updateLeftRef, updateRightRef, updateRight,
+            updateRightDescriptionRef, updateLeftDescriptionRef,
+            updateRightKeywordsRef, updateLeftKeywordsRef,
+            updateLeftDescription, updateRightDescription,
+            updateLeftKeywords, updateRightKeywords,
+            deleteSide
+        };
+}})
+
+</script>

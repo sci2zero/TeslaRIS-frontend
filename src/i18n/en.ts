@@ -367,5 +367,11 @@ export default {
     deduplicationScanInProgressMessage: "Scanning for duplicates is still in progress, please wait.",
     scanForDuplicatesLabel: "Scan for duplicates",
     flagSuccessNotification: "Sucessfully flagged: {name}.",
-    flagFailedNotification: "Could not flag: {name}, please refresh the page and try again."
+    flagFailedNotification: "Could not flag: {name}, please refresh the page and try again.",
+    deleteLeftLabel: "Delete left",
+    deleteRightLabel: "Delete right",
+    approvedSuccessfullyLabel: "Added successfully",
+    patentMetadataComparatorLabel: "Comparing patent metadata",
+    softwareMetadataComparatorLabel: "Comparing software metadata",
+    datasetMetadataComparatorLabel: "Comparing dataset metadata"
 }
