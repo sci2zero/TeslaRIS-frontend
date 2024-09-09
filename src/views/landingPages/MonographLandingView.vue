@@ -147,6 +147,14 @@
         
         <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
+        <!-- Publications Table -->
+        <v-row>
+            <h2>{{ $t("monographPublicationsLabel") }}</h2>
+            <v-col cols="12">
+                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+            </v-col>
+        </v-row>
+
         <v-row>
             <h2>{{ $t("proofsLabel") }}</h2>
             <v-col cols="12">
@@ -187,7 +195,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
@@ -211,11 +219,12 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink, PublicationTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -238,6 +247,13 @@ export default defineComponent({
         const publicationSeries = ref<PublicationSeries>();
         const publicationSeriesType = ref<PublicationSeriesType>(PublicationSeriesType.JOURNAL);
 
+        const publications = ref<DocumentPublicationIndex[]>([]);
+        const totalPublications = ref<number>(0);
+        const page = ref(0);
+        const size = ref(1);
+        const sort = ref("");
+        const direction = ref("");
+
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
@@ -259,7 +275,7 @@ export default defineComponent({
                 monograph.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
                 fetchConnectedEntities();
-
+                fetchPublications();
                 populateData();
             });
         };
@@ -276,6 +292,25 @@ export default defineComponent({
                     researchAreaHierarchy.value = response.data;
                 });
             }  
+        };
+
+        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            page.value = nextPage;
+            size.value = pageSize;
+            sort.value = sortField;
+            direction.value = sortDir;
+            fetchPublications();
+        };
+
+        const fetchPublications = () => {
+            if (!monograph.value?.id) {
+                return;
+            }
+
+            DocumentPublicationService.findPublicationsInMonograph(monograph.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+                publications.value = publicationResponse.data.content;
+                totalPublications.value = publicationResponse.data.totalElements
+            });
         };
 
         const fetchConnectedEntities = () => {
@@ -366,7 +401,8 @@ export default defineComponent({
             snackbar, snackbarMessage, event,
             researchAreaHierarchy, updateContributions,
             publicationSeries, publicationSeriesType,
-            getMonographTypeTitleFromValueAutoLocale
+            getMonographTypeTitleFromValueAutoLocale,
+            switchPage, publications, totalPublications
         };
 }})
 

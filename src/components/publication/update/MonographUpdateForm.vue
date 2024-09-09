@@ -161,6 +161,11 @@ export default defineComponent({
                 })
             });
 
+            ResearchAreaService.listAllResearchAreas().then(response => {
+                allResearchAreas.value = response.data;
+                populateSelectionData();
+            });
+
             if (props.presetMonograph) {
                 if (props.presetMonograph.researchAreaId) {
                     ResearchAreaService.readResearchAreaHierarchy(props.presetMonograph.researchAreaId).then((response) => {
@@ -182,9 +187,16 @@ export default defineComponent({
                             selectedBookSeries.value = {title: returnCurrentLocaleContent(bookSeriesResponse.data.title) as string, value: bookSeriesResponse.data.id as number};
                         });
                     });
-                }                
+                }              
             }
         });
+
+        const populateSelectionData = () => {
+            researchAreasSelectable.value = [];
+            allResearchAreas.value.forEach(researchArea => {
+                researchAreasSelectable.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.id as number});
+            });
+        };
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);

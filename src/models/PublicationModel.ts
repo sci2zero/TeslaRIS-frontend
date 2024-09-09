@@ -29,6 +29,7 @@ export interface DocumentPublicationIndex {
     eventId: number | null;
     publisherId: number | null;
     journalId: number | null;
+    monographId: number | null;
     databaseId: number | null;
     doi: string;
 }
@@ -40,7 +41,16 @@ export enum PublicationType {
     PROCEEDINGS = "PROCEEDINGS",
     DATASET = "DATASET",
     SOFTWARE = "SOFTWARE",
-    MONOGRAPH = "MONOGRAPH"
+    MONOGRAPH = "MONOGRAPH",
+    MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
+    THESIS = "THESIS"
+}
+
+export enum ThesisType {
+    BACHELOR = "BACHELOR",
+    MR = "MR",
+    PHD = "PHD",
+    MASTER = "MASTER"
 }
   
 export enum JournalPublicationType {
@@ -92,6 +102,7 @@ export enum DocumentContributionType {
     EDITOR = "EDITOR",
     REVIEWER = "REVIEWER",
     ADVISOR = "ADVISOR",
+    BOARD_MEMBER = "BOARD_MEMBER"
 }
 
 export interface ProceedingsPublication extends Document {
@@ -150,6 +161,24 @@ export interface Monograph extends Document {
     researchAreaId?: number;
 }
 
+export enum MonographPublicationType {
+    CHAPTER = "CHAPTER",
+    RESEARCH_ARTICLE = "RESEARCH_ARTICLE",
+    PREFACE = "PREFACE",
+    LEXICOGRAPHIC_UNIT = "LEXICOGRAPHIC_UNIT",
+    POLEMICS = "POLEMICS",
+    SCIENTIFIC_CRITIC = "SCIENTIFIC_CRITIC",
+}
+
+export interface MonographPublication extends Document {
+    monographPublicationType: MonographPublicationType;
+    startPage?: string;
+    endPage?: string;
+    numberOfPages?: number;
+    articleNumber?: string;
+    monographId?: number;
+}
+
 export interface Patent extends Document {
     number: string;
     publisherId?: number;
@@ -163,4 +192,14 @@ export interface Software extends Document {
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
+}
+
+export interface Thesis extends Document {
+    organisationUnitId: number;
+    thesisType: ThesisType;
+    numberOfPages?: number;
+    languageTagIds: number[];
+    researchAreaId?: number;
+    publisherId?: number;
+    languageTagNames?: string[];
 }

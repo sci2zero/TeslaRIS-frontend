@@ -18,7 +18,7 @@
                 <v-card-text>
                     <v-form v-model="isFormValid" @submit.prevent>
                         <v-container>
-                            <person-publication-contribution ref="updateFormRef" :preset-contributions="presetDocumentContributions" @set-input="contributions = $event"></person-publication-contribution>
+                            <person-publication-contribution ref="updateFormRef" :preset-contributions="presetDocumentContributions" :board-members-allowed="boardMembersAllowed" @set-input="contributions = $event"></person-publication-contribution>
                         </v-container>
                     </v-form>
                 </v-card-text>
@@ -55,6 +55,10 @@ export default defineComponent({
         presetDocumentContributions: {
             type: Object as PropType<PersonDocumentContribution[]>,
             required: true
+        },
+        boardMembersAllowed: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
