@@ -5,8 +5,16 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !inComparator" density="compact" class="compare-button" :disabled="selectedPublications.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN' && !inComparator" density="compact" class="compare-button"
+        :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN' && !inComparator" density="compact" class="compare-button"
+        :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
+        @click="startPublicationComparison">
+        {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <div ref="tableWrapper">
         <v-data-table-server
@@ -39,12 +47,12 @@
                             />
                         </td>
                         <td v-if="$i18n.locale == 'sr'">
-                            <localized-link :to="(getResultType(item) !== 'proceedings/' ? 'scientific-results/' : '') + getResultType(item) + item.databaseId">
+                            <localized-link :to="getLandingPageBasePath(item.type) + item.databaseId">
                                 {{ item.titleSr }}
                             </localized-link>
                         </td>
                         <td v-else>
-                            <localized-link :to="(getResultType(item) !== 'proceedings/' ? 'scientific-results/' : '') + getResultType(item) + item.databaseId">
+                            <localized-link :to="getLandingPageBasePath(item.type) + item.databaseId">
                                 {{ item.titleOther }}
                             </localized-link>
                         </td>
@@ -95,6 +103,8 @@ import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationTy
 import DoiLink from '../core/DoiLink.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
+import { getLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "PublicationTableComponent",
@@ -115,9 +125,10 @@ export default defineComponent({
     },
     emits: ["switchPage", "dragged"],
     setup(_, {emit}) {
-        const selectedPublications = ref([]);
+        const selectedPublications = ref<DocumentPublicationIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -211,34 +222,30 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const getResultType = (result: DocumentPublicationIndex): string => {
-            switch (result.type) {
-                case "JOURNAL_PUBLICATION":
-                    return "journal-publication/";
-                case "PROCEEDINGS_PUBLICATION":
-                    return "proceedings-publication/";
-                case "PATENT":
-                    return "patent/";
-                case "PROCEEDINGS":
-                    return "proceedings/";
-                case "DATASET":
-                    return "dataset/";
-                case "SOFTWARE":
-                    return "software/";
-                case "MONOGRAPH":
-                    return "monograph/";
-            }
-            return "";
-        };
-
         const onDropCallback = (event: any) => {
             emit("dragged", event);
         };
 
-        return {selectedPublications, headers, notifications,
+        const startMetadataComparison = () => {
+            router.push({name: getMetadataComparisonPageName(selectedPublications.value[0].type), params: {
+                leftId: selectedPublications.value[0].databaseId, rightId: selectedPublications.value[1].databaseId
+            }});
+        };
+
+        const startPublicationComparison = () => {
+            router.push({name: getPublicationComparisonPageName(selectedPublications.value[0].type), params: {
+                leftId: selectedPublications.value[0].databaseId, rightId: selectedPublications.value[1].databaseId
+            }});
+        };
+
+        return {
+            selectedPublications, headers, notifications,
             refreshTable, userRole, deleteSelection, tableWrapper,
-            tableOptions, getResultType, displayTextOrPlaceholder,
-            getPublicationTypeTitleFromValueAutoLocale, onDropCallback};
+            tableOptions, displayTextOrPlaceholder, onDropCallback,
+            getPublicationTypeTitleFromValueAutoLocale,
+            startMetadataComparison, getLandingPageBasePath,
+            startPublicationComparison
+        };
     }
 });
 </script>

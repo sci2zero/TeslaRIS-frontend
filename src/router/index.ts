@@ -59,6 +59,7 @@ import DeduplicationView from "@/views/DeduplicationView.vue";
 import SoftwareMetadataComparatorView from "@/views/comparators/documents/SoftwareMetadataComparatorView.vue";
 import DatasetMetadataComparatorView from "@/views/comparators/documents/DatasetMetadataComparatorView.vue";
 import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMetadataComparatorView.vue";
+import ProceedingsPublicationComparatorView from "@/views/comparators/documents/ProceedingsPublicationComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -445,13 +446,27 @@ const router = createRouter({
                             },
                         },
                         {
-                            path: "proceedings-publication/:id",
-                            name: "proceedingsPublicationLandingPage",
-                            component: ProceedingsPublicationsLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "proceedings-publication",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "proceedingsPublicationLandingPage",
+                                    component: ProceedingsPublicationsLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "proceedingsPublicationMetadataComparator",
+                                    component: ProceedingsPublicationComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
                             path: "software",

@@ -27,6 +27,8 @@
                         <person-document-contribution-list :contribution-list="leftDataset?.contributions ? leftDataset.contributions : []" :document-id="leftDataset?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="leftDataset" :proofs="leftDataset?.proofs" :file-items="leftDataset?.fileItems"></attachment-section>
             </v-col>
 
             <v-col cols="1">
@@ -65,6 +67,8 @@
                         <person-document-contribution-list :contribution-list="rightDataset?.contributions ? rightDataset.contributions : []" :document-id="rightDataset?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="rightDataset" :proofs="rightDataset?.proofs" :file-items="rightDataset?.fileItems"></attachment-section>
             </v-col>
         </v-row>
 
@@ -104,11 +108,13 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide } from '@/models/MergeModel';
+import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "DatasetMetadataComparator",
-    components: { PersonDocumentContributionList, DatasetUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { PersonDocumentContributionList, DatasetUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -154,6 +160,8 @@ export default defineComponent({
 
             mergeMultilingualContentField(dataset1.description, dataset2.description);
             dataset2.description = [];
+
+            mergeDocumentAttachments(dataset1, dataset2);
 
             dataset1.internalNumber = dataset2.internalNumber;
             dataset2.internalNumber = "";
@@ -261,8 +269,13 @@ export default defineComponent({
             
                 MergeService.saveMergedDatasetsMetadata(
                     leftDataset.value?.id as number, rightDataset.value?.id as number,
-                    {leftDataset: leftDataset.value as Dataset, 
-                        rightDataset: rightDataset.value as Dataset
+                    {
+                        leftDataset: leftDataset.value as Dataset, 
+                        rightDataset: rightDataset.value as Dataset,
+                        leftProofs: leftDataset.value?.proofs?.map(file => file.id) as number[],
+                        leftFileItems: leftDataset.value?.fileItems?.map(file => file.id) as number[],
+                        rightProofs: rightDataset.value?.proofs?.map(file => file.id) as number[],
+                        rightFileItems: rightDataset.value?.fileItems?.map(file => file.id) as number[]
                     }
                 )
                 .then(() => {

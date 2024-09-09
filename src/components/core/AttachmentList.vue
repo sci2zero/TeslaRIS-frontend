@@ -5,46 +5,51 @@
 
             <v-row>
                 <v-list
-                    v-if="attachments && attachments.length > 0"
                     :lines="false"
                     density="compact"
                     class="pa-0"
                 >
-                    <v-list-item
-                        v-for="(attachment, attachmentIndex) in attachments" :key="attachmentIndex"
-                        :value="attachment.serverFilename"
-                        color="primary"
+                    <draggable 
+                        :list="attachments" item-key="id"
+                        :group="isProof ? 'proofs' : 'fileItems'" 
+                        :disabled="false"
                     >
-                        <template #prepend>
-                            <v-icon icon="mdi-file-document-outline"></v-icon>
-                        </template>
+                        <v-list-item
+                            v-for="(attachment, attachmentIndex) in attachments" :key="attachmentIndex"
+                            :value="attachment.serverFilename"
+                            color="primary"
+                        >
+                            <template #prepend>
+                                <v-icon icon="mdi-file-document-outline"></v-icon>
+                            </template>
 
-                        <v-list-item-title @click="download(attachment)">
-                            {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
-                        </v-list-item-title>
+                            <v-list-item-title @click="download(attachment)">
+                                {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
+                            </v-list-item-title>
 
-                        <v-list-item-subtitle>
-                            {{ returnCurrentLocaleContent(attachment.description) }}
-                        </v-list-item-subtitle>
+                            <v-list-item-subtitle>
+                                {{ returnCurrentLocaleContent(attachment.description) }}
+                            </v-list-item-subtitle>
 
 
-                        <template #append>
-                            <v-row v-if="canEdit">
-                                <v-col>
-                                    <v-btn
-                                        icon variant="outlined" size="x-small" color="primary"
-                                        class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
-                                        <v-icon size="x-large" icon="mdi-delete"></v-icon>
-                                    </v-btn>
-                                </v-col>
-                                <v-col>
-                                    <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment" @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
-                                </v-col>
-                            </v-row>
-                        </template>
-                    </v-list-item>
+                            <template #append>
+                                <v-row v-if="canEdit">
+                                    <v-col>
+                                        <v-btn
+                                            icon variant="outlined" size="x-small" color="primary"
+                                            class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
+                                            <v-icon size="x-large" icon="mdi-delete"></v-icon>
+                                        </v-btn>
+                                    </v-col>
+                                    <v-col>
+                                        <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment" @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
+                                    </v-col>
+                                </v-row>
+                            </template>
+                        </v-list-item>
+                    </draggable>
                 </v-list>
-                <h4 v-else>
+                <h4 v-if="attachments && attachments.length === 0">
                     {{ $t("noFilesUploadedMessage") }}
                 </h4>
             </v-row>
@@ -74,11 +79,12 @@ import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionM
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { VueDraggableNext } from 'vue-draggable-next';
 
 
 export default defineComponent({
     name: "AttachmentList",
-    components: { DocumentFileSubmissionModal },
+    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext },
     props: {
         attachments: {
             type: Object as PropType<DocumentFileResponse[]>,
@@ -89,6 +95,10 @@ export default defineComponent({
             default: false
         },
         canEdit: {
+            type: Boolean,
+            default: false
+        },
+        inComparator: {
             type: Boolean,
             default: false
         }

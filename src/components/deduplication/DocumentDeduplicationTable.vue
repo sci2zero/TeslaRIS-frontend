@@ -72,6 +72,7 @@ import DeduplicationService from "@/services/DeduplicationService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import LocalizedLink from "../localization/LocalizedLink.vue";
 import { useRouter } from "vue-router";
+import { getMetadataComparisonPageName, getPublicationComparisonPageName, getLandingPageBasePath } from "@/utils/PathResolutionUtil";
 
 
 export default defineComponent({
@@ -138,58 +139,6 @@ export default defineComponent({
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        };
-
-        const getLandingPageBasePath = (type: PublicationType): string => {
-            switch (type) {
-                case "JOURNAL_PUBLICATION":
-                    return "scientific-results/journal-publication/";
-                case "PROCEEDINGS_PUBLICATION":
-                    return "scientific-results/proceedings-publication/";
-                case "PATENT":
-                    return "scientific-results/patent/";
-                case "PROCEEDINGS":
-                    return "proceedings/";
-                case "DATASET":
-                    return "scientific-results/dataset/";
-                case "SOFTWARE":
-                    return "scientific-results/software/";
-                case "MONOGRAPH":
-                    return "scientific-results/monograph/";
-                // TODO: add monograph pubs and theses
-            }
-            return "";
-        };
-
-        const getMetadataComparisonPageName = (type: PublicationType): string => {
-            switch (type) {
-                case "JOURNAL_PUBLICATION":
-                    return "journalPublicationMetadataComparator";
-                case "PROCEEDINGS_PUBLICATION":
-                    return "proceedingsPublicationMetadataComparator";
-                case "PATENT":
-                    return "patentMetadataComparator";
-                case "PROCEEDINGS":
-                    return "proceedingsMetadataComparator";
-                case "DATASET":
-                    return "datasetMetadataComparator";
-                case "SOFTWARE":
-                    return "softwareMetadataComparator";
-                case "MONOGRAPH":
-                    return "monographMetadataComparator";
-                // TODO: add monograph pubs and theses
-            }
-            return "";
-        };
-
-        const getPublicationComparisonPageName = (type: PublicationType): string => {
-            switch (type) {
-                case "PROCEEDINGS":
-                    return "proceedingsPublicationsComparator";
-                case "MONOGRAPH":
-                    return "monographPublicationsComparator";
-            }
-            return "";
         };
 
         const compareMetadata = (leftId: number, rightId: number, publicationType: PublicationType) => {

@@ -27,6 +27,8 @@
                         <person-document-contribution-list :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []" :document-id="leftPatent?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="leftPatent" :proofs="leftPatent?.proofs" :file-items="leftPatent?.fileItems"></attachment-section>
             </v-col>
 
             <v-col cols="1">
@@ -65,6 +67,8 @@
                         <person-document-contribution-list :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []" :document-id="rightPatent?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="rightPatent" :proofs="rightPatent?.proofs" :file-items="rightPatent?.fileItems"></attachment-section>
             </v-col>
         </v-row>
 
@@ -104,11 +108,13 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide } from '@/models/MergeModel';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 
 
 export default defineComponent({
     name: "PatentMetadataComparator",
-    components: { PersonDocumentContributionList, PatentUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { PersonDocumentContributionList, PatentUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -148,6 +154,8 @@ export default defineComponent({
 
             mergeMultilingualContentField(patent1.subTitle, patent2.subTitle);
             patent2.subTitle = [];
+
+            mergeDocumentAttachments(patent1, patent2);
 
             mergeMultilingualContentField(patent1.keywords, patent2.keywords);
             patent2.keywords = [];
@@ -261,8 +269,13 @@ export default defineComponent({
             
                 MergeService.saveMergedPatentsMetadata(
                     leftPatent.value?.id as number, rightPatent.value?.id as number,
-                    {leftPatent: leftPatent.value as Patent, 
-                        rightPatent: rightPatent.value as Patent
+                    {
+                        leftPatent: leftPatent.value as Patent, 
+                        rightPatent: rightPatent.value as Patent,
+                        leftProofs: leftPatent.value?.proofs?.map(file => file.id) as number[],
+                        leftFileItems: leftPatent.value?.fileItems?.map(file => file.id) as number[],
+                        rightProofs: rightPatent.value?.proofs?.map(file => file.id) as number[],
+                        rightFileItems: rightPatent.value?.fileItems?.map(file => file.id) as number[]
                     }
                 )
                 .then(() => {

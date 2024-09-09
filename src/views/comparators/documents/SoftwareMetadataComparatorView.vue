@@ -27,6 +27,8 @@
                         <person-document-contribution-list :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []" :document-id="leftSoftware?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="leftSoftware" :proofs="leftSoftware?.proofs" :file-items="leftSoftware?.fileItems"></attachment-section>
             </v-col>
 
             <v-col cols="1">
@@ -65,6 +67,8 @@
                         <person-document-contribution-list :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []" :document-id="rightSoftware?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="rightSoftware" :proofs="rightSoftware?.proofs" :file-items="rightSoftware?.fileItems"></attachment-section>
             </v-col>
         </v-row>
 
@@ -104,11 +108,13 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide } from '@/models/MergeModel';
+import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "SoftwareMetadataComparator",
-    components: { PersonDocumentContributionList, SoftwareUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { PersonDocumentContributionList, SoftwareUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -154,6 +160,8 @@ export default defineComponent({
 
             mergeMultilingualContentField(software1.description, software2.description);
             software2.description = [];
+
+            mergeDocumentAttachments(software1, software2);
 
             software1.internalNumber = software2.internalNumber;
             software2.internalNumber = "";
@@ -261,8 +269,13 @@ export default defineComponent({
             
                 MergeService.saveMergedSoftwareMetadata(
                     leftSoftware.value?.id as number, rightSoftware.value?.id as number,
-                    {leftSoftware: leftSoftware.value as Software, 
-                        rightSoftware: rightSoftware.value as Software
+                    {
+                        leftSoftware: leftSoftware.value as Software, 
+                        rightSoftware: rightSoftware.value as Software,
+                        leftProofs: leftSoftware.value?.proofs?.map(file => file.id) as number[],
+                        leftFileItems: leftSoftware.value?.fileItems?.map(file => file.id) as number[],
+                        rightProofs: rightSoftware.value?.proofs?.map(file => file.id) as number[],
+                        rightFileItems: rightSoftware.value?.fileItems?.map(file => file.id) as number[]
                     }
                 )
                 .then(() => {

@@ -27,6 +27,8 @@
                         <person-document-contribution-list :contribution-list="leftProceedings?.contributions ? leftProceedings.contributions : []" :document-id="leftProceedings?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="leftProceedings" :proofs="leftProceedings?.proofs" :file-items="leftProceedings?.fileItems"></attachment-section>
             </v-col>
 
             <v-col cols="1">
@@ -65,6 +67,8 @@
                         <person-document-contribution-list :contribution-list="rightProceedings?.contributions ? rightProceedings.contributions : []" :document-id="rightProceedings?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="rightProceedings" :proofs="rightProceedings?.proofs" :file-items="rightProceedings?.fileItems"></attachment-section>
             </v-col>
         </v-row>
 
@@ -104,11 +108,13 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide } from '@/models/MergeModel';
+import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "ProceedingsMetadataComparator",
-    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -154,6 +160,8 @@ export default defineComponent({
 
             mergeMultilingualContentField(proceedings1.description, proceedings2.description);
             proceedings2.description = [];
+
+            mergeDocumentAttachments(proceedings1, proceedings2);
 
             proceedings1.eISBN = proceedings2.eISBN;
             proceedings2.eISBN = "";
@@ -284,9 +292,15 @@ export default defineComponent({
         const finishUpdates = () => {
             MergeService.saveMergedProceedingsMetadata(
                 leftProceedings.value?.id as number, rightProceedings.value?.id as number,
-                {leftProceedings: leftProceedings.value as Proceedings, 
-                    rightProceedings: rightProceedings.value as Proceedings
-                }).then(() => {
+                {
+                    leftProceedings: leftProceedings.value as Proceedings, 
+                    rightProceedings: rightProceedings.value as Proceedings,
+                    leftProofs: leftProceedings.value?.proofs?.map(file => file.id) as number[],
+                    leftFileItems: leftProceedings.value?.fileItems?.map(file => file.id) as number[],
+                    rightProofs: rightProceedings.value?.proofs?.map(file => file.id) as number[],
+                    rightFileItems: rightProceedings.value?.fileItems?.map(file => file.id) as number[]
+                })
+                .then(() => {
                     snackbarMessage.value = i18n.t("updatedSuccessMessage");
                     snackbar.value = true;
                 })

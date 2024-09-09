@@ -34,3 +34,15 @@ export const deleteAttachment = (attachmentId: number, isProof: boolean, documen
         }
     });
 };
+
+export const mergeDocumentAttachments = (document1: Document, document2: Document) => {
+    document2.proofs?.forEach(proof => {
+        document1.proofs?.push(proof);
+    });
+    document2.proofs = [];
+    
+    document2.fileItems?.forEach(proof => {
+        document1.fileItems?.push(proof);
+    });
+    document2.fileItems = [];
+};

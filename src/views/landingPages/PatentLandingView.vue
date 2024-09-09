@@ -89,22 +89,9 @@
 
         <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="patent?.proofs ? patent.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, patent)"
-                    @delete="deleteAttachment($event, true, patent)" @update="updateAttachment($event, true, patent)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="patent?.fileItems ? patent.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, patent)" @delete="deleteAttachment($event, false, patent)"
-                    @update="updateAttachment($event, false, patent)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"
+            in-comparator></attachment-section>
 
         <v-snackbar
             v-model="snackbar"
@@ -134,23 +121,22 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Patent } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, DoiLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, DoiLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -262,7 +248,6 @@ export default defineComponent({
             patent, icon, publisher,
             returnCurrentLocaleContent,
             languageTagMap, searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo
         };
