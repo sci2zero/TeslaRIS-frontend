@@ -290,7 +290,12 @@ export default defineComponent({
         };
 
         const finishUpdates = () => {
-            MergeService.saveMergedProceedingsMetadata(
+            if (leftUpdateComplete.value && rightUpdateComplete.value) {
+                leftUpdateComplete.value = false;
+                rightUpdateComplete.value = false;
+                update.value = false;
+
+                MergeService.saveMergedProceedingsMetadata(
                 leftProceedings.value?.id as number, rightProceedings.value?.id as number,
                 {
                     leftProceedings: leftProceedings.value as Proceedings, 
@@ -308,6 +313,7 @@ export default defineComponent({
                     snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                     snackbar.value = true;
                 });
+            }
         };
 
         const updateLeftDescription = (description: MultilingualContent[]) => {

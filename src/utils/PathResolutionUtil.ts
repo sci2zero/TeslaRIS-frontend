@@ -17,7 +17,10 @@ export const getMetadataComparisonPageName = (type: PublicationType): string => 
             return "softwareMetadataComparator";
         case "MONOGRAPH":
             return "monographMetadataComparator";
-        // TODO: add monograph pubs and theses
+        case "MONOGRAPH_PUBLICATION":
+            return "monographPublicationMetadataComparator"
+        case "THESIS":
+            return "thesisMetadataComparator"
     }
     return "";
 };
@@ -49,7 +52,10 @@ export const getLandingPageBasePath = (type: PublicationType): string => {
             return "scientific-results/software/";
         case "MONOGRAPH":
             return "scientific-results/monograph/";
-        // TODO: add monograph pubs and theses
+        case "MONOGRAPH_PUBLICATION":
+            return "scientific-results/monograph-publication/";
+        case "THESIS":
+            return "scientific-results/thesis/";
     }
     return "";
 };

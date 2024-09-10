@@ -53,7 +53,8 @@ export interface ErrorResponse {
 
 export enum NotificationAction {
     APPROVE = "APPROVE",
-    REMOVE_FROM_PUBLICATION = "REMOVE_FROM_PUBLICATION"
+    REMOVE_FROM_PUBLICATION = "REMOVE_FROM_PUBLICATION",
+    PERFORM_DEDUPLICATION = "PERFORM_DEDUPLICATION"
 }
 
 export interface Notification {

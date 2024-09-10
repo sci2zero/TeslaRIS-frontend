@@ -277,7 +277,12 @@ export default defineComponent({
         };
 
         const finishUpdates = () => {
-            MergeService.saveMergedProceedingsPublicationMetadata(
+            if (leftUpdateComplete.value && rightUpdateComplete.value) {
+                leftUpdateComplete.value = false;
+                rightUpdateComplete.value = false;
+                update.value = false;
+            
+                MergeService.saveMergedProceedingsPublicationMetadata(
                 leftProceedingsPublication.value?.id as number, rightProceedingsPublication.value?.id as number,
                 {
                     leftProceedingsPublication: leftProceedingsPublication.value as ProceedingsPublication, 
@@ -295,6 +300,7 @@ export default defineComponent({
                     snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                     snackbar.value = true;
                 });
+            }
         };
 
         const updateLeftDescription = (description: MultilingualContent[]) => {

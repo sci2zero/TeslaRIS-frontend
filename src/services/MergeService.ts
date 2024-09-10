@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { MergedConferences, MergedDatasets, MergedJournals, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedSoftware } from "@/models/MergeModel";
+import type { MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedSoftware, MergedTheses } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -88,6 +88,14 @@ export class MergeService extends BaseService {
 
     async saveMergedProceedingsPublicationMetadata(leftProceedingsPublicationId: number, rightProceedingsPublicationId: number, body: MergedProceedingsPublications): Promise<AxiosResponse<void>> {
       return super.sendRequest(axios.patch, `merge/proceedings-publication/metadata/${leftProceedingsPublicationId}/${rightProceedingsPublicationId}`, body);
+    }
+
+    async saveMergedThesesMetadata(leftThesisId: number, rightThesisId: number, body: MergedTheses): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/thesis/metadata/${leftThesisId}/${rightThesisId}`, body);
+    }
+
+    async saveMergedJournalPublicationsMetadata(leftJournalPublicationId: number, rightJournalPublicationId: number, body: MergedJournalPublications): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.patch, `merge/journal-publication/metadata/${leftJournalPublicationId}/${rightJournalPublicationId}`, body);
     }
   }
   

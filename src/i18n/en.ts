@@ -384,5 +384,8 @@ export default {
     patentMetadataComparatorLabel: "Comparing patent metadata",
     softwareMetadataComparatorLabel: "Comparing software metadata",
     datasetMetadataComparatorLabel: "Comparing dataset metadata",
-    boardMembersLabel: "Board members"
+    boardMembersLabel: "Board members",
+    thesisMetadataComparatorLabel: "Comparing theses",
+    proceedingsPublicationComparatorLabel: "Comparing proceedings publication",
+    journalPublicationComparatorLabel: "Comparing journal publication"
 }

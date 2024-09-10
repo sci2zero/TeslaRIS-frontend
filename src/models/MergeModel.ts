@@ -2,7 +2,7 @@ import type { Conference } from "./EventModel";
 import type { Journal } from "./JournalModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
-import type { Dataset, Patent, ProceedingsPublication, Software } from "./PublicationModel";
+import type { Dataset, JournalPublication, Patent, ProceedingsPublication, Software, Thesis } from "./PublicationModel";
 
 
 export interface MergedDocuments {
@@ -54,6 +54,16 @@ export interface MergedPatents extends MergedDocuments {
 export interface MergedProceedingsPublications extends MergedDocuments {
     leftProceedingsPublication: ProceedingsPublication;
     rightProceedingsPublication: ProceedingsPublication;
+}
+
+export interface MergedTheses extends MergedDocuments {
+    leftThesis: Thesis;
+    rightThesis: Thesis;
+}
+
+export interface MergedJournalPublications extends MergedDocuments {
+    leftJournalPublication: JournalPublication;
+    rightJournalPublication: JournalPublication;
 }
 
 export enum ComparisonSide {

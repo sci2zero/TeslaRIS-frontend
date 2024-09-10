@@ -64,6 +64,8 @@ import SoftwareMetadataComparatorView from "@/views/comparators/documents/Softwa
 import DatasetMetadataComparatorView from "@/views/comparators/documents/DatasetMetadataComparatorView.vue";
 import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMetadataComparatorView.vue";
 import ProceedingsPublicationComparatorView from "@/views/comparators/documents/ProceedingsPublicationComparatorView.vue";
+import ThesisMetadataComparatorView from "@/views/comparators/documents/ThesisMetadataComparatorView.vue";
+import JournalPublicationMetadataComparatorView from "@/views/comparators/documents/JournalPublicationMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -459,13 +461,27 @@ const router = createRouter({
                             },
                         },
                         {
-                            path: "journal-publication/:id",
-                            name: "journalPublicationLandingPage",
-                            component: JournalPublicationLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "journal-publication",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "journalPublicationLandingPage",
+                                    component: JournalPublicationLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "journalPublicationMetadataComparator",
+                                    component: JournalPublicationMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
                             path: "proceedings-publication",
@@ -578,13 +594,27 @@ const router = createRouter({
                             },
                         },
                         {
-                            path: "thesis/:id",
-                            name: "thesisLandingPage",
-                            component: ThesisLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "thesis",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "thesisLandingPage",
+                                    component: ThesisLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "thesisMetadataComparator",
+                                    component: ThesisMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         }
                     ]
                     
@@ -629,7 +659,6 @@ const router = createRouter({
                             },
                         },
                     ]
-                    
                 },
                 {
                     path: "submit-proceedings-publication",

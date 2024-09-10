@@ -384,5 +384,8 @@ export default {
     patentMetadataComparatorLabel: "Poređenje patenata",
     softwareMetadataComparatorLabel: "Poređenje softvera",
     datasetMetadataComparatorLabel: "Poređenje skupova podataka",
-    boardMembersLabel: "Članovi komisije"
+    boardMembersLabel: "Članovi komisije",
+    thesisMetadataComparatorLabel: "Poređenje završnih radova",
+    proceedingsPublicationComparatorLabel: "Poređenje radova u zborniku radova",
+    journalPublicationComparatorLabel: "Poređenje radova u časopisu"
 }

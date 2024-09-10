@@ -22,6 +22,9 @@
                                 <v-icon v-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION'">
                                     mdi-file-remove-outline
                                 </v-icon>
+                                <v-icon v-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
+                                    mdi-content-duplicate
+                                </v-icon>
                             </v-btn>
                         </v-list-item-action>
                     </v-col>
@@ -42,9 +45,11 @@
 </template>
   
 <script lang="ts">
-import type { Notification, NotificationAction } from '@/models/Common';
+import { NotificationAction } from '@/models/Common';
+import type { Notification } from '@/models/Common';
 import NotificationService from '@/services/NotificationService';
 import { defineComponent, onMounted, ref } from 'vue';  
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "NotificationList",
@@ -52,6 +57,8 @@ export default defineComponent({
     setup(_, {emit}) {
         const notifications = ref<Notification[]>([]);
         const notificationCount = ref(0);
+
+        const router = useRouter();
 
         onMounted(() => {
             fetchNotificationsAndCounts();
@@ -74,6 +81,10 @@ export default defineComponent({
                 removeHandledNotification(notificationId);
                 emit("performedAction", action);
             });
+
+            if (action === NotificationAction.PERFORM_DEDUPLICATION) {
+                router.push({name: "deduplication"});
+            }
         };
 
         const rejectNotification = (notificationId: number) => {
