@@ -10,11 +10,11 @@
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("addConferenceLabel") }}</span>
+                    <span class="text-h5">{{ $t("addMonographLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <conference-submission-form ref="submissionFormRef" in-modal @create="emitToParent"></conference-submission-form>
+                        <monograph-submission-form ref="submissionFormRef" in-modal @create="emitToParent"></monograph-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -22,7 +22,7 @@
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" @click="submissionFormRef?.addConference(true)">
+                    <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" @click="submissionFormRef?.submitMonograph(true)">
                         {{ $t("saveLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -34,13 +34,13 @@
 <script lang="ts">
 import { ref } from "vue";
 import { defineComponent } from "vue";
-import ConferenceSubmissionForm from "@/components/event/ConferenceSubmissionForm.vue";
-import type { Conference } from "@/models/EventModel";
+import MonographSubmissionForm from "@/components/publication/MonographSubmissionForm.vue";
+import type { Monograph } from "@/models/PublicationModel";
 
 
 export default defineComponent({
-    name: "SubmitConferenceModal",
-    components: { ConferenceSubmissionForm },
+    name: "SubmitMonographModal",
+    components: { MonographSubmissionForm },
     props: {
         readOnly: {
             type: Boolean,
@@ -51,10 +51,10 @@ export default defineComponent({
     setup(_, { emit }) {
         const dialog = ref(false);
 
-        const submissionFormRef = ref<typeof ConferenceSubmissionForm>();
+        const submissionFormRef = ref<typeof MonographSubmissionForm>();
 
-        const emitToParent = (conference: Conference) => {
-            emit("create", conference);
+        const emitToParent = (monograph: Monograph) => {
+            emit("create", monograph);
             dialog.value = false;
         }
 

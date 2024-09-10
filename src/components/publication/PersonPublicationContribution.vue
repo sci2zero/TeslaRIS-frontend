@@ -58,6 +58,10 @@ export default defineComponent({
         presetContributions: {
             type: Array as PropType<PersonDocumentContribution[]>,
             default: () => []
+        },
+        boardMembersAllowed: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],
@@ -88,7 +92,15 @@ export default defineComponent({
             }
         });
 
-        const contributionTypes = computed(() => getTypesForGivenLocale());
+        const contributionTypes = computed(() => {
+            const types = getTypesForGivenLocale();
+
+            if (types && !props.boardMembersAllowed) {
+                return types.filter(type => type.value !== 'BOARD_MEMBER');
+            }
+
+            return types;
+        });
 
         const addInput = () => {
             inputs.value.push({

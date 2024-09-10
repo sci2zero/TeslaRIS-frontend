@@ -33,7 +33,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const doiPattern = /^10.\d{4,9}\/[-._;()/:A-Z0-9]+$/i;
+    const doiPattern = /^10\.\d{4,9}\/[-,._;()/:A-Z0-9]+$/i;
     const doiValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -123,7 +123,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const orcidPattern = /^\d{4}-\d{4}-\d{4}-\d{4}$/i;
+    const orcidPattern = /^\d{4}-\d{4}-\d{4}-[\dX]{4}$/i;
     const orcidValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;

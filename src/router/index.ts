@@ -54,6 +54,10 @@ import EventProceedingsComparatorView from "@/views/comparators/event/EventProce
 import ProceedingsPublicationsComparatorView from "@/views/comparators/proceedings/ProceedingsPublicationsComparatorView.vue";
 import ProceedingsMetadataComparatorView from "@/views/comparators/proceedings/ProceedingsMetadataComparatorView.vue";
 import EventMetadataComparatorView from "@/views/comparators/event/EventMetadataComparatorView.vue";
+import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationView.vue";
+import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
+import SubmitThesisView from "@/views/SubmitThesisView.vue";
+import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import SoftwareMetadataComparatorView from "@/views/comparators/documents/SoftwareMetadataComparatorView.vue";
@@ -249,8 +253,8 @@ const router = createRouter({
                             name: "journalLandingPage",
                             component: JournalLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.researcher, roles.institutionalEditor, roles.admin],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
@@ -310,9 +314,27 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "submit-thesis",
+                    name: "submitThesis",
+                    component: SubmitThesisView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
                     path: "submit-monograph",
                     name: "submitMonograph",
                     component: SubmitMonographView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-monograph-publication",
+                    name: "submitMonographPublication",
+                    component: SubmitMonographPublicationView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
@@ -541,6 +563,24 @@ const router = createRouter({
                             path: "monograph/:id",
                             name: "monographLandingPage",
                             component: MonographLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "monograph-publication/:id",
+                            name: "monographPublicationLandingPage",
+                            component: MonographPublicationLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "thesis/:id",
+                            name: "thesisLandingPage",
+                            component: ThesisLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

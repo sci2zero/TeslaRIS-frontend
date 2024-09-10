@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, Patent, ProceedingsPublication, Software } from "@/models/PublicationModel";
+import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "@/models/PublicationModel";
 
 
 export class DocumentPublicationService extends BaseService {
@@ -85,6 +85,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "monograph", body, DocumentPublicationService.idempotencyKey);
   }
 
+  async createMonographPublication(body: MonographPublication): Promise<AxiosResponse<MonographPublication>> {
+    return super.sendRequest(axios.post, "monograph-publication", body, DocumentPublicationService.idempotencyKey);
+  }
+
   async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
     return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}/my-publications`);
   }
@@ -121,6 +125,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.put, `monograph/${monographId}`, updatedMonograph);
   }
 
+  async updateMonographPublication(monographPublicationId: number, updatedMonographPublication: Monograph): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `monograph-publication/${monographPublicationId}`, updatedMonographPublication);
+  }
+
   async updateProceedingsPublication(proceedingsPublicationId: number, updatedProceedingsPublication: ProceedingsPublication): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `proceedings-publication/${proceedingsPublicationId}`, updatedProceedingsPublication);
   }
@@ -131,6 +139,34 @@ export class DocumentPublicationService extends BaseService {
 
   async reorderContribution(publicationId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `document/${publicationId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
+  }
+
+  async searchMonographs(tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `monograph/simple-search?${tokens}`);
+  }
+
+  async findMyPublicationsInMonograph(monographId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
+    return super.sendRequest(axios.get, `monograph-publication/monograph/${monographId}/my-publications`);
+  }
+
+  async findPublicationsInMonograph(journalId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `monograph-publication/monograph/${journalId}?${pageable}`);
+  }
+
+  async readMonographPublication(monographPublicationId: number): Promise<AxiosResponse<MonographPublication>> {
+    return super.sendRequest(axios.get, `monograph-publication/${monographPublicationId}`);
+  }
+
+  async readThesis(thesisId: number): Promise<AxiosResponse<Thesis>> {
+    return super.sendRequest(axios.get, `thesis/${thesisId}`);
+  }
+
+  async createThesis(body: Thesis): Promise<AxiosResponse<Thesis>> {
+    return super.sendRequest(axios.post, "thesis", body, DocumentPublicationService.idempotencyKey);
+  }
+
+  async updateThesis(thesisId: number, body: Thesis): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `thesis/${thesisId}`, body);
   }
 }
 

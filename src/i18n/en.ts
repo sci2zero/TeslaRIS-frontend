@@ -133,7 +133,7 @@ export default {
     numberOfPagesLabel: "Number of Pages",
     recentPublicationsLabel: "Your publications in this journal:",
     noRecentPublicationsJournalLabel: "You don't have any publications in this journal yet.",
-    noRecentPublicationsconferenceLabel: "You don't have any publications in this conference yet.",
+    noRecentPublicationsConferenceLabel: "You don't have any publications in this conference yet.",
     uriInputLabel: "Available on",
     mainContributorLabel: "Main Contributor",
     correspondingContributorLabel: "Corresponding Contributor",
@@ -352,6 +352,16 @@ export default {
     goBackLabel: "Go back",
     redirectingToMessage: "You are being redirected to {0}.",
     doNotCloseMessage: "Please, do not close or leave this page.",
+    addMonographPublicationLabel: "Add Monograph Publication",
+    monographPublicationsLabel: "Monograph Publications",
+    monographPublicationLabel: "Monograph Publication",
+    updateMonographPublicationLabel: "Update Monograph Publication",
+    noRecentPublicationsMonographLabel: "You don't have any publications in this monograph yet.",
+    journalPublicationsLabel: "Publications in this journal",
+    addThesisLabel: "Add Thesis",
+    thesisLabel: "Thesis",
+    thesisTypeLabel: "Thesis type",
+    updateThesisLabel: "Update Thesis",
     notificationPeriodLabel: "Email notification send period",
     notificationsLabel: "Notifications list",
     addeddSuccessfullyLabel: "Successfuly added.",
@@ -373,5 +383,6 @@ export default {
     approvedSuccessfullyLabel: "Added successfully",
     patentMetadataComparatorLabel: "Comparing patent metadata",
     softwareMetadataComparatorLabel: "Comparing software metadata",
-    datasetMetadataComparatorLabel: "Comparing dataset metadata"
+    datasetMetadataComparatorLabel: "Comparing dataset metadata",
+    boardMembersLabel: "Board members"
 }

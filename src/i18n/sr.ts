@@ -133,7 +133,7 @@ export default {
     numberOfPagesLabel: "Broj strana",
     recentPublicationsLabel: "Vaše publikacije u ovom časopisu:",
     noRecentPublicationsJournalLabel: "Nemate ni jednu publikaciju u ovom časopisu.",
-    noRecentPublicationsconferenceLabel: "Nemate ni jednu publikaciju u ovoj konferenciji.",
+    noRecentPublicationsConferenceLabel: "Nemate ni jednu publikaciju na ovoj konferenciji.",
     uriInputLabel: "Dostupno na",
     mainContributorLabel: "Glavni kontributor",
     correspondingContributorLabel: "Korespondentni kontributor",
@@ -352,6 +352,16 @@ export default {
     goBackLabel: "Vrati se nazad",
     redirectingToMessage: "Preusmeravamo vas na {0}.",
     doNotCloseMessage: "Molimo vas, nemojte zatvarati ili napuštati ovu stranicu.",
+    addMonographPublicationLabel: "Dodaj rad u monografiji",
+    monographPublicationsLabel: "Radovi u monografiji",
+    monographPublicationLabel: "Rad u monografiji",
+    updateMonographPublicationLabel: "Ažuriraj rad u monografiji",
+    noRecentPublicationsMonographLabel: "Nemate ni jednu publikaciju u ovoj monografiji.",
+    journalPublicationsLabel: "Radovi u ovom časopisu",
+    addThesisLabel: "Dodaj završni rad",
+    thesisLabel: "Završni rad",
+    thesisTypeLabel: "Tip završnog rada",
+    updateThesisLabel: "Ažuriraj završni rad",
     notificationPeriodLabel: "Period slanja email notifikacija",
     notificationsLabel: "Lista obaveštenja",
     addeddSuccessfullyLabel: "Uspešno dodato.",
@@ -373,5 +383,6 @@ export default {
     approvedSuccessfullyLabel: "Uspešno dodato",
     patentMetadataComparatorLabel: "Poređenje patenata",
     softwareMetadataComparatorLabel: "Poređenje softvera",
-    datasetMetadataComparatorLabel: "Poređenje skupova podataka"
+    datasetMetadataComparatorLabel: "Poređenje skupova podataka",
+    boardMembersLabel: "Članovi komisije"
 }

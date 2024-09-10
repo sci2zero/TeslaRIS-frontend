@@ -57,10 +57,14 @@
 
         <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
 
-        <!-- Publication Table -->
-        <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
-        
+        <!-- Publications Table -->
+        <v-row>
+            <h2>{{ $t("journalPublicationsLabel") }}</h2>
+            <v-col cols="12">
+                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+            </v-col>
+        </v-row>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">

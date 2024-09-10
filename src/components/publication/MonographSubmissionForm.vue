@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
@@ -173,7 +173,14 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 export default defineComponent({
     name: "SubmitMonograph",
     components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution},
-    setup() {
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        }
+    },
+    emits: ["create"],
+    setup(props, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -202,7 +209,7 @@ export default defineComponent({
             ResearchAreaService.listAllResearchAreas().then(response => {
                 allResearchAreas.value = response.data;
                 populateSelectionData();
-            }); 
+            });
         });
 
         const populateSelectionData = () => {
@@ -312,6 +319,11 @@ export default defineComponent({
             };
 
             DocumentPublicationService.createMonograph(newMonograph).then((response) => {
+                if (props.inModal) {
+                    emit("create", response.data);
+                    return;
+                }
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
