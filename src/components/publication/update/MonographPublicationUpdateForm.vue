@@ -96,6 +96,7 @@ import type { Monograph } from '@/models/PublicationModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getMonographPublicationTypesForGivenLocale } from '@/i18n/monographPublicationType';
 import MonographAutocompleteSearch from '../MonographAutocompleteSearch.vue';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -117,17 +118,31 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+            });
+
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if(props.presetMonographPublication?.monographId) {
                 MonographService.readMonograph(props.presetMonographPublication.monographId).then((response) => {
                     monograph.value = response.data;
                     selectedMonograph.value = {title: returnCurrentLocaleContent(monograph.value.title) as string, value: monograph.value.id as number};
                 });
             }
+        };
 
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
+        watch(() => props.presetMonographPublication, () => {
+            if (props.presetMonographPublication) {
+                refreshForm();
+            }
         });
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderMonograph = {title: returnCurrentLocaleContent(monograph.value?.title) as string, value: monograph.value?.id as number};
         const selectedMonograph = ref<{ title: string, value: number }>(searchPlaceholderMonograph);
@@ -135,8 +150,8 @@ export default defineComponent({
         const searchPlaceholderEvent = {title: returnCurrentLocaleContent(event.value?.name) as string, value: event.value?.id as number};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholderEvent);
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const startPage = ref(props.presetMonographPublication?.startPage);
         const endPage = ref(props.presetMonographPublication?.endPage);
         const publicationYear = ref(props.presetMonographPublication?.documentDate);
@@ -149,7 +164,7 @@ export default defineComponent({
         const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
         
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
+        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
 
         const updateMonographPublication = () => {
             const updatedMonographPublication: MonographPublication = {
@@ -176,6 +191,31 @@ export default defineComponent({
             emit("update", updatedMonographPublication);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetMonographPublication?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetMonographPublication?.subTitle as MultilingualContent[];
+
+            uris.value = props.presetMonographPublication?.uris as string[];
+            startPage.value = props.presetMonographPublication?.startPage;
+            endPage.value = props.presetMonographPublication?.endPage;
+            numberOfPages.value = props.presetMonographPublication?.numberOfPages;
+            publicationYear.value = props.presetMonographPublication?.documentDate;
+            doi.value = props.presetMonographPublication?.doi;
+            scopus.value = props.presetMonographPublication?.scopusId;
+            articleNumber.value = props.presetMonographPublication?.articleNumber;
+
+            selectedpublicationType.value = {title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType ? props.presetMonographPublication?.monographPublicationType as MonographPublicationType : null};
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            fetchDetails();
+        };
+
         return {
             isFormValid,
             title, subtitle,
@@ -184,9 +224,10 @@ export default defineComponent({
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
             updateMonographPublication, toMultilingualTextInput,
-            languageTags, startPage, endPage,
+            languageTags, startPage, endPage, refreshForm,
             publicationTypes, selectedpublicationType,
-            scopusIdValidationRules
+            scopusIdValidationRules, titleRef, subtitleRef,
+            urisRef
         };
     }
 });

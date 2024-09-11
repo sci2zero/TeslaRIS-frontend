@@ -115,6 +115,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -166,6 +167,7 @@ export default defineComponent({
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
 
             fetchDetails();
         };
@@ -178,7 +180,7 @@ export default defineComponent({
             uris, requiredFieldRules, titleRef, subtitleRef,
             updateSoftware, toMultilingualTextInput,
             languageTags, selectedEvent, doiValidationRules,
-            scopusIdValidationRules, refreshForm
+            scopusIdValidationRules, refreshForm, urisRef
         };
     }
 });

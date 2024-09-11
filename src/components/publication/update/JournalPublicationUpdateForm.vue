@@ -149,6 +149,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderJournal = {title: returnCurrentLocaleContent(journal.value?.title) as string, value: journal.value?.id as number};
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholderJournal);
@@ -172,7 +173,7 @@ export default defineComponent({
         const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
         
         const publicationTypes = computed(() => getTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
+        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
 
         const updateJournalPublication = () => {
             const updatedJournalPublication: JournalPublication = {
@@ -218,9 +219,12 @@ export default defineComponent({
             articleNumber.value = props.presetJournalPublication?.articleNumber;
             volume.value = props.presetJournalPublication?.volume;
             issue.value = props.presetJournalPublication?.issue;
+            selectedpublicationType.value = {title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType ? props.presetJournalPublication?.journalPublicationType as JournalPublicationType : null};
+
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
 
             fetchDetails();
         };
@@ -236,7 +240,7 @@ export default defineComponent({
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
-            refreshForm
+            refreshForm, urisRef
         };
     }
 });

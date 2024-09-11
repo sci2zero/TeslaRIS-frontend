@@ -66,6 +66,9 @@ import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMe
 import ProceedingsPublicationComparatorView from "@/views/comparators/documents/ProceedingsPublicationComparatorView.vue";
 import ThesisMetadataComparatorView from "@/views/comparators/documents/ThesisMetadataComparatorView.vue";
 import JournalPublicationMetadataComparatorView from "@/views/comparators/documents/JournalPublicationMetadataComparatorView.vue";
+import MonographPublicationsComparatorView from "@/views/comparators/documents/MonographPublicationsComparatorView.vue";
+import MonographMetadataComparatorView from "@/views/comparators/documents/MonographMetadataComparatorView.vue";
+import MonographPublicationMetadataComparatorView from "@/views/comparators/documents/MonographPublicationMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -576,22 +579,59 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: "monograph/:id",
-                            name: "monographLandingPage",
-                            component: MonographLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "monograph",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "monographLandingPage",
+                                    component: MonographLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "monographMetadataComparator",
+                                    component: MonographMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                                {
+                                    path: 'publications-comparator/:leftId/:rightId',
+                                    name: "monographPublicationsComparator",
+                                    component: MonographPublicationsComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
-                            path: "monograph-publication/:id",
-                            name: "monographPublicationLandingPage",
-                            component: MonographPublicationLandingView,
-                            meta: {
-                                authenticated: false,
-                                authorities: [],
-                            },
+                            path: "monograph-publication",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "monographPublicationLandingPage",
+                                    component: MonographPublicationLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "monographPublicationMetadataComparator",
+                                    component: MonographPublicationMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         },
                         {
                             path: "thesis",

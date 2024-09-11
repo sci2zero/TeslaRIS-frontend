@@ -194,6 +194,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const selectedPublisher = ref<{ title: string, value: number }>({title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number});
         const selectedEvent = ref<{ title: string, value: number }>();
@@ -257,6 +258,7 @@ export default defineComponent({
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
 
             selectedThesisType.value = {title: props.presetThesis?.thesisType ? getTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string : "", value: props.presetThesis?.thesisType ? props.presetThesis?.thesisType as ThesisType : undefined};
 
@@ -265,7 +267,7 @@ export default defineComponent({
 
         return {
             isFormValid,
-            title, subtitle,
+            title, subtitle, urisRef,
             publicationYear, doi, scopus,
             selectedPublisher, numberOfPages,
             uris, requiredFieldRules, requiredSelectionRules,

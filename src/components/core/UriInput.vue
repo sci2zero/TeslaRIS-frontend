@@ -34,13 +34,21 @@ export default defineComponent({
         const uris = ref([{value: ""}]);
 
         onMounted(() => {
-            if (props.modelValue && props.modelValue.length > 0) {
+            populateUriList(props.modelValue);
+        });
+
+        const populateUriList = (uriList: string[]) => {
+            if (uriList && uriList.length > 0) {
                 uris.value = [];
-                props.modelValue.forEach((uri) => {
+                uriList.forEach((uri) => {
+                    if (!uri && uriList.length > 1) {
+                        return;
+                    }
                     uris.value.push({value: uri});
                 });
             }
-        });
+            sendContentToParent();
+        };
 
         const addUri = () => {
             uris.value.push({value: ""});
@@ -63,10 +71,14 @@ export default defineComponent({
 
         const { uriValidationRules } = useValidationUtils();
 
+        const refreshModelValue = (uriList: string[]) => {
+            populateUriList(uriList);
+        };
+
         return { 
             uris, addUri, removeUri, 
             sendContentToParent, clearInput,
-            uriValidationRules };
+            uriValidationRules, refreshModelValue };
     },
 });
 </script>

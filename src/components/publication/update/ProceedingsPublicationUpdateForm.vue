@@ -160,6 +160,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderProceedings = {title: returnCurrentLocaleContent(proceedings.value?.title) as string, value: proceedings.value?.id as number};
         const selectedProceedings = ref<{ title: string, value: number }>(searchPlaceholderProceedings);
@@ -183,7 +184,7 @@ export default defineComponent({
         
         const i18n = useI18n();
         const publicationTypes = computed(() => getTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType }>({title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType});
+        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType});
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
             let title: string | undefined;
@@ -260,9 +261,12 @@ export default defineComponent({
             doi.value = props.presetProceedingsPublication?.doi;
             scopus.value = props.presetProceedingsPublication?.scopusId;
             articleNumber.value = props.presetProceedingsPublication?.articleNumber;
+            selectedpublicationType.value = {title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType ? props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType : null};
+
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
 
             fetchDetails();
         };
@@ -278,7 +282,7 @@ export default defineComponent({
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,
             selectNewlyAddedProceedings, scopusIdValidationRules,
-            refreshForm
+            refreshForm, urisRef
 
         };
     }
