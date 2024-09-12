@@ -80,3 +80,10 @@ export enum ComparisonSide {
     LEFT = "LEFT",
     RIGHT = "RIGHT"
 }
+
+export enum EntityType {
+    PUBLICATION = "PUBLICATION",
+    JOURNAL = "JOURNAL",
+    EVENT = "EVENT",
+    PERSON = "PERSON"
+}

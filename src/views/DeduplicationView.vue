@@ -7,7 +7,7 @@
         </v-btn>
 
         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-            <v-card-text v-if="totalDocumentSuggestions === 0">
+            <v-card-text v-if="totalDocumentSuggestions === 0 && totalJournalSuggestions === 0 && totalEventSuggestions === 0 && totalPersonSuggestions === 0">
                 <h2>{{ $t("noDeduplicationSuggestionsMessage") }}</h2>
             </v-card-text>
             <v-card-text v-else class="edit-pen-container">
@@ -19,11 +19,32 @@
                     <v-tab v-if="totalDocumentSuggestions > 0" value="documents">
                         {{ $t("documentsLabel") }}
                     </v-tab>
+                    <v-tab v-if="totalJournalSuggestions > 0" value="journals">
+                        {{ $t("journalListLabel") }}
+                    </v-tab>
+                    <v-tab v-if="totalEventSuggestions > 0" value="events">
+                        {{ $t("eventListLabel") }}
+                    </v-tab>
+                    <v-tab v-if="totalPersonSuggestions > 0" value="persons">
+                        {{ $t("personListLabel") }}
+                    </v-tab>
                 </v-tabs>
 
                 <v-window v-model="currentTab">
                     <v-window-item value="documents">
-                        <document-deduplication-table :suggestions="documentSuggestions" :total-suggestions="totalDocumentSuggestions" @switch-page="switchDocumentSuggestionsPage"></document-deduplication-table>
+                        <document-deduplication-table :suggestions="documentSuggestions" :total-suggestions="totalDocumentSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
+                    </v-window-item>
+
+                    <v-window-item value="journals">
+                        <document-deduplication-table :suggestions="journalSuggestions" :total-suggestions="totalJournalSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
+                    </v-window-item>
+
+                    <v-window-item value="events">
+                        <document-deduplication-table :suggestions="eventSuggestions" :total-suggestions="totalEventSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
+                    </v-window-item>
+
+                    <v-window-item value="persons">
+                        <document-deduplication-table :suggestions="personSuggestions" :total-suggestions="totalPersonSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
                     </v-window-item>
                 </v-window>
             </v-card-text>
@@ -51,8 +72,9 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import DocumentDeduplicationTable from "@/components/deduplication/DocumentDeduplicationTable.vue";
-import type { DocumentDeduplicationSuggestion } from "@/models/PublicationModel";
+import type { DeduplicationSuggestion } from "@/models/PublicationModel";
 import DeduplicationService from "@/services/DeduplicationService";
+import { EntityType } from "@/models/MergeModel";
 
 
 export default defineComponent({
@@ -61,11 +83,22 @@ export default defineComponent({
     setup() {
         const currentTab = ref("documents");
 
-        const documentSuggestions = ref<DocumentDeduplicationSuggestion[]>([]);
+        const documentSuggestions = ref<DeduplicationSuggestion[]>([]);
+        const journalSuggestions = ref<DeduplicationSuggestion[]>([]);
+        const eventSuggestions = ref<DeduplicationSuggestion[]>([]);
+        const personSuggestions = ref<DeduplicationSuggestion[]>([]);
+        
         const totalDocumentSuggestions = ref(0);
+        const totalJournalSuggestions = ref(0);
+        const totalEventSuggestions = ref(0);
+        const totalPersonSuggestions = ref(0);
 
         const documentSuggestionsPage = ref(0);
-        const documentSuggestionsSize = ref(5);
+        const journalSuggestionsPage = ref(0);
+        const eventSuggestionsPage = ref(0);
+        const personSuggestionsPage = ref(0);
+        
+        const globalPageSize = ref(5);
 
         const i18n = useI18n();
 
@@ -73,22 +106,63 @@ export default defineComponent({
         const message = ref("");
 
         onMounted(() => {
-            document.title = `TeslaRIS - ${i18n.t("deduplicationLabel")}`;
+            document.title = `TeslaRIS - ${i18n.t("deduplicationPageLabel")}`;
 
             fetchDocumentSuggestions();
+            fetchJournalSuggestions();
+            fetchEventSuggestions();
+            fetchPersonSuggestions();
         });
 
         const fetchDocumentSuggestions = () => {
-            DeduplicationService.fetchDocumentSuggestions(documentSuggestionsPage.value, documentSuggestionsSize.value).then(response => {
+            DeduplicationService.fetchDeduplicationSuggestions(documentSuggestionsPage.value, globalPageSize.value, EntityType.PUBLICATION).then(response => {
                 documentSuggestions.value = response.data.content;
                 totalDocumentSuggestions.value = response.data.totalElements;
             });
         };
 
-        const switchDocumentSuggestionsPage = (nextPage: number, pageSize: number) => {
-            documentSuggestionsPage.value = nextPage;
-            documentSuggestionsSize.value = pageSize;
-            fetchDocumentSuggestions();
+        const fetchJournalSuggestions = () => {
+            DeduplicationService.fetchDeduplicationSuggestions(documentSuggestionsPage.value, globalPageSize.value, EntityType.JOURNAL).then(response => {
+                journalSuggestions.value = response.data.content;
+                totalJournalSuggestions.value = response.data.totalElements;
+            });
+        };
+
+        const fetchEventSuggestions = () => {
+            DeduplicationService.fetchDeduplicationSuggestions(eventSuggestionsPage.value, globalPageSize.value, EntityType.EVENT).then(response => {
+                eventSuggestions.value = response.data.content;
+                totalEventSuggestions.value = response.data.totalElements;
+            });
+        };
+
+        const fetchPersonSuggestions = () => {
+            DeduplicationService.fetchDeduplicationSuggestions(personSuggestionsPage.value, globalPageSize.value, EntityType.PERSON).then(response => {
+                personSuggestions.value = response.data.content;
+                totalPersonSuggestions.value = response.data.totalElements;
+            });
+        };
+
+        const switchDeduplicationSuggestionsPage = (nextPage: number, pageSize: number, type: EntityType) => {
+            globalPageSize.value = pageSize;
+            
+            switch (type) {
+                case EntityType.PUBLICATION:
+                    documentSuggestionsPage.value = nextPage;
+                    fetchDocumentSuggestions();
+                    break;
+                case EntityType.JOURNAL:
+                    journalSuggestionsPage.value = nextPage;
+                    fetchJournalSuggestions();
+                    break;
+                case EntityType.EVENT:
+                    eventSuggestionsPage.value = nextPage;
+                    fetchEventSuggestions();
+                    break;
+                case EntityType.PERSON:
+                    personSuggestionsPage.value = nextPage;
+                    fetchPersonSuggestions();
+                    break;
+            }
         };
 
         const scanForDuplicates = () => {
@@ -105,9 +179,12 @@ export default defineComponent({
         return {
             currentTab, documentSuggestions,
             totalDocumentSuggestions,
-            switchDocumentSuggestionsPage,
+            switchDeduplicationSuggestionsPage,
             scanForDuplicates, snackbar,
-            message
+            message, journalSuggestions,
+            totalJournalSuggestions,
+            eventSuggestions, totalEventSuggestions,
+            personSuggestions, totalPersonSuggestions
         };
     },
 });

@@ -27,21 +27,21 @@
                         />
                     </td>
                     <td>
-                        <localized-link :to="`${getLandingPageBasePath(row.item.documentPublicationType)}` + row.item.leftDocumentId">
-                            {{ returnCurrentLocaleContent(row.item.leftDocumentTitle) }}
+                        <localized-link :to="`${getLandingPageBasePath(row.item)}` + row.item.leftEntityId">
+                            {{ $i18n.locale == 'sr' ? row.item.leftTitleSr : row.item.leftTitleOther }}
                         </localized-link>
                     </td>
                     <td>
-                        <localized-link :to="`${getLandingPageBasePath(row.item.documentPublicationType)}` + row.item.rightDocumentId">
-                            {{ returnCurrentLocaleContent(row.item.rightDocumentTitle) }}
+                        <localized-link :to="`${getLandingPageBasePath(row.item)}` + row.item.rightEntityId">
+                            {{ $i18n.locale == 'sr' ? row.item.rightTitleSr : row.item.rightTitleOther }}
                         </localized-link>
                     </td>
                     <td>
-                        <v-btn density="compact" @click="compareMetadata(row.item.leftDocumentId, row.item.rightDocumentId, row.item.documentPublicationType)">
+                        <v-btn density="compact" @click="compareMetadata(row.item)">
                             {{ $t("compareMetadataLabel") }}
                         </v-btn>
-                        <v-btn v-if="row.item.documentPublicationType === 'PROCEEDINGS' || row.item.documentPublicationType === 'MONOGRAPH'" density="compact" class="ml-2" @click="comparePublications(row.item.leftDocumentId, row.item.rightDocumentId, row.item.documentPublicationType)">
-                            {{ $t("comparePublicationsLabel") }}
+                        <v-btn v-if="canAggregateEntities(row.item)" density="compact" class="ml-2" @click="comparePublications(row.item)">
+                            {{ getAggregationComparisonLabel(row.item.entityType) }}
                         </v-btn>
                     </td>
                 </tr>
@@ -67,12 +67,13 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import { computed } from "vue";
-import type { DocumentDeduplicationSuggestion, PublicationType } from "@/models/PublicationModel";
+import type { DeduplicationSuggestion } from "@/models/PublicationModel";
 import DeduplicationService from "@/services/DeduplicationService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import LocalizedLink from "../localization/LocalizedLink.vue";
 import { useRouter } from "vue-router";
-import { getMetadataComparisonPageName, getPublicationComparisonPageName, getLandingPageBasePath } from "@/utils/PathResolutionUtil";
+import { getMetadataComparisonPageName, getPublicationComparisonPageName, getDocumentLandingPageBasePath } from "@/utils/PathResolutionUtil";
+import { EntityType } from "@/models/MergeModel";
 
 
 export default defineComponent({
@@ -80,7 +81,7 @@ export default defineComponent({
     components: { LocalizedLink },
     props: {
         suggestions: {
-            type: Array<DocumentDeduplicationSuggestion>,
+            type: Array<DeduplicationSuggestion>,
             required: true
         }, 
         totalSuggestions: {
@@ -102,9 +103,12 @@ export default defineComponent({
         const titleRightLabel = computed(() => i18n.t("titleRightLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
+        const leftTitleColumn = computed(() => i18n.t("leftTitleColumn"));
+        const rightTitleColumn = computed(() => i18n.t("rightTitleColumn"));
+
         const headers = [
-            { title: titleLeftLabel, align: "start", sortable: false, key: "leftDocumentTitle"},
-            { title: titleRightLabel, align: "start", sortable: false, key: "rightDocumentTitle"},
+            { title: titleLeftLabel, align: "start", sortable: false, key: leftTitleColumn},
+            { title: titleRightLabel, align: "start", sortable: false, key: rightTitleColumn},
             { title: actionLabel, align: "start", sortable: false, key: "action"}
         ];
 
@@ -115,13 +119,13 @@ export default defineComponent({
         };
 
         const flagAsNotDuplicates = () => {
-            Promise.all(selectedSuggestions.value.map((suggestion: DocumentDeduplicationSuggestion) => {
-                return DeduplicationService.flagDocumentAsNotDuplicate(suggestion.id)
+            Promise.all(selectedSuggestions.value.map((suggestion: DeduplicationSuggestion) => {
+                return DeduplicationService.flagAsNotDuplicate(suggestion.id)
                     .then(() => {
-                        addNotification(i18n.t("flagSuccessNotification", { name: returnCurrentLocaleContent(suggestion.leftDocumentTitle) }));
+                        addNotification(i18n.t("flagSuccessNotification", { name: i18n.locale.value == 'sr' ? suggestion.leftTitleSr : suggestion.leftTitleOther }));
                     })
                     .catch(() => {
-                        addNotification(i18n.t("flagFailedNotification", { name: returnCurrentLocaleContent(suggestion.leftDocumentTitle) }));
+                        addNotification(i18n.t("flagFailedNotification", { name: i18n.locale.value == 'sr' ? suggestion.leftTitleSr : suggestion.leftTitleOther }));
                         return suggestion;
                     });
             })).then((failedFlags) => {
@@ -141,35 +145,102 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const compareMetadata = (leftId: number, rightId: number, publicationType: PublicationType) => {
-            router.push({name: getMetadataComparisonPageName(publicationType), params: {
-                leftId: leftId, rightId: rightId
-            }});
+        const compareMetadata = (suggestion: DeduplicationSuggestion) => {
+            switch(suggestion.entityType) {
+                case EntityType.PUBLICATION:
+                    router.push({name: getMetadataComparisonPageName(suggestion.documentPublicationType), params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.JOURNAL:
+                    router.push({name: "journalMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                    case EntityType.EVENT:
+                    router.push({name: "eventMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.PERSON:
+                    router.push({name: "personMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+            }
         };
 
-        const comparePublications = (leftId: number, rightId: number, publicationType: PublicationType) => {
-            router.push({name: getPublicationComparisonPageName(publicationType), params: {
-                leftId: leftId, rightId: rightId
-            }});
+        const comparePublications = (suggestion: DeduplicationSuggestion) => {
+            switch(suggestion.entityType) {
+                case EntityType.PUBLICATION:
+                    router.push({name: getPublicationComparisonPageName(suggestion.documentPublicationType), params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.JOURNAL:
+                    router.push({name: "journalPublicationsComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.EVENT:
+                    router.push({name: "eventProceedingsComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.PERSON:
+                    router.push({name: "personPublicationsComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+            }
+        };
+
+        const canAggregateEntities = (suggestion: DeduplicationSuggestion) => {
+            switch(suggestion.entityType) {
+                case EntityType.PUBLICATION:
+                    return suggestion.documentPublicationType === 'PROCEEDINGS' || suggestion.documentPublicationType === 'MONOGRAPH';
+                case EntityType.JOURNAL:
+                    return true;
+                case EntityType.EVENT:
+                    return true;
+                case EntityType.PERSON:
+                    return true;
+            }
+        };
+
+        const getLandingPageBasePath = (suggestion: DeduplicationSuggestion) => {
+            switch(suggestion.entityType) {
+                case EntityType.PUBLICATION:
+                    return getDocumentLandingPageBasePath(suggestion.documentPublicationType);
+                case EntityType.JOURNAL:
+                    return "journals/";
+                case EntityType.EVENT:
+                    return "events/conference/";
+                case EntityType.PERSON:
+                    return "persons/";
+            }
+        };
+
+        const getAggregationComparisonLabel = (entityType: EntityType) => {
+            switch (entityType) {
+                case EntityType.PUBLICATION:
+                case EntityType.PERSON:
+                case EntityType.JOURNAL:
+                    return i18n.t("comparePublicationsLabel");
+                case EntityType.EVENT:
+                    return i18n.t("compareProceedingsLabel");
+                
+            }
         };
         
         return {
             selectedSuggestions, notifications, headers,
             refreshTable, flagAsNotDuplicates,
-            returnCurrentLocaleContent, getLandingPageBasePath,
-            compareMetadata, comparePublications
+            returnCurrentLocaleContent, getDocumentLandingPageBasePath,
+            compareMetadata, comparePublications,
+            canAggregateEntities, getLandingPageBasePath,
+            getAggregationComparisonLabel
         };   
     },
 });
 </script>
-
-<style scoped>
-  .notificationContainer {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    display: grid;
-    grid-gap: 0.5em;
-    z-index: 99;
-  }
-</style>

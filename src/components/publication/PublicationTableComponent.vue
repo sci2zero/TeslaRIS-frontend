@@ -47,12 +47,12 @@
                             />
                         </td>
                         <td v-if="$i18n.locale == 'sr'">
-                            <localized-link :to="getLandingPageBasePath(item.type) + item.databaseId">
+                            <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
                                 {{ item.titleSr }}
                             </localized-link>
                         </td>
                         <td v-else>
-                            <localized-link :to="getLandingPageBasePath(item.type) + item.databaseId">
+                            <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
                                 {{ item.titleOther }}
                             </localized-link>
                         </td>
@@ -103,7 +103,7 @@ import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationTy
 import DoiLink from '../core/DoiLink.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
-import { getLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
+import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -243,21 +243,10 @@ export default defineComponent({
             refreshTable, userRole, deleteSelection, tableWrapper,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
             getPublicationTypeTitleFromValueAutoLocale,
-            startMetadataComparison, getLandingPageBasePath,
+            startMetadataComparison, getDocumentLandingPageBasePath,
             startPublicationComparison
         };
     }
 });
 </script>
-
-<style scoped>
-  .notificationContainer {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    display: grid;
-    grid-gap: 0.5em;
-    z-index: 99;
-  }
-</style>
 

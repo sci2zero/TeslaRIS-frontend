@@ -36,7 +36,7 @@ export const getPublicationComparisonPageName = (type: PublicationType): string 
     return "";
 };
 
-export const getLandingPageBasePath = (type: PublicationType): string => {
+export const getDocumentLandingPageBasePath = (type: PublicationType): string => {
     switch (type) {
         case "JOURNAL_PUBLICATION":
             return "scientific-results/journal-publication/";

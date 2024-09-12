@@ -1,23 +1,24 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { DocumentDeduplicationSuggestion } from "@/models/PublicationModel";
+import type { DeduplicationSuggestion } from "@/models/PublicationModel";
 import type { Page } from "@/models/Common";
+import type { EntityType } from "@/models/MergeModel";
 
 export class DeduplicationService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async fetchDocumentSuggestions(page: number, size: number): Promise<AxiosResponse<Page<DocumentDeduplicationSuggestion>>> {
-    return super.sendRequest(axios.get, `deduplication/documents?page=${page}&size=${size}`);
+  async fetchDeduplicationSuggestions(page: number, size: number, type: EntityType): Promise<AxiosResponse<Page<DeduplicationSuggestion>>> {
+    return super.sendRequest(axios.get, `deduplication/${type}?page=${page}&size=${size}`);
   }
 
-  async flagDocumentAsNotDuplicate(suggestionId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.patch, `deduplication/document/${suggestionId}`);
+  async flagAsNotDuplicate(suggestionId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `deduplication/suggestion/${suggestionId}`);
   }
 
-  async deleteDocumentSuggestion(suggestionId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.delete, `deduplication/document/${suggestionId}`);
+  async deleteSuggestion(suggestionId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `deduplication/suggestion/${suggestionId}`);
   }
 
   async performDeduplicationScan(): Promise<AxiosResponse<boolean>> {

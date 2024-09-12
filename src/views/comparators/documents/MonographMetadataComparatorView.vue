@@ -296,7 +296,7 @@ export default defineComponent({
                 rightUpdateComplete.value = false;
                 update.value = false;
 
-                MergeService.saveMergedMonographMetadata(
+                MergeService.saveMergedMonographsMetadata(
                 leftMonograph.value?.id as number, rightMonograph.value?.id as number,
                 {
                     leftMonograph: leftMonograph.value as Monograph, 
@@ -334,7 +334,7 @@ export default defineComponent({
         };
 
         const deleteSide = (side: ComparisonSide) => {
-            MonographService.deleteMonograph(side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number).then(() => {
+            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number).then(() => {
                 router.push({ name: "deduplication" });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftMonograph.value?.title : rightMonograph.value?.title;

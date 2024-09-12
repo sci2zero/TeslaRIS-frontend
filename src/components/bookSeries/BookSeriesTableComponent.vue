@@ -170,14 +170,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-  .notificationContainer {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    display: grid;
-    grid-gap: 0.5em;
-    z-index: 99;
-  }
-</style>

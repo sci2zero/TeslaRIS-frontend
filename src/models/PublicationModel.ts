@@ -1,5 +1,6 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import type { EntityType } from "./MergeModel";
 import type { PersonContribution } from "./PersonModel";
 
 export interface DocumentPublicationIndex {
@@ -194,13 +195,16 @@ export interface Dataset extends Document {
     publisherId?: number;
 }
 
-export interface DocumentDeduplicationSuggestion {
+export interface DeduplicationSuggestion {
     id: number;
-    leftDocumentId: number;
-    rightDocumentId: number;
-    leftDocumentTitle: MultilingualContent[];
-    rightDocumentTitle: MultilingualContent[];
+    leftEntityId: number;
+    rightEntityId: number;
+    leftTitleSr: string;
+    rightTitleSr: string;
+    leftTitleOther: string;
+    rightTitleOther: string;
     documentPublicationType: PublicationType;
+    entityType: EntityType;
 }
 
 export interface Thesis extends Document {
