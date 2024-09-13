@@ -331,9 +331,12 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     eventAutocompleteRef.value?.clearInput();
+                    contributionsRef.value?.clearInput();
                     doi.value = "";
                     scopus.value = "";
                     numberOfPages.value = null;
+                    selectedResearchArea.value = { title: "", value: null };
+                    selectedMonographType.value = { title: "", value: null };
                     eIsbn.value = "";
                     printIsbn.value = "";
                     publicationYear.value = "";

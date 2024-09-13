@@ -7,7 +7,12 @@
         </v-btn>
 
         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-            <v-card-text v-if="totalDocumentSuggestions === 0 && totalJournalSuggestions === 0 && totalEventSuggestions === 0 && totalPersonSuggestions === 0">
+            <v-card-text
+                v-if="
+                    totalDocumentSuggestions === 0 && totalJournalSuggestions === 0 && 
+                        totalBookSeriesSuggestions === 0 && totalEventSuggestions === 0 && 
+                        totalPersonSuggestions === 0 && totalOrganisationUnitSuggestions === 0"
+            >
                 <h2>{{ $t("noDeduplicationSuggestionsMessage") }}</h2>
             </v-card-text>
             <v-card-text v-else class="edit-pen-container">
@@ -22,11 +27,17 @@
                     <v-tab v-if="totalJournalSuggestions > 0" value="journals">
                         {{ $t("journalListLabel") }}
                     </v-tab>
+                    <v-tab v-if="totalBookSeriesSuggestions > 0" value="bookSeries">
+                        {{ $t("bookSeriesListLabel") }}
+                    </v-tab>
                     <v-tab v-if="totalEventSuggestions > 0" value="events">
                         {{ $t("eventListLabel") }}
                     </v-tab>
                     <v-tab v-if="totalPersonSuggestions > 0" value="persons">
                         {{ $t("personListLabel") }}
+                    </v-tab>
+                    <v-tab v-if="totalOrganisationUnitSuggestions > 0" value="organisationUnits">
+                        {{ $t("ouListLabel") }}
                     </v-tab>
                 </v-tabs>
 
@@ -39,12 +50,20 @@
                         <document-deduplication-table :suggestions="journalSuggestions" :total-suggestions="totalJournalSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
                     </v-window-item>
 
+                    <v-window-item value="bookSeries">
+                        <document-deduplication-table :suggestions="bookSeriesSuggestions" :total-suggestions="totalBookSeriesSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
+                    </v-window-item>
+
                     <v-window-item value="events">
                         <document-deduplication-table :suggestions="eventSuggestions" :total-suggestions="totalEventSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
                     </v-window-item>
 
                     <v-window-item value="persons">
                         <document-deduplication-table :suggestions="personSuggestions" :total-suggestions="totalPersonSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
+                    </v-window-item>
+
+                    <v-window-item value="organisationUnits">
+                        <document-deduplication-table :suggestions="organisationUnitSuggestions" :total-suggestions="totalOrganisationUnitSuggestions" @switch-page="switchDeduplicationSuggestionsPage"></document-deduplication-table>
                     </v-window-item>
                 </v-window>
             </v-card-text>
@@ -75,6 +94,8 @@ import DocumentDeduplicationTable from "@/components/deduplication/DocumentDedup
 import type { DeduplicationSuggestion } from "@/models/PublicationModel";
 import DeduplicationService from "@/services/DeduplicationService";
 import { EntityType } from "@/models/MergeModel";
+import { useRoute, useRouter } from "vue-router";
+import { watch } from "vue";
 
 
 export default defineComponent({
@@ -83,20 +104,29 @@ export default defineComponent({
     setup() {
         const currentTab = ref("documents");
 
+        const route = useRoute();
+        const router = useRouter();
+
         const documentSuggestions = ref<DeduplicationSuggestion[]>([]);
         const journalSuggestions = ref<DeduplicationSuggestion[]>([]);
+        const bookSeriesSuggestions = ref<DeduplicationSuggestion[]>([]);
         const eventSuggestions = ref<DeduplicationSuggestion[]>([]);
         const personSuggestions = ref<DeduplicationSuggestion[]>([]);
-        
+        const organisationUnitSuggestions = ref<DeduplicationSuggestion[]>([]);
+
         const totalDocumentSuggestions = ref(0);
         const totalJournalSuggestions = ref(0);
+        const totalBookSeriesSuggestions = ref(0);
         const totalEventSuggestions = ref(0);
         const totalPersonSuggestions = ref(0);
+        const totalOrganisationUnitSuggestions = ref(0);
 
         const documentSuggestionsPage = ref(0);
         const journalSuggestionsPage = ref(0);
+        const bookSeriesSuggestionsPage = ref(0);
         const eventSuggestionsPage = ref(0);
         const personSuggestionsPage = ref(0);
+        const organisationUnitSuggestionsPage = ref(0);
         
         const globalPageSize = ref(5);
 
@@ -108,10 +138,19 @@ export default defineComponent({
         onMounted(() => {
             document.title = `TeslaRIS - ${i18n.t("deduplicationPageLabel")}`;
 
+            if (route.query.tab) {
+                currentTab.value = route.query.tab as string;
+            }
+
             fetchDocumentSuggestions();
             fetchJournalSuggestions();
             fetchEventSuggestions();
             fetchPersonSuggestions();
+            fetchOrganisationUnitSuggestions();
+        });
+
+        watch(currentTab, () => {
+            router.push({name:"deduplication", query: { tab: currentTab.value }});
         });
 
         const fetchDocumentSuggestions = () => {
@@ -122,9 +161,16 @@ export default defineComponent({
         };
 
         const fetchJournalSuggestions = () => {
-            DeduplicationService.fetchDeduplicationSuggestions(documentSuggestionsPage.value, globalPageSize.value, EntityType.JOURNAL).then(response => {
+            DeduplicationService.fetchDeduplicationSuggestions(journalSuggestionsPage.value, globalPageSize.value, EntityType.JOURNAL).then(response => {
                 journalSuggestions.value = response.data.content;
                 totalJournalSuggestions.value = response.data.totalElements;
+            });
+        };
+
+        const fetchBookSeriesSuggestions = () => {
+            DeduplicationService.fetchDeduplicationSuggestions(bookSeriesSuggestionsPage.value, globalPageSize.value, EntityType.BOOK_SERIES).then(response => {
+                bookSeriesSuggestions.value = response.data.content;
+                totalBookSeriesSuggestions.value = response.data.totalElements;
             });
         };
 
@@ -142,6 +188,13 @@ export default defineComponent({
             });
         };
 
+        const fetchOrganisationUnitSuggestions = () => {
+            DeduplicationService.fetchDeduplicationSuggestions(organisationUnitSuggestionsPage.value, globalPageSize.value, EntityType.ORGANISATION_UNIT).then(response => {
+                organisationUnitSuggestions.value = response.data.content;
+                totalOrganisationUnitSuggestions.value = response.data.totalElements;
+            });
+        };
+
         const switchDeduplicationSuggestionsPage = (nextPage: number, pageSize: number, type: EntityType) => {
             globalPageSize.value = pageSize;
             
@@ -154,6 +207,10 @@ export default defineComponent({
                     journalSuggestionsPage.value = nextPage;
                     fetchJournalSuggestions();
                     break;
+                case EntityType.BOOK_SERIES:
+                    bookSeriesSuggestionsPage.value = nextPage;
+                    fetchBookSeriesSuggestions();
+                    break;
                 case EntityType.EVENT:
                     eventSuggestionsPage.value = nextPage;
                     fetchEventSuggestions();
@@ -161,6 +218,10 @@ export default defineComponent({
                 case EntityType.PERSON:
                     personSuggestionsPage.value = nextPage;
                     fetchPersonSuggestions();
+                    break;
+                case EntityType.ORGANISATION_UNIT:
+                    organisationUnitSuggestionsPage.value = nextPage;
+                    fetchOrganisationUnitSuggestions();
                     break;
             }
         };
@@ -184,7 +245,11 @@ export default defineComponent({
             message, journalSuggestions,
             totalJournalSuggestions,
             eventSuggestions, totalEventSuggestions,
-            personSuggestions, totalPersonSuggestions
+            personSuggestions, totalPersonSuggestions,
+            totalBookSeriesSuggestions,
+            totalOrganisationUnitSuggestions,
+            organisationUnitSuggestions,
+            bookSeriesSuggestions
         };
     },
 });

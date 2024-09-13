@@ -157,13 +157,23 @@ export default defineComponent({
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
-                    case EntityType.EVENT:
+                case EntityType.BOOK_SERIES:
+                    router.push({name: "bookSeriesMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.EVENT:
                     router.push({name: "eventMetadataComparator", params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
                 case EntityType.PERSON:
                     router.push({name: "personMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.ORGANISATION_UNIT:
+                    router.push({name: "organisationUnitMetadataComparator", params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
@@ -182,6 +192,11 @@ export default defineComponent({
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
+                case EntityType.BOOK_SERIES:
+                    router.push({name: "bookSeriesPublicationsComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
                 case EntityType.EVENT:
                     router.push({name: "eventProceedingsComparator", params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
@@ -189,6 +204,11 @@ export default defineComponent({
                     break;
                 case EntityType.PERSON:
                     router.push({name: "personPublicationsComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
+                case EntityType.ORGANISATION_UNIT:
+                    router.push({name: "organisationUnitEmploymentsComparator", params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
@@ -200,10 +220,10 @@ export default defineComponent({
                 case EntityType.PUBLICATION:
                     return suggestion.documentPublicationType === 'PROCEEDINGS' || suggestion.documentPublicationType === 'MONOGRAPH';
                 case EntityType.JOURNAL:
-                    return true;
+                case EntityType.BOOK_SERIES:
                 case EntityType.EVENT:
-                    return true;
                 case EntityType.PERSON:
+                case EntityType.ORGANISATION_UNIT:
                     return true;
             }
         };
@@ -214,10 +234,14 @@ export default defineComponent({
                     return getDocumentLandingPageBasePath(suggestion.documentPublicationType);
                 case EntityType.JOURNAL:
                     return "journals/";
+                case EntityType.BOOK_SERIES:
+                    return "book-series/";
                 case EntityType.EVENT:
                     return "events/conference/";
                 case EntityType.PERSON:
                     return "persons/";
+                case EntityType.ORGANISATION_UNIT:
+                    return "organisation-units/";
             }
         };
 
@@ -225,11 +249,13 @@ export default defineComponent({
             switch (entityType) {
                 case EntityType.PUBLICATION:
                 case EntityType.PERSON:
+                case EntityType.BOOK_SERIES:
                 case EntityType.JOURNAL:
                     return i18n.t("comparePublicationsLabel");
                 case EntityType.EVENT:
                     return i18n.t("compareProceedingsLabel");
-                
+                case EntityType.ORGANISATION_UNIT:
+                    return i18n.t("compareEmployeesLabel");
             }
         };
         

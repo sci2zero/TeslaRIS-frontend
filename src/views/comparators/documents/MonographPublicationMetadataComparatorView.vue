@@ -320,7 +320,7 @@ export default defineComponent({
         };
 
         const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteMonograph(side === ComparisonSide.LEFT ? leftMonographPublication.value?.id as number : rightMonographPublication.value?.id as number).then(() => {
+            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftMonographPublication.value?.id as number : rightMonographPublication.value?.id as number).then(() => {
                 router.push({ name: "deduplication" });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftMonographPublication.value?.title : rightMonographPublication.value?.title;
