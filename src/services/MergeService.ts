@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedSoftware, MergedTheses } from "@/models/MergeModel";
+import type { MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedSoftware, MergedTheses } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -12,6 +12,14 @@ export class MergeService extends BaseService {
 
     async switchAllPublicationsToOtherJournal(sourceJournalId: number, targetJournalId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/journal/source/${sourceJournalId}/target/${targetJournalId}`);
+    }
+
+    async switchPublicationToOtherBookSeries(sourceBookSeriesId: number, publicationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/book-series/${sourceBookSeriesId}/publication/${publicationId}`);
+    }
+
+    async switchAllPublicationsToOtherBookSeries(sourceBookSeriesId: number, targetBookSeriesId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/book-series/source/${sourceBookSeriesId}/target/${targetBookSeriesId}`);
     }
 
     async switchPublicationToOtherPerson(sourcePersonId: number, targetPersonId: number, publicationId: number): Promise<AxiosResponse<void>> {
@@ -80,6 +88,10 @@ export class MergeService extends BaseService {
 
     async saveMergedJournalsMetadata(leftJournalId: number, rightJournalId: number, body: MergedJournals): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/journal/metadata/${leftJournalId}/${rightJournalId}`, body);
+    }
+
+    async saveMergedBookSeriesMetadata(leftBookSeriesId: number, rightBookSeriesId: number, body: MergedBookSeries): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/book-series/metadata/${leftBookSeriesId}/${rightBookSeriesId}`, body);
     }
 
     async saveMergedSoftwareMetadata(leftSoftwareId: number, rightSoftwareId: number, body: MergedSoftware): Promise<AxiosResponse<void>> {

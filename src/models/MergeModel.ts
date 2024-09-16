@@ -1,3 +1,4 @@
+import type { BookSeries } from "./BookSeriesModel";
 import type { Conference } from "./EventModel";
 import type { Journal } from "./JournalModel";
 import type { PersonalInfo } from "./PersonModel";
@@ -29,6 +30,11 @@ export interface MergedConferences {
 export interface MergedJournals {
     leftJournal: Journal;
     rightJournal: Journal;
+}
+
+export interface MergedBookSeries {
+    leftBookSeries: BookSeries;
+    rightBookSeries: BookSeries;
 }
 
 export interface MergedProceedings extends MergedDocuments {

@@ -91,7 +91,6 @@ import BookSeriesService from '@/services/BookSeriesService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
-import ProceedingsService from '@/services/ProceedingsService';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
@@ -168,7 +167,7 @@ export default defineComponent({
                 return;
             }
 
-            ProceedingsService.findProceedingsForBookSeries(bookSeries.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
+            BookSeriesService.findPublicationsForBookSeries(bookSeries.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements
             });

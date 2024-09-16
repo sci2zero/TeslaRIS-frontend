@@ -5,8 +5,14 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2"
+        @click="startPublicationComparison">
+        {{ $t("comparePublicationsLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedBookSeries"
@@ -71,6 +77,7 @@ import type {BookSeriesIndex} from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -87,9 +94,11 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedBookSeries = ref([]);
+        const selectedBookSeries = ref<BookSeriesIndex[]>([]);
 
         const i18n = useI18n();
+
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -158,15 +167,30 @@ export default defineComponent({
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
+
+        const startPublicationComparison = () => {
+            router.push({name: "bookSeriesPublicationsComparator", params: {
+                leftId: selectedBookSeries.value[0].databaseId, rightId: selectedBookSeries.value[1].databaseId
+            }});
+        };
+
+        const startMetadataComparison = () => {
+            router.push({name: "bookSeriesMetadataComparator", params: {
+                leftId: selectedBookSeries.value[0].databaseId, rightId: selectedBookSeries.value[1].databaseId
+            }});
+        };
 
         return {selectedBookSeries, headers, notifications, 
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            startPublicationComparison,
+            startMetadataComparison
+        };
     }
 });
 </script>

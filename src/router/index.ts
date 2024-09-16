@@ -69,6 +69,8 @@ import JournalPublicationMetadataComparatorView from "@/views/comparators/docume
 import MonographPublicationsComparatorView from "@/views/comparators/documents/MonographPublicationsComparatorView.vue";
 import MonographMetadataComparatorView from "@/views/comparators/documents/MonographMetadataComparatorView.vue";
 import MonographPublicationMetadataComparatorView from "@/views/comparators/documents/MonographPublicationMetadataComparatorView.vue";
+import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/BookSeriesMetadataComparatorView.vue";
+import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -229,7 +231,25 @@ const router = createRouter({
                                 authenticated: true,
                                 authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
-                        }
+                        },
+                        {
+                            path: 'publications-comparator/:leftId/:rightId',
+                            name: "bookSeriesPublicationsComparator",
+                            component: BookSeriesPublicationsComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "bookSeriesMetadataComparator",
+                            component: BookSeriesMetadataComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                 },
                 {

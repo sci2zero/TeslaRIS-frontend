@@ -4,6 +4,7 @@ import axios from "axios";
 import type { Page } from "@/models/Common";
 import type { BookSeries, BookSeriesIndex } from "@/models/BookSeriesModel";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
+import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 
 export class BookSeriesService extends BaseService {
 
@@ -31,6 +32,10 @@ export class BookSeriesService extends BaseService {
 
   async canEdit(bookSeriesId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `book-series/${bookSeriesId}/can-edit`);
+  }
+
+  async findPublicationsForBookSeries(bookSeriesId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `book-series/publications/${bookSeriesId}?${pageable}`);
   }
 }
 
