@@ -71,6 +71,7 @@ import MonographMetadataComparatorView from "@/views/comparators/documents/Monog
 import MonographPublicationMetadataComparatorView from "@/views/comparators/documents/MonographPublicationMetadataComparatorView.vue";
 import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/BookSeriesMetadataComparatorView.vue";
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
+import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -463,6 +464,15 @@ const router = createRouter({
                             path: 'employments-comparator/:leftId/:rightId',
                             name: "organisationUnitEmploymentsComparator",
                             component: OrganisationUnitEmployeeComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "organisationUnitMetadataComparator",
+                            component: OrganisationUnitMetadataComparatorView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

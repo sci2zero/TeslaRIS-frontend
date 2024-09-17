@@ -9,6 +9,11 @@
         @click="startEmploymentComparison">
         {{ $t("compareEmployeesLabel") }}
     </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
+    </v-btn>
     <v-data-table-server
         v-model="selectedOUs"
         :sort-by="tableOptions.sortBy"
@@ -195,10 +200,17 @@ export default defineComponent({
             }});
         };
 
+        const startMetadataComparison = () => {
+            router.push({name: "organisationUnitMetadataComparator", params: {
+                leftId: selectedOUs.value[0].databaseId, rightId: selectedOUs.value[1].databaseId
+            }});
+        };
+
         return {selectedOUs, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startEmploymentComparison};
+            startEmploymentComparison,
+            startMetadataComparison};
     }
 });
 </script>

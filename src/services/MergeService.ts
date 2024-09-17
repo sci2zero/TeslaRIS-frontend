@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedSoftware, MergedTheses } from "@/models/MergeModel";
+import type { MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedSoftware, MergedTheses } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -80,6 +80,10 @@ export class MergeService extends BaseService {
 
     async saveMergedPersonsMetadata(leftPersonId: number, rightPersonId: number, body: MergedPersons): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/person/metadata/${leftPersonId}/${rightPersonId}`, body);
+    }
+
+    async saveMergedOrganisationUnitsMetadata(leftOUId: number, rightOUId: number, body: MergedOrganisationUnits): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/organisation-unit/metadata/${leftOUId}/${rightOUId}`, body);
     }
 
     async saveMergedConferencesMetadata(leftConferenceId: number, rightConferenceId: number, body: MergedConferences): Promise<AxiosResponse<void>> {

@@ -1,6 +1,7 @@
 import type { BookSeries } from "./BookSeriesModel";
 import type { Conference } from "./EventModel";
 import type { Journal } from "./JournalModel";
+import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
 import type { Dataset, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "./PublicationModel";
@@ -20,6 +21,11 @@ export interface MergedDocuments {
 export interface MergedPersons {
     leftPerson: PersonalInfo;
     rightPerson: PersonalInfo;
+}
+
+export interface MergedOrganisationUnits {
+    leftOrganisationUnit: OrganisationUnitRequest;
+    rightOrganisationUnit: OrganisationUnitRequest;
 }
 
 export interface MergedConferences {
