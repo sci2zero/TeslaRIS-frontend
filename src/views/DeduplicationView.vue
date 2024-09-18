@@ -102,9 +102,9 @@ export default defineComponent({
     name: "DeduplicationView",
     components: { DocumentDeduplicationTable },
     setup() {
-        const currentTab = ref("documents");
-
         const route = useRoute();
+        const currentTab = ref(route.query.tab || "documents");
+
         const router = useRouter();
 
         const documentSuggestions = ref<DeduplicationSuggestion[]>([]);
@@ -137,10 +137,6 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = `TeslaRIS - ${i18n.t("deduplicationPageLabel")}`;
-
-            if (route.query.tab) {
-                currentTab.value = route.query.tab as string;
-            }
 
             fetchDocumentSuggestions();
             fetchJournalSuggestions();
@@ -192,7 +188,26 @@ export default defineComponent({
             DeduplicationService.fetchDeduplicationSuggestions(organisationUnitSuggestionsPage.value, globalPageSize.value, EntityType.ORGANISATION_UNIT).then(response => {
                 organisationUnitSuggestions.value = response.data.content;
                 totalOrganisationUnitSuggestions.value = response.data.totalElements;
+                if(totalOrganisationUnitSuggestions.value === 0) {
+                    navigateToPopulatedTab();
+                }
             });
+        };
+
+        const navigateToPopulatedTab = () => {
+            if(totalDocumentSuggestions.value > 0) {
+                currentTab.value = "documents";
+            } else if(totalJournalSuggestions.value > 0) {
+                currentTab.value = "journals";
+            }else if(totalBookSeriesSuggestions.value > 0) {
+                currentTab.value = "bookSeries";
+            }else if(totalEventSuggestions.value > 0) {
+                currentTab.value = "events";
+            }else if(totalPersonSuggestions.value > 0) {
+                currentTab.value = "persons";
+            }else if(totalOrganisationUnitSuggestions.value > 0) {
+                currentTab.value = "organisationUnits";
+            }
         };
 
         const switchDeduplicationSuggestionsPage = (nextPage: number, pageSize: number, type: EntityType) => {

@@ -235,9 +235,9 @@ export default defineComponent({
             leftMonographPublication.value!.eventId = updatedInfo.eventId;
             leftMonographPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             leftMonographPublication.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -258,9 +258,9 @@ export default defineComponent({
             rightMonographPublication.value!.eventId = updatedInfo.eventId;
             rightMonographPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             rightMonographPublication.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

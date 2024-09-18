@@ -255,7 +255,7 @@ export default defineComponent({
         };
 
         const fetchEmployees = () => {
-            PersonService.findEmployeesForOU(parseInt(currentRoute.params.id as string)).then((response) => {
+            PersonService.findEmployeesForOU(parseInt(currentRoute.params.id as string), `page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`).then((response) => {
                 employees.value = response.data.content;
                 totalEmployees.value = response.data.totalElements;
             });

@@ -225,9 +225,9 @@ export default defineComponent({
             leftSoftware.value!.eventId = updatedInfo.eventId;
             leftSoftware.value!.publisherId = updatedInfo.publisherId;
             leftSoftware.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -244,9 +244,9 @@ export default defineComponent({
             rightSoftware.value!.eventId = updatedInfo.eventId;
             rightSoftware.value!.publisherId = updatedInfo.publisherId;
             rightSoftware.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
-            
+                        
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

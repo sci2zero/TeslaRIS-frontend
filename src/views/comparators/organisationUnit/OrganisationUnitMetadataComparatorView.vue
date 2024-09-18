@@ -177,6 +177,7 @@ export default defineComponent({
             organisationUnit1.nameAbbreviation = organisationUnit2.nameAbbreviation;
             organisationUnit2.nameAbbreviation = "";
             organisationUnit1.scopusAfid = organisationUnit2.scopusAfid;
+            organisationUnit2.scopusAfid = "";
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
             organisationUnit1.contact!.phoneNumber = organisationUnit2.contact?.phoneNumber as string;
@@ -193,19 +194,20 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
             updateLeftRef.value?.updateOU();
             updateRightRef.value?.updateOU();
+            updateLeftKeywordsRef.value?.updateKeywords();
+            updateRightKeywordsRef.value?.updateKeywords();
 
             if (fromLeftToRight) {
                 [rightOrganisationUnit.value, leftOrganisationUnit.value] = mergeOrganisationUnitMetadata(rightOrganisationUnit.value as OrganisationUnitResponse, leftOrganisationUnit.value as OrganisationUnitResponse);
+                rightRelations.value = leftRelations.value;
+                leftRelations.value = [];
             } else {
                 [leftOrganisationUnit.value, rightOrganisationUnit.value] = mergeOrganisationUnitMetadata(leftOrganisationUnit.value as OrganisationUnitResponse, rightOrganisationUnit.value as OrganisationUnitResponse);
+                leftRelations.value = rightRelations.value;
+                rightRelations.value = [];
             }
-
-            fetchLeftDetails();
-            fetchRightDetails();
 
             updateLeftRef.value?.refreshForm();
             updateRightRef.value?.refreshForm();
@@ -226,10 +228,9 @@ export default defineComponent({
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
 
             leftUpdateRequest.value = updatedData;
-
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -243,10 +244,9 @@ export default defineComponent({
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
 
             rightUpdateRequest.value = updatedData;
-
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -282,6 +282,14 @@ export default defineComponent({
                 leftUpdateComplete.value = false;
                 rightUpdateComplete.value = false;
                 update.value = false;
+                
+                leftOrganisationUnit.value?.researchAreas.forEach(researchArea => {
+                    leftUpdateRequest.value?.researchAreasId.push(researchArea.id as number);
+                });
+
+                rightOrganisationUnit.value?.researchAreas.forEach(researchArea => {
+                    rightUpdateRequest.value?.researchAreasId.push(researchArea.id as number);
+                });
                 
                 MergeService.saveMergedOrganisationUnitsMetadata(
                     leftOrganisationUnit.value?.id as number, rightOrganisationUnit.value?.id as number,
@@ -337,7 +345,7 @@ export default defineComponent({
         };
 
         const fetchAndSetRelations = async (left: boolean) => {
-            const sourceOUId = parseInt(currentRoute.params.id as string);
+            const sourceOUId = parseInt(left ? currentRoute.params.leftId as string : currentRoute.params.rightId as string);
             const response = await OrganisationUnitService.getAllRelationsForSourceOU(sourceOUId);
             if (left) {
                 leftRelations.value = response.data;

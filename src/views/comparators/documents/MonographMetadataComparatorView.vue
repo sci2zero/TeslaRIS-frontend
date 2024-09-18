@@ -248,9 +248,9 @@ export default defineComponent({
             leftMonograph.value!.number = updatedInfo.number;
             leftMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             leftMonograph.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -273,9 +273,9 @@ export default defineComponent({
             rightMonograph.value!.number = updatedInfo.number;
             rightMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             rightMonograph.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

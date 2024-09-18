@@ -227,9 +227,9 @@ export default defineComponent({
             leftConference.value!.fee = basicInfo.fee;
             leftConference.value!.number = basicInfo.number;
             leftConference.value!.confId = basicInfo.confId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -245,9 +245,9 @@ export default defineComponent({
             rightConference.value!.fee = basicInfo.fee;
             rightConference.value!.number = basicInfo.number;
             rightConference.value!.confId = basicInfo.confId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

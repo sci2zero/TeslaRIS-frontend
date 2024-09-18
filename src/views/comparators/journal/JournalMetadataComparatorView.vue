@@ -198,9 +198,9 @@ export default defineComponent({
             leftJournal.value!.eissn = updatedJournal.eissn;
             leftJournal.value!.printISSN = updatedJournal.printISSN;
             leftJournal.value!.languageTagIds = updatedJournal.languageTagIds;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -211,9 +211,9 @@ export default defineComponent({
             rightJournal.value!.eissn = updatedJournal.eissn;
             rightJournal.value!.printISSN = updatedJournal.printISSN;
             rightJournal.value!.languageTagIds = updatedJournal.languageTagIds;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

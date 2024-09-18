@@ -66,7 +66,8 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const autocompleteSearchRef = ref<any>([]);
-        const data = ref<any[]>([{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}]);
+        const defaultFillerData = [{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}];
+        const data = ref<any[]>(defaultFillerData);
 
         const languageList = ref<LanguageTagResponse[]>([]);
         const toDelete = ref<number[]>([]);
@@ -91,6 +92,8 @@ export default defineComponent({
                         targetOrganisationUnit: {title: returnCurrentLocaleContent(relation.targetOrganisationUnitName), value: relation.targetOrganisationUnitId}
                     });
                 });
+            } else if (props.relations && props.relations.length === 0) {
+                data.value = defaultFillerData;
             }
         };
 

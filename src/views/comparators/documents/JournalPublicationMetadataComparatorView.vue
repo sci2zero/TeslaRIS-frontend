@@ -242,9 +242,9 @@ export default defineComponent({
             leftJournalPublication.value!.eventId = updatedInfo.eventId;
             leftJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             leftJournalPublication.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -267,9 +267,9 @@ export default defineComponent({
             rightJournalPublication.value!.eventId = updatedInfo.eventId;
             rightJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             rightJournalPublication.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

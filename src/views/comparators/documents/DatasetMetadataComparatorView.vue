@@ -225,9 +225,9 @@ export default defineComponent({
             leftDataset.value!.eventId = updatedInfo.eventId;
             leftDataset.value!.publisherId = updatedInfo.publisherId;
             leftDataset.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -244,9 +244,9 @@ export default defineComponent({
             rightDataset.value!.eventId = updatedInfo.eventId;
             rightDataset.value!.publisherId = updatedInfo.publisherId;
             rightDataset.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

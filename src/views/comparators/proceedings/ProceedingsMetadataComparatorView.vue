@@ -247,9 +247,9 @@ export default defineComponent({
             leftProceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             leftProceedings.value!.publisherId = updatedInfo.publisherId;
             leftProceedings.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -272,9 +272,9 @@ export default defineComponent({
             rightProceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             rightProceedings.value!.publisherId = updatedInfo.publisherId;
             rightProceedings.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

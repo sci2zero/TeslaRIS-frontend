@@ -240,9 +240,9 @@ export default defineComponent({
             leftThesis.value!.eventId = updatedInfo.eventId;
             leftThesis.value!.publisherId = updatedInfo.publisherId;
             leftThesis.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -263,9 +263,9 @@ export default defineComponent({
             rightThesis.value!.eventId = updatedInfo.eventId;
             rightThesis.value!.publisherId = updatedInfo.publisherId;
             rightThesis.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

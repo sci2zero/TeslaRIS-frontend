@@ -37,10 +37,10 @@
                         </localized-link>
                     </td>
                     <td>
-                        <v-btn density="compact" @click="compareMetadata(row.item)">
+                        <v-btn density="compact" class="mt-1 mb-1 ml-2" @click="compareMetadata(row.item)">
                             {{ $t("compareMetadataLabel") }}
                         </v-btn>
-                        <v-btn v-if="canAggregateEntities(row.item)" density="compact" class="ml-2" @click="comparePublications(row.item)">
+                        <v-btn v-if="canAggregateEntities(row.item)" density="compact" class="mb-1 ml-2" @click="comparePublications(row.item)">
                             {{ getAggregationComparisonLabel(row.item.entityType) }}
                         </v-btn>
                     </td>
@@ -90,7 +90,7 @@ export default defineComponent({
         }
     },
     emits: ["switchPage"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const selectedSuggestions = ref([]);
 
         const router = useRouter();
@@ -115,7 +115,7 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10});
 
         const refreshTable = (event: any) => {
-            emit("switchPage", event.page - 1, event.itemsPerPage);
+            emit("switchPage", event.page - 1, event.itemsPerPage, props.suggestions[0].entityType);
         };
 
         const flagAsNotDuplicates = () => {

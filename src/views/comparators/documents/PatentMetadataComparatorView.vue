@@ -225,9 +225,9 @@ export default defineComponent({
             leftPatent.value!.eventId = updatedInfo.eventId;
             leftPatent.value!.publisherId = updatedInfo.publisherId;
             leftPatent.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -244,9 +244,9 @@ export default defineComponent({
             rightPatent.value!.eventId = updatedInfo.eventId;
             rightPatent.value!.publisherId = updatedInfo.publisherId;
             rightPatent.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };

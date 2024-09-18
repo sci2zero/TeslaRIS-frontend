@@ -327,18 +327,18 @@ export default defineComponent({
 
         const updateLeft = (updatedPersonalInfo: PersonalInfo) => {
             leftPerson.value!.personalInfo = updatedPersonalInfo;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
 
         const updateRight = (updatedPersonalInfo: PersonalInfo) => {
             rightPerson.value!.personalInfo = updatedPersonalInfo;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };
