@@ -9,7 +9,7 @@
 
                 <organisation-unit-update-form ref="updateLeftRef" :preset-o-u="leftOrganisationUnit" @update="updateLeft"></organisation-unit-update-form>
 
-                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="(leftOrganisationUnit?.keyword as MultilingualContent[])" @update="updateLeftKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftOrganisationUnit?.keyword as MultilingualContent[])" @update="updateLeftKeywords"></keyword-update-form>
 
                 <br />
 
@@ -290,7 +290,7 @@ export default defineComponent({
                 rightOrganisationUnit.value?.researchAreas.forEach(researchArea => {
                     rightUpdateRequest.value?.researchAreasId.push(researchArea.id as number);
                 });
-                
+
                 MergeService.saveMergedOrganisationUnitsMetadata(
                     leftOrganisationUnit.value?.id as number, rightOrganisationUnit.value?.id as number,
                     {
