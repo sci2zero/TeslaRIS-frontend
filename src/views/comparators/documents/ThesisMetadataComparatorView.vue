@@ -326,7 +326,7 @@ export default defineComponent({
 
         const deleteSide = (side: ComparisonSide) => {
             DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftThesis.value?.id as number : rightThesis.value?.id as number).then(() => {
-                router.push({ name: "deduplication" });
+                router.push({ name: "deduplication", query: { tab: "documents" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftThesis.value?.title : rightThesis.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

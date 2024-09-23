@@ -304,7 +304,7 @@ export default defineComponent({
 
         const deleteSide = (side: ComparisonSide) => {
             EventService.deleteConference(side === ComparisonSide.LEFT ? leftConference.value?.id as number : rightConference.value?.id as number).then(() => {
-                router.push({ name: "deduplication" });
+                router.push({ name: "deduplication", query: { tab: "events" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftConference.value?.name : rightConference.value?.name;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

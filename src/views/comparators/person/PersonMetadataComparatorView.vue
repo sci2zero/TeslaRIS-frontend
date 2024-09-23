@@ -420,7 +420,7 @@ export default defineComponent({
 
         const deleteSide = (side: ComparisonSide) => {
             PersonService.deleteResearcher(side === ComparisonSide.LEFT ? leftPerson.value?.id as number : rightPerson.value?.id as number).then(() => {
-                router.push({ name: "deduplication" });
+                router.push({ name: "deduplication", query: { tab: "persons" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftPerson.value?.personName.firstname : rightPerson.value?.personName.firstname;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: name });

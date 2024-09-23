@@ -311,7 +311,7 @@ export default defineComponent({
 
         const deleteSide = (side: ComparisonSide) => {
             OrganisationUnitService.deleteOrganisationUnit(side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.id as number : rightOrganisationUnit.value?.id as number).then(() => {
-                router.push({ name: "deduplication" });
+                router.push({ name: "deduplication", query: { tab: "organisationUnits" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.name : rightOrganisationUnit.value?.name;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: name });

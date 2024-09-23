@@ -250,7 +250,7 @@ export default defineComponent({
 
         const deleteSide = (side: ComparisonSide) => {
             BookSeriesService.deleteBookSeries(side === ComparisonSide.LEFT ? leftBookSeries.value?.id as number : rightBookSeries.value?.id as number).then(() => {
-                router.push({ name: "deduplication" });
+                router.push({ name: "deduplication", query: { tab: "bookSeries" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftBookSeries.value?.title : rightBookSeries.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

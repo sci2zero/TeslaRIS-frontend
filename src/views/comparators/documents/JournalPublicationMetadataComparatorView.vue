@@ -330,7 +330,7 @@ export default defineComponent({
 
         const deleteSide = (side: ComparisonSide) => {
             JournalService.deleteJournal(side === ComparisonSide.LEFT ? leftJournalPublication.value?.id as number : rightJournalPublication.value?.id as number).then(() => {
-                router.push({ name: "deduplication" });
+                router.push({ name: "deduplication", query: { tab: "documents" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftJournalPublication.value?.title : rightJournalPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
