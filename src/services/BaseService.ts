@@ -52,17 +52,14 @@ export class BaseService {
 
     const appendFormData = (data: any, parentKey: string | null = null) => {
         if (data instanceof Object && !Array.isArray(data) && !(data instanceof File)) {
-            // If it's a nested object, recursively append
             for (const key in data) {
                 appendFormData(data[key], parentKey ? `${parentKey}.${key}` : key);
             }
         } else if (Array.isArray(data)) {
-            // Handle arrays (with indexes)
             data.forEach((item, index) => {
                 appendFormData(item, `${parentKey}[${index}]`);
             });
         } else {
-            // Handle flat key-value pairs
             formData.append(parentKey!, data);
         }
     };
