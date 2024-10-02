@@ -103,3 +103,19 @@ label {
 .inline-action {
     margin-left: 10px;
 }
+
+.notificationContainer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    grid-gap: 0.5em;
+    z-index: 99;
+}
+
+/* Comparators */
+
+.middle-arrow {
+    margin-left: 25px;
+    margin-top: 120px;
+}

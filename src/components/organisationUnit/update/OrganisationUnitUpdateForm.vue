@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
@@ -79,9 +79,16 @@ export default defineComponent({
             });
         });
 
+        watch(() => props.presetOU, () => {
+            if (props.presetOU) {
+                refreshForm();
+            }
+        });
+
+        const nameRef = ref<typeof MultilingualTextInput>();
         const mapRef = ref<typeof OpenLayersMap>();
 
-        const name = ref([]);
+        const name = ref<any>([]);
         const nameAbbreviation = ref(props.presetOU?.nameAbbreviation);
         const email = ref(props.presetOU?.contact?.contactEmail);
         const phoneNumber = ref(props.presetOU?.contact?.phoneNumber);
@@ -103,13 +110,25 @@ export default defineComponent({
             emit("update", updatedOU);
         };
 
+        const refreshForm = () => {
+            nameRef.value?.clearInput();
+            name.value = props.presetOU?.name as MultilingualContent[];
+
+            nameAbbreviation.value = props.presetOU?.nameAbbreviation;
+            email.value = props.presetOU?.contact?.contactEmail;
+            phoneNumber.value = props.presetOU?.contact?.phoneNumber;
+            scopusAfid.value = props.presetOU?.scopusAfid;
+
+            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageList.value));
+        };
+
         return {
             isFormValid, name, mapRef,
-            nameAbbreviation,
+            nameAbbreviation, refreshForm,
             email, phoneNumber, scopusAfid,
             requiredFieldRules, updateOU,
             toMultilingualTextInput, languageList,
-            scopusAfidValidationRules
+            scopusAfidValidationRules, nameRef
         };
     }
 });

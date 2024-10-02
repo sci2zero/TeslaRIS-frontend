@@ -27,6 +27,8 @@
                         <person-document-contribution-list :contribution-list="leftProceedings?.contributions ? leftProceedings.contributions : []" :document-id="leftProceedings?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="leftProceedings" :proofs="leftProceedings?.proofs" :file-items="leftProceedings?.fileItems"></attachment-section>
             </v-col>
 
             <v-col cols="1">
@@ -65,14 +67,12 @@
                         <person-document-contribution-list :contribution-list="rightProceedings?.contributions ? rightProceedings.contributions : []" :document-id="rightProceedings?.id"></person-document-contribution-list>
                     </v-card-text>
                 </v-card>
+
+                <attachment-section :document="rightProceedings" :proofs="rightProceedings?.proofs" :file-items="rightProceedings?.fileItems"></attachment-section>
             </v-col>
         </v-row>
 
-        <v-row class="d-flex flex-row justify-center">
-            <v-btn color="blue darken-1" @click="updateAll">
-                {{ $t("updateLabel") }}
-            </v-btn>
-        </v-row>
+        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -94,7 +94,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import ProceedingsService from '@/services/ProceedingsService';
 import type { Proceedings } from '@/models/ProceedingsModel';
@@ -105,16 +105,22 @@ import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
+import MergeService from '@/services/MergeService';
+import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import { ComparisonSide } from '@/models/MergeModel';
+import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "ProceedingsMetadataComparator",
-    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm },
+    components: { PersonDocumentContributionList, ProceedingsUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
+        const router = useRouter();
 
         const leftProceedings = ref<Proceedings>();
         const rightProceedings = ref<Proceedings>();
@@ -154,6 +160,8 @@ export default defineComponent({
 
             mergeMultilingualContentField(proceedings1.description, proceedings2.description);
             proceedings2.description = [];
+
+            mergeDocumentAttachments(proceedings1, proceedings2);
 
             proceedings1.eISBN = proceedings2.eISBN;
             proceedings2.eISBN = "";
@@ -239,9 +247,9 @@ export default defineComponent({
             leftProceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             leftProceedings.value!.publisherId = updatedInfo.publisherId;
             leftProceedings.value!.scopusId = updatedInfo.scopusId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -264,9 +272,9 @@ export default defineComponent({
             rightProceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             rightProceedings.value!.publisherId = updatedInfo.publisherId;
             rightProceedings.value!.scopusId = updatedInfo.scopusId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -282,32 +290,29 @@ export default defineComponent({
         };
 
         const finishUpdates = () => {
-            console.log(leftUpdateComplete.value, rightUpdateComplete.value)
             if (leftUpdateComplete.value && rightUpdateComplete.value) {
                 leftUpdateComplete.value = false;
                 rightUpdateComplete.value = false;
                 update.value = false;
 
-                const updateProceedingss = (firstId: number, firstProceedings: Proceedings, secondId: number, secondProceedings: Proceedings) => {
-                    return ProceedingsService.updateProceedings(firstId, firstProceedings)
-                        .then(() => ProceedingsService.updateProceedings(secondId, secondProceedings))
-                        .then(() => {
-                            snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                            snackbar.value = true;
-                        })
-                        .catch((error) => {
-                            throw error; // Propagate error to handle alternative update order
-                        });
-                };
-
-                updateProceedingss(leftProceedings.value?.id as number, leftProceedings.value as Proceedings, rightProceedings.value?.id as number, rightProceedings.value as Proceedings)
-                    .catch(() => {
-                        updateProceedingss(rightProceedings.value?.id as number, rightProceedings.value as Proceedings, leftProceedings.value?.id as number, leftProceedings.value as Proceedings)
-                            .catch((secondError) => {
-                                snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
-                                snackbar.value = true;
-                            });
-                    });
+                MergeService.saveMergedProceedingsMetadata(
+                leftProceedings.value?.id as number, rightProceedings.value?.id as number,
+                {
+                    leftProceedings: leftProceedings.value as Proceedings, 
+                    rightProceedings: rightProceedings.value as Proceedings,
+                    leftProofs: leftProceedings.value?.proofs?.map(file => file.id) as number[],
+                    leftFileItems: leftProceedings.value?.fileItems?.map(file => file.id) as number[],
+                    rightProofs: rightProceedings.value?.proofs?.map(file => file.id) as number[],
+                    rightFileItems: rightProceedings.value?.fileItems?.map(file => file.id) as number[]
+                })
+                .then(() => {
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                })
+                .catch((error) => {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
+                });
             }
         };
 
@@ -327,6 +332,16 @@ export default defineComponent({
             rightProceedings.value!.keywords = keywords;
         };
 
+        const deleteSide = (side: ComparisonSide) => {
+            ProceedingsService.deleteProceedings(side === ComparisonSide.LEFT ? leftProceedings.value?.id as number : rightProceedings.value?.id as number).then(() => {
+                router.push({ name: "deduplication", query: { tab: "documents" } });
+            }).catch(() => {
+                const name = side === ComparisonSide.LEFT ? leftProceedings.value?.title : rightProceedings.value?.title;
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+                snackbar.value = true;
+            });
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
@@ -336,17 +351,9 @@ export default defineComponent({
             updateRightDescriptionRef, updateLeftDescriptionRef,
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
-            updateLeftKeywords, updateRightKeywords
+            updateLeftKeywords, updateRightKeywords,
+            deleteSide
         };
 }})
 
 </script>
-
-<style scoped>
-
-    .middle-arrow {
-        margin-left: 25px;
-        margin-top: 120px;
-    }
-
-</style>

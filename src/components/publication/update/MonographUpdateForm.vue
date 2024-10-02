@@ -37,7 +37,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <uri-input v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris"></uri-input>
             </v-col>
         </v-row>
         <v-row>
@@ -166,6 +166,10 @@ export default defineComponent({
                 populateSelectionData();
             });
 
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if (props.presetMonograph) {
                 if (props.presetMonograph.researchAreaId) {
                     ResearchAreaService.readResearchAreaHierarchy(props.presetMonograph.researchAreaId).then((response) => {
@@ -189,6 +193,12 @@ export default defineComponent({
                     });
                 }              
             }
+        };
+
+        watch(() => props.presetMonograph, () => {
+            if (props.presetMonograph) {
+                refreshForm();
+            }
         });
 
         const populateSelectionData = () => {
@@ -197,6 +207,10 @@ export default defineComponent({
                 researchAreasSelectable.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.id as number});
             });
         };
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -210,8 +224,8 @@ export default defineComponent({
         const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const contributions = ref([]);
         const uris = ref(props.presetMonograph?.uris);
         const eIsbn = ref(props.presetMonograph?.eisbn);
@@ -272,6 +286,32 @@ export default defineComponent({
             emit("update", updatedMonograph);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetMonograph?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetMonograph?.subTitle as MultilingualContent[];
+
+            selectedLanguages.value = props.presetMonograph?.languageTagIds as number[];
+            uris.value = props.presetMonograph?.uris as string[];
+            eIsbn.value = props.presetMonograph?.eisbn;
+            printIsbn.value = props.presetMonograph?.printISBN;
+            numberOfPages.value = props.presetMonograph?.numberOfPages;
+            publicationYear.value = props.presetMonograph?.documentDate;
+            doi.value = props.presetMonograph?.doi;
+            scopus.value = props.presetMonograph?.scopusId;
+            volume.value = props.presetMonograph?.volume;
+            number.value = props.presetMonograph?.number;
+            selectedMonographType.value = {title: props.presetMonograph?.monographType ? getMonographTypeTitleFromValueAutoLocale(props.presetMonograph?.monographType as MonographType) as string : "", value: props.presetMonograph?.monographType ? props.presetMonograph?.monographType as MonographType : null};
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            fetchDetails();
+        };
+
         return {
             isFormValid, title, subtitle,
             publicationYear, doi, scopus,
@@ -286,7 +326,8 @@ export default defineComponent({
             selectedLanguages, languageList,
             requiredSelectionRules, uris,
             selectedResearchArea, doiValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules, titleRef,
+            subtitleRef, refreshForm, urisRef
         };
     }
 });

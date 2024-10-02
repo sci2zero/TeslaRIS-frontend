@@ -25,7 +25,7 @@
         </v-row>
         <v-container>
             <v-row class="stats-cards">
-                <!-- Kartice -->
+                <!-- Cards -->
                 <v-col v-for="(item, index) in cardsData" :key="index" cols="4" class="my-10">
                     <v-card :to="item.path !== undefined ? '/' + $i18n.locale + '/' + item.path : undefined">
                         <v-card-title class="text-center">

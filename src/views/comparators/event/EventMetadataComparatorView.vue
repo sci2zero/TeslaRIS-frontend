@@ -68,11 +68,7 @@
             </v-col>
         </v-row>
 
-        <v-row class="d-flex flex-row justify-center">
-            <v-btn color="blue darken-1" @click="updateAll">
-                {{ $t("updateLabel") }}
-            </v-btn>
-        </v-row>
+        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -96,7 +92,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import type { Conference, PersonEventContribution } from '@/models/EventModel';
@@ -107,16 +103,20 @@ import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
 import PersistentStopDialog from '@/components/core/PersistentStopDialog.vue';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
+import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import { ComparisonSide } from '@/models/MergeModel';
+import MergeService from '@/services/MergeService';
 
 
 export default defineComponent({
     name: "ConferenceMetadataComparator",
-    components: { EventUpdateForm, PersonEventContributionList, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm },
+    components: { EventUpdateForm, PersonEventContributionList, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
+        const router = useRouter();
 
         const leftConference = ref<Conference>();
         const rightConference = ref<Conference>();
@@ -227,9 +227,9 @@ export default defineComponent({
             leftConference.value!.fee = basicInfo.fee;
             leftConference.value!.number = basicInfo.number;
             leftConference.value!.confId = basicInfo.confId;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -245,9 +245,9 @@ export default defineComponent({
             rightConference.value!.fee = basicInfo.fee;
             rightConference.value!.number = basicInfo.number;
             rightConference.value!.confId = basicInfo.confId;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -268,25 +268,20 @@ export default defineComponent({
                 rightUpdateComplete.value = false;
                 update.value = false;
 
-                const updateConferences = (firstId: number, firstConference: Conference, secondId: number, secondConference: Conference) => {
-                    return EventService.updateConference(firstId, firstConference)
-                        .then(() => EventService.updateConference(secondId, secondConference))
-                        .then(() => {
-                            snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                            snackbar.value = true;
-                        })
-                        .catch((error) => {
-                            throw error;
-                        });
-                };
-
-                updateConferences(leftConference.value?.id as number, leftConference.value as Conference, rightConference.value?.id as number, rightConference.value as Conference)
-                .catch(() => {
-                    updateConferences(rightConference.value?.id as number, rightConference.value as Conference, leftConference.value?.id as number, leftConference.value as Conference)
-                        .catch((secondError) => {
-                            snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
-                            snackbar.value = true;
-                        });
+                MergeService.saveMergedConferencesMetadata(
+                    leftConference.value?.id as number, rightConference.value?.id as number,
+                    {
+                        leftConference: leftConference.value as Conference, 
+                        rightConference: rightConference.value as Conference
+                    }
+                )
+                .then(() => {
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                })
+                .catch((error) => {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
                 });
             }
         };
@@ -307,13 +302,23 @@ export default defineComponent({
             rightConference.value!.keywords = keywords;
         };
 
+        const deleteSide = (side: ComparisonSide) => {
+            EventService.deleteConference(side === ComparisonSide.LEFT ? leftConference.value?.id as number : rightConference.value?.id as number).then(() => {
+                router.push({ name: "deduplication", query: { tab: "events" } });
+            }).catch(() => {
+                const name = side === ComparisonSide.LEFT ? leftConference.value?.name : rightConference.value?.name;
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+                snackbar.value = true;
+            });
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
             leftConference, rightConference,
             moveAll, updateAll, updateLeft,
             updateLeftRef, updateRightRef,
-            updateRight, showStopDialog,
+            updateRight, showStopDialog, deleteSide,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
             updateLeftKeywordsRef, updateRightKeywordsRef,
@@ -322,12 +327,3 @@ export default defineComponent({
 }})
 
 </script>
-
-<style scoped>
-
-    .middle-arrow {
-        margin-left: 25px;
-        margin-top: 120px;
-    }
-
-</style>

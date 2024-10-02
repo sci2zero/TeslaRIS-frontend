@@ -20,7 +20,7 @@
         <v-row>
             <v-col cols="10">
                 <v-select
-                    v-model="selectedpublicationType"
+                    v-model="selectedThesisType"
                     :label="$t('thesisTypeLabel') + '*'"
                     :items="publicationTypes"
                     :rules="requiredSelectionRules"
@@ -113,6 +113,7 @@ import EventService from '@/services/EventService';
 import { computed } from 'vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -135,6 +136,23 @@ export default defineComponent({
         const selectedLanguages = ref<number[]>(props.presetThesis?.languageTagIds as number[]);
 
         onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+
+                response.data.forEach((languageTag: LanguageTagResponse) => {
+                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
+                });
+            });
+
+            ResearchAreaService.listAllResearchAreas().then(response => {
+                allResearchAreas.value = response.data;
+                populateSelectionData();
+            });
+            
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if(props.presetThesis) {
                 OrganisationUnitService.readOU(props.presetThesis.organisationUnitId).then((response) => {
                     selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number}
@@ -158,22 +176,8 @@ export default defineComponent({
                         selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
                     });
                 }
-                
-
-                LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                    languageTags.value = response.data;
-
-                    response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                });
-                });
-
-                ResearchAreaService.listAllResearchAreas().then(response => {
-                    allResearchAreas.value = response.data;
-                    populateSelectionData();
-                });
             }
-        });
+        };
 
         const populateSelectionData = () => {
             researchAreasSelectable.value = [];
@@ -182,17 +186,26 @@ export default defineComponent({
             });
         };
 
+        watch(() => props.presetThesis, () => {
+            if (props.presetThesis) {
+                refreshForm();
+            }
+        });
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
+
         const selectedPublisher = ref<{ title: string, value: number }>({title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number});
         const selectedEvent = ref<{ title: string, value: number }>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>();
-        const selectedThesisType = ref<{ title: string, value: ThesisType }>({title: getTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string, value: props.presetThesis?.thesisType as ThesisType});
 
         const allResearchAreas = ref<ResearchArea[]>([]);
         const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetThesis?.documentDate);
         const doi = ref(props.presetThesis?.doi);
         const scopus = ref(props.presetThesis?.scopusId);
@@ -202,13 +215,13 @@ export default defineComponent({
         const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: ThesisType }>({title: props.presetThesis?.thesisType ? getTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string : "", value: props.presetThesis?.thesisType as ThesisType});
+        const selectedThesisType = ref<{ title: string, value: ThesisType | undefined }>({title: getTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string, value: props.presetThesis?.thesisType as ThesisType});
 
         const updateThesis = () => {
             const updatedThesis: Thesis = {
                 organisationUnitId: selectedOrganisationUnit.value?.value as number,
                 researchAreaId: selectedResearchArea.value.value as number,
-                thesisType: selectedThesisType.value.value,
+                thesisType: selectedThesisType.value.value as ThesisType,
                 title: title.value as MultilingualContent[],
                 numberOfPages: numberOfPages.value as number,
                 description: props.presetThesis?.description as MultilingualContent[],
@@ -229,9 +242,32 @@ export default defineComponent({
             emit("update", updatedThesis);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetThesis?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetThesis?.subTitle as MultilingualContent[];
+
+            selectedLanguages.value = props.presetThesis?.languageTagIds as number[];
+            uris.value = props.presetThesis?.uris as string[];
+            numberOfPages.value = props.presetThesis?.numberOfPages;
+            publicationYear.value = props.presetThesis?.documentDate;
+            doi.value = props.presetThesis?.doi;
+            scopus.value = props.presetThesis?.scopusId;
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            selectedThesisType.value = {title: props.presetThesis?.thesisType ? getTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string : "", value: props.presetThesis?.thesisType ? props.presetThesis?.thesisType as ThesisType : undefined};
+
+            fetchDetails();
+        };
+
         return {
             isFormValid,
-            title, subtitle,
+            title, subtitle, urisRef,
             publicationYear, doi, scopus,
             selectedPublisher, numberOfPages,
             uris, requiredFieldRules, requiredSelectionRules,
@@ -239,8 +275,8 @@ export default defineComponent({
             languageTags, selectedEvent, doiValidationRules,
             scopusIdValidationRules, selectedOrganisationUnit,
             researchAreasSelectable, selectedResearchArea,
-            selectedLanguages, publicationTypes, selectedpublicationType,
-            languageList
+            selectedLanguages, publicationTypes, selectedThesisType,
+            languageList, titleRef, subtitleRef, refreshForm
         };
     }
 });

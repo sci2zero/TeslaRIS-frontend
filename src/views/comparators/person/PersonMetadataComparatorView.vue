@@ -102,11 +102,7 @@
             </v-col>
         </v-row>
 
-        <v-row class="d-flex flex-row justify-center">
-            <v-btn color="blue darken-1" @click="updateAll">
-                {{ $t("updateLabel") }}
-            </v-btn>
-        </v-row>
+        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -128,7 +124,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
@@ -143,16 +139,19 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import type { MultilingualContent } from '@/models/Common';
 import MergeService from '@/services/MergeService';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import { ComparisonSide } from '@/models/MergeModel';
+import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 
 
 export default defineComponent({
     name: "PersonMetadataComparator",
-    components: { PersonUpdateForm, InvolvementList, ExpertiseOrSkillList, PrizeList, DescriptionOrBiographyUpdateForm, KeywordUpdateForm },
+    components: { PersonUpdateForm, InvolvementList, ExpertiseOrSkillList, PrizeList, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
+        const router = useRouter();
 
         const leftPerson = ref<PersonResponse>();
         const leftEmployments = ref<Employment[]>([]);
@@ -328,18 +327,18 @@ export default defineComponent({
 
         const updateLeft = (updatedPersonalInfo: PersonalInfo) => {
             leftPerson.value!.personalInfo = updatedPersonalInfo;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
 
         const updateRight = (updatedPersonalInfo: PersonalInfo) => {
             rightPerson.value!.personalInfo = updatedPersonalInfo;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -377,15 +376,10 @@ export default defineComponent({
                 update.value = false;
                 
                 try {
-                    PersonService.updatePersonalInfo(leftPerson.value?.id as number, leftPerson.value?.personalInfo as PersonalInfo).then(() => {
-                        PersonService.updatePersonalInfo(rightPerson.value?.id as number, rightPerson.value?.personalInfo as PersonalInfo);
-                    }).catch(() => {
-                        PersonService.updatePersonalInfo(rightPerson.value?.id as number, rightPerson.value?.personalInfo as PersonalInfo).then(() => {
-                            PersonService.updatePersonalInfo(leftPerson.value?.id as number, leftPerson.value?.personalInfo as PersonalInfo);
-                        });
-                    });
-
                     await Promise.all([
+                        // Personal information
+                        MergeService.saveMergedPersonsMetadata(leftPerson.value?.id as number, rightPerson.value?.id as number, {leftPerson: leftPerson.value?.personalInfo as PersonalInfo, rightPerson: rightPerson.value?.personalInfo as PersonalInfo}),
+
                         // Left Person
                         PersonService.updateKeywords(leftPerson.value?.id as number, leftPerson.value?.keyword as MultilingualContent[]),
                         PersonService.updateBiography(leftPerson.value?.id as number, leftPerson.value?.biography as MultilingualContent[]),
@@ -424,10 +418,20 @@ export default defineComponent({
             }
         };
 
+        const deleteSide = (side: ComparisonSide) => {
+            PersonService.deleteResearcher(side === ComparisonSide.LEFT ? leftPerson.value?.id as number : rightPerson.value?.id as number).then(() => {
+                router.push({ name: "deduplication", query: { tab: "persons" } });
+            }).catch(() => {
+                const name = side === ComparisonSide.LEFT ? leftPerson.value?.personName.firstname : rightPerson.value?.personName.firstname;
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: name });
+                snackbar.value = true;
+            });
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
-            leftPerson, rightPerson,
+            leftPerson, rightPerson, deleteSide,
             moveAll, updateAll, updateLeft,
             updateLeftRef, updateRightRef, updateRight,
             leftEmployments, leftEducation, leftMemberships,
@@ -440,12 +444,3 @@ export default defineComponent({
 }})
 
 </script>
-
-<style scoped>
-
-    .middle-arrow {
-        margin-left: 25px;
-        margin-top: 120px;
-    }
-
-</style>

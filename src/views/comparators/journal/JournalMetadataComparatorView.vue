@@ -60,11 +60,7 @@
             </v-col>
         </v-row>
 
-        <v-row class="d-flex flex-row justify-center">
-            <v-btn color="blue darken-1" @click="updateAll">
-                {{ $t("updateLabel") }}
-            </v-btn>
-        </v-row>
+        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -86,7 +82,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
@@ -94,16 +90,20 @@ import PersonPublicationSeriesContributionList from '@/components/core/PersonPub
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import { ComparisonSide } from '@/models/MergeModel';
+import MergeService from '@/services/MergeService';
+import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 
 
 export default defineComponent({
     name: "JournalMetadataComparator",
-    components: { PersonPublicationSeriesContributionList, PublicationSeriesUpdateForm },
+    components: { PersonPublicationSeriesContributionList, PublicationSeriesUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
+        const router = useRouter();
 
         const leftJournal = ref<Journal>();
         const rightJournal = ref<Journal>();
@@ -111,7 +111,6 @@ export default defineComponent({
         const updateLeftRef = ref<typeof PublicationSeriesUpdateForm>();
         const updateRightRef = ref<typeof PublicationSeriesUpdateForm>();
         
-
         const i18n = useI18n();
 
         onMounted(() => {
@@ -199,9 +198,9 @@ export default defineComponent({
             leftJournal.value!.eissn = updatedJournal.eissn;
             leftJournal.value!.printISSN = updatedJournal.printISSN;
             leftJournal.value!.languageTagIds = updatedJournal.languageTagIds;
-            leftUpdateComplete.value = true;
             
             if (update.value) {
+                leftUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -212,9 +211,9 @@ export default defineComponent({
             rightJournal.value!.eissn = updatedJournal.eissn;
             rightJournal.value!.printISSN = updatedJournal.printISSN;
             rightJournal.value!.languageTagIds = updatedJournal.languageTagIds;
-            rightUpdateComplete.value = true;
             
             if (update.value) {
+                rightUpdateComplete.value = true;
                 finishUpdates();
             }
         };
@@ -231,27 +230,32 @@ export default defineComponent({
                 rightUpdateComplete.value = false;
                 update.value = false;
 
-                const updateJournals = (firstId: number, firstJournal: Journal, secondId: number, secondJournal: Journal) => {
-                    return JournalService.updateJournal(firstId, firstJournal)
-                        .then(() => JournalService.updateJournal(secondId, secondJournal))
-                        .then(() => {
-                            snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                            snackbar.value = true;
-                        })
-                        .catch((error) => {
-                            throw error; // Propagate error to handle alternative update order
-                        });
-                };
-
-                updateJournals(leftJournal.value?.id as number, leftJournal.value as Journal, rightJournal.value?.id as number, rightJournal.value as Journal)
-                    .catch(() => {
-                        updateJournals(rightJournal.value?.id as number, rightJournal.value as Journal, leftJournal.value?.id as number, leftJournal.value as Journal)
-                            .catch((secondError) => {
-                                snackbarMessage.value = getErrorMessageForErrorKey(secondError.response.data.message);
-                                snackbar.value = true;
-                            });
-                    });
+                MergeService.saveMergedJournalsMetadata(
+                    leftJournal.value?.id as number, rightJournal.value?.id as number,
+                    {
+                        leftJournal: leftJournal.value as Journal, 
+                        rightJournal: rightJournal.value as Journal
+                    }
+                )
+                .then(() => {
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                })
+                .catch((error) => {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
+                });
             }
+        };
+
+        const deleteSide = (side: ComparisonSide) => {
+            JournalService.deleteJournal(side === ComparisonSide.LEFT ? leftJournal.value?.id as number : rightJournal.value?.id as number).then(() => {
+                router.push({ name: "deduplication", query: { tab: "journals" } });
+            }).catch(() => {
+                const name = side === ComparisonSide.LEFT ? leftJournal.value?.title : rightJournal.value?.title;
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+                snackbar.value = true;
+            });
         };
 
         return {
@@ -259,17 +263,9 @@ export default defineComponent({
             snackbar, snackbarMessage,
             leftJournal, rightJournal,
             moveAll, updateAll, updateLeft,
-            updateLeftRef, updateRightRef, updateRight
+            updateLeftRef, updateRightRef,
+            updateRight, deleteSide
         };
 }})
 
 </script>
-
-<style scoped>
-
-    .middle-arrow {
-        margin-left: 25px;
-        margin-top: 120px;
-    }
-
-</style>

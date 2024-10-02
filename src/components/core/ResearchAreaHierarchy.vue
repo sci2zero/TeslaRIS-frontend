@@ -1,8 +1,12 @@
 <template>
     <strong v-if="!researchAreas || researchAreas.length === 0">{{ $t("notYetSetMessage") }}</strong>
-    <ul v-for="researchArea in researchAreas" :key="researchArea.name[0].content" class="tree">
-        <tree-hierarchy-recursive :preset-research-area="reorganiseParent(researchArea)"></tree-hierarchy-recursive>
-    </ul>
+    <draggable
+        :list="researchAreas" group="researchAreaHierarchy" item-key="id" :disabled="!inComparator"
+        @change="onDropCallback">
+        <ul v-for="researchArea in researchAreas" :key="researchArea.name[0].content" class="tree">
+            <tree-hierarchy-recursive :preset-research-area="reorganiseParent(researchArea)"></tree-hierarchy-recursive>
+        </ul>
+    </draggable>
 </template>
 
 
@@ -11,18 +15,24 @@ import { ref, type PropType, watch } from 'vue';
 import { defineComponent } from 'vue'
 import TreeHierarchyRecursive from '../hierarchy/TreeHierarchyRecursive.vue';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
+import { VueDraggableNext } from 'vue-draggable-next';
 
 
 export default defineComponent({
     name: 'ResearchAreaHierarchy',
-    components: {TreeHierarchyRecursive},
+    components: {TreeHierarchyRecursive, draggable: VueDraggableNext},
     props: {
         researchAreas: {
             type: Object as PropType<ResearchArea[] | undefined>,
             required: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
-    setup(props) {
+    emits: ["dragged"],
+    setup(props, {emit}) {
         const researchAreaData = ref<any>(props.researchAreas);
 
         watch(() => props.researchAreas, () => {
@@ -63,7 +73,11 @@ export default defineComponent({
             return root;
         };
 
-        return {reorganiseParent};
+        const onDropCallback = (event: any) => {
+            emit("dragged", event);
+        };
+
+        return {reorganiseParent, onDropCallback};
     },
 })
 </script>

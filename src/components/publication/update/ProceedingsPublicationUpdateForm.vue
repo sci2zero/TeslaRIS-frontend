@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
@@ -129,6 +129,14 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+            });
+
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if(props.presetProceedingsPublication?.eventId && props.presetProceedingsPublication?.proceedingsId) {
                 EventService.readConference(props.presetProceedingsPublication.eventId).then((response) => {
                     event.value = response.data;
@@ -142,11 +150,17 @@ export default defineComponent({
                     selectedProceedings.value = {title: returnCurrentLocaleContent(proceedings.value.title) as string, value: proceedings.value.id as number};
                 });
             }
+        };
 
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
+        watch(() => props.presetProceedingsPublication, () => {
+            if (props.presetProceedingsPublication) {
+                refreshForm();
+            }
         });
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderProceedings = {title: returnCurrentLocaleContent(proceedings.value?.title) as string, value: proceedings.value?.id as number};
         const selectedProceedings = ref<{ title: string, value: number }>(searchPlaceholderProceedings);
@@ -154,8 +168,8 @@ export default defineComponent({
         const searchPlaceholderEvent = {title: returnCurrentLocaleContent(event.value?.name) as string, value: event.value?.id as number};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholderEvent);
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const startPage = ref(props.presetProceedingsPublication?.startPage);
         const endPage = ref(props.presetProceedingsPublication?.endPage);
         const publicationYear = ref(props.presetProceedingsPublication?.documentDate);
@@ -170,7 +184,7 @@ export default defineComponent({
         
         const i18n = useI18n();
         const publicationTypes = computed(() => getTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType }>({title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType});
+        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType});
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
             let title: string | undefined;
@@ -232,17 +246,44 @@ export default defineComponent({
             emit("update", updatedProceedingsPublication);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetProceedingsPublication?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetProceedingsPublication?.subTitle as MultilingualContent[];
+
+            uris.value = props.presetProceedingsPublication?.uris as string[];
+            startPage.value = props.presetProceedingsPublication?.startPage;
+            endPage.value = props.presetProceedingsPublication?.endPage;
+            numberOfPages.value = props.presetProceedingsPublication?.numberOfPages;
+            publicationYear.value = props.presetProceedingsPublication?.documentDate;
+            doi.value = props.presetProceedingsPublication?.doi;
+            scopus.value = props.presetProceedingsPublication?.scopusId;
+            articleNumber.value = props.presetProceedingsPublication?.articleNumber;
+            selectedpublicationType.value = {title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType ? props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType : null};
+
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            fetchDetails();
+        };
+
         return {
             isFormValid,
             title, subtitle,
             publicationYear, doi, scopus,
             selectedProceedings, articleNumber,
             uris, numberOfPages, doiValidationRules,
-            requiredFieldRules, selectedEvent,
+            requiredFieldRules, selectedEvent, titleRef, subtitleRef,
             updateProceedingsPublication, toMultilingualTextInput,
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,
-            selectNewlyAddedProceedings, scopusIdValidationRules
+            selectNewlyAddedProceedings, scopusIdValidationRules,
+            refreshForm, urisRef
+
         };
     }
 });

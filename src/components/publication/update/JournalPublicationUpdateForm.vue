@@ -103,6 +103,7 @@ import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -124,17 +125,31 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+            });
+
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if(props.presetJournalPublication?.journalId) {
                 JournalService.readJournal(props.presetJournalPublication.journalId).then((response) => {
                     journal.value = response.data;
                     selectedJournal.value = {title: returnCurrentLocaleContent(journal.value.title) as string, value: journal.value.id as number};
                 });
             }
+        };
 
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
+        watch(() => props.presetJournalPublication, () => {
+            if (props.presetJournalPublication) {
+                refreshForm();
+            }
         });
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderJournal = {title: returnCurrentLocaleContent(journal.value?.title) as string, value: journal.value?.id as number};
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholderJournal);
@@ -142,8 +157,8 @@ export default defineComponent({
         const searchPlaceholderEvent = {title: returnCurrentLocaleContent(event.value?.name) as string, value: event.value?.id as number};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholderEvent);
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const volume = ref(props.presetJournalPublication?.volume);
         const issue = ref(props.presetJournalPublication?.issue);
         const startPage = ref(props.presetJournalPublication?.startPage);
@@ -158,7 +173,7 @@ export default defineComponent({
         const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
         
         const publicationTypes = computed(() => getTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
+        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
 
         const updateJournalPublication = () => {
             const updatedJournalPublication: JournalPublication = {
@@ -187,6 +202,33 @@ export default defineComponent({
             emit("update", updatedJournalPublication);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetJournalPublication?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetJournalPublication?.subTitle as MultilingualContent[];
+
+            uris.value = props.presetJournalPublication?.uris as string[];
+            startPage.value = props.presetJournalPublication?.startPage;
+            endPage.value = props.presetJournalPublication?.endPage;
+            numberOfPages.value = props.presetJournalPublication?.numberOfPages;
+            publicationYear.value = props.presetJournalPublication?.documentDate;
+            doi.value = props.presetJournalPublication?.doi;
+            scopus.value = props.presetJournalPublication?.scopusId;
+            articleNumber.value = props.presetJournalPublication?.articleNumber;
+            volume.value = props.presetJournalPublication?.volume;
+            issue.value = props.presetJournalPublication?.issue;
+            selectedpublicationType.value = {title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType ? props.presetJournalPublication?.journalPublicationType as JournalPublicationType : null};
+
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            fetchDetails();
+        };
+
         return {
             isFormValid,
             title, subtitle,
@@ -197,7 +239,8 @@ export default defineComponent({
             updateJournalPublication, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
-            scopusIdValidationRules
+            scopusIdValidationRules, titleRef, subtitleRef,
+            refreshForm, urisRef
         };
     }
 });

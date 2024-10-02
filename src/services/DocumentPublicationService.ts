@@ -168,6 +168,10 @@ export class DocumentPublicationService extends BaseService {
   async updateThesis(thesisId: number, body: Thesis): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `thesis/${thesisId}`, body);
   }
+
+  async deleteMonograph(monographId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `monograph/${monographId}`);
+  }
 }
 
 export default new DocumentPublicationService();

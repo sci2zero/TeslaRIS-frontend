@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
@@ -90,24 +90,38 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+            });
+
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if(props.presetPatent?.publisherId) {
                 PublisherService.readPublisher(props.presetPatent.publisherId).then((response) => {
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
             }
+        };
 
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
+        watch(() => props.presetPatent, () => {
+            if (props.presetPatent) {
+                refreshForm();
+            }
         });
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetPatent?.documentDate);
         const doi = ref(props.presetPatent?.doi);
         const scopus = ref(props.presetPatent?.scopusId);
@@ -137,6 +151,26 @@ export default defineComponent({
             emit("update", updatedPatent);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetPatent?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetPatent?.subTitle as MultilingualContent[];
+
+            uris.value = props.presetPatent?.uris as string[];
+            patentNumber.value = props.presetPatent?.number;
+            publicationYear.value = props.presetPatent?.documentDate;
+            doi.value = props.presetPatent?.doi;
+            scopus.value = props.presetPatent?.scopusId;
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            fetchDetails();
+        };
+
         return {
             isFormValid,
             title,
@@ -151,7 +185,9 @@ export default defineComponent({
             languageTags,
             selectedEvent,
             doiValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules,
+            titleRef, subtitleRef,
+            refreshForm, urisRef
         };
     }
 });

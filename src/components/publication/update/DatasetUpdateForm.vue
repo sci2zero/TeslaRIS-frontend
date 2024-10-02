@@ -70,6 +70,7 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -90,24 +91,38 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+            });
+
+            fetchDetails();
+        });
+
+        const fetchDetails = () => {
             if(props.presetDataset?.publisherId) {
                 PublisherService.readPublisher(props.presetDataset.publisherId).then((response) => {
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
             }
+        };
 
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
+        watch(() => props.presetDataset, () => {
+            if (props.presetDataset) {
+                refreshForm();
+            }
         });
+
+        const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>()
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
-        const subtitle = ref([]);
+        const title = ref<any>([]);
+        const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetDataset?.documentDate);
         const doi = ref(props.presetDataset?.doi);
         const scopus = ref(props.presetDataset?.scopusId);
@@ -137,6 +152,26 @@ export default defineComponent({
             emit("update", updatedDataset);
         };
 
+        const refreshForm = () => {
+            titleRef.value?.clearInput();
+            title.value = props.presetDataset?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetDataset?.subTitle as MultilingualContent[];
+
+            uris.value = props.presetDataset?.uris as string[];
+            datasetNumber.value = props.presetDataset?.internalNumber;
+            publicationYear.value = props.presetDataset?.documentDate;
+            doi.value = props.presetDataset?.doi;
+            scopus.value = props.presetDataset?.scopusId;
+
+            titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            urisRef.value?.refreshModelValue(uris.value);
+
+            fetchDetails();
+        };
+
         return {
             isFormValid,
             title, subtitle,
@@ -144,7 +179,8 @@ export default defineComponent({
             selectedPublisher, datasetNumber,
             uris, requiredFieldRules, doiValidationRules,
             updateDataset, toMultilingualTextInput,
-            languageTags, selectedEvent, scopusIdValidationRules
+            languageTags, selectedEvent, scopusIdValidationRules,
+            titleRef, subtitleRef, urisRef
         };
     }
 });
