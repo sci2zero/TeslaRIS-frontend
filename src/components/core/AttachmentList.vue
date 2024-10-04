@@ -24,7 +24,7 @@
                             </template>
 
                             <v-list-item-title @click="download(attachment)">
-                                {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
+                                {{ getResourceTypeTitleFromValueAutoLocale(attachment.resourceType) }}: {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
                             </v-list-item-title>
 
                             <v-list-item-subtitle>
@@ -80,6 +80,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next';
+import { getResourceTypeTitleFromValueAutoLocale } from '@/i18n/resourceType';
 
 
 export default defineComponent({
@@ -136,7 +137,7 @@ export default defineComponent({
 
         return {download, sendDataToParent, sendDeleteRequestToParent, 
                 sendUpdateRequestToParent, returnCurrentLocaleContent, 
-                errorMessage, snackbar};
+                errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale};
     }
 });
 </script>

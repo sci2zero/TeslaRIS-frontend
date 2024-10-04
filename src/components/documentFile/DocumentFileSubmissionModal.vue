@@ -24,8 +24,8 @@
                 <v-card-text>
                     <v-container>
                         <document-file-submission-form
-                            ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></document-file-submission-form>
+                            ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" :is-proof="isProof"
+                            @create="emitCreateToParent" @update="emitUpdateToParent"></document-file-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
