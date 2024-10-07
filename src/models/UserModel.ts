@@ -9,6 +9,7 @@ export interface UserResponse {
     canTakeRole: boolean;
     preferredLanguage: string;
     organisationUnitId: number;
+    personId: number;
     organisationUnitName: MultilingualContent[];
     notificationPeriod: UserNotificationPeriod;
 }
