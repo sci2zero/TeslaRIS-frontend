@@ -96,7 +96,7 @@ export default defineComponent({
         const updatedData = () => {
             const token: string = firstName.value + " " + lastName.value;
             searchResearchers(token)
-        }
+        };
 
         const searchResearchers = lodash.debounce((input: string) => {
                 const token = input
@@ -109,7 +109,7 @@ export default defineComponent({
         const registrationNextStep = () => {
             emit("registration-next-step", {firstName: firstName.value, lastName: lastName.value});
             registerStore.clearRegisterPersonData();
-        }
+        };
 
         const personClick = (person : any) => {
             PersonService.getPersonWithUser(person.databaseId).then(response => {
@@ -121,11 +121,9 @@ export default defineComponent({
                     emit("registration-next-step", {});
                 }
             }).catch(() => {
-                
+                // TODO: Improve this      
             })
-            
-        }
-        
+        };
 
         return {firstNameRules, lastNameRules, firstName, lastName,
             updatedFirstName, updatedLastName, suggestions, isEmptyData,

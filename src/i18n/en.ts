@@ -387,5 +387,7 @@ export default {
     boardMembersLabel: "Board members",
     thesisMetadataComparatorLabel: "Comparing theses",
     proceedingsPublicationComparatorLabel: "Comparing proceedings publication",
-    journalPublicationComparatorLabel: "Comparing journal publication"
+    journalPublicationComparatorLabel: "Comparing journal publication",
+    createNewAccount: "Create new researcher account: ",
+    successfulRegistrationMessage: "Registration request sent. Please check you email."
 }

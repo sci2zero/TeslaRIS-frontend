@@ -20,6 +20,10 @@ export class UserService extends BaseService {
     return decoded.role;
   }
 
+  invalidateCaches(): void {
+    this.cachedUser = null;
+  }
+
   private getDecodedJwt(): any {
     const jwt = localStorage.getItem("jwt");
     if (jwt === null) {
