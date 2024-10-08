@@ -87,8 +87,6 @@ import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageResponse } from "@/models/Common";
 import type { EmployeeRegistrationRequest } from "@/models/AuthenticationModel";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 
@@ -111,20 +109,7 @@ export default defineComponent({
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
-        const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
-
-        const emailFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) return emailFormatMessage.value;
-                return true;
-            }
-        ];
-
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
         const registerEmployee = (stayOnPage: boolean) => {
             const newEmployee: EmployeeRegistrationRequest = {

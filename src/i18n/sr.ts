@@ -387,5 +387,7 @@ export default {
     boardMembersLabel: "Članovi komisije",
     thesisMetadataComparatorLabel: "Poređenje završnih radova",
     proceedingsPublicationComparatorLabel: "Poređenje radova u zborniku radova",
-    journalPublicationComparatorLabel: "Poređenje radova u časopisu"
+    journalPublicationComparatorLabel: "Poređenje radova u časopisu",
+    createNewAccount: "Kreiraj novi istraživački nalog: ",
+    successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email."
 }

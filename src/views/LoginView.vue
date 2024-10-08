@@ -81,6 +81,7 @@ import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useRouteStore } from "@/stores/routeStore";
+import { useValidationUtils } from "@/utils/ValidationUtils";
 
 
 export default defineComponent(
@@ -99,7 +100,6 @@ export default defineComponent(
             const loginStore = useLoginStore();
             const i18n = useI18n();
             const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-            const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
 
             const forgotPasswordForm = ref(false);
             const forgotPasswordSubmissionSent = ref(false);
@@ -137,14 +137,7 @@ export default defineComponent(
                 }, interval);
             };
 
-            const emailFieldRules = [
-                (value: string) => {
-                    if (!value) return requiredFieldMessage.value;
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(value)) return emailFormatMessage.value;
-                    return true;
-                }
-            ];
+            const { emailFieldRules } = useValidationUtils();
 
             const passwordFieldRules = [
                 (value: string) => {

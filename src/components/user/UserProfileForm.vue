@@ -171,22 +171,12 @@ export default defineComponent({
 
         const i18n = useI18n();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
         const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
         const savedMessage = computed(() => i18n.t("savedMessage"));
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: UserNotificationPeriod.NEVER };
         const notificationPeriods = getNotificationPeriodForGivenLocale();
         const selectedNotificationPeriod = ref(selectionPlaceholder);
-
-        const emailFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) return emailFormatMessage.value;
-                return true;
-            }
-        ];
 
         const repeatPasswordRules = [
             (value: string) => {
@@ -196,7 +186,7 @@ export default defineComponent({
             }
         ];
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
         const populateUserData = () => {
             UserService.getLoggedInUser().then((response) => {
