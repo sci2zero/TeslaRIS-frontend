@@ -152,6 +152,7 @@ import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/u
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -199,7 +200,7 @@ export default defineComponent({
             });
 
             fetchOU();
-
+            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             fetchRelations();
 
             OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {

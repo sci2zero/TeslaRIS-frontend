@@ -220,6 +220,7 @@ import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -260,6 +261,7 @@ export default defineComponent({
             });
 
             fetchMonograph();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
         });
 
         watch(i18n.locale, () => {

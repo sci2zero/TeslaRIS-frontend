@@ -206,6 +206,7 @@ import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/Expertise
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -250,6 +251,7 @@ export default defineComponent({
             });
 
             fetchPerson();
+            StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
         });
 
         watch(i18n.locale, () => {
