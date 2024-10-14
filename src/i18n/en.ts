@@ -389,5 +389,8 @@ export default {
     proceedingsPublicationComparatorLabel: "Comparing proceedings publication",
     journalPublicationComparatorLabel: "Comparing journal publication",
     createNewAccount: "Create new researcher account: ",
-    successfulRegistrationMessage: "Registration request sent. Please check you email."
+    successfulRegistrationMessage: "Registration request sent. Please check you email.",
+    deactivateAccountLabel: "Deactivate Account",
+    activateAccountLabel: "Activate Account",
+    takeRoleLabel: "Take Role"
 }

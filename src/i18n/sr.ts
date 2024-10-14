@@ -389,5 +389,8 @@ export default {
     proceedingsPublicationComparatorLabel: "Poređenje radova u zborniku radova",
     journalPublicationComparatorLabel: "Poređenje radova u časopisu",
     createNewAccount: "Kreiraj novi istraživački nalog: ",
-    successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email."
+    successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email.",
+    deactivateAccountLabel: "Deaktiviraj nalog",
+    activateAccountLabel: "Aktiviraj nalog",
+    takeRoleLabel: "Preuzmi ulogu"
 }

@@ -21,10 +21,10 @@
                 <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
                 <td>
                     <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
-                        {{ row.item.active ? "Deactivate" : "Activate" }}
+                        {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
                     </v-btn>
                     <v-btn color="blue" dark class="inline-action" @click="takeRoleOfUser(row.item.email)">
-                        Take Role
+                        {{ $t("takeRoleLabel") }}
                     </v-btn>
                 </td>
             </tr>
