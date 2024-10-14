@@ -204,6 +204,7 @@ export default defineComponent({
             return new Promise(resolve => {
                 const intervalId = setInterval(() => {
                     const allAffiliationsBinded = importAffiliationsRef.value
+                        .filter(importAffiliationRef => importAffiliationRef !== null)
                         .every(importAffiliationRef => importAffiliationRef.affiliationBinded === true);
                 if (allAffiliationsBinded) {
                     clearInterval(intervalId);
@@ -216,6 +217,7 @@ export default defineComponent({
         const addNew = async () => {
             await waitForImportAffiliations();
 
+            console.log(importAffiliationsRef.value, props.personForLoading.firstName)
             const newPerson: BasicPerson = {
                 personName: {firstname: props.personForLoading.firstName, otherName: props.personForLoading.middleName, lastname: props.personForLoading.lastName, dateFrom: null, dateTo: null},
                 contactEmail: "",
@@ -280,12 +282,14 @@ export default defineComponent({
 
         const isHandled = () => {
             const allAffiliationsBinded = importAffiliationsRef.value
+                .filter(importAffiliationRef => importAffiliationRef !== null)
                 .every(importAffiliationRef => importAffiliationRef.affiliationBinded === true);
             return researcherBinded.value && allAffiliationsBinded;
         };
 
         const isReady = () => {
             const allAffiliationProcessesCompleted = importAffiliationsRef.value
+                .filter(importAffiliationRef => importAffiliationRef !== null)
                 .every(importAffiliationRef => importAffiliationRef.automaticProcessCompleted === true);
 
             return automaticProcessCompleted.value && allAffiliationProcessesCompleted;

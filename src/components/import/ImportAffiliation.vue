@@ -210,7 +210,9 @@ export default defineComponent({
             showTable.value = false;
         };
 
-        const addNew = () => {
+        const addNew = async () => {
+            await new Promise(r => setTimeout(r, Math.floor(Math.random() * (500 - 10 + 1)) + 10));
+
             ImportService.createNewInstitution(props.ouForLoading.scopusAfid, idempotencyKey).then((response) => {
                 selectedAffiliation.value = {
                     nameSr: response.data.name[0].content,
@@ -234,6 +236,14 @@ export default defineComponent({
                 hadToBeCreated.value = true;
                 affiliationBinded.value = true;
                 automaticProcessCompleted.value = true;
+            }).catch(() => {
+                OrganisationUnitService.findOUByScopusAfid(props.ouForLoading.scopusAfid).then(response => {
+                    selectedAffiliation.value = response.data;
+                    hadToBeCreated.value = true;
+                    affiliationBinded.value = true;
+                    automaticProcessCompleted.value = true;
+                });
+                
             });
         };
 

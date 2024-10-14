@@ -51,6 +51,7 @@ interface PersonDocumentContributionLoad {
     contributionType: DocumentContributionType;
     isMainContributor: boolean | null;
     isCorrespondingContributor: boolean | null;
+    key: string;
 }
 
 export interface PersonLoad {
