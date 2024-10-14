@@ -18,7 +18,7 @@ export default {
     userPageLabel: "Users",
     userListLabel: "Registered Users",
     logoutLabel: "Logout",
-    emailOrPasswordIncorrectError: "Incorrect Email and Password combination.",
+    emailOrPasswordIncorrectError: "Incorrect Email and Password combination, or the account is blocked.",
     closeLabel: "Close",
     mandatoryFieldError: "This is a mandatory field",
     emailFormatError: "Invalid email format",

@@ -18,7 +18,7 @@ export default {
     userPageLabel: "Korisnici",
     userListLabel: "Registrovani Korisnici",
     logoutLabel: "Izloguj se",
-    emailOrPasswordIncorrectError: "Neispravan email ili lozinka.",
+    emailOrPasswordIncorrectError: "Neispravan email ili lozinka, ili je nalog blokiran.",
     closeLabel: "Zatvori",
     mandatoryFieldError: "Ovo je obavezno polje",
     emailFormatError: "Neispravan format email-a",
