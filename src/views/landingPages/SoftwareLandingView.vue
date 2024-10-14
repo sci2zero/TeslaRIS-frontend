@@ -145,6 +145,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import SoftwareUpdateModal from '@/components/publication/update/SoftwareUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -173,6 +174,7 @@ export default defineComponent({
             });
 
             fetchSoftware();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
         });
 
         watch(i18n.locale, () => {

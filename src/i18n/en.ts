@@ -387,5 +387,11 @@ export default {
     boardMembersLabel: "Board members",
     thesisMetadataComparatorLabel: "Comparing theses",
     proceedingsPublicationComparatorLabel: "Comparing proceedings publication",
-    journalPublicationComparatorLabel: "Comparing journal publication"
+    journalPublicationComparatorLabel: "Comparing journal publication",
+    assessmentLabel: "Assessment",
+    indicatorListLabel: "Indicators",
+    codeLabel: "Code",
+    createNewIndicatorLabel: "Create new indicator",
+    updateIndicatorLabel: "Update indicator",
+    accessLevelLabel: "Access Level"
 }

@@ -191,6 +191,7 @@ import ResearchAreaService from '@/services/ResearchAreaService';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -223,6 +224,7 @@ export default defineComponent({
             });
 
             fetchThesis();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
         });
 
         watch(i18n.locale, () => {

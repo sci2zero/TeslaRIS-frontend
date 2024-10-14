@@ -387,5 +387,11 @@ export default {
     boardMembersLabel: "Članovi komisije",
     thesisMetadataComparatorLabel: "Poređenje završnih radova",
     proceedingsPublicationComparatorLabel: "Poređenje radova u zborniku radova",
-    journalPublicationComparatorLabel: "Poređenje radova u časopisu"
+    journalPublicationComparatorLabel: "Poređenje radova u časopisu",
+    assessmentLabel: "Vrednovanje",
+    indicatorListLabel: "Indikatori",
+    codeLabel: "Kod",
+    createNewIndicatorLabel: "Kreiraj novi indikator",
+    updateIndicatorLabel: "Ažuriraj indikator",
+    accessLevelLabel: "Nivo pristupa"
 }

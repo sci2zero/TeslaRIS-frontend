@@ -182,6 +182,7 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -216,6 +217,7 @@ export default defineComponent({
             });
 
             fetchProceedingsPublication();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
         });
 
         watch(i18n.locale, () => {

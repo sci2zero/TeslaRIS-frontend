@@ -62,3 +62,9 @@ export interface Notification {
     notificationText: string;
     possibleActions: NotificationAction[];
 }
+
+export enum AccessLevel {
+    OPEN = "OPEN",
+    CLOSED = "CLOSED",
+    ADMIN_ONLY = "ADMIN_ONLY"
+}
