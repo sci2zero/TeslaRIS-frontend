@@ -4,7 +4,7 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <indicator-modal></indicator-modal>
+    <indicator-modal @create="createNewIndicator"></indicator-modal>
 
     <v-data-table-server
         v-model="selectedIndicators"
@@ -31,7 +31,7 @@
                 <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
                 <td>{{ row.item.code }}</td>
                 <td>
-                    <indicator-modal :preset-indicator="row.item" is-update></indicator-modal>
+                    <indicator-modal :preset-indicator="row.item" is-update @update="updateIndicator(row.item.id, $event)"></indicator-modal>
                 </td>
             </tr>
         </template>
@@ -56,7 +56,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
-import type { IndicatorResponse } from '@/models/AssessmentModel';
+import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import IndicatorService from '@/services/assessment/IndicatorService';
 import IndicatorModal from './indicators/IndicatorModal.vue';
@@ -141,10 +141,25 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
+        const createNewIndicator = (indicator: IndicatorRequest) => {
+            IndicatorService.createIndicator(indicator).then(() => {
+                emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+            });
+        };
+
+        const updateIndicator = (indicatorId: number, indicator: IndicatorRequest) => {
+            IndicatorService.updateIndicator(indicatorId, indicator).then(() => {
+                addNotification(i18n.t("updatedSuccessMessage"));
+                emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+            });
+        };
+
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedIndicators, notifications};
+            selectedIndicators, notifications, createNewIndicator,
+            updateIndicator
+        };
     }
 });
 </script>

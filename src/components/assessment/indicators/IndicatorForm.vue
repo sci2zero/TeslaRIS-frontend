@@ -63,7 +63,7 @@ export default defineComponent({
             default: undefined
         }
     },
-    emits: ["update"],
+    emits: ["create"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
@@ -105,7 +105,7 @@ export default defineComponent({
                 indicatorAccessLevel: selectedAccessLevel.value.value
             };
 
-            emit("update", indicator);
+            emit("create", indicator);
         };
 
         return {

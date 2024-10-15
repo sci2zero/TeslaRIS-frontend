@@ -51,14 +51,19 @@ export default defineComponent({
             default: undefined
         }
     },
-    emits: ["create"],
-    setup(_, { emit }) {
+    emits: ["create", "update"],
+    setup(props, { emit }) {
         const dialog = ref(false);
 
         const formRef = ref<typeof IndicatorForm>();
 
         const emitToParent = (indicator: IndicatorRequest) => {
-            emit("create", indicator)
+            if (props.isUpdate) {
+                emit("update", indicator);
+            } else {
+                emit("create", indicator);
+            }
+            
             dialog.value = false;
         }
 
