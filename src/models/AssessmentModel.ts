@@ -20,3 +20,22 @@ export interface IndicatorRequest {
 
     indicatorAccessLevel: AccessLevel
 }
+
+export interface EntityIndicatorResponse {
+    numericValue: number,
+
+    booleanValue: boolean,
+
+    textualValue: string,
+
+    fromDate: string,
+
+    toDate: string,
+
+    indicatorResponse: IndicatorResponse
+}
+
+export enum StatisticsType {
+    VIEW = "VIEW",
+    DOWNLOAD = "DOWNLOAD"
+}

@@ -15,7 +15,7 @@ import { ref } from 'vue';
 import type { IndicatorResponse } from '@/models/AssessmentModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-import IndicatorTableComponent from '@/components/assessment/IndicatorTableComponent.vue';
+import IndicatorTableComponent from '@/components/assessment/indicators/IndicatorTableComponent.vue';
 import type { Page } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
 

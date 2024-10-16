@@ -59,7 +59,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import IndicatorService from '@/services/assessment/IndicatorService';
-import IndicatorModal from './indicators/IndicatorModal.vue';
+import IndicatorModal from './IndicatorModal.vue';
 
 
 export default defineComponent({
