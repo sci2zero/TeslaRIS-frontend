@@ -44,7 +44,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="dataset?.documentDate" class="response">
-                                    {{ dataset.documentDate }}
+                                    {{ localiseDate(dataset.documentDate) }}
                                 </div>
                                 <div v-if="dataset?.publisherId">
                                     {{ $t("publisherLabel") }}:
@@ -154,6 +154,7 @@ import StatisticsService from '@/services/StatisticsService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -275,7 +276,7 @@ export default defineComponent({
 
         return {
             dataset, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, localiseDate,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

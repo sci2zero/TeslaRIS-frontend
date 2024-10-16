@@ -1,5 +1,5 @@
 <template>
-    <v-expansion-panels>
+    <v-expansion-panels class="mt-3">
         <v-expansion-panel
             :title="title">
             <v-expansion-panel-text>
@@ -17,6 +17,8 @@ import { ref } from 'vue';
 import type { EntityIndicatorResponse } from '@/models/AssessmentModel';
 import StatisticsService from '@/services/StatisticsService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { useI18n } from 'vue-i18n';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -32,11 +34,13 @@ export default defineComponent({
         }
     },
     setup(props) {
-        const statisticsIndicators = ref<string[]>([totalIndicator.value]);
+        const statisticsIndicators = ref<string[]>([]);
         const statisticsEntityIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const title = ref<string>("");
         const content = ref<string[]>([]);
+
+        const i18n = useI18n();
         
         onMounted(() => {
             setIndicators();
@@ -44,6 +48,10 @@ export default defineComponent({
 
         watch(() => props.entityIndicators, () => {
             setIndicators();
+        });
+
+        watch(i18n.locale, () => {
+            buildDisplayData();
         });
 
         const setIndicators = () => {
@@ -68,7 +76,7 @@ export default defineComponent({
                 if (statisticsEntityIndicator.indicatorResponse.code === getIndicatorForTotalCount()) {
                     title.value = `${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.title)}: ${statisticsEntityIndicator.numericValue}`;
                 } else {
-                    content.value.push(`${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.title)}: ${statisticsEntityIndicator.numericValue} (${statisticsEntityIndicator.fromDate} - ${statisticsEntityIndicator.toDate}) - ${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.description)}`);
+                    content.value.push(`${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.title)}: ${statisticsEntityIndicator.numericValue} (${localiseDate(statisticsEntityIndicator.fromDate)} - ${localiseDate(statisticsEntityIndicator.toDate)}) - ${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.description)}`);
                 }
             });
         };
