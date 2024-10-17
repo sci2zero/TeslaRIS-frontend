@@ -54,7 +54,7 @@
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
-                                <div style="width: 50%">
+                                <div class="w-50">
                                     <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
                                     <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
                                 </div>
@@ -188,7 +188,6 @@ export default defineComponent({
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
-                console.log(documentIndicators.value)
             });
         });
 

@@ -84,6 +84,10 @@
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="monograph?.scopusId">
@@ -221,11 +225,14 @@ import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import StatisticsService from '@/services/StatisticsService';
+import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink, PublicationTableComponent },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink, PublicationTableComponent, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -255,6 +262,8 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
@@ -262,6 +271,9 @@ export default defineComponent({
 
             fetchMonograph();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -404,7 +416,8 @@ export default defineComponent({
             researchAreaHierarchy, updateContributions,
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
-            switchPage, publications, totalPublications
+            switchPage, publications, totalPublications,
+            documentIndicators, StatisticsType
         };
 }})
 
