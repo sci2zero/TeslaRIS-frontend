@@ -73,6 +73,7 @@ import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/Boo
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
 import IndicatorsView from "@/views/assessment/IndicatorsView.vue";
+import AssessmentRulebooksView from "@/views/assessment/AssessmentRulebooksView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -817,6 +818,15 @@ const router = createRouter({
                             path: "indicators",
                             name: "indicators",
                             component: IndicatorsView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "assessment-rulebooks",
+                            name: "assessmentRulebooks",
+                            component: AssessmentRulebooksView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

@@ -57,8 +57,10 @@ export default defineComponent({
         const setIndicators = () => {
             if(props.entityIndicators) {
                 StatisticsService.fetchStatisticsTypeIndicators(props.statisticsType).then((response) => {
-                    statisticsIndicators.value = [getIndicatorForTotalCount()];
-                    statisticsIndicators.value = statisticsIndicators.value.concat(response.data);
+                    statisticsIndicators.value = response.data;
+                    if (!statisticsIndicators.value.includes(getIndicatorForTotalCount())) {
+                        statisticsIndicators.value.push(getIndicatorForTotalCount());
+                    }
 
                     props.entityIndicators.forEach(entityIndicator => {
                         if (statisticsIndicators.value.includes(entityIndicator.indicatorResponse.code)) {

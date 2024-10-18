@@ -393,5 +393,8 @@ export default {
     codeLabel: "Code",
     createNewIndicatorLabel: "Create new indicator",
     updateIndicatorLabel: "Update indicator",
-    accessLevelLabel: "Access Level"
+    accessLevelLabel: "Access Level",
+    assessmentRulebookPageLabel: "Assessment rulebooks",
+    assessmentRulebooPageLabel: "Rulebook",
+    issueDateLabel: "Issue Date"
 }

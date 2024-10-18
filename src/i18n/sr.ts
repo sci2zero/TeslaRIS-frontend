@@ -393,5 +393,8 @@ export default {
     codeLabel: "Kod",
     createNewIndicatorLabel: "Kreiraj novi indikator",
     updateIndicatorLabel: "Ažuriraj indikator",
-    accessLevelLabel: "Nivo pristupa"
+    accessLevelLabel: "Nivo pristupa",
+    assessmentRulebookPageLabel: "Pravilnici o vrednovanju",
+    assessmentRulebookLabel: "Pravilnik",
+    issueDateLabel: "Datum izdavanja"
 }

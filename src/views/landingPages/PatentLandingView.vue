@@ -54,6 +54,10 @@
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="patent?.scopusId">
@@ -133,11 +137,14 @@ import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import StatisticsService from '@/services/StatisticsService';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, DoiLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, DoiLink, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -153,7 +160,9 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-seal-variant")
+        const icon = ref("mdi-seal-variant");
+
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -162,6 +171,9 @@ export default defineComponent({
 
             fetchPatent();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -248,10 +260,10 @@ export default defineComponent({
 
         return {
             patent, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, StatisticsType,
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo
+            updateContributions, updateBasicInfo, documentIndicators
         };
 }})
 

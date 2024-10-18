@@ -64,6 +64,10 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="thesis?.numberOfPages">
@@ -192,11 +196,14 @@ import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import StatisticsService from '@/services/StatisticsService';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, DoiLink, ThesisUpdateModal, ResearchAreaHierarchy },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, DoiLink, ThesisUpdateModal, ResearchAreaHierarchy, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -216,7 +223,9 @@ export default defineComponent({
 
         const researchAreaHierarchy = ref<ResearchArea>();
 
-        const icon = ref("mdi-certificate-outline")
+        const icon = ref("mdi-certificate-outline");
+
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -225,6 +234,9 @@ export default defineComponent({
 
             fetchThesis();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -336,8 +348,8 @@ export default defineComponent({
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, localiseDate,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, organisationUnit,
-            researchAreaHierarchy, event
+            updateBasicInfo, organisationUnit, StatisticsType,
+            researchAreaHierarchy, event, documentIndicators
         };
 }})
 
