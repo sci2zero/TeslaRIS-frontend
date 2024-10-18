@@ -17,6 +17,7 @@ export const useValidationUtils = () => {
     const invalidScopusAfidMessage = computed(() => i18n.t("scopusAfidFormatError"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
+    const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
 
     
     const requiredFieldRules = [
@@ -150,10 +151,20 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const emailFieldRules = [
+        (value: string) => {
+            if (!value) return requiredFieldMessage.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) return emailFormatMessage.value;
+            return true;
+        }
+    ];
+
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
-        orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules
+        orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
+        emailFieldRules
     };
 };

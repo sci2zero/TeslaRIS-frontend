@@ -3,6 +3,10 @@ export const localiseDate = (iso8601DateString: string | undefined) => {
         return "";
     }
 
+    if(!iso8601DateString.includes("-")) {
+        return iso8601DateString;
+    }
+
     const dateParts = iso8601DateString.split('-');
 
     const year = dateParts[0];

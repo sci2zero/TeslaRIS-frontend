@@ -124,7 +124,7 @@ export default defineComponent({
                 loading.value = false;
                 harvestComplete.value = true;
                 newDocumentsHarvested.value = response.data;
-                numberOfHarvestedDocuments.value += newDocumentsHarvested.value;
+                fetchNumberOfHarvestedDocuments();
             }).catch((error) => {
                 if(error.response.status === 500) {
                     errorMessage.value = i18n.t("harvestFailedMessage");

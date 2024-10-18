@@ -18,7 +18,7 @@ export default {
     userPageLabel: "Korisnici",
     userListLabel: "Registrovani Korisnici",
     logoutLabel: "Izloguj se",
-    emailOrPasswordIncorrectError: "Neispravan email ili lozinka.",
+    emailOrPasswordIncorrectError: "Neispravan email ili lozinka, ili je nalog blokiran.",
     closeLabel: "Zatvori",
     mandatoryFieldError: "Ovo je obavezno polje",
     emailFormatError: "Neispravan format email-a",
@@ -387,5 +387,10 @@ export default {
     boardMembersLabel: "Članovi komisije",
     thesisMetadataComparatorLabel: "Poređenje završnih radova",
     proceedingsPublicationComparatorLabel: "Poređenje radova u zborniku radova",
-    journalPublicationComparatorLabel: "Poređenje radova u časopisu"
+    journalPublicationComparatorLabel: "Poređenje radova u časopisu",
+    createNewAccount: "Kreiraj novi istraživački nalog: ",
+    successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email.",
+    deactivateAccountLabel: "Deaktiviraj nalog",
+    activateAccountLabel: "Aktiviraj nalog",
+    takeRoleLabel: "Preuzmi ulogu"
 }

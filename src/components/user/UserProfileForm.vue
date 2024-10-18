@@ -19,7 +19,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-        <v-btn v-if="userRole === 'RESEARCHER'" color="blue darken-1" class="update-researcher">
+        <v-btn v-if="userRole === 'RESEARCHER'" color="blue darken-1" class="update-researcher" @click="navigateToResearcherPage()">
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
@@ -135,6 +135,7 @@ import UserService from "@/services/UserService";
 import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriods";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     name: "UserProfileForm",
@@ -143,6 +144,8 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarText = ref("");
         const timeout = 5000;
+
+        const router = useRouter();
 
         const changePassword = ref(false);
         const isFormValid = ref(false);
@@ -158,6 +161,7 @@ export default defineComponent({
         const ouPlaceholder = {title: "", value: -1};
         const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
         const allowAccountTakeover = ref(false);
+        const researcherId = ref(-1);
 
         const oldPassword = ref("");
         const newPassword = ref("");
@@ -167,22 +171,12 @@ export default defineComponent({
 
         const i18n = useI18n();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
         const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
         const savedMessage = computed(() => i18n.t("savedMessage"));
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: UserNotificationPeriod.NEVER };
         const notificationPeriods = getNotificationPeriodForGivenLocale();
         const selectedNotificationPeriod = ref(selectionPlaceholder);
-
-        const emailFieldRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) return emailFormatMessage.value;
-                return true;
-            }
-        ];
 
         const repeatPasswordRules = [
             (value: string) => {
@@ -192,7 +186,7 @@ export default defineComponent({
             }
         ];
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
         const populateUserData = () => {
             UserService.getLoggedInUser().then((response) => {
@@ -224,6 +218,8 @@ export default defineComponent({
                         selectedOrganisationUnit.value = { title: ouNameOther, value: response.data.organisationUnitId }
                     }
                 }
+
+                researcherId.value = response.data.personId;
                 
                 populateLanguageData(response.data.preferredLanguage);
             });
@@ -296,6 +292,7 @@ export default defineComponent({
                 localStorage.setItem("refreshToken", response.data.refreshToken);
                 snackbarText.value = savedMessage.value;
                 snackbar.value = true;
+                UserService.invalidateCaches();
             }).catch((error: AxiosError<any, any>) => {
                 snackbarText.value = i18n.t(error.response?.data.message);
                 snackbar.value = true;
@@ -313,6 +310,10 @@ export default defineComponent({
             populateUserData();
         });
 
+        const navigateToResearcherPage = () => {
+            router.push({name: "researcherLandingPage", params: {id: researcherId.value}});
+        };
+
         return {
             changePassword, name, surname,
             organisationUnits, selectedOrganisationUnit, 
@@ -323,7 +324,8 @@ export default defineComponent({
             emailFieldRules, requiredFieldRules, requiredSelectionRules, repeatPasswordRules,
             isFormValid, userRole, notificationPeriods,
             oldPassword, newPassword, repeatNewPassword,
-            updateAccountTakeoverPermission, snackbar, snackbarText, timeout
+            updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
+            navigateToResearcherPage
         };
     }
 });

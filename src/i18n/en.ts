@@ -18,7 +18,7 @@ export default {
     userPageLabel: "Users",
     userListLabel: "Registered Users",
     logoutLabel: "Logout",
-    emailOrPasswordIncorrectError: "Incorrect Email and Password combination.",
+    emailOrPasswordIncorrectError: "Incorrect Email and Password combination, or the account is blocked.",
     closeLabel: "Close",
     mandatoryFieldError: "This is a mandatory field",
     emailFormatError: "Invalid email format",
@@ -387,5 +387,10 @@ export default {
     boardMembersLabel: "Board members",
     thesisMetadataComparatorLabel: "Comparing theses",
     proceedingsPublicationComparatorLabel: "Comparing proceedings publication",
-    journalPublicationComparatorLabel: "Comparing journal publication"
+    journalPublicationComparatorLabel: "Comparing journal publication",
+    createNewAccount: "Create new researcher account: ",
+    successfulRegistrationMessage: "Registration request sent. Please check you email.",
+    deactivateAccountLabel: "Deactivate Account",
+    activateAccountLabel: "Activate Account",
+    takeRoleLabel: "Take Role"
 }
