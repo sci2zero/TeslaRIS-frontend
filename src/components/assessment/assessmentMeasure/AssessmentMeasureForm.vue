@@ -4,14 +4,14 @@
             <v-col>
                 <multilingual-text-input
                     ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetIndicator?.title, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetAssessmentMeasure?.title, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetIndicator?.description, languageTags)"></multilingual-text-input>
+                <v-text-field
+                    v-model="value" type="number" :label="$t('valueLabel')" :placeholder="$t('valueLabel') + '*'"
+                    :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -21,13 +21,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-select
-                    v-model="selectedAccessLevel"
-                    :items="accessLevels"
-                    :label="$t('accessLevelLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                <v-text-field v-model="formalDescriptionOfRule" :label="$t('formalDescriptionOfRuleLabel')" :placeholder="$t('formalDescriptionOfRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
 
@@ -49,17 +43,16 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
+import type { AssessmentMeasure } from '@/models/AssessmentModel';
 import { getAccessLevelForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/accessLevel';
-import IndicatorService from '@/services/assessment/IndicatorService';
 
 
 export default defineComponent({
-    name: "IndicatorForm",
+    name: "AssessmentMeasureForm",
     components: {MultilingualTextInput},
     props: {
-        presetIndicator: {
-            type: Object as PropType<IndicatorResponse | undefined>,
+        presetAssessmentMeasure: {
+            type: Object as PropType<AssessmentMeasure | undefined>,
             default: undefined
         }
     },
@@ -73,46 +66,35 @@ export default defineComponent({
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
             });
-
-            fetchDetails();
         });
 
-        const fetchDetails = () => {
-            if(props.presetIndicator) {
-                IndicatorService.fetchIndicatorAccessLevel(props.presetIndicator.id).then(response => {
-                    selectedAccessLevel.value = {title: getTitleFromValueAutoLocale(response.data) as string, value: response.data};
-                });
-            }
-        };
-
         const titleRef = ref<typeof MultilingualTextInput>();
-        const descriptionRef = ref<typeof MultilingualTextInput>();
 
         const accessLevels = getAccessLevelForGivenLocale();
         const selectedAccessLevel = ref<{ title: string, value: AccessLevel }>({title: getTitleFromValueAutoLocale(AccessLevel.OPEN) as string, value: AccessLevel.OPEN});
 
         const title = ref<any>([]);
-        const description = ref<any>([]);
-        const code = ref<string>(props.presetIndicator ? props.presetIndicator.code as string : "");
+        const value = ref<number>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.value : 0);
+        const code = ref<string>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.code as string : "");
+        const formalDescriptionOfRule = ref<string>(""); // for now
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const submit = () => {
-            const indicator: IndicatorRequest = {
+            const assessmentMeasure: AssessmentMeasure = {
                 code: code.value,
                 title: title.value,
-                description: description.value,
-                indicatorAccessLevel: selectedAccessLevel.value.value
+                value: value.value,
+                formalDescriptionOfRule: formalDescriptionOfRule.value
             };
 
-            emit("create", indicator);
+            emit("create", assessmentMeasure);
         };
 
         return {
             isFormValid,
-            title, description,
-            titleRef, descriptionRef,
-            toMultilingualTextInput,
+            title, titleRef, formalDescriptionOfRule,
+            toMultilingualTextInput, value,
             languageTags, selectedAccessLevel,
             requiredFieldRules, code, submit,
             accessLevels, requiredSelectionRules

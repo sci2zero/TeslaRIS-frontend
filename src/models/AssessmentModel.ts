@@ -42,7 +42,7 @@ export enum StatisticsType {
 }
 
 export interface AssessmentMeasure {
-    id: number;
+    id?: number;
 
     formalDescriptionOfRule: string;
     

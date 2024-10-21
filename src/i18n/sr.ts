@@ -401,5 +401,11 @@ export default {
     successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email.",
     deactivateAccountLabel: "Deaktiviraj nalog",
     activateAccountLabel: "Aktiviraj nalog",
-    takeRoleLabel: "Preuzmi ulogu"
+    takeRoleLabel: "Preuzmi ulogu",
+    createNewAssessmentRulebookLabel: "Kreiraj novi pravilnik",
+    updateAssessmentRulebookLabel: "Ažuriraj pravilnik",
+    createNewAssessmentMeasureLabel: "Kreiraj novu meru",
+    updateAssessmentMeasureLabel: "Ažuriraj meru",
+    valueLabel: "Vrednost",
+    formalDescriptionOfRuleLabel: "Pravilo"
 }

@@ -1,25 +1,24 @@
 <template>
     <v-btn
-        density="compact" class="bottom-spacer" :disabled="selectedIndicators.length === 0"
+        density="compact" class="bottom-spacer" :disabled="selectedAssessmentMeasures.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-assessment-modal
-        :form-component="IndicatorForm"
-        :form-props="{ presetIndicator: undefined }"
-        entity-name="Indicator"
-        @create="createNewIndicator"
+        :form-component="AssessmentMeasureForm"
+        :form-props="{ presetAssessmentMeasure: undefined }"
+        entity-name="AssessmentMeasure"
+        @create="createNewAssessmentMeasure"
     />
 
     <v-data-table-server
-        v-model="selectedIndicators"
+        v-model="selectedAssessmentMeasures"
         :sort-by="tableOptions.sortBy"
-        :items="indicators"
+        :items="assessmentMeasures"
         :headers="headers"
-        :items-length="totalIndicators"
+        :items-length="totalAssessmentMeasures"
         :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 25, 50]"
-        :items-per-page="25"
+        :items-per-page-options="[5, 10, 25, 50]"
         show-select
         return-object
         @update:options="refreshTable">
@@ -27,23 +26,19 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedIndicators"
+                        v-model="selectedAssessmentMeasures"
                         :value="row.item"
                         class="table-checkbox"
                         hide-details
                     />
                 </td>
-                <td>{{ returnCurrentLocaleContent(row.item.title) }}</td>
-                <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
-                <td>{{ row.item.code }}</td>
                 <td>
-                    <generic-assessment-modal
-                        :form-component="IndicatorForm"
-                        :form-props="{ presetIndicator: row.item }"
-                        is-update
-                        entity-name="Indicator"
-                        @update="updateIndicator(row.item.id, $event)"
-                    />
+                    {{ returnCurrentLocaleContent(row.item.title) }}
+                </td>
+                <td>{{ row.item.code }}</td>
+                <td>{{ row.item.value }}</td>
+                <td>
+                    {{ row.item.formalDescriptionOfRule }}
                 </td>
             </tr>
         </template>
@@ -68,28 +63,29 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
-import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
+import type { AssessmentMeasure } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import IndicatorService from '@/services/assessment/IndicatorService';
+import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
+import { localiseDate } from '@/i18n/dateLocalisation';
 import GenericAssessmentModal from '../GenericAssessmentModal.vue';
-import IndicatorForm from './IndicatorForm.vue';
+import AssessmentMeasureForm from './AssessmentMeasureForm.vue';
 
 
 export default defineComponent({
-    name: "IndicatorTableComponent",
+    name: "AssessmentMeasureTableComponent",
     components: { GenericAssessmentModal },
     props: {
-        indicators: {
-            type: Array<IndicatorResponse>,
+        assessmentMeasures: {
+            type: Array<AssessmentMeasure>,
             required: true
         }, 
-        totalIndicators: {
+        totalAssessmentMeasures: {
             type: Number,
             required: true
         }},
-    emits: ["switchPage"],
+    emits: ["switchPage", "delete"],
     setup(_, {emit}) {
-        const selectedIndicators = ref<IndicatorResponse[]>([]);
+        const selectedAssessmentMeasures = ref<AssessmentMeasure[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
         const i18n = useI18n();
@@ -99,17 +95,17 @@ export default defineComponent({
         const timeout = 5000;
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
-        const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const codeLabel = computed(() => i18n.t("codeLabel"));
-        const actionLabel = computed(() => i18n.t("actionLabel"));
+        const valueLabel = computed(() => i18n.t("valueLabel"));
+        const ruleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "title", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "code", order: "asc"}]});
 
         const headers = [
-          { title: titleLabel, align: "start", sortable: true, key: "title"},
-          { title: descriptionLabel, align: "start", sortable: true, key: "description"},
+          { title: titleLabel, align: "start", sortable: false},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
-          { title: actionLabel},
+          { title: valueLabel, align: "start", sortable: true, key: "value"},
+          { title: ruleLabel, align: "start", sortable: true, key: "rule"}
         ];
 
         const refreshTable = (event: any) => {
@@ -128,19 +124,7 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedIndicators.value.map((indicator: IndicatorResponse) => {
-                return IndicatorService.deleteIndicator(indicator.id as number)
-                    .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(indicator.title) }));
-                    })
-                    .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(indicator.title) }));
-                        return indicator;
-                    });
-            })).then((failedDeletions) => {
-                selectedIndicators.value = selectedIndicators.value.filter((indicator) => failedDeletions.includes(indicator));
-                refreshTable(tableOptions.value);
-            });
+            emit("delete", selectedAssessmentMeasures);
         };
 
         const addNotification = (message: string) => {
@@ -154,14 +138,14 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const createNewIndicator = (indicator: IndicatorRequest) => {
-            IndicatorService.createIndicator(indicator).then(() => {
+        const createNewAssessmentMeasure = (assessmentMeasure: AssessmentMeasure) => {
+            AssessmentMeasureService.createAssessmentMeasure(assessmentMeasure).then(() => {
                 emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
             });
         };
 
-        const updateIndicator = (indicatorId: number, indicator: IndicatorRequest) => {
-            IndicatorService.updateIndicator(indicatorId, indicator).then(() => {
+        const updateAssessmentMeasure = (assessmentMeasureId: number, assessmentMeasure: AssessmentMeasure) => {
+            AssessmentMeasureService.updateAssessmentMeasure(assessmentMeasureId, assessmentMeasure).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
                 emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
             });
@@ -170,8 +154,8 @@ export default defineComponent({
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedIndicators, notifications, createNewIndicator,
-            updateIndicator, IndicatorForm
+            selectedAssessmentMeasures, notifications, createNewAssessmentMeasure,
+            updateAssessmentMeasure, localiseDate, AssessmentMeasureForm
         };
     }
 });

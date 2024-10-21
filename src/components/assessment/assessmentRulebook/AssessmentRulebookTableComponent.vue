@@ -7,6 +7,7 @@
     <generic-assessment-modal
         :form-component="AssessmentRulebookForm"
         :form-props="{ presetAssessmentRulebook: undefined }"
+        entity-name="AssessmentRulebook"
         @create="createNewAssessmentRulebook"
     />
 

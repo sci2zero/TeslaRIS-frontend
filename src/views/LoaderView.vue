@@ -51,7 +51,7 @@
             </v-tooltip>
         </v-btn>
 
-        <v-btn class="load-action same-line" @click="finishLoad" :disabled="stepperValue != steps.length">
+        <v-btn class="load-action same-line" :disabled="stepperValue != steps.length" @click="finishLoad">
             {{ $t('finishLoadLabel') }}
         </v-btn>
 

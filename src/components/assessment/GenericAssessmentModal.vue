@@ -14,12 +14,12 @@
                     v-else
                     density="compact" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
-                    {{ isUpdate ? $t("updateLabel") : $t("createNewIndicatorLabel") }}
+                    {{ isUpdate ? $t("updateLabel") : $t("createNew" + entityName + "Label") }}
                 </v-btn>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ isUpdate ? $t("updateIndicatorLabel") : $t("createNewIndicatorLabel") }}</span>
+                    <span class="text-h5">{{ isUpdate || isSectionUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -69,6 +69,10 @@ export default defineComponent({
         formProps: {
             type: Object as PropType<Record<string, any>>,
             default: () => ({})
+        },
+        entityName: {
+            type: String,
+            required: true
         }
     },
     emits: ["create", "update"],

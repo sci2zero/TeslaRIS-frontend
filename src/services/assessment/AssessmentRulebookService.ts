@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { AssessmentRulebook, AssessmentRulebookResponse } from "@/models/AssessmentModel";
+import type { AssessmentMeasure, AssessmentRulebook, AssessmentRulebookResponse } from "@/models/AssessmentModel";
 import type { Page } from "@/models/Common";
 import { License, ResourceType, type DocumentFileResponse } from "@/models/DocumentFileModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
@@ -13,6 +13,10 @@ export class AssessmentRulebookService extends BaseService {
 
     async fetchAllAssessmentRulebooks(pageable: string): Promise<AxiosResponse<Page<AssessmentRulebookResponse>>> {
         return super.sendRequest(axios.get, `assessment/assessment-rulebook?${pageable}`);
+    }
+
+    async getAssessmentMeasuresForRulebook(rulebookId: number, pageable: string): Promise<AxiosResponse<Page<AssessmentMeasure>>> {
+        return super.sendRequest(axios.get, `assessment/assessment-rulebook/${rulebookId}/measures?${pageable}`);
     }
 
     async readAssessmentRulebook(assessmentRulebookId: number): Promise<AxiosResponse<AssessmentRulebookResponse>> {

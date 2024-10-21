@@ -28,6 +28,7 @@
                             :form-component="AssessmentRulebookForm"
                             :form-props="{ presetAssessmentRulebook: assessmentRulebook, isUpdate: true }"
                             is-section-update
+                            entity-name="AssessmentRulebook"
                             @create="updateBasicInfo"
                         />
 
@@ -61,6 +62,10 @@
         <!-- Description -->
         <description-section :description="assessmentRulebook?.description" can-edit @update="updateDescription"></description-section>
 
+        <!-- Assessment Measures -->
+        <br />
+        <assessment-measure-table-component :assessment-measures="assessmentMeasures" :total-assessment-measures="totalAssessmentMeasures" @switch-page="switchPage"></assessment-measure-table-component>
+
         <v-row>
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <v-col cols="12">
@@ -87,7 +92,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent, Page } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -98,18 +103,20 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import type { AssessmentRulebook, AssessmentRulebookResponse } from '@/models/AssessmentModel';
+import type { AssessmentMeasure, AssessmentRulebook, AssessmentRulebookResponse } from '@/models/AssessmentModel';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import DocumentFileService from '@/services/DocumentFileService';
 import AssessmentRulebookForm from '@/components/assessment/assessmentRulebook/AssessmentRulebookForm.vue';
 import GenericAssessmentModal from '@/components/assessment/GenericAssessmentModal.vue';
+import AssessmentMeasureTableComponent from '@/components/assessment/assessmentMeasure/AssessmentMeasureTableComponent.vue';
+import type { AxiosResponse } from 'axios';
 
 
 export default defineComponent({
     name: "AssessmentRulebookLandingPage",
-    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericAssessmentModal },
+    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericAssessmentModal, AssessmentMeasureTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -121,7 +128,14 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-desktop-classic");
+        const icon = ref("mdi-notebook-outline");
+
+        const assessmentMeasures = ref<AssessmentMeasure[]>([]);
+        const totalAssessmentMeasures = ref<number>(0);
+        const assessmentsPage = ref(0);
+        const assessmentsSize = ref(25);
+        const assessmentsSort = ref("");
+        const assessmentsDirection = ref("");
 
         onMounted(() => {
             fetchAssessmentRulebook();
@@ -139,6 +153,21 @@ export default defineComponent({
     
                 populateData();
             });
+        };
+
+        const fetchMeasures = () => {
+            AssessmentRulebookService.getAssessmentMeasuresForRulebook(parseInt(currentRoute.params.id as string), `page=${assessmentsPage.value}&size=${assessmentsSize.value}&sort=${assessmentsSort.value},${assessmentsDirection.value}`).then((response: AxiosResponse<Page<AssessmentMeasure>>) => {
+                assessmentMeasures.value = response.data.content;
+                totalAssessmentMeasures.value = response.data.totalElements;
+            });
+        };
+
+        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            assessmentsPage.value = nextPage;
+            assessmentsSize.value = pageSize;
+            assessmentsSort.value = sortField;
+            assessmentsDirection.value = sortDir;
+            fetchMeasures();
         };
 
         const populateData = () => {
@@ -209,7 +238,8 @@ export default defineComponent({
             languageTagMap, updateBasicInfo, updateAttachment,
             addAttachment, deleteAttachment, localiseDate,
             updateDescription, snackbar, snackbarMessage,
-            AssessmentRulebookForm
+            AssessmentRulebookForm, assessmentMeasures,
+            totalAssessmentMeasures, switchPage
         };
 }})
 

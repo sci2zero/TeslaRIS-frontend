@@ -401,5 +401,11 @@ export default {
     successfulRegistrationMessage: "Registration request sent. Please check you email.",
     deactivateAccountLabel: "Deactivate Account",
     activateAccountLabel: "Activate Account",
-    takeRoleLabel: "Take Role"
+    takeRoleLabel: "Take Role",
+    createNewAssessmentRulebookLabel: "Create New Rulebook",
+    updateAssessmentRulebookLabel: "Update Rulebook",
+    createNewAssessmentMeasureLabel: "create New Measure",
+    updateAssessmentMeasureLabel: "Update Measure",
+    valueLabel: "Value",
+    formalDescriptionOfRuleLabel: "Rule"
 }
