@@ -4,7 +4,11 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <!-- <assessment-rulebook-modal @create="createNewAssessmentRulebook"></assessment-rulebook-modal> -->
+    <generic-assessment-modal
+        :form-component="AssessmentRulebookForm"
+        :form-props="{ presetAssessmentRulebook: undefined }"
+        @create="createNewAssessmentRulebook"
+    />
 
     <v-data-table-server
         v-model="selectedAssessmentRulebooks"
@@ -27,7 +31,11 @@
                         hide-details
                     />
                 </td>
-                <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
+                <td>
+                    <localized-link :to="'assessment/assessment-rulebooks/' + row.item.id">
+                        {{ returnCurrentLocaleContent(row.item.name) }}
+                    </localized-link>
+                </td>
                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.description) as string) }}</td>
                 <td>{{ localiseDate(row.item.issueDate) }}</td>
                 <td>
@@ -66,11 +74,13 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import GenericAssessmentModal from '../GenericAssessmentModal.vue';
+import AssessmentRulebookForm from './AssessmentRulebookForm.vue';
 
 
 export default defineComponent({
     name: "AssessmentRulebookTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, GenericAssessmentModal },
     props: {
         assessmentRulebooks: {
             type: Array<AssessmentRulebookResponse>,
@@ -164,7 +174,7 @@ export default defineComponent({
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedAssessmentRulebooks, notifications, createNewAssessmentRulebook,
-            updateAssessmentRulebook, localiseDate
+            updateAssessmentRulebook, localiseDate, AssessmentRulebookForm
         };
     }
 });

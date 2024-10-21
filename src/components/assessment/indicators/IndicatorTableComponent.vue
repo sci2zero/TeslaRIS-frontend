@@ -4,7 +4,11 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <indicator-modal @create="createNewIndicator"></indicator-modal>
+    <generic-assessment-modal
+        :form-component="IndicatorForm"
+        :form-props="{ presetIndicator: undefined }"
+        @create="createNewIndicator"
+    />
 
     <v-data-table-server
         v-model="selectedIndicators"
@@ -13,7 +17,8 @@
         :headers="headers"
         :items-length="totalIndicators"
         :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
+        :items-per-page-options="[5, 25, 50]"
+        :items-per-page="25"
         show-select
         return-object
         @update:options="refreshTable">
@@ -31,7 +36,12 @@
                 <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
                 <td>{{ row.item.code }}</td>
                 <td>
-                    <indicator-modal :preset-indicator="row.item" is-update @update="updateIndicator(row.item.id, $event)"></indicator-modal>
+                    <generic-assessment-modal
+                        :form-component="IndicatorForm"
+                        :form-props="{ presetIndicator: row.item }"
+                        is-update
+                        @update="updateIndicator(row.item.id, $event)"
+                    />
                 </td>
             </tr>
         </template>
@@ -59,12 +69,13 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import IndicatorService from '@/services/assessment/IndicatorService';
-import IndicatorModal from './IndicatorModal.vue';
+import GenericAssessmentModal from '../GenericAssessmentModal.vue';
+import IndicatorForm from './IndicatorForm.vue';
 
 
 export default defineComponent({
     name: "IndicatorTableComponent",
-    components: { IndicatorModal },
+    components: { GenericAssessmentModal },
     props: {
         indicators: {
             type: Array<IndicatorResponse>,
@@ -90,7 +101,7 @@ export default defineComponent({
         const codeLabel = computed(() => i18n.t("codeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "title", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "title", order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: "title"},
@@ -158,7 +169,7 @@ export default defineComponent({
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedIndicators, notifications, createNewIndicator,
-            updateIndicator
+            updateIndicator, IndicatorForm
         };
     }
 });

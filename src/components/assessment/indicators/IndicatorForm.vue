@@ -98,6 +98,7 @@ export default defineComponent({
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const submit = () => {
+            console.log("AAAAAAAAAAAAAAAAA")
             const indicator: IndicatorRequest = {
                 code: code.value,
                 title: title.value,

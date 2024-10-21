@@ -27,7 +27,7 @@ export default defineComponent({
         const indicators = ref<IndicatorResponse[]>([]);
         const totalIndicators = ref(0);
         const page = ref(0);
-        const size = ref(1);
+        const size = ref(25);
         const sort = ref("");
         const direction = ref("");
 

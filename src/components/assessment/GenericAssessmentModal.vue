@@ -2,7 +2,16 @@
     <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
+                <div v-if="isSectionUpdate" class="edit-pen">
+                    <v-btn
+                        icon variant="outlined"
+                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
+                        size="small" v-on="scope.isActive">
+                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                    </v-btn>
+                </div>
                 <v-btn
+                    v-else
                     density="compact" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
                     {{ isUpdate ? $t("updateLabel") : $t("createNewIndicatorLabel") }}
@@ -14,7 +23,13 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <indicator-form ref="formRef" :preset-indicator="presetIndicator" in-modal @create="emitToParent"></indicator-form>
+                        <component
+                            :is="formComponent"
+                            ref="formRef"
+                            v-bind="formProps"
+                            in-modal
+                            @create="emitToParent"
+                        />
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -31,43 +46,48 @@
     </v-row>
 </template>
 
+
 <script lang="ts">
 import { type PropType, ref } from "vue";
 import { defineComponent } from "vue";
-import IndicatorForm from "./IndicatorForm.vue";
-import type { IndicatorRequest, IndicatorResponse } from "@/models/AssessmentModel";
-
 
 export default defineComponent({
-    name: "IndicatorModal",
-    components: { IndicatorForm },
+    name: "GenericModal",
     props: {
         isUpdate: {
             type: Boolean,
             default: false
         },
-        presetIndicator: {
-            type: Object as PropType<IndicatorResponse | undefined>,
-            default: undefined
+        isSectionUpdate: {
+            type: Boolean,
+            default: false
+        },
+        formComponent: {
+            type: Object as PropType<any>,
+            required: true
+        },
+        formProps: {
+            type: Object as PropType<Record<string, any>>,
+            default: () => ({})
         }
     },
     emits: ["create", "update"],
     setup(props, { emit }) {
         const dialog = ref(false);
+        const formRef = ref<InstanceType<typeof props.formComponent>>();
 
-        const formRef = ref<typeof IndicatorForm>();
-
-        const emitToParent = (indicator: IndicatorRequest) => {
+        const emitToParent = (formData: any) => {
+            console.log(formData);
             if (props.isUpdate) {
-                emit("update", indicator);
+                emit("update", formData);
             } else {
-                emit("create", indicator);
+                emit("create", formData);
             }
             
             dialog.value = false;
         }
 
-        return {dialog, formRef, emitToParent};
+        return { dialog, formRef, emitToParent };
     }
 });
 </script>

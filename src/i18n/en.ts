@@ -395,6 +395,6 @@ export default {
     updateIndicatorLabel: "Update indicator",
     accessLevelLabel: "Access Level",
     assessmentRulebookPageLabel: "Assessment rulebooks",
-    assessmentRulebooPageLabel: "Rulebook",
+    assessmentRulebookLabel: "Rulebook",
     issueDateLabel: "Issue Date"
 }

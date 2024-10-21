@@ -74,6 +74,7 @@ import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
 import IndicatorsView from "@/views/assessment/IndicatorsView.vue";
 import AssessmentRulebooksView from "@/views/assessment/AssessmentRulebooksView.vue";
+import AssessmentRulebookLandingView from "@/views/assessment/landingPages/AssessmentRulebookLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -825,12 +826,26 @@ const router = createRouter({
                         },
                         {
                             path: "assessment-rulebooks",
-                            name: "assessmentRulebooks",
-                            component: AssessmentRulebooksView,
-                            meta: {
-                                authenticated: true,
-                                authorities: [roles.admin],
-                            },
+                            children: [
+                                {
+                                    path: "",
+                                    name: "assessmentRulebooks",
+                                    component: AssessmentRulebooksView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                                {
+                                    path: ":id",
+                                    name: "assessmentRulebookLandingPage",
+                                    component: AssessmentRulebookLandingView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
                         }
                     ]
                 },
