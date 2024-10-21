@@ -95,6 +95,10 @@ export default defineComponent({
         });
     
         const search = (tokenParams: string) => {
+            if (!tokenParams) {
+                return;
+            }
+
             searchParams.value = tokenParams;
             
             if (!currentTab.value) {
