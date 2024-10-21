@@ -47,19 +47,6 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ $t("savedMessage") }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
 </template>
 
 <script lang="ts">
@@ -100,7 +87,6 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const snackbar = ref(false);
         const i18n = useI18n();
         const languageTags = ref<LanguageTagResponse[]>([]);
 
@@ -154,7 +140,7 @@ export default defineComponent({
             
         };
 
-        return {isFormValid, snackbar, file,
+        return {isFormValid, file,
             description, descriptionRef,
             requiredFieldRules, licenses, resourceTypes,
             selectedLicense, selectedResourceType,

@@ -18,7 +18,7 @@ export default {
     userPageLabel: "Korisnici",
     userListLabel: "Registrovani Korisnici",
     logoutLabel: "Izloguj se",
-    emailOrPasswordIncorrectError: "Neispravan email ili lozinka.",
+    emailOrPasswordIncorrectError: "Neispravan email ili lozinka, ili je nalog blokiran.",
     closeLabel: "Zatvori",
     mandatoryFieldError: "Ovo je obavezno polje",
     emailFormatError: "Neispravan format email-a",
@@ -396,5 +396,10 @@ export default {
     accessLevelLabel: "Nivo pristupa",
     assessmentRulebookPageLabel: "Pravilnici o vrednovanju",
     assessmentRulebookLabel: "Pravilnik",
-    issueDateLabel: "Datum izdavanja"
+    issueDateLabel: "Datum izdavanja",
+    createNewAccount: "Kreiraj novi istraživački nalog: ",
+    successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email.",
+    deactivateAccountLabel: "Deaktiviraj nalog",
+    activateAccountLabel: "Aktiviraj nalog",
+    takeRoleLabel: "Preuzmi ulogu"
 }

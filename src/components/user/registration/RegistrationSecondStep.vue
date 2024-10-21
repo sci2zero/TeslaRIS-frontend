@@ -1,16 +1,16 @@
 <template>
     <div>
-        <div>
+        <v-form v-model="isFormValid" @submit.prevent>
             <v-text-field
                 v-model="firstName"
                 label="First Name"
-                :rules="emailFieldRules"
+                :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             ></v-text-field>
             <v-text-field
                 v-model="lastName"
                 label="Last Name"
-                :rules="emailFieldRules"
+                :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             ></v-text-field>
             <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" :disabled="isPersonSelected()" required></organisation-unit-autocomplete-search>
@@ -25,11 +25,25 @@
                 :rules="emailFieldRules"
             ></v-text-field>
             <password-input-with-meter :label="$t('newPasswordLabel')" @password-change="setNewPassword($event)" @show-repeated-password="true"></password-input-with-meter>
-        </div>
+        </v-form>
 
-        <v-btn block color="blue darken-1 large" @click="register">
+        <v-btn block color="blue darken-1 large" :disabled="!isFormValid" @click="register">
             {{ $t("registerLabel") }}
         </v-btn>
+
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="5000">
+            {{ message }}
+            <template #actions>
+                <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snackbar = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+            </template>
+        </v-snackbar>
     </div>
 </template>
 
@@ -43,6 +57,10 @@ import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue
 import type { AxiosResponse } from "axios";
 import type { LanguageResponse } from "@/models/Common";
 import { useRegisterStore } from '@/stores/registerStore';
+import { useValidationUtils } from "@/utils/ValidationUtils";
+import { getErrorMessageForErrorKey } from "@/i18n";
+import { useRouter } from "vue-router";
+
 
 export default defineComponent({
     name: "RegistrationSecondStep",
@@ -58,7 +76,14 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const isFormValid = ref(false);
+
+        const snackbar = ref(false);
+        const message = ref("");
+
         const registerStore = useRegisterStore();
+
+        const router = useRouter();
 
         const i18n = useI18n();
         const firstName = ref(props.firstname || registerStore.registerPersonData?.personName.firstname);
@@ -69,23 +94,8 @@ export default defineComponent({
         const selectedLanguage = ref<{ title: string, value: number } | number>({title: "SR", value: -1});
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
+        const { requiredFieldRules, emailFieldRules } = useValidationUtils();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const emailFormatMessage = computed(() => i18n.t("emailFormatMessage"));
-        const emailFieldRules = [
-                (value: string) => {
-                    if (!value) return requiredFieldMessage.value;
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(value)) return emailFormatMessage.value;
-                    return true;
-                }
-            ];
-
-            const passwordFieldRules = [
-                (value: string) => {
-                    if (!value) return requiredFieldMessage.value;
-                    return true;
-                }
-            ];
 
         const setNewPassword = (newPassword: string) => {
             password.value = newPassword;
@@ -93,18 +103,24 @@ export default defineComponent({
 
         const register = () => {
             const requestBody = {
-                    firstName: firstName.value,
-                    lastName: lastName.value,
-                    email: email.value,
-                    password: password.value,
-                    preferredLanguageId: selectedLanguage.value as number,
-                    organisationUnitId: selectedOrganisationUnit.value.value
+                firstName: firstName.value,
+                lastName: lastName.value,
+                email: email.value,
+                password: password.value,
+                preferredLanguageId: selectedLanguage.value as number,
+                organisationUnitId: selectedOrganisationUnit.value.value
+            };
 
-                }
             AuthenticationService.registerResearcher(requestBody).then(() => {
-                // TODO: Improve this
-            }).catch(() => {
-                alert("error")
+                message.value = i18n.t("successfulRegistrationMessage");
+                snackbar.value = true;
+
+                setTimeout(() => {
+                    router.push({ name: "login" });
+                }, 5000);
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
             });
         };
 
@@ -125,11 +141,11 @@ export default defineComponent({
            return registerStore.registerPersonData != null
         }
 
-        return {email, emailFieldRules, passwordFieldRules, requiredFieldMessage, register, selectedLanguage, languages, firstName, lastName, selectedOrganisationUnit, setNewPassword, isPersonSelected}
+        return {email, emailFieldRules, requiredFieldMessage,
+            register, selectedLanguage, languages, firstName, lastName, 
+            selectedOrganisationUnit, setNewPassword, isPersonSelected,
+            requiredFieldRules, isFormValid, snackbar, message
+        }
     }
 })
 </script>
-
-<style>
-
-</style>

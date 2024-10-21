@@ -10,7 +10,7 @@
             v-model="stepperValue" :items="steps"
             :next-text="$t('nextLabel')"
             :prev-text="$t('previousLabel')">
-            <template v-for="(contribution, index) in currentLoadRecord?.contributions" :key="index" #[`item.${index+1}`]>
+            <template v-for="(contribution, index) in currentLoadRecord?.contributions" :key="contribution.key" #[`item.${index+1}`]>
                 <import-author :ref="(el) => (importAuthorsRef[index] = el)" :person-for-loading="contribution.person" :institutions-for-loading="contribution.institutions"></import-author>
             </template>
 
@@ -51,7 +51,7 @@
             </v-tooltip>
         </v-btn>
 
-        <v-btn class="load-action same-line" @click="finishLoad">
+        <v-btn class="load-action same-line" @click="finishLoad" :disabled="stepperValue != steps.length">
             {{ $t('finishLoadLabel') }}
         </v-btn>
 
@@ -106,6 +106,8 @@ export default defineComponent({
         const proceedingsImportRef = ref<typeof ImportProceedings>();
         const proceedingsPublicationDetailsRef = ref<typeof ImportProceedingsPublicationDetails>();
 
+        const contributionsLength = ref(0);
+
         const isFormValid = ref(false);
         
         const snackbar = ref(false);
@@ -138,10 +140,10 @@ export default defineComponent({
         });
 
         const fetchNextRecordForLoading = () => {
-            loadingJournalPublication.value = false;
-            loadingProceedingsPublication.value = false;
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
+            loadingJournalPublication.value = false;
+            loadingProceedingsPublication.value = false;
 
             ImportService.getNextFromWizard().then(response => {
                 if(!response.data) {
@@ -150,10 +152,12 @@ export default defineComponent({
                 }
 
                 currentLoadRecord.value = response.data;
-                steps.value = [];
+                contributionsLength.value = currentLoadRecord.value.contributions.length;
+                steps.value.splice(0, steps.value.length);
                 currentLoadRecord.value.contributions.forEach((contribution) => {
+                    contribution.key = crypto.randomUUID();
                     steps.value.push(`${contribution.person.firstName} ${contribution.person.lastName}`);
-                })
+                });
 
                 if ((currentLoadRecord.value as ProceedingsPublicationLoad).proceedingsPublicationType) {
                     steps.value.push(i18n.t("proceedingsLabel"));
@@ -215,6 +219,7 @@ export default defineComponent({
             let shouldStep = true;
             while (shouldStep) {
                 nextStep();
+                await new Promise(r => setTimeout(r, 1000));
                 if (stepperValue.value <= currentLoadRecord.value!.contributions.length) {
                     await waitForImportAuthor(stepperValue.value - 1);
                     shouldStep = importAuthorsRef.value[stepperValue.value - 1].isHandled();
@@ -231,7 +236,6 @@ export default defineComponent({
                 } else {
                     shouldStep = false;
                 }
-                
             }
         };
 
@@ -260,7 +264,7 @@ export default defineComponent({
         };
 
         const finishLoad = () => {
-            if (getAuthorLength() !== currentLoadRecord.value?.contributions.length) {
+            if (contributionsLength.value !== currentLoadRecord.value?.contributions.length) {
                 errorMessage.value = i18n.t("authorBindNotFinishedMessage");
                 snackbar.value = true;
                 return;
@@ -268,7 +272,7 @@ export default defineComponent({
 
             const unbindedAuthors: string[] = [];
             importAuthorsRef.value.forEach(contribution => {
-                if (!contribution.isHandled()) {
+                if (contribution && !contribution.isHandled()) {
                     unbindedAuthors.push(`${contribution.personForLoading.firstName} ${contribution.personForLoading.lastName}`)
                 }
             });
@@ -390,23 +394,15 @@ export default defineComponent({
         };
 
         const markAsLoadedAndFetchNext = () => {
-            stepperValue.value = 1;
+            importAuthorsRef.value = [];
+            importAuthorsRef.value.length = 0;
             ImportService.markCurrentAsLoaded().then(() => {
-                importAuthorsRef.value = [];
-                importAuthorsRef.value.length = 0;
+                stepperValue.value = 1;
                 fetchNextRecordForLoading();
                 errorMessage.value = i18n.t("loadSuccessMessage");
                 snackbar.value = true;
             });
         };
-
-        const getAuthorLength = () => {
-            let counter = 0;
-            importAuthorsRef.value.forEach(() => {
-                counter += 1;
-            });
-            return counter;
-        }
 
         return {
             isFormValid, snackbar,
