@@ -51,6 +51,8 @@ export interface AssessmentMeasure {
     value: number;
     
     title: MultilingualContent[];
+
+    assessmentRulebookId: number;
 }
 
 export interface AssessmentRulebookResponse {
@@ -61,7 +63,6 @@ export interface AssessmentRulebookResponse {
     pdfFile?: DocumentFileResponse;
     publisherId: number;
     publisherName: MultilingualContent[];
-    assessmentMeasures: AssessmentMeasure
 }
 
 export interface AssessmentRulebook {
@@ -69,5 +70,30 @@ export interface AssessmentRulebook {
     description?: MultilingualContent[];
     issueDate: string;
     publisherId?: number;
-    assessmentMeasureIds: number[];
+}
+
+export interface Commission {
+    description: MultilingualContent[];
+    sources?: string[];
+    assessmentDateFrom: string;
+    assessmentDateTo: string;
+    documentIdsForAssessment: number[];
+    personIdsForAssessment: number[];
+    organisationUnitIdsForAssessment: number[];
+    formalDescriptionOfRule: string;
+    superCommissionId?: number;
+}
+
+export interface CommissionResponse {
+    id: number;
+    description: MultilingualContent[];
+    sources?: string[];
+    assessmentDateFrom: string;
+    assessmentDateTo: string;
+    documentIdsForAssessment: number[];
+    personIdsForAssessment: number[];
+    organisationUnitIdsForAssessment: number[];
+    formalDescriptionOfRule: string;
+    superCommissionId: number;
+    superCommissionDescription: MultilingualContent[];
 }

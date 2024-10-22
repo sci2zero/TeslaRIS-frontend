@@ -13,12 +13,16 @@ export class AssessmentMeasureService extends BaseService {
         return super.sendRequest(axios.get, `assessment/assessment-measure?${parameters}`);
     }
 
-    async createAssessmentMeasure(body: AssessmentMeasure): Promise<AxiosResponse<Page<AssessmentMeasure>>> {
+    async createAssessmentMeasure(body: AssessmentMeasure): Promise<AxiosResponse<AssessmentMeasure>> {
         return super.sendRequest(axios.post, "assessment/assessment-measure", body, AssessmentMeasureService.idempotencyKey);
     }
 
     async updateAssessmentMeasure(assessmentMeasureId: number, body: AssessmentMeasure): Promise<AxiosResponse<Page<AssessmentMeasure>>> {
-        return super.sendRequest(axios.post, `assessment/assessment-measure/${assessmentMeasureId}`, body, AssessmentMeasureService.idempotencyKey);
+        return super.sendRequest(axios.put, `assessment/assessment-measure/${assessmentMeasureId}`, body);
+    }
+
+    async deleteAssessmentMeasure(assessmentMeasureId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `assessment/assessment-measure/${assessmentMeasureId}`);
     }
 }
 

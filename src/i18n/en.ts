@@ -407,5 +407,10 @@ export default {
     createNewAssessmentMeasureLabel: "create New Measure",
     updateAssessmentMeasureLabel: "Update Measure",
     valueLabel: "Value",
-    formalDescriptionOfRuleLabel: "Rule"
+    formalDescriptionOfRuleLabel: "Rule",
+    commissionPageLabel: "Commissions",
+    superCommissionLabel: "Super Commission",
+    commissionLabel: "Commission",
+    createNewCommissionLabel: "Create New Commission",
+    updateCommissionLabel: "Update Commission"
 }

@@ -10,18 +10,18 @@
         <v-row>
             <v-col>
                 <v-text-field
-                    v-model="value" type="number" :label="$t('valueLabel')" :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredFieldRules"></v-text-field>
+                    v-model="value" type="number" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'"
+                    :rules="requiredNumericFieldRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('codeLabel')" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="formalDescriptionOfRule" :label="$t('formalDescriptionOfRuleLabel')" :placeholder="$t('formalDescriptionOfRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="formalDescriptionOfRule" :label="$t('formalDescriptionOfRuleLabel') + '*'" :placeholder="$t('formalDescriptionOfRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
 
@@ -74,18 +74,21 @@ export default defineComponent({
         const selectedAccessLevel = ref<{ title: string, value: AccessLevel }>({title: getTitleFromValueAutoLocale(AccessLevel.OPEN) as string, value: AccessLevel.OPEN});
 
         const title = ref<any>([]);
-        const value = ref<number>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.value : 0);
+        const value = ref<number>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.value as number : 0);
         const code = ref<string>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.code as string : "");
-        const formalDescriptionOfRule = ref<string>(""); // for now
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        // TODO: update this to fetch rule methods from backend
+        const formalDescriptionOfRule = ref<string>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.formalDescriptionOfRule as string : "");
+
+        const { requiredFieldRules, requiredNumericFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const submit = () => {
             const assessmentMeasure: AssessmentMeasure = {
                 code: code.value,
                 title: title.value,
                 value: value.value,
-                formalDescriptionOfRule: formalDescriptionOfRule.value
+                formalDescriptionOfRule: formalDescriptionOfRule.value,
+                assessmentRulebookId: props.presetAssessmentMeasure?.assessmentRulebookId as number
             };
 
             emit("create", assessmentMeasure);
@@ -97,7 +100,8 @@ export default defineComponent({
             toMultilingualTextInput, value,
             languageTags, selectedAccessLevel,
             requiredFieldRules, code, submit,
-            accessLevels, requiredSelectionRules
+            accessLevels, requiredSelectionRules,
+            requiredNumericFieldRules
         };
     }
 });

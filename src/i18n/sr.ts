@@ -407,5 +407,10 @@ export default {
     createNewAssessmentMeasureLabel: "Kreiraj novu meru",
     updateAssessmentMeasureLabel: "Ažuriraj meru",
     valueLabel: "Vrednost",
-    formalDescriptionOfRuleLabel: "Pravilo"
+    formalDescriptionOfRuleLabel: "Pravilo",
+    commissionPageLabel: "Komisije",
+    superCommissionLabel: "Nad-komisija",
+    commissionLabel: "Komisija",
+    createNewCommissionLabel: "Kreiraj novu komisiju",
+    updateCommissionLabel: "Ažuriraj komisiju"
 }

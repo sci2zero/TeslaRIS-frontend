@@ -26,7 +26,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                <publisher-autocomplete-search v-model="selectedPublisher"></publisher-autocomplete-search>
             </v-col>
         </v-row>
 
@@ -106,8 +106,7 @@ export default defineComponent({
                 name: name.value as MultilingualContent[],
                 description: description.value as MultilingualContent[],
                 issueDate: issueDate.value as string,
-                publisherId: selectedPublisher.value.value < 1 ? undefined : selectedPublisher.value.value as number,
-                assessmentMeasureIds: []
+                publisherId: selectedPublisher.value.value < 1 ? undefined : selectedPublisher.value.value as number
             };
 
             emit("create", assessmentRulebook);

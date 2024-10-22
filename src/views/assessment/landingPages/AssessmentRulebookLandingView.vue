@@ -64,7 +64,9 @@
 
         <!-- Assessment Measures -->
         <br />
-        <assessment-measure-table-component :assessment-measures="assessmentMeasures" :total-assessment-measures="totalAssessmentMeasures" @switch-page="switchPage"></assessment-measure-table-component>
+        <assessment-measure-table-component
+            :assessment-measures="assessmentMeasures" :total-assessment-measures="totalAssessmentMeasures" @switch-page="switchPage" @create="addAssessmentMeasure"
+            @update="updateAssessmentMeasure"></assessment-measure-table-component>
 
         <v-row>
             <h2>{{ $t("fileItemsLabel") }}</h2>
@@ -112,6 +114,7 @@ import AssessmentRulebookForm from '@/components/assessment/assessmentRulebook/A
 import GenericAssessmentModal from '@/components/assessment/GenericAssessmentModal.vue';
 import AssessmentMeasureTableComponent from '@/components/assessment/assessmentMeasure/AssessmentMeasureTableComponent.vue';
 import type { AxiosResponse } from 'axios';
+import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
 
 
 export default defineComponent({
@@ -214,8 +217,7 @@ export default defineComponent({
                 name: assessmentRulebook.value?.name as MultilingualContent[],
                 description: assessmentRulebook.value?.description as MultilingualContent[],
                 issueDate: assessmentRulebook.value?.issueDate as string,
-                publisherId: assessmentRulebook.value?.publisherId,
-                assessmentMeasureIds: []
+                publisherId: assessmentRulebook.value?.publisherId
             }
 
             AssessmentRulebookService.updateAssessmentRulebook(assessmentRulebook.value?.id as number, updateRequest).then(() => {
@@ -233,13 +235,26 @@ export default defineComponent({
             });
         };
 
+        const addAssessmentMeasure = (newAssessmentMeasure: AssessmentMeasure) => {
+            newAssessmentMeasure.assessmentRulebookId = assessmentRulebook.value?.id as number;
+            AssessmentMeasureService.createAssessmentMeasure(newAssessmentMeasure).then(response => {
+                assessmentMeasures.value.push(response.data);
+            });
+        };
+
+        const updateAssessmentMeasure = (assessmentMeasureId: number, assessmentMeasure: AssessmentMeasure) => {
+            const index = assessmentMeasures.value.findIndex(measure => measure.id === assessmentMeasureId);
+            assessmentMeasures.value[index] = assessmentMeasure;
+        };
+
         return {
             assessmentRulebook, icon, returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo, updateAttachment,
             addAttachment, deleteAttachment, localiseDate,
             updateDescription, snackbar, snackbarMessage,
             AssessmentRulebookForm, assessmentMeasures,
-            totalAssessmentMeasures, switchPage
+            totalAssessmentMeasures, switchPage,
+            addAssessmentMeasure, updateAssessmentMeasure
         };
 }})
 

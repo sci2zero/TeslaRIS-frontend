@@ -178,6 +178,7 @@ export default defineComponent(
             const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
             const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
+            const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -252,7 +253,8 @@ export default defineComponent(
 
             const assessmentsMenu = ref<MenuItem[]>([
                 { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
-                { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' }
+                { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
+                { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([

@@ -1,22 +1,22 @@
 <template>
     <v-btn
-        density="compact" class="bottom-spacer" :disabled="selectedAssessmentMeasures.length === 0"
+        density="compact" class="bottom-spacer" :disabled="selectedCommissions.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-assessment-modal
-        :form-component="AssessmentMeasureForm"
-        :form-props="{ presetAssessmentMeasure: undefined }"
-        entity-name="AssessmentMeasure"
-        @create="createNewAssessmentMeasure"
+        :form-component="CommissionForm"
+        :form-props="{ presetCommission: undefined }"
+        entity-name="Commission"
+        @create="createNewCommission"
     />
 
     <v-data-table-server
-        v-model="selectedAssessmentMeasures"
+        v-model="selectedCommissions"
         :sort-by="tableOptions.sortBy"
-        :items="assessmentMeasures"
+        :items="commissions"
         :headers="headers"
-        :items-length="totalAssessmentMeasures"
+        :items-length="totalCommissions"
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
         show-select
@@ -26,28 +26,29 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedAssessmentMeasures"
+                        v-model="selectedCommissions"
                         :value="row.item"
                         class="table-checkbox"
                         hide-details
                     />
                 </td>
                 <td>
-                    {{ returnCurrentLocaleContent(row.item.title) }}
+                    <localized-link :to="'assessment/commissions/' + row.item.id">
+                        {{ returnCurrentLocaleContent(row.item.description) }}
+                    </localized-link>
                 </td>
-                <td>{{ row.item.code }}</td>
-                <td>{{ row.item.value }}</td>
+                <td>{{ displayTextOrPlaceholder(localiseDate(row.item.assessmentDateFrom)) }}</td>
+                <td>{{ displayTextOrPlaceholder(localiseDate(row.item.assessmentDateTo)) }}</td>
                 <td>
                     {{ row.item.formalDescriptionOfRule }}
                 </td>
                 <td>
-                    <generic-assessment-modal
-                        :form-component="AssessmentMeasureForm"
-                        :form-props="{ presetAssessmentMeasure: row.item }"
-                        is-update
-                        entity-name="Indicator"
-                        @update="updateAssessmentMeasure(row.item.id, $event)"
-                    />
+                    <localized-link v-if="row.item.superCommissionId" :to="'assessment/commissions/' + row.item.superCommissionId">
+                        {{ returnCurrentLocaleContent(row.item.superCommissionDescription) }}
+                    </localized-link>
+                    <p v-else>
+                        -
+                    </p>
                 </td>
             </tr>
         </template>
@@ -72,29 +73,30 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
-import type { AssessmentMeasure } from '@/models/AssessmentModel';
+import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
+import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericAssessmentModal from '../GenericAssessmentModal.vue';
-import AssessmentMeasureForm from './AssessmentMeasureForm.vue';
+import CommissionForm from './CommissionForm.vue';
 
 
 export default defineComponent({
-    name: "AssessmentMeasureTableComponent",
-    components: { GenericAssessmentModal },
+    name: "CommissionTableComponent",
+    components: { LocalizedLink, GenericAssessmentModal },
     props: {
-        assessmentMeasures: {
-            type: Array<AssessmentMeasure>,
+        commissions: {
+            type: Array<CommissionResponse>,
             required: true
         }, 
-        totalAssessmentMeasures: {
+        totalCommissions: {
             type: Number,
             required: true
         }},
-    emits: ["switchPage", "create", "update"],
+    emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedAssessmentMeasures = ref<AssessmentMeasure[]>([]);
+        const selectedCommissions = ref<CommissionResponse[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
         const i18n = useI18n();
@@ -103,20 +105,20 @@ export default defineComponent({
         const snackbarText = ref("");
         const timeout = 5000;
 
-        const titleLabel = computed(() => i18n.t("titleLabel"));
-        const codeLabel = computed(() => i18n.t("codeLabel"));
-        const valueLabel = computed(() => i18n.t("valueLabel"));
-        const ruleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
-        const actionLabel = computed(() => i18n.t("actionLabel"));
+        const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
+        const dateFromLabel = computed(() => i18n.t("startDateLabel"));
+        const dateToLabel = computed(() => i18n.t("endDateLabel"));
+        const formalDescriptionOfRuleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
+        const superCommissionLabel = computed(() => i18n.t("superCommissionLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "code", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "description", order: "asc"}]});
 
         const headers = [
-          { title: titleLabel, align: "start", sortable: false},
-          { title: codeLabel, align: "start", sortable: true, key: "code"},
-          { title: valueLabel, align: "start", sortable: true, key: "value"},
-          { title: ruleLabel, align: "start", sortable: true, key: "rule"},
-          { title: actionLabel, align: "start", sortable: false}
+          { title: descriptionLabel, align: "start", sortable: true, key: "description"},
+          { title: dateFromLabel, align: "start", sortable: true, key: "assessmentDateFrom"},
+          { title: dateToLabel, align: "start", sortable: true, key: "assessmentDateTo"},
+          { title: formalDescriptionOfRuleLabel, align: "start", sortable: true, key: "formalDescriptionOfRuleLabel"},
+          { title: superCommissionLabel, align: "start", sortable: false}
         ];
 
         const refreshTable = (event: any) => {
@@ -135,17 +137,17 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedAssessmentMeasures.value.map((assessmentMeasure: AssessmentMeasure) => {
-                return AssessmentMeasureService.deleteAssessmentMeasure(assessmentMeasure.id as number)
+            Promise.all(selectedCommissions.value.map((commission: CommissionResponse) => {
+                return CommissionService.deleteCommission(commission.id as number)
                     .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(assessmentMeasure.title) }));
+                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(commission.description) }));
                     })
                     .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(assessmentMeasure.title) }));
-                        return assessmentMeasure;
+                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(commission.description) }));
+                        return commission;
                     });
             })).then((failedDeletions) => {
-                selectedAssessmentMeasures.value = selectedAssessmentMeasures.value.filter((assessmentMeasure) => failedDeletions.includes(assessmentMeasure));
+                selectedCommissions.value = selectedCommissions.value.filter((commission) => failedDeletions.includes(commission));
                 refreshTable(tableOptions.value);
             });
         };
@@ -161,22 +163,17 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const createNewAssessmentMeasure = (assessmentMeasure: AssessmentMeasure) => {
-            emit("create", assessmentMeasure);
-        };
-
-        const updateAssessmentMeasure = (assessmentMeasureId: number, assessmentMeasure: AssessmentMeasure) => {
-            AssessmentMeasureService.updateAssessmentMeasure(assessmentMeasureId, assessmentMeasure).then(() => {
-                addNotification(i18n.t("updatedSuccessMessage"));
-                emit("update", assessmentMeasureId, assessmentMeasure);
+        const createNewCommission = (newCommission: Commission) => {
+            CommissionService.createCommission(newCommission).then(() => {
+                refreshTable(tableOptions.value);
             });
         };
 
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedAssessmentMeasures, notifications, createNewAssessmentMeasure,
-            updateAssessmentMeasure, localiseDate, AssessmentMeasureForm
+            selectedCommissions, notifications, localiseDate,
+            CommissionForm, createNewCommission
         };
     }
 });
