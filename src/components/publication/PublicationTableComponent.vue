@@ -1,5 +1,6 @@
 <template>
     <v-btn
+        v-if="userRole === 'ADMIN'"
         density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
@@ -24,7 +25,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            show-select
+            :show-select="userRole === 'ADMIN'"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -38,7 +39,7 @@
                     @change="onDropCallback"
                 >
                     <tr v-for="item in props.items" :key="item.id">
-                        <td>
+                        <td v-if="userRole === 'ADMIN'">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -66,7 +67,7 @@
                             {{ getPublicationTypeTitleFromValueAutoLocale(item.type) }}
                         </td>
                         <td v-if="item.doi">
-                            <doi-link :doi="item.doi"></doi-link>
+                            <identifier-link :identifier="item.doi"></identifier-link>
                         </td>
                         <td v-else>
                             {{ displayTextOrPlaceholder(item.doi) }}
@@ -100,7 +101,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import DoiLink from '../core/DoiLink.vue';
+import IdentifierLink from '../core/IdentifierLink.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
@@ -108,7 +109,7 @@ import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, DoiLink, draggable: VueDraggableNext },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,

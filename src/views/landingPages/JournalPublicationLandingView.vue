@@ -98,7 +98,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="journalPublication?.doi" class="response">
-                                    <doi-link :doi="journalPublication.doi"></doi-link>
+                                    <identifier-link :identifier="journalPublication.doi"></identifier-link>
                                 </div>
                                 <div v-if="journalPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
@@ -192,13 +192,13 @@ import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal, UriList, DoiLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

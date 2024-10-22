@@ -66,7 +66,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="patent?.doi" class="response">
-                                    <doi-link :doi="patent.doi"></doi-link>
+                                    <identifier-link :identifier="patent.doi"></identifier-link>
                                 </div>
                                 <div v-if="patent?.uris && patent?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -129,14 +129,14 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, DoiLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

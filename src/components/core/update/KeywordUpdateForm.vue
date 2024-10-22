@@ -46,6 +46,9 @@ export default defineComponent({
         });
 
         const updateKeywords = () => {
+            keywords.value.forEach((keywordMC: MultilingualContent) => {
+                keywordMC.content = keywordMC.content.trim();
+            });
             emit("update", keywords.value)
         };
 

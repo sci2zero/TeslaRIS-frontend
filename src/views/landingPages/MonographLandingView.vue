@@ -96,7 +96,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="monograph?.doi" class="response">
-                                    <doi-link :doi="monograph.doi"></doi-link>
+                                    <identifier-link :identifier="monograph.doi"></identifier-link>
                                 </div>
                                 <div v-if="monograph?.eventId">
                                     {{ $t("conferenceLabel") }}:
@@ -217,14 +217,14 @@ import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink, PublicationTableComponent },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -82,7 +82,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="thesis?.doi" class="response">
-                                    <doi-link :doi="thesis.doi"></doi-link>
+                                    <identifier-link :identifier="thesis.doi"></identifier-link>
                                 </div>
                                 <div v-if="thesis?.uris && thesis?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -183,7 +183,7 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import ThesisUpdateModal from '@/components/publication/update/ThesisUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse, ResearchArea } from '@/models/OrganisationUnitModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
@@ -195,7 +195,7 @@ import EventService from '@/services/EventService';
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, DoiLink, ThesisUpdateModal, ResearchAreaHierarchy },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, ThesisUpdateModal, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

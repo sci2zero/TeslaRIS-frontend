@@ -56,7 +56,12 @@
                             {{ displayTextOrPlaceholder(item.employmentsOther) }}
                         </td>
                         <td>{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</td>
-                        <td>{{ displayTextOrPlaceholder(item.orcid) }}</td>
+                        <td v-if="item.orcid">
+                            <identifier-link :identifier="item.orcid" type="orcid"></identifier-link>
+                        </td>
+                        <td v-else>
+                            {{ displayTextOrPlaceholder(item.orcid) }}
+                        </td>
                     </tr>
                 </draggable>
             </template>
@@ -89,11 +94,12 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import { useRouter } from 'vue-router';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
+import IdentifierLink from '../core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext },
+    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink },
     props: {
         persons: {
             type: Array<PersonIndex>,

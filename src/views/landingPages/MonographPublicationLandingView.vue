@@ -86,7 +86,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="monographPublication?.doi" class="response">
-                                    <doi-link :doi="monographPublication.doi"></doi-link>
+                                    <identifier-link :identifier="monographPublication.doi"></identifier-link>
                                 </div>
                                 <div v-if="monographPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
@@ -180,12 +180,12 @@ import type { Monograph } from '@/models/PublicationModel';
 import MonographService from '@/services/DocumentPublicationService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, MonographPublicationUpdateModal, UriList, DoiLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, MonographPublicationUpdateModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

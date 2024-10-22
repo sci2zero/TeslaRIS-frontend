@@ -66,8 +66,11 @@
                                     {{ personalInfo.eNaukaId ? personalInfo.eNaukaId : $t("notYetSetMessage") }}
                                 </div>
                                 <div>ORCID:</div>
-                                <div class="response">
-                                    {{ personalInfo.orcid ? personalInfo.orcid : $t("notYetSetMessage") }}
+                                <div v-if="personalInfo.orcid" class="response">
+                                    <identifier-link :identifier="personalInfo.orcid" type="orcid"></identifier-link>
+                                </div>
+                                <div v-else class="response">
+                                    {{ $t("notYetSetMessage") }}
                                 </div>
                                 <div>Scopus Author ID:</div>
                                 <div class="response">
@@ -206,11 +209,12 @@ import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/Expertise
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
