@@ -1,0 +1,113 @@
+name: TeslaRIS Frontend Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip running tests'
+        default: false
+        type: boolean
+      api_url:
+        description: 'Backend API URL (https://testcris.uns.ac.rs/api/)'
+        default: ''
+        required: false
+      environment:
+        description: 'Deploy environment'
+        type: environment
+        required: false
+      without_deploy:
+        description: 'Only build (without deploy)'
+        default: false
+        type: boolean
+  push:
+    branches:
+      - main
+
+env:
+  VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install package dependencies
+        run: npm ci
+
+      - name: Lint project
+        if: ${{ !inputs.skip_tests }}
+        run: npm run lint
+
+      - name: Build dist files
+        run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: teslaris-frontend
+          path: dist/
+
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if : ${{ !inputs.without_deploy }}
+    needs: build-frontend
+    environment:
+      name: ${{ inputs.environment || 'test' }}
+
+    steps:
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: teslaris-frontend
+          path: teslaris
+
+      - name: Copy files to Server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          source: "teslaris"
+          target: "tmp/github-frontend"
+
+
+      - name: Deploy application to blue node
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          script: |
+            /opt/teslaris/deploy-frontend-script.sh deploy-blue
+
+  start-new-frontend:
+    runs-on: ubuntu-latest
+    if : ${{ !inputs.without_deploy }}
+
+    needs: deploy-frontend
+    environment:
+      name: ${{ inputs.environment || 'test' }}
+    steps:
+      - name: Apply blue node
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          script: |
+            chmod +x /opt/teslaris/deploy-script.sh
+            /opt/teslaris/deploy-frontend-script.sh apply-blue
