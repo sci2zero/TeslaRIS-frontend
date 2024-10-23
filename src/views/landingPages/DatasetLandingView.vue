@@ -81,30 +81,17 @@
             </v-col>
         </v-row>
 
+        <person-document-contribution-tabs :document-id="dataset?.id" :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="dataset?.keywords ? dataset.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
         <description-section :description="dataset?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-tabs :document-id="dataset?.id" :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="dataset?.proofs ? dataset.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, dataset)"
-                    @delete="deleteAttachment($event, true, dataset)" @update="updateAttachment($event, true, dataset)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="dataset?.fileItems ? dataset.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, dataset)" @delete="deleteAttachment($event, false, dataset)"
-                    @update="updateAttachment($event, false, dataset)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="dataset" :can-edit="canEdit" :proofs="dataset?.proofs" :file-items="dataset?.fileItems"
+            in-comparator></attachment-section>
 
         <v-snackbar
             v-model="snackbar"
@@ -134,7 +121,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Dataset } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
@@ -146,11 +132,12 @@ import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateMod
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

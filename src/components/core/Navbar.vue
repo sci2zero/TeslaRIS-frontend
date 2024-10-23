@@ -180,7 +180,7 @@ export default defineComponent(
             const registerLabel = computed(() => i18n.t("registerLabel"));
             const userLoggedIn = ref(false);
 
-            const appTitle = ref("TeslaRIS");
+            const appTitle = ref("CRIS UNS");
             const sidebar = ref(false);
             const userRole = ref("");
 

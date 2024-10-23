@@ -1,11 +1,11 @@
 <template>
-    <v-row>
+    <v-row v-if="canEdit || (description && description.length > 0)">
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
                     <description-or-biography-update-modal :preset-description-or-biography="description ? description : []" :is-biography="isBiography" :read-only="!canEdit" @update="emitToParent"></description-or-biography-update-modal>
 
-                    <div><b>{{ $t("descriptionLabel") }}</b></div>
+                    <div><b>{{ isBiography ? $t("biographyLabel") : $t("descriptionLabel") }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <p>{{ returnCurrentLocaleContent(description) }}</p>
                 </v-card-text>

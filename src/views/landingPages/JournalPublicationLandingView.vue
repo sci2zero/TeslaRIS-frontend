@@ -125,30 +125,17 @@
             </v-col>
         </v-row>
 
+        <person-document-contribution-tabs :document-id="journalPublication?.id" :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="journalPublication?.keywords ? journalPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
         <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-tabs :document-id="journalPublication?.id" :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="journalPublication?.proofs ? journalPublication.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, journalPublication)"
-                    @delete="deleteAttachment($event, true, journalPublication)" @update="updateAttachment($event, true, journalPublication)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, journalPublication)" @delete="deleteAttachment($event, false, journalPublication)"
-                    @update="updateAttachment($event, false, journalPublication)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="journalPublication" :can-edit="canEdit" :proofs="journalPublication?.proofs" :file-items="journalPublication?.fileItems"
+            in-comparator></attachment-section>
 
         <v-snackbar
             v-model="snackbar"
@@ -178,7 +165,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -194,11 +180,12 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

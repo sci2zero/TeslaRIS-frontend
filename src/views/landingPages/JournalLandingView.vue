@@ -55,15 +55,30 @@
             </v-col>
         </v-row>
 
-        <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+        <br />
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Publications Table -->
-        <v-row>
-            <h2>{{ $t("journalPublicationsLabel") }}</h2>
-            <v-col cols="12">
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="publications">
+                <!-- Publications Table -->
+                <h2>{{ $t("journalPublicationsLabel") }}</h2>
                 <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-            </v-col>
-        </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <v-snackbar
             v-model="snackbar"
@@ -105,6 +120,8 @@ export default defineComponent({
     name: "JournalLandingPage",
     components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs },
     setup() {
+        const currentTab = ref("");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -131,14 +148,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
-            fetchJournal();
+            fetchJournal(true);
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
 
-        const fetchJournal = () => {
+        const fetchJournal = (uponStartup: boolean) => {
             JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
                 journal.value = response.data;
 
@@ -146,7 +163,12 @@ export default defineComponent({
 
                 journal.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                fetchPublications();                
+                if(uponStartup) {
+                    Promise.all([fetchPublications()]).then(() => {
+                        setStartTab();
+                    });
+                }
+
                 populateData();
             });
         };
@@ -168,11 +190,7 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!journal.value?.id) {
-                return;
-            }
-
-            DocumentPublicationService.findPublicationsInJournal(journal.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsInJournal(journal.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
@@ -198,15 +216,23 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchJournal();
+                    fetchJournal(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchJournal();
+                    fetchJournal(false);
                 }
             });
+        };
+
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else {
+                currentTab.value = "contributions";
+            }
         };
 
         return {
@@ -217,7 +243,8 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
             snackbar, snackbarMessage,
-            updateContributions
+            updateContributions,
+            currentTab
         };
 }})
 

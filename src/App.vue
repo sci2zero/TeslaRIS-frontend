@@ -2,7 +2,7 @@
     <v-app>
         <v-main>
             <navbar />
-            <router-view />
+            <router-view :key="$route.params.id" />
         </v-main>
         <footerbar />
     </v-app>

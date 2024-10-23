@@ -50,10 +50,20 @@
                             </localized-link>
                         </td>
                         <td v-if="$i18n.locale == 'sr'">
-                            {{ displayTextOrPlaceholder(item.employmentsSr) }}
+                            <span v-if="item.employmentsSr.trim() === ''">
+                                {{ displayTextOrPlaceholder(item.employmentsSr) }}
+                            </span>
+                            <localized-link v-for="(employment, index) in item.employmentsSr.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
+                                {{ `${employment}; ` }}
+                            </localized-link>
                         </td>
                         <td v-else>
-                            {{ displayTextOrPlaceholder(item.employmentsOther) }}
+                            <span v-if="item.employmentsOther.trim() === ''">
+                                {{ displayTextOrPlaceholder(item.employmentsOther) }}
+                            </span>
+                            <localized-link v-for="(employment, index) in item.employmentsOther.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
+                                {{ `${employment}; ` }}
+                            </localized-link>
                         </td>
                         <td>{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</td>
                         <td v-if="item.orcid">

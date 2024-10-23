@@ -129,30 +129,17 @@
             </v-col>
         </v-row>
 
+        <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
         <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="proceedings?.proofs ? proceedings.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, proceedings)"
-                    @delete="deleteAttachment($event, true, proceedings)" @update="updateAttachment($event, true, proceedings)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="proceedings?.fileItems ? proceedings.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, proceedings)" @delete="deleteAttachment($event, false, proceedings)"
-                    @update="updateAttachment($event, false, proceedings)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"
+            in-comparator></attachment-section>
 
         <!-- All Publications Table -->
         <v-row>
@@ -188,7 +175,6 @@ import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/mod
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -210,11 +196,12 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, IdentifierLink, PublicationTableComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, IdentifierLink, PublicationTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

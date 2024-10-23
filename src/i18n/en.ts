@@ -82,7 +82,7 @@ export default {
     journalLabel: "Journal",
     publisherListLabel: "Publishers",
     publisherLabel: "Publisher",
-    advancedSearchLabel: "Advanced Search",
+    advancedSearchLabel: "Search",
     saveLabel: "Save",
     saveAndAddAnotherLabel: "Save and Add Another",
     userProfileLabel: "User Profile",
@@ -99,7 +99,7 @@ export default {
     savedMessage: "Saved successfully",
     wrongOldPasswordError: "Wrong old password provided.",
     noDataMessage: "Type to search...",
-    descriptionLabel: "Description",
+    descriptionLabel: "Abstract",
     addConferenceLabel: "Add Conference",
     tookPlaceLabel: "Took Place",
     fromLabel: "From",
@@ -136,7 +136,7 @@ export default {
     noRecentPublicationsConferenceLabel: "You don't have any publications in this conference yet.",
     uriInputLabel: "Available on",
     mainContributorLabel: "Main Contributor",
-    correspondingContributorLabel: "Corresponding Contributor",
+    correspondingContributorLabel: "Corresponding Author",
     authorsLabel: "Authors",
     editorsLabel: "Editors",
     reviewersLabel: "Reviewers",
@@ -392,5 +392,6 @@ export default {
     successfulRegistrationMessage: "Registration request sent. Please check you email.",
     deactivateAccountLabel: "Deactivate Account",
     activateAccountLabel: "Activate Account",
-    takeRoleLabel: "Take Role"
+    takeRoleLabel: "Take Role",
+    subUnitsLabel: "Subunits"
 }

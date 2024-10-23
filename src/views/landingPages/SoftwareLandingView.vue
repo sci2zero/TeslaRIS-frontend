@@ -81,30 +81,17 @@
             </v-col>
         </v-row>
 
+        <person-document-contribution-tabs :document-id="software?.id" :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
         <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <person-document-contribution-tabs :document-id="software?.id" :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="software?.proofs ? software.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, software)"
-                    @delete="deleteAttachment($event, true, software)" @update="updateAttachment($event, true, software)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="software?.fileItems ? software.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, software)" @delete="deleteAttachment($event, false, software)"
-                    @update="updateAttachment($event, false, software)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="software" :can-edit="canEdit" :proofs="software?.proofs" :file-items="software?.fileItems"
+            in-comparator></attachment-section>
 
         <v-snackbar
             v-model="snackbar"
@@ -134,7 +121,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Software } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
@@ -145,11 +131,12 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import SoftwareUpdateModal from '@/components/publication/update/SoftwareUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

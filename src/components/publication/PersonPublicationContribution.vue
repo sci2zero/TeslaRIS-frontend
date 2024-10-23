@@ -28,9 +28,6 @@
         </v-row>
         <v-row v-if="!basic">
             <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
-                <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
-            </v-col>
-            <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
         </v-row>

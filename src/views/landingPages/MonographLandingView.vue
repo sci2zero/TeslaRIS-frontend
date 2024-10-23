@@ -127,6 +127,8 @@
             </v-col>
         </v-row>
 
+        <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
@@ -145,8 +147,6 @@
             </v-col>
         </v-row>
         
-        <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
         <!-- Publications Table -->
         <v-row>
             <h2>{{ $t("monographPublicationsLabel") }}</h2>
@@ -155,22 +155,9 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="monograph?.proofs ? monograph.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, monograph)"
-                    @delete="deleteAttachment($event, true, monograph)" @update="updateAttachment($event, true, monograph)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="monograph?.fileItems ? monograph.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, monograph)" @delete="deleteAttachment($event, false, monograph)"
-                    @update="updateAttachment($event, false, monograph)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"
+            in-comparator></attachment-section>
 
         <v-snackbar
             v-model="snackbar"
@@ -200,7 +187,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
@@ -220,11 +206,12 @@ import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

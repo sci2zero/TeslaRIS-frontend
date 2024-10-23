@@ -105,6 +105,11 @@
             </v-col>
         </v-row>
 
+        <!-- Contributions -->
+        <person-document-contribution-tabs
+            :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
+            @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
@@ -123,27 +128,9 @@
             </v-col>
         </v-row>
 
-        <!-- Contributions -->
-        <person-document-contribution-tabs
-            :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
-            @update="updateContributions"></person-document-contribution-tabs>
-
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="thesis?.proofs ? thesis.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, thesis)"
-                    @delete="deleteAttachment($event, true, thesis)" @update="updateAttachment($event, true, thesis)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="thesis?.fileItems ? thesis.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, thesis)" @delete="deleteAttachment($event, false, thesis)"
-                    @update="updateAttachment($event, false, thesis)"></attachment-list>
-            </v-col>
-        </v-row>
+        <attachment-section
+            :document="thesis" :can-edit="canEdit" :proofs="thesis?.proofs" :file-items="thesis?.fileItems"
+            in-comparator></attachment-section>
 
         <v-snackbar
             v-model="snackbar"
@@ -173,7 +160,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Thesis } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
@@ -191,11 +177,12 @@ import ResearchAreaService from '@/services/ResearchAreaService';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, ThesisUpdateModal, ResearchAreaHierarchy },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, ThesisUpdateModal, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

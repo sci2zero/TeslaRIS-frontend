@@ -14,6 +14,7 @@ export interface OrganisationUnitIndex {
     researchAreasOther: string;
     researchAreasOtherSortable: string;
     databaseId: number;
+    superOUId: number;
     superOUNameSr: string;
     superOUNameSrSortable: string;
     superOUNameOther: string;

@@ -47,10 +47,20 @@
                     </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                    <localized-link v-if="row.item.superOUId" :to="'organisation-units/' + row.item.superOUId">
+                        {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                    </localized-link>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                    </span>
                 </td>
                 <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                    <localized-link v-if="row.item.superOUId" :to="'organisation-units/' + row.item.superOUId">
+                        {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                    </localized-link>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                    </span>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ displayTextOrPlaceholder(row.item.keywordsSr) }}

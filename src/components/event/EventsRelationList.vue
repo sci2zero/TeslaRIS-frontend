@@ -114,9 +114,7 @@ setup(props) {
     };
 
     const navigateToTargetEvent = (eventId: number) => {
-        router.push({ name: "conferenceLandingPage", params: {id: eventId} }).then(() => {
-            router.go(0);
-        });
+        router.push({ name: "conferenceLandingPage", params: {id: eventId} });
     };
 
     const refreshRelationsList = () => {
