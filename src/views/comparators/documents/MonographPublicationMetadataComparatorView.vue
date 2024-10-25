@@ -141,10 +141,12 @@ export default defineComponent({
         const fetchMonographs = () => {
             DocumentPublicationService.readMonographPublication(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftMonographPublication.value = response.data;
+                leftMonographPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readMonographPublication(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightMonographPublication.value = response.data;
+                rightMonographPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

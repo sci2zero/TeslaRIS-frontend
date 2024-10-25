@@ -44,7 +44,10 @@
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div class="response">
-                                    {{ organisationUnit?.contact?.contactEmail ? organisationUnit?.contact?.contactEmail : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
                                 <div>
                                     {{ $t("phoneNumberLabel") }}:
@@ -56,7 +59,10 @@
                                     Scopus AFID:
                                 </div>
                                 <div class="response">
-                                    {{ organisationUnit?.scopusAfid ? organisationUnit?.scopusAfid : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
                             </v-col>
                             <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
@@ -180,11 +186,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent, IdentifierLink },
     setup() {
         const currentTab = ref("");
 

@@ -104,11 +104,12 @@ import type { Journal } from '@/models/JournalModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import { watch } from 'vue';
+import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch},
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,

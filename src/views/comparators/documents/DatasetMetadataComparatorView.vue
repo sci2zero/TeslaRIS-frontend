@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchDatasets = () => {
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftDataset.value = response.data;
+                leftDataset.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightDataset.value = response.data;
+                rightDataset.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

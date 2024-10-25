@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchThesiss = () => {
             DocumentPublicationService.readThesis(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftThesis.value = response.data;
+                leftThesis.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readThesis(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightThesis.value = response.data;
+                rightThesis.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

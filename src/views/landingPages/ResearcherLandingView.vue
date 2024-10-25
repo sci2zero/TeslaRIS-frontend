@@ -59,7 +59,10 @@
                                 </div>
                                 <div>eCRIS-ID:</div>
                                 <div class="response">
-                                    {{ personalInfo.eCrisId ? personalInfo.eCrisId : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="personalInfo.eCrisId" :identifier="personalInfo.eCrisId" type="ecris"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
                                 <div>enaukaID:</div>
                                 <div class="response">
@@ -74,7 +77,10 @@
                                 </div>
                                 <div>Scopus Author ID:</div>
                                 <div class="response">
-                                    {{ personalInfo.scopusAuthorId ? personalInfo.scopusAuthorId : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="personalInfo.scopusAuthorId" :identifier="personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -100,7 +106,7 @@
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail" class="response">
-                                    {{ personalInfo.contact.contactEmail }}
+                                    <identifier-link :identifier="personalInfo.contact.contactEmail" type="email"></identifier-link>
                                 </div>
                                 <div v-if="personalInfo.contact.phoneNumber">
                                     {{ $t("phoneNumberLabel") }}:

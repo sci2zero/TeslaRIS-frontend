@@ -156,7 +156,7 @@ export default {
     selectConferenceMessage: "Izaberite konferenciju da bi ste mogli izabrati ovo.",
     selectOnePublicationSeriesMessage: "Možete selektovati samo jedan tip serije publikacija.",
     personOtherNamesLabel: "Oblik imena korišćen u radu",
-    addCustomLabel: "Prilagođeno",
+    addCustomLabel: "Prilagodi",
     selectFromListLabel: "Lista",
     addPatentLabel: "Dodaj patent",
     addSoftwareLabel: "Dodaj softver",

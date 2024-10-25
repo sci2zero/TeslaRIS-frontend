@@ -145,6 +145,7 @@ export default defineComponent({
                 }
 
                 leftConference.value = response.data;
+                leftConference.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             EventService.readConference(parseInt(currentRoute.params.rightId as string)).then((response) => {
@@ -154,6 +155,7 @@ export default defineComponent({
                 }
 
                 rightConference.value = response.data;
+                rightConference.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

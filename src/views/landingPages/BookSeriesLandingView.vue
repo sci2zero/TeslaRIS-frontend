@@ -55,12 +55,31 @@
             </v-col>
         </v-row>
 
-        <person-publication-series-contribution-tabs :contribution-list="bookSeries?.contributions ? bookSeries.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
-
-        <!-- Publication Table -->
         <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
-        
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (bookSeries?.contributions && bookSeries?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="publications">
+                <!-- Publications Table -->
+                <h2>{{ $t("journalPublicationsLabel") }}</h2>
+                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-publication-series-contribution-tabs :contribution-list="bookSeries?.contributions ? bookSeries.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -100,6 +119,8 @@ export default defineComponent({
     name: "BookSeriesLandingPage",
     components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs },
     setup() {
+        const currentTab = ref("");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -126,14 +147,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
-            fetchBookSeries();
+            fetchBookSeries(true);
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
 
-        const fetchBookSeries = () => {
+        const fetchBookSeries = (uponStartup: boolean) => {
             BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
                 bookSeries.value = response.data;
 
@@ -141,7 +162,12 @@ export default defineComponent({
 
                 bookSeries.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                fetchPublications();                
+                if(uponStartup) {
+                    Promise.all([fetchPublications()]).then(() => {
+                        setStartTab();
+                    });
+                }
+
                 populateData();
             });
         };
@@ -163,11 +189,7 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!bookSeries.value?.id) {
-                return;
-            }
-
-            BookSeriesService.findPublicationsForBookSeries(bookSeries.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
+            return BookSeriesService.findPublicationsForBookSeries(bookSeries.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements
             });
@@ -193,22 +215,30 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchBookSeries();
+                    fetchBookSeries(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchBookSeries();
+                    fetchBookSeries(false);
                 }
             });
+        };
+
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else {
+                currentTab.value = "contributions";
+            }
         };
 
         return {
             bookSeries, icon,
             publications, 
             totalPublications,
-            switchPage,
+            switchPage, currentTab,
             returnCurrentLocaleContent,
             languageTagMap, canEdit,
             updateBasicInfo, snackbar,

@@ -121,10 +121,12 @@ export default defineComponent({
         const fetchJournals = () => {
             JournalService.readJournal(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftJournal.value = response.data;
+                leftJournal.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             JournalService.readJournal(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightJournal.value = response.data;
+                rightJournal.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

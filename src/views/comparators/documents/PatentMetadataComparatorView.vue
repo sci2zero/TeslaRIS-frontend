@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchPatents = () => {
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftPatent.value = response.data;
+                leftPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightPatent.value = response.data;
+                rightPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchJournals = () => {
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftJournalPublication.value = response.data;
+                leftJournalPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightJournalPublication.value = response.data;
+                rightJournalPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

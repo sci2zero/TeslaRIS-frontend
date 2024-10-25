@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchSoftwares = () => {
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftSoftware.value = response.data;
+                leftSoftware.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightSoftware.value = response.data;
+                rightSoftware.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 

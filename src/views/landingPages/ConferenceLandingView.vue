@@ -217,6 +217,13 @@ export default defineComponent({
 
             const fromDate = new Date(Date.parse(from));
             const toDate = new Date(Date.parse(to));
+            if (fromDate.getDate() === 1 && fromDate.getMonth() === 0 && 
+                fromDate.getDate() === toDate.getDate() && 
+                fromDate.getMonth() === toDate.getMonth() && 
+                fromDate.getFullYear() === toDate.getFullYear()) 
+            {
+                return `${fromDate.getFullYear()}`;
+            }
 
             const diffInMonths = Math.abs((toDate.getMonth() - fromDate.getMonth()) + 
                       12 * (toDate.getFullYear() - fromDate.getFullYear()));

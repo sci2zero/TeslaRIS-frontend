@@ -58,7 +58,7 @@
                 @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
         <v-col cols="2" class="custom-label">
-            <v-btn color="primary" @click="customNameInput = !customNameInput">
+            <v-btn color="primary" class="text-body-2" @click="customNameInput = !customNameInput">
                 {{ !customNameInput ? $t("addCustomLabel") : $t("selectFromListLabel") }}
             </v-btn>
         </v-col>
@@ -193,7 +193,7 @@ export default defineComponent({
             if(props.presetContributionValue && !valueSet.value) {
                 valueSet.value = true;
 
-                const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
+                const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
                 presetAffiliations.value = props.presetContributionValue.institutionIds;
 
                 firstName.value = props.presetContributionValue.selectedOtherName[0];

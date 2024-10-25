@@ -129,25 +129,41 @@
             </v-col>
         </v-row>
 
-        <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+        <br />
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (proceedings?.contributions && proceedings?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="publications">
+                <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
+                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <!-- Keywords -->
+        <br />
         <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
         <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
+        <br />
         <attachment-section
             :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"
             in-comparator></attachment-section>
-
-        <!-- All Publications Table -->
-        <v-row>
-            <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
-            <v-col cols="12">
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-            </v-col>
-        </v-row>
 
         <v-snackbar
             v-model="snackbar"
@@ -203,6 +219,8 @@ export default defineComponent({
     name: "ProceedingsLandingPage",
     components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, IdentifierLink, PublicationTableComponent },
     setup() {
+        const currentTab = ref("");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -236,14 +254,14 @@ export default defineComponent({
                 canEdit.value = response.data;
             });
 
-            fetchProceedings();
+            fetchProceedings(true);
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
 
-        const fetchProceedings = () => {
+        const fetchProceedings = (uponStartup: boolean) => {
             ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedings.value = response.data;
 
@@ -254,7 +272,12 @@ export default defineComponent({
                 fetchConnectedEntities();
 
                 populateData();
-                fetchPublications();
+                
+                if(uponStartup) {
+                    Promise.all([fetchPublications()]).then(() => {
+                        setStartTab();
+                    });
+                }
             });
         };
 
@@ -275,11 +298,7 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!proceedings.value?.id) {
-                return;
-            }
-
-            DocumentPublicationService.findPublicationsInProceedings(proceedings.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsInProceedings(proceedings.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
@@ -363,20 +382,28 @@ export default defineComponent({
                 snackbar.value = true;
                 fetchConnectedEntities();
                 if(reload) {
-                    fetchProceedings();
+                    fetchProceedings(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchProceedings();
+                    fetchProceedings(false);
                 }
             });
         };
 
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else {
+                currentTab.value = "contributions";
+            }
+        };
+
         return {
             proceedings, icon,
-            publications, event,
+            publications, event, currentTab,
             totalPublications, switchPage,
             returnCurrentLocaleContent, localiseDate,
             languageTagMap, publicationSeriesType,
