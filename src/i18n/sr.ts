@@ -393,5 +393,6 @@ export default {
     deactivateAccountLabel: "Deaktiviraj nalog",
     activateAccountLabel: "Aktiviraj nalog",
     takeRoleLabel: "Preuzmi ulogu",
-    subUnitsLabel: "Podjedinice"
+    subUnitsLabel: "Podjedinice",
+    additionalInfoLabel: "Dodatni podaci"
 }

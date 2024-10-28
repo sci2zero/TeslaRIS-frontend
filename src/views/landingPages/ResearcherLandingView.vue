@@ -120,56 +120,75 @@
                 </v-card>
             </v-col>
         </v-row>
-
-        <!-- Keywords -->
-        <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
-
-        <!-- Biography -->
-        <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
-
-        <v-row>
-            <v-col cols="6">
-                <!-- Expertises and Skills -->
-                <expertise-or-skill-list :expertise-or-skills="person?.expertisesOrSkills" :person="person" :can-edit="canEdit" @crud="fetchPerson"></expertise-or-skill-list>
-                <br />
-                <!-- Prizes -->
-                <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit" @crud="fetchPerson"></prize-list>
-            </v-col>
-
-
-            <!-- Involvements -->
-            <v-col cols="6">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <person-involvement-modal :read-only="!canEdit" @create="addInvolvement"></person-involvement-modal>
-
-                        <div><h2>{{ $t("involvementsLabel") }}</h2></div>
-                        <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <br />
-                        <div v-if="employments.length > 0">
-                            <h3>{{ $t("employmentsLabel") }}</h3>
-                        </div>
-                        <br />
-                        <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
-                        <div v-if="education.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
-                        </div>
-                        <br />
-                        <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
-                        <div v-if="memberships.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
-                        </div>
-                        <br />
-                        <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Publication Table -->
-        <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
     
+        <br />
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+
+                <!-- Biography -->
+                <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
+
+                <v-row>
+                    <v-col cols="6">
+                        <!-- Expertises and Skills -->
+                        <expertise-or-skill-list :expertise-or-skills="person?.expertisesOrSkills" :person="person" :can-edit="canEdit" @crud="fetchPerson"></expertise-or-skill-list>
+                        <br />
+                        <!-- Prizes -->
+                        <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit" @crud="fetchPerson"></prize-list>
+                    </v-col>
+
+
+                    <!-- Involvements -->
+                    <v-col cols="6">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <person-involvement-modal :read-only="!canEdit" @create="addInvolvement"></person-involvement-modal>
+
+                                <div><h2>{{ $t("involvementsLabel") }}</h2></div>
+                                <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                                <br />
+                                <div v-if="employments.length > 0">
+                                    <h3>{{ $t("employmentsLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <div v-if="education.length > 0">
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <div v-if="memberships.length > 0">
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="publications">
+                <!-- Publication Table -->
+                <h1>{{ $t("publicationsLabel") }}</h1>
+                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -222,6 +241,8 @@ export default defineComponent({
     name: "ResearcherLandingPage",
     components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink },
     setup() {
+        const currentTab = ref("additionalInfo");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
         
@@ -473,7 +494,8 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
-            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate
+            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
+            currentTab
         };
 }})
 

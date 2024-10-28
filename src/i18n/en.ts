@@ -393,5 +393,6 @@ export default {
     deactivateAccountLabel: "Deactivate Account",
     activateAccountLabel: "Activate Account",
     takeRoleLabel: "Take Role",
-    subUnitsLabel: "Subunits"
+    subUnitsLabel: "Subunits",
+    additionalInfoLabel: "Additional information"
 }

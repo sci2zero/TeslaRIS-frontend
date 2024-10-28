@@ -81,20 +81,6 @@
         <!-- Keywords -->
         <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <!-- Research Area -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-ares-update-modal>
-
-                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
         <br />
         <v-tabs
             v-model="currentTab"
@@ -109,6 +95,9 @@
             </v-tab>
             <v-tab value="relations">
                 {{ $t("relationsLabel") }}
+            </v-tab>
+            <v-tab value="researchAreas">
+                {{ $t("researchAreasLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -141,6 +130,21 @@
                 <v-row>
                     <v-col>
                         <organisation-unit-table-component :organisation-units="subUnits" :total-o-us="totalSubUnits" @switch-page="switchSubUnitsPage"></organisation-unit-table-component>
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchAreas">
+                <!-- Research Area -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-ares-update-modal>
+
+                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
+                            </v-card-text>
+                        </v-card>
                     </v-col>
                 </v-row>
             </v-tabs-window-item>
