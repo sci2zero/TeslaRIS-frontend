@@ -39,7 +39,7 @@ export default {
     accountActivationSuccessfull: "Account successfully activated, you can now close this page and login.",
     accountActivationFailed: "Account activation failed, if this issue persists please contact platform administrator.",
     organisationUnitNameColumn: "organisationUnitNameOther",
-    superOUColumn: "super_ou_name_other",
+    superOUColumn: "superOUNameOther",
     superOULabel: "Super Organisation Unit",
     birthdateLabel: "Birthdate",
     placeOfBirthLabel: "Place of Birth",
@@ -394,5 +394,6 @@ export default {
     activateAccountLabel: "Activate Account",
     takeRoleLabel: "Take Role",
     subUnitsLabel: "Subunits",
-    additionalInfoLabel: "Additional information"
+    additionalInfoLabel: "Additional information",
+    websiteLabel: "Website"
 }

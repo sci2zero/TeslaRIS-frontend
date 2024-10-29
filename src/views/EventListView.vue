@@ -3,7 +3,7 @@
         <h1>{{ $t("eventListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component :preset-search-input="presetSearchParams" @search="search"></search-bar-component>
+        <search-bar-component :preset-search-input="presetSearchParams" @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <span class="d-flex align-center">
             <v-btn color="primary" @click="addConference">
@@ -15,7 +15,7 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
-        <event-table-component :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
+        <event-table-component ref="tableRef" :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
     </v-container>
 </template>
 
@@ -49,6 +49,7 @@ export default defineComponent({
         const direction = ref("");
 
         const returnSerialEvents = ref(true);
+        const tableRef = ref<typeof EventTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
@@ -57,6 +58,11 @@ export default defineComponent({
         watch(returnSerialEvents, () => {
             search(searchParams.value);
         });
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortOption([]);
+            search(tokenParams); 
+        };
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -78,8 +84,11 @@ export default defineComponent({
             router.push({name: "submitConference"});
         }
 
-        return { search, events, totalEvents, switchPage,
-            addConference, presetSearchParams, returnSerialEvents };
+        return {
+            search, events, totalEvents, switchPage,
+            addConference, presetSearchParams, returnSerialEvents,
+            tableRef, clearSortAndPerformSearch
+        };
     }
 });
 </script>

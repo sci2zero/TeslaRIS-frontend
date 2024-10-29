@@ -160,11 +160,20 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const nonMandatoryEmailFieldRules = [
+        (value: string) => {
+            if (!value) return true;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) return emailFormatMessage.value;
+            return true;
+        }
+    ];
+
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
-        emailFieldRules
+        emailFieldRules, nonMandatoryEmailFieldRules
     };
 };

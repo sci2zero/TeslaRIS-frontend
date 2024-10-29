@@ -114,6 +114,12 @@
                                 <div v-if="personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
                                 </div>
+                                <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
+                                    {{ $t("websiteLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="person?.personalInfo.uris"></uri-list>
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -235,11 +241,12 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("additionalInfo");
 

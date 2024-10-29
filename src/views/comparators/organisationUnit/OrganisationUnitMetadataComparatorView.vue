@@ -186,6 +186,13 @@ export default defineComponent({
 
             organisationUnit1.researchAreas = organisationUnit2.researchAreas;
 
+            organisationUnit2.uris!.forEach(uri => {
+                if (!organisationUnit1.uris!.includes(uri)) {
+                    organisationUnit1.uris!.push(uri);
+                }
+            });
+            organisationUnit2.uris = [];
+
             organisationUnit1.location!.latitude = organisationUnit2.location?.latitude as number;
             organisationUnit1.location!.longitude = organisationUnit2.location?.longitude as number;
             organisationUnit1.location!.address = organisationUnit2.location?.address;
@@ -226,6 +233,7 @@ export default defineComponent({
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
+            leftOrganisationUnit.value!.uris = updatedData.uris;
 
             leftUpdateRequest.value = updatedData;
             
@@ -242,6 +250,7 @@ export default defineComponent({
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
+            rightOrganisationUnit.value!.uris = updatedData.uris;
 
             rightUpdateRequest.value = updatedData;
             

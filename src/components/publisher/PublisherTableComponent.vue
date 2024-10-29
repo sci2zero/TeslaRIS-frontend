@@ -163,22 +163,30 @@ export default defineComponent({
                 selectedPublishers.value = selectedPublishers.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
 
-        return {selectedPublishers, headers, notifications,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        return {
+            selectedPublishers, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            setSortOption
+        };
     }
 });
 </script>

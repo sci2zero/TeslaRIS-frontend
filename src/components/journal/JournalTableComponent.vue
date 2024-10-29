@@ -183,10 +183,18 @@ export default defineComponent({
             }});
         };
 
-        return {selectedJournals, headers, notifications,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        return {
+            selectedJournals, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startPublicationComparison, startMetadataComparison};
+            startPublicationComparison, startMetadataComparison,
+            setSortOption
+        };
     }
 });
 </script>

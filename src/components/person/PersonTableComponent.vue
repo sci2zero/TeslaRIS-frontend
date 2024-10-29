@@ -229,12 +229,17 @@ export default defineComponent({
             emit("dragged", event);
         };
 
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
         return {selectedPersons, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             localiseDate, startPublicationComparison,
             startMetadataComparison, onDropCallback,
-            tableWrapper };
+            tableWrapper, setSortOption };
     }
 });
 </script>

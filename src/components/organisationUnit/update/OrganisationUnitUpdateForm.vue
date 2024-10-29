@@ -16,7 +16,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
+                        <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -27,6 +27,11 @@
                 <v-row>
                     <v-col>
                         <v-text-field v-model="scopusAfid" label="Scopus AFID" placeholder="Scopus AFID" :rules="scopusAfidValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -57,10 +62,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
+import UriInput from '@/components/core/UriInput.vue';
+
 
 export default defineComponent({
     name: "OrganisationUnitUpdateForm",
-    components: { MultilingualTextInput, OpenLayersMap },
+    components: { MultilingualTextInput, OpenLayersMap, UriInput },
     props: {
         presetOU: {
             type: Object as PropType<OrganisationUnitResponse | undefined>,
@@ -87,14 +94,16 @@ export default defineComponent({
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const mapRef = ref<typeof OpenLayersMap>();
+        const urisRef = ref<typeof UriInput>();
 
         const name = ref<any>([]);
         const nameAbbreviation = ref(props.presetOU?.nameAbbreviation);
         const email = ref(props.presetOU?.contact?.contactEmail);
         const phoneNumber = ref(props.presetOU?.contact?.phoneNumber);
         const scopusAfid = ref(props.presetOU?.scopusAfid);
+        const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
-        const { requiredFieldRules, scopusAfidValidationRules } = useValidationUtils();
+        const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
 
         const updateOU = () => {
             const updatedOU: OrganisationUnitRequest = {
@@ -104,7 +113,8 @@ export default defineComponent({
                 researchAreasId: [],
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
                 contact: {contactEmail: email.value as string, phoneNumber: phoneNumber.value as string},
-                scopusAfid: scopusAfid.value
+                scopusAfid: scopusAfid.value,
+                uris: uris.value
             };
 
             emit("update", updatedOU);
@@ -114,10 +124,12 @@ export default defineComponent({
             nameRef.value?.clearInput();
             name.value = props.presetOU?.name as MultilingualContent[];
 
+            uris.value = props.presetOU?.uris as string[];
             nameAbbreviation.value = props.presetOU?.nameAbbreviation;
             email.value = props.presetOU?.contact?.contactEmail;
             phoneNumber.value = props.presetOU?.contact?.phoneNumber;
             scopusAfid.value = props.presetOU?.scopusAfid;
+            urisRef.value?.refreshModelValue(uris.value);
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageList.value));
         };
@@ -128,7 +140,8 @@ export default defineComponent({
             email, phoneNumber, scopusAfid,
             requiredFieldRules, updateOU,
             toMultilingualTextInput, languageList,
-            scopusAfidValidationRules, nameRef
+            scopusAfidValidationRules, nameRef, uris,
+            nonMandatoryEmailFieldRules
         };
     }
 });

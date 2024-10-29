@@ -64,6 +64,12 @@
                                         {{ $t("notYetSetMessage") }}
                                     </span>
                                 </div>
+                                <div v-if="organisationUnit?.uris && organisationUnit.uris.length > 0">
+                                    {{ $t("websiteLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="organisationUnit?.uris"></uri-list>
+                                </div>
                             </v-col>
                             <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
                                 <div>
@@ -191,11 +197,12 @@ import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.v
 import { getErrorMessageForErrorKey } from '@/i18n';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent, IdentifierLink },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("");
 
@@ -356,6 +363,7 @@ export default defineComponent({
             organisationUnit.value!.location = basicInfo.location;
             organisationUnit.value!.contact = basicInfo.contact;
             organisationUnit.value!.scopusAfid = basicInfo.scopusAfid;
+            organisationUnit.value!.uris = basicInfo.uris;
             performUpdate(false);
         };
 
@@ -398,7 +406,8 @@ export default defineComponent({
                 keyword: organisationUnit.value!.keyword,
                 researchAreasId: researchAreaIds,
                 location: organisationUnit.value?.location,
-                contact: organisationUnit.value?.contact
+                contact: organisationUnit.value?.contact,
+                uris: organisationUnit.value?.uris as string[]
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -420,7 +429,8 @@ export default defineComponent({
                 researchAreasId: organisationUnit.value!.researchAreas.map(leafResearchArea => leafResearchArea.id as number),
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
-                scopusAfid: organisationUnit.value?.scopusAfid
+                scopusAfid: organisationUnit.value?.scopusAfid,
+                uris: organisationUnit.value?.uris as string[]
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {

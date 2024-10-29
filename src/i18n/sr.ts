@@ -39,7 +39,7 @@ export default {
     accountActivationSuccessfull: "Nalog uspešno aktiviran, možete zatvoriti ovu stranicu i ulogovati se.",
     accountActivationFailed: "Aktivacija naloga neuspešna, ako ovaj problem perzistira obratite se administratoru.",
     organisationUnitNameColumn: "organisationUnitNameSr",
-    superOUColumn: "super_ou_name_sr",
+    superOUColumn: "superOUNameSr",
     superOULabel: "Organizaciona nad-jedinica",
     birthdateLabel: "Datum rođenja",
     placeOfBirthLabel: "Mesto rođenja",
@@ -394,5 +394,6 @@ export default {
     activateAccountLabel: "Aktiviraj nalog",
     takeRoleLabel: "Preuzmi ulogu",
     subUnitsLabel: "Podjedinice",
-    additionalInfoLabel: "Dodatni podaci"
+    additionalInfoLabel: "Dodatni podaci",
+    websiteLabel: "Web sajt"
 }

@@ -230,7 +230,8 @@ export default defineComponent({
                     superOUNameSrSortable: "",
                     superOUNameOther: "",
                     superOUNameOtherSortable: "",
-                    id: ""
+                    id: "",
+                    superOUId: -1
                 };
 
                 hadToBeCreated.value = true;

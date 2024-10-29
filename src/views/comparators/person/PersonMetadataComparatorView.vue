@@ -261,6 +261,12 @@ export default defineComponent({
             person2.contact.contactEmail = "";
             person1.contact.phoneNumber = person2.contact.phoneNumber;
             person2.contact.phoneNumber = "";
+            person2.uris!.forEach(uri => {
+                if (!person1.uris!.includes(uri)) {
+                    person1.uris!.push(uri);
+                }
+            });
+            person2.uris = [];
 
             person1.postalAddress!.countryId = person2.postalAddress?.countryId as number;
 

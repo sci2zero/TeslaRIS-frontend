@@ -225,10 +225,18 @@ export default defineComponent({
             }});
         };
 
-        return {selectedEvents, headers, notifications,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        return {
+            selectedEvents, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startProceedingsComparison, startMetadataComparison};
+            startProceedingsComparison, startMetadataComparison,
+            setSortOption
+        };
     }
 });
 </script>

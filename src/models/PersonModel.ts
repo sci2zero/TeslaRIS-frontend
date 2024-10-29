@@ -127,6 +127,7 @@ export interface PersonalInfo {
     eNaukaId?: string;
     orcid?: string;
     scopusAuthorId?: string;
+    uris: string[];
 }
 
 export interface ExpertiseOrSkillResponse {

@@ -85,6 +85,11 @@
                         <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageList)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col>
+                        <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
     </v-form>
@@ -104,11 +109,12 @@ import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import CountryService from '@/services/CountryService';
 import DatePicker from '@/components/core/DatePicker.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import UriInput from '@/components/core/UriInput.vue';
 
 
 export default defineComponent({
     name: "PersonUpdateForm",
-    components: { MultilingualTextInput, DatePicker },
+    components: { MultilingualTextInput, DatePicker, UriInput },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
@@ -152,11 +158,13 @@ export default defineComponent({
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>();
 
-
         const cityRef = ref<typeof MultilingualTextInput>();
         const streetAndNumberRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>()
+
         const city = ref<any>([]);
         const streetAndNumber = ref<any>([]);
+        const uris = ref<string[]>(props.presetPerson?.personalInfo.uris as string[]);
 
         const sexes = getSexForGivenLocale();
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
@@ -175,7 +183,8 @@ export default defineComponent({
                 orcid: orcid.value,
                 placeOfBirth: placeOfBirth.value,
                 postalAddress: {city: city.value, countryId: selectedCountry.value?.value as number, streetAndNumber: streetAndNumber.value},
-                scopusAuthorId: scopus.value
+                scopusAuthorId: scopus.value,
+                uris: uris.value
             };
 
             emit("update", updatedPerson);
@@ -196,6 +205,7 @@ export default defineComponent({
                 });
             }
 
+            uris.value = props.presetPerson?.personalInfo.uris as string[];
             placeOfBirth.value = props.presetPerson?.personalInfo.placeOfBirth;
             email.value = props.presetPerson?.personalInfo.contact.contactEmail;
             phoneNumber.value = props.presetPerson?.personalInfo.contact.phoneNumber;
@@ -205,6 +215,7 @@ export default defineComponent({
             eNaukaId.value = props.presetPerson?.personalInfo.eNaukaId;
             apvnt.value = props.presetPerson?.personalInfo.apvnt;
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
+            urisRef.value?.refreshModelValue(uris.value);
 
             cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageList.value));
             streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageList.value));
@@ -217,7 +228,7 @@ export default defineComponent({
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
-            streetAndNumberRef, refreshForm
+            streetAndNumberRef, refreshForm, uris, urisRef
         };
     }
 });

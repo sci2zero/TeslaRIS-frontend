@@ -245,13 +245,18 @@ export default defineComponent({
             }});
         };
 
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, userRole, deleteSelection, tableWrapper,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
             getPublicationTypeTitleFromValueAutoLocale,
             startMetadataComparison, getDocumentLandingPageBasePath,
-            startPublicationComparison
+            startPublicationComparison, setSortOption
         };
     }
 });

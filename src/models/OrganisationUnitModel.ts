@@ -29,6 +29,7 @@ export interface OrganisationUnitRequest {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
+    uris: string[];
 }
 
 export interface OrganisationUnitResponse {
@@ -40,6 +41,7 @@ export interface OrganisationUnitResponse {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
+    uris: string[]
 }
 
 export enum OrganisationUnitsRelationType {

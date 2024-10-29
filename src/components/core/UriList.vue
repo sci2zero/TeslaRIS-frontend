@@ -27,7 +27,8 @@ export default defineComponent({
 <style scoped>
 
 .uri {
-    margin-top:10px
+    margin-top: 10px;
+    margin-left: -15px;
 }
 
 :deep(.v-btn__content) {

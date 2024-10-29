@@ -216,10 +216,15 @@ export default defineComponent({
             }});
         };
 
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
         return {selectedOUs, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startEmploymentComparison,
+            startEmploymentComparison, setSortOption,
             startMetadataComparison};
     }
 });

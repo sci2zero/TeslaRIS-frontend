@@ -11,7 +11,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
 
@@ -19,7 +18,7 @@ export default defineComponent({
     name: "IdentifierLink",
     props: {
         identifier: {
-            type: Object as PropType<string | undefined>,
+            type: String,
             required: true,
         },
         type: {
