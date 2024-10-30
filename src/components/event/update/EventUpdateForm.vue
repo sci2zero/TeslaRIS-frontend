@@ -44,8 +44,14 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
-                        <v-autocomplete v-model="state" :label="$t('stateLabel')" :items="countryList" return-object></v-autocomplete>
+                    <v-col>
+                        <v-select
+                            v-model="selectedCountry"
+                            hide-details="auto"
+                            :items="countries"
+                            :label="$t('countryLabel')"
+                            return-object
+                        ></v-select>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -90,7 +96,7 @@
 import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -98,8 +104,8 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Conference } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import { getCountriesForGivenLocale, countriesSr, countriesEn } from '@/i18n/countries';
 import DatePicker from '@/components/core/DatePicker.vue';
+import CountryService from '@/services/CountryService';
 
 
 export default defineComponent({
@@ -123,13 +129,39 @@ export default defineComponent({
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
-        const countryList = getCountriesForGivenLocale();
-
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
             });
+
+            fetchCountries();
         });
+
+        const fetchCountries = () => {
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [{ title: "", value: -1}];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                });
+
+                setAdditionalInfo();
+            });
+        };
+
+        watch(i18n.locale, () => {
+            fetchCountries();
+        });
+
+        const setAdditionalInfo = () => {
+            if (props.presetEvent?.countryId) {
+                const country = countries.value.find(country => 
+                    country.value === props.presetEvent?.countryId
+                );
+                if (country) {
+                    selectedCountry.value = country;
+                }
+            }
+        };
 
         watch(() => props.presetEvent, () => {
             if (props.presetEvent) {
@@ -150,7 +182,9 @@ export default defineComponent({
         const eventYear = ref(props.presetEvent?.dateFrom.split("-")[0]);
         const timePeriodInput = ref(!((new Date(dateTo.value as string).getTime() - new Date(dateFrom.value as string).getTime()) > (30 * 24 * 60 * 60 * 1000)));
         
-        const state = ref(returnCurrentLocaleContent(props.presetEvent?.state));
+        const countries = ref<{title: string, value: number}[]>([]);
+        const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
+
         const place = ref<any>([]);
         const conferenceNumber = ref(props.presetEvent?.number);
         const entryFee = ref(props.presetEvent?.fee);
@@ -166,30 +200,6 @@ export default defineComponent({
                 dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
                 dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
             }
-            
-            const multilingualState: MultilingualContent[] = [];
-            if (state.value) {
-                let stateContentIndex = -1;
-                if (i18n.locale.value === "en") {
-                    stateContentIndex = countriesEn.findIndex(obj => obj === state.value);
-                } else {
-                    stateContentIndex = countriesSr.findIndex(obj => obj === state.value);
-                }
-
-                languageTags.value?.forEach((language: LanguageTagResponse) => {
-                    let content = "";
-                    switch (language.languageCode) {
-                        case "SR":
-                            content = countriesSr[stateContentIndex];
-                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 1});
-                            break;
-                        case "EN":
-                            content = countriesEn[stateContentIndex];
-                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 2});
-                            break;
-                    }
-                });
-            }
 
             const updatedEvent: Conference = {
                 name: name.value,
@@ -198,7 +208,7 @@ export default defineComponent({
                 keywords: props.presetEvent?.keywords as MultilingualContent[],
                 dateFrom: dateFrom.value as string,
                 dateTo: dateTo.value as string,
-                state: multilingualState,
+                countryId: selectedCountry.value?.value === -1 ? undefined : selectedCountry.value?.value as number,
                 place: place.value,
                 serialEvent: serialEvent.value as boolean,
                 fee: entryFee.value,
@@ -220,7 +230,7 @@ export default defineComponent({
             placeRef.value?.clearInput();
             place.value = props.presetEvent?.place as MultilingualContent[];
 
-            state.value = returnCurrentLocaleContent(props.presetEvent?.state);
+            setAdditionalInfo();
 
             dateFrom.value = props.presetEvent?.dateFrom;
             dateTo.value = props.presetEvent?.dateTo;
@@ -239,8 +249,8 @@ export default defineComponent({
             name, nameAbbreviation, urisRef, refreshForm,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, updateEvent,
-            dateFrom, dateTo, state, place, conferenceNumber, entryFee, serialEvent,
-            eventYear, countryList, timePeriodInput, confIdValidationRules, confId
+            dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
+            eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId
         };
     }
 });

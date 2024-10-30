@@ -96,11 +96,11 @@
                                 <div v-if="personalInfo.city" class="response">
                                     {{ personalInfo.city }}
                                 </div>
-                                <div v-if="personalInfo.placeOfBrith">
+                                <div v-if="personalInfo.placeOfBirth">
                                     {{ $t("placeOfBirthLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.placeOfBrith" class="response">
-                                    {{ personalInfo.placeOfBrith }}
+                                <div v-if="personalInfo.placeOfBirth" class="response">
+                                    {{ personalInfo.placeOfBirth }}
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail">
                                     {{ $t("emailLabel") }}:

@@ -32,11 +32,11 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div v-if="publisher?.state && publisher?.state.length > 0">
+                                <div v-if="publisher?.countryId">
                                     {{ $t("stateLabel") }}:
                                 </div>
-                                <div v-if="publisher?.state && publisher?.state.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(publisher?.state) }}
+                                <div v-if="publisher?.countryId" class="response">
+                                    {{ returnCurrentLocaleContent(country?.name) }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import type { Country, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -89,6 +89,7 @@ import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublisherUpdateModal from '@/components/publisher/update/PublisherUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import CountryService from '@/services/CountryService';
 
 
 export default defineComponent({
@@ -115,6 +116,7 @@ export default defineComponent({
         const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
+        const country = ref<Country>();
 
         onMounted(() => {
             PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -128,12 +130,21 @@ export default defineComponent({
 
                 fetchPublications();     
                 populateData();
+                fetchDetails();
             });
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchDetails = () => {
+            if (publisher.value?.countryId) {
+                CountryService.readCountry(publisher.value.countryId as number).then((response) => {
+                    country.value = response.data;
+                });
+            }
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -165,11 +176,12 @@ export default defineComponent({
         const updateBasicInfo = (updatedBasicInfo: Publisher) => {
             publisher.value!.name = updatedBasicInfo.name;
             publisher.value!.place = updatedBasicInfo.place;
-            publisher.value!.state = updatedBasicInfo.state;
+            publisher.value!.countryId = updatedBasicInfo.countryId;
 
             PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                fetchDetails();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
@@ -180,7 +192,7 @@ export default defineComponent({
             publisher, icon,
             publications, 
             totalPublications,
-            switchPage,
+            switchPage, country,
             returnCurrentLocaleContent,
             languageTagMap, canEdit,
             updateBasicInfo, snackbar, snackbarMessage

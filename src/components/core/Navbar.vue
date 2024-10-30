@@ -175,6 +175,7 @@ export default defineComponent(
             const importerLabel = computed(() => i18n.t("importerLabel"));
             const researcherProfileLabel = computed(() => i18n.t("researcherProfileLabel"));
             const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
+            const countryListLabel = computed(() => i18n.t("countryListLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -244,7 +245,8 @@ export default defineComponent(
                 { title: eventListLabel, type:'icon-link', pathName: 'events' },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals' },
                 { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
-                { title: publisherListLabel, type:'icon-link', pathName: 'publishers' }
+                { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
+                { title: countryListLabel, type:'icon-link', pathName: "countries"}
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([

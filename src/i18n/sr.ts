@@ -395,5 +395,9 @@ export default {
     takeRoleLabel: "Preuzmi ulogu",
     subUnitsLabel: "Podjedinice",
     additionalInfoLabel: "Dodatni podaci",
-    websiteLabel: "Web sajt"
+    websiteLabel: "Web sajt",
+    createNewCountryLabel: "Kreiraj novu zemlju",
+    updateCountryLabel: "Ažuriraj zemlju",
+    countryCodeLabel: "Kod zemlje",
+    countryListLabel: "Zemlje"
 }

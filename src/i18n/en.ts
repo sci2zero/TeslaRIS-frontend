@@ -395,5 +395,9 @@ export default {
     takeRoleLabel: "Take Role",
     subUnitsLabel: "Subunits",
     additionalInfoLabel: "Additional information",
-    websiteLabel: "Website"
+    websiteLabel: "Website",
+    createNewCountryLabel: "Add new country",
+    updateCountryLabel: "Update country",
+    countryCodeLabel: "Country Code",
+    countryListLabel: "Countries"
 }

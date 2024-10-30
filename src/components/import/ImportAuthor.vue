@@ -216,8 +216,7 @@ export default defineComponent({
 
         const addNew = async () => {
             await waitForImportAffiliations();
-
-            console.log(importAffiliationsRef.value, props.personForLoading.firstName)
+            
             const newPerson: BasicPerson = {
                 personName: {firstname: props.personForLoading.firstName, otherName: props.personForLoading.middleName, lastname: props.personForLoading.lastName, dateFrom: null, dateTo: null},
                 contactEmail: "",

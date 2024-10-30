@@ -27,7 +27,7 @@
                         </v-select>
                     </v-col>
                 </v-row>
-                <v-row>
+                <!-- <v-row>
                     <v-col>
                         <v-select
                             v-model="selectedLicense"
@@ -37,6 +37,9 @@
                             return-object>
                         </v-select>
                     </v-col>
+                </v-row> -->
+                <v-row>
+                    <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
                 </v-row>
             </v-col>
         </v-row>
@@ -90,9 +93,15 @@ export default defineComponent({
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
             });
+            
             if(props.edit && props.presetDocumentFile) {
                     file.value.push(new File([], props.presetDocumentFile.fileName));
                     selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.license };
+
+                    if (props.presetDocumentFile.license.toString() !== "OPEN_ACCESS") {
+                        isOpenAccess.value = false;
+                    }
+
                     selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
             } 
         });
@@ -116,6 +125,7 @@ export default defineComponent({
         ];
 
         const selectedLicense = ref({ title: "Open Access", value: License.OPEN_ACCESS });
+        const isOpenAccess = ref<boolean>(true);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
@@ -125,7 +135,8 @@ export default defineComponent({
                 file: file.value![0],
                 description: description.value,
                 resourceType: selectedResourceType.value.value,
-                license: selectedLicense.value.value
+                // license: selectedLicense.value.value
+                license: isOpenAccess.value ? License.OPEN_ACCESS : License.ALL_RIGHTS_RESERVED
             }
 
             if(props.edit) {
@@ -137,7 +148,7 @@ export default defineComponent({
         };
 
         return {isFormValid, file,
-            description, descriptionRef,
+            description, descriptionRef, isOpenAccess,
             requiredFieldRules, licenses, resourceTypes,
             selectedLicense, selectedResourceType,
             addDocumentFile, requiredSelectionRules, 

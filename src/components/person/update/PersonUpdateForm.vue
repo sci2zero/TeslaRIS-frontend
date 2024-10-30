@@ -110,6 +110,7 @@ import CountryService from '@/services/CountryService';
 import DatePicker from '@/components/core/DatePicker.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import UriInput from '@/components/core/UriInput.vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -126,23 +127,48 @@ export default defineComponent({
         const isFormValid = ref(false);
         const languageList = ref<LanguageTagResponse[]>([]);
 
+        const i18n = useI18n();
+
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageList.value = response.data;
             });
 
-            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
-                countries.value = [];
-                response.data.forEach(country => {
-                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id});
-                });
-            });
+            fetchCountries();
         });
+
+        const fetchCountries = () => {
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [{ title: "", value: -1}];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                });
+
+                setAdditionalInfo();
+            });
+        };
+
+        const setAdditionalInfo = () => {
+            if (props.presetPerson?.personalInfo?.postalAddress && 
+                props.presetPerson?.personalInfo?.postalAddress?.countryId
+            ) {
+                const country = countries.value.find(country => 
+                    country.value === props.presetPerson?.personalInfo?.postalAddress?.countryId
+                );
+                if (country) {
+                    selectedCountry.value = country;
+                }
+            }
+        };
 
         watch(() => props.presetPerson, () => {
             if (props.presetPerson) {
                 refreshForm();
             }
+        });
+
+        watch(i18n.locale, () => {
+            fetchCountries();
         });
 
         const placeOfBirth = ref(props.presetPerson?.personalInfo.placeOfBirth);
@@ -199,11 +225,7 @@ export default defineComponent({
 
             selectedSex.value = {title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined};
 
-            if(props.presetPerson?.personalInfo.postalAddress?.countryId) {
-                CountryService.readCountry(props.presetPerson?.personalInfo.postalAddress?.countryId).then(response => {
-                    selectedCountry.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id};
-                });
-            }
+            setAdditionalInfo();
 
             uris.value = props.presetPerson?.personalInfo.uris as string[];
             placeOfBirth.value = props.presetPerson?.personalInfo.placeOfBirth;

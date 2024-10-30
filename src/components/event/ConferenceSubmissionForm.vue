@@ -12,7 +12,7 @@
                         <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <div v-if="!serialEvent">
+                <div v-if="!serialEvent" class="mt-3">
                     <h3>{{ $t("tookPlaceLabel") }}</h3>
                     <v-row>
                         <v-col v-if="timePeriodInput" cols="3">
@@ -37,7 +37,7 @@
                                 :label="$t('eventYearLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
                         </v-col>
                         <v-col>
-                            <v-btn color="blue darken-1" compact @click="timePeriodInput = !timePeriodInput">
+                            <v-btn color="blue darken-1" class="mt-2" compact @click="timePeriodInput = !timePeriodInput">
                                 {{ timePeriodInput ? $t("dontKnowExactDateLabel") : $t("knowExactDateLabel") }}
                             </v-btn>
                         </v-col>
@@ -48,10 +48,16 @@
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <v-autocomplete v-model="state" :label="$t('stateLabel')" :items="countryList" return-object></v-autocomplete>
+                        <v-select
+                            v-model="selectedCountry"
+                            hide-details="auto"
+                            :items="countries"
+                            :label="$t('countryLabel')"
+                            return-object
+                        ></v-select>
                     </v-col>
                 </v-row>
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
+                <v-btn color="blue darken-1" class="mt-3" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
@@ -71,7 +77,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col cols="10">
                             <v-text-field v-model="confId" label="Conf ID" placeholder="Conf ID" :rules="confIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
@@ -115,14 +121,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import { ref } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
-import { countriesSr, countriesEn } from "@/i18n/countries";
 import EventService from "@/services/EventService";
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, LanguageTagResponse } from '@/models/Common';
 import type { Conference } from '@/models/EventModel';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
@@ -130,6 +134,8 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import DatePicker from '../core/DatePicker.vue';
+import CountryService from '@/services/CountryService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -153,21 +159,28 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
 
-        const countryList = computed(() => {
-            if (i18n.locale.value === "sr") {
-                return countriesSr;
-            } else {
-                return countriesEn;
-            }
-        });
-
         const languageList = ref<LanguageTagResponse[]>();
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageList.value = response.data;
             });
-        })
+
+            fetchCountries();
+        });
+
+        const fetchCountries = () => {
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [{ title: "", value: -1}];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                });
+            });
+        };
+
+        watch(i18n.locale, () => {
+            fetchCountries();
+        });
 
         const name = ref([]);
         const nameAbbreviation = ref([]);
@@ -176,12 +189,14 @@ export default defineComponent({
         const dateFrom = ref();
         const dateTo = ref();
         const eventYear = ref();
-        const state = ref();
         const place = ref([]);
         const confId = ref("");
         const conferenceNumber = ref("");
         const entryFee = ref("");
         const serialEvent = ref(false);
+
+        const countries = ref<{title: string, value: number}[]>([]);
+        const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const abbreviationRef = ref<typeof MultilingualTextInput>();
@@ -196,30 +211,6 @@ export default defineComponent({
                 dateFrom.value = new Date(eventYear.value, 1, 1);
                 dateTo.value = new Date(eventYear.value, 11, 31);
             }
-            
-            const multilingualState: MultilingualContent[] = [];
-            if (state.value) {
-                let stateContentIndex = -1;
-                if (i18n.locale.value === "en") {
-                    stateContentIndex = countriesEn.findIndex(obj => obj === state.value);
-                } else {
-                    stateContentIndex = countriesSr.findIndex(obj => obj === state.value);
-                }
-
-                languageList.value?.forEach((language: LanguageTagResponse) => {
-                    let content = "";
-                    switch (language.languageCode) {
-                        case "SR":
-                            content = countriesSr[stateContentIndex];
-                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 1});
-                            break;
-                        case "EN":
-                            content = countriesEn[stateContentIndex];
-                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 2});
-                            break;
-                    }
-                });
-            }
 
             const newConference: Conference = {
                 name: name.value,
@@ -228,7 +219,7 @@ export default defineComponent({
                 keywords: keywords.value,
                 dateFrom: dateFrom.value,
                 dateTo: dateTo.value,
-                state: multilingualState,
+                countryId: selectedCountry.value?.value === -1 ? undefined : selectedCountry.value?.value as number,
                 place: place.value,
                 serialEvent: serialEvent.value,
                 fee: entryFee.value,
@@ -256,7 +247,7 @@ export default defineComponent({
                     dateFrom.value = null;
                     dateTo.value = null;
                     eventYear.value = null;
-                    state.value = null;
+                    selectedCountry.value = { title: "", value: -1};
                     timePeriodInput.value = true;
 
                     error.value = false;
@@ -270,13 +261,15 @@ export default defineComponent({
             });
         };
 
-        return {isFormValid, additionalFields, snackbar,
+        return {
+            isFormValid, additionalFields, snackbar,
             name, nameAbbreviation, description, keywords,
-            dateFrom, dateTo, eventYear, state, countryList,
+            dateFrom, dateTo, eventYear, countries, selectedCountry,
             place, conferenceNumber, entryFee, serialEvent,
             requiredFieldRules, addConference, timePeriodInput,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
-            confIdValidationRules, confId};
+            confIdValidationRules, confId
+        };
     }
 });
 </script>

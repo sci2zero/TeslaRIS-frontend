@@ -44,11 +44,11 @@
                                 <div v-if="conference?.description && conference.description.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(conference?.description) }}
                                 </div>
-                                <div v-if="conference?.state && conference.state.length > 0">
+                                <div v-if="conference?.countryId">
                                     {{ $t("stateLabel") }}:
                                 </div>
-                                <div v-if="conference?.state && conference.state.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(conference?.state) }}
+                                <div v-if="conference?.countryId" class="response">
+                                    {{ returnCurrentLocaleContent(country?.name) }}
                                 </div>
                                 <div v-if="conference?.place && conference.place.length > 0">
                                     {{ $t("placeLabel") }}:
@@ -140,13 +140,14 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
-import type { MultilingualContent } from '@/models/Common';
+import type { Country, MultilingualContent } from '@/models/Common';
 import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import CountryService from '@/services/CountryService';
 
 
 export default defineComponent({
@@ -172,6 +173,7 @@ export default defineComponent({
         const icon = ref("mdi-presentation");
 
         const canEdit = ref(false);
+        const country = ref<Country>();
 
         onMounted(() => {
             EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -188,7 +190,16 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(conference.value.name) as string;
 
                 fetchPublications();
+                fetchDetails();
             });
+        };
+
+        const fetchDetails = () => {
+            if (conference.value?.countryId) {
+                CountryService.readCountry(conference.value.countryId as number).then((response) => {
+                    country.value = response.data;
+                });
+            }
         };
 
         const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -255,14 +266,14 @@ export default defineComponent({
             conference.value!.nameAbbreviation = basicInfo.nameAbbreviation;
             conference.value!.dateFrom = basicInfo.dateFrom;
             conference.value!.dateTo = basicInfo.dateTo;
-            conference.value!.state = basicInfo.state;
+            conference.value!.countryId = basicInfo.countryId;
             conference.value!.place = basicInfo.place;
             conference.value!.serialEvent = basicInfo.serialEvent;
             conference.value!.fee = basicInfo.fee;
             conference.value!.number = basicInfo.number;
             conference.value!.confId = basicInfo.confId;
 
-            performUpdate(false);
+            performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
@@ -288,7 +299,7 @@ export default defineComponent({
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
-            localiseDate
+            localiseDate, country
         };
 }})
 

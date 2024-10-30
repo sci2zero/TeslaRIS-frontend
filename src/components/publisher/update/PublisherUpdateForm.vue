@@ -10,8 +10,14 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12">
-                        <v-autocomplete v-model="state" :label="$t('stateLabel')" :items="countryList" return-object></v-autocomplete>
+                    <v-col cols="10">
+                        <v-select
+                            v-model="selectedCountry"
+                            hide-details="auto"
+                            :items="countries"
+                            :label="$t('countryLabel')"
+                            return-object
+                        ></v-select>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -31,19 +37,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import { countriesSr, countriesEn } from "@/i18n/countries";
-import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Publisher } from "@/models/PublisherModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import CountryService from '@/services/CountryService';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "PublisherUpdateForm",
@@ -60,59 +65,53 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const countryList = computed(() => {
-            if (i18n.locale.value === "sr") {
-                return countriesSr;
-            } else {
-                return countriesEn;
-            }
-        });
-
         const languageList = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageList.value = response.data;
             });
+
+            fetchCountries();
+        });
+
+        const fetchCountries = () => {
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [{ title: "", value: -1}];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                });
+
+                if (props.presetPublisher?.countryId) {
+                    const country = countries.value.find(country => 
+                        country.value === props.presetPublisher?.countryId
+                    );
+                    if (country) {
+                        selectedCountry.value = country;
+                    }
+                }
+            });
+        };
+
+        watch(i18n.locale, () => {
+            fetchCountries();
         });
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
 
         const name = ref([]);
-        const state = ref(returnCurrentLocaleContent(props.presetPublisher?.state));
         const place = ref([]);
+
+        const countries = ref<{title: string, value: number}[]>([]);
+        const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
 
         const { requiredFieldRules } = useValidationUtils();
 
         const updatePublisher = () => {
-            const multilingualState: MultilingualContent[] = [];
-            if (state.value) {
-                let stateContentIndex = -1;
-                if (i18n.locale.value === "en") {
-                    stateContentIndex = countriesEn.findIndex(obj => obj === state.value);
-                } else {
-                    stateContentIndex = countriesSr.findIndex(obj => obj === state.value);
-                }
-
-                languageList.value?.forEach((language: LanguageTagResponse) => {
-                    let content = "";
-                    switch (language.languageCode) {
-                        case "SR":
-                            content = countriesSr[stateContentIndex];
-                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 1});
-                            break;
-                        case "EN":
-                            content = countriesEn[stateContentIndex];
-                            multilingualState.push({content: content, languageTag: language.languageCode, languageTagId: language.id, priority: 2});
-                            break;
-                    }
-                });
-            }
-
             const updatedPublisher: Publisher = {
                 name: name.value,
-                state: multilingualState,
+                countryId: selectedCountry.value?.value === -1 ? undefined : selectedCountry.value?.value as number,
                 place: place.value
             };
 
@@ -122,7 +121,7 @@ export default defineComponent({
         return {
             isFormValid,
             name, nameRef,
-            state, countryList,
+            countries, selectedCountry,
             place, placeRef,
             requiredFieldRules,
             updatePublisher,
