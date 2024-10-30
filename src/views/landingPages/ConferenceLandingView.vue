@@ -77,6 +77,12 @@
                                 <div v-if="keywords && keywords.length > 0">
                                     {{ $t("keywordsLabel") }}:
                                 </div>
+                                <div v-if="conference?.uris && conference?.uris.length > 0">
+                                    {{ $t("uriInputLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="conference?.uris"></uri-list>
+                                </div>
                                 <br />
                                 <div>
                                     <h2>{{ conference?.serialEvent ? $t("isSerialEventMessage") : $t("isOneTimeEventMessage") }}</h2>
@@ -147,11 +153,12 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList, EventsRelationList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -254,6 +261,7 @@ export default defineComponent({
             conference.value!.fee = basicInfo.fee;
             conference.value!.number = basicInfo.number;
             conference.value!.confId = basicInfo.confId;
+            conference.value!.uris = basicInfo.uris;
 
             performUpdate(false);
         };

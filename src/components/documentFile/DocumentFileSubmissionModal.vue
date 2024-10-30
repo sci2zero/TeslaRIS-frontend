@@ -51,7 +51,7 @@ import type { PropType } from "vue";
 
 
 export default defineComponent({
-    name: "SubmitDocumentFileModal",
+    name: "DocumentFileSubmissionModal",
     components: { DocumentFileSubmissionForm },
     props: {
         edit: {

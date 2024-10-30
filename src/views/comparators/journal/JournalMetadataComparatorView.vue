@@ -168,6 +168,13 @@ export default defineComponent({
             });
             journal2.languageTagIds = [];
 
+            journal2.uris.forEach(uri => {
+                if (!journal1.uris.includes(uri)) {
+                    journal1.uris.push(uri);
+                }
+            });
+            journal2.uris = [];
+
             journal1.contributions = journal1.contributions?.concat(journal2.contributions as PersonPublicationSeriesContribution[]);
             journal2.contributions = [];
 
@@ -198,6 +205,7 @@ export default defineComponent({
             leftJournal.value!.eissn = updatedJournal.eissn;
             leftJournal.value!.printISSN = updatedJournal.printISSN;
             leftJournal.value!.languageTagIds = updatedJournal.languageTagIds;
+            leftJournal.value!.uris = updatedJournal.uris;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -211,6 +219,7 @@ export default defineComponent({
             rightJournal.value!.eissn = updatedJournal.eissn;
             rightJournal.value!.printISSN = updatedJournal.printISSN;
             rightJournal.value!.languageTagIds = updatedJournal.languageTagIds;
+            rightJournal.value!.uris = updatedJournal.uris;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
