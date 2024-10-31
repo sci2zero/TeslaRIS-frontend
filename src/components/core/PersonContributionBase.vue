@@ -171,7 +171,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                PersonService.searchResearchers(params).then((response) => {
+                PersonService.searchResearchers(params, false).then((response) => {
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value === "sr") {

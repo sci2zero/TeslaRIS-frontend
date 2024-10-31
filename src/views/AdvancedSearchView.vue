@@ -111,7 +111,7 @@ export default defineComponent({
             
             switch(currentTab.value) {
                 case "persons":
-                    PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`).then((response) => {
+                    PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`, false).then((response) => {
                         persons.value = response.data.content;
                         totalPersons.value = response.data.totalElements;
                     });

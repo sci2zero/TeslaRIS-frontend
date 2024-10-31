@@ -49,7 +49,7 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false).then((response) => {
                 persons.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
             });

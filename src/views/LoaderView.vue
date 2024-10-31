@@ -41,7 +41,7 @@
         </v-btn>
 
         
-        <v-btn class="load-action same-line" @click="smartSkip">
+        <v-btn class="load-action same-line" :disabled="stepperValue === steps.length" @click="smartSkip">
             {{ $t('smartImportLabel') }}
             <v-tooltip
                 activator="parent"
@@ -51,7 +51,7 @@
             </v-tooltip>
         </v-btn>
 
-        <v-btn class="load-action same-line" :disabled="stepperValue != steps.length" @click="finishLoad">
+        <v-btn class="load-action same-line" :disabled="stepperValue !== steps.length" @click="finishLoad">
             {{ $t('finishLoadLabel') }}
         </v-btn>
 

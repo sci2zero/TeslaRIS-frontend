@@ -96,7 +96,7 @@
             <v-tab v-if="totalPublications > 0" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
-            <v-tab v-if="totalEmployees > 0" value="employees">
+            <v-tab v-if="totalEmployees > 0 || canEdit" value="employees">
                 {{ $t("employeesLabel") }}
             </v-tab>
             <v-tab value="relations">
@@ -116,7 +116,7 @@
             <v-tabs-window-item value="employees">
                 <!-- Employee Table -->
                 <h1>{{ $t("employeesLabel") }}</h1>
-                <person-table-component :persons="employees" :total-persons="totalEmployees" @switch-page="switchEmployeesPage"></person-table-component>
+                <person-table-component :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"></person-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
                 <!-- Relations -->

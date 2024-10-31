@@ -14,6 +14,8 @@
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
+    <add-employment-modal v-if="employmentInstitutionId > 0" :institution-id="employmentInstitutionId" @update="notifyUserAndRefreshTable"></add-employment-modal>
+    
     <div ref="tableWrapper">
         <v-data-table-server
             v-model="selectedPersons"
@@ -105,11 +107,13 @@ import { useRouter } from 'vue-router';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import IdentifierLink from '../core/IdentifierLink.vue';
+import InvolvementService from '@/services/InvolvementService';
+import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink },
+    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -122,10 +126,14 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        employmentInstitutionId: {
+            type: Number,
+            default: -1
         }
     },
     emits: ["switchPage", "dragged"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const selectedPersons = ref<PersonIndex[]>([]);
 
         const i18n = useI18n();
@@ -188,14 +196,25 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPersons.value.map((person: PersonIndex) => {
-                return PersonService.deleteResearcher(person.databaseId)
-                    .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: person.name }));
-                    })
-                    .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: person.name }));
-                        return person;
-                    });
+                if (props.employmentInstitutionId > 0) {
+                    return InvolvementService.terminateEmployment(person.databaseId, props.employmentInstitutionId)
+                        .then(() => {
+                            addNotification(i18n.t("terminationSuccessNotification", { name: person.name }));
+                        })
+                        .catch(() => {
+                            addNotification(i18n.t("terminationFailedNotification", { name: person.name }));
+                            return person;
+                        });
+                } else {
+                    return PersonService.deleteResearcher(person.databaseId)
+                        .then(() => {
+                            addNotification(i18n.t("deleteSuccessNotification", { name: person.name }));
+                        })
+                        .catch(() => {
+                            addNotification(i18n.t("deleteFailedNotification", { name: person.name }));
+                            return person;
+                        });
+                }
             })).then((failedDeletions) => {
                 selectedPersons.value = selectedPersons.value.filter((person) => failedDeletions.includes(person));
                 refreshTable(tableOptions.value);
@@ -234,12 +253,22 @@ export default defineComponent({
             tableOptions.value.sortBy = sortBy;
         };
 
+        const notifyUserAndRefreshTable = (success: boolean) => {
+            if (success) {
+                addNotification(i18n.t("savedMessage"));
+            } else {
+                addNotification(i18n.t("genericErrorMessage"));
+            }
+
+            refreshTable(tableOptions.value);
+        };
+
         return {selectedPersons, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             localiseDate, startPublicationComparison,
             startMetadataComparison, onDropCallback,
-            tableWrapper, setSortOption };
+            tableWrapper, setSortOption, notifyUserAndRefreshTable };
     }
 });
 </script>

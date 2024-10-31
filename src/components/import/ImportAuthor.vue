@@ -136,7 +136,7 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
-            PersonService.searchResearchers(`tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`).then(response => {
+            PersonService.searchResearchers(`tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`, true).then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
                 if (totalPersons.value === 0) {

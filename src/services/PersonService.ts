@@ -18,8 +18,8 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, "person/for-user");
   }
 
-  async searchResearchers(tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
-    return super.sendRequest(axios.get, `person/simple-search?${tokens}`);
+  async searchResearchers(tokens: string, strict: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}`);
   }
 
   async findResearcherByScopusAuthorId(scopusId: string): Promise<AxiosResponse<PersonIndex | null>> {
