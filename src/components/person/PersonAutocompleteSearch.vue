@@ -106,7 +106,6 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
-            console.log(selectedPerson.value)
             emit("update:modelValue", selectedPerson.value);
         };
 
