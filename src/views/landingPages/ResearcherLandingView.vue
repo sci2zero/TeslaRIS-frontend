@@ -348,11 +348,6 @@ export default defineComponent({
         };
 
         const fetchAndSetCountryInfo = () => {
-            if (country.value !== undefined) {
-                personalInfo.value.country = returnCurrentLocaleContent(country.value.name);
-                return;
-            }
-
             if (person.value?.personalInfo.postalAddress?.countryId === null) {
                 return;
             }

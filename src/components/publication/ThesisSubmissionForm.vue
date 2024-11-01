@@ -50,7 +50,7 @@
                         <v-col cols="10">
                             <v-select
                                 v-model="selectedResearchArea"
-                                :label="$t('researchAreaLabel') + '*'"
+                                :label="$t('researchAreaLabel')"
                                 :items="researchAreasSelectable"
                                 return-object
                             ></v-select>
