@@ -5,12 +5,12 @@
                 <v-btn
                     density="compact" class="bottom-spacer ml-3" v-bind="scope.props"
                     v-on="scope.isActive">
-                    {{ $t("addEmploymentLabel") }}
+                    {{ $t("addEmployeeLabel") }}
                 </v-btn>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("addEmploymentLabel") }}</span>
+                    <span class="text-h5">{{ $t("addEmployeeLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>

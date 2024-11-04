@@ -131,14 +131,14 @@ export default defineComponent({
         };
 
         const fetchLeftEmployees = () => {
-            PersonService.findEmployeesForOU(parseInt(currentRoute.params.leftId as string), `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`).then((response) => {
+            PersonService.findEmployeesForOU(parseInt(currentRoute.params.leftId as string), `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`, false).then((response) => {
                 leftEmployees.value = response.data.content;
                 leftTotalEmployees.value = response.data.totalElements;
             });
         };
 
         const fetchRightEmployees = () => {
-            PersonService.findEmployeesForOU(parseInt(currentRoute.params.rightId as string), `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`).then((response) => {
+            PersonService.findEmployeesForOU(parseInt(currentRoute.params.rightId as string), `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`, false).then((response) => {
                 rightEmployees.value = response.data.content;
                 rightTotalEmployees.value = response.data.totalElements;
             });

@@ -61,8 +61,8 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.patch, `person/personal-info/${personId}`, personalInfo);
   }
 
-  async findEmployeesForOU(organisationUnitId: number, tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
-    return super.sendRequest(axios.get, `person/employed-at/${organisationUnitId}?${tokens}`);
+  async findEmployeesForOU(organisationUnitId: number, tokens: string, fetchAlumni: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/employed-at/${organisationUnitId}?${tokens}&fetchAlumni=${fetchAlumni}`);
   }
 
   async updateOtherNames(otherNames: PersonName[], personId: number): Promise<AxiosResponse<void>> {

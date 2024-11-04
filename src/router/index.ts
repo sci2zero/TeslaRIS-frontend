@@ -73,6 +73,7 @@ import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/Boo
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
 import CountryListView from "@/views/CountryListView.vue";
+import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -813,6 +814,15 @@ const router = createRouter({
                     path: "countries",
                     name: "countries",
                     component: CountryListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "research-areas",
+                    name: "researchAreas",
+                    component: ResearchAreaListView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

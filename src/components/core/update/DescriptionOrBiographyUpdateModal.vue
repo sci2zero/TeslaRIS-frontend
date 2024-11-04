@@ -13,7 +13,7 @@
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ isBiography ? $t("updateBiographyLabel") : $t("updateDescriptionLabel") }}</span>
+                    <span class="text-h5">{{ isBiography ? $t("updateBiographyLabel") : $t("updateabstractLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>

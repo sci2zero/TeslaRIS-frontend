@@ -38,10 +38,15 @@
                 </v-icon>
                 <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
                 <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }}</strong>
-                <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">{{ (involvement as Employment).employmentPosition }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
+                <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY'">{{ getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
                 <v-icon icon="mdi-circle-small">
                 </v-icon>
-                {{ involvement.dateFrom ? `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}
+                <span v-if="involvement.dateFrom">
+                    {{ `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` }}
+                </span>
+                <span v-else>
+                    {{ involvement.dateTo ? `${$t("unknownDateMessage")} - ${localiseDate(involvement.dateTo)}` : $t("currentLabel") }}
+                </span>
             </h4>
             <p v-if="involvement.involvementType === 'MEMBER_OF'">
                 {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
@@ -64,7 +69,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getInvolvementTypeTitleFromValueAutoLocale } from '@/i18n/involvementType';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import type { Education, Employment, Membership } from '@/models/InvolvementModel';
-import type { PersonResponse } from '@/models/PersonModel';
+import { EmploymentPosition, type PersonResponse } from '@/models/PersonModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
@@ -76,6 +81,7 @@ import { watch } from 'vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { VueDraggableNext } from 'vue-draggable-next'
+import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 
 
 export default defineComponent({
@@ -168,7 +174,8 @@ export default defineComponent({
         return { returnCurrentLocaleContent, addInvolvementProof, menus,
             deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement,
-            localiseDate };
+            localiseDate, getEmploymentPositionTitleFromValueAutoLocale,
+            EmploymentPosition };
     }
 });
 </script>

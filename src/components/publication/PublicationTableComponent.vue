@@ -62,9 +62,15 @@
                             <span v-if="item.authorNames.trim() === ''">
                                 {{ displayTextOrPlaceholder(item.authorNames) }}
                             </span>
-                            <localized-link v-for="(employment, index) in item.authorNames.split('; ')" v-else :key="index" :to="'persons/' + item.authorIds[index]">
-                                {{ `${employment}; ` }}
-                            </localized-link>
+                            <span v-for="(employment, index) in item.authorNames.split('; ')" v-else :key="index">
+                                <localized-link
+                                    v-if="item.authorIds[index] !== -1"
+                                    :to="'persons/' + item.authorIds[index]"
+                                >
+                                    {{ `${employment}; ` }}
+                                </localized-link>
+                                <span v-else>{{ `${employment}; ` }}</span>
+                            </span>
                         </td>
                         <td>
                             {{ item.year !== -1 ? item.year : "-" }}

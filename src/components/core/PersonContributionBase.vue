@@ -66,7 +66,7 @@
     <v-row>
         <v-col>
             <multilingual-text-input
-                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')"
+                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
                 :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
                 is-area
                 @update:model-value="sendContentToParent"></multilingual-text-input>

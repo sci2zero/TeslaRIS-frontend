@@ -58,7 +58,7 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"
+                    ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"
                     :initial-value="toMultilingualTextInput(presetMetadata?.description, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>

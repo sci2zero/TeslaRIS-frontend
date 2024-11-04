@@ -114,9 +114,14 @@
                 <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
-                <!-- Employee Table -->
+                <!-- Employees -->
                 <h1>{{ $t("employeesLabel") }}</h1>
-                <person-table-component :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"></person-table-component>
+                <person-table-component
+                    :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"
+                    @delete="fetchEmployees(true)"></person-table-component>
+
+                <h1>{{ $t("alumniLabel") }}</h1>
+                <person-table-component :persons="alumni" :total-persons="totalAlumni" is-alumni-table @switch-page="switchAlumniPage"></person-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
                 <!-- Relations -->
@@ -225,6 +230,9 @@ export default defineComponent({
         const employees = ref<PersonIndex[]>([]);
         const totalEmployees = ref<number>(0);
 
+        const alumni = ref<PersonIndex[]>([]);
+        const totalAlumni = ref<number>(0);
+
         const publicationsPage = ref(0);
         const publicationsSize = ref(1);
         const publicationsSort = ref("");
@@ -234,6 +242,11 @@ export default defineComponent({
         const employeesSize = ref(1);
         const employeesSort = ref("");
         const employeesDirection = ref("");
+
+        const alumniPage = ref(0);
+        const alumniSize = ref(1);
+        const alumniSort = ref("");
+        const alumniDirection = ref("");
 
         const subUnitsPage = ref(0);
         const subUnitsSize = ref(1);
@@ -270,7 +283,7 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                 
                 if(uponStartup) {
-                    Promise.all([fetchPublications(), fetchEmployees()]).then(() => {
+                    Promise.all([fetchPublications(), fetchEmployees(false), fetchEmployees(true)]).then(() => {
                         setStartTab();
                     });
                 }
@@ -319,7 +332,15 @@ export default defineComponent({
             employeesSize.value = pageSize;
             employeesSort.value = sortField;
             employeesDirection.value = sortDir;
-            fetchEmployees();
+            fetchEmployees(false);
+        };
+
+        const switchAlumniPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            alumniPage.value = nextPage;
+            alumniSize.value = pageSize;
+            alumniSort.value = sortField;
+            alumniDirection.value = sortDir;
+            fetchEmployees(true);
         };
 
         const fetchPublications = () => {
@@ -332,13 +353,19 @@ export default defineComponent({
             });
         };
 
-        const fetchEmployees = () => {
+        const fetchEmployees = (fetchAlumni: boolean) => {
             return PersonService.findEmployeesForOU(
                 parseInt(currentRoute.params.id as string),
-                `page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`
+                `page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`,
+                fetchAlumni
             ).then((response) => {
-                employees.value = response.data.content;
-                totalEmployees.value = response.data.totalElements;
+                if (fetchAlumni) {
+                    alumni.value = response.data.content;
+                    totalAlumni.value = response.data.totalElements;
+                } else {
+                    employees.value = response.data.content;
+                    totalEmployees.value = response.data.totalElements;
+                }
             });
         };
 
@@ -465,7 +492,8 @@ export default defineComponent({
             updateKeywords, updateBasicInfo,
             snackbar, snackbarMessage, relations,
             updateRelations, graphRef, updateResearchAreas,
-            subUnits, totalSubUnits, switchSubUnitsPage
+            subUnits, totalSubUnits, switchSubUnitsPage,
+            alumni, totalAlumni, switchAlumniPage, fetchEmployees
         };
 }})
 

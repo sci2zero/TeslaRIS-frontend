@@ -38,7 +38,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" basic limit-one @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -71,7 +71,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>

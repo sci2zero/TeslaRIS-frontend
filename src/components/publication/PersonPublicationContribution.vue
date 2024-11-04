@@ -9,7 +9,7 @@
                     <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
-                    <v-btn v-show="index === inputs.length - 1" icon @click="addInput">
+                    <v-btn v-show="index === inputs.length - 1 && !limitOne" icon @click="addInput">
                         <v-icon>mdi-plus</v-icon>
                     </v-btn>
                 </v-col>
@@ -57,6 +57,10 @@ export default defineComponent({
             default: () => []
         },
         boardMembersAllowed: {
+            type: Boolean,
+            default: false
+        },
+        limitOne: {
             type: Boolean,
             default: false
         }

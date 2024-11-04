@@ -66,7 +66,7 @@ const employmentPositionsSr = [
     { title: "Stariji naučni saradnik", value: EmploymentPosition.SENIOR_SCIENTIFIC_COLLABORATOR },
 ];
 
-export const getTitleFromValueAutoLocale = (value: EmploymentPosition) => {
+export const getEmploymentPositionTitleFromValueAutoLocale = (value: EmploymentPosition) => {
     const locale = i18n.vueI18n.global.locale;
     
     let resourceTypeArray = employmentPositionsEn;

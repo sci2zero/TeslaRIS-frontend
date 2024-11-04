@@ -56,10 +56,8 @@ export default defineComponent({
         });
 
         const nameRef = ref<typeof MultilingualTextInput>();
-        const descriptionRef = ref<typeof MultilingualTextInput>();
 
         const name = ref<any>([]);
-        const description = ref<any>([]);
         const code = ref<string>(props.presetCountry ? props.presetCountry.code as string : "");
 
         const { requiredFieldRules } = useValidationUtils();
@@ -75,8 +73,7 @@ export default defineComponent({
 
         return {
             isFormValid,
-            name, description,
-            nameRef, descriptionRef,
+            name, nameRef,
             toMultilingualTextInput,
             languageTags, requiredFieldRules,
             code, submit

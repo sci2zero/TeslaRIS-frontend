@@ -62,3 +62,17 @@ export interface Notification {
     notificationText: string;
     possibleActions: NotificationAction[];
 }
+
+export interface ResearchAreaResponse {
+    id? : number;
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    superResearchAreaId?: number;
+    superResearchAreaName?: MultilingualContent[];
+}
+
+export interface ResearchAreaRequest {
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    superResearchAreaId?: number;
+}

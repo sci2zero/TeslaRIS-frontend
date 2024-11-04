@@ -1,16 +1,16 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -130,9 +130,13 @@ export default defineComponent({
         employmentInstitutionId: {
             type: Number,
             default: -1
+        },
+        isAlumniTable: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["switchPage", "dragged"],
+    emits: ["switchPage", "dragged", "delete"],
     setup(props, {emit}) {
         const selectedPersons = ref<PersonIndex[]>([]);
 
@@ -218,6 +222,9 @@ export default defineComponent({
             })).then((failedDeletions) => {
                 selectedPersons.value = selectedPersons.value.filter((person) => failedDeletions.includes(person));
                 refreshTable(tableOptions.value);
+                if (props.employmentInstitutionId > 0) {
+                    emit("delete");
+                }
             });
         };
 

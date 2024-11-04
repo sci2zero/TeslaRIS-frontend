@@ -45,8 +45,9 @@
                 <v-select
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
-                    :label="$t('typeOfPublicationLabel')"
-                    return-object>
+                    :label="$t('typeOfPublicationLabel') + '*'"
+                    return-object
+                    :rules="requiredSelectionRules">
                 </v-select>
             </v-col>
         </v-row>
@@ -161,7 +162,7 @@ export default defineComponent({
         const numberOfPages = ref(props.presetMonographPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetMonographPublication?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
         
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
@@ -227,7 +228,7 @@ export default defineComponent({
             languageTags, startPage, endPage, refreshForm,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
-            urisRef
+            urisRef, requiredSelectionRules
         };
     }
 });

@@ -67,7 +67,7 @@
             <v-col>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageList)" :label="$t('contributionDescriptionLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageList)" :label="$t('contributionabstractLabel')" is-area></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -120,7 +120,7 @@ import { getInvolvementTypesForGivenLocale, getInvolvementTypeTitleFromValueAuto
 import { InvolvementType, type Education, type Employment, type Involvement, type Membership } from '@/models/InvolvementModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
-import { getEmploymentPositionsForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
+import { getEmploymentPositionsForGivenLocale, getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import type { EmploymentPosition } from '@/models/PersonModel';
 import DatePicker from '@/components/core/DatePicker.vue';
 
@@ -157,7 +157,7 @@ export default defineComponent({
             }
 
             if(props.presetInvolvement && (props.presetInvolvement as Employment).employmentPosition) {
-                selectedEmploymentPosition.value = {title: getTitleFromValueAutoLocale((props.presetInvolvement as Employment).employmentPosition as EmploymentPosition) as string, value: (props.presetInvolvement as Employment).employmentPosition};
+                selectedEmploymentPosition.value = {title: getEmploymentPositionTitleFromValueAutoLocale((props.presetInvolvement as Employment).employmentPosition as EmploymentPosition) as string, value: (props.presetInvolvement as Employment).employmentPosition};
             }
         });
 

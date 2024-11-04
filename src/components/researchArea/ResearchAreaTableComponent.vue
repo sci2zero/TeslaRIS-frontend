@@ -2,23 +2,23 @@
     <v-row class="align-center">
         <v-col cols="auto">
             <v-btn
-                density="compact" class="bottom-spacer" :disabled="selectedCountrys.length === 0"
+                density="compact" class="bottom-spacer" :disabled="selectedResearchAreas.length === 0"
                 @click="deleteSelection">
                 {{ $t("deleteLabel") }}
             </v-btn>
         </v-col>
 
         <v-col cols="auto">
-            <country-modal :preset-country="undefined" @submit="createNewCountry"></country-modal>
+            <research-area-modal :preset-research-area="undefined" @submit="createNewResearchArea"></research-area-modal>
         </v-col>
     </v-row>
 
     <v-data-table-server
-        v-model="selectedCountrys"
+        v-model="selectedResearchAreas"
         :sort-by="tableOptions.sortBy"
-        :items="countries"
+        :items="researchAreas"
         :headers="headers"
-        :items-length="totalCountrys"
+        :items-length="totalResearchAreas"
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
         :items-per-page="25"
@@ -29,16 +29,17 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedCountrys"
+                        v-model="selectedResearchAreas"
                         :value="row.item"
                         class="table-checkbox"
                         hide-details
                     />
                 </td>
                 <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
-                <td>{{ row.item.code }}</td>
+                <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.description) as string) }}</td>
+                <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superResearchAreaName) as string) }}</td>
                 <td>
-                    <country-modal class="mt-2" :preset-country="row.item" is-update @submit="updateCountry(row.item.id, $event)"></country-modal>
+                    <research-area-modal class="mt-2" :preset-research-area="row.item" is-update @submit="updateResearchArea(row.item.id, $event)"></research-area-modal>
                 </td>
             </tr>
         </template>
@@ -63,27 +64,27 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
-import type { Country } from '@/models/Common';
+import type { ResearchAreaRequest, ResearchAreaResponse } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import CountryService from '@/services/CountryService';
-import CountryModal from './CountryModal.vue';
+import ResearchAreaService from '@/services/ResearchAreaService';
+import ResearchAreaModal from './ResearchAreaModal.vue';
 
 
 export default defineComponent({
-    name: "CountryTableComponent",
-    components: { CountryModal },
+    name: "ResearchAreaTableComponent",
+    components: { ResearchAreaModal },
     props: {
-        countries: {
-            type: Array<Country>,
+        researchAreas: {
+            type: Array<ResearchAreaResponse>,
             required: true
         }, 
-        totalCountrys: {
+        totalResearchAreas: {
             type: Number,
             required: true
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedCountrys = ref<Country[]>([]);
+        const selectedResearchAreas = ref<ResearchAreaResponse[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
         const i18n = useI18n();
@@ -93,14 +94,16 @@ export default defineComponent({
         const timeout = 5000;
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
-        const codeLabel = computed(() => i18n.t("countryCodeLabel"));
+        const abstractLabel = computed(() => i18n.t("descriptionLabel"));
+        const superAreaLabel = computed(() => i18n.t("superResearchAreaLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name", order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: "name"},
-          { title: codeLabel, align: "start", sortable: true, key: "code"},
+          { title: abstractLabel, align: "start", sortable: true, key: "description"},
+          { title: superAreaLabel, align: "start", sortable: false, key: "superResearchAreaName"},
           { title: actionLabel},
         ];
 
@@ -120,18 +123,17 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedCountrys.value.map((country: Country) => {
-                return CountryService.deleteCountry(country.id as number)
+            Promise.all(selectedResearchAreas.value.map((researchArea: ResearchAreaResponse) => {
+                return ResearchAreaService.deleteResearchArea(researchArea.id as number)
                     .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(country.name) }));
+                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(researchArea.name) }));
                     })
                     .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(country.name) }));
-                        return country;
+                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(researchArea.name) }));
+                        return researchArea;
                     });
             })).then((failedDeletions) => {
-                selectedCountrys.value = selectedCountrys.value.filter((country) => failedDeletions.includes(country));
-                CountryService.invalidateCaches();
+                selectedResearchAreas.value = selectedResearchAreas.value.filter((researchArea) => failedDeletions.includes(researchArea));
                 refreshTable(tableOptions.value);
             });
         };
@@ -147,17 +149,15 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const createNewCountry = (country: Country) => {
-            CountryService.createCountry(country).then(() => {
-                CountryService.invalidateCaches();
+        const createNewResearchArea = (researchArea: ResearchAreaRequest) => {
+            ResearchAreaService.createResearchArea(researchArea).then(() => {
                 emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
             });
         };
 
-        const updateCountry = (countryId: number, country: Country) => {
-            CountryService.updateCountry(countryId, country).then(() => {
+        const updateResearchArea = (researchAreaId: number, researchArea: ResearchAreaRequest) => {
+            ResearchAreaService.updateResearchArea(researchAreaId, researchArea).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
-                CountryService.invalidateCaches();
                 emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
             });
         };
@@ -170,8 +170,8 @@ export default defineComponent({
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedCountrys, notifications, createNewCountry,
-            updateCountry, setSortOption
+            selectedResearchAreas, notifications, createNewResearchArea,
+            updateResearchArea, setSortOption
         };
     }
 });

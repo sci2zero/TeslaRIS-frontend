@@ -5,7 +5,7 @@
                 <v-card-text class="edit-pen-container">
                     <description-or-biography-update-modal :preset-description-or-biography="description ? description : []" :is-biography="isBiography" :read-only="!canEdit" @update="emitToParent"></description-or-biography-update-modal>
 
-                    <div><b>{{ isBiography ? $t("biographyLabel") : $t("descriptionLabel") }}</b></div>
+                    <div><b>{{ isBiography ? $t("biographyLabel") : $t("abstractLabel") }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <p>{{ returnCurrentLocaleContent(description) }}</p>
                 </v-card-text>

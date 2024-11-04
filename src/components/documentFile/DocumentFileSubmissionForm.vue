@@ -13,7 +13,7 @@
                     <v-col>
                         <multilingual-text-input
                             ref="descriptionRef" v-model="description" :initial-value="toMultilingualTextInput(presetDocumentFile?.description, languageTags)" is-area
-                            :label="$t('descriptionLabel')"></multilingual-text-input>
+                            :label="$t('abstractLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>

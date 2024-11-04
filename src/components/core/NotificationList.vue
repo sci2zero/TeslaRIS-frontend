@@ -8,6 +8,7 @@
                 :key="i"
                 :value="notification.id"
                 color="secondary"
+                @click="navigateToNotificationPage"
             >
                 <v-row>
                     <v-col cols="10">
@@ -98,11 +99,16 @@ export default defineComponent({
             emit("lowerCount");
         };
 
+        const navigateToNotificationPage = () => {
+            router.push({ name: "notifications" });
+        };
+
         return {
             performAction,
             notifications,
             rejectNotification,
-            notificationCount
+            notificationCount,
+            navigateToNotificationPage
         };
 }});
 </script>
