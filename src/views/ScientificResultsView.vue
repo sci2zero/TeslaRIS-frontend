@@ -95,7 +95,6 @@ export default defineComponent({
         const i18n = useI18n();
         const addJournalPublicationLabel = computed(() => i18n.t("addJournalPublicationLabel"));
         const addProceedingsPublicationLabel = computed(() => i18n.t("addProceedingsPublicationLabel"));
-        const addProceedingsLabel = computed(() => i18n.t("addProceedingsLabel"));
         const addPatentLabel = computed(() => i18n.t("addPatentLabel"));
         const addSoftwareLabel = computed(() => i18n.t("addSoftwareLabel"));
         const addDatasetLabel = computed(() => i18n.t("addDatasetLabel"));
@@ -106,7 +105,6 @@ export default defineComponent({
         const items = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
             { title: addProceedingsPublicationLabel, value: "submitProceedingsPublication" },
-            { title: addProceedingsLabel, value: "submitProceedings" },
             { title: addPatentLabel, value: "submitPatent" },
             { title: addSoftwareLabel, value: "submitSoftware" },
             { title: addDatasetLabel, value: "submitDataset" },

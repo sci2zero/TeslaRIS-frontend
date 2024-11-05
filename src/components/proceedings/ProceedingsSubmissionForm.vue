@@ -8,20 +8,34 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="10">
                         <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required :read-only="conference.value > 0"></event-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="10">
                         <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="10">
                         <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="5">
+                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -47,7 +61,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col cols="10">
                             <v-select
                                 v-model="selectedLanguages"
                                 :label="$t('languageLabel')"
@@ -57,41 +71,30 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
+                        <v-col cols="10">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
+                        <v-col cols="5">
                             <v-text-field v-model="publicationSeriesVolume" :label="$t('publicationSeriesVolumeLabel')" :placeholder="$t('publicationSeriesVolumeLabel')"></v-text-field>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="5">
                             <v-text-field v-model="publicationSeriesIssue" :label="$t('publicationSeriesIssueLabel')" :placeholder="$t('publicationSeriesIssueLabel')"></v-text-field>
                         </v-col>
                     </v-row>

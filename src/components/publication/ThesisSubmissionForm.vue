@@ -13,11 +13,6 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
                     <v-col cols="10">
                         <v-select
                             v-model="selectedThesisType"
@@ -47,6 +42,11 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
+                        <v-col>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="10">
                             <v-select
                                 v-model="selectedResearchArea"
@@ -57,11 +57,8 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="5">
+                        <v-col cols="10">
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -87,11 +84,6 @@
                     <v-row>
                         <v-col cols="10">
                             <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <event-autocomplete-search ref="eventRef" v-model="selectedEvent"></event-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -132,7 +124,6 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
 import type { ErrorResponse, LanguageTagResponse } from '@/models/Common';
-import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
@@ -144,7 +135,7 @@ import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, EventAutocompleteSearch, OrganisationUnitAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -195,12 +186,10 @@ export default defineComponent({
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
-        const eventRef = ref<typeof EventAutocompleteSearch>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -209,7 +198,6 @@ export default defineComponent({
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
-        const scopus = ref("");
         const numberOfPages = ref<number|null>();
         const uris = ref<string[]>([]);
 
@@ -219,7 +207,7 @@ export default defineComponent({
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
             const newThesis: Thesis = {
@@ -234,10 +222,9 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
-                scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
+                researchAreaId: selectedResearchArea.value.value as number,
                 fileItems: [],
                 proofs: []
             };
@@ -251,11 +238,9 @@ export default defineComponent({
                     urisRef.value?.clearInput();
                     contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
-                    eventRef.value?.clearInput();
                     ouAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
-                    scopus.value = "";
                     numberOfPages.value = null;
                     selectedThesisType.value = { title: "", value: null };
                     selectedResearchArea.value = { title: "", value: null };
@@ -284,14 +269,14 @@ export default defineComponent({
             snackbar, error,
             title, titleRef,
             subtitle, subtitleRef,
-            publicationYear, doi, scopus,
+            publicationYear, doi,
             publisherAutocompleteRef,
             selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef,
-            contributions, contributionsRef, eventRef, selectedEvent,
+            contributions, contributionsRef,
             requiredFieldRules, submitThesis, errorMessage,
-            scopusIdValidationRules, requiredSelectionRules,
+            requiredSelectionRules,
             researchAreasSelectable, selectedResearchArea,
             selectedThesisType, thesisTypes, selectedOrganisationUnit
         };

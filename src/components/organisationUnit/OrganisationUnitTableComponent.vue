@@ -63,10 +63,24 @@
                     </span>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.keywordsSr) }}
+                    <span v-if="row.item.keywordsSr">
+                        <localized-link v-for="(keyword, index) in row.item.keywordsSr.split('\n')" :key="index" :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`">
+                            {{ `${displayTextOrPlaceholder(keyword)}; ` }}
+                        </localized-link>
+                    </span>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.keywordsSr) }}
+                    </span>
                 </td>
                 <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
+                    <span v-if="row.item.keywordsOther">
+                        <localized-link v-for="(keyword, index) in row.item.keywordsOther.split('\n')" :key="index" :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`">
+                            {{ `${displayTextOrPlaceholder(keyword)}; ` }}
+                        </localized-link>
+                    </span>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
+                    </span>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ displayTextOrPlaceholder(row.item.researchAreasSr) }}

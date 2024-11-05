@@ -34,6 +34,12 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <div v-if="thesis?.thesisType">
+                                    {{ $t("publicationTypeLabel") }}:
+                                </div>
+                                <div v-if="thesis?.thesisType" class="response">
+                                    {{ getThesisTitleFromValueAutoLocale(thesis.thesisType) }}
+                                </div>
                                 <div v-if="thesis?.documentDate">
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
@@ -48,22 +54,14 @@
                                         {{ returnCurrentLocaleContent(organisationUnit?.name) }}
                                     </localized-link>
                                 </div>
-                                <div v-if="thesis?.publisherId">
+                                <!-- <div v-if="thesis?.publisherId">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="thesis?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + thesis?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
-                                </div>
-                                <div v-if="thesis?.eventId">
-                                    {{ $t("conferenceLabel") }}:
-                                </div>
-                                <div v-if="thesis?.eventId" class="response">
-                                    <localized-link :to="'events/conference/' + thesis?.eventId">
-                                        {{ returnCurrentLocaleContent(event?.name) }}
-                                    </localized-link>
-                                </div>
+                                </div> -->
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="thesis?.numberOfPages">
@@ -71,12 +69,6 @@
                                 </div>
                                 <div v-if="thesis?.numberOfPages" class="response">
                                     {{ thesis.numberOfPages }}
-                                </div>
-                                <div v-if="thesis?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="thesis?.scopusId" class="response">
-                                    {{ thesis.scopusId }}
                                 </div>
                                 <div v-if="thesis?.doi">
                                     DOI:
@@ -178,6 +170,7 @@ import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 
 
 export default defineComponent({
@@ -322,7 +315,7 @@ export default defineComponent({
             updateKeywords, updateDescription, localiseDate,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, organisationUnit,
-            researchAreaHierarchy, event
+            researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale
         };
 }})
 

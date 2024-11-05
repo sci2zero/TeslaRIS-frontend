@@ -34,11 +34,26 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="6">
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+
+                <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
                         <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
+                
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -79,18 +94,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
+                        <v-col cols="12">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>

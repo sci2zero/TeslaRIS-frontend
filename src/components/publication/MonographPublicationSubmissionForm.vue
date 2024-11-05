@@ -82,14 +82,6 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col>
                             <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>

@@ -94,6 +94,7 @@ export enum EmploymentPosition {
     RESEARCH_ASSOCIATE,
     SCIENTIFIC_COLLABORATOR,
     SENIOR_SCIENTIFIC_COLLABORATOR,
+    TEACHING_ASSOCIATE
 }
 
 export enum Sex {

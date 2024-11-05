@@ -51,6 +51,7 @@ export enum ThesisType {
     BACHELOR = "BACHELOR",
     MR = "MR",
     PHD = "PHD",
+    PHD_ART_PROJECT = "PHD_ART_PROJECT",
     MASTER = "MASTER"
 }
   
