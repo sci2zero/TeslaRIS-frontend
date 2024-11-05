@@ -11,7 +11,7 @@
             <v-col>
                 <multilingual-text-input
                     ref="descriptionRef" v-model="description" :label="$t('descriptionLabel')"
-                    :initial-value="toMultilingualTextInput(presetResearchArea?.name, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetResearchArea?.description, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
