@@ -86,7 +86,6 @@ import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
 
-
 export default defineComponent({
     name: "EventTableComponent",
     components: { LocalizedLink },

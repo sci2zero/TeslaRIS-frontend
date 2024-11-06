@@ -6,7 +6,7 @@
                 :label="$t('personLabel') + '*'"
                 :items="persons"
                 :custom-filter="((): boolean => true)"
-                :auto-select-first="true"
+                :auto-select-first="false"
                 :rules="requiredSelectionRules"
                 :no-data-text="$t('noDataMessage')"
                 return-object

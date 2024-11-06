@@ -108,7 +108,7 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const updatePublisher = () => {
+        const submit = () => {
             const updatedPublisher: Publisher = {
                 name: name.value,
                 countryId: selectedCountry.value?.value === -1 ? undefined : selectedCountry.value?.value as number,
@@ -124,9 +124,8 @@ export default defineComponent({
             countries, selectedCountry,
             place, placeRef,
             requiredFieldRules,
-            updatePublisher,
             toMultilingualTextInput,
-            languageList
+            submit, languageList
         };
     }
 });

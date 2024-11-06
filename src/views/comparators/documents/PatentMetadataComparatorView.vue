@@ -194,8 +194,8 @@ export default defineComponent({
             updateRightKeywordsRef.value?.updateKeywords();
             updateLeftDescriptionRef.value?.updateDescription();
             updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updatePatent();
-            updateRightRef.value?.updatePatent();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightPatent.value, leftPatent.value] = mergePatentMetadata(rightPatent.value as Patent, leftPatent.value as Patent);
@@ -259,8 +259,8 @@ export default defineComponent({
             updateRightKeywordsRef.value?.updateKeywords();
             updateLeftDescriptionRef.value?.updateDescription();
             updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updatePatent();
-            updateRightRef.value?.updatePatent();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

@@ -85,7 +85,7 @@ export default defineComponent({
             const researchArea: ResearchAreaRequest = {
                 name: name.value,
                 description: description.value,
-                superResearchAreaId: selectedResearchArea.value.value
+                superResearchAreaId: selectedResearchArea.value.value > 0 ? selectedResearchArea.value.value : undefined
             };
 
             emit("create", researchArea);

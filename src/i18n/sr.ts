@@ -406,5 +406,8 @@ export default {
     superResearchAreaLabel: "Sadržajna oblast istraživanja",
     researchAreaListLabel: "Oblasti istraživanja",
     updateResearchAreaLabel: "Ažuriraj oblast istraživanja",
-    createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja"
+    createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja",
+    searchInSystemLabel: "Pretraži u sistemu",
+    enterExternalOULabel: "Unesi spoljnu afilijaciju",
+    externalOUNameLabel: "Naziv spoljne afilijacije"
 }

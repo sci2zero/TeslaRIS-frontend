@@ -18,11 +18,8 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
+            <v-col cols="10">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -38,11 +35,6 @@
         <v-row>
             <v-col cols="10">
                 <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
-                <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
             </v-col>
         </v-row>
 
@@ -69,13 +61,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 import { watch } from 'vue';
 
 
 export default defineComponent({
     name: "SoftwareUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, EventAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
     props: {
         presetSoftware: {
             type: Object as PropType<Software | undefined>,
@@ -119,19 +110,17 @@ export default defineComponent({
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetSoftware?.documentDate);
         const doi = ref(props.presetSoftware?.doi);
-        const scopus = ref(props.presetSoftware?.scopusId);
         const softwareNumber = ref(props.presetSoftware?.internalNumber);
         const uris = ref<string[]>(props.presetSoftware?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
-        const updateSoftware = () => {
+        const submit = () => {
             const updatedSoftware: Software = {
                 title: title.value as MultilingualContent[],
                 internalNumber: softwareNumber.value as string,
@@ -141,10 +130,8 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: props.presetSoftware?.contributions,
                 documentDate: publicationYear.value,
-                scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -163,7 +150,6 @@ export default defineComponent({
             softwareNumber.value = props.presetSoftware?.internalNumber;
             publicationYear.value = props.presetSoftware?.documentDate;
             doi.value = props.presetSoftware?.doi;
-            scopus.value = props.presetSoftware?.scopusId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -175,12 +161,12 @@ export default defineComponent({
         return {
             isFormValid,
             title, subtitle,
-            publicationYear, doi, scopus,
+            publicationYear, doi,
             selectedPublisher, softwareNumber,
             uris, requiredFieldRules, titleRef, subtitleRef,
-            updateSoftware, toMultilingualTextInput,
-            languageTags, selectedEvent, doiValidationRules,
-            scopusIdValidationRules, refreshForm, urisRef
+            submit, toMultilingualTextInput,
+            languageTags, doiValidationRules,
+            refreshForm, urisRef
         };
     }
 });

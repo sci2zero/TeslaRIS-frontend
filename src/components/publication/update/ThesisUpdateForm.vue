@@ -1,8 +1,20 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="11">
+            <v-col v-if="!enterExternalOU" cols="11">
                 <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+            </v-col>
+            <v-col v-else>
+                <multilingual-text-input
+                    ref="externalOUNameRef" v-model="externalOUName" :rules="requiredFieldRules" :label="$t('externalOUNameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"></multilingual-text-input>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
+                    {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                </v-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -118,6 +130,7 @@ export default defineComponent({
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
+        const enterExternalOU = ref(false);
 
         const publisher = ref<Publisher>();
 
@@ -144,11 +157,16 @@ export default defineComponent({
 
         const fetchDetails = () => {
             if(props.presetThesis) {
-                OrganisationUnitService.readOU(props.presetThesis.organisationUnitId).then((response) => {
-                    selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number}
-                });
+                if (props.presetThesis.organisationUnitId) {
+                    OrganisationUnitService.readOU(props.presetThesis.organisationUnitId).then((response) => {
+                        selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number}
+                    });
+                } else {
+                    externalOUName.value = props.presetThesis?.externalOrganisationUnitName as MultilingualContent[];
+                    enterExternalOU.value = true;
+                }
 
-                if(props.presetThesis?.publisherId) {
+                if (props.presetThesis?.publisherId) {
                     PublisherService.readPublisher(props.presetThesis.publisherId).then((response) => {
                         publisher.value = response.data;
                         selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
@@ -177,6 +195,7 @@ export default defineComponent({
         });
 
         const titleRef = ref<typeof MultilingualTextInput>();
+        const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
 
@@ -188,6 +207,7 @@ export default defineComponent({
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
         const title = ref<any>([]);
+        const externalOUName = ref<any>([]);
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetThesis?.documentDate);
         const doi = ref(props.presetThesis?.doi);
@@ -201,7 +221,8 @@ export default defineComponent({
 
         const updateThesis = () => {
             const updatedThesis: Thesis = {
-                organisationUnitId: selectedOrganisationUnit.value?.value as number,
+                organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
+                externalOrganisationUnitName: externalOUName.value,
                 researchAreaId: selectedResearchArea.value.value as number,
                 thesisType: selectedThesisType.value.value as ThesisType,
                 title: title.value as MultilingualContent[],
@@ -225,6 +246,9 @@ export default defineComponent({
         const refreshForm = () => {
             titleRef.value?.clearInput();
             title.value = props.presetThesis?.title as MultilingualContent[];
+
+            externalOUNameRef.value?.clearInput();
+            externalOUName.value = props.presetThesis?.externalOrganisationUnitName as MultilingualContent[];
 
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetThesis?.subTitle as MultilingualContent[];
@@ -251,11 +275,12 @@ export default defineComponent({
             numberOfPages, selectedPublisher,
             uris, requiredFieldRules, requiredSelectionRules,
             updateThesis, toMultilingualTextInput,
-            languageTags, doiValidationRules,
+            languageTags, doiValidationRules, enterExternalOU,
             scopusIdValidationRules, selectedOrganisationUnit,
             researchAreasSelectable, selectedResearchArea,
             selectedLanguages, publicationTypes, selectedThesisType,
-            languageList, titleRef, subtitleRef, refreshForm
+            languageList, titleRef, subtitleRef, refreshForm,
+            externalOUName, externalOUNameRef
         };
     }
 });

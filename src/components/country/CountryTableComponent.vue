@@ -9,7 +9,12 @@
         </v-col>
 
         <v-col cols="auto">
-            <country-modal :preset-country="undefined" @submit="createNewCountry"></country-modal>
+            <generic-crud-modal
+                :form-component="CountryForm"
+                :form-props="{ presetCountry: undefined }"
+                entity-name="Country"
+                @create="createNewCountry"
+            />
         </v-col>
     </v-row>
 
@@ -38,7 +43,14 @@
                 <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
                 <td>{{ row.item.code }}</td>
                 <td>
-                    <country-modal class="mt-2" :preset-country="row.item" is-update @submit="updateCountry(row.item.id, $event)"></country-modal>
+                    <generic-crud-modal
+                        class="mt-2"
+                        :form-component="CountryForm"
+                        :form-props="{ presetCountry: row.item }"
+                        entity-name="Country"
+                        is-update
+                        @update="updateCountry(row.item.id, $event)"
+                    />
                 </td>
             </tr>
         </template>
@@ -66,12 +78,13 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 import type { Country } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import CountryService from '@/services/CountryService';
-import CountryModal from './CountryModal.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import CountryForm from './CountryForm.vue';
 
 
 export default defineComponent({
     name: "CountryTableComponent",
-    components: { CountryModal },
+    components: { GenericCrudModal },
     props: {
         countries: {
             type: Array<Country>,
@@ -150,7 +163,12 @@ export default defineComponent({
         const createNewCountry = (country: Country) => {
             CountryService.createCountry(country).then(() => {
                 CountryService.invalidateCaches();
-                emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                } else {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, "", "");
+                }
+                
             });
         };
 
@@ -158,7 +176,11 @@ export default defineComponent({
             CountryService.updateCountry(countryId, country).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
                 CountryService.invalidateCaches();
-                emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                } else {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, "", "");
+                }
             });
         };
 
@@ -171,7 +193,7 @@ export default defineComponent({
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedCountrys, notifications, createNewCountry,
-            updateCountry, setSortOption
+            updateCountry, setSortOption, CountryForm
         };
     }
 });

@@ -26,7 +26,14 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <software-update-modal :preset-software="software" :read-only="!canEdit" @update="updateBasicInfo"></software-update-modal>
+                        <generic-crud-modal
+                            :form-component="SoftwareUpdateForm"
+                            :form-props="{ presetSoftware: software }"
+                            entity-name="Software"
+                            is-update
+                            is-section-update
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -128,15 +135,16 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import SoftwareUpdateModal from '@/components/publication/update/SoftwareUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateForm.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, SoftwareUpdateModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -251,7 +259,7 @@ export default defineComponent({
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo
+            updateBasicInfo, SoftwareUpdateForm
         };
 }})
 

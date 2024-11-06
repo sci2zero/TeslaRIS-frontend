@@ -10,6 +10,12 @@
 
         <v-col cols="auto">
             <research-area-modal :preset-research-area="undefined" @submit="createNewResearchArea"></research-area-modal>
+            <generic-crud-modal
+                :form-component="ResearchAreaForm"
+                :form-props="{ presetResearchArea: undefined }"
+                entity-name="ResearchArea"
+                @create="createNewResearchArea"
+            />
         </v-col>
     </v-row>
 
@@ -39,7 +45,14 @@
                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.description) as string) }}</td>
                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superResearchAreaName) as string) }}</td>
                 <td>
-                    <research-area-modal class="mt-2" :preset-research-area="row.item" is-update @submit="updateResearchArea(row.item.id, $event)"></research-area-modal>
+                    <generic-crud-modal
+                        class="mt-2"
+                        :form-component="ResearchAreaForm"
+                        :form-props="{ presetResearchArea: row.item }"
+                        entity-name="ResearchArea"
+                        is-update
+                        @update="updateResearchArea(row.item.id, $event)"
+                    />
                 </td>
             </tr>
         </template>
@@ -67,12 +80,13 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 import type { ResearchAreaRequest, ResearchAreaResponse } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import ResearchAreaService from '@/services/ResearchAreaService';
-import ResearchAreaModal from './ResearchAreaModal.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import ResearchAreaForm from './ResearchAreaForm.vue';
 
 
 export default defineComponent({
     name: "ResearchAreaTableComponent",
-    components: { ResearchAreaModal },
+    components: { GenericCrudModal },
     props: {
         researchAreas: {
             type: Array<ResearchAreaResponse>,
@@ -151,14 +165,22 @@ export default defineComponent({
 
         const createNewResearchArea = (researchArea: ResearchAreaRequest) => {
             ResearchAreaService.createResearchArea(researchArea).then(() => {
-                emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                } else {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, "", "");
+                }
             });
         };
 
         const updateResearchArea = (researchAreaId: number, researchArea: ResearchAreaRequest) => {
             ResearchAreaService.updateResearchArea(researchAreaId, researchArea).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
-                emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
+                } else {
+                    emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, "", "");
+                }
             });
         };
 
@@ -171,7 +193,7 @@ export default defineComponent({
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedResearchAreas, notifications, createNewResearchArea,
-            updateResearchArea, setSortOption
+            updateResearchArea, setSortOption, ResearchAreaForm
         };
     }
 });

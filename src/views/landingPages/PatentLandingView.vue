@@ -26,7 +26,14 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <patent-update-modal :preset-patent="patent" :read-only="!canEdit" @update="updateBasicInfo"></patent-update-modal>
+                        <generic-crud-modal
+                            :form-component="PatentUpdateForm"
+                            :form-props="{ presetPatent: patent }"
+                            entity-name="Patent"
+                            is-update
+                            is-section-update
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -127,16 +134,17 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -246,7 +254,7 @@ export default defineComponent({
 
         return {
             patent, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, PatentUpdateForm,
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo

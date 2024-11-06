@@ -26,7 +26,14 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <dataset-update-modal :preset-dataset="dataset" :read-only="!canEdit" @update="updateBasicInfo"></dataset-update-modal>
+                        <generic-crud-modal
+                            :form-component="DatasetUpdateForm"
+                            :form-props="{ presetDataset: dataset }"
+                            entity-name="Dataset"
+                            is-update
+                            is-section-update
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -128,16 +135,17 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -251,7 +259,7 @@ export default defineComponent({
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo
+            updateContributions, updateBasicInfo, DatasetUpdateForm
         };
 }})
 

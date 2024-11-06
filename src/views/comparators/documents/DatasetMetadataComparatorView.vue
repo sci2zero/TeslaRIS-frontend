@@ -194,8 +194,8 @@ export default defineComponent({
             updateRightKeywordsRef.value?.updateKeywords();
             updateLeftDescriptionRef.value?.updateDescription();
             updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateDataset();
-            updateRightRef.value?.updateDataset();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightDataset.value, leftDataset.value] = mergeDatasetMetadata(rightDataset.value as Dataset, leftDataset.value as Dataset);
@@ -259,8 +259,8 @@ export default defineComponent({
             updateRightKeywordsRef.value?.updateKeywords();
             updateLeftDescriptionRef.value?.updateDescription();
             updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateDataset();
-            updateRightRef.value?.updateDataset();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

@@ -239,9 +239,8 @@ export default defineComponent({
             leftThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
             leftThesis.value!.languageTagIds = updatedInfo.languageTagIds;
             leftThesis.value!.thesisType = updatedInfo.thesisType;
-            leftThesis.value!.eventId = updatedInfo.eventId;
             leftThesis.value!.publisherId = updatedInfo.publisherId;
-            leftThesis.value!.scopusId = updatedInfo.scopusId;
+            leftThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -262,9 +261,8 @@ export default defineComponent({
             rightThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
             rightThesis.value!.languageTagIds = updatedInfo.languageTagIds;
             rightThesis.value!.thesisType = updatedInfo.thesisType;
-            rightThesis.value!.eventId = updatedInfo.eventId;
             rightThesis.value!.publisherId = updatedInfo.publisherId;
-            rightThesis.value!.scopusId = updatedInfo.scopusId;
+            rightThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

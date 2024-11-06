@@ -406,5 +406,8 @@ export default {
     superResearchAreaLabel: "Super research area",
     researchAreaListLabel: "Research Areas",
     updateResearchAreaLabel: "Update Research Area",
-    createNewResearchAreaLabel: "Create New Research Area"
+    createNewResearchAreaLabel: "Create New Research Area",
+    searchInSystemLabel: "Search in system",
+    enterExternalOULabel: "Enter external affiliation",
+    externalOUNameLabel: "External affiliation name"
 }

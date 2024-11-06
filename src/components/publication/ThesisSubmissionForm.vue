@@ -1,10 +1,22 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="8">
                 <v-row>
-                    <v-col cols="11">
+                    <v-col v-if="!enterExternalOU" cols="10">
                         <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                    </v-col>
+                </v-row>
+                <v-row v-if="enterExternalOU">
+                    <v-col>
+                        <multilingual-text-input ref="externalOUNameRef" v-model="externalOUName" :rules="requiredFieldRules" :label="$t('externalOUNameLabel') + '*'"></multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
+                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                        </v-btn>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -139,6 +151,7 @@ export default defineComponent({
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
+        const enterExternalOU = ref(false);
 
         const snackbar = ref(false);
         const error = ref(false);
@@ -181,6 +194,7 @@ export default defineComponent({
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
         const titleRef = ref<typeof MultilingualTextInput>();
+        const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
@@ -192,6 +206,7 @@ export default defineComponent({
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
+        const externalOUName = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
@@ -215,7 +230,8 @@ export default defineComponent({
                 thesisType: selectedThesisType.value.value as ThesisType,
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value as number,
-                organisationUnitId: selectedOrganisationUnit.value.value,
+                organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
+                externalOrganisationUnitName: externalOUName.value,
                 description: description.value,
                 keywords: keywords.value,
                 subTitle: subtitle.value,
@@ -232,11 +248,11 @@ export default defineComponent({
             DocumentPublicationService.createThesis(newThesis).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
+                    externalOUNameRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     ouAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
@@ -244,7 +260,8 @@ export default defineComponent({
                     numberOfPages.value = null;
                     selectedThesisType.value = { title: "", value: null };
                     selectedResearchArea.value = { title: "", value: null };
-                    ouAutocompleteRef.value?.clearInput();
+                    selectedOrganisationUnit.value = {title: "", value: -1};
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -276,9 +293,10 @@ export default defineComponent({
             keywords, keywordsRef, uris, urisRef,
             contributions, contributionsRef,
             requiredFieldRules, submitThesis, errorMessage,
-            requiredSelectionRules,
+            requiredSelectionRules, enterExternalOU,
             researchAreasSelectable, selectedResearchArea,
-            selectedThesisType, thesisTypes, selectedOrganisationUnit
+            selectedThesisType, thesisTypes, selectedOrganisationUnit,
+            externalOUName, externalOUNameRef, ouAutocompleteRef
         };
     }
 });

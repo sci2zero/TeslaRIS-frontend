@@ -35,7 +35,7 @@
                         <v-row>
                             <v-col cols="6">
                                 <div v-if="thesis?.thesisType">
-                                    {{ $t("publicationTypeLabel") }}:
+                                    {{ $t("typeOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="thesis?.thesisType" class="response">
                                     {{ getThesisTitleFromValueAutoLocale(thesis.thesisType) }}
@@ -46,7 +46,7 @@
                                 <div v-if="thesis?.documentDate" class="response">
                                     {{ localiseDate(thesis.documentDate) }}
                                 </div>
-                                <div v-if="thesis?.organisationUnitId">
+                                <div v-if="thesis?.organisationUnitId || (thesis?.externalOrganisationUnitName && thesis?.externalOrganisationUnitName.length > 0)">
                                     {{ $t("organisationUnitLabel") }}:
                                 </div>
                                 <div v-if="thesis?.organisationUnitId" class="response">
@@ -54,14 +54,17 @@
                                         {{ returnCurrentLocaleContent(organisationUnit?.name) }}
                                     </localized-link>
                                 </div>
-                                <!-- <div v-if="thesis?.publisherId">
+                                <div v-else class="response">
+                                    {{ returnCurrentLocaleContent(thesis?.externalOrganisationUnitName) }}
+                                </div>
+                                <div v-if="thesis?.publisherId">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="thesis?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + thesis?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
-                                </div> -->
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="thesis?.numberOfPages">
@@ -217,9 +220,11 @@ export default defineComponent({
 
                 thesis.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                OrganisationUnitService.readOU(thesis.value.organisationUnitId).then((response) => {
-                    organisationUnit.value = response.data;
-                });
+                if (thesis.value.organisationUnitId) {
+                    OrganisationUnitService.readOU(thesis.value.organisationUnitId).then((response) => {
+                        organisationUnit.value = response.data;
+                    });
+                }
 
                 if(thesis.value.publisherId) {
                     PublisherService.readPublisher(thesis.value.publisherId).then((publisherResponse) => {
@@ -286,12 +291,13 @@ export default defineComponent({
             thesis.value!.numberOfPages = basicInfo.numberOfPages;
             thesis.value!.languageTagIds = basicInfo.languageTagIds;
             thesis.value!.researchAreaId = basicInfo.researchAreaId;
-            thesis.value!.eventId = basicInfo.eventId;
+            thesis.value!.externalOrganisationUnitName = basicInfo.externalOrganisationUnitName;
 
             performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
+            console.log(thesis.value)
             DocumentPublicationService.updateThesis(thesis.value?.id as number, thesis.value as Thesis).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;

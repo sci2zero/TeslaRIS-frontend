@@ -24,7 +24,14 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <publisher-update-modal :read-only="!canEdit" :preset-publisher="publisher" @update="updateBasicInfo"></publisher-update-modal>
+                        <generic-crud-modal
+                            :form-component="PublisherUpdateForm"
+                            :form-props="{ presetPublisher: publisher }"
+                            entity-name="Publisher"
+                            is-update
+                            is-section-update
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -87,14 +94,15 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import PublisherUpdateModal from '@/components/publisher/update/PublisherUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import CountryService from '@/services/CountryService';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, PublisherUpdateModal },
+    components: { PublicationTableComponent, GenericCrudModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -194,7 +202,7 @@ export default defineComponent({
             totalPublications,
             switchPage, country,
             returnCurrentLocaleContent,
-            languageTagMap, canEdit,
+            languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage
         };
 }})

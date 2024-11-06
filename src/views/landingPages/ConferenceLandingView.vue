@@ -36,7 +36,7 @@
                                     {{ $t("eventDateLabel") }}:
                                 </div>
                                 <div v-if="!conference?.serialEvent" class="response">
-                                    {{ getDates(conference?.dateFrom as string, conference?.dateTo as string) }}
+                                    {{ localiseDateRange(conference?.dateFrom as string, conference?.dateTo as string) }}
                                 </div>
                                 <div v-if="conference?.description && conference.description.length > 0">
                                     {{ $t("abstractLabel") }}:
@@ -143,7 +143,7 @@ import PersonEventContributionTabs from '@/components/core/PersonEventContributi
 import type { Country, MultilingualContent } from '@/models/Common';
 import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDateRange } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
@@ -221,31 +221,6 @@ export default defineComponent({
             });
         };
 
-        const getDates = (from: string, to: string): string => {
-            if(!from || !to) {
-                return "";
-            }
-
-            const fromDate = new Date(Date.parse(from));
-            const toDate = new Date(Date.parse(to));
-            if (fromDate.getDate() === 1 && fromDate.getMonth() === 0 && 
-                fromDate.getDate() === toDate.getDate() && 
-                fromDate.getMonth() === toDate.getMonth() && 
-                fromDate.getFullYear() === toDate.getFullYear()) 
-            {
-                return `${fromDate.getFullYear()}`;
-            }
-
-            const diffInMonths = Math.abs((toDate.getMonth() - fromDate.getMonth()) + 
-                      12 * (toDate.getFullYear() - fromDate.getFullYear()));
-
-            if (diffInMonths > 3) {
-                return fromDate.getFullYear().toString();
-            }
-
-            return `${fromDate.toLocaleDateString("sr")} - ${toDate.toLocaleDateString("sr")}`;
-        };
-
         const updateKeywords = (keywords: MultilingualContent[]) => {
             conference.value!.keywords = keywords;
             performUpdate(false);
@@ -295,11 +270,11 @@ export default defineComponent({
         return {
             conference, icon, publications, 
             totalPublications, switchPublicationsPage,
-            keywords, getDates, updateBasicInfo,
+            keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
-            localiseDate, country
+            country
         };
 }})
 

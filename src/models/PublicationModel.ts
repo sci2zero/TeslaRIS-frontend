@@ -209,7 +209,8 @@ export interface DeduplicationSuggestion {
 }
 
 export interface Thesis extends Document {
-    organisationUnitId: number;
+    organisationUnitId?: number;
+    externalOrganisationUnitName?: MultilingualContent[];
     thesisType: ThesisType;
     numberOfPages?: number;
     languageTagIds: number[];

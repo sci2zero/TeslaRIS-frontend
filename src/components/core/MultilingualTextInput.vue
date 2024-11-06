@@ -187,7 +187,10 @@ export default defineComponent({
         const sendContentToParent = () => {
             const returnObject: MultilingualContent[] = [];
             inputs.value.forEach((input, index) => {
-                if(input.text.trim() === "") {
+                if (!input.text) {
+                    input.text = "";
+                    return;
+                } else if(input.text.trim() === "") {
                     return;
                 }
                 returnObject.push({content: input.text, 
