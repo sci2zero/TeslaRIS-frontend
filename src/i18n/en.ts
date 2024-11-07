@@ -197,7 +197,7 @@ export default {
     unauthorizedPublicationEditAttemptMessage: "You can't submit or edit publications where you are not a contributor.",
     loginToViewDocumentMessage: "Document is not publicly available, please login to be able to view it.",
     updateKeywordsLabel: "Update Keywords",
-    updateabstractLabel: "Update Description",
+    updateAbstractLabel: "Update Description",
     updateBiographyLabel: "Update Biography",
     updatedSuccessMessage: "Updated successfully.",
     updatePublisherLabel: "Update Publisher",

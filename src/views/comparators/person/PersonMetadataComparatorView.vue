@@ -301,12 +301,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftBioRef.value?.updateDescription();
-            updateRightBioRef.value?.updateDescription();
-            updateLeftRef.value?.updatePerson();
-            updateRightRef.value?.updatePerson();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftBioRef.value?.submit();
+            updateRightBioRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightPerson.value!.personalInfo, leftPerson.value!.personalInfo] = mergePersonMetadata(rightPerson.value?.personalInfo as PersonalInfo, leftPerson.value?.personalInfo as PersonalInfo);
@@ -351,12 +351,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftBioRef.value?.updateDescription();
-            updateRightBioRef.value?.updateDescription();
-            updateLeftRef.value?.updatePerson();
-            updateRightRef.value?.updatePerson();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftBioRef.value?.submit();
+            updateRightBioRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const updateLeftBiography = (biography: MultilingualContent[]) => {

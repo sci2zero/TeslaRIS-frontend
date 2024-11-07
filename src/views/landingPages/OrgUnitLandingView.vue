@@ -26,7 +26,16 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <organisation-unit-update-modal :preset-o-u="organisationUnit" :read-only="!canEdit" @update="updateBasicInfo"></organisation-unit-update-modal>
+                        <!-- <organisation-unit-update-modal :preset-o-u="organisationUnit" :read-only="!canEdit" @update="updateBasicInfo"></organisation-unit-update-modal> -->
+                        <generic-crud-modal
+                            :form-component="OrganisationUnitUpdateForm"
+                            :form-props="{ presetOU: organisationUnit }"
+                            entity-name="OrganisationUnit"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -195,7 +204,7 @@ import type { MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
-import OrganisationUnitUpdateModal from '@/components/organisationUnit/update/OrganisationUnitUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
@@ -203,11 +212,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
+import OrganisationUnitUpdateForm from '@/components/organisationUnit/update/OrganisationUnitUpdateForm.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent, IdentifierLink, UriList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("");
 
@@ -493,7 +503,8 @@ export default defineComponent({
             snackbar, snackbarMessage, relations,
             updateRelations, graphRef, updateResearchAreas,
             subUnits, totalSubUnits, switchSubUnitsPage,
-            alumni, totalAlumni, switchAlumniPage, fetchEmployees
+            alumni, totalAlumni, switchAlumniPage,
+            OrganisationUnitUpdateForm, fetchEmployees
         };
 }})
 

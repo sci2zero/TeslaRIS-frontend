@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import type { OrganisationUnitLoad, PersonLoad } from "@/models/LoadModel";
-import type { BasicPerson, PersonIndex } from "@/models/PersonModel";
+import type { PersonIndex } from "@/models/PersonModel";
 import PersonService from "@/services/PersonService";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import type { PropType } from "vue";
@@ -72,6 +72,7 @@ import { useI18n } from "vue-i18n";
 import PublicationsDialog from "@/components/core/PublicationsDialog.vue"
 import { watch } from "vue";
 import ImportAffiliation from "./ImportAffiliation.vue";
+import ImportService from "@/services/ImportService";
 
 
 export default defineComponent({
@@ -216,23 +217,8 @@ export default defineComponent({
 
         const addNew = async () => {
             await waitForImportAffiliations();
-            
-            const newPerson: BasicPerson = {
-                personName: {firstname: props.personForLoading.firstName, otherName: props.personForLoading.middleName, lastname: props.personForLoading.lastName, dateFrom: null, dateTo: null},
-                contactEmail: "",
-                phoneNumber: "",
-                apvnt: props.personForLoading.apvnt,
-                eCrisId: props.personForLoading.eCrisId,
-                eNaukaId: props.personForLoading.eNaukaId,
-                orcid: props.personForLoading.orcid,
-                scopusAuthorId: props.personForLoading.scopusAuthorId,
-                sex: undefined,
-                localBirthDate: "",
-                organisationUnitId: importAffiliationsRef.value[0].selectedAffiliation.databaseId,
-                employmentPosition: undefined
-            };
 
-            PersonService.createPerson(newPerson, idempotencyKey).then((response) => {
+            ImportService.createNewPerson(props.personForLoading.scopusAuthorId, idempotencyKey).then(response => {
                 selectedResearcher.value = {
                     name: `${props.personForLoading.firstName} ${props.personForLoading.lastName}`,
                     birthdate: "",

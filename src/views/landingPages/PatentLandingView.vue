@@ -32,6 +32,7 @@
                             entity-name="Patent"
                             is-update
                             is-section-update
+                            :read-only="!canEdit"
                             @update="updateBasicInfo"
                         />
 

@@ -237,6 +237,7 @@ export default defineComponent({
                 hadToBeCreated.value = true;
                 affiliationBinded.value = true;
                 automaticProcessCompleted.value = true;
+                showTable.value = false;
             }).catch(() => {
                 OrganisationUnitService.findOUByScopusAfid(props.ouForLoading.scopusAfid).then(response => {
                     selectedAffiliation.value = response.data;

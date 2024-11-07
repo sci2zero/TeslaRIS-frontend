@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <publication-series-update-modal :read-only="!canEdit" :preset-publication-series="bookSeries" input-type="BOOK_SERIES" @update="updateBasicInfo"></publication-series-update-modal>
+                        <generic-crud-modal
+                            :form-component="PublicationSeriesUpdateForm"
+                            :form-props="{ presetPublicationSeries: bookSeries, inputType: 'BOOK_SERIES' }"
+                            entity-name="BookSeries"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -109,15 +117,16 @@ import type { BookSeries } from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs },
     setup() {
         const currentTab = ref("");
 
@@ -242,7 +251,8 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap, canEdit,
             updateBasicInfo, snackbar,
-            snackbarMessage, updateContributions
+            snackbarMessage, updateContributions,
+            PublicationSeriesUpdateForm
         };
 }})
 

@@ -28,7 +28,7 @@ export interface BasicPerson {
     eNaukaId?: string | null;
     orcid?: string | null;
     scopusAuthorId?: string | null;
-    organisationUnitId: number;
+    organisationUnitId?: number;
     employmentPosition?: EmploymentPosition;
   }
 

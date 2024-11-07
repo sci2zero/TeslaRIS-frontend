@@ -177,8 +177,8 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftRef.value?.updatePublicationSeries();
-            updateRightRef.value?.updatePublicationSeries();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightJournal.value, leftJournal.value] = mergeJournalMetadata(rightJournal.value as Journal, leftJournal.value as Journal);
@@ -222,8 +222,8 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftRef.value?.updatePublicationSeries();
-            updateRightRef.value?.updatePublicationSeries();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

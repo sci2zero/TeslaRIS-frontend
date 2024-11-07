@@ -197,7 +197,7 @@ export default {
     unauthorizedPublicationEditAttemptMessage: "Ne možete dodati/izmeniti publikaciju u kojoj niste u listi autora.",
     loginToViewDocumentMessage: "Dokument nije javno dostupan, morate se ulogovati kako biste ga videli.",
     updateKeywordsLabel: "Ažuriraj ključne reči",
-    updateabstractLabel: "Ažuriraj opis",
+    updateAbstractLabel: "Ažuriraj opis",
     updateBiographyLabel: "Ažuriraj biografiju",
     updatedSuccessMessage: "Uspešno ažurirano.",
     updatePublisherLabel: "Ažuriraj izdavača",

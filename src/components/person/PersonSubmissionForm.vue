@@ -12,7 +12,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit"></organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -201,7 +201,7 @@ export default defineComponent({
                 scopusAuthorId: scopus.value,
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
-                organisationUnitId: selectedOrganisationUnit.value.value,
+                organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
                 employmentPosition: selectedEmploymentPosition.value.value
             };
 

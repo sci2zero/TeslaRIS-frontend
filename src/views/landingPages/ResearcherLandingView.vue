@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <person-update-modal :preset-person="person" :read-only="!canEdit" @update="updatePersonalInfo"></person-update-modal>
+                        <generic-crud-modal
+                            :form-component="PersonUpdateForm"
+                            :form-props="{ presetPerson: person }"
+                            entity-name="Person"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updatePersonalInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -231,7 +239,7 @@ import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
@@ -242,11 +250,12 @@ import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
+import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -497,7 +506,7 @@ export default defineComponent({
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            currentTab
+            currentTab, PersonUpdateForm
         };
 }})
 

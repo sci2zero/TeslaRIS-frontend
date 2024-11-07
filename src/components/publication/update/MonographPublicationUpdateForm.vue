@@ -167,7 +167,7 @@ export default defineComponent({
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
 
-        const updateMonographPublication = () => {
+        const submit = () => {
             const updatedMonographPublication: MonographPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -224,7 +224,7 @@ export default defineComponent({
             selectedMonograph, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
-            updateMonographPublication, toMultilingualTextInput,
+            submit, toMultilingualTextInput,
             languageTags, startPage, endPage, refreshForm,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,

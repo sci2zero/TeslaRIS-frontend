@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col cols="4">
+        <v-col v-if="relations && relations.length > 0" cols="4">
             <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
         </v-col>
         <v-col v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission" cols="3">

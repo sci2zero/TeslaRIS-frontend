@@ -32,6 +32,7 @@
                             entity-name="Software"
                             is-update
                             is-section-update
+                            :read-only="!canEdit"
                             @update="updateBasicInfo"
                         />
 

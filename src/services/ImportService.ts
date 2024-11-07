@@ -7,6 +7,7 @@ import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import type { Page } from "@/models/Common";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
+import type { PersonResponse } from "@/models/PersonModel";
 
 export class ImportService extends BaseService {
   
@@ -32,6 +33,10 @@ export class ImportService extends BaseService {
 
     async createNewInstitution(scopusAfid: string, idempotencyKey: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
       return super.sendRequest(axios.post, `load/institution/${scopusAfid}`, {}, idempotencyKey);
+    }
+
+    async createNewPerson(scopusAuthorId: string, idempotencyKey: string): Promise<AxiosResponse<PersonResponse>> {
+      return super.sendRequest(axios.post, `load/person/${scopusAuthorId}`, {}, idempotencyKey);
     }
 
     async createNewJournal(eIssn: string, printIssn: string, idempotencyKey: string): Promise<AxiosResponse<PublicationSeries>> {

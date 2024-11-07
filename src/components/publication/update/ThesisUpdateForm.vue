@@ -219,7 +219,7 @@ export default defineComponent({
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
         const selectedThesisType = ref<{ title: string, value: ThesisType | undefined }>({title: getThesisTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string, value: props.presetThesis?.thesisType as ThesisType});
 
-        const updateThesis = () => {
+        const submit = () => {
             const updatedThesis: Thesis = {
                 organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
                 externalOrganisationUnitName: externalOUName.value,
@@ -274,7 +274,7 @@ export default defineComponent({
             publicationYear, doi,
             numberOfPages, selectedPublisher,
             uris, requiredFieldRules, requiredSelectionRules,
-            updateThesis, toMultilingualTextInput,
+            submit, toMultilingualTextInput,
             languageTags, doiValidationRules, enterExternalOU,
             scopusIdValidationRules, selectedOrganisationUnit,
             researchAreasSelectable, selectedResearchArea,

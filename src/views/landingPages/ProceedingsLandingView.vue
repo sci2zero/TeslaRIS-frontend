@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <proceedings-update-modal :preset-proceedings="proceedings" :read-only="!canEdit" @update="updateBasicInfo"></proceedings-update-modal>
+                        <generic-crud-modal
+                            :form-component="ProceedingsUpdateForm"
+                            :form-props="{ presetProceedings: proceedings}"
+                            entity-name="Proceedings"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -206,18 +214,19 @@ import type { Publisher } from '@/models/PublisherModel';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
-import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, IdentifierLink, PublicationTableComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent },
     setup() {
         const currentTab = ref("");
 
@@ -410,7 +419,8 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            publicationSeries, updateBasicInfo, updateContributions
+            publicationSeries, updateBasicInfo, updateContributions,
+            ProceedingsUpdateForm
         };
 }})
 

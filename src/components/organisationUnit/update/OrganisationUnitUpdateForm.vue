@@ -105,7 +105,7 @@ export default defineComponent({
 
         const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
 
-        const updateOU = () => {
+        const submit = () => {
             const updatedOU: OrganisationUnitRequest = {
                 name: name.value,
                 nameAbbreviation: nameAbbreviation.value,
@@ -138,7 +138,7 @@ export default defineComponent({
             isFormValid, name, mapRef,
             nameAbbreviation, refreshForm,
             email, phoneNumber, scopusAfid,
-            requiredFieldRules, updateOU,
+            requiredFieldRules, submit,
             toMultilingualTextInput, languageList,
             scopusAfidValidationRules, nameRef, uris,
             nonMandatoryEmailFieldRules

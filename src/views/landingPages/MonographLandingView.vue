@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <monograph-update-modal :read-only="!canEdit" :preset-monograph="monograph" @update="updateBasicInfo"></monograph-update-modal>
+                        <generic-crud-modal
+                            :form-component="MonographUpdateForm"
+                            :form-props="{ presetMonograph: monograph}"
+                            entity-name="Monograph"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -194,7 +202,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import MonographUpdateModal from '@/components/publication/update/MonographUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import EventService from '@/services/EventService';
@@ -207,11 +215,12 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -383,13 +392,14 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment,
+            addAttachment, updateAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, event,
             researchAreaHierarchy, updateContributions,
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
-            switchPage, publications, totalPublications
+            switchPage, publications, totalPublications,
+            MonographUpdateForm, deleteAttachment
         };
 }})
 

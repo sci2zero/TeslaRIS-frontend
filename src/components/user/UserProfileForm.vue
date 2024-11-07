@@ -82,18 +82,7 @@
             </v-row>
             <v-row>
                 <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
-                    <password-input-with-meter :label="$t('newPasswordLabel')" @password-change="setNewPassword($event)" @show-repeated-password="showRepeatedPassword = !showRepeatedPassword"></password-input-with-meter>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
-                    <v-text-field
-                        v-model="repeatNewPassword"
-                        :label="$t('repeatNewPasswordLabel')"
-                        :rules="repeatPasswordRules"
-                        validate-on-blur
-                        :type="showRepeatedPassword ? 'text' : 'password'"
-                    ></v-text-field>
+                    <password-input-with-meter :label="$t('newPasswordLabel')" repeat-password @password-change="setNewPassword($event)"></password-input-with-meter>
                 </v-col>
             </v-row>
         </v-container>
@@ -150,7 +139,6 @@ export default defineComponent({
         const changePassword = ref(false);
         const isFormValid = ref(false);
         const showOldPassword = ref(false);
-        const showRepeatedPassword = ref(false);
 
         const name = ref("");
         const surname = ref("");
@@ -165,26 +153,15 @@ export default defineComponent({
 
         const oldPassword = ref("");
         const newPassword = ref("");
-        const repeatNewPassword = ref("");
 
         const userRole = ref("");
 
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
         const savedMessage = computed(() => i18n.t("savedMessage"));
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: UserNotificationPeriod.NEVER };
         const notificationPeriods = getNotificationPeriodForGivenLocale();
         const selectedNotificationPeriod = ref(selectionPlaceholder);
-
-        const repeatPasswordRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                if (newPassword.value !== repeatNewPassword.value) return passwordsDontMatchMessage.value;
-                return true;
-            }
-        ];
 
         const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
@@ -317,13 +294,13 @@ export default defineComponent({
         return {
             changePassword, name, surname,
             organisationUnits, selectedOrganisationUnit, 
-            email, showOldPassword, showRepeatedPassword,
+            email, showOldPassword,
             languages, selectedLanguage, 
             searchOUs, filterOUs, allowAccountTakeover,
             updateUser, setNewPassword, selectedNotificationPeriod,
-            emailFieldRules, requiredFieldRules, requiredSelectionRules, repeatPasswordRules,
+            emailFieldRules, requiredFieldRules, requiredSelectionRules,
             isFormValid, userRole, notificationPeriods,
-            oldPassword, newPassword, repeatNewPassword,
+            oldPassword, newPassword,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage
         };

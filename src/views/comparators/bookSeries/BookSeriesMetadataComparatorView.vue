@@ -175,8 +175,8 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftRef.value?.updatePublicationSeries();
-            updateRightRef.value?.updatePublicationSeries();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightBookSeries.value, leftBookSeries.value] = mergeBookSeriesMetadata(rightBookSeries.value as BookSeries, leftBookSeries.value as BookSeries);
@@ -220,8 +220,8 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftRef.value?.updatePublicationSeries();
-            updateRightRef.value?.updatePublicationSeries();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

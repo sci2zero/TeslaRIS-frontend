@@ -198,7 +198,7 @@ export default defineComponent({
         const { apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
 
-        const updatePerson = () => {
+        const submit = () => {
             const updatedPerson: PersonalInfo = {
                 contact: {phoneNumber: phoneNumber.value as string, contactEmail: email.value},
                 localBirthDate: birthdate.value ? birthdate.value : "",
@@ -246,7 +246,7 @@ export default defineComponent({
         return {
             isFormValid, email, phoneNumber, birthdate,
             orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
-            toMultilingualTextInput, languageList, updatePerson,
+            toMultilingualTextInput, languageList, submit,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,

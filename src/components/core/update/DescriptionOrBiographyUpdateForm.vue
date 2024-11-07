@@ -24,6 +24,7 @@ import type { PropType } from 'vue';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { watch } from 'vue';
 
+
 export default defineComponent({
     name: "DescriptionOrBiographyUpdateForm",
     components: {MultilingualTextInput},
@@ -35,6 +36,8 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
+        const isFormValid = ref(true);
+
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const description = ref<any>([]);
 
@@ -46,7 +49,7 @@ export default defineComponent({
             });
         });
 
-        const updateDescription = () => {
+        const submit = () => {
             emit("update", description.value)
         };
 
@@ -64,8 +67,8 @@ export default defineComponent({
 
         return {
             description, descriptionRef,
-            updateDescription, toMultilingualTextInput,
-            languageTags, refreshForm
+            submit, toMultilingualTextInput,
+            languageTags, refreshForm, isFormValid
         };
     }
 });

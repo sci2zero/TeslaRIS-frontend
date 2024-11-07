@@ -201,10 +201,10 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftRef.value?.updateOU();
-            updateRightRef.value?.updateOU();
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightOrganisationUnit.value, leftOrganisationUnit.value] = mergeOrganisationUnitMetadata(rightOrganisationUnit.value as OrganisationUnitResponse, leftOrganisationUnit.value as OrganisationUnitResponse);
@@ -262,10 +262,10 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftRef.value?.updateOU();
-            updateRightRef.value?.updateOU();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
             leftRelationsRef.value?.updateOURelations();
             rightRelationsRef.value?.updateOURelations();
         };

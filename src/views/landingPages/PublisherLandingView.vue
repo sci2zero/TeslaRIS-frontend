@@ -30,6 +30,7 @@
                             entity-name="Publisher"
                             is-update
                             is-section-update
+                            :read-only="!canEdit"
                             @update="updateBasicInfo"
                         />
 

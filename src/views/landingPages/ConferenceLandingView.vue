@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <event-update-modal :preset-event="conference" :read-only="!canEdit" @update="updateBasicInfo"></event-update-modal>
+                        <generic-crud-modal
+                            :form-component="EventUpdateForm"
+                            :form-props="{ presetEvent: conference }"
+                            entity-name="Software"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -141,18 +149,19 @@ import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
 import type { Country, MultilingualContent } from '@/models/Common';
-import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDateRange } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import CountryService from '@/services/CountryService';
+import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList, EventsRelationList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -274,7 +283,7 @@ export default defineComponent({
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
-            country
+            country, EventUpdateForm
         };
 }})
 

@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <publication-series-update-modal :read-only="!canEdit" :preset-publication-series="journal" input-type="JOURNAL" @update="updateBasicInfo"></publication-series-update-modal>
+                        <generic-crud-modal
+                            :form-component="PublicationSeriesUpdateForm"
+                            :form-props="{ presetPublicationSeries: journal, inputType: 'JOURNAL' }"
+                            entity-name="Journal"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -111,14 +119,16 @@ import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
+
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs },
     setup() {
         const currentTab = ref("");
 
@@ -244,7 +254,7 @@ export default defineComponent({
             languageTagMap, updateBasicInfo,
             snackbar, snackbarMessage,
             updateContributions,
-            currentTab
+            currentTab, PublicationSeriesUpdateForm
         };
 }})
 

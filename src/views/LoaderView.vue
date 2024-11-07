@@ -43,6 +43,10 @@
         
         <v-btn class="load-action same-line" :disabled="stepperValue === steps.length" @click="smartSkip">
             {{ $t('smartImportLabel') }}
+        </v-btn>
+
+        <v-btn icon variant="plain">
+            <v-icon>mdi-information-variant</v-icon>
             <v-tooltip
                 activator="parent"
                 location="bottom"

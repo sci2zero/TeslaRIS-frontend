@@ -195,7 +195,7 @@ export default defineComponent({
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
-        const updateEvent = () => {
+        const submit = () => {
             if (!timePeriodInput.value) {
                 dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
                 dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
@@ -248,7 +248,7 @@ export default defineComponent({
             isFormValid,
             name, nameAbbreviation, urisRef, refreshForm,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
-            requiredFieldRules, publicationSeriesExternalValidation, updateEvent,
+            requiredFieldRules, publicationSeriesExternalValidation, submit,
             dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
             eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId
         };

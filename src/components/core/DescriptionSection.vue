@@ -3,7 +3,15 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <description-or-biography-update-modal :preset-description-or-biography="description ? description : []" :is-biography="isBiography" :read-only="!canEdit" @update="emitToParent"></description-or-biography-update-modal>
+                    <generic-crud-modal
+                        :form-component="DescriptionOrBiographyUpdateForm"
+                        :form-props="{ presetDescriptionOrBiography: description ? description : [] }"
+                        :entity-name="isBiography ? 'Biography' : 'Abstract'"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="emitToParent"
+                    />
 
                     <div><b>{{ isBiography ? $t("biographyLabel") : $t("abstractLabel") }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
@@ -18,12 +26,13 @@
 import { defineComponent, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
-import DescriptionOrBiographyUpdateModal from './update/DescriptionOrBiographyUpdateModal.vue';
+import GenericCrudModal from './GenericCrudModal.vue';
+import DescriptionOrBiographyUpdateForm from './update/DescriptionOrBiographyUpdateForm.vue';
 
 
 export default defineComponent({
     name: "DescriptionSection",
-    components: { DescriptionOrBiographyUpdateModal },
+    components: { GenericCrudModal },
     props: {
         canEdit: {
             type: Boolean,
@@ -45,7 +54,10 @@ export default defineComponent({
             emit("update", description)
         };
 
-        return { emitToParent, returnCurrentLocaleContent };
+        return { 
+            emitToParent, returnCurrentLocaleContent,
+            DescriptionOrBiographyUpdateForm
+        };
     },
 });
 </script>

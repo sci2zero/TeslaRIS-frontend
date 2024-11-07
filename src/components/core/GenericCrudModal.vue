@@ -2,7 +2,7 @@
     <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
-                <div v-if="isSectionUpdate" class="edit-pen">
+                <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
@@ -11,7 +11,7 @@
                     </v-btn>
                 </div>
                 <v-btn
-                    v-else
+                    v-if="!isSectionUpdate && !readOnly"
                     density="compact" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
                     {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
@@ -60,6 +60,10 @@ export default defineComponent({
             default: false
         },
         isSectionUpdate: {
+            type: Boolean,
+            default: false
+        },
+        readOnly: {
             type: Boolean,
             default: false
         },
