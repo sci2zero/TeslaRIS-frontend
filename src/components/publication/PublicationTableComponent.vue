@@ -108,7 +108,7 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type {DocumentPublicationIndex} from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
@@ -202,6 +202,25 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
+                if (publication.type === PublicationType.MONOGRAPH) {
+                    return DocumentPublicationService.deleteMonograph(publication.databaseId as number)
+                        .then(() => {
+                            if (i18n.locale.value === "sr") {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
+                            }
+                        })
+                        .catch(() => {
+                            if (i18n.locale.value === "sr") {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
+                            }
+                            return publication;
+                    });
+                }
+                
                 return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
                     .then(() => {
                         if (i18n.locale.value === "sr") {
@@ -217,7 +236,7 @@ export default defineComponent({
                             addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
                         }
                         return publication;
-                    });
+                });
             })).then((failedDeletions) => {
                 selectedPublications.value = selectedPublications.value.filter((publication) => failedDeletions.includes(publication));
                 refreshTable(tableOptions.value);

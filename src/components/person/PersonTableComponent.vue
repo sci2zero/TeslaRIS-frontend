@@ -52,7 +52,7 @@
                             </localized-link>
                         </td>
                         <td v-if="$i18n.locale == 'sr'">
-                            <span v-if="item.employmentsSr.trim() === ''">
+                            <span v-if="item.employmentsSr.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
                                 {{ displayTextOrPlaceholder(item.employmentsSr) }}
                             </span>
                             <localized-link v-for="(employment, index) in item.employmentsSr.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
@@ -60,7 +60,7 @@
                             </localized-link>
                         </td>
                         <td v-else>
-                            <span v-if="item.employmentsOther.trim() === ''">
+                            <span v-if="item.employmentsOther.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
                                 {{ displayTextOrPlaceholder(item.employmentsOther) }}
                             </span>
                             <localized-link v-for="(employment, index) in item.employmentsOther.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
