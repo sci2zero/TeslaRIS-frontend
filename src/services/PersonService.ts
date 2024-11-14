@@ -37,6 +37,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.delete, `person/${researcherId}`);
   }
 
+  async forceDeleteResearcher(researcherId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `person/force/${researcherId}`);
+  }
+
   async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
     return super.sendRequest(axios.get, `person/${personId}`);
   }
@@ -75,6 +79,10 @@ export class PersonService extends BaseService {
 
   async getLatestAffiliation(personId: number): Promise<AxiosResponse<Involvement>> {
     return super.sendRequest(axios.get, `person/${personId}/latest-involvement`);
+  }
+
+  async isPersonBoundToAUser(personId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `person/is-bound/${personId}`);
   }
 }
 

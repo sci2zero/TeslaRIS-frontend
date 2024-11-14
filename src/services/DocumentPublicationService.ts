@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "@/models/PublicationModel";
+import type { Dataset, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, Software, Thesis } from "@/models/PublicationModel";
 
 
 export class DocumentPublicationService extends BaseService {
@@ -89,7 +89,7 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "monograph-publication", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
+  async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<ProceedingsPublicationResponse[]>> {
     return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}/my-publications`);
   }
 
@@ -171,6 +171,10 @@ export class DocumentPublicationService extends BaseService {
 
   async deleteMonograph(monographId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `monograph/${monographId}`);
+  }
+
+  async forceDeleteMonograph(monographId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `monograph/force/${monographId}`);
   }
 }
 

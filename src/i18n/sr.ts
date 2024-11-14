@@ -409,5 +409,12 @@ export default {
     createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja",
     searchInSystemLabel: "Pretraži u sistemu",
     enterExternalOULabel: "Unesi spoljnu afilijaciju",
-    externalOUNameLabel: "Naziv spoljne afilijacije"
+    externalOUNameLabel: "Naziv spoljne afilijacije",
+    boundToUserLabel: "(Vezan za korisnika)",
+    forceDeleteLabel: "Forsirano brisanje",
+    inLabel: "u",
+    organisationUnitAdminExistsMessage: "Postoje administratori za ovu organizacionu jedinicu, ovim brisanjem ćete ukloniti i njih.",
+    cancelLabel: "Odustani",
+    continueLabel: "Nastavi",
+    areYouSureLabel: "Da li ste sigurni?"
 }

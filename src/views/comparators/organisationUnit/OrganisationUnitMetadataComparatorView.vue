@@ -74,7 +74,9 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions
+            supports-force-delete :left-warning-message="leftWarningMessage" :right-warning-message="rightWarningMessage" @update="updateAll"
+            @delete="deleteSide"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -93,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -136,12 +138,20 @@ export default defineComponent({
         const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
         const leftRelationsRef = ref<typeof OrganisationUnitRelationUpdateForm>();
         const rightRelationsRef = ref<typeof OrganisationUnitRelationUpdateForm>();
+
+        const leftWarningMessage = ref("");
+        const rightWarningMessage = ref("");
         
         const i18n = useI18n();
 
         onMounted(() => {
             document.title = i18n.t("organisationUnitMetadataComparatorLabel");
             fetchOrganisationUnits();
+            constructPotentialWarningMessages();
+        });
+
+        watch(i18n.locale, () => {
+            constructPotentialWarningMessages();
         });
 
         const fetchOrganisationUnits = () => {
@@ -153,6 +163,20 @@ export default defineComponent({
             OrganisationUnitService.readOU(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightOrganisationUnit.value = response.data;
                 fetchRightDetails();
+            });
+        };
+
+        const constructPotentialWarningMessages = () => {
+            OrganisationUnitService.checkIfInstitutionalAdminsExist(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                if (response.data) {
+                    leftWarningMessage.value = i18n.t("organisationUnitAdminExistsMessage");
+                }
+            });
+
+            OrganisationUnitService.checkIfInstitutionalAdminsExist(parseInt(currentRoute.params.rightId as string)).then((response) => {
+                if (response.data) {
+                    rightWarningMessage.value = i18n.t("organisationUnitAdminExistsMessage");
+                }
             });
         };
 
@@ -318,12 +342,18 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            OrganisationUnitService.deleteOrganisationUnit(side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.id as number : rightOrganisationUnit.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.id as number : rightOrganisationUnit.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.name : rightOrganisationUnit.value?.name;
+
+            const deleteAction = isForceDelete 
+                ? OrganisationUnitService.forceDeleteOrganisationUnit(id)
+                : OrganisationUnitService.deleteOrganisationUnit(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "organisationUnits" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.name : rightOrganisationUnit.value?.name;
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: name });
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             });
         };
@@ -372,7 +402,8 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             leftRelations, rightRelations, snackbar,
             leftRelationsRef, rightRelationsRef,
-            updateLeftRelations, updateRightRelations
+            updateLeftRelations, updateRightRelations,
+            leftWarningMessage, rightWarningMessage
         };
 }})
 

@@ -72,7 +72,7 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -335,11 +335,17 @@ export default defineComponent({
             rightMonograph.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteMonograph(side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftMonograph.value?.title : rightMonograph.value?.title;
+
+            const deleteAction = isForceDelete 
+                ? DocumentPublicationService.forceDeleteMonograph(id)
+                : DocumentPublicationService.deleteMonograph(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "documents" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftMonograph.value?.title : rightMonograph.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             });

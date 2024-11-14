@@ -294,11 +294,13 @@ export default defineComponent({
         });
 
         const selectLatestAffiliation = () => {
-            PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
-                if(latestAffiliationResponse.data) {
-                    selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
-                }
-            });
+            if (selectedPerson.value.value && selectedPerson.value.value > 0) {
+                PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
+                    if(latestAffiliationResponse.data) {
+                        selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
+                    }
+                });
+            }
         };
 
         const clearInput = () => {

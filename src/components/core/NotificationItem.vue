@@ -18,7 +18,7 @@
                 </v-btn>
             </template>
 
-            <notification-list @lower-count="notificationCount -= 1;"></notification-list>
+            <notification-list @lower-count="notificationCount -= 1;" @performed-action="notificationCount -=1"></notification-list>
         </v-menu>
     </div>
 </template>

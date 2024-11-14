@@ -232,7 +232,6 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     monographAutocompleteRef.value?.clearInput();
                     availableMonograph.value = [];
                     selectedMonograph.value = searchPlaceholder;
@@ -243,6 +242,7 @@ export default defineComponent({
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;

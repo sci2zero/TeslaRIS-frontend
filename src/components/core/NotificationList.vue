@@ -16,7 +16,7 @@
                     </v-col>
                     <v-col cols="1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
-                            <v-btn icon @click="performAction(notification.id, notificationAction)">
+                            <v-btn icon @click.stop="performAction(notification.id, notificationAction)">
                                 <v-icon v-if="notificationAction.toString() === 'APPROVE'">
                                     mdi-check
                                 </v-icon>
@@ -84,6 +84,7 @@ export default defineComponent({
             });
 
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
+                emit("performedAction", action);
                 router.push({name: "deduplication"});
             }
         };

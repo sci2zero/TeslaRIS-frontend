@@ -409,5 +409,12 @@ export default {
     createNewResearchAreaLabel: "Create New Research Area",
     searchInSystemLabel: "Search in system",
     enterExternalOULabel: "Enter external affiliation",
-    externalOUNameLabel: "External affiliation name"
+    externalOUNameLabel: "External affiliation name",
+    boundToUserLabel: "(Bound to user)",
+    forceDeleteLabel: "Force Delete",
+    inLabel: "in",
+    organisationUnitAdminExistsMessage: "There are registered administrators for this organisation unit, with this deletion, they will be removed too.",
+    cancelLabel: "Cancel",
+    continueLabel: "Proceed",
+    areYouSureLabel: "Are you sure?"
 }

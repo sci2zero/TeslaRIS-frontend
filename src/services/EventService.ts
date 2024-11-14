@@ -24,6 +24,10 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.delete, `conference/${conferenceId}`);
   }
 
+  async forceDeleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `conference/force/${conferenceId}`);
+  }
+
   async createConference(body: Conference): Promise<AxiosResponse<Conference>> {
     return super.sendRequest(axios.post, "conference", body, EventService.idempotencyKey);
   }

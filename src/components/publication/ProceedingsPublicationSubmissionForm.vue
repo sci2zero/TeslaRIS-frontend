@@ -11,11 +11,11 @@
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
-                            v-for="(publicationIndex, i) in myPublications"
-                            :key="i"
-                            :value="publicationIndex"
+                            v-for="(publication) in myPublications"
+                            :key="publication.id"
+                            :value="publication"
                         >
-                            {{ $i18n.locale === "sr" ? publicationIndex.titleSr : publicationIndex.titleOther }}
+                            {{ returnCurrentLocaleContent(publication.title) + ` ${$t("inLabel")} ` + returnCurrentLocaleContent(publication.proceedingsTitle) }}
                         </p>
                     </v-col>
                 </v-row>
@@ -143,7 +143,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
-import type { DocumentPublicationIndex, ProceedingsPublicationType } from "@/models/PublicationModel";
+import type { ProceedingsPublicationResponse, ProceedingsPublicationType } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
@@ -156,6 +156,7 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
 import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -189,7 +190,7 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const myPublications = ref<DocumentPublicationIndex[]>([]);
+        const myPublications = ref<ProceedingsPublicationResponse[]>([]);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -296,8 +297,7 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
-                    eventAutocompleteRef.value?.clearInput();
+                    eventAutocompleteRef.value!.clearInput();
                     availableProceedings.value = [];
                     selectedProceedings.value = searchPlaceholder;
                     selectedpublicationType.value = {title: "", value: null};
@@ -307,6 +307,8 @@ export default defineComponent({
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
+                    myPublications.value = [];
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -326,24 +328,16 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            startPage, endPage,
-            doi, scopus,
-            articleNumber, numberOfPages,
-            description, descriptionRef,
-            keywords, keywordsRef,
-            placeRef, uris, urisRef,
-            myPublications, doiValidationRules,
+            isFormValid, additionalFields, snackbar, error, title,
+            subtitle, subtitleRef, startPage, endPage, doi, scopus,
+            articleNumber, numberOfPages, description, descriptionRef,
+            keywords, keywordsRef, placeRef, uris, urisRef, titleRef,
+            myPublications, doiValidationRules, selectNewlyAddedProceedings,
             selectedEvent, eventAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType,
+            publicationTypes, selectedpublicationType, errorMessage,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
-            availableProceedings, selectedProceedings, 
-            selectNewlyAddedProceedings, errorMessage
+            availableProceedings, selectedProceedings, returnCurrentLocaleContent
         };
     }
 });

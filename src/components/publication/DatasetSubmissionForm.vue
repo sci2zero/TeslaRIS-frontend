@@ -172,11 +172,11 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
                     datasetNumber.value = "";
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;

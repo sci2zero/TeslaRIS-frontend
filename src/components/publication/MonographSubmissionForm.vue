@@ -335,7 +335,6 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     eventAutocompleteRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     doi.value = "";
                     scopus.value = "";
                     numberOfPages.value = null;
@@ -344,6 +343,7 @@ export default defineComponent({
                     eIsbn.value = "";
                     printIsbn.value = "";
                     publicationYear.value = "";
+                    contributionsRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;

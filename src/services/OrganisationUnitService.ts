@@ -12,6 +12,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, "organisation-unit/count");
   }
 
+  async checkIfInstitutionalAdminsExist(organisationUnitId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `organisation-unit/admin-exists/${organisationUnitId}`);
+  }
+
   async readOU(organisationUnitId: number): Promise<AxiosResponse<OrganisationUnitResponse>> {
     return super.sendRequest(axios.get, `organisation-unit/${organisationUnitId}`);
   }
@@ -41,6 +45,10 @@ export class OrganisationUnitService extends BaseService {
 
   async deleteOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `organisation-unit/${organisationUnitId}`);
+  }
+
+  async forceDeleteOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `organisation-unit/force/${organisationUnitId}`);
   }
 
   async updateOrganisationUnit(organisationUnitId: number, updatedOU: OrganisationUnitRequest): Promise<AxiosResponse<void>> {

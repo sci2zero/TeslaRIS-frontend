@@ -164,11 +164,11 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
                     softwareNumber.value = "";
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;

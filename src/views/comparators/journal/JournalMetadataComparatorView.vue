@@ -60,7 +60,7 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -250,11 +250,17 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            JournalService.deleteJournal(side === ComparisonSide.LEFT ? leftJournal.value?.id as number : rightJournal.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftJournal.value?.id as number : rightJournal.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftJournal.value?.title : rightJournal.value?.title;
+
+            const deleteAction = isForceDelete 
+                ? JournalService.forceDeleteJournal(id)
+                : JournalService.deleteJournal(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "journals" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftJournal.value?.title : rightJournal.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             });

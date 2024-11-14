@@ -3,7 +3,7 @@
         <v-row class="d-flex flex-row justify-center align-start">
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ `${leftPerson?.personName.firstname} ${leftPerson?.personName.lastname}` }}
+                    {{ `${leftPerson?.personName.firstname} ${leftPerson?.personName.lastname}` + (isLeftBoundToUser ? ` - ${$t("boundToUserLabel")}` : "") }}
                 </h2>
                 <br />
 
@@ -57,7 +57,7 @@
             
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ `${rightPerson?.personName.firstname} ${rightPerson?.personName.lastname}` }}
+                    {{ `${rightPerson?.personName.firstname} ${rightPerson?.personName.lastname}` + (isRightBoundToUser ? ` - ${$t("boundToUserLabel")}` : "") }}
                 </h2>
 
                 <br />
@@ -102,7 +102,7 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -153,6 +153,9 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
+        const isLeftBoundToUser = ref(false);
+        const isRightBoundToUser = ref(false);
+
         const leftPerson = ref<PersonResponse>();
         const leftEmployments = ref<Employment[]>([]);
         const leftEducation = ref<Education[]>([]);
@@ -187,6 +190,14 @@ export default defineComponent({
             PersonService.readPerson(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightPerson.value = response.data;
                 fetchRightDetails();
+            });
+
+            PersonService.isPersonBoundToAUser(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                isLeftBoundToUser.value = response.data;
+            });
+
+            PersonService.isPersonBoundToAUser(parseInt(currentRoute.params.rightId as string)).then((response) => {
+                isRightBoundToUser.value = response.data;
             });
         };
 
@@ -424,12 +435,18 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            PersonService.deleteResearcher(side === ComparisonSide.LEFT ? leftPerson.value?.id as number : rightPerson.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftPerson.value?.id as number : rightPerson.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftPerson.value?.personName.firstname : rightPerson.value?.personName.firstname;
+
+            const deleteAction = isForceDelete 
+                ? PersonService.forceDeleteResearcher(id)
+                : PersonService.forceDeleteResearcher(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "persons" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftPerson.value?.personName.firstname : rightPerson.value?.personName.firstname;
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: name });
+                snackbarMessage.value = isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
                 snackbar.value = true;
             });
         };
@@ -445,7 +462,8 @@ export default defineComponent({
             updateLeftBiography, updateRightBiography,
             updateLeftKeywords, updateRightKeywords,
             updateRightBioRef, updateLeftBioRef,
-            updateRightKeywordsRef, updateLeftKeywordsRef
+            updateRightKeywordsRef, updateLeftKeywordsRef,
+            isLeftBoundToUser, isRightBoundToUser
         };
 }})
 

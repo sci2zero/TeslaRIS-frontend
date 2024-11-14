@@ -30,6 +30,10 @@ export class BookSeriesService extends BaseService {
     return super.sendRequest(axios.delete, `book-series/${bookSeriesId}`);
   }
 
+  async forceDeleteBookSeries(bookSeriesId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `book-series/force/${bookSeriesId}`);
+  }
+
   async canEdit(bookSeriesId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `book-series/${bookSeriesId}/can-edit`);
   }
