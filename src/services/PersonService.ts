@@ -41,6 +41,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.delete, `person/force/${researcherId}`);
   }
 
+  async migrateToUnmanagedResearcher(researcherId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `person/unmanaged/${researcherId}`);
+  }
+
   async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
     return super.sendRequest(axios.get, `person/${personId}`);
   }

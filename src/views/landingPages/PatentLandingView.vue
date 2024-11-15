@@ -89,13 +89,13 @@
             </v-col>
         </v-row>
 
+        <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+
         <!-- Keywords -->
         <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <!-- Description -->
         <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
-
-        <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
         <attachment-section
             :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"

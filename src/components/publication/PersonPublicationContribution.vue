@@ -1,5 +1,5 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
+    <v-container v-for="(input, index) in inputs" :key="input.key" class="bottom-spacer">
         <v-row>
             <v-col cols="10">
                 <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
@@ -150,8 +150,9 @@ export default defineComponent({
                                   dateFrom: input.contribution.selectedOtherName[3],
                                   dateTo: input.contribution.selectedOtherName[4]}
                 }
+                
                 returnObject.push({contributionDescription: input.contribution.description,
-                                    personId: input.contribution.personId,
+                                    personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
                                     personName: personName,

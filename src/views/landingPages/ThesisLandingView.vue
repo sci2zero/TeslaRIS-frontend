@@ -306,7 +306,6 @@ export default defineComponent({
         };
 
         const performUpdate = (reload: boolean) => {
-            console.log(thesis.value)
             DocumentPublicationService.updateThesis(thesis.value?.id as number, thesis.value as Thesis).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;

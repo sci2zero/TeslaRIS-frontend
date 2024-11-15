@@ -203,6 +203,12 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
+        <v-btn
+            v-if="userRole === 'ADMIN'" density="compact" class="mt-5"
+            @click="migrateToUnmanaged">
+            {{ $t("migrateToUnmanagedResearcherLabel") }}
+        </v-btn>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -223,7 +229,7 @@
 import type { MultilingualContent, Country } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -251,6 +257,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -276,6 +283,8 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
+
+        const userRole = computed(() => UserService.provideUserRole());
 
         const researcherName = ref("");
         const accountIcon = ref('mdi-account-circle')
@@ -499,6 +508,14 @@ export default defineComponent({
             });
         };
 
+        const migrateToUnmanaged = () => {
+            PersonService.migrateToUnmanagedResearcher(person.value?.id as number).then(() => {
+                router.push({name:"persons"});
+            });
+
+            // TODO: Add warning and error handling
+        };
+
         return {
             researcherName, accountIcon, person, personalInfo, keywords,
             biography, publications,  totalPublications, switchPage, searchKeyword,
@@ -506,7 +523,7 @@ export default defineComponent({
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            currentTab, PersonUpdateForm
+            currentTab, PersonUpdateForm, userRole, migrateToUnmanaged
         };
 }})
 

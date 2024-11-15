@@ -416,5 +416,9 @@ export default {
     organisationUnitAdminExistsMessage: "There are registered administrators for this organisation unit, with this deletion, they will be removed too.",
     cancelLabel: "Cancel",
     continueLabel: "Proceed",
-    areYouSureLabel: "Are you sure?"
+    areYouSureLabel: "Are you sure?",
+    setupIdentifiersMessage: "In order to scan external data sources, you have to enter your ScopusID in your researcher profile.",
+    selectAssociateFromSystemLabel: "Select from system",
+    addExternalAssociateLabel: "Add external associate",
+    migrateToUnmanagedResearcherLabel: "Migrate to external associate"
 }

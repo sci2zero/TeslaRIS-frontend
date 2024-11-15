@@ -163,6 +163,8 @@ export default defineComponent({
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
+        
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
         
@@ -170,6 +172,7 @@ export default defineComponent({
           { title: nameLabel, align: "start", sortable: false, key: nameColumn},
           { title: eventDateLabel, align: "start", sortable: false, key: "dateFromTo"},
           { title: stateLabel, align: "start", sortable: false, key: stateColumn},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"}
         ];
 
         const selectManually = (conference: EventIndex) => {

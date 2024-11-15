@@ -11,11 +11,15 @@ import type { PersonResponse } from "@/models/PersonModel";
 
 export class ImportService extends BaseService {
   
+    async canPerformHarvest(): Promise<AxiosResponse<boolean>> {
+      return super.sendRequest(axios.get, "import-common/can-perform");
+    }
+  
     async startHarvest(dateFrom: string, dateTo: string): Promise<AxiosResponse<number>> {
       return super.sendRequest(axios.get, `import-common/documents-by-author?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}`);
     }
 
-    async getHarvestedDocumentsCound(): Promise<AxiosResponse<number>> {
+    async getHarvestedDocumentsCount(): Promise<AxiosResponse<number>> {
       return super.sendRequest(axios.get, "load/load-wizard/count-remaining");
     }
 

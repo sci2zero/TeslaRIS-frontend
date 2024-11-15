@@ -10,7 +10,7 @@
                     v-bind="props"
                     icon="mdi-translate"
                 >
-                    <v-badge :content="notificationCount" :model-value="notificationCount > 0">
+                    <v-badge :content="notificationCountStore.notificationCount" :model-value="notificationCountStore.notificationCount > 0">
                         <v-icon left dark>
                             mdi-bell
                         </v-icon>
@@ -18,22 +18,23 @@
                 </v-btn>
             </template>
 
-            <notification-list @lower-count="notificationCount -= 1;" @performed-action="notificationCount -=1"></notification-list>
+            <notification-list></notification-list>
         </v-menu>
     </div>
 </template>
   
 <script lang="ts">
 import NotificationService from '@/services/NotificationService';
-import { defineComponent, onMounted, ref } from 'vue';  
+import { defineComponent, onMounted } from 'vue';  
 import NotificationList from './NotificationList.vue';
+import { useNotificationCountStore } from '@/stores/notificationCountStore';
 
 
 export default defineComponent({
     name: "NotificationItem",
     components: { NotificationList },
     setup() {
-        const notificationCount = ref(0);
+        const notificationCountStore = useNotificationCountStore();
 
         onMounted(() => {
             fetchCount();
@@ -44,12 +45,12 @@ export default defineComponent({
 
         const fetchCount = () => {
             NotificationService.getNotificationCount().then(response => {
-                notificationCount.value = response.data;
+                notificationCountStore.setNotificationCount(response.data);
             });
         };
 
         return {
-            notificationCount
+            notificationCountStore
         };
 },
 data: () => ({

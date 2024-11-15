@@ -168,12 +168,14 @@ export default defineComponent({
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
         const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
         const superOUColumn = computed(() => i18n.t("superOUColumn"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: superOULabel, align: "start", sortable: true, key: superOUColumn},
           { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
-          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn}
+          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"},
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([

@@ -31,7 +31,7 @@
                     </v-col>
                     <v-col cols="1">
                         <v-list-item-action>
-                            <v-btn icon @click="rejectNotification(notification.id)">
+                            <v-btn icon @click.stop="rejectNotification(notification.id)">
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
                         </v-list-item-action>
@@ -49,15 +49,15 @@
 import { NotificationAction } from '@/models/Common';
 import type { Notification } from '@/models/Common';
 import NotificationService from '@/services/NotificationService';
+import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { defineComponent, onMounted, ref } from 'vue';  
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "NotificationList",
-    emits: ["lowerCount", "performedAction"],
-    setup(_, {emit}) {
+    setup() {
         const notifications = ref<Notification[]>([]);
-        const notificationCount = ref(0);
+        const notificationCountStore = useNotificationCountStore();
 
         const router = useRouter();
 
@@ -72,19 +72,20 @@ export default defineComponent({
             NotificationService.getAllNotifications().then(response => {
                 notifications.value = response.data;
             });
+            
             NotificationService.getNotificationCount().then(response => {
-                notificationCount.value = response.data;
+                notificationCountStore.setNotificationCount(response.data);
             });
         };
     
         const performAction = (notificationId: number, action: NotificationAction) => {
             NotificationService.performAction(notificationId, action).then(() => {
                 removeHandledNotification(notificationId);
-                emit("performedAction", action);
+                notificationCountStore.decrementCounter();
             });
 
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
-                emit("performedAction", action);
+                notificationCountStore.decrementCounter();
                 router.push({name: "deduplication"});
             }
         };
@@ -97,7 +98,7 @@ export default defineComponent({
 
         const removeHandledNotification = (notificationId: number) => {
             notifications.value = notifications.value.filter(notification => notification.id != notificationId);
-            emit("lowerCount");
+            notificationCountStore.decrementCounter();
         };
 
         const navigateToNotificationPage = () => {
@@ -108,7 +109,7 @@ export default defineComponent({
             performAction,
             notifications,
             rejectNotification,
-            notificationCount,
+            notificationCountStore,
             navigateToNotificationPage
         };
 }});

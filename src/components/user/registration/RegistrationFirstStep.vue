@@ -117,7 +117,7 @@ export default defineComponent({
                     const email = response.data.user.email;
                     router.push({name:"login", path:'/login/', query: { "email": email }})
                 } else {
-                    registerStore.setRegisterPersonData(response.data)
+                    registerStore.setRegisterPersonData(response.data);
                     emit("registration-next-step", {});
                 }
             }).catch(() => {

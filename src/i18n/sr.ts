@@ -416,5 +416,9 @@ export default {
     organisationUnitAdminExistsMessage: "Postoje administratori za ovu organizacionu jedinicu, ovim brisanjem ćete ukloniti i njih.",
     cancelLabel: "Odustani",
     continueLabel: "Nastavi",
-    areYouSureLabel: "Da li ste sigurni?"
+    areYouSureLabel: "Da li ste sigurni?",
+    setupIdentifiersMessage: "Da biste skenirali eksterne izvore podataka, morate uneti vaš ScopusID u profilu istraživača.",
+    selectAssociateFromSystemLabel: "Selektuj iz sistema",
+    addExternalAssociateLabel: "Dodaj spoljnog saradnika",
+    migrateToUnmanagedResearcherLabel: "Prebaci u spoljnog saradnika"
 }

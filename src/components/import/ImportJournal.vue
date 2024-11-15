@@ -147,12 +147,15 @@ export default defineComponent({
         };
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
+
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
           { title: "eISSN", align: "start", sortable: true, key: "eISSN"},
           { title: "Print ISSN", align: "start", sortable: true, key: "printISSN"},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([

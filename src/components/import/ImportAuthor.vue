@@ -159,6 +159,7 @@ export default defineComponent({
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
         const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
@@ -167,7 +168,7 @@ export default defineComponent({
           { title: organisationUnitLabel, align: "start", sortable: true, key: employmentColumn},
           { title: birthdateLabel, align: "start", sortable: true, key: "birthdate"},
           { title: "ORCID", align: "start", sortable: true, key: "orcid"},
-          { title: "Actions", align: "start", sortable: false, key: "actions"},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([

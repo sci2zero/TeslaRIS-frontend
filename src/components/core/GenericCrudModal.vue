@@ -86,7 +86,6 @@ export default defineComponent({
         const formRef = ref<InstanceType<typeof props.formComponent>>();
 
         const emitToParent = (formData: any) => {
-            console.log(formData);
             if (props.isUpdate) {
                 emit("update", formData);
             } else {
