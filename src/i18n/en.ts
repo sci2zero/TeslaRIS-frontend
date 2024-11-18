@@ -420,5 +420,9 @@ export default {
     setupIdentifiersMessage: "In order to scan external data sources, you have to enter your ScopusID in your researcher profile.",
     selectAssociateFromSystemLabel: "Select from system",
     addExternalAssociateLabel: "Add external associate",
-    migrateToUnmanagedResearcherLabel: "Migrate to external associate"
+    migrateToUnmanagedResearcherLabel: "Migrate to external associate",
+    documentClaimMessage: "These publications are potentially yours",
+    claimLabel: "Claim",
+    documentClaimLabel: "Document claim",
+    claimSuccessMessage: "Claim successful"
 }

@@ -209,6 +209,8 @@
             {{ $t("migrateToUnmanagedResearcherLabel") }}
         </v-btn>
 
+        <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="performMigrationToUnmanaged"></persistent-question-dialog>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -258,13 +260,17 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import UserService from '@/services/UserService';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog },
     setup() {
         const currentTab = ref("additionalInfo");
+
+        const dialogRef = ref<typeof PersistentQuestionDialog>();
+        const dialogMessage = ref("");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -509,11 +515,13 @@ export default defineComponent({
         };
 
         const migrateToUnmanaged = () => {
+            dialogRef.value?.toggle();
+        };
+
+        const performMigrationToUnmanaged = () => {
             PersonService.migrateToUnmanagedResearcher(person.value?.id as number).then(() => {
                 router.push({name:"persons"});
             });
-
-            // TODO: Add warning and error handling
         };
 
         return {
@@ -523,7 +531,8 @@ export default defineComponent({
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            currentTab, PersonUpdateForm, userRole, migrateToUnmanaged
+            currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
+            dialogRef, dialogMessage
         };
 }})
 

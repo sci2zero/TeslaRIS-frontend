@@ -420,5 +420,9 @@ export default {
     setupIdentifiersMessage: "Da biste skenirali eksterne izvore podataka, morate uneti vaš ScopusID u profilu istraživača.",
     selectAssociateFromSystemLabel: "Selektuj iz sistema",
     addExternalAssociateLabel: "Dodaj spoljnog saradnika",
-    migrateToUnmanagedResearcherLabel: "Prebaci u spoljnog saradnika"
+    migrateToUnmanagedResearcherLabel: "Prebaci u spoljnog saradnika",
+    documentClaimMessage: "Ove publikacije su potencijalno vaše",
+    claimLabel: "Prisvoji",
+    documentClaimLabel: "Prisvajanje publikacija",
+    claimSuccessMessage: "Prisvajanje uspešno"
 }

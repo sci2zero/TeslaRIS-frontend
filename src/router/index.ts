@@ -74,6 +74,7 @@ import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
 import CountryListView from "@/views/CountryListView.vue";
 import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
+import DocumentClaimerView from "@/views/DocumentClaimerView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -826,6 +827,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "document-claim",
+                    name: "documentClaim",
+                    component: DocumentClaimerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher],
                     },
                 },
             ]

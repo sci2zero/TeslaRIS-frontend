@@ -176,6 +176,14 @@ export class DocumentPublicationService extends BaseService {
   async forceDeleteMonograph(monographId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `monograph/force/${monographId}`);
   }
+
+  async findPotentialClaims(parameters: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `document-claim?${parameters}`);
+  }
+
+  async claimPublication(documentId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.post, `document-claim/${documentId}`);
+  }
 }
 
 export default new DocumentPublicationService();

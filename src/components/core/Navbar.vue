@@ -177,6 +177,7 @@ export default defineComponent(
             const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
             const countryListLabel = computed(() => i18n.t("countryListLabel"));
             const researchAreaListLabel = computed(() => i18n.t("researchAreaListLabel"));
+            const documentClaimLabel = computed(() => i18n.t("documentClaimLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -259,6 +260,7 @@ export default defineComponent(
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER' && personId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
+                { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER') },
             ]);
 
             const menuItems = ref<MenuItem[]>([

@@ -84,6 +84,11 @@
                         <td v-else>
                             {{ displayTextOrPlaceholder(item.doi) }}
                         </td>
+                        <td v-if="inClaimer">
+                            <v-btn size="small" color="primary" @click="claimPublication(item.databaseId)">
+                                {{ $t("claimLabel") }}
+                            </v-btn>
+                        </td>
                     </tr>
                 </draggable>
             </template>
@@ -104,7 +109,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
@@ -118,6 +123,7 @@ import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
 import { useRouter } from 'vue-router';
+
 
 export default defineComponent({
     name: "PublicationTableComponent",
@@ -134,10 +140,14 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        inClaimer: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["switchPage", "dragged"],
-    setup(_, {emit}) {
+    emits: ["switchPage", "dragged", "claim"],
+    setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
 
         const i18n = useI18n();
@@ -146,6 +156,12 @@ export default defineComponent({
         const notifications = ref<Map<string, string>>(new Map());
 
         const tableWrapper = ref<any>(null);
+
+        onMounted(() => {
+            if (props.inClaimer) {
+                headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
+            }
+        })
 
         watch(tableWrapper, () => {
             if (tableWrapper.value) {
@@ -161,6 +177,7 @@ export default defineComponent({
         const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
@@ -168,13 +185,13 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
-        const headers = [
+        const headers = ref([
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
           { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
           { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
           { title: typeOfPublicationLabel, align: "start", sortable: true, key: "type"},
           { title: "DOI", align: "start", sortable: true, key: "doi"},
-        ];
+        ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
@@ -275,13 +292,17 @@ export default defineComponent({
             tableOptions.value.sortBy = sortBy;
         };
 
+        const claimPublication = (documentId: number) => {
+            emit("claim", documentId);
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, userRole, deleteSelection, tableWrapper,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
             getPublicationTypeTitleFromValueAutoLocale,
             startMetadataComparison, getDocumentLandingPageBasePath,
-            startPublicationComparison, setSortOption
+            startPublicationComparison, setSortOption, claimPublication
         };
     }
 });

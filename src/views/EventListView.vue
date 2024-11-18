@@ -32,7 +32,7 @@ import { watch } from 'vue';
 
 
 export default defineComponent({
-    name: "OrganisationUnitListView",
+    name: "EventListView",
     components: {SearchBarComponent, EventTableComponent},
     setup() {
         const i18n = useI18n();
@@ -78,11 +78,11 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
         const addConference = () => {
             router.push({name: "submitConference"});
-        }
+        };
 
         return {
             search, events, totalEvents, switchPage,
