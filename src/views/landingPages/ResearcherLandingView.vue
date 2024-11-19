@@ -41,7 +41,7 @@
                         <v-row>
                             <v-col cols="6">
                                 <div class="response">
-                                    <person-other-name-modal :preset-other-names="person?.personOtherNames" :read-only="!canEdit" @update="updateOtherNames" @select-primary="selectPrimaryName"></person-other-name-modal>
+                                    <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
                                 </div>
                                 <div v-if="personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
@@ -492,15 +492,20 @@ export default defineComponent({
             }
         };
 
-        const updateOtherNames = (otherNames: PersonName[]) => {
-            PersonService.updateOtherNames(otherNames, person.value?.id as number).then(() => {
-                fetchPerson();
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("genericErrorMessage");
-                snackbar.value = true;
-            });
+        const updateNames = (personMainName: PersonName, otherNames: PersonName[]) => {
+            Promise.all([
+                PersonService.updatePrimaryName(person.value?.id as number, personMainName),
+                PersonService.updateOtherNames(otherNames, person.value?.id as number)
+            ])
+                .then(() => {
+                    fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                })
+                .catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
+                });
         };
 
         const selectPrimaryName = (personNameId: number) => {
@@ -529,7 +534,7 @@ export default defineComponent({
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
-            updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
+            updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
             dialogRef, dialogMessage

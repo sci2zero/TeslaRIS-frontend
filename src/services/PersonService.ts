@@ -77,6 +77,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.patch, `person/other-names/${personId}`, otherNames);
   }
 
+  async updatePrimaryName(personId: number, name: PersonName): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `person/name/${personId}`, name);
+  }
+
   async selectPrimaryName(otherNameId: number, personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `person/name/${personId}/${otherNameId}`);
   }
