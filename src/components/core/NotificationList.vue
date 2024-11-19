@@ -26,6 +26,9 @@
                                 <v-icon v-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
                                     mdi-content-duplicate
                                 </v-icon>
+                                <v-icon v-if="notificationAction.toString() === 'BROWSE_CLAIMABLE_DOCUMENTS'">
+                                    mdi-eye-outline
+                                </v-icon>
                             </v-btn>
                         </v-list-item-action>
                     </v-col>
@@ -85,9 +88,15 @@ export default defineComponent({
             });
 
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
-                notificationCountStore.decrementCounter();
-                router.push({name: "deduplication"});
+                decrementCounterAndNavigateToPage("deduplication");
+            } else if (action === NotificationAction.BROWSE_CLAIMABLE_DOCUMENTS) {
+                decrementCounterAndNavigateToPage("documentClaim");
             }
+        };
+
+        const decrementCounterAndNavigateToPage = (pageName: string) => {
+            notificationCountStore.decrementCounter();
+            router.push({name: pageName});
         };
 
         const rejectNotification = (notificationId: number) => {
