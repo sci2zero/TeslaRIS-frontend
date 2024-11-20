@@ -5,7 +5,7 @@
                 <v-btn
                     color="primary" dark v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
-                    {{ $t("viewOtherNamesLabel") }}
+                    {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>
             </template>
             <v-card>
@@ -39,7 +39,7 @@
                                 <v-col :cols="readOnly ? 4 : 3">
                                     <v-text-field
                                         v-model="element.firstname" :label="$t('firstNameLabel') + (readOnly ? '' : '*')" :placeholder="$t('firstNameLabel')" outlined
-                                        :rules="oterNameFieldRules" :readonly="readOnly"></v-text-field>
+                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
                                 </v-col>
                                 <v-col v-if="readOnly ? element.otherName : true" :cols="readOnly ? 4 : 3">
                                     <v-text-field
@@ -49,16 +49,23 @@
                                 <v-col :cols="readOnly ? 4 : 3">
                                     <v-text-field
                                         v-model="element.lastname" :label="$t('surnameLabel') + (readOnly ? '' : '*')" :placeholder="$t('surnameLabel')" outlined
-                                        :rules="oterNameFieldRules" :readonly="readOnly"></v-text-field>
+                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
                                 </v-col>
                                 <v-col cols="3">
-                                    <v-btn v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0) || index > 0)" icon @click="removeOtherName(index)">
+                                    <v-btn v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0))" icon @click="removeOtherName(index)">
                                         <v-icon>mdi-delete</v-icon>
                                     </v-btn>
                                     <v-btn v-if="!readOnly && element.id" icon @click="selectOtherName(element)">
                                         <v-icon>mdi-check-circle</v-icon>
                                     </v-btn>
                                     <v-btn v-if="!readOnly && (index === otherNames.length - 1)" icon @click="addOtherName">
+                                        <v-icon>mdi-plus</v-icon>
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-btn v-if="!readOnly && (otherNames.length === 0)" icon @click="addOtherName">
                                         <v-icon>mdi-plus</v-icon>
                                     </v-btn>
                                 </v-col>
@@ -84,13 +91,12 @@
 </template>
 
 <script lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import type { PropType } from "vue";
 import type { PersonName, PersonResponse } from "@/models/PersonModel";
 import { watch } from "vue";
-import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
@@ -111,20 +117,7 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: ""});
-        const otherNames = ref<PersonName[]>([{firstname: "", lastname: "", otherName: ""}]);
-
-        const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const oterNameFieldRules = [
-            (value: string) => {
-                if (otherNames.value.length === 1 && otherNames.value[0].firstname === "" && otherNames.value[0].otherName === "" && otherNames.value[0].lastname === "") {
-                    return true;
-                }
-
-                if (!value || value.trim() === "") return requiredFieldMessage.value;
-                return true;
-            }
-        ];
+        const otherNames = ref<PersonName[]>([]);
 
         const { requiredFieldRules } = useValidationUtils();
 
@@ -134,8 +127,6 @@ export default defineComponent({
                 props.presetPerson.personOtherNames.forEach((personName) => {
                     otherNames.value.push({id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName});
                 });
-            } else {
-                otherNames.value = [{firstname: "", lastname: "", otherName: ""}];
             }
 
             if (props.presetPerson) {
@@ -166,8 +157,7 @@ export default defineComponent({
 
         return { dialog, isFormValid, requiredFieldRules,
                 addOtherName, otherNames, removeOtherName,
-                update, selectOtherName, primaryName,
-                oterNameFieldRules };
+                update, selectOtherName, primaryName };
     }
 });
 </script>
