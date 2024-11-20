@@ -424,5 +424,6 @@ export default {
     documentClaimMessage: "These publications are potentially yours",
     claimLabel: "Claim",
     documentClaimLabel: "Document claim",
-    claimSuccessMessage: "Claim successful"
+    claimSuccessMessage: "Claim successful",
+    declineClaimLabel: "Not mine"
 }

@@ -88,6 +88,9 @@
                             <v-btn size="small" color="primary" @click="claimPublication(item.databaseId)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
+                            <v-btn class="ml-1" size="small" color="primary" @click="declinePublicationClaim(item.databaseId)">
+                                {{ $t("declineClaimLabel") }}
+                            </v-btn>
                         </td>
                     </tr>
                 </draggable>
@@ -146,7 +149,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ["switchPage", "dragged", "claim"],
+    emits: ["switchPage", "dragged", "claim", "declineClaim"],
     setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
 
@@ -296,13 +299,18 @@ export default defineComponent({
             emit("claim", documentId);
         };
 
+        const declinePublicationClaim = (documentId: number) => {
+            emit("declineClaim", documentId);
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, userRole, deleteSelection, tableWrapper,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
             getPublicationTypeTitleFromValueAutoLocale,
             startMetadataComparison, getDocumentLandingPageBasePath,
-            startPublicationComparison, setSortOption, claimPublication
+            startPublicationComparison, setSortOption, claimPublication,
+            declinePublicationClaim
         };
     }
 });

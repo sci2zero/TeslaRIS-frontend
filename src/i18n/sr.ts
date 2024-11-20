@@ -424,5 +424,6 @@ export default {
     documentClaimMessage: "Ove publikacije su potencijalno vaše",
     claimLabel: "Prisvoji",
     documentClaimLabel: "Prisvajanje publikacija",
-    claimSuccessMessage: "Prisvajanje uspešno"
+    claimSuccessMessage: "Prisvajanje uspešno",
+    declineClaimLabel: "Nije moje"
 }

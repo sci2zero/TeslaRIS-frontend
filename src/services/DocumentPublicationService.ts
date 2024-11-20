@@ -182,7 +182,11 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async claimPublication(documentId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.post, `document-claim/${documentId}`);
+    return super.sendRequest(axios.patch, `document-claim/${documentId}`);
+  }
+
+  async declinePublicationClaim(documentId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document-claim/decline/${documentId}`);
   }
 }
 

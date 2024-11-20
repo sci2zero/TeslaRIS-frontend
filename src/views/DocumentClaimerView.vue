@@ -5,7 +5,7 @@
         <br />
         <publication-table-component
             ref="tableRef" :publications="publications" :total-publications="totalPublications" in-claimer
-            @switch-page="switchPage" @claim="claimPublication"></publication-table-component>
+            @switch-page="switchPage" @claim="claimPublication" @decline-claim="declinePublicationClaim"></publication-table-component>
         
         <v-snackbar
             v-model="snackbar"
@@ -74,10 +74,18 @@ export default defineComponent({
             });
         };
 
+        const declinePublicationClaim = (documentId: number) => {
+            DocumentPublicationService.declinePublicationClaim(documentId).then(() => {
+                message.value = i18n.t("successfulltUpdatedNotification");
+                snackbar.value = true;
+                fetchPotentialClaims();
+            });
+        };
+
         return {
             publications, totalPublications,
             switchPage, claimPublication, message,
-            snackbar
+            snackbar, declinePublicationClaim
         };
     }
 });
