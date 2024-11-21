@@ -50,6 +50,7 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import CountryService from '@/services/CountryService';
 import { useI18n } from 'vue-i18n';
 
+
 export default defineComponent({
     name: "PublisherUpdateForm",
     components: {MultilingualTextInput},
@@ -86,6 +87,7 @@ export default defineComponent({
                     const country = countries.value.find(country => 
                         country.value === props.presetPublisher?.countryId
                     );
+
                     if (country) {
                         selectedCountry.value = country;
                     }
@@ -95,6 +97,12 @@ export default defineComponent({
 
         watch(i18n.locale, () => {
             fetchCountries();
+        });
+
+        watch(() => props.presetPublisher, () => {
+            if (props.presetPublisher) {
+                refreshForm();
+            }
         });
 
         const nameRef = ref<typeof MultilingualTextInput>();
@@ -118,6 +126,16 @@ export default defineComponent({
             emit("update", updatedPublisher);
         };
 
+        const refreshForm = () => {
+            const country = countries.value.find(country => 
+                country.value === props.presetPublisher?.countryId
+            );
+
+            if (country) {
+                selectedCountry.value = country;
+            }
+        };
+
         return {
             isFormValid,
             name, nameRef,
@@ -125,7 +143,8 @@ export default defineComponent({
             place, placeRef,
             requiredFieldRules,
             toMultilingualTextInput,
-            submit, languageList
+            submit, languageList,
+            refreshForm
         };
     }
 });

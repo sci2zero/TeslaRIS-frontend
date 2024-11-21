@@ -5,8 +5,16 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedPublishers.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button"
+        :disabled="selectedPublishers.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button"
+        :disabled="selectedPublishers.length !== 2"
+        @click="startPublicationComparison">
+        {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedPublishers"
@@ -77,6 +85,7 @@ import type { PublisherIndex } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -93,9 +102,10 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedPublishers = ref([]);
+        const selectedPublishers = ref<PublisherIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -181,11 +191,24 @@ export default defineComponent({
             tableOptions.value.sortBy = sortBy;
         };
 
+        const startMetadataComparison = () => {
+            router.push({name: "publisherMetadataComparator", params: {
+                leftId: selectedPublishers.value[0].databaseId, rightId: selectedPublishers.value[1].databaseId
+            }});
+        };
+
+        const startPublicationComparison = () => {
+            router.push({name: "publisherPublicationsComparator", params: {
+                leftId: selectedPublishers.value[0].databaseId, rightId: selectedPublishers.value[1].databaseId
+            }});
+        };
+
         return {
             selectedPublishers, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            setSortOption
+            setSortOption, startMetadataComparison,
+            startPublicationComparison
         };
     }
 });

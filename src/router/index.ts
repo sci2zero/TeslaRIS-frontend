@@ -75,6 +75,8 @@ import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisa
 import CountryListView from "@/views/CountryListView.vue";
 import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
 import DocumentClaimerView from "@/views/DocumentClaimerView.vue";
+import PublisherPublicationsComparator from "@/views/comparators/publisher/PublisherPublicationsComparator.vue";
+import PublisherMetadataComparator from "@/views/comparators/publisher/PublisherMetadataComparator.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -398,7 +400,25 @@ const router = createRouter({
                                 authenticated: true,
                                 authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
-                        }
+                        },
+                        {
+                            path: 'publications-comparator/:leftId/:rightId',
+                            name: "publisherPublicationsComparator",
+                            component: PublisherPublicationsComparator,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "publisherMetadataComparator",
+                            component: PublisherMetadataComparator,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                 },
                 {

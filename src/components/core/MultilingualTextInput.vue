@@ -2,13 +2,14 @@
     <v-row v-for="(input, index) in inputs" :key="index" class="multi-lingual-input">
         <v-col cols="7">
             <v-text-field
-                v-if="!isArea"
+                v-if="!isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-text-field>
             <v-textarea
-                v-if="isArea"
+                v-if="isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-textarea>
+            <rich-text-editor v-if="isRich" v-model="input.text" @input="sendContentToParent"></rich-text-editor>
         </v-col>
         <v-col cols="3">
             <v-select
@@ -41,16 +42,23 @@ import type { AxiosResponse } from 'axios';
 import UserService from '@/services/UserService';
 import type { UserResponse } from '@/models/UserModel';
 import { watch } from 'vue';
+import RichTextEditor from './RichTextEditor.vue';
 
 
 export default defineComponent({
     name: "MultilingualTextInput",
+    components: { RichTextEditor },
     props: {
         label: {
             type: String,
             required: true
         },
         isArea: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        isRich: {
             type: Boolean,
             required: false,
             default: false
@@ -126,8 +134,7 @@ export default defineComponent({
                 setInitialModelValue();
                 initialValueSet.value = true;
             }
-            
-        })
+        });
 
         const addInput = () => {
             let languageChoice = supportedLanguages.value;
@@ -187,7 +194,7 @@ export default defineComponent({
         const sendContentToParent = () => {
             const returnObject: MultilingualContent[] = [];
             inputs.value.forEach((input, index) => {
-                if (!input.text) {
+                if (!input.text || input.text === "<p></p>") {
                     input.text = "";
                     return;
                 } else if(input.text.trim() === "") {

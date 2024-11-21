@@ -6,7 +6,7 @@
                     <v-col cols="12">
                         <multilingual-text-input
                             ref="descriptionRef" v-model="description" :initial-value="toMultilingualTextInput(presetDescriptionOrBiography, languageTags)" :label="$t('abstractLabel')"
-                            is-area></multilingual-text-input>
+                            is-rich></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>

@@ -15,7 +15,7 @@
 
                     <div><b>{{ isBiography ? $t("biographyLabel") : $t("abstractLabel") }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <p>{{ returnCurrentLocaleContent(description) }}</p>
+                    <rich-text-editor v-model="descriptionDisplay" :editable="false"></rich-text-editor>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -23,16 +23,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, ref, watch, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
 import GenericCrudModal from './GenericCrudModal.vue';
 import DescriptionOrBiographyUpdateForm from './update/DescriptionOrBiographyUpdateForm.vue';
+import RichTextEditor from './RichTextEditor.vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
     name: "DescriptionSection",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, RichTextEditor },
     props: {
         canEdit: {
             type: Boolean,
@@ -48,15 +50,24 @@ export default defineComponent({
         }
     },
     emits: ["update"],
-    setup(_, { emit }) {
-        
+    setup(props, { emit }) {
+        const descriptionDisplay = ref("");
+
+        const i18n = useI18n();
+
         const emitToParent = (description: MultilingualContent[]) => {
+            console.log(description)
             emit("update", description)
         };
 
+        watch([() => props.description, i18n.locale], () => {
+            descriptionDisplay.value = returnCurrentLocaleContent(props.description) as string;
+        });
+
         return { 
             emitToParent, returnCurrentLocaleContent,
-            DescriptionOrBiographyUpdateForm
+            DescriptionOrBiographyUpdateForm,
+            descriptionDisplay
         };
     },
 });
