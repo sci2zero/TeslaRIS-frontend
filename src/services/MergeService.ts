@@ -139,7 +139,7 @@ export class MergeService extends BaseService {
     }
 
     async saveMergedPublishersMetadata(leftPublisherId: number, rightPublisherId: number, body: MergedPublishers): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/monograph-publication/metadata/${leftPublisherId}/${rightPublisherId}`, body);
+        return super.sendRequest(axios.patch, `merge/publisher/metadata/${leftPublisherId}/${rightPublisherId}`, body);
     }
 }
 

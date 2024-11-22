@@ -134,6 +134,9 @@ export default defineComponent({
             if (country) {
                 selectedCountry.value = country;
             }
+
+            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageList.value));
+            placeRef.value?.forceRefreshModelValue(toMultilingualTextInput(place.value, languageList.value));
         };
 
         return {
