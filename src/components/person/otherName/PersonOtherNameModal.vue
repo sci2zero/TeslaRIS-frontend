@@ -103,7 +103,7 @@ export default defineComponent({
     name: "PersonOtherNameModal",
     props: {
         presetPerson: {
-            type: Object as PropType<PersonResponse>,
+            type: Object as PropType<PersonResponse | undefined>,
             required: true
         },
         readOnly: {

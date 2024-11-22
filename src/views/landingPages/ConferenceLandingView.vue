@@ -46,12 +46,6 @@
                                 <div v-if="!conference?.serialEvent" class="response">
                                     {{ localiseDateRange(conference?.dateFrom as string, conference?.dateTo as string) }}
                                 </div>
-                                <div v-if="conference?.description && conference.description.length > 0">
-                                    {{ $t("abstractLabel") }}:
-                                </div>
-                                <div v-if="conference?.description && conference.description.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(conference?.description) }}
-                                </div>
                                 <div v-if="conference?.countryId">
                                     {{ $t("stateLabel") }}:
                                 </div>

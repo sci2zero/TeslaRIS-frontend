@@ -423,7 +423,9 @@ export default {
     migrateToUnmanagedResearcherLabel: "Migrate to external associate",
     documentClaimMessage: "These publications are potentially yours",
     claimLabel: "Claim",
-    documentClaimLabel: "Document claim",
+    documentClaimLabel: "Autorship claim",
     claimSuccessMessage: "Claim successful",
-    declineClaimLabel: "Not mine"
+    declineClaimLabel: "Not mine",
+    updateProfilePictureLabel: "Update profile photo",
+    isOpenAccessLabel: "Open Access"
 }

@@ -56,8 +56,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const emitToParent = (description: MultilingualContent[]) => {
-            console.log(description)
-            emit("update", description)
+            emit("update", description);
         };
 
         watch([() => props.description, i18n.locale], () => {

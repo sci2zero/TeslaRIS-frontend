@@ -115,6 +115,7 @@ export interface PersonResponse {
     membershipIds: number[];
     expertisesOrSkills: ExpertiseOrSkillResponse[];
     prizes: PrizeResponse[];
+    imageServerFilename?: string;
 }
 
 export interface PersonalInfo {
@@ -157,4 +158,8 @@ export interface Prize {
     title: MultilingualContent[];
     description: MultilingualContent[];
     date: string;
+}
+
+export interface PersonProfileImageRequest {
+    imageFile: File
 }

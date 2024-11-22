@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 
 export class BaseService {
   basePath: string = import.meta.env.VITE_BASE_URL as string;
@@ -24,6 +24,25 @@ export class BaseService {
     link.download = documentName;
     link.click();
     URL.revokeObjectURL(link.href);
+  }
+
+  async fetchImageForDisplay(serverFilename: string): Promise<[string | null, string | null]> {
+    try {
+      const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/image/${serverFilename}`, {
+        responseType: 'blob',
+      });
+
+      let imageName = null;
+      if (response.headers["content-disposition"]) {
+        imageName = response.headers["content-disposition"].split("=")[1].replaceAll('"', '');
+      }
+  
+      const imageUrl = URL.createObjectURL(response.data);
+      return [imageUrl, imageName];
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return [null, null];
+    }
   }
 
   async sendRequest(

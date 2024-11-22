@@ -17,9 +17,7 @@
         <!-- Researcher Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-researcher-icon">
-                    {{ accountIcon }}
-                </v-icon>
+                <person-profile-image :filename="person?.imageServerFilename" :person-id="person?.id" :can-edit="canEdit"></person-profile-image>
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -261,11 +259,12 @@ import UriList from '@/components/core/UriList.vue';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
+import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -293,7 +292,6 @@ export default defineComponent({
         const userRole = computed(() => UserService.provideUserRole());
 
         const researcherName = ref("");
-        const accountIcon = ref('mdi-account-circle')
 
         const personalInfo = ref<any>({contact: {}});
         
@@ -530,7 +528,7 @@ export default defineComponent({
         };
 
         return {
-            researcherName, accountIcon, person, personalInfo, keywords,
+            researcherName, person, personalInfo, keywords,
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
@@ -539,15 +537,10 @@ export default defineComponent({
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
             dialogRef, dialogMessage
         };
-}})
-
+}});
 </script>
 
 <style scoped>
-    #researcher .large-researcher-icon {
-        font-size: 10em;
-    }
-
     #researcher .response {
         font-size: 1.2rem;
         margin-bottom: 10px;

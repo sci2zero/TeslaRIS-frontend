@@ -422,8 +422,10 @@ export default {
     addExternalAssociateLabel: "Dodaj spoljnog saradnika",
     migrateToUnmanagedResearcherLabel: "Prebaci u spoljnog saradnika",
     documentClaimMessage: "Ove publikacije su potencijalno vaše",
-    claimLabel: "Prisvoji",
-    documentClaimLabel: "Prisvajanje publikacija",
-    claimSuccessMessage: "Prisvajanje uspešno",
-    declineClaimLabel: "Nije moje"
+    claimLabel: "Potvrdi",
+    documentClaimLabel: "Potvrda autorstva",
+    claimSuccessMessage: "Potrvrda uspešno",
+    declineClaimLabel: "Nije moje",
+    updateProfilePictureLabel: "Ažuriraj profilnu fotogorafiju",
+    isOpenAccessLabel: "Otvoren Pristup"
 }

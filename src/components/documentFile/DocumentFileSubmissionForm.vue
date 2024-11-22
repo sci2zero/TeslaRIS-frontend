@@ -70,7 +70,7 @@ import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
 
 export default defineComponent({
-    name: "ConferenceSubmissionForm",
+    name: "DOcumentFileSubmissionForm",
     components: {MultilingualTextInput},
     props: {
         edit: {
