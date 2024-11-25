@@ -68,6 +68,7 @@ export default {
     titleLabel: "Title",
     subtitleLabel: "Subtitle",
     yearOfPublicationLabel: "Year of Publication",
+    dateOfPublicationLabel: "Date of publication",
     typeOfPublicationLabel: "Type of Publication",
     eventListLabel: "Events",
     conferenceLabel: "Conference",
@@ -269,7 +270,8 @@ export default {
     foundAsLabel: "Found as {0} in the system.",
     createdNewResearcherLabel: "Created {0} in the system.",
     canNotAutoFindResearcherMessage: "Can't automatically find a researcher in the system, please, select researcher from the list:",
-    createdNewEntityLabel: "If the researcher is not in the list you can create a new one:",
+    createdNewEntityLabel: "Created {0} in the system.",
+    canCreateNewResearcherLabel: "If the researcher is not in the list, you can create a new one:",
     viewPublicationsLabel: "View publications",
     selectLabel: "Select",
     skipDocumentLabel: "Skip Document",
@@ -363,7 +365,7 @@ export default {
     thesisTypeLabel: "Thesis type",
     updateThesisLabel: "Update Thesis",
     notificationPeriodLabel: "Email notification send period",
-    notificationsLabel: "Notifications list",
+    notificationsLabel: "Notification list",
     addeddSuccessfullyLabel: "Successfuly added.",
     removedSuccessfullyLabel: "Successfully removed.",
     noNewNotificationsMessage: "You have no new notifications",
@@ -427,5 +429,6 @@ export default {
     claimSuccessMessage: "Claim successful",
     declineClaimLabel: "Not mine",
     updateProfilePictureLabel: "Update profile photo",
-    isOpenAccessLabel: "Open Access"
+    isOpenAccessLabel: "Open Access",
+    removeProfileImageLabel: "Remove profile picture"
 }

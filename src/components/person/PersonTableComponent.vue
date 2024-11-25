@@ -14,7 +14,7 @@
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
-    <add-employment-modal v-if="employmentInstitutionId > 0" :institution-id="employmentInstitutionId" @update="notifyUserAndRefreshTable"></add-employment-modal>
+    <add-employment-modal v-if="employmentInstitutionId > 0 && userRole === 'ADMIN'" :institution-id="employmentInstitutionId" @update="notifyUserAndRefreshTable"></add-employment-modal>
     
     <div ref="tableWrapper">
         <v-data-table-server

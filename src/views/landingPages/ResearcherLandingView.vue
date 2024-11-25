@@ -490,21 +490,20 @@ export default defineComponent({
             }
         };
 
-        const updateNames = (personMainName: PersonName, otherNames: PersonName[]) => {
-            Promise.all([
-                PersonService.updatePrimaryName(person.value?.id as number, personMainName),
-                PersonService.updateOtherNames(otherNames, person.value?.id as number)
-            ])
-                .then(() => {
-                    fetchPerson();
-                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                    snackbar.value = true;
-                })
-                .catch(() => {
-                    snackbarMessage.value = i18n.t("genericErrorMessage");
-                    snackbar.value = true;
-                });
+        const updateNames = async (personMainName: PersonName, otherNames: PersonName[]) => {
+            try {
+                await PersonService.updatePrimaryName(person.value?.id as number, personMainName);
+                await PersonService.updateOtherNames(otherNames, person.value?.id as number);
+
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            } catch (error) {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            }
         };
+
 
         const selectPrimaryName = (personNameId: number) => {
             PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {

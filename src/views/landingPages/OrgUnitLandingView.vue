@@ -129,8 +129,10 @@
                     :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"
                     @delete="fetchEmployees(true)"></person-table-component>
 
-                <h1>{{ $t("alumniLabel") }}</h1>
-                <person-table-component :persons="alumni" :total-persons="totalAlumni" is-alumni-table @switch-page="switchAlumniPage"></person-table-component>
+                <div v-if="totalAlumni > 0">
+                    <h1>{{ $t("alumniLabel") }}</h1>
+                    <person-table-component :persons="alumni" :total-persons="totalAlumni" is-alumni-table @switch-page="switchAlumniPage"></person-table-component>
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
                 <!-- Relations -->
@@ -146,12 +148,14 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                <h1>{{ $t("subUnitsLabel") }}</h1>
-                <v-row>
-                    <v-col>
-                        <organisation-unit-table-component :organisation-units="subUnits" :total-o-us="totalSubUnits" @switch-page="switchSubUnitsPage"></organisation-unit-table-component>
-                    </v-col>
-                </v-row>
+                <div v-if="totalSubUnits > 0">
+                    <h1>{{ $t("subUnitsLabel") }}</h1>
+                    <v-row>
+                        <v-col>
+                            <organisation-unit-table-component :organisation-units="subUnits" :total-o-us="totalSubUnits" @switch-page="switchSubUnitsPage"></organisation-unit-table-component>
+                        </v-col>
+                    </v-row>
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
                 <!-- Research Area -->

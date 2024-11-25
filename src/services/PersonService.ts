@@ -96,6 +96,10 @@ export class PersonService extends BaseService {
   async updatePersonProfileImage(imageFile: PersonProfileImageRequest, personId: number): Promise<AxiosResponse<string>> {
     return super.sendMultipartFormDataRequest(axios.patch, `person/profile-image/${personId}`, imageFile, PersonService.idempotencyKey);
   }
+
+  async removePersonProfileImage(personId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `person/profile-image/${personId}`);
+  }
 }
 
 export default new PersonService();

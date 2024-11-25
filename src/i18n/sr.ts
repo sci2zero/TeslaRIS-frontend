@@ -68,6 +68,7 @@ export default {
     titleLabel: "Naslov",
     subtitleLabel: "Podnaslov",
     yearOfPublicationLabel: "Godina izdanja",
+    dateOfPublicationLabel: "Datum izdanja",
     typeOfPublicationLabel: "Tip Publikacije",
     eventListLabel: "Događaji",
     conferenceLabel: "Konferencija",
@@ -427,5 +428,6 @@ export default {
     claimSuccessMessage: "Potrvrda uspešno",
     declineClaimLabel: "Nije moje",
     updateProfilePictureLabel: "Ažuriraj profilnu fotogorafiju",
-    isOpenAccessLabel: "Otvoren Pristup"
+    isOpenAccessLabel: "Otvoren Pristup",
+    removeProfileImageLabel: "Ukloni profilnu sliku"
 }

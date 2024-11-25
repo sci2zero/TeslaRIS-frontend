@@ -2,7 +2,7 @@
     <div class="edit-pen-container">
         <generic-crud-modal
             :form-component="PersonProfileImageForm"
-            :form-props="{ fileName: imageName, personId: personId }"
+            :form-props="{ originalFileName: imageName, personId: personId }"
             entity-name="ProfilePicture"
             is-update
             is-section-update
@@ -55,12 +55,14 @@ export default defineComponent({
 
         watch(() => props.filename, async () => {
             if (props.filename) {
-                await fetchImage(props.filename);
+                await fetchImage();
             }
         });
 
-        const fetchImage = async (filename: string) => {
-            [imageSrc.value, imageName.value] = await BaseService.fetchImageForDisplay(filename);
+        const fetchImage = async () => {
+            if (props.personId) {
+                [imageSrc.value, imageName.value] = await BaseService.fetchImageForDisplay(props.personId, false);
+            }
         };
 
         return {

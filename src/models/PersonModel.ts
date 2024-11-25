@@ -161,5 +161,9 @@ export interface Prize {
 }
 
 export interface PersonProfileImageRequest {
-    imageFile: File
+    file: File
+    top: number;
+    left: number;
+    height: number;
+    width: number;
 }

@@ -26,11 +26,15 @@ export class BaseService {
     URL.revokeObjectURL(link.href);
   }
 
-  async fetchImageForDisplay(serverFilename: string): Promise<[string | null, string | null]> {
+  async fetchImageForDisplay(personId: number, fullSize: boolean): Promise<[string | null, string | null]> {
     try {
-      const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/image/${serverFilename}`, {
+      const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/image/${personId}?fullSize=${fullSize}`, {
         responseType: 'blob',
       });
+
+      if (response.status === 204) {
+        return [null, null];
+      }
 
       let imageName = null;
       if (response.headers["content-disposition"]) {
