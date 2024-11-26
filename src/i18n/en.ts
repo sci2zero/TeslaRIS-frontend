@@ -430,5 +430,6 @@ export default {
     declineClaimLabel: "Not mine",
     updateProfilePictureLabel: "Update profile photo",
     isOpenAccessLabel: "Open Access",
-    removeProfileImageLabel: "Remove profile picture"
+    removeProfileImageLabel: "Remove profile picture",
+    noDataInTableMessage: "No data available."
 }

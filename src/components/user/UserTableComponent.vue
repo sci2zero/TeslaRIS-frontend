@@ -7,6 +7,7 @@
         :items-length="totalUsers"
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>

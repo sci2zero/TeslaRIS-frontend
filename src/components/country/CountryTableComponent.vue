@@ -29,6 +29,7 @@
         :items-per-page="25"
         show-select
         return-object
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>

@@ -38,7 +38,8 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[10, 25, 50]"
-            hide-default-footer>
+            hide-default-footer
+            :no-data-text="$t('noDataInTableMessage')">
             <template #item="row">
                 <tr>
                     <td v-if="$i18n.locale == 'sr'">

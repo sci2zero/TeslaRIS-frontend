@@ -429,5 +429,6 @@ export default {
     declineClaimLabel: "Nije moje",
     updateProfilePictureLabel: "Ažuriraj profilnu fotogorafiju",
     isOpenAccessLabel: "Otvoren Pristup",
-    removeProfileImageLabel: "Ukloni profilnu sliku"
+    removeProfileImageLabel: "Ukloni profilnu sliku",
+    noDataInTableMessage: "Nema podataka za prikazivanje."
 }

@@ -35,9 +35,15 @@
                     tag="tbody"
                     :disabled="!inComparator"
                     group="persons"
+                    handle=".handle"
                     @change="onDropCallback"
                 >
-                    <tr v-for="item in props.items" :key="item.id">
+                    <tr v-if="props.items?.length === 0">
+                        <td colspan="10" class="text-center">
+                            <p>{{ $t("noDataInTableMessage") }}</p>
+                        </td>
+                    </tr>
+                    <tr v-for="item in props.items" :key="item.id" class="handle">
                         <td v-if="userRole === 'ADMIN'">
                             <v-checkbox
                                 v-model="selectedPersons"
