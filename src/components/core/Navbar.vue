@@ -119,7 +119,7 @@
 import LangChangeItem from './LangChangeItem.vue';
 import UserService from "@/services/UserService";
 import AuthenticationService from '@/services/AuthenticationService';
-import { computed, defineComponent, reactive } from 'vue';
+import { computed, defineComponent, onMounted, reactive, watch } from 'vue';
 import { useLoginStore } from '@/stores/loginStore';
 import { watchEffect } from 'vue';
 import { ref } from 'vue';
@@ -181,22 +181,10 @@ export default defineComponent(
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
-            const userLoggedIn = ref(false);
-
+            
             const appTitle = ref("CRIS UNS");
             const sidebar = ref(false);
             const userRole = ref("");
-
-            const a = ref(true);
-            const testData = reactive({
-                test: !a.value,
-                get test2() {
-                    return !a.value;
-                },
-                test3: a,
-
-            });
-            a.value = false;
 
             const loginStore = useLoginStore();
             const userName = ref("");
@@ -216,25 +204,21 @@ export default defineComponent(
 
             const logout = () => {
                 AuthenticationService.logoutUser();
-                userLoggedIn.value = false;
                 loginStore.userLoggedOut();
                 router.push({ name: "login" });
             };
 
-            watchEffect(() => {
+            watch(() => loginStore.userLoggedIn, () => {
                 if (loginStore.userLoggedIn) {
-                    userLoggedIn.value = true;
                     populateUserData();
-                } else {
-                    userLoggedIn.value = false;
                 }
             });
 
-            if (AuthenticationService.userLoggedIn()) {
-                userLoggedIn.value = true;
-                populateUserData();
-            }
-
+            onMounted(() => {
+                if (AuthenticationService.userLoggedIn()) {
+                    populateUserData();
+                }
+            });
 
             const personsAndOU = ref<MenuItem[]>([
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
@@ -256,25 +240,25 @@ export default defineComponent(
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
                 { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
-                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER') },
-                { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER' && personId.value > 0) },
-                { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
-                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
-                { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER') },
+                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
+                { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER' && personId.value > 0) },
+                { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
+                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
+                { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
             ]);
 
             const menuItems = ref<MenuItem[]>([
                 { title: undefined, type:'lang_component', icon: 'mdi-translate', condition: true, component: langChangeItem },
                 { type:'divider' },
-                { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: userLoggedIn, component: notificationItem },
-                { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !userLoggedIn.value), variant: 'text' },
-                { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !userLoggedIn.value), variant: 'outlined', color:'primary' },
-                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: userLoggedIn, variant: 'flat', color:'primary' },
-                { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: userLoggedIn },
+                { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
+                { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
+                { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color:'primary' },
+                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
+                { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) },
             ]);
 
 
-            return { userName, userRole, userLoggedIn, logout, appTitle, sidebar, menuItems, leftMenuItems, testData, a };
+            return { userName, userRole, logout, appTitle, sidebar, menuItems, leftMenuItems, loginStore };
         }
     });
 </script>
