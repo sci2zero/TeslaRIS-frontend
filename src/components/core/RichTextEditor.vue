@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container h-100">
         <bubble-menu
             v-if="editor"
             :editor="editor"
@@ -17,15 +17,14 @@
                 </button>
             </div>
         </bubble-menu>
-        <editor-content :editor="editor" />
+        <editor-content style="height: 100%;" :editor="editor" />
     </div>
 </template>
 
 <script lang="ts">
-import { useEditor, EditorContent } from '@tiptap/vue-3'
+import { useEditor, EditorContent, BubbleMenu } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { defineComponent, watch } from 'vue';
-import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Placeholder from '@tiptap/extension-placeholder'
 
 
@@ -43,10 +42,10 @@ export default defineComponent({
         }
     },
     emits: ["update:modelValue", "input"],
-    setup(props, {emit}) {
+    setup(props, { emit }) {
         const editor = useEditor({
             content: props.modelValue,
-            extensions: [ 
+            extensions: [
                 StarterKit,
                 Placeholder.configure({
                     placeholder: 'Write something …',
@@ -72,39 +71,46 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-
+<style>
+.tiptap {
+    height: 100%;
+}
 .bubble-menu {
-  background-color: var(--white);
-  border: 1px solid var(--gray-1);
-  border-radius: 0.7rem;
-  box-shadow: var(--shadow);
-  display: flex;
-  padding: 0.2rem;
+    background-color: white;
+    border: 1px solid rgba(61, 37, 20, .05);
+    border-radius: 0.7rem;
+    box-shadow: 0px 12px 33px 0px rgba(0, 0, 0, .06), 0px 3.618px 9.949px 0px rgba(0, 0, 0, .04);
+    display: flex;
+    padding: 0.2rem;
+    height: 100%;
+}
 
-  button {
+.bubble-menu button {
     background-color: unset;
+    padding: 3px 10px;
+    border-radius: 5px;
+}
 
-    &:hover {
-      background-color: var(--gray-3);
-    }
+.bubble-menu button:hover {
+    background-color: rgba(61, 37, 20, .12);
+}
 
-    &.is-active {
-      background-color: var(--purple);
+.bubble-menu button.is-active {
+    background-color: #6A00F5;
+    color: white;
+    font-weight: bold;
+}
 
-      &:hover {
-        background-color: var(--purple-contrast);
-      }
-    }
-  }
+.bubble-menu button.is-active:hover {
+    background-color: #5800CC;
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-  color: #adb5bd;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
 }
 
 </style>

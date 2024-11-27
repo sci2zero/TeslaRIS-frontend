@@ -1,5 +1,5 @@
 <template>
-    <v-row justify="start">
+    <div justify="start">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
                 <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
@@ -44,7 +44,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
+    </div>
 </template>
 
 

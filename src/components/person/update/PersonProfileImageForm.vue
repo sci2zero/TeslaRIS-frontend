@@ -20,7 +20,7 @@
                 :options="{
                     viewMode: 1,
                     dragMode: 'crop',
-                    aspectRatio: 4 / 5,
+                    aspectRatio: 1 / 1,
                 }"
             />
         </v-row>
@@ -82,12 +82,13 @@ export default defineComponent({
         const submit = async () => {
             if (!cropper || !file.value) return
 
+            console.log(imageSrc.value)
             const newProfileImage: PersonProfileImageRequest = {
-                file: file.value[0],
-                top: Math.floor(cropper.getCropBoxData().top),
-                left: Math.floor(cropper.getCropBoxData().left),
-                height: Math.floor(cropper.getCropBoxData().height),
-                width: Math.floor(cropper.getCropBoxData().width)
+                file: await urlToFile(imageSrc.value as string, file.value[0].name),
+                top: Math.round(cropper.getCropBoxData().top),
+                left: Math.round(cropper.getCropBoxData().left) - 40,
+                height: Math.round(cropper.getCropBoxData().height),
+                width: Math.round(cropper.getCropBoxData().width)
             };
 
             PersonService.updatePersonProfileImage(newProfileImage, props.personId).then(() => {
@@ -102,16 +103,52 @@ export default defineComponent({
         };
 
         const handleFileChange = () => {
-            if (!cropper || !file.value) return
+            if (!cropper || !file.value) return;
+
             cropper.clear();
+
             if (file.value[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    imageSrc.value = e.target?.result as string;
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        canvas.width = 450;
+                        canvas.height = 600;
+
+                        ctx?.drawImage(img, 0, 0, 450, 600);
+
+                        imageSrc.value = canvas.toDataURL('image/jpeg');
+                    };
+
+                    img.src = e.target?.result as string;
                 };
                 reader.readAsDataURL(file.value[0]);
             }
         };
+
+        const urlToFile = async (url: string, fileName: string): Promise<File> => {
+            if (url.startsWith('data:')) {
+                const [metadata, base64] = url.split(',');
+                const mime = metadata.match(/:(.*?);/)?.[1] || 'image/jpeg';
+                const binary = atob(base64);
+                const array = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    array[i] = binary.charCodeAt(i);
+                }
+                return new File([array], fileName, { type: mime });
+            } else if (url.startsWith('blob:')) {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const mime = blob.type || 'image/jpeg';
+                return new File([blob], fileName, { type: mime });
+            } else {
+                throw new Error('Unsupported URL format');
+            }
+        };
+
 
         return {
             isFormValid, file, submit,

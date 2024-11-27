@@ -119,9 +119,8 @@
 import LangChangeItem from './LangChangeItem.vue';
 import UserService from "@/services/UserService";
 import AuthenticationService from '@/services/AuthenticationService';
-import { computed, defineComponent, onMounted, reactive, watch } from 'vue';
+import { computed, defineComponent, onMounted, watch } from 'vue';
 import { useLoginStore } from '@/stores/loginStore';
-import { watchEffect } from 'vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from "vue-i18n";
