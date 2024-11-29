@@ -178,6 +178,11 @@ export default defineComponent({
         const skipDocument = () => {
             ImportService.skipWizard().then(() => {
                 stepperValue.value = 1;
+                importAuthorsRef.value.forEach(contribution => {
+                    if (contribution) {
+                        contribution.resetIdempotencyKey();
+                    }
+                });
                 importAuthorsRef.value = [];
                 importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();

@@ -90,6 +90,7 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
         const importAffiliationsRef = ref<any[]>([]);
         const automaticProcessCompleted = ref(false);
 
@@ -218,9 +219,14 @@ export default defineComponent({
         };
 
         const addNew = async () => {
+            if (creationInProgress.value) {
+                return;
+            }
+
+            creationInProgress.value = true;
             await waitForImportAffiliations();
 
-            ImportService.createNewPerson(props.personForLoading.scopusAuthorId, idempotencyKey).then(response => {
+            ImportService.createNewPerson(props.personForLoading.scopusAuthorId, idempotencyKey.value).then(response => {
                 selectedResearcher.value = {
                     name: `${props.personForLoading.firstName} ${props.personForLoading.lastName}`,
                     birthdate: "",
@@ -240,6 +246,7 @@ export default defineComponent({
                 researcherBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
+                creationInProgress.value = false;
             });
         };
 
@@ -265,7 +272,7 @@ export default defineComponent({
                 s4()
             );
         };
-        const idempotencyKey = generateIdempotencyKey();
+        const idempotencyKey = ref(generateIdempotencyKey());
 
         const isHandled = () => {
             const allAffiliationsBinded = importAffiliationsRef.value
@@ -282,6 +289,10 @@ export default defineComponent({
             return automaticProcessCompleted.value && allAffiliationProcessesCompleted;
         };
 
+        const resetIdempotencyKey = () => {
+            idempotencyKey.value = generateIdempotencyKey();
+        };
+
         return {
             potentialMatches, switchPage, 
             tableOptions, headers, refreshTable,
@@ -289,7 +300,7 @@ export default defineComponent({
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
             hadToBeCreated, importAffiliationsRef,
-            isHandled, isReady
+            isHandled, isReady, resetIdempotencyKey
         };
     },
 });

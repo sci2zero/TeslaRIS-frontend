@@ -430,5 +430,6 @@ export default {
     updateProfilePictureLabel: "Ažuriraj profilnu fotogorafiju",
     isOpenAccessLabel: "Otvoren Pristup",
     removeProfileImageLabel: "Ukloni profilnu sliku",
-    noDataInTableMessage: "Nema podataka za prikazivanje."
+    noDataInTableMessage: "Nema podataka za prikazivanje.",
+    writeSomethingPlaceholder: "Napišite nešto..."
 }

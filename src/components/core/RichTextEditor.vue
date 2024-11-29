@@ -24,8 +24,9 @@
 <script lang="ts">
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { defineComponent, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import Placeholder from '@tiptap/extension-placeholder'
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -43,12 +44,15 @@ export default defineComponent({
     },
     emits: ["update:modelValue", "input"],
     setup(props, { emit }) {
+        const i18n = useI18n();
+        const placeholder = computed(() => i18n.t("writeSomethingPlaceholder"));
+
         const editor = useEditor({
             content: props.modelValue,
             extensions: [
                 StarterKit,
                 Placeholder.configure({
-                    placeholder: 'Write something …',
+                    placeholder: () => placeholder.value,
                 })
             ],
             onUpdate: () => {

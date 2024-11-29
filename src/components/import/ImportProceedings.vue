@@ -99,6 +99,8 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
+
         const eventBinded = ref(false);
         const proceedingsBinded = ref(false);
         const automaticProcessCompleted = ref(false);
@@ -215,6 +217,12 @@ export default defineComponent({
         };
 
         const addNew = () => {
+            if (creationInProgress.value) {
+                return;
+            }
+
+            creationInProgress.value = true;
+
             ImportService.createNewProceedings(idempotencyKey).then((response) => {
                 selectedEvent.value = {
                     nameSr: returnCurrentLocaleContent(response.data.eventName) as string,
@@ -246,6 +254,7 @@ export default defineComponent({
                 proceedingsBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
+                creationInProgress.value = false;
             });
         };
 

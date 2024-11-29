@@ -431,5 +431,6 @@ export default {
     updateProfilePictureLabel: "Update profile photo",
     isOpenAccessLabel: "Open Access",
     removeProfileImageLabel: "Remove profile picture",
-    noDataInTableMessage: "No data available."
+    noDataInTableMessage: "No data available.",
+    writeSomethingPlaceholder: "Write something..."
 }

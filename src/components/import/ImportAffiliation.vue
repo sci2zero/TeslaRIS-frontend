@@ -94,6 +94,8 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
+
         const affiliationBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedAffiliation = ref<OrganisationUnitIndex>();
@@ -214,6 +216,11 @@ export default defineComponent({
         };
 
         const addNew = async () => {
+            if (creationInProgress.value) {
+                return;
+            }
+            creationInProgress.value = true;
+
             await new Promise(r => setTimeout(r, Math.floor(Math.random() * (500 - 10 + 1)) + 10));
 
             ImportService.createNewInstitution(props.ouForLoading.scopusAfid, idempotencyKey).then((response) => {
@@ -241,14 +248,15 @@ export default defineComponent({
                 affiliationBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
+                creationInProgress.value = false;
             }).catch(() => {
                 OrganisationUnitService.findOUByScopusAfid(props.ouForLoading.scopusAfid).then(response => {
                     selectedAffiliation.value = response.data;
                     hadToBeCreated.value = true;
                     affiliationBinded.value = true;
                     automaticProcessCompleted.value = true;
+                    creationInProgress.value = false;
                 });
-                
             });
         };
 

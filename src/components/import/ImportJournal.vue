@@ -82,6 +82,7 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
         const journalBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedJournal = ref<JournalIndex>();
@@ -190,6 +191,12 @@ export default defineComponent({
         };
 
         const addNew = () => {
+            if (creationInProgress.value) {
+                return;
+            }
+
+            creationInProgress.value = true;
+
             ImportService.createNewJournal(props.publicationForLoading.journalEIssn, props.publicationForLoading.journalPrintIssn, idempotencyKey).then((response) => {
                 selectedJournal.value = {
                     titleSr: returnCurrentLocaleContent(response.data.title) as string,
@@ -206,6 +213,7 @@ export default defineComponent({
                 journalBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
+                creationInProgress.value = false;
             });
         };
 
