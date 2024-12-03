@@ -10,6 +10,7 @@
                         is-update
                         is-section-update
                         :read-only="!canEdit"
+                        wide
                         @update="emitToParent"
                     />
 

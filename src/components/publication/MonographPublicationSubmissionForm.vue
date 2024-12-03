@@ -7,7 +7,7 @@
                         <monograph-autocomplete-search ref="eventAutocompleteRef" v-model="selectedMonograph" required></monograph-autocomplete-search>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedMonograph.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedMonograph.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length == 0">
                     <v-col><h3>{{ $t("noRecentPublicationsMonographLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -195,14 +195,18 @@ export default defineComponent({
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => i18n.locale.value === "sr" ? monographPublicationTypeSr : monographPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
 
-        const listPublications = (event: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInMonograph(event.value).then((response) => {
+        const listPublications = (monograph: { title: string, value: number }) => {
+            if (monograph.value > 0) {
+                DocumentPublicationService.findMyPublicationsInMonograph(monograph.value).then((response) => {
                 myPublications.value = response.data;
             });
+            }
         };
 
         watch(selectedMonograph, (newValue) => {
-            listPublications(newValue);
+            if (newValue) {
+                listPublications(newValue);
+            }
         });
 
         const submitMonographPublication = (stayOnPage: boolean) => {

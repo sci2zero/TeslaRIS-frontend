@@ -269,7 +269,7 @@ export default defineComponent({
         const currentTab = ref("additionalInfo");
 
         const dialogRef = ref<typeof PersistentQuestionDialog>();
-        const dialogMessage = ref("");
+        const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -523,6 +523,11 @@ export default defineComponent({
         const performMigrationToUnmanaged = () => {
             PersonService.migrateToUnmanagedResearcher(person.value?.id as number).then(() => {
                 router.push({name:"persons"});
+            }).catch(error => {
+                if (error.response.status === 409) {
+                    snackbarMessage.value = i18n.t("researcherBindedMessage");
+                    snackbar.value = true;
+                }
             });
         };
 

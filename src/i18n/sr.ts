@@ -422,6 +422,7 @@ export default {
     selectAssociateFromSystemLabel: "Selektuj iz sistema",
     addExternalAssociateLabel: "Dodaj spoljnog saradnika",
     migrateToUnmanagedResearcherLabel: "Prebaci u spoljnog saradnika",
+    migrateToUnmanagedMessage: "Ako migrirate na spoljnog saradnika, sve afilijacije, nagrade, ekspertize i veštine istraživača će biti uklonjene. Takođe, stranica istraživača neće biti dostupna.",
     documentClaimMessage: "Ove publikacije su potencijalno vaše",
     claimLabel: "Potvrdi",
     documentClaimLabel: "Potvrda autorstva",
@@ -431,5 +432,6 @@ export default {
     isOpenAccessLabel: "Otvoren Pristup",
     removeProfileImageLabel: "Ukloni profilnu sliku",
     noDataInTableMessage: "Nema podataka za prikazivanje.",
-    writeSomethingPlaceholder: "Napišite nešto..."
+    writeSomethingPlaceholder: "Napišite nešto...",
+    researcherBindedMessage: "Nije moguće migrirati ovog istraživača jer je povezan sa korisnikom."
 }

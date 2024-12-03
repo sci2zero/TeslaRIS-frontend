@@ -423,6 +423,7 @@ export default {
     selectAssociateFromSystemLabel: "Select from system",
     addExternalAssociateLabel: "Add external associate",
     migrateToUnmanagedResearcherLabel: "Migrate to external associate",
+    migrateToUnmanagedMessage: "If you migrate to external researcher, all of the researcher's affiliations, prizes expertises and skills will be removed. Furthermore, this landing page will not be accessible as well.",
     documentClaimMessage: "These publications are potentially yours",
     claimLabel: "Claim",
     documentClaimLabel: "Autorship claim",
@@ -432,5 +433,6 @@ export default {
     isOpenAccessLabel: "Open Access",
     removeProfileImageLabel: "Remove profile picture",
     noDataInTableMessage: "No data available.",
-    writeSomethingPlaceholder: "Write something..."
+    writeSomethingPlaceholder: "Write something...",
+    researcherBindedMessage: "It is not possible to migrate this researcher as it is bound to a user."
 }

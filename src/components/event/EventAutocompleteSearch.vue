@@ -8,7 +8,6 @@
                 :items="events"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
-                :auto-select-first="true"
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchEvents($event)"
@@ -85,7 +84,7 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
 
         const searchEvents = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
+            if (!input || input.includes("|")) {
                 return;
             }
             if (input.length >= 3) {

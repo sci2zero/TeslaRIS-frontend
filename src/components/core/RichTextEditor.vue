@@ -17,7 +17,7 @@
                 </button>
             </div>
         </bubble-menu>
-        <editor-content style="height: 100%;" :editor="editor" />
+        <editor-content style="height: 100%;" :editor="editor" :class="editable ? 'bordered' : ''" />
     </div>
 </template>
 
@@ -55,18 +55,38 @@ export default defineComponent({
                     placeholder: () => placeholder.value,
                 })
             ],
-            onUpdate: () => {
-                emit('update:modelValue', editor.value.getHTML());
-                emit("input");
-            },
             editable: props.editable
         });
+
+        watch(
+            () => editor.value?.getHTML(),
+            (newValue) => {
+                if (newValue !== props.modelValue) {
+                    newValue = newValue.replace(/\s/g, "\u00a0");
+                    emit('update:modelValue', newValue);
+                    emit("input");
+                }
+            }
+        );
 
         watch(() => props.modelValue, () => {
             if (!props.editable) {
                 editor.value.chain()
+                .setContent(props.modelValue)
+                .run()
+            } else {
+                const editorInstance = editor.value;
+                const { state } = editorInstance;
+
+                const { from, to } = state.selection;
+
+                editorInstance.chain()
                     .setContent(props.modelValue)
-                    .run()
+                    .run();
+
+                editorInstance.chain()
+                    .setTextSelection({ from, to })
+                    .run();
             }
         });
 
@@ -76,8 +96,28 @@ export default defineComponent({
 </script>
 
 <style>
+
 .tiptap {
     height: 100%;
+    padding: 10px;
+    --white: #FFF;
+    --black: #2E2B29;
+    --black-contrast: #110F0E;
+    --gray-1: rgba(61, 37, 20, .05);
+    --gray-2: rgba(61, 37, 20, .08);
+    --gray-3: rgba(61, 37, 20, .12);
+    --gray-4: rgba(53, 38, 28, .3);
+    --gray-5: rgba(28, 25, 23, .6);
+    --green: #22C55E;
+    --purple: #6A00F5;
+    --purple-contrast: #5800CC;
+    --purple-light: rgba(88, 5, 255, .05);
+    --yellow-contrast: #FACC15;
+    --yellow: rgba(250, 204, 21, .4);
+    --yellow-light: #FFFAE5;
+    --red: #FF5C33;
+    --red-light: #FFEBE5;
+    --shadow: 0px 12px 33px 0px rgba(0, 0, 0, .06), 0px 3.618px 9.949px 0px rgba(0, 0, 0, .04);
 }
 
 .bubble-menu {
@@ -193,6 +233,12 @@ export default defineComponent({
     border: none;
     border-top: 1px solid var(--gray-2);
     margin: 2rem 0;
+}
+
+.bordered {
+    outline: 1px solid #110F0E;
+    background-color: #fafafa !important;
+    color: #000000 !important;
 }
 
 </style>

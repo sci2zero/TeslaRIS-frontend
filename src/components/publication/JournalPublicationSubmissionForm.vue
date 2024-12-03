@@ -8,7 +8,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row v-if="selectedJournal.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -20,7 +20,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedJournal.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0">
                     <v-col><h3>{{ $t("noRecentPublicationsJournalLabel") }}</h3></v-col>
                 </v-row>
 
@@ -212,13 +212,17 @@ export default defineComponent({
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
 
         const listPublications = (journal: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInJournal(journal.value).then((response) => {
-                myPublications.value = response.data;
-            });
+            if (journal.value > 0) {
+                DocumentPublicationService.findMyPublicationsInJournal(journal.value).then((response) => {
+                    myPublications.value = response.data;
+                });
+            }
         };
 
         watch(selectedJournal, (newValue) => {
-            listPublications(newValue);
+            if (newValue) {
+                listPublications(newValue);
+            }
         });
 
         const submitJournalPublication = (stayOnPage: boolean) => {

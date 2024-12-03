@@ -110,10 +110,10 @@ export default defineComponent({
         const codeLabel = computed(() => i18n.t("countryCodeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name.content", order: "asc"}]});
 
         const headers = [
-          { title: nameLabel, align: "start", sortable: true, key: "name"},
+          { title: nameLabel, align: "start", sortable: true, key: "name.content"},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: actionLabel},
         ];

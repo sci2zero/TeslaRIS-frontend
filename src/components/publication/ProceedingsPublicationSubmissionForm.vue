@@ -7,7 +7,7 @@
                         <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0">
                     <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -28,13 +28,13 @@
                             v-model="selectedProceedings"
                             :items="availableProceedings"
                             :label="$t('proceedingsLabel') + '*'"
-                            :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
+                            :no-data-text="(selectedEvent && selectedEvent.value === -1) ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
                             :rules="requiredSelectionRules"
                             return-object
                         ></v-select>
                     </v-col>
                     <v-col class="proceedings-submission">
-                        <proceedings-submission-modal :conference="selectedEvent" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
+                        <proceedings-submission-modal :conference="selectedEvent ? selectedEvent : searchPlaceholder" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -217,9 +217,11 @@ export default defineComponent({
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
 
         const listPublications = (event: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInEvent(event.value).then((response) => {
-                myPublications.value = response.data;
-            });
+            if (event.value > 0) {
+                DocumentPublicationService.findMyPublicationsInEvent(event.value).then((response) => {
+                    myPublications.value = response.data;
+                });
+            }
         };
 
         const fetchProceedings = (event: { title: string, value: number }) => {
@@ -246,10 +248,12 @@ export default defineComponent({
         };
 
         watch(selectedEvent, (newValue) => {
-            listPublications(newValue);
-            availableProceedings.value = [];
-            selectedProceedings.value = searchPlaceholder;
-            fetchProceedings(newValue);
+            if (newValue) {
+                listPublications(newValue);
+                availableProceedings.value = [];
+                selectedProceedings.value = searchPlaceholder;
+                fetchProceedings(newValue);
+            }
         });
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
@@ -337,7 +341,8 @@ export default defineComponent({
             publicationTypes, selectedpublicationType, errorMessage,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
-            availableProceedings, selectedProceedings, returnCurrentLocaleContent
+            availableProceedings, selectedProceedings, returnCurrentLocaleContent,
+            searchPlaceholder
         };
     }
 });

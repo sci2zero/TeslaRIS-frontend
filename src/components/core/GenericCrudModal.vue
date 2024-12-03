@@ -1,6 +1,6 @@
 <template>
     <div justify="start">
-        <v-dialog v-model="dialog" persistent max-width="600px">
+        <v-dialog v-model="dialog" persistent :class="wide ? 'wide' : 'narrow'">
             <template #activator="scope">
                 <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
                     <v-btn
@@ -78,6 +78,10 @@ export default defineComponent({
         entityName: {
             type: String,
             required: true
+        },
+        wide: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "update"],
@@ -99,3 +103,17 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.wide {
+    width: 100%;
+    max-width: 1500px;
+}
+
+.narrow {
+    width: 100%;
+    max-width: 700px;
+}
+
+</style>

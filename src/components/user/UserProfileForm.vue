@@ -44,7 +44,6 @@
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :auto-select-first="true"
                     :rules="userRole === 'RESEARCHER' ? requiredSelectionRules : []"
                     :readonly="userRole === 'RESEARCHER'"
                     :no-data-text="$t('noDataMessage')"

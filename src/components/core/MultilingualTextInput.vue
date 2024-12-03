@@ -9,7 +9,7 @@
                 v-if="isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-textarea>
-            <rich-text-editor v-if="isRich" v-model="input.text" @input="sendContentToParent"></rich-text-editor>
+            <rich-text-editor v-if="isRich" ref="richEditorRef" v-model="input.text" @input="sendContentToParent"></rich-text-editor>
         </v-col>
         <v-col cols="3">
             <v-select
@@ -82,6 +82,8 @@ export default defineComponent({
         const userPreferredLanguage = ref<{tag: string, id: number}>({tag: "", id: -1});
         const supportedLanguages = ref<{title: string, value: number}[]>([]);
         const inputs = ref<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]>([]);
+
+        const richEditorRef = ref<typeof RichTextEditor[]>([]);
 
         const initialValueSet = ref(false);
 
@@ -216,19 +218,23 @@ export default defineComponent({
             sendContentToParent,
             clearInput,
             updatedLanguage,
-            forceRefreshModelValue
+            forceRefreshModelValue,
+            richEditorRef
         };
     }
 });
 </script>
 
 <style scoped>
+    
     .multi-lingual-input:first-child:not(:last-child) > div.v-col{
         padding-bottom: 0;
     }
+    
     .multi-lingual-input:last-child:not(:first-child) > div.v-col{
         padding-top: 0;
     }
+    
     .multi-lingual-input:not(:first-child):not(:last-child)  > div.v-col{
         padding-bottom: 0;
         padding-top: 0;

@@ -6,7 +6,6 @@
                 :label="$t('researchAreaLabel')"
                 :items="researchAreas"
                 :custom-filter="((): boolean => true)"
-                :auto-select-first="true"
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchResearchAreas($event)"

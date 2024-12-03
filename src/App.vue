@@ -28,6 +28,7 @@ export default defineComponent({
         const route = useRoute();
         const router = useRouter();
         const loginStore = useLoginStore();
+        loginStore.initialize();
         const routeStore = useRouteStore();
 
         router.beforeEach((to: any, from: any, next: any) => {

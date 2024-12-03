@@ -27,7 +27,6 @@
                 v-model="selectedAffiliations"
                 :label="$t('personAffiliationsLabel')"
                 :items="personAffiliations"
-                :auto-select-first="true"
                 :no-data-text="$t('noAffiliationsMessage')"
                 return-object
                 multiple
