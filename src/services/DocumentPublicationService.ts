@@ -188,6 +188,10 @@ export class DocumentPublicationService extends BaseService {
   async declinePublicationClaim(documentId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `document-claim/decline/${documentId}`);
   }
+
+  async unbindPersonFromPublication(documentId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document/unbind-researcher/${documentId}`);
+  }
 }
 
 export default new DocumentPublicationService();

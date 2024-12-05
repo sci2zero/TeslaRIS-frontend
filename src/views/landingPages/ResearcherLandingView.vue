@@ -202,7 +202,9 @@
         </v-tabs-window>
 
         <v-btn
-            v-if="userRole === 'ADMIN'" density="compact" class="mt-5"
+            v-if="userRole === 'ADMIN'" 
+            density="compact" class="mt-5" 
+            color="blue darken-1"
             @click="migrateToUnmanaged">
             {{ $t("migrateToUnmanagedResearcherLabel") }}
         </v-btn>

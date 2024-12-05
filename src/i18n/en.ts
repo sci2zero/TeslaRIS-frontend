@@ -434,5 +434,8 @@ export default {
     removeProfileImageLabel: "Remove profile picture",
     noDataInTableMessage: "No data available.",
     writeSomethingPlaceholder: "Write something...",
-    researcherBindedMessage: "It is not possible to migrate this researcher as it is bound to a user."
+    researcherBindedMessage: "It is not possible to migrate this researcher as it is bound to a user.",
+    removeFromPublicationLabel: "Remove me from publication",
+    unbindSuccessfullMessage: "Zou are successfullz removed from this publication.",
+    researcherUnbindWarning: "This publication will be removed from your results list."
 }

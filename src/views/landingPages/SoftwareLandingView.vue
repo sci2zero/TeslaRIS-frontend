@@ -101,6 +101,8 @@
             :document="software" :can-edit="canEdit" :proofs="software?.proofs" :file-items="software?.fileItems"
             in-comparator></attachment-section>
 
+        <publication-unbind-button v-if="canEdit" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -141,11 +143,12 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -164,12 +167,24 @@ export default defineComponent({
         const icon = ref("mdi-desktop-classic")
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchSoftware();
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -260,7 +275,8 @@ export default defineComponent({
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, SoftwareUpdateForm
+            updateBasicInfo, SoftwareUpdateForm,
+            handleResearcherUnbind
         };
 }})
 

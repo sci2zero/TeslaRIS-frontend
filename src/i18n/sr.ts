@@ -433,5 +433,8 @@ export default {
     removeProfileImageLabel: "Ukloni profilnu sliku",
     noDataInTableMessage: "Nema podataka za prikazivanje.",
     writeSomethingPlaceholder: "Napišite nešto...",
-    researcherBindedMessage: "Nije moguće migrirati ovog istraživača jer je povezan sa korisnikom."
+    researcherBindedMessage: "Nije moguće migrirati ovog istraživača jer je povezan sa korisnikom.",
+    removeFromPublicationLabel: "Ukloni me sa publikacije",
+    unbindSuccessfullMessage: "Uspešno ste uklonjeni sa publikacije.",
+    researcherUnbindWarning: "Ova publikacija će se ukloniti iz vaše liste rezultata."
 }
