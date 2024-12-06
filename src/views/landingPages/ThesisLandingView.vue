@@ -135,6 +135,8 @@
             :document="thesis" :can-edit="canEdit" :proofs="thesis?.proofs" :file-items="thesis?.fileItems"
             in-comparator></attachment-section>
 
+        <publication-unbind-button v-if="canEdit" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -183,11 +185,12 @@ import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -207,15 +210,21 @@ export default defineComponent({
 
         const researchAreaHierarchy = ref<ResearchArea>();
 
-        const icon = ref("mdi-certificate-outline")
+        const icon = ref("mdi-certificate-outline");
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchThesis();
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -321,6 +330,12 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             thesis, icon, publisher,
             returnCurrentLocaleContent,
@@ -329,7 +344,8 @@ export default defineComponent({
             updateKeywords, updateDescription, localiseDate,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, organisationUnit, ThesisUpdateForm,
-            researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale
+            researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
+            handleResearcherUnbind
         };
 }})
 

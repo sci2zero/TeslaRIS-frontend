@@ -133,6 +133,8 @@
             :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"
             in-comparator></attachment-section>
 
+        <publication-unbind-button v-if="canEdit" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -178,11 +180,12 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -207,12 +210,18 @@ export default defineComponent({
         const icon = ref("mdi-newspaper-variant");
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchProceedingsPublication();
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -302,6 +311,12 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             proceedingsPublication, icon,
             publications, event,
@@ -311,7 +326,7 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo
+            updateContributions, updateBasicInfo, handleResearcherUnbind
         };
 }})
 

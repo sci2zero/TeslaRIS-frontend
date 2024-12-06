@@ -167,6 +167,8 @@
             :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"
             in-comparator></attachment-section>
 
+        <publication-unbind-button v-if="canEdit" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -216,11 +218,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -251,12 +254,18 @@ export default defineComponent({
         const direction = ref("");
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchMonograph();
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -387,6 +396,12 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             monograph, icon,
             returnCurrentLocaleContent,
@@ -399,7 +414,8 @@ export default defineComponent({
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,
-            MonographUpdateForm, deleteAttachment
+            MonographUpdateForm, deleteAttachment,
+            handleResearcherUnbind
         };
 }})
 

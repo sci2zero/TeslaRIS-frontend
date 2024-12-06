@@ -164,7 +164,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-desktop-classic")
+        const icon = ref("mdi-desktop-classic");
 
         onMounted(() => {
             fetchDisplayData();

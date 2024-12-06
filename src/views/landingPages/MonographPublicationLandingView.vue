@@ -134,6 +134,8 @@
             :document="monographPublication" :can-edit="canEdit" :proofs="monographPublication?.proofs" :file-items="monographPublication?.fileItems"
             in-comparator></attachment-section>
 
+        <publication-unbind-button v-if="canEdit" :document-id="(monographPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -179,11 +181,12 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -206,12 +209,18 @@ export default defineComponent({
         const icon = ref("mdi-newspaper-variant");
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchMonographPublication();
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -304,14 +313,18 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
-            monographPublication, icon,
-            publications, event,
-            totalPublications,
-            returnCurrentLocaleContent,
+            monographPublication, publications, event, totalPublications,
+            returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, monograph, MonographPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, localiseDate,
-            addAttachment, deleteAttachment, updateAttachment,
+            addAttachment, deleteAttachment, updateAttachment, icon,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale
         };

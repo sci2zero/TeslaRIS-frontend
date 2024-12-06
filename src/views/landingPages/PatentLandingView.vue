@@ -101,6 +101,8 @@
             :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"
             in-comparator></attachment-section>
 
+        <publication-unbind-button v-if="canEdit" :document-id="(patent?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -141,11 +143,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -164,12 +167,18 @@ export default defineComponent({
         const icon = ref("mdi-seal-variant")
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchPatent();
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -253,12 +262,18 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             patent, icon, publisher,
             returnCurrentLocaleContent, PatentUpdateForm,
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo
+            updateContributions, updateBasicInfo, handleResearcherUnbind
         };
 }})
 
