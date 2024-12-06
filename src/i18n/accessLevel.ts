@@ -31,4 +31,4 @@ export const getAccessLevelForGivenLocale = () => {
         case "en":
             return accessLevelEn;
     }
-}
+};

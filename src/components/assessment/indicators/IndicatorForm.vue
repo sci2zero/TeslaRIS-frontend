@@ -16,7 +16,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('codeLabel')" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -27,6 +27,18 @@
                     :label="$t('accessLevelLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object>
+                </v-select>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedApplicableTypes"
+                    :items="applicableTypes"
+                    :label="$t('applicableTypeLabel') + '*'"
+                    :rules="requiredSelectionRules"
+                    return-object
+                    multiple>
                 </v-select>
             </v-col>
         </v-row>
@@ -43,7 +55,7 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import { AccessLevel, type LanguageTagResponse } from '@/models/Common';
+import { AccessLevel, ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -52,6 +64,7 @@ import type { AxiosResponse } from 'axios';
 import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
 import { getAccessLevelForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/accessLevel';
 import IndicatorService from '@/services/assessment/IndicatorService';
+import { getApplicableEntityTypesForGivenLocale, getApplicableEntityTypeTitleFromValueAutoLocale } from '@/i18n/applicableEntityType';
 
 
 export default defineComponent({
@@ -82,6 +95,12 @@ export default defineComponent({
                 IndicatorService.fetchIndicatorAccessLevel(props.presetIndicator.id).then(response => {
                     selectedAccessLevel.value = {title: getTitleFromValueAutoLocale(response.data) as string, value: response.data};
                 });
+
+                selectedApplicableTypes.value = [];
+                props.presetIndicator.applicableEntityTypes.forEach(applicableType => {
+                    console.log(applicableType)
+                    selectedApplicableTypes.value.push({title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string, value: applicableType});
+                });
             }
         };
 
@@ -90,6 +109,9 @@ export default defineComponent({
 
         const accessLevels = getAccessLevelForGivenLocale();
         const selectedAccessLevel = ref<{ title: string, value: AccessLevel }>({title: getTitleFromValueAutoLocale(AccessLevel.OPEN) as string, value: AccessLevel.OPEN});
+
+        const applicableTypes = getApplicableEntityTypesForGivenLocale();
+        const selectedApplicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>([{title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.ALL) as string, value: ApplicableEntityType.ALL}]);
 
         const title = ref<any>([]);
         const description = ref<any>([]);
@@ -102,7 +124,8 @@ export default defineComponent({
                 code: code.value,
                 title: title.value,
                 description: description.value,
-                indicatorAccessLevel: selectedAccessLevel.value.value
+                indicatorAccessLevel: selectedAccessLevel.value.value,
+                applicableTypes: selectedApplicableTypes.value.map(applicableTypeObject => applicableTypeObject.value)
             };
 
             emit("create", indicator);
@@ -115,7 +138,8 @@ export default defineComponent({
             toMultilingualTextInput,
             languageTags, selectedAccessLevel,
             requiredFieldRules, code, submit,
-            accessLevels, requiredSelectionRules
+            accessLevels, requiredSelectionRules,
+            applicableTypes, selectedApplicableTypes
         };
     }
 });

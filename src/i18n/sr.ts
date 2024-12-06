@@ -406,11 +406,13 @@ export default {
     updateAssessmentRulebookLabel: "Ažuriraj pravilnik",
     createNewAssessmentMeasureLabel: "Kreiraj novu meru",
     updateAssessmentMeasureLabel: "Ažuriraj meru",
+    assessmentMeasuresLabel: "Mere za vrednovanje",
     valueLabel: "Vrednost",
     formalDescriptionOfRuleLabel: "Pravilo",
     commissionPageLabel: "Komisije",
     superCommissionLabel: "Nad-komisija",
     commissionLabel: "Komisija",
     createNewCommissionLabel: "Kreiraj novu komisiju",
-    updateCommissionLabel: "Ažuriraj komisiju"
+    updateCommissionLabel: "Ažuriraj komisiju",
+    applicableTypeLabel: "Primenljivo na"
 }

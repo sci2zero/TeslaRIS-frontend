@@ -11,7 +11,7 @@
             <v-col cols="5">
                 <date-picker
                     v-model="dateFrom"
-                    :label="$t('dateFromLabel') + '*'"
+                    :label="$t('fromLabel') + '*'"
                     color="primary"
                     required
                 ></date-picker>
@@ -19,7 +19,7 @@
             <v-col cols="5">
                 <date-picker
                     v-model="dateTo"
-                    :label="$t('dateToLabel') + '*'"
+                    :label="$t('toLabel') + '*'"
                     color="primary"
                     required
                 ></date-picker>

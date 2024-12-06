@@ -1,4 +1,4 @@
-import type { AccessLevel, MultilingualContent } from "./Common";
+import type { AccessLevel, ApplicableEntityType, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 
 
@@ -9,7 +9,9 @@ export interface IndicatorResponse {
 
     title: MultilingualContent[];
 
-    description: MultilingualContent[]
+    description: MultilingualContent[];
+
+    applicableEntityTypes: ApplicableEntityType[];
 }
 
 export interface IndicatorRequest {
@@ -17,9 +19,11 @@ export interface IndicatorRequest {
 
     title: MultilingualContent[];
 
-    description: MultilingualContent[]
+    description: MultilingualContent[];
 
-    indicatorAccessLevel: AccessLevel
+    indicatorAccessLevel: AccessLevel;
+
+    applicableTypes: ApplicableEntityType[];
 }
 
 export interface EntityIndicatorResponse {

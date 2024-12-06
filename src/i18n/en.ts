@@ -406,11 +406,13 @@ export default {
     updateAssessmentRulebookLabel: "Update Rulebook",
     createNewAssessmentMeasureLabel: "create New Measure",
     updateAssessmentMeasureLabel: "Update Measure",
+    assessmentMeasuresLabel: "Assessment Measures",
     valueLabel: "Value",
     formalDescriptionOfRuleLabel: "Rule",
     commissionPageLabel: "Commissions",
     superCommissionLabel: "Super Commission",
     commissionLabel: "Commission",
     createNewCommissionLabel: "Create New Commission",
-    updateCommissionLabel: "Update Commission"
+    updateCommissionLabel: "Update Commission",
+    applicableTypeLabel: "Applicable on"
 }
