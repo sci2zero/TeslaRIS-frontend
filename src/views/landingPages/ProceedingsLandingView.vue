@@ -173,7 +173,7 @@
             :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"
             in-comparator></attachment-section>
 
-        <publication-unbind-button v-if="canEdit" :document-id="(proceedings?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedings?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -193,7 +193,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
@@ -225,6 +225,7 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -239,6 +240,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const proceedings = ref<Proceedings>();
@@ -435,7 +437,7 @@ export default defineComponent({
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
-            ProceedingsUpdateForm, handleResearcherUnbind
+            ProceedingsUpdateForm, handleResearcherUnbind, userRole
         };
 }})
 

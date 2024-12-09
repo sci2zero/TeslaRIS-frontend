@@ -133,7 +133,7 @@
             :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"
             in-comparator></attachment-section>
 
-        <publication-unbind-button v-if="canEdit" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -181,6 +181,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -193,6 +194,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const proceedingsPublication = ref<ProceedingsPublication>();
@@ -318,10 +320,8 @@ export default defineComponent({
         };
 
         return {
-            proceedingsPublication, icon,
-            publications, event,
-            totalPublications,
-            returnCurrentLocaleContent,
+            proceedingsPublication, icon, publications, event,
+            totalPublications, returnCurrentLocaleContent, userRole,
             languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,

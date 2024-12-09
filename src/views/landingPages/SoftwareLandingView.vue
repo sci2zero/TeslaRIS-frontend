@@ -101,7 +101,7 @@
             :document="software" :can-edit="canEdit" :proofs="software?.proofs" :file-items="software?.fileItems"
             in-comparator></attachment-section>
 
-        <publication-unbind-button v-if="canEdit" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -121,7 +121,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -144,6 +144,7 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -160,6 +161,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const i18n = useI18n();
@@ -276,7 +278,7 @@ export default defineComponent({
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, SoftwareUpdateForm,
-            handleResearcherUnbind
+            handleResearcherUnbind, userRole
         };
 }})
 
