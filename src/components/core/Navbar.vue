@@ -175,6 +175,10 @@ export default defineComponent(
             const importerLabel = computed(() => i18n.t("importerLabel"));
             const researcherProfileLabel = computed(() => i18n.t("researcherProfileLabel"));
             const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
+            const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
+            const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
+            const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
+            const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -247,6 +251,12 @@ export default defineComponent(
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers' }
             ]);
 
+            const assessmentsMenu = ref<MenuItem[]>([
+                { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
+                { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
+                { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
+            ]);
+
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
@@ -254,6 +264,7 @@ export default defineComponent(
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER') },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => userLoggedIn.value && userRole.value === 'RESEARCHER' && personId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
+                { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => userLoggedIn.value && userRole.value === 'ADMIN') },
             ]);
 

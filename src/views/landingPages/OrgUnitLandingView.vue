@@ -58,6 +58,9 @@
                                 <div class="response">
                                     {{ organisationUnit?.scopusAfid ? organisationUnit?.scopusAfid : $t("notYetSetMessage") }}
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="ouIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                </div>
                             </v-col>
                             <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
                                 <div>
@@ -152,11 +155,15 @@ import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/u
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsService from '@/services/StatisticsService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -193,13 +200,18 @@ export default defineComponent({
 
         const relations = ref<OrganisationUnitRelationResponse[]>([]);
 
+        const ouIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchOU();
-
+            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                ouIndicators.value = response.data;
+            });
             fetchRelations();
 
             OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -370,7 +382,8 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
             snackbar, snackbarMessage, relations,
-            updateRelations, graphRef, updateResearchAreas
+            updateRelations, graphRef, updateResearchAreas,
+            ouIndicators, StatisticsType
         };
 }})
 

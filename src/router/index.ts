@@ -72,6 +72,11 @@ import MonographPublicationMetadataComparatorView from "@/views/comparators/docu
 import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/BookSeriesMetadataComparatorView.vue";
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
+import IndicatorsView from "@/views/assessment/listViews/IndicatorsView.vue";
+import AssessmentRulebooksView from "@/views/assessment/listViews/AssessmentRulebooksView.vue";
+import AssessmentRulebookLandingView from "@/views/assessment/landingPages/AssessmentRulebookLandingView.vue";
+import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
+import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -808,6 +813,66 @@ const router = createRouter({
                         authenticated: true,
                         authorities: [roles.admin],
                     },
+                },
+                {
+                    path: "assessment",                 
+                    children: [
+                        {
+                            path: "indicators",
+                            name: "indicators",
+                            component: IndicatorsView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "assessment-rulebooks",
+                            children: [
+                                {
+                                    path: "",
+                                    name: "assessmentRulebooks",
+                                    component: AssessmentRulebooksView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                                {
+                                    path: ":id",
+                                    name: "assessmentRulebookLandingPage",
+                                    component: AssessmentRulebookLandingView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
+                        },
+                        {
+                            path: "commissions",
+                            children: [
+                                {
+                                    path: "",
+                                    name: "commissions",
+                                    component: CommissionsView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                                {
+                                    path: ":id",
+                                    name: "commissionLandingPage",
+                                    component: CommissionLandingView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
+                        }
+                    ]
                 },
             ]
         },

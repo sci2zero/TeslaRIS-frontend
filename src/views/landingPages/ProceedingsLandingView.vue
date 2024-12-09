@@ -84,6 +84,10 @@
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="proceedings?.eISBN">
@@ -210,11 +214,15 @@ import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import StatisticsService from '@/services/StatisticsService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, DoiLink, PublicationTableComponent },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, DoiLink, PublicationTableComponent, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -244,12 +252,18 @@ export default defineComponent({
 
         const icon = ref("mdi-newspaper-variant-multiple");
 
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchProceedings();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -396,7 +410,8 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            publicationSeries, updateBasicInfo, updateContributions
+            publicationSeries, updateBasicInfo, updateContributions,
+            documentIndicators, StatisticsType
         };
 }})
 

@@ -89,6 +89,11 @@
                             ></v-text-field>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col>
+                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -130,11 +135,12 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import DatePicker from '../core/DatePicker.vue';
+import UriInput from '../core/UriInput.vue';
 
 
 export default defineComponent({
     name: "ConferenceSubmissionForm",
-    components: {MultilingualTextInput, DatePicker},
+    components: { MultilingualTextInput, DatePicker, UriInput },
     props: {
         inModal: {
             type: Boolean,
@@ -182,12 +188,14 @@ export default defineComponent({
         const conferenceNumber = ref("");
         const entryFee = ref("");
         const serialEvent = ref(false);
+        const uris = ref<string[]>([]);
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const abbreviationRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof MultilingualTextInput>();
 
         const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
 
@@ -234,8 +242,9 @@ export default defineComponent({
                 fee: entryFee.value,
                 number: conferenceNumber.value,
                 contributions: [],
-                confId: confId.value
-            }
+                confId: confId.value,
+                uris: uris.value
+            };
 
             EventService.createConference(newConference).then((response) => {
                 if (props.inModal) {
@@ -258,6 +267,7 @@ export default defineComponent({
                     eventYear.value = null;
                     state.value = null;
                     timePeriodInput.value = true;
+                    urisRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -270,13 +280,15 @@ export default defineComponent({
             });
         };
 
-        return {isFormValid, additionalFields, snackbar,
+        return {
+            isFormValid, additionalFields, snackbar,
             name, nameAbbreviation, description, keywords,
             dateFrom, dateTo, eventYear, state, countryList,
             place, conferenceNumber, entryFee, serialEvent,
             requiredFieldRules, addConference, timePeriodInput,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
-            confIdValidationRules, confId};
+            confIdValidationRules, confId, uris, urisRef
+        };
     }
 });
 </script>

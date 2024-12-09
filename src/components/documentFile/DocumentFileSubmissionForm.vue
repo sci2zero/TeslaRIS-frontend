@@ -16,7 +16,7 @@
                             :label="$t('descriptionLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="!isProof">
                     <v-col>
                         <v-select
                             v-model="selectedResourceType"
@@ -67,7 +67,7 @@ import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
 
 export default defineComponent({
-    name: "ConferenceSubmissionForm",
+    name: "DocumentFileSubmissionForm",
     components: {MultilingualTextInput},
     props: {
         edit: {
@@ -77,6 +77,10 @@ export default defineComponent({
         presetDocumentFile: {
             type: Object as PropType<DocumentFileResponse>,
             default: undefined
+        },
+        isProof: {
+            type: Boolean,
+            default: false
         },
     },
     emits: ["create", "update"],
@@ -124,7 +128,7 @@ export default defineComponent({
             const newDocumentFile: DocumentFile = {
                 file: file.value![0],
                 description: description.value,
-                resourceType: selectedResourceType.value.value,
+                resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
                 license: selectedLicense.value.value
             }
 

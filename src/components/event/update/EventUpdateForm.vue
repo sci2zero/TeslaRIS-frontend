@@ -75,6 +75,11 @@
                 <v-row v-if="!inComparator">
                     <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                 </v-row>
+                <v-row>
+                    <v-col>
+                        <uri-input ref="urisRef" v-model="uris"></uri-input>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
 
@@ -100,11 +105,12 @@ import { useI18n } from 'vue-i18n';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { getCountriesForGivenLocale, countriesSr, countriesEn } from '@/i18n/countries';
 import DatePicker from '@/components/core/DatePicker.vue';
+import UriInput from '@/components/core/UriInput.vue';
 
 
 export default defineComponent({
     name: "EventUpdateForm",
-    components: {MultilingualTextInput, DatePicker},
+    components: { MultilingualTextInput, DatePicker, UriInput },
     props: {
         presetEvent: {
             type: Object as PropType<Conference | undefined>,
@@ -156,6 +162,7 @@ export default defineComponent({
         const entryFee = ref(props.presetEvent?.fee);
         const serialEvent = ref(props.presetEvent?.serialEvent);
         const confId = ref(props.presetEvent?.confId);
+        const uris = ref<string[]>(props.presetEvent?.uris as string[]);
 
         const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
 
@@ -204,7 +211,8 @@ export default defineComponent({
                 fee: entryFee.value,
                 number: conferenceNumber.value,
                 contributions: props.presetEvent?.contributions,
-                confId: confId.value
+                confId: confId.value,
+                uris: uris.value
             }
 
             emit("update", updatedEvent);
@@ -222,6 +230,7 @@ export default defineComponent({
 
             state.value = returnCurrentLocaleContent(props.presetEvent?.state);
 
+            uris.value = props.presetEvent?.uris as string[];
             dateFrom.value = props.presetEvent?.dateFrom;
             dateTo.value = props.presetEvent?.dateTo;
             eventYear.value = props.presetEvent?.dateFrom.split("-")[0];
@@ -229,6 +238,7 @@ export default defineComponent({
             conferenceNumber.value = props.presetEvent?.number;
             entryFee.value = props.presetEvent?.fee;
             confId.value = props.presetEvent?.confId;
+            urisRef.value?.refreshModelValue(uris.value);
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
             abbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
@@ -236,7 +246,7 @@ export default defineComponent({
 
         return {
             isFormValid,
-            name, nameAbbreviation, urisRef, refreshForm,
+            name, nameAbbreviation, urisRef, refreshForm, uris,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, updateEvent,
             dateFrom, dateTo, state, place, conferenceNumber, entryFee, serialEvent,

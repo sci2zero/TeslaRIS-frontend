@@ -74,6 +74,10 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="monographPublication?.scopusId">
@@ -181,11 +185,16 @@ import MonographService from '@/services/DocumentPublicationService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
+import StatisticsService from '@/services/StatisticsService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, MonographPublicationUpdateModal, UriList, DoiLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, MonographPublicationUpdateModal, UriList, DoiLink, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -207,12 +216,18 @@ export default defineComponent({
 
         const icon = ref("mdi-newspaper-variant");
 
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchMonographPublication();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -311,11 +326,12 @@ export default defineComponent({
             publications, event,
             totalPublications,
             returnCurrentLocaleContent,
-            languageTagMap, monograph,
+            languageTagMap, monograph, StatisticsType,
             searchKeyword, goToURL, canEdit, localiseDate,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo, getTitleFromValueAutoLocale
+            updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
+            documentIndicators
         };
 }})
 

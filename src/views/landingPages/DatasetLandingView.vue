@@ -44,7 +44,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="dataset?.documentDate" class="response">
-                                    {{ dataset.documentDate }}
+                                    {{ localiseDate(dataset.documentDate) }}
                                 </div>
                                 <div v-if="dataset?.publisherId">
                                     {{ $t("publisherLabel") }}:
@@ -53,6 +53,10 @@
                                     <localized-link :to="'publishers/' + dataset?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -146,11 +150,16 @@ import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateMod
 import UriList from '@/components/core/UriList.vue';
 import DoiLink from '@/components/core/DoiLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsService from '@/services/StatisticsService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, DoiLink },
+    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, DoiLink, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -166,7 +175,9 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-database")
+        const icon = ref("mdi-database");
+
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -174,6 +185,10 @@ export default defineComponent({
             });
 
             fetchDataset();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -260,11 +275,11 @@ export default defineComponent({
 
         return {
             dataset, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, localiseDate,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo
+            updateContributions, updateBasicInfo, documentIndicators, StatisticsType
         };
 }})
 

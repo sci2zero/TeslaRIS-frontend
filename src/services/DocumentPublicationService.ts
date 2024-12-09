@@ -125,7 +125,7 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.put, `monograph/${monographId}`, updatedMonograph);
   }
 
-  async updateMonographPublication(monographPublicationId: number, updatedMonographPublication: Monograph): Promise<AxiosResponse<void>> {
+  async updateMonographPublication(monographPublicationId: number, updatedMonographPublication: MonographPublication): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `monograph-publication/${monographPublicationId}`, updatedMonographPublication);
   }
 

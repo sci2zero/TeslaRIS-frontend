@@ -105,6 +105,9 @@
                                 <div v-if="personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
                                 </div>
+                                <div class="w-50">
+                                    <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -206,11 +209,15 @@ import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/Expertise
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import StatisticsService from '@/services/StatisticsService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -244,12 +251,18 @@ export default defineComponent({
 
         const canEdit = ref(false);
 
+        const personIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchPerson();
+            StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchPersonIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                personIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -463,7 +476,8 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
-            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate
+            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
+            personIndicators, StatisticsType
         };
 }})
 

@@ -48,6 +48,12 @@
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
+                                <div v-if="journal?.uris && journal?.uris.length > 0">
+                                    {{ $t("uriInputLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="journal?.uris"></uri-list>
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -100,10 +106,12 @@ import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import UriList from '@/components/core/UriList.vue';
+
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs },
+    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs, UriList },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -184,6 +192,7 @@ export default defineComponent({
             journal.value!.eissn = updatedJournal.eissn;
             journal.value!.printISSN = updatedJournal.printISSN;
             journal.value!.languageTagIds = updatedJournal.languageTagIds;
+            journal.value!.uris = updatedJournal.uris;
 
             performUpdate(false);
         };
