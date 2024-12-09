@@ -9,6 +9,7 @@ export interface PublicationSeries {
     contributions?: PersonPublicationSeriesContribution[];
     languageTagIds: number[];
     nameAbbreviation: MultilingualContent[];
+    uris: string[]
 }
 
 export interface PersonPublicationSeriesContribution extends PersonContribution {

@@ -56,6 +56,7 @@ interface Event {
     place: MultilingualContent[];
     contributions?: PersonEventContribution[];
     countryId?: number;
+    uris: string[]
 }
 
 export interface Conference extends Event {

@@ -2,6 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Country, Page } from "@/models/Common";
+import i18n from "@/i18n";
 
 export class CountryService extends BaseService {
 
@@ -11,7 +12,7 @@ export class CountryService extends BaseService {
 
 
   async searchCountries(parameters: string): Promise<AxiosResponse<Page<Country>>> {
-    return super.sendRequest(axios.get, `country/search?${parameters}`);
+    return super.sendRequest(axios.get, `country/search?${parameters}&lang=${i18n.vueI18n.global.locale}`);
   }
 
   async readCountry(countryId: number): Promise<AxiosResponse<Country>> {

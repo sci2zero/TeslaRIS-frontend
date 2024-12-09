@@ -168,6 +168,13 @@ export default defineComponent({
             });
             bookSeries2.languageTagIds = [];
 
+            bookSeries2.uris.forEach(uri => {
+                if (!bookSeries1.uris.includes(uri)) {
+                    bookSeries1.uris.push(uri);
+                }
+            });
+            bookSeries2.uris = [];
+
             bookSeries1.contributions = bookSeries1.contributions?.concat(bookSeries2.contributions as PersonPublicationSeriesContribution[]);
             bookSeries2.contributions = [];
 
@@ -198,6 +205,7 @@ export default defineComponent({
             leftBookSeries.value!.eissn = updatedBookSeries.eissn;
             leftBookSeries.value!.printISSN = updatedBookSeries.printISSN;
             leftBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            leftBookSeries.value!.uris = updatedBookSeries.uris;
             leftUpdateComplete.value = true;
             
             if (update.value) {
@@ -211,6 +219,7 @@ export default defineComponent({
             rightBookSeries.value!.eissn = updatedBookSeries.eissn;
             rightBookSeries.value!.printISSN = updatedBookSeries.printISSN;
             rightBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            rightBookSeries.value!.uris = updatedBookSeries.uris;
             rightUpdateComplete.value = true;
             
             if (update.value) {

@@ -177,6 +177,10 @@ export default defineComponent(
             const countryListLabel = computed(() => i18n.t("countryListLabel"));
             const researchAreaListLabel = computed(() => i18n.t("researchAreaListLabel"));
             const documentClaimLabel = computed(() => i18n.t("documentClaimLabel"));
+            const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
+            const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
+            const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
+            const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -235,6 +239,12 @@ export default defineComponent(
                 { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"}
             ]);
 
+            const assessmentsMenu = ref<MenuItem[]>([
+                { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
+                { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
+                { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
+            ]);
+
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
@@ -244,6 +254,7 @@ export default defineComponent(
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
+                { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') }
             ]);
 
             const menuItems = ref<MenuItem[]>([
@@ -257,7 +268,10 @@ export default defineComponent(
             ]);
 
 
-            return { userName, userRole, logout, appTitle, sidebar, menuItems, leftMenuItems, loginStore };
+            return { 
+                userName, userRole, logout, appTitle,
+                sidebar, menuItems, leftMenuItems, loginStore 
+            };
         }
     });
 </script>

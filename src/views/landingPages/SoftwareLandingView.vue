@@ -89,17 +89,40 @@
             </v-col>
         </v-row>
 
-        <person-document-contribution-tabs :document-id="software?.id" :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <person-document-contribution-tabs :document-id="software?.id" :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
-        <!-- Description -->
-        <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <!-- Keywords -->
+                <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <attachment-section
-            :document="software" :can-edit="canEdit" :proofs="software?.proofs" :file-items="software?.fileItems"
-            in-comparator></attachment-section>
+                <!-- Description -->
+                <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+
+                <attachment-section
+                    :document="software" :can-edit="canEdit" :proofs="software?.proofs" :file-items="software?.fileItems"
+                    in-comparator></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
@@ -145,12 +168,18 @@ import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateFo
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import UserService from '@/services/UserService';
+import StatisticsService from '@/services/StatisticsService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("additionalInfo");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -167,6 +196,8 @@ export default defineComponent({
         const i18n = useI18n();
 
         const icon = ref("mdi-desktop-classic");
+
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
             fetchDisplayData();
@@ -186,6 +217,10 @@ export default defineComponent({
             });
 
             fetchSoftware();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         };
 
         watch(i18n.locale, () => {
@@ -272,13 +307,14 @@ export default defineComponent({
 
         return {
             software, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, currentTab,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, SoftwareUpdateForm,
-            handleResearcherUnbind, userRole
+            handleResearcherUnbind, userRole,
+            StatisticsType, documentIndicators
         };
 }})
 

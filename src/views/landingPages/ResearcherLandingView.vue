@@ -145,6 +145,9 @@
             <v-tab v-if="totalPublications > 0" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
+            <v-tab v-if="personIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -198,6 +201,11 @@
                 <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
                 <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                </div>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -262,11 +270,15 @@ import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
+import StatisticsService from '@/services/StatisticsService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -306,12 +318,18 @@ export default defineComponent({
 
         const canEdit = ref(false);
 
+        const personIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchPerson();
+            StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchPersonIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                personIndicators.value = response.data;
+            });
         });
 
         watch(i18n.locale, () => {
@@ -541,7 +559,7 @@ export default defineComponent({
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
-            dialogRef, dialogMessage
+            dialogRef, dialogMessage, personIndicators, StatisticsType
         };
 }});
 </script>

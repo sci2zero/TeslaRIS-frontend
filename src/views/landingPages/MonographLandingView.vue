@@ -135,37 +135,60 @@
             </v-col>
         </v-row>
 
-        <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
 
-        <!-- Description -->
-        <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <!-- Keywords -->
+                <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <!-- Research Area -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-        
-        <!-- Publications Table -->
-        <v-row>
-            <h2>{{ $t("monographPublicationsLabel") }}</h2>
-            <v-col cols="12">
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-            </v-col>
-        </v-row>
+                <!-- Description -->
+                <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <attachment-section
-            :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"
-            in-comparator></attachment-section>
+                <!-- Research Area -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                
+                <!-- Publications Table -->
+                <v-row>
+                    <v-col cols="12">
+                        <h2>{{ $t("monographPublicationsLabel") }}</h2>
+                        <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                    </v-col>
+                </v-row>
+
+                <attachment-section
+                    :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"
+                    in-comparator></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
@@ -220,12 +243,18 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import UserService from '@/services/UserService';
+import StatisticsService from '@/services/StatisticsService';
+import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("additionalInfo");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -255,6 +284,8 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             fetchDisplayData();
         });
@@ -267,6 +298,10 @@ export default defineComponent({
             });
 
             fetchMonograph();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         };
 
         watch(i18n.locale, () => {
@@ -417,7 +452,9 @@ export default defineComponent({
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,
             MonographUpdateForm, deleteAttachment,
-            handleResearcherUnbind, userRole
+            handleResearcherUnbind, userRole,
+            documentIndicators, StatisticsType,
+            currentTab
         };
 }})
 

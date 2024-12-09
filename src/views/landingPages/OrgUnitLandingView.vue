@@ -114,6 +114,9 @@
             <v-tab value="researchAreas">
                 {{ $t("researchAreasLabel") }}
             </v-tab>
+            <v-tab v-if="ouIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -172,6 +175,11 @@
                     </v-col>
                 </v-row>
             </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="ouIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                </div>
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <v-snackbar
@@ -217,11 +225,15 @@ import OrganisationUnitTableComponent from '@/components/organisationUnit/Organi
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import OrganisationUnitUpdateForm from '@/components/organisationUnit/update/OrganisationUnitUpdateForm.vue';
+import StatisticsService from '@/services/StatisticsService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, OrganisationUnitTableComponent, IdentifierLink, UriList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("");
 
@@ -276,13 +288,18 @@ export default defineComponent({
         const subUnits = ref<OrganisationUnitIndex[]>([]);
         const totalSubUnits = ref<number>(0);
 
+        const ouIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchOU(true);
-
+            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                ouIndicators.value = response.data;
+            });
             fetchRelations();
 
             OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -508,7 +525,8 @@ export default defineComponent({
             updateRelations, graphRef, updateResearchAreas,
             subUnits, totalSubUnits, switchSubUnitsPage,
             alumni, totalAlumni, switchAlumniPage,
-            OrganisationUnitUpdateForm, fetchEmployees
+            OrganisationUnitUpdateForm, fetchEmployees,
+            ouIndicators, StatisticsType
         };
 }})
 

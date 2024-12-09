@@ -80,7 +80,7 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            uris.value = [];
+            refreshModelValue([""]);
         };
 
         const { uriValidationRules } = useValidationUtils();

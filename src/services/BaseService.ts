@@ -72,19 +72,25 @@ export class BaseService {
     idempotencyKey: string = ""
   ): Promise<any> {
     const formData = new FormData();
-  
-    for (const key in requestBody) {
-        if (Array.isArray(requestBody[key])) {
-            requestBody[key].forEach((item: any, index: number) => {
-                for (const nestedKey in item) {
-                    formData.append(`${key}[${index}].${nestedKey}`, item[nestedKey]);
-                }
+
+    const appendFormData = (data: any, parentKey: string | null = null) => {
+        if (data instanceof Object && !Array.isArray(data) && !(data instanceof File)) {
+            for (const key in data) {
+                appendFormData(data[key], parentKey ? `${parentKey}.${key}` : key);
+            }
+        } else if (Array.isArray(data)) {
+            data.forEach((item, index) => {
+                appendFormData(item, `${parentKey}[${index}]`);
             });
         } else {
-            formData.append(key, requestBody[key]);
+            formData.append(parentKey!, data);
         }
+    };
+
+    for (const key in requestBody) {
+        appendFormData(requestBody[key], key);
     }
-  
+
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
@@ -92,7 +98,7 @@ export class BaseService {
         },
         withCredentials: true
     };
-  
+
     return restMethod(this.basePath + path, formData, config);
   }
 }

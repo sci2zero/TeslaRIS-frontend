@@ -56,6 +56,12 @@
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
+                                <div v-if="bookSeries?.uris && bookSeries?.uris.length > 0">
+                                    {{ $t("uriInputLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="bookSeries?.uris"></uri-list>
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -122,11 +128,12 @@ import type { PersonPublicationSeriesContribution } from '@/models/PublicationSe
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
+import UriList from '@/components/core/UriList.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList },
     setup() {
         const currentTab = ref("");
 
@@ -210,6 +217,7 @@ export default defineComponent({
             bookSeries.value!.eissn = updatedBookSeries.eissn;
             bookSeries.value!.printISSN = updatedBookSeries.printISSN;
             bookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            bookSeries.value!.uris = updatedBookSeries.uris;
 
             performUpdate(false);
         };

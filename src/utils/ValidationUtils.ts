@@ -27,6 +27,13 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const requiredNumericFieldRules = [
+        (value: string) => {
+            if (!value) return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
     const requiredSelectionRules = [
         (value: { title: string, value: number }) => {
             if (!value || value.value === null || value.value === -1) return requiredFieldMessage.value;
@@ -174,6 +181,6 @@ export const useValidationUtils = () => {
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
-        emailFieldRules, nonMandatoryEmailFieldRules
+        emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules
     };
 };

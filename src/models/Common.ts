@@ -77,3 +77,18 @@ export interface ResearchAreaRequest {
     description: MultilingualContent[];
     superResearchAreaId?: number;
 }
+
+export enum AccessLevel {
+    OPEN = "OPEN",
+    CLOSED = "CLOSED",
+    ADMIN_ONLY = "ADMIN_ONLY"
+}
+
+export enum ApplicableEntityType {
+    MONOGRAPH = "MONOGRAPH",
+    EVENT = "EVENT",
+    DOCUMENT = "DOCUMENT",
+    PERSON = "PERSON",
+    ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    ALL = "ALL"
+}

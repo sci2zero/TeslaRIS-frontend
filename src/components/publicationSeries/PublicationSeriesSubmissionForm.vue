@@ -34,6 +34,11 @@
                             ></v-select>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col>
+                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -74,11 +79,12 @@ import { PublicationSeriesType, type PublicationSeries } from '@/models/Publicat
 import BookSeriesService from '@/services/BookSeriesService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import UriInput from '@/components/core/UriInput.vue';
 
 
 export default defineComponent({
     name: "SubmitPublicationSeries",
-    components: {MultilingualTextInput},
+    components: { MultilingualTextInput, UriInput },
     props: {
         inputType: {
             type: String,
@@ -118,11 +124,13 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const abbreviationsRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof MultilingualTextInput>();
 
         const title = ref([]);
         const nameAbbreviations = ref([]);
         const eIssn = ref("");
         const printIssn = ref("");
+        const uris = ref<string[]>([]);
 
         const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
@@ -133,7 +141,8 @@ export default defineComponent({
                 printISSN: printIssn.value,
                 languageTagIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value,
-                contributions: []
+                contributions: [],
+                uris: uris.value
             };
 
             switch(props.inputType) {
@@ -195,7 +204,7 @@ export default defineComponent({
             title, titleRef, eIssnValidationRules,
             eIssn, printIssn, languageList, selectedLanguages,
             nameAbbreviations, abbreviationsRef,
-            requiredFieldRules,
+            requiredFieldRules, uris, urisRef,
             submitPublicationSeries
         };
     }

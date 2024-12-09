@@ -73,6 +73,14 @@
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
+                                <div v-if="thesis?.eventId">
+                                    {{ $t("conferenceLabel") }}:
+                                </div>
+                                <div v-if="thesis?.eventId" class="response">
+                                    <localized-link :to="'events/conference/' + thesis?.eventId">
+                                        {{ returnCurrentLocaleContent(event?.name) }}
+                                    </localized-link>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="thesis?.numberOfPages">
@@ -108,32 +116,53 @@
             </v-col>
         </v-row>
 
-        <!-- Contributions -->
-        <person-document-contribution-tabs
-            :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
-            @update="updateContributions"></person-document-contribution-tabs>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Contributions -->
+                <person-document-contribution-tabs
+                    :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
+                    @update="updateContributions"></person-document-contribution-tabs>
 
-        <!-- Description -->
-        <description-section :description="thesis?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <!-- Keywords -->
+                <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <!-- Research Area -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                <!-- Description -->
+                <description-section :description="thesis?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <attachment-section
-            :document="thesis" :can-edit="canEdit" :proofs="thesis?.proofs" :file-items="thesis?.fileItems"
-            in-comparator></attachment-section>
+                <!-- Research Area -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+
+                <attachment-section :document="thesis" :can-edit="canEdit" :proofs="thesis?.proofs" :file-items="thesis?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
@@ -187,12 +216,18 @@ import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import UserService from '@/services/UserService';
+import StatisticsService from '@/services/StatisticsService';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("additionalInfo");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -214,6 +249,8 @@ export default defineComponent({
 
         const icon = ref("mdi-certificate-outline");
 
+        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             fetchDisplayData();
         });
@@ -226,6 +263,10 @@ export default defineComponent({
             });
 
             fetchThesis();
+            StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
         };
 
         watch(i18n.locale, () => {
@@ -340,14 +381,14 @@ export default defineComponent({
 
         return {
             thesis, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, currentTab,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, localiseDate,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, organisationUnit, ThesisUpdateForm,
             researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
-            handleResearcherUnbind, userRole
+            handleResearcherUnbind, userRole, StatisticsType, documentIndicators
         };
 }})
 

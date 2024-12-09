@@ -32,6 +32,11 @@
                         ></v-select>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col>
+                        <uri-input ref="urisRef" v-model="uris"></uri-input>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
 
@@ -55,10 +60,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PublicationSeries } from '@/models/PublicationSeriesModel';
 import { watch } from 'vue';
+import UriInput from '@/components/core/UriInput.vue';
+
 
 export default defineComponent({
     name: "PublicationSeriesUpdateForm",
-    components: {MultilingualTextInput},
+    components: { MultilingualTextInput, UriInput },
     props: {
         presetPublicationSeries: {
             type: Object as PropType<PublicationSeries | undefined>,
@@ -97,10 +104,13 @@ export default defineComponent({
             }
         });
 
+        const urisRef = ref<typeof UriInput>();
+
         const title = ref<any[]>([]);
         const nameAbbreviations = ref<any[]>([]);
         const eIssn = ref(props.presetPublicationSeries?.eissn);
         const printIssn = ref(props.presetPublicationSeries?.printISSN);
+        const uris = ref<string[]>(props.presetPublicationSeries?.uris as string[]);
 
         const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
@@ -111,7 +121,8 @@ export default defineComponent({
                 printISSN: printIssn.value,
                 languageTagIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value,
-                contributions: []
+                contributions: [],
+                uris: uris.value
             };
 
             emit("update", updatedPublicationSeries);
@@ -124,9 +135,11 @@ export default defineComponent({
             abbreviationsRef.value?.clearInput();
             nameAbbreviations.value = props.presetPublicationSeries?.nameAbbreviation as MultilingualContent[];
 
+            uris.value = props.presetPublicationSeries?.uris as string[];
             selectedLanguages.value = props.presetPublicationSeries?.languageTagIds as number[];
             eIssn.value = props.presetPublicationSeries?.eissn;
             printIssn.value = props.presetPublicationSeries?.printISSN;
+            urisRef.value?.refreshModelValue(uris.value);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             abbreviationsRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviations.value, languageTags.value));
@@ -143,7 +156,8 @@ export default defineComponent({
             eIssnValidationRules,
             printIssnValidationRules,
             titleRef, abbreviationsRef,
-            refreshForm, submit
+            refreshForm, uris, urisRef,
+            submit
         };
     }
 });
