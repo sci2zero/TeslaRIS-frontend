@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import ResearchAreaTableComponent from '@/components/researchArea/ResearchAreaTableComponent.vue';
@@ -39,6 +39,10 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("researchAreaListLabel");
+        });
+
+        watch(i18n.locale, () => {
+            search(searchParams.value);
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {

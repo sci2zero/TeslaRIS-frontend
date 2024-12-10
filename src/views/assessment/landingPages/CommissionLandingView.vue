@@ -24,11 +24,12 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <generic-assessment-modal
+                        <generic-crud-modal
                             :form-component="CommissionForm"
                             :form-props="{ presetCommission: commission, isUpdate: true }"
                             is-section-update
                             entity-name="Commission"
+                            :read-only="false"
                             @create="updateBasicInfo"
                         />
 
@@ -100,13 +101,13 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
-import GenericAssessmentModal from '@/components/assessment/GenericAssessmentModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from '@/components/assessment/commission/CommissionForm.vue';
 
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { LocalizedLink, GenericAssessmentModal },
+    components: { LocalizedLink, GenericCrudModal },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -146,6 +146,9 @@
             <v-tab v-if="totalPublications > 0" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
             <v-tab v-if="canEdit || (proceedings?.contributions && proceedings?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -159,6 +162,17 @@
                 <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
                 <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
             </v-tabs-window-item>
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <br />
+                <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+
+                <!-- Description -->
+                <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+
+                <br />
+                <attachment-section :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"></attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
@@ -169,18 +183,6 @@
                 </div>
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <!-- Keywords -->
-        <br />
-        <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
-
-        <!-- Description -->
-        <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
-
-        <br />
-        <attachment-section
-            :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"
-            in-comparator></attachment-section>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedings?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 

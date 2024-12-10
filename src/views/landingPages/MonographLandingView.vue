@@ -143,6 +143,12 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
+            <v-tab v-if="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="researchAreaHierarchy" value="researchArea">
+                {{ $t("researchAreaLabel") }}
+            </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -150,15 +156,26 @@
 
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
-                <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
                 <!-- Keywords -->
                 <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
                 <!-- Description -->
                 <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                
+                <!-- Publications Table -->
+                <v-row>
+                    <v-col cols="12">
+                        <h2>{{ $t("monographPublicationsLabel") }}</h2>
+                        <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                    </v-col>
+                </v-row>
 
-                <!-- Research Area -->
+                <attachment-section :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchArea">
                 <v-row>
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -169,18 +186,6 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                
-                <!-- Publications Table -->
-                <v-row>
-                    <v-col cols="12">
-                        <h2>{{ $t("monographPublicationsLabel") }}</h2>
-                        <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-                    </v-col>
-                </v-row>
-
-                <attachment-section
-                    :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"
-                    in-comparator></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
@@ -253,7 +258,7 @@ export default defineComponent({
     name: "MonographLandingPage",
     components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
     setup() {
-        const currentTab = ref("additionalInfo");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");

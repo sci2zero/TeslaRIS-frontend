@@ -4,10 +4,11 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <generic-assessment-modal
+    <generic-crud-modal
         :form-component="AssessmentMeasureForm"
         :form-props="{ presetAssessmentMeasure: undefined }"
         entity-name="AssessmentMeasure"
+        :read-only="false"
         @create="createNewAssessmentMeasure"
     />
 
@@ -41,11 +42,12 @@
                     {{ row.item.formalDescriptionOfRule }}
                 </td>
                 <td>
-                    <generic-assessment-modal
+                    <generic-crud-modal
                         :form-component="AssessmentMeasureForm"
                         :form-props="{ presetAssessmentMeasure: row.item }"
                         is-update
-                        entity-name="Indicator"
+                        entity-name="AssessmentMeasure"
+                        :read-only="false"
                         @update="updateAssessmentMeasure(row.item.id, $event)"
                     />
                 </td>
@@ -76,13 +78,13 @@ import type { AssessmentMeasure } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
 import { localiseDate } from '@/i18n/dateLocalisation';
-import GenericAssessmentModal from '../GenericAssessmentModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentMeasureForm from './AssessmentMeasureForm.vue';
 
 
 export default defineComponent({
     name: "AssessmentMeasureTableComponent",
-    components: { GenericAssessmentModal },
+    components: { GenericCrudModal },
     props: {
         assessmentMeasures: {
             type: Array<AssessmentMeasure>,

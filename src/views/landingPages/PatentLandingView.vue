@@ -97,6 +97,9 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
+            <v-tab v-if="canEdit || (patent?.contributions && patent?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -104,8 +107,6 @@
 
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
-                <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
                 <!-- Keywords -->
                 <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
@@ -113,6 +114,9 @@
                 <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
                 <attachment-section :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
@@ -176,7 +180,7 @@ export default defineComponent({
     name: "PatentLandingPage",
     components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
-        const currentTab = ref("additionalInfo");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -130,6 +130,9 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
+            <v-tab v-if="canEdit || (monographPublication?.contributions && monographPublication?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -137,17 +140,16 @@
 
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
-                <person-document-contribution-tabs :document-id="monographPublication?.id" :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
                 <!-- Keywords -->
                 <keyword-list :keywords="monographPublication?.keywords ? monographPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
                 <!-- Description -->
                 <description-section :description="monographPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-                <attachment-section
-                    :document="monographPublication" :can-edit="canEdit" :proofs="monographPublication?.proofs" :file-items="monographPublication?.fileItems"
-                    in-comparator></attachment-section>
+                <attachment-section :document="monographPublication" :can-edit="canEdit" :proofs="monographPublication?.proofs" :file-items="monographPublication?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="monographPublication?.id" :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
@@ -216,7 +218,7 @@ export default defineComponent({
     name: "MonographPublicationLandingPage",
     components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
-        const currentTab = ref("additionalInfo");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");

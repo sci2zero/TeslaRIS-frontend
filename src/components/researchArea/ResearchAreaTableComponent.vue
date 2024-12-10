@@ -116,7 +116,7 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name", order: "asc"}]});
 
         const headers = [
-          { title: nameLabel, align: "start", sortable: true, key: "name"},
+          { title: nameLabel, align: "start", sortable: true, key: "name.content"},
           { title: abstractLabel, align: "start", sortable: true, key: "description"},
           { title: superAreaLabel, align: "start", sortable: false, key: "superResearchAreaName"},
           { title: actionLabel},

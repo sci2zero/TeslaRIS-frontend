@@ -3,6 +3,8 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { ResearchArea } from "@/models/OrganisationUnitModel";
 import type { Page, ResearchAreaRequest, ResearchAreaResponse } from "@/models/Common";
+import i18n from "@/i18n";
+
 
 export class ResearchAreaService extends BaseService {
 
@@ -21,7 +23,7 @@ export class ResearchAreaService extends BaseService {
   }
 
   async searchResearchAreas(tokens: string): Promise<AxiosResponse<Page<ResearchAreaResponse>>> {
-    return super.sendRequest(axios.get, `research-area/search?${tokens}`);
+    return super.sendRequest(axios.get, `research-area/search?${tokens}&lang=${i18n.vueI18n.global.locale}`);
   }
 
   async createResearchArea(body: ResearchAreaRequest): Promise<AxiosResponse<ResearchAreaRequest>> {

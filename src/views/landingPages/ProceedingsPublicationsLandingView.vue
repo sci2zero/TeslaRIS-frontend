@@ -129,6 +129,9 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
+            <v-tab v-if="canEdit || (proceedingsPublication?.contributions && proceedingsPublication?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -136,17 +139,16 @@
 
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
-                <person-document-contribution-tabs :document-id="proceedingsPublication?.id" :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
                 <!-- Keywords -->
                 <keyword-list :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
                 <!-- Description -->
                 <description-section :description="proceedingsPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-                <attachment-section
-                    :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"
-                    in-comparator></attachment-section>    
+                <attachment-section :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"></attachment-section>    
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="proceedingsPublication?.id" :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
@@ -215,7 +217,7 @@ export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
     components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
-        const currentTab = ref("additionalInfo");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
