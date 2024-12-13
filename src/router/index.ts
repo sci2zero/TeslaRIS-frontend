@@ -82,6 +82,7 @@ import AssessmentRulebooksView from "@/views/assessment/listViews/AssessmentRule
 import AssessmentRulebookLandingView from "@/views/assessment/landingPages/AssessmentRulebookLandingView.vue";
 import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
 import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
+import LanguageTagListView from "@/views/LanguageTagListView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -840,6 +841,15 @@ const router = createRouter({
                     path: "countries",
                     name: "countries",
                     component: CountryListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "language-tags",
+                    name: "languageTags",
+                    component: LanguageTagListView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

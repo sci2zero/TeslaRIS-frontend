@@ -459,5 +459,7 @@ export default {
     commissionLabel: "Commission",
     createNewCommissionLabel: "Create New Commission",
     updateCommissionLabel: "Update Commission",
-    applicableTypeLabel: "Applicable on"
+    applicableTypeLabel: "Applicable on",
+    createNewLanguageTagLabel: "Create new language tag",
+    displayLabel: "Display label"
 }

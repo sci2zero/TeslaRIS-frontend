@@ -458,5 +458,7 @@ export default {
     commissionLabel: "Komisija",
     createNewCommissionLabel: "Kreiraj novu komisiju",
     updateCommissionLabel: "Ažuriraj komisiju",
-    applicableTypeLabel: "Primenljivo na"
+    applicableTypeLabel: "Primenljivo na",
+    createNewLanguageTagLabel: "Kreiraj novu jezičku oznaku",
+    displayLabel: "Labela za prikaz"
 }

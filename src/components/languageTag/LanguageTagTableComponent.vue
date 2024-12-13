@@ -2,7 +2,7 @@
     <v-row class="align-center">
         <v-col cols="auto">
             <v-btn
-                density="compact" class="bottom-spacer" :disabled="selectedCountrys.length === 0"
+                density="compact" class="bottom-spacer" :disabled="selectedLanguageTags.length === 0"
                 @click="deleteSelection">
                 {{ $t("deleteLabel") }}
             </v-btn>
@@ -10,20 +10,20 @@
 
         <v-col cols="auto">
             <generic-crud-modal
-                :form-component="CountryForm"
-                :form-props="{ presetCountry: undefined }"
-                entity-name="Country"
-                @create="createNewCountry"
+                :form-component="LanguageTagForm"
+                :form-props="{ presetLanguageTag: undefined }"
+                entity-name="LanguageTag"
+                @create="createNewLanguageTag"
             />
         </v-col>
     </v-row>
 
     <v-data-table-server
-        v-model="selectedCountrys"
+        v-model="selectedLanguageTags"
         :sort-by="tableOptions.sortBy"
-        :items="countries"
+        :items="languageTags"
         :headers="headers"
-        :items-length="totalCountrys"
+        :items-length="totalLanguageTags"
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
         :items-per-page="25"
@@ -35,22 +35,22 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedCountrys"
+                        v-model="selectedLanguageTags"
                         :value="row.item"
                         class="table-checkbox"
                         hide-details
                     />
                 </td>
-                <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
-                <td>{{ row.item.code }}</td>
+                <td>{{ row.item.display }}</td>
+                <td>{{ row.item.languageCode }}</td>
                 <td>
                     <generic-crud-modal
                         class="mt-2"
-                        :form-component="CountryForm"
-                        :form-props="{ presetCountry: row.item }"
-                        entity-name="Country"
+                        :form-component="LanguageTagForm"
+                        :form-props="{ presetLanguageTag: row.item }"
+                        entity-name=""
                         is-update
-                        @update="updateCountry(row.item.id, $event)"
+                        @update="updateLanguageTag(row.item.id, $event)"
                     />
                 </td>
             </tr>
@@ -76,28 +76,27 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
-import type { Country } from '@/models/Common';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import CountryService from '@/services/CountryService';
+import type { LanguageTag, LanguageTagResponse } from '@/models/Common';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
-import CountryForm from './CountryForm.vue';
+import LanguageTagForm from './LanguageTagForm.vue';
+import LanguageService from '@/services/LanguageService';
 
 
 export default defineComponent({
-    name: "CountryTableComponent",
+    name: "LanguageTagTableComponent",
     components: { GenericCrudModal },
     props: {
-        countries: {
-            type: Array<Country>,
+        languageTags: {
+            type: Array<LanguageTagResponse>,
             required: true
         }, 
-        totalCountrys: {
+        totalLanguageTags: {
             type: Number,
             required: true
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedCountrys = ref<Country[]>([]);
+        const selectedLanguageTags = ref<LanguageTagResponse[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
         const i18n = useI18n();
@@ -106,15 +105,15 @@ export default defineComponent({
         const snackbarText = ref("");
         const timeout = 5000;
 
-        const nameLabel = computed(() => i18n.t("nameLabel"));
-        const codeLabel = computed(() => i18n.t("countryCodeLabel"));
+        const displayLabel = computed(() => i18n.t("displayLabel"));
+        const codeLabel = computed(() => i18n.t("codeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name.content", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "display", order: "asc"}]});
 
         const headers = [
-          { title: nameLabel, align: "start", sortable: true, key: "name.content"},
-          { title: codeLabel, align: "start", sortable: true, key: "code"},
+          { title: displayLabel, align: "start", sortable: true, key: "display"},
+          { title: codeLabel, align: "start", sortable: true, key: "languageTag"},
           { title: actionLabel},
         ];
 
@@ -134,18 +133,18 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedCountrys.value.map((country: Country) => {
-                return CountryService.deleteCountry(country.id as number)
+            Promise.all(selectedLanguageTags.value.map((languageTag: LanguageTagResponse) => {
+                return LanguageService.deleteLanguageTag(languageTag.id as number)
                     .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(country.name) }));
+                        addNotification(i18n.t("deleteSuccessNotification", { name: languageTag.display }));
                     })
                     .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(country.name) }));
-                        return country;
+                        addNotification(i18n.t("deleteFailedNotification", { name: languageTag.display }));
+                        return languageTag;
                     });
             })).then((failedDeletions) => {
-                selectedCountrys.value = selectedCountrys.value.filter((country) => failedDeletions.includes(country));
-                CountryService.invalidateCaches();
+                selectedLanguageTags.value = selectedLanguageTags.value.filter((languageTag) => failedDeletions.includes(languageTag));
+                LanguageService.invalidateLanguageTagCaches();
                 refreshTable(tableOptions.value);
             });
         };
@@ -161,9 +160,9 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const createNewCountry = (country: Country) => {
-            CountryService.createCountry(country).then(() => {
-                CountryService.invalidateCaches();
+        const createNewLanguageTag = (languageTag: LanguageTag) => {
+            LanguageService.createLanguageTag(languageTag).then(() => {
+                LanguageService.invalidateLanguageTagCaches();
                 if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
                     emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
                 } else {
@@ -173,10 +172,10 @@ export default defineComponent({
             });
         };
 
-        const updateCountry = (countryId: number, country: Country) => {
-            CountryService.updateCountry(countryId, country).then(() => {
+        const updateLanguageTag = (languageTagId: number, languageTag: LanguageTag) => {
+            LanguageService.updateLanguageTag(languageTagId, languageTag).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
-                CountryService.invalidateCaches();
+                LanguageService.invalidateLanguageTagCaches();
                 if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
                     emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
                 } else {
@@ -192,9 +191,9 @@ export default defineComponent({
 
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
-            getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedCountrys, notifications, createNewCountry,
-            updateCountry, setSortOption, CountryForm
+            getTitleFromValueAutoLocale, LanguageTagForm,
+            selectedLanguageTags, notifications, createNewLanguageTag,
+            updateLanguageTag, setSortOption
         };
     }
 });
