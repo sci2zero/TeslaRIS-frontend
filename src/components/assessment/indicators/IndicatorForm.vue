@@ -98,7 +98,6 @@ export default defineComponent({
 
                 selectedApplicableTypes.value = [];
                 props.presetIndicator.applicableEntityTypes.forEach(applicableType => {
-                    console.log(applicableType)
                     selectedApplicableTypes.value.push({title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string, value: applicableType});
                 });
             }

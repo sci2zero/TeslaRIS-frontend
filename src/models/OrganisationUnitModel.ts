@@ -81,6 +81,11 @@ export interface ResearchArea {
     superResearchArea?: ResearchArea;
 }
 
+export interface ResearchAreaNode {
+    id : number;
+    name: MultilingualContent[];
+}
+
 interface Contact {
     contactEmail: string;
     phoneNumber: string;

@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { ResearchArea } from "@/models/OrganisationUnitModel";
+import type { ResearchArea, ResearchAreaNode } from "@/models/OrganisationUnitModel";
 import type { Page, ResearchAreaRequest, ResearchAreaResponse } from "@/models/Common";
 import i18n from "@/i18n";
 
@@ -12,6 +12,10 @@ export class ResearchAreaService extends BaseService {
 
   async readAllResearchAreas(): Promise<AxiosResponse<ResearchArea[]>> {
     return super.sendRequest(axios.get, "research-area");
+  }
+
+  async fetchChildResearchAreas(parentId: number | null): Promise<AxiosResponse<ResearchAreaNode[]>> {
+    return super.sendRequest(axios.get, `research-area/children/${parentId}`);
   }
 
   async listAllResearchAreas(): Promise<AxiosResponse<ResearchArea[]>> {

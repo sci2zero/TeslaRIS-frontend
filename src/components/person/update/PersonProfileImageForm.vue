@@ -82,7 +82,6 @@ export default defineComponent({
         const submit = async () => {
             if (!cropper || !file.value) return
 
-            console.log(imageSrc.value)
             const newProfileImage: PersonProfileImageRequest = {
                 file: await urlToFile(imageSrc.value as string, file.value[0].name),
                 top: Math.round(cropper.getCropBoxData().top),

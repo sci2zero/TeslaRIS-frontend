@@ -18,15 +18,16 @@
                 <v-card-text>
                     <v-treeview
                         v-model:selected="selectedResearchAreas"
-                        :items="researchAreasSelectable"
-                        selection-type="leaf"
+                        v-model:opened="openNodes"
+                        :items="researchAreas"
+                        select-strategy="independent"
                         item-title="title"
                         item-value="id"
                         selected-color="indigo"
-                        open-on-click
-                        open-all
                         selectable
-                    ></v-treeview>
+                        :load-children="onNodeOpen"
+                        @click:select="handleSelection"
+                    />
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -43,13 +44,12 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { ResearchArea } from "@/models/OrganisationUnitModel";
 import ResearchAreaService from "@/services/ResearchAreaService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
-import { watch } from "vue";
 
 
 export default defineComponent({
@@ -68,97 +68,163 @@ export default defineComponent({
     setup(props, { emit }) {
         const dialog = ref(false);
 
-        const selectedResearchAreas = ref<number[]>([]);
-        const researchAreasSelectable = ref<any>([]);
+        onMounted(async () => {
+            buildInitialSelection();
+        });
 
-        onMounted(() => {
-            ResearchAreaService.readAllResearchAreas().then((response) => {
-                response.data.forEach((researchAreaResponse) => {
-                    researchAreasSelectable.value.push(...reorganiseParent(researchAreaResponse));
+        const buildInitialSelection = () => {
+            selectedResearchAreas.value = [];
+            researchAreas.splice(0);
+
+            ResearchAreaService.fetchChildResearchAreas(0).then(response => {
+                response.data.forEach(researchAreaNode => {
+                    researchAreas.push({ id: researchAreaNode.id, title: returnCurrentLocaleContent(researchAreaNode.name) as string, children: []});
+                });
+
+                props.researchAreasHierarchy?.forEach(researchArea => {
+                    preSelectEverything(researchArea);
                 });
             });
-        });
+        }
 
-        watch(() => props.researchAreasHierarchy, () => {
-            props.researchAreasHierarchy?.forEach((researchArea) => {
-                selectedResearchAreas.value.push(researchArea.id as number);
-                while(researchArea.superResearchArea) {
-                    selectedResearchAreas.value.push(researchArea.superResearchArea.id as number);
-                    researchArea = researchArea.superResearchArea;
+        watch(dialog, () => {
+            if (dialog.value) {
+                buildInitialSelection();
+            }
+        })
+
+        const preSelectEverything = async (researchArea: ResearchArea) => {
+            if (selectedResearchAreas.value.find(researchAreaId => researchAreaId === researchArea.id)) {
+                return;
+            }
+
+            selectedResearchAreas.value.push(researchArea.id as number);
+            if (researchArea.superResearchArea) {
+                await preSelectEverything(researchArea.superResearchArea);
+            }
+
+            const childrenResponse = await ResearchAreaService.fetchChildResearchAreas(researchArea.id as number);
+            childrenResponse.data.forEach(researchAreaNode => {
+                const node = findNodeById(researchAreas, researchArea.id as number);
+                if (node) {
+                    node.children.push({ id: researchAreaNode.id, title: returnCurrentLocaleContent(researchAreaNode.name) as string, children: [], superResearchAreaId: researchArea.id});
                 }
             });
-        });
-
-        const reorganiseParent = (data: any) => {
-            if (!data) {
-                return [];
-            }
-
-            const nodeMap: { [key: string]: any } = {};
-            const root: any[] = [];
-
-            let current = data;
-            while (current['superResearchArea']) {
-                current["children"] = [];
-                current["title"] = returnCurrentLocaleContent(current.name);
-
-                if(current.name[0].content) {
-                    nodeMap[current.name[0].content] = current;
-                }
-                current = current['superResearchArea'];
-            }
-
-            current["children"] = [];
-            current["title"] = returnCurrentLocaleContent(current.name);
-            nodeMap[current.name[0].content] = current;
-            root.push(current);
-
-            for (const [, value] of Object.entries(nodeMap)) {
-                if (!value.children) {
-                    value.children = [];
-                }
-
-                if (value['superResearchArea']) {
-                    const parent = nodeMap[value['superResearchArea'].name[0].content];
-                    parent.children.push(value);
-                }
-            }
-            return root;
+            
+            openNodes.value.push(researchArea.id as number);
         };
 
-        const findDeepestNodes = (ids: number[]): number[] => {
-            const idSet = new Set(ids);
-            const result = new Set();
+        const findNodeById = (tree: Array<{ id: number; title: string; children: any[] }>, id: number): any => {
+            for (const node of tree) {
+                if (node.id === id) {
+                    return node;
+                }
+                if (node.children && node.children.length > 0) {
+                    const found = findNodeById(node.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
 
-            function traverse(node: any, currentPath: any) {
-                if (!node.children || node.children.length === 0) {
-                    if (idSet.has(node.id)) {
-                        result.add(node.id);
+        const unselectSubNodes = (tree: Array<{ id: number; title: string; children: any[] }>, id: number): void => {
+            for (const node of tree) {
+                if (node.id === id) {
+                    const index = selectedResearchAreas.value.indexOf(node.id);
+                    if (index !== -1) {
+                        selectedResearchAreas.value.splice(index, 1);
+                    }
+
+                    if (node.children && node.children.length > 0) {
+                        for (const child of node.children) {
+                            unselectSubNodes(tree, child.id);
+                        }
                     }
                     return;
                 }
 
-                const isCurrentNodeInIds = idSet.has(node.id);
-                let foundChildInIds = false;
+                if (node.children && node.children.length > 0) {
+                    unselectSubNodes(node.children, id);
+                }
+            }
+        };
 
-                for (const child of node.children) {
-                    traverse(child, currentPath.concat(node.id));
-                    if (idSet.has(child.id)) {
-                        foundChildInIds = true;
+        const openNodes = ref<number[]>([]);
+        const selectedResearchAreas = ref<number[]>([]);
+        const researchAreas = reactive<any[]>([]);
+
+        const onNodeOpen = async (node: any) => {
+            return ResearchAreaService.fetchChildResearchAreas(node.id).then(response => {
+                if (response.data.length === 0) {
+                    node.children = null;
+                } else {
+                    node.children = response.data.map(researchAreaNode => ({
+                        id: researchAreaNode.id,
+                        title: returnCurrentLocaleContent(researchAreaNode.name) as string,
+                        children: [],
+                        superResearchAreaId: node.id
+                    }));
+                }
+            });
+        };
+
+        const selectParentHierarchy = (node: any) => {
+            const index = selectedResearchAreas.value.indexOf(node.id);
+            if (index == -1) {
+                selectedResearchAreas.value.push(node.id);
+            }
+
+            if (node.superResearchAreaId) {
+                const parentNode = findNodeById(researchAreas, node.superResearchAreaId);
+                if (parentNode) {
+                    selectParentHierarchy(parentNode);
+                }
+            }
+        };
+
+        const handleSelection = (event: any) => {
+            if (!event.value) {
+                unselectSubNodes(researchAreas, event.id);
+            } else {
+                const node = findNodeById(researchAreas, event.id);
+                if (node) {
+                    selectParentHierarchy(node);
+                }
+            }
+        };
+
+        const findDeepestNodes = (ids: number[]): number[] => {
+            const idSet = new Set(ids);
+            const result = new Set<number>();
+
+            function traverse(node: any): boolean {
+                const isInIdSet = idSet.has(node.id);
+
+                if (!node.children || node.children.length === 0) {
+                    if (isInIdSet) {
+                        result.add(node.id);
                     }
+                    return isInIdSet;
                 }
 
-                if (isCurrentNodeInIds && !foundChildInIds) {
+                let foundChildInIds = false;
+                for (const child of node.children) {
+                    foundChildInIds = traverse(child) || foundChildInIds;
+                }
+
+                if (isInIdSet && !foundChildInIds) {
                     result.add(node.id);
                 }
+
+                return isInIdSet || foundChildInIds;
             }
 
-            for (const item of researchAreasSelectable.value) {
-                traverse(item, []);
+            for (const item of researchAreas) {
+                traverse(item);
             }
 
-            return Array.from(result) as number[];
-        }
+            return Array.from(result);
+        };
 
         const emitToParent = (researchAreaIds: number[]) => {
             emit("update", researchAreaIds)
@@ -166,12 +232,14 @@ export default defineComponent({
         }
 
         const submitSelection = () => {
-            emitToParent(findDeepestNodes(selectedResearchAreas.value));
+            emitToParent(findDeepestNodes([...new Set(selectedResearchAreas.value)]));
         };
 
-        return {dialog, researchAreasSelectable,
-            selectedResearchAreas, emitToParent,
-            submitSelection};
+        return {
+            dialog, researchAreas, openNodes,
+            selectedResearchAreas, handleSelection,
+            submitSelection, onNodeOpen, emitToParent
+        };
     }
 });
 </script>
