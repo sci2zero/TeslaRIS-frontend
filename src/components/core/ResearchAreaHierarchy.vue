@@ -1,12 +1,12 @@
 <template>
     <strong v-if="!researchAreas || researchAreas.length === 0">{{ $t("notYetSetMessage") }}</strong>
-    <draggable
-        :list="researchAreas" group="researchAreaHierarchy" item-key="id" :disabled="!inComparator"
-        @change="onDropCallback">
-        <ul class="tree">
+    <ul class="tree">
+        <draggable
+            :list="researchAreas" group="researchAreaHierarchy" item-key="id" :disabled="!inComparator"
+            @change="onDropCallback">
             <tree-hierarchy-recursive :preset-research-area="researchAreaTree"></tree-hierarchy-recursive>
-        </ul>
-    </draggable>
+        </draggable>
+    </ul>
 </template>
 
 

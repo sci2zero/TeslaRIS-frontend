@@ -180,6 +180,7 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
+                                <research-areas-update-modal :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []" :read-only="!canEdit" limit-one @update="updateResearchAreas"></research-areas-update-modal>
                                 <div><b>{{ $t("researchAreasLabel") }}</b></div>
                                 <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
                             </v-card-text>
@@ -188,10 +189,29 @@
                 </v-row>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                </div>
+                <generic-crud-modal
+                    class="mt-5 ml-5"
+                    :form-component="DocumentIndicatorForm"
+                    :form-props="{ applicableTypes: [ApplicableEntityType.MONOGRAPH], entityId: monograph?.id }"
+                    entity-name="EntityIndicator"
+                    :read-only="!(canEdit && userRole === 'RESEARCHER')"
+                    @create="createIndicator"
+                />
+                <v-row>
+                    <v-col>
+                        <div class="statistics">
+                            <h2>{{ $t("statisticsIndicatorsLabel") }}</h2>
+                            <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                            <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                        </div>
+                    </v-col>
+                    <v-col>
+                        <div class="statistics">
+                            <h2>{{ $t("otherIndicatorsLabel") }}</h2>
+                            <indicators-view :entity-indicators="documentIndicators" :exclude-prefixes="['view']" :can-edit="canEdit && userRole === 'RESEARCHER'" :entity-id="monograph?.id"></indicators-view>
+                        </div>
+                    </v-col>
+                </v-row>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -214,7 +234,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
 import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -249,14 +269,17 @@ import MonographUpdateForm from '@/components/publication/update/MonographUpdate
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
-import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
+import DocumentIndicatorForm from '@/components/assessment/indicators/DocumentIndicatorForm.vue';
+import IndicatorsView from '@/components/assessment/indicators/IndicatorsView.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsView },
     setup() {
         const currentTab = ref("contributions");
 
@@ -304,6 +327,10 @@ export default defineComponent({
 
             fetchMonograph();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            fetchIndicators();
+        };
+
+        const fetchIndicators = () => {
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
@@ -403,6 +430,12 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            monograph.value!.researchAreaId = researchAreaIds[0];
+
+            performUpdate(true);
+        };
+
         const updateBasicInfo = (basicInfo: Monograph) => {
             monograph.value!.title = basicInfo.title;
             monograph.value!.subTitle = basicInfo.subTitle;
@@ -444,6 +477,12 @@ export default defineComponent({
             fetchDisplayData();
         };
 
+        const createIndicator = (documentIndicator: DocumentIndicator) => {
+            EntityIndicatorService.createDocumentIndicator(documentIndicator).then(() => {
+                fetchIndicators();
+            });
+        };
+
         return {
             monograph, icon,
             returnCurrentLocaleContent,
@@ -459,7 +498,9 @@ export default defineComponent({
             MonographUpdateForm, deleteAttachment,
             handleResearcherUnbind, userRole,
             documentIndicators, StatisticsType,
-            currentTab
+            currentTab, updateResearchAreas,
+            ApplicableEntityType, DocumentIndicatorForm,
+            createIndicator
         };
 }})
 

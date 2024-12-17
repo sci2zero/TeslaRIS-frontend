@@ -166,7 +166,7 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-ares-update-modal>
+                                <research-areas-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-areas-update-modal>
 
                                 <div><b>{{ $t("researchAreasLabel") }}</b></div>
                                 <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
@@ -219,7 +219,7 @@ import PersonService from '@/services/PersonService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
+import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
@@ -233,7 +233,7 @@ import { type EntityIndicatorResponse, StatisticsType } from '@/models/Assessmen
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("");
 

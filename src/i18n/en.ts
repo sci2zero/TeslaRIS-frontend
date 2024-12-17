@@ -392,6 +392,7 @@ export default {
     journalPublicationComparatorLabel: "Comparing journal publication",
     assessmentLabel: "Assessment",
     indicatorListLabel: "Indicators",
+    indicatorLabel: "Indicator",
     codeLabel: "Code",
     createNewIndicatorLabel: "Create new indicator",
     updateIndicatorLabel: "Update indicator",
@@ -461,5 +462,10 @@ export default {
     updateCommissionLabel: "Update Commission",
     applicableTypeLabel: "Applicable on",
     createNewLanguageTagLabel: "Create new language tag",
-    displayLabel: "Display label"
+    displayLabel: "Display label",
+    otherIndicatorsLabel: "Other indicators",
+    statisticsIndicatorsLabel: "Statistics indicators",
+    createNewEntityIndicatorLabel: "Enter indicator",
+    trueLabel: "Yes",
+    falseLabel: "No"
 }

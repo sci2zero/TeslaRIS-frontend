@@ -391,6 +391,7 @@ export default {
     journalPublicationComparatorLabel: "Poređenje radova u časopisu",
     assessmentLabel: "Vrednovanje",
     indicatorListLabel: "Indikatori",
+    indicatorLabel: "Indikator",
     codeLabel: "Kod",
     createNewIndicatorLabel: "Kreiraj novi indikator",
     updateIndicatorLabel: "Ažuriraj indikator",
@@ -460,5 +461,10 @@ export default {
     updateCommissionLabel: "Ažuriraj komisiju",
     applicableTypeLabel: "Primenljivo na",
     createNewLanguageTagLabel: "Kreiraj novu jezičku oznaku",
-    displayLabel: "Labela za prikaz"
+    displayLabel: "Labela za prikaz",
+    otherIndicatorsLabel: "Ostali indikatori",
+    statisticsIndicatorsLabel: "Statistički indikatori",
+    createNewEntityIndicatorLabel: "Unesi indikator",
+    trueLabel: "Da",
+    falseLabel: "Ne"
 }

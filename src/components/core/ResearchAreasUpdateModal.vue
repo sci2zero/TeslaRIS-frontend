@@ -53,7 +53,7 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
 export default defineComponent({
-    name: "ResearchAreaUpdateModal",
+    name: "ResearchAreasUpdateModal",
     props: {
         readOnly: {
             type: Boolean,
@@ -62,6 +62,10 @@ export default defineComponent({
         researchAreasHierarchy: {
             type: Object as PropType<ResearchArea[] | undefined>,
             required: true
+        },
+        limitOne: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
@@ -186,6 +190,10 @@ export default defineComponent({
             if (!event.value) {
                 unselectSubNodes(researchAreas, event.id);
             } else {
+                if (props.limitOne) {
+                    selectedResearchAreas.value.splice(0);
+                }
+
                 const node = findNodeById(researchAreas, event.id);
                 if (node) {
                     selectParentHierarchy(node);

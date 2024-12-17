@@ -27,15 +27,15 @@ export interface IndicatorRequest {
 }
 
 export interface EntityIndicatorResponse {
-    numericValue: number,
+    numericValue?: number,
 
-    booleanValue: boolean,
+    booleanValue?: boolean,
 
-    textualValue: string,
+    textualValue?: string,
 
-    fromDate: string,
+    fromDate?: string,
 
-    toDate: string,
+    toDate?: string,
 
     indicatorResponse: IndicatorResponse
 }
@@ -100,4 +100,17 @@ export interface CommissionResponse {
     formalDescriptionOfRule: string;
     superCommissionId: number;
     superCommissionDescription: MultilingualContent[];
+}
+
+export interface EntityIndicator {
+    numericValue?: number;
+    booleanValue?: boolean;
+    textualValue?: string;
+    fromDate?: string;
+    toDate?: string;
+    indicatorId: number;
+}
+
+export interface DocumentIndicator extends EntityIndicator {
+    documentId: number;
 }
