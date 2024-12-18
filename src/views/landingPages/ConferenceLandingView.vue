@@ -96,28 +96,58 @@
             </v-col>
         </v-row>
 
-        <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (conference?.contributions && conference?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="eventIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
+                <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
+            
+                <!-- Proceedings List -->
+                <div v-if="!conference?.serialEvent">
+                    <br />
+                    <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
+                </div>
 
-        <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
+                <div>
+                    <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
+                </div>
 
-        <!-- Proceedings List -->
-        <div v-if="!conference?.serialEvent">
-            <br />
-            <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
-        </div>
-
-        <!-- Relations List -->
-        <div>
-            <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
-        </div>
-
-        <!-- Publication Table -->
-        <div v-if="!conference?.serialEvent">
-            <h2>{{ $t("publicationsLabel") }}</h2>
-            <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
-        </div>
+                <!-- Publication Table -->
+                <div v-if="!conference?.serialEvent">
+                    <h2>{{ $t("publicationsLabel") }}</h2>
+                    <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+                </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="eventIndicators" 
+                    :applicable-types="[ApplicableEntityType.EVENT]" 
+                    :entity-id="conference?.id" 
+                    :entity-type="ApplicableEntityType.EVENT" 
+                    :can-edit="canEdit"
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+        </v-tabs-window>
         
         <v-snackbar
             v-model="snackbar"
@@ -148,7 +178,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
-import type { Country, MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDateRange } from '@/i18n/dateLocalisation';
@@ -158,12 +188,17 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import CountryService from '@/services/CountryService';
 import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import type { EntityIndicatorResponse, EventIndicator } from '@/models/AssessmentModel';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -185,13 +220,22 @@ export default defineComponent({
         const canEdit = ref(false);
         const country = ref<Country>();
 
+        const eventIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
             fetchConference();
+            fetchIndicators();
         });
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchEventIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                eventIndicators.value = response.data;
+            });
+        };
 
         const fetchConference = () => {
             EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -278,14 +322,22 @@ export default defineComponent({
             });
         };
 
+        const createIndicator = (eventIndicator: EventIndicator) => {
+            EntityIndicatorService.createEventIndicator(eventIndicator).then(() => {
+                fetchIndicators();
+            });
+        };
+
         return {
-            conference, icon, publications, 
+            conference, icon, publications,
             totalPublications, switchPublicationsPage,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
-            country, EventUpdateForm
+            country, EventUpdateForm, ApplicableEntityType,
+            eventIndicators, fetchIndicators, createIndicator,
+            currentTab
         };
 }})
 

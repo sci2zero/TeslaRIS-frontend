@@ -42,6 +42,17 @@
                 </v-select>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedContentType"
+                    :items="contentTypes"
+                    :label="$t('contentTypeLabel') + '*'"
+                    :rules="requiredSelectionRules"
+                    return-object>
+                </v-select>
+            </v-col>
+        </v-row>
 
         <v-row>
             <p class="required-fields-message">
@@ -61,10 +72,11 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
+import { IndicatorContentType, type IndicatorRequest, type IndicatorResponse } from '@/models/AssessmentModel';
 import { getAccessLevelForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/accessLevel';
 import IndicatorService from '@/services/assessment/IndicatorService';
 import { getApplicableEntityTypesForGivenLocale, getApplicableEntityTypeTitleFromValueAutoLocale } from '@/i18n/applicableEntityType';
+import { getIndicatorContentTypeForGivenLocale, getIndicatorContentTypeTitleFromValueAutoLocale } from '@/i18n/indicatorContentType';
 
 
 export default defineComponent({
@@ -100,6 +112,8 @@ export default defineComponent({
                 props.presetIndicator.applicableEntityTypes.forEach(applicableType => {
                     selectedApplicableTypes.value.push({title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string, value: applicableType});
                 });
+
+                selectedContentType.value = {title: getIndicatorContentTypeTitleFromValueAutoLocale(props.presetIndicator.contentType) as string, value: props.presetIndicator.contentType};
             }
         };
 
@@ -111,6 +125,9 @@ export default defineComponent({
 
         const applicableTypes = getApplicableEntityTypesForGivenLocale();
         const selectedApplicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>([{title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.ALL) as string, value: ApplicableEntityType.ALL}]);
+
+        const contentTypes = getIndicatorContentTypeForGivenLocale();
+        const selectedContentType = ref<{ title: string, value: IndicatorContentType }>({title: getIndicatorContentTypeTitleFromValueAutoLocale(IndicatorContentType.TEXT) as string, value: IndicatorContentType.TEXT});
 
         const title = ref<any>([]);
         const description = ref<any>([]);
@@ -124,7 +141,8 @@ export default defineComponent({
                 title: title.value,
                 description: description.value,
                 indicatorAccessLevel: selectedAccessLevel.value.value,
-                applicableTypes: selectedApplicableTypes.value.map(applicableTypeObject => applicableTypeObject.value)
+                applicableTypes: selectedApplicableTypes.value.map(applicableTypeObject => applicableTypeObject.value),
+                contentType: selectedContentType.value.value
             };
 
             emit("create", indicator);
@@ -138,7 +156,8 @@ export default defineComponent({
             languageTags, selectedAccessLevel,
             requiredFieldRules, code, submit,
             accessLevels, requiredSelectionRules,
-            applicableTypes, selectedApplicableTypes
+            applicableTypes, selectedApplicableTypes,
+            contentTypes, selectedContentType
         };
     }
 });

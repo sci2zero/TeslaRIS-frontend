@@ -463,9 +463,13 @@ export default {
     applicableTypeLabel: "Applicable on",
     createNewLanguageTagLabel: "Create new language tag",
     displayLabel: "Display label",
-    otherIndicatorsLabel: "Other indicators",
+    otherIndicatorsLabel: "Indicators",
     statisticsIndicatorsLabel: "Statistics indicators",
     createNewEntityIndicatorLabel: "Enter indicator",
     trueLabel: "Yes",
-    falseLabel: "No"
+    falseLabel: "No",
+    contentTypeLabel: "Content type",
+    numericLabel: "Numeric value",
+    textLabel: "Text",
+    boolLabel: "Yes/No value"
 }

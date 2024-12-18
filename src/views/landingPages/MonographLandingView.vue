@@ -189,29 +189,16 @@
                 </v-row>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <generic-crud-modal
-                    class="mt-5 ml-5"
-                    :form-component="DocumentIndicatorForm"
-                    :form-props="{ applicableTypes: [ApplicableEntityType.MONOGRAPH], entityId: monograph?.id }"
-                    entity-name="EntityIndicator"
-                    :read-only="!(canEdit && userRole === 'RESEARCHER')"
+                <indicators-section 
+                    :indicators="documentIndicators" 
+                    :applicable-types="[ApplicableEntityType.MONOGRAPH]" 
+                    :entity-id="monograph?.id" 
+                    :entity-type="ApplicableEntityType.DOCUMENT" 
+                    :can-edit="canEdit"
+                    show-statistics
                     @create="createIndicator"
+                    @updated="fetchIndicators"
                 />
-                <v-row>
-                    <v-col>
-                        <div class="statistics">
-                            <h2>{{ $t("statisticsIndicatorsLabel") }}</h2>
-                            <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                            <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                        </div>
-                    </v-col>
-                    <v-col>
-                        <div class="statistics">
-                            <h2>{{ $t("otherIndicatorsLabel") }}</h2>
-                            <indicators-view :entity-indicators="documentIndicators" :exclude-prefixes="['view']" :can-edit="canEdit && userRole === 'RESEARCHER'" :entity-id="monograph?.id"></indicators-view>
-                        </div>
-                    </v-col>
-                </v-row>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -271,15 +258,14 @@ import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
-import DocumentIndicatorForm from '@/components/assessment/indicators/DocumentIndicatorForm.vue';
-import IndicatorsView from '@/components/assessment/indicators/IndicatorsView.vue';
+import EntityIndicatorForm from '@/components/assessment/indicators/EntityIndicatorForm.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -499,8 +485,8 @@ export default defineComponent({
             handleResearcherUnbind, userRole,
             documentIndicators, StatisticsType,
             currentTab, updateResearchAreas,
-            ApplicableEntityType, DocumentIndicatorForm,
-            createIndicator
+            ApplicableEntityType, EntityIndicatorForm,
+            createIndicator, fetchIndicators
         };
 }})
 

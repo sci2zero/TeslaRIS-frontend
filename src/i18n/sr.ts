@@ -462,9 +462,13 @@ export default {
     applicableTypeLabel: "Primenljivo na",
     createNewLanguageTagLabel: "Kreiraj novu jezičku oznaku",
     displayLabel: "Labela za prikaz",
-    otherIndicatorsLabel: "Ostali indikatori",
+    otherIndicatorsLabel: "Indikatori",
     statisticsIndicatorsLabel: "Statistički indikatori",
     createNewEntityIndicatorLabel: "Unesi indikator",
     trueLabel: "Da",
-    falseLabel: "Ne"
+    falseLabel: "Ne",
+    contentTypeLabel: "Tip sadržaja",
+    numericLabel: "Numerička vrednost",
+    textLabel: "Tekst",
+    boolLabel: "Da/Ne vrednost"
 }
