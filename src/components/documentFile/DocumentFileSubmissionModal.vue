@@ -78,7 +78,7 @@ export default defineComponent({
         const submissionFormRef = ref<typeof DocumentFileSubmissionForm>();
 
         const emitCreateToParent = (documentFile: DocumentFile) => {
-            emit("create", documentFile)
+            emit("create", documentFile);
             dialog.value = false;
         };
 

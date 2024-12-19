@@ -58,12 +58,12 @@ export default defineComponent({
                         next();
                     } else {
                         next({ name: "login", params: { locale: newLocale } });
-                        routeStore.setRoute(to.name);
+                        routeStore.setRouteAndParams(to.name, to.params);
                     }
                 } else {
                     next({ name: "login", params: { locale: newLocale } });
                     if (from.name !== to.name) {
-                        routeStore.setRoute(to.name);
+                        routeStore.setRouteAndParams(to.name, to.params);
                     }
                 }
             } else {
@@ -118,7 +118,7 @@ export default defineComponent({
                                 } 
                                 AuthenticationService.logoutUser();
                                 loginStore.userLoggedOut();
-                                routeStore.setRoute(route.name?.toString() as string);
+                                routeStore.setRouteAndParams(route.name?.toString() as string, route.params);
                                 router.push({ name: "login" });
                                 return Promise.reject(refreshError);
                             }

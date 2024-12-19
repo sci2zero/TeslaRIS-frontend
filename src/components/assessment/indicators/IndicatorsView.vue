@@ -126,7 +126,13 @@ export default defineComponent({
             }
 
             titles.value.push(`${returnCurrentLocaleContent(entityIndicator.indicatorResponse.title)}: ${displayValue}`)
-            contents.value.push(`${returnCurrentLocaleContent(entityIndicator.indicatorResponse.title)}: ${displayValue} (${localiseDate(entityIndicator.fromDate)} - ${localiseDate(entityIndicator.toDate)}) - ${returnCurrentLocaleContent(entityIndicator.indicatorResponse.description)}`);
+
+            let date = "";
+            if (entityIndicator.fromDate || entityIndicator.toDate) {
+                date = `(${entityIndicator.fromDate ? localiseDate(entityIndicator.fromDate) : "*"} - ${entityIndicator.toDate ? localiseDate(entityIndicator.toDate) : i18n.t("currentLabel")}) `;
+            }
+            
+            contents.value.push(`${returnCurrentLocaleContent(entityIndicator.indicatorResponse.title)}: ${displayValue} ${date}- ${returnCurrentLocaleContent(entityIndicator.indicatorResponse.description)}`);
         };
 
         const updateIndicator = async (entityIndicator: any, entityIndicatorId: number) => {

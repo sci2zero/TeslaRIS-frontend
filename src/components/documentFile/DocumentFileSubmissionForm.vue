@@ -99,7 +99,7 @@ export default defineComponent({
             });
             
             if(props.edit && props.presetDocumentFile) {
-                    file.value.push(new File([], props.presetDocumentFile.fileName));
+                    file.value = new File([], props.presetDocumentFile.fileName);
                     selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.license };
 
                     if (props.presetDocumentFile.license.toString() !== "OPEN_ACCESS") {
@@ -110,7 +110,7 @@ export default defineComponent({
             } 
         });
 
-        const file = ref<File[]>([]);
+        const file = ref<File>();
 
         const description = ref([]);
         const descriptionRef = ref<typeof MultilingualTextInput>();
@@ -134,9 +134,8 @@ export default defineComponent({
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const addDocumentFile = () => {
-
             const newDocumentFile: DocumentFile = {
-                file: file.value![0],
+                file: file.value as File,
                 description: description.value,
                 resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
                 license: selectedLicense.value.value

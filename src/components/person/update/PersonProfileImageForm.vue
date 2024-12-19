@@ -68,7 +68,7 @@ export default defineComponent({
             });
             
             if(props.originalFileName) {
-                file.value.push(new File([], props.originalFileName));
+                file.value = (new File([], props.originalFileName));
             }
 
             if (props.personId) {
@@ -76,16 +76,16 @@ export default defineComponent({
             }
         });
 
-        const file = ref<File[]>([]);
+        const file = ref<File>();
         const imageSrc = ref<string | undefined>(undefined);
 
         const submit = async () => {
             if (!cropper || !file.value) return
 
             const newProfileImage: PersonProfileImageRequest = {
-                file: await urlToFile(imageSrc.value as string, file.value[0].name),
+                file: await urlToFile(imageSrc.value as string, file.value.name),
                 top: Math.round(cropper.getCropBoxData().top),
-                left: Math.round(cropper.getCropBoxData().left) - 40,
+                left: Math.round(cropper.getCropBoxData().left) - 60,
                 height: Math.round(cropper.getCropBoxData().height),
                 width: Math.round(cropper.getCropBoxData().width)
             };
@@ -106,7 +106,7 @@ export default defineComponent({
 
             cropper.clear();
 
-            if (file.value[0]) {
+            if (file.value) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const img = new Image();
@@ -124,7 +124,7 @@ export default defineComponent({
 
                     img.src = e.target?.result as string;
                 };
-                reader.readAsDataURL(file.value[0]);
+                reader.readAsDataURL(file.value);
             }
         };
 
