@@ -227,7 +227,7 @@ export default defineComponent({
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const contributions = ref([]);
-        const uris = ref(props.presetMonograph?.uris);
+        const uris = ref<string[]>(props.presetMonograph?.uris as string[]);
         const eIsbn = ref(props.presetMonograph?.eisbn);
         const printIsbn = ref(props.presetMonograph?.printISBN);
         const numberOfPages = ref(props.presetMonograph?.numberOfPages);
@@ -253,7 +253,7 @@ export default defineComponent({
             validatePublicationSeriesSelection();
         });
 
-        const updateMonograph = () => {
+        const submit = () => {
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
                 publicationSeriesId = undefined;
@@ -315,7 +315,7 @@ export default defineComponent({
         return {
             isFormValid, title, subtitle,
             publicationYear, doi, scopus,
-            requiredFieldRules, updateMonograph, 
+            requiredFieldRules, submit, 
             toMultilingualTextInput, languageTags,
             number, volume, selectedJournal,
             selectedBookSeries, monographTypes,

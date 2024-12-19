@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <journal-publication-update-modal :preset-journal-publication="journalPublication" :read-only="!canEdit" @update="updateBasicInfo"></journal-publication-update-modal>
+                        <generic-crud-modal
+                            :form-component="JournalPublicationUpdateForm"
+                            :form-props="{ presetJournalPublication: journalPublication}"
+                            entity-name="JournalPublication"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -86,10 +94,6 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="journalPublication?.scopusId">
@@ -102,7 +106,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="journalPublication?.doi" class="response">
-                                    <doi-link :doi="journalPublication.doi"></doi-link>
+                                    <identifier-link :identifier="journalPublication.doi"></identifier-link>
                                 </div>
                                 <div v-if="journalPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
@@ -129,30 +133,44 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="journalPublication?.keywords ? journalPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (journalPublication?.contributions && journalPublication?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="journalPublication?.keywords ? journalPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <person-document-contribution-tabs :document-id="journalPublication?.id" :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <!-- Description -->
+                <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="journalPublication?.proofs ? journalPublication.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, journalPublication)"
-                    @delete="deleteAttachment($event, true, journalPublication)" @update="updateAttachment($event, true, journalPublication)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="journalPublication?.fileItems ? journalPublication.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, journalPublication)" @delete="deleteAttachment($event, false, journalPublication)"
-                    @update="updateAttachment($event, false, journalPublication)"></attachment-list>
-            </v-col>
-        </v-row>
+                <attachment-section :document="journalPublication" :can-edit="canEdit" :proofs="journalPublication?.proofs" :file-items="journalPublication?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="journalPublication?.id" :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(journalPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -172,7 +190,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -182,7 +200,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -190,14 +207,18 @@ import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import JournalPublicationUpdateModal from '@/components/publication/update/JournalPublicationUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
@@ -206,14 +227,17 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, JournalPublicationUpdateModal, UriList, DoiLink, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
         const router = useRouter();
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const journalPublication = ref<JournalPublication>();
@@ -231,8 +255,14 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchJournalPublication();
@@ -240,7 +270,7 @@ export default defineComponent({
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -335,12 +365,18 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             journalPublication, icon,
-            publications, event,
-            totalPublications,
-            returnCurrentLocaleContent, StatisticsType,
-            languageTagMap, journal, documentIndicators,
+            publications, event, totalPublications, userRole,
+            returnCurrentLocaleContent, handleResearcherUnbind,
+            languageTagMap, journal, JournalPublicationUpdateForm,
+            StatisticsType, documentIndicators, currentTab,
             searchKeyword, goToURL, canEdit, localiseDate,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

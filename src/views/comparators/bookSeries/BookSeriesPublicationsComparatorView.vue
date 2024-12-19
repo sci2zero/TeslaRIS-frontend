@@ -32,6 +32,12 @@
             </v-col>
         </v-row>
 
+        <v-row class="d-flex flex-row justify-center mt-10">
+            <v-btn @click="navigateToMetadataComparison">
+                {{ $t("compareMetadataLabel") }}
+            </v-btn>
+        </v-row>
+
         <v-row v-if="loading" class="d-flex flex-row justify-center submission-action">
             <v-progress-circular
                 :size="70"
@@ -61,7 +67,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -98,6 +104,7 @@ export default defineComponent({
         const rightDirection = ref("");
 
         const i18n = useI18n();
+        const router = useRouter();
 
         onMounted(() => {
             document.title = i18n.t("bookSeriesPublicationsComparatorLabel");
@@ -173,6 +180,12 @@ export default defineComponent({
             });
         };
 
+        const navigateToMetadataComparison = () => {
+            router.push({name: "bookSeriesMetadataComparator", params: {
+                leftId: parseInt(currentRoute.params.leftId as string), rightId: parseInt(currentRoute.params.rightId as string)
+            }});
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
@@ -180,7 +193,7 @@ export default defineComponent({
             leftPublications, leftTotalPublications,
             rightPublications, rightTotalPublications,
             leftBookSeries, rightBookSeries, handleDrag,
-            moveAll, loading
+            moveAll, loading, navigateToMetadataComparison
         };
 }})
 

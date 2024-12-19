@@ -96,7 +96,6 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import ProceedingsService from '@/services/ProceedingsService';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
@@ -142,10 +141,12 @@ export default defineComponent({
         const fetchProceedingss = () => {
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftProceedingsPublication.value = response.data;
+                leftProceedingsPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightProceedingsPublication.value = response.data;
+                rightProceedingsPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -195,12 +196,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateProceedingsPublication();
-            updateRightRef.value?.updateProceedingsPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightProceedingsPublication.value, leftProceedingsPublication.value] = mergeProceedingsMetadata(rightProceedingsPublication.value as ProceedingsPublication, leftProceedingsPublication.value as ProceedingsPublication);
@@ -268,12 +269,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateProceedingsPublication();
-            updateRightRef.value?.updateProceedingsPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {
@@ -320,7 +321,7 @@ export default defineComponent({
         };
 
         const deleteSide = (side: ComparisonSide) => {
-            ProceedingsService.deleteProceedings(side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.id as number : rightProceedingsPublication.value?.id as number).then(() => {
+            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.id as number : rightProceedingsPublication.value?.id as number).then(() => {
                 router.push({ name: "deduplication", query: { tab: "documents" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.title : rightProceedingsPublication.value?.title;

@@ -20,6 +20,6 @@ export interface PublisherIndex {
 export interface Publisher {
     id?: number;
     name: MultilingualContent[];
-    state: MultilingualContent[];
     place: MultilingualContent[];
+    countryId?: number
 }

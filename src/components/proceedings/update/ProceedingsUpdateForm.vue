@@ -221,7 +221,7 @@ export default defineComponent({
             validatePublicationSeriesSelection();
         });
         
-        const updateProceedings = () => {
+        const submit = () => {
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
                 publicationSeriesId = undefined;
@@ -285,7 +285,7 @@ export default defineComponent({
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
             selectedPublisher, selectedBookSeries, doiValidationRules,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, updateProceedings,
+            publicationSeriesExternalValidation, submit,
             scopusIdValidationRules, refreshForm, titleRef, subtitleRef
         };
     }

@@ -1,18 +1,18 @@
 <template>
-    <v-row class="mt-10">
-        <h2>{{ $t("proofsLabel") }}</h2>
+    <v-row v-if="canEdit || (fileItems && fileItems.length > 0)">
         <v-col cols="12">
-            <attachment-list
-                :attachments="proofs ? proofs : []" :can-edit="canEdit" is-proof :in-comparator="inComparator"
-                @create="addAttachment($event, true, document)" @delete="deleteAttachment($event, true, document)" @update="updateAttachment($event, true, document)"></attachment-list>
-        </v-col>
-    </v-row>
-    <v-row>
-        <h2>{{ $t("fileItemsLabel") }}</h2>
-        <v-col cols="12">
+            <h2>{{ $t("fileItemsLabel") }}</h2>
             <attachment-list
                 :attachments="fileItems ? fileItems : []" :can-edit="canEdit" :in-comparator="inComparator" @create="addAttachment($event, false, document)"
                 @delete="deleteAttachment($event, false, document)" @update="updateAttachment($event, false, document)"></attachment-list>
+        </v-col>
+    </v-row>
+    <v-row v-if="canEdit || (proofs && proofs.length > 0)" class="mt-10">
+        <v-col cols="12">
+            <h2>{{ $t("proofsLabel") }}</h2>
+            <attachment-list
+                :attachments="proofs ? proofs : []" :can-edit="canEdit" is-proof :in-comparator="inComparator"
+                @create="addAttachment($event, true, document)" @delete="deleteAttachment($event, true, document)" @update="updateAttachment($event, true, document)"></attachment-list>
         </v-col>
     </v-row>
 </template>

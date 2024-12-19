@@ -50,7 +50,7 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"
+                    ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"
                     :initial-value="toMultilingualTextInput(presetMetadata?.description, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
@@ -128,8 +128,8 @@ export default defineComponent({
                 endPage: endPage.value as string,
                 numberOfPages: numberOfPages.value as number,
                 articleNumber: articleNumber.value as string,
-                description: props.presetMetadata?.description as MultilingualContent[],
-                keywords: props.presetMetadata?.keywords as MultilingualContent[],
+                description: description.value,
+                keywords: keywords.value,
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: [],

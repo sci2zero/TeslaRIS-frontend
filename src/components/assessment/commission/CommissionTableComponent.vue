@@ -4,10 +4,11 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <generic-assessment-modal
+    <generic-crud-modal
         :form-component="CommissionForm"
         :form-props="{ presetCommission: undefined }"
         entity-name="Commission"
+        :read-only="false"
         @create="createNewCommission"
     />
 
@@ -78,13 +79,13 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import GenericAssessmentModal from '../GenericAssessmentModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from './CommissionForm.vue';
 
 
 export default defineComponent({
     name: "CommissionTableComponent",
-    components: { LocalizedLink, GenericAssessmentModal },
+    components: { LocalizedLink, GenericCrudModal },
     props: {
         commissions: {
             type: Array<CommissionResponse>,
@@ -114,10 +115,10 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "description", order: "asc"}]});
 
         const headers = [
-          { title: descriptionLabel, align: "start", sortable: true, key: "description"},
+          { title: descriptionLabel, align: "start", sortable: true, key: "description.content"},
           { title: dateFromLabel, align: "start", sortable: true, key: "assessmentDateFrom"},
           { title: dateToLabel, align: "start", sortable: true, key: "assessmentDateTo"},
-          { title: formalDescriptionOfRuleLabel, align: "start", sortable: true, key: "formalDescriptionOfRuleLabel"},
+          { title: formalDescriptionOfRuleLabel, align: "start", sortable: true, key: "formalDescriptionOfRule"},
           { title: superCommissionLabel, align: "start", sortable: false}
         ];
 

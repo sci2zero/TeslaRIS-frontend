@@ -6,9 +6,13 @@
         @change="onDropCallback"
     >
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
-            <localized-link :to="'persons/' + contribution.personId">
+            <localized-link v-if="contribution.personId" :to="'persons/' + contribution.personId">
                 <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
             </localized-link>
+            <h4 v-else>
+                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong>
+            </h4>
+            
             <p>{{ contribution.dateFrom ? `${localiseDate(contribution.dateFrom)} - ${contribution.dateTo ? localiseDate(contribution.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}</p>
             <p>{{ getTitleFromValueAutoLocale(contribution.contributionType) }}</p>
             <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>

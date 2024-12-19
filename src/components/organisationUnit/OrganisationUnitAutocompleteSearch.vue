@@ -6,7 +6,6 @@
                 :label="$t('organisationUnitLabel') + (required ? '*' : '')"
                 :items="organisationUnits"
                 :custom-filter="((): boolean => true)"
-                :auto-select-first="true"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
                 return-object

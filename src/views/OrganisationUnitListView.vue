@@ -3,14 +3,14 @@
         <h1>{{ $t("ouListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
             {{ $t("addOULabel") }}
         </v-btn>
         <br />
         <br />
-        <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+        <organisation-unit-table-component ref="tableRef" :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
     </v-container>
 </template>
 
@@ -40,10 +40,16 @@ export default defineComponent({
         const i18n = useI18n();
         const router = useRouter();
         const userRole = UserService.provideUserRole();
+        const tableRef = ref<typeof OrganisationUnitTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("ouListLabel");
         });
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortOption([]);
+            search(tokenParams); 
+        };
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -65,7 +71,11 @@ export default defineComponent({
             router.push({name: "submitOrganisationUnit"});
         }
 
-        return {search, organisationUnits, totalOUs, switchPage, addOU, userRole};
+        return {
+            search, organisationUnits, totalOUs,
+            switchPage, addOU, userRole,
+            clearSortAndPerformSearch, tableRef
+        };
     }
 });
 </script>

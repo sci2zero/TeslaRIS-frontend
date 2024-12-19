@@ -3,14 +3,14 @@
         <h1>{{ $t("publisherListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn color="primary" @click="addPublisher">
             {{ $t("addPublisherLabel") }}
         </v-btn>
         <br />
         <br />
-        <publisher-table-component :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
+        <publisher-table-component ref="tableRef" :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
     </v-container>
 </template>
 
@@ -39,10 +39,16 @@ export default defineComponent({
 
         const i18n = useI18n();
         const router = useRouter();
+        const tableRef = ref<typeof PublisherTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("publisherListLabel");
         });
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortOption([]);
+            search(tokenParams); 
+        };
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -58,13 +64,17 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
         const addPublisher = () => {
             router.push({name: "submitPublisher"});
-        }
+        };
 
-        return {search, publishers, totalPublishers, switchPage, addPublisher};
+        return {
+            search, publishers, totalPublishers, 
+            switchPage, addPublisher, tableRef,
+            clearSortAndPerformSearch
+        };
     }
 });
 </script>

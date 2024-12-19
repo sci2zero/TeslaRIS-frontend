@@ -26,7 +26,16 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <monograph-publication-update-modal :preset-monograph-publication="monographPublication" :read-only="!canEdit" @update="updateBasicInfo"></monograph-publication-update-modal>
+                        <generic-crud-modal
+                            :form-component="MonographPublicationUpdateForm"
+                            :form-props="{ presetMonographPublication: monographPublication}"
+                            entity-name="MonographPublication"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
+
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -74,10 +83,6 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="monographPublication?.scopusId">
@@ -90,7 +95,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="monographPublication?.doi" class="response">
-                                    <doi-link :doi="monographPublication.doi"></doi-link>
+                                    <identifier-link :identifier="monographPublication.doi"></identifier-link>
                                 </div>
                                 <div v-if="monographPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
@@ -117,30 +122,44 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="monographPublication?.keywords ? monographPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (monographPublication?.contributions && monographPublication?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="monographPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="monographPublication?.keywords ? monographPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <person-document-contribution-tabs :document-id="monographPublication?.id" :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <!-- Description -->
+                <description-section :description="monographPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="monographPublication?.proofs ? monographPublication.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, monographPublication)"
-                    @delete="deleteAttachment($event, true, monographPublication)" @update="updateAttachment($event, true, monographPublication)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="monographPublication?.fileItems ? monographPublication.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, monographPublication)" @delete="deleteAttachment($event, false, monographPublication)"
-                    @update="updateAttachment($event, false, monographPublication)"></attachment-list>
-            </v-col>
-        </v-row>
+                <attachment-section :document="monographPublication" :can-edit="canEdit" :proofs="monographPublication?.proofs" :file-items="monographPublication?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="monographPublication?.id" :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monographPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -160,7 +179,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -170,7 +189,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MonographPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -178,30 +196,37 @@ import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import MonographPublicationUpdateModal from '@/components/publication/update/MonographPublicationUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
 import type { Monograph } from '@/models/PublicationModel';
 import MonographService from '@/services/DocumentPublicationService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
-import { getErrorMessageForErrorKey } from '@/i18n';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, MonographPublicationUpdateModal, UriList, DoiLink, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
         const router = useRouter();
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const monographPublication = ref<MonographPublication>();
@@ -219,8 +244,14 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchMonographPublication();
@@ -228,7 +259,7 @@ export default defineComponent({
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -321,17 +352,21 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
-            monographPublication, icon,
-            publications, event,
-            totalPublications,
-            returnCurrentLocaleContent,
-            languageTagMap, monograph, StatisticsType,
-            searchKeyword, goToURL, canEdit, localiseDate,
-            addAttachment, deleteAttachment, updateAttachment,
+            monographPublication, publications, event, totalPublications,
+            returnCurrentLocaleContent, handleResearcherUnbind,
+            languageTagMap, monograph, MonographPublicationUpdateForm,
+            searchKeyword, goToURL, canEdit, localiseDate, userRole,
+            addAttachment, deleteAttachment, updateAttachment, icon,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
-            documentIndicators
+            documentIndicators, StatisticsType, currentTab
         };
 }})
 

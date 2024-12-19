@@ -25,6 +25,7 @@
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -47,7 +48,7 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.eISSN) }}
+                    {{ displayTextOrPlaceholder(row.item.eissn) }}
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(row.item.printISSN) }}
@@ -183,10 +184,18 @@ export default defineComponent({
             }});
         };
 
-        return {selectedJournals, headers, notifications,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        return {
+            selectedJournals, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startPublicationComparison, startMetadataComparison};
+            startPublicationComparison, startMetadataComparison,
+            setSortOption
+        };
     }
 });
 </script>

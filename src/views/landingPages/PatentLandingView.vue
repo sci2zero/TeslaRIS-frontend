@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <patent-update-modal :preset-patent="patent" :read-only="!canEdit" @update="updateBasicInfo"></patent-update-modal>
+                        <generic-crud-modal
+                            :form-component="PatentUpdateForm"
+                            :form-props="{ presetPatent: patent }"
+                            entity-name="Patent"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -54,10 +62,6 @@
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="patent?.scopusId">
@@ -70,7 +74,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="patent?.doi" class="response">
-                                    <doi-link :doi="patent.doi"></doi-link>
+                                    <identifier-link :identifier="patent.doi"></identifier-link>
                                 </div>
                                 <div v-if="patent?.uris && patent?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -85,17 +89,44 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (patent?.contributions && patent?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <!-- Description -->
+                <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <attachment-section
-            :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"
-            in-comparator></attachment-section>
+                <attachment-section :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="patent?.id" :contribution-list="patent?.contributions ? patent?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(patent?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -115,7 +146,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -131,11 +162,14 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import PatentUpdateModal from '@/components/publication/update/PatentUpdateModal.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
@@ -144,8 +178,10 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, PatentUpdateModal, UriList, DoiLink, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -156,6 +192,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const i18n = useI18n();
@@ -165,8 +202,14 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchPatent();
@@ -174,7 +217,7 @@ export default defineComponent({
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -258,12 +301,19 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
-            patent, icon, publisher,
-            returnCurrentLocaleContent, StatisticsType,
-            languageTagMap, searchKeyword, goToURL, canEdit,
+            patent, icon, publisher, currentTab,
+            returnCurrentLocaleContent, PatentUpdateForm,
+            languageTagMap, searchKeyword, goToURL, canEdit, userRole,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo, documentIndicators
+            updateContributions, updateBasicInfo, handleResearcherUnbind,
+            StatisticsType, documentIndicators
         };
 }})
 

@@ -3,14 +3,14 @@
         <h1>{{ $t("bookSeriesListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn color="primary" @click="addBookSeries">
             {{ $t("addBookSeriesLabel") }}
         </v-btn>
         <br />
         <br />
-        <book-series-table-component :book-series="bookSeries" :total-book-series="totalBookSeries" @switch-page="switchPage"></book-series-table-component>
+        <book-series-table-component ref="tableRef" :book-series="bookSeries" :total-book-series="totalBookSeries" @switch-page="switchPage"></book-series-table-component>
     </v-container>
 </template>
 
@@ -39,10 +39,16 @@ export default defineComponent({
 
         const i18n = useI18n();
         const router = useRouter();
+        const tableRef = ref<typeof BookSeriesTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("bookSeriesListLabel");
         });
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortOption([]);
+            search(tokenParams); 
+        };
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -58,13 +64,17 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
         const addBookSeries = () => {
             router.push({name: "submitBookSeries"});
-        }
+        };
 
-        return {search, bookSeries, totalBookSeries, switchPage, addBookSeries};
+        return {
+            search, bookSeries, totalBookSeries,
+            switchPage, addBookSeries, tableRef,
+            clearSortAndPerformSearch
+        };
     }
 });
 </script>

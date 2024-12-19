@@ -1,19 +1,21 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
+    <add-employment-modal v-if="employmentInstitutionId > 0 && userRole === 'ADMIN'" :institution-id="employmentInstitutionId" @update="notifyUserAndRefreshTable"></add-employment-modal>
+    
     <div ref="tableWrapper">
         <v-data-table-server
             v-model="selectedPersons"
@@ -33,9 +35,15 @@
                     tag="tbody"
                     :disabled="!inComparator"
                     group="persons"
+                    handle=".handle"
                     @change="onDropCallback"
                 >
-                    <tr v-for="item in props.items" :key="item.id">
+                    <tr v-if="props.items?.length === 0">
+                        <td colspan="10" class="text-center">
+                            <p>{{ $t("noDataInTableMessage") }}</p>
+                        </td>
+                    </tr>
+                    <tr v-for="item in props.items" :key="item.id" class="handle">
                         <td v-if="userRole === 'ADMIN'">
                             <v-checkbox
                                 v-model="selectedPersons"
@@ -50,13 +58,28 @@
                             </localized-link>
                         </td>
                         <td v-if="$i18n.locale == 'sr'">
-                            {{ displayTextOrPlaceholder(item.employmentsSr) }}
+                            <span v-if="item.employmentsSr.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
+                                {{ displayTextOrPlaceholder(item.employmentsSr) }}
+                            </span>
+                            <localized-link v-for="(employment, index) in item.employmentsSr.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
+                                {{ `${employment}; ` }}
+                            </localized-link>
                         </td>
                         <td v-else>
-                            {{ displayTextOrPlaceholder(item.employmentsOther) }}
+                            <span v-if="item.employmentsOther.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
+                                {{ displayTextOrPlaceholder(item.employmentsOther) }}
+                            </span>
+                            <localized-link v-for="(employment, index) in item.employmentsOther.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
+                                {{ `${employment}; ` }}
+                            </localized-link>
                         </td>
                         <td>{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</td>
-                        <td>{{ displayTextOrPlaceholder(item.orcid) }}</td>
+                        <td v-if="item.orcid">
+                            <identifier-link :identifier="item.orcid" type="orcid"></identifier-link>
+                        </td>
+                        <td v-else>
+                            {{ displayTextOrPlaceholder(item.orcid) }}
+                        </td>
                     </tr>
                 </draggable>
             </template>
@@ -89,11 +112,14 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 import { useRouter } from 'vue-router';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
+import IdentifierLink from '../core/IdentifierLink.vue';
+import InvolvementService from '@/services/InvolvementService';
+import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext },
+    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -106,10 +132,18 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        employmentInstitutionId: {
+            type: Number,
+            default: -1
+        },
+        isAlumniTable: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["switchPage", "dragged"],
-    setup(_, {emit}) {
+    emits: ["switchPage", "dragged", "delete"],
+    setup(props, {emit}) {
         const selectedPersons = ref<PersonIndex[]>([]);
 
         const i18n = useI18n();
@@ -172,17 +206,31 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPersons.value.map((person: PersonIndex) => {
-                return PersonService.deleteResearcher(person.databaseId)
-                    .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: person.name }));
-                    })
-                    .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: person.name }));
-                        return person;
-                    });
+                if (props.employmentInstitutionId > 0) {
+                    return InvolvementService.terminateEmployment(person.databaseId, props.employmentInstitutionId)
+                        .then(() => {
+                            addNotification(i18n.t("terminationSuccessNotification", { name: person.name }));
+                        })
+                        .catch(() => {
+                            addNotification(i18n.t("terminationFailedNotification", { name: person.name }));
+                            return person;
+                        });
+                } else {
+                    return PersonService.deleteResearcher(person.databaseId)
+                        .then(() => {
+                            addNotification(i18n.t("deleteSuccessNotification", { name: person.name }));
+                        })
+                        .catch(() => {
+                            addNotification(i18n.t("deleteFailedNotification", { name: person.name }));
+                            return person;
+                        });
+                }
             })).then((failedDeletions) => {
                 selectedPersons.value = selectedPersons.value.filter((person) => failedDeletions.includes(person));
                 refreshTable(tableOptions.value);
+                if (props.employmentInstitutionId > 0) {
+                    emit("delete");
+                }
             });
         };
 
@@ -213,12 +261,27 @@ export default defineComponent({
             emit("dragged", event);
         };
 
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        const notifyUserAndRefreshTable = (success: boolean) => {
+            if (success) {
+                addNotification(i18n.t("savedMessage"));
+            } else {
+                addNotification(i18n.t("genericErrorMessage"));
+            }
+
+            refreshTable(tableOptions.value);
+        };
+
         return {selectedPersons, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             localiseDate, startPublicationComparison,
             startMetadataComparison, onDropCallback,
-            tableWrapper };
+            tableWrapper, setSortOption, notifyUserAndRefreshTable };
     }
 });
 </script>

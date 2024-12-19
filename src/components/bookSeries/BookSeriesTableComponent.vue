@@ -25,6 +25,7 @@
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -185,11 +186,16 @@ export default defineComponent({
             }});
         };
 
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
         return {selectedBookSeries, headers, notifications, 
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startPublicationComparison,
-            startMetadataComparison
+            startMetadataComparison, setSortOption
         };
     }
 });

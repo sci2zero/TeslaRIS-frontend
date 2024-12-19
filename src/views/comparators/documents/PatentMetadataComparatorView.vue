@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchPatents = () => {
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftPatent.value = response.data;
+                leftPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightPatent.value = response.data;
+                rightPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -188,12 +190,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updatePatent();
-            updateRightRef.value?.updatePatent();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightPatent.value, leftPatent.value] = mergePatentMetadata(rightPatent.value as Patent, leftPatent.value as Patent);
@@ -253,12 +255,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updatePatent();
-            updateRightRef.value?.updatePatent();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

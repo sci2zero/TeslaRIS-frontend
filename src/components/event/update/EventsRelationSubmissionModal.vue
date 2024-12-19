@@ -28,7 +28,7 @@
                                     </v-select>
                                 </v-col>
                                 <v-col cols="7">
-                                    <event-autocomplete-search v-model="selectedEvent" required :return-only-non-serial-events="false"></event-autocomplete-search>
+                                    <event-autocomplete-search v-model="selectedEvent" required :return-only-non-serial-events="false" :return-only-serial-events="relationType.value === EventsRelationType.BELONGS_TO_SERIES"></event-autocomplete-search>
                                 </v-col>
                             </v-row>
                         </v-form>
@@ -74,7 +74,7 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import { getEventsRelationTypeForGivenLocale } from "@/i18n/eventsRelationType";
 import EventAutocompleteSearch from "../EventAutocompleteSearch.vue";
-import type { Conference, EventsRelation, EventsRelationType } from "@/models/EventModel";
+import { type Conference, type EventsRelation, EventsRelationType } from "@/models/EventModel";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import EventService from "@/services/EventService";
 import { getErrorMessageForErrorKey } from "@/i18n";
@@ -132,7 +132,7 @@ export default defineComponent({
         return {dialog, emitToParent, isFormValid, 
             selectedEvent, relationTypes, relationType,
             requiredSelectionRules, createRelation,
-            message, snackbar};
+            message, snackbar, EventsRelationType};
     }
 });
 </script>

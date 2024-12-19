@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchJournals = () => {
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftJournalPublication.value = response.data;
+                leftJournalPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightJournalPublication.value = response.data;
+                rightJournalPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -199,12 +201,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateJournalPublication();
-            updateRightRef.value?.updateJournalPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightJournalPublication.value, leftJournalPublication.value] = mergeJournalMetadata(rightJournalPublication.value as JournalPublication, leftJournalPublication.value as JournalPublication);
@@ -276,12 +278,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateJournalPublication();
-            updateRightRef.value?.updateJournalPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

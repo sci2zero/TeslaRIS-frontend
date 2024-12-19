@@ -18,6 +18,7 @@ import { onMounted } from 'vue';
 import CommissionTableComponent from '@/components/assessment/commission/CommissionTableComponent.vue';
 import type { Page } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
+import { watch } from 'vue';
 
 
 export default defineComponent({
@@ -35,6 +36,10 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("commissionPageLabel");
+        });
+
+        watch(i18n.locale, () => {
+            search();
         });
 
         const search = () => {

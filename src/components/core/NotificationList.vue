@@ -8,6 +8,7 @@
                 :key="i"
                 :value="notification.id"
                 color="secondary"
+                @click="navigateToNotificationPage"
             >
                 <v-row>
                     <v-col cols="10">
@@ -15,7 +16,7 @@
                     </v-col>
                     <v-col cols="1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
-                            <v-btn icon @click="performAction(notification.id, notificationAction)">
+                            <v-btn icon @click.stop="performAction(notification.id, notificationAction)">
                                 <v-icon v-if="notificationAction.toString() === 'APPROVE'">
                                     mdi-check
                                 </v-icon>
@@ -25,12 +26,15 @@
                                 <v-icon v-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
                                     mdi-content-duplicate
                                 </v-icon>
+                                <v-icon v-if="notificationAction.toString() === 'BROWSE_CLAIMABLE_DOCUMENTS'">
+                                    mdi-eye-outline
+                                </v-icon>
                             </v-btn>
                         </v-list-item-action>
                     </v-col>
                     <v-col cols="1">
                         <v-list-item-action>
-                            <v-btn icon @click="rejectNotification(notification.id)">
+                            <v-btn icon @click.stop="rejectNotification(notification.id)">
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
                         </v-list-item-action>
@@ -48,15 +52,15 @@
 import { NotificationAction } from '@/models/Common';
 import type { Notification } from '@/models/Common';
 import NotificationService from '@/services/NotificationService';
+import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { defineComponent, onMounted, ref } from 'vue';  
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "NotificationList",
-    emits: ["lowerCount", "performedAction"],
-    setup(_, {emit}) {
+    setup() {
         const notifications = ref<Notification[]>([]);
-        const notificationCount = ref(0);
+        const notificationCountStore = useNotificationCountStore();
 
         const router = useRouter();
 
@@ -71,20 +75,28 @@ export default defineComponent({
             NotificationService.getAllNotifications().then(response => {
                 notifications.value = response.data;
             });
+            
             NotificationService.getNotificationCount().then(response => {
-                notificationCount.value = response.data;
+                notificationCountStore.setNotificationCount(response.data);
             });
         };
     
         const performAction = (notificationId: number, action: NotificationAction) => {
             NotificationService.performAction(notificationId, action).then(() => {
                 removeHandledNotification(notificationId);
-                emit("performedAction", action);
+                notificationCountStore.decrementCounter();
             });
 
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
-                router.push({name: "deduplication"});
+                decrementCounterAndNavigateToPage("deduplication");
+            } else if (action === NotificationAction.BROWSE_CLAIMABLE_DOCUMENTS) {
+                decrementCounterAndNavigateToPage("documentClaim");
             }
+        };
+
+        const decrementCounterAndNavigateToPage = (pageName: string) => {
+            notificationCountStore.decrementCounter();
+            router.push({name: pageName});
         };
 
         const rejectNotification = (notificationId: number) => {
@@ -95,14 +107,19 @@ export default defineComponent({
 
         const removeHandledNotification = (notificationId: number) => {
             notifications.value = notifications.value.filter(notification => notification.id != notificationId);
-            emit("lowerCount");
+            notificationCountStore.decrementCounter();
+        };
+
+        const navigateToNotificationPage = () => {
+            router.push({ name: "notifications" });
         };
 
         return {
             performAction,
             notifications,
             rejectNotification,
-            notificationCount
+            notificationCountStore,
+            navigateToNotificationPage
         };
 }});
 </script>

@@ -24,11 +24,12 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <generic-assessment-modal
+                        <generic-crud-modal
                             :form-component="AssessmentRulebookForm"
                             :form-props="{ presetAssessmentRulebook: assessmentRulebook, isUpdate: true }"
                             is-section-update
                             entity-name="AssessmentRulebook"
+                            :read-only="false"
                             @create="updateBasicInfo"
                         />
 
@@ -111,7 +112,7 @@ import type { DocumentFile } from '@/models/DocumentFileModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import DocumentFileService from '@/services/DocumentFileService';
 import AssessmentRulebookForm from '@/components/assessment/assessmentRulebook/AssessmentRulebookForm.vue';
-import GenericAssessmentModal from '@/components/assessment/GenericAssessmentModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentMeasureTableComponent from '@/components/assessment/assessmentMeasure/AssessmentMeasureTableComponent.vue';
 import type { AxiosResponse } from 'axios';
 import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
@@ -119,7 +120,7 @@ import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureSer
 
 export default defineComponent({
     name: "AssessmentRulebookLandingPage",
-    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericAssessmentModal, AssessmentMeasureTableComponent },
+    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericCrudModal, AssessmentMeasureTableComponent },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

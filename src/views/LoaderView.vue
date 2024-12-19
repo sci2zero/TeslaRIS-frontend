@@ -1,7 +1,7 @@
 <template>
     <v-container v-if="!noRecordsRemaining">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
-        <h3>{{ $t("yearOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
+        <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
         <deduplicator :publication-for-loading="currentLoadRecord" @deduplicate="deduplicate"></deduplicator>
 
@@ -41,8 +41,12 @@
         </v-btn>
 
         
-        <v-btn class="load-action same-line" @click="smartSkip">
+        <v-btn class="load-action same-line" :disabled="stepperValue === steps.length" @click="smartSkip">
             {{ $t('smartImportLabel') }}
+        </v-btn>
+
+        <v-btn icon variant="plain">
+            <v-icon>mdi-information-variant</v-icon>
             <v-tooltip
                 activator="parent"
                 location="bottom"
@@ -51,7 +55,7 @@
             </v-tooltip>
         </v-btn>
 
-        <v-btn class="load-action same-line" :disabled="stepperValue != steps.length" @click="finishLoad">
+        <v-btn class="load-action same-line" :disabled="stepperValue !== steps.length" @click="finishLoad">
             {{ $t('finishLoadLabel') }}
         </v-btn>
 
@@ -174,6 +178,11 @@ export default defineComponent({
         const skipDocument = () => {
             ImportService.skipWizard().then(() => {
                 stepperValue.value = 1;
+                importAuthorsRef.value.forEach(contribution => {
+                    if (contribution) {
+                        contribution.resetIdempotencyKey();
+                    }
+                });
                 importAuthorsRef.value = [];
                 importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();

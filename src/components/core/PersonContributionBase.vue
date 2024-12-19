@@ -1,12 +1,11 @@
 <template>
-    <v-row>
+    <v-row v-if="!selectExternalAssociate">
         <v-col cols="11">
             <v-autocomplete
                 v-model="selectedPerson"
                 :label="$t('personLabel') + '*'"
                 :items="persons"
                 :custom-filter="filterPersons"
-                :auto-select-first="true"
                 :rules="requiredSelectionRules"
                 :no-data-text="$t('noDataMessage')"
                 return-object
@@ -18,13 +17,16 @@
             <person-submission-modal @create="selectNewlyAddedPerson"></person-submission-modal>
         </v-col>
     </v-row>
+    <v-btn color="primary" class="text-body-2 mb-2" @click="toggleExternalSelection">
+        {{ selectExternalAssociate ? $t("selectAssociateFromSystemLabel") : $t("addExternalAssociateLabel") }}
+    </v-btn>
     <v-row v-if="personOtherNames.length > 0">
         <v-col cols="10">
             <v-select
+                v-if="!selectExternalAssociate"
                 v-model="selectedAffiliations"
                 :label="$t('personAffiliationsLabel')"
                 :items="personAffiliations"
-                :auto-select-first="true"
                 :no-data-text="$t('noAffiliationsMessage')"
                 return-object
                 multiple
@@ -32,8 +34,8 @@
             ></v-select>
         </v-col>
     </v-row>
-    <v-row v-if="personOtherNames.length > 0">
-        <v-col v-if="!customNameInput" cols="10">
+    <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
+        <v-col v-if="!customNameInput && !selectExternalAssociate" cols="10">
             <v-select
                 v-model="selectedOtherName"
                 :label="$t('personOtherNamesLabel')"
@@ -44,34 +46,34 @@
                 @update:model-value="sendContentToParent"
             ></v-select>
         </v-col>
-        <v-col v-if="customNameInput" cols="3">
+        <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field
                 v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"
                 @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
-        <v-col v-if="customNameInput" cols="3">
+        <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
-        <v-col v-if="customNameInput" cols="3">
+        <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field
                 v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"
                 @update:model-value="sendContentToParent"></v-text-field>
         </v-col>
-        <v-col cols="2" class="custom-label">
-            <v-btn color="primary" @click="customNameInput = !customNameInput">
+        <v-col v-if="!selectExternalAssociate" cols="2" class="custom-label">
+            <v-btn color="primary" class="text-body-2" @click="customNameInput = !customNameInput">
                 {{ !customNameInput ? $t("addCustomLabel") : $t("selectFromListLabel") }}
             </v-btn>
         </v-col>
     </v-row>
-    <v-row>
+    <!-- <v-row>
         <v-col>
             <multilingual-text-input
-                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('descriptionLabel')"
+                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
                 :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
                 is-area
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
-    </v-row>
+    </v-row> -->
     <v-row>
         <v-col>
             <multilingual-text-input
@@ -154,6 +156,8 @@ export default defineComponent({
 
         const valueSet = ref(false);
 
+        const selectExternalAssociate = ref(false);
+
         onMounted(() => {
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
@@ -171,7 +175,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                PersonService.searchResearchers(params).then((response) => {
+                PersonService.searchResearchers(params, false).then((response) => {
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value === "sr") {
@@ -193,7 +197,7 @@ export default defineComponent({
             if(props.presetContributionValue && !valueSet.value) {
                 valueSet.value = true;
 
-                const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
+                const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
                 presetAffiliations.value = props.presetContributionValue.institutionIds;
 
                 firstName.value = props.presetContributionValue.selectedOtherName[0];
@@ -202,7 +206,13 @@ export default defineComponent({
 
                 if(props.presetContributionValue.personId) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
-                        selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
+                        
+                        if (personResponse.data.personName.otherName && personResponse.data.personName.otherName !== "null") {
+                            selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
+                        } else {
+                            selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
+                        }
+
                         personOtherNames.value = [{title: selectedPerson.value.title, value: -1}];
                         personResponse.data.personOtherNames.forEach((otherName) => {
                             if (otherName.dateFrom && otherName.dateTo) {
@@ -229,6 +239,7 @@ export default defineComponent({
                     });
                 } else {
                     customNameInput.value = true;
+                    selectExternalAssociate.value = true;
                 }
             }
         });
@@ -253,8 +264,9 @@ export default defineComponent({
             if (customNameInput.value) {
                 otherName = [firstName.value, middleName.value, lastName.value, null, null]
             }
+            
             const returnObject = {
-                personId: selectedPerson.value.value,
+                personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
                 description: contributionDescription.value,
                 affiliationStatement: affiliationStatement.value,
                 selectedOtherName: otherName,
@@ -294,11 +306,13 @@ export default defineComponent({
         });
 
         const selectLatestAffiliation = () => {
-            PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
-                if(latestAffiliationResponse.data) {
-                    selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
-                }
-            });
+            if (selectedPerson.value.value && selectedPerson.value.value > 0) {
+                PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
+                    if(latestAffiliationResponse.data) {
+                        selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
+                    }
+                });
+            }
         };
 
         const clearInput = () => {
@@ -317,6 +331,12 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const toggleExternalSelection = () => {
+            selectExternalAssociate.value = !selectExternalAssociate.value;
+            customNameInput.value = selectExternalAssociate.value;
+            sendContentToParent();
+        };
+
         return {persons,
                 firstName, middleName, lastName,
                 selectedPerson, customNameInput,
@@ -324,8 +344,8 @@ export default defineComponent({
                 requiredFieldRules, requiredSelectionRules,
                 contributionDescription, affiliationStatement,
                 sendContentToParent, clearInput, onPersonSelect,
-                descriptionRef, affiliationStatementRef,
-                personOtherNames, selectedOtherName,
+                descriptionRef, affiliationStatementRef, toggleExternalSelection,
+                personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput,
                 languageTags, valueSet, selectedAffiliations, personAffiliations};
     }
