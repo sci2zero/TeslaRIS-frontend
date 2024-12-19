@@ -95,5 +95,6 @@ export enum ApplicableEntityType {
     DOCUMENT = "DOCUMENT",
     PERSON = "PERSON",
     ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    PUBLICATION_SERIES = "PUBLICATION_SERIES",
     ALL = "ALL"
 }

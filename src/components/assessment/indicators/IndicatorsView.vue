@@ -35,7 +35,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, type PropType, reactive, watch } from 'vue';
 import { ref } from 'vue';
-import { EntityIndicatorSource, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { EntityIndicatorSource, type PublicationSeriesIndicatorResponse, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useI18n } from 'vue-i18n';
 import { localiseDate } from '@/i18n/dateLocalisation';
@@ -43,6 +43,7 @@ import EntityIndicatorForm from './EntityIndicatorForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { getIndicatorSourceTitleFromValueAutoLocale } from '@/i18n/entityIndicatorSource';
 
 
 export default defineComponent({
@@ -125,7 +126,13 @@ export default defineComponent({
                 }
             }
 
-            titles.value.push(`${returnCurrentLocaleContent(entityIndicator.indicatorResponse.title)}: ${displayValue}`)
+            let title = `${returnCurrentLocaleContent(entityIndicator.indicatorResponse.title)}: ${displayValue} (${getIndicatorSourceTitleFromValueAutoLocale(entityIndicator.source)})`;
+
+            if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
+                title += ` ${i18n.t("inLabel")} ${(entityIndicator as PublicationSeriesIndicatorResponse).categoryIdentifier}`;
+            }
+
+            titles.value.push(title);
 
             let date = "";
             if (entityIndicator.fromDate || entityIndicator.toDate) {

@@ -81,6 +81,9 @@
             <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab v-if="canEdit || journalIndicators.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -91,6 +94,15 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="journalIndicators" 
+                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]" 
+                    :entity-id="journal?.id"
+                    :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
+                    :can-edit="false"
+                />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -112,7 +124,7 @@
 
 <script lang="ts">
 
-import type { LanguageTagResponse } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -131,11 +143,14 @@ import type { PersonPublicationSeriesContribution } from '@/models/PublicationSe
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import type { EntityIndicatorResponse } from '@/models/AssessmentModel';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection },
     setup() {
         const currentTab = ref("");
 
@@ -160,12 +175,15 @@ export default defineComponent({
 
         const canEdit = ref(false);
 
+        const journalIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                 canEdit.value = response.data;
             });
 
             fetchJournal(true);
+            fetchIndicators();
         });
 
         watch(i18n.locale, () => {
@@ -187,6 +205,12 @@ export default defineComponent({
                 }
 
                 populateData();
+            });
+        };
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchPublicationSeriesIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                journalIndicators.value = response.data;
             });
         };
 
@@ -260,8 +284,8 @@ export default defineComponent({
             switchPage, canEdit,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
-            snackbar, snackbarMessage,
-            updateContributions,
+            snackbar, snackbarMessage, journalIndicators,
+            updateContributions, ApplicableEntityType,
             currentTab, PublicationSeriesUpdateForm
         };
 }})

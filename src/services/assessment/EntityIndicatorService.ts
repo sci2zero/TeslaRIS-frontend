@@ -24,6 +24,10 @@ export class EntityIndicatorService extends BaseService {
         return super.sendRequest(axios.get, `assessment/person-indicator/${personId}`);
     }
 
+    async fetchPublicationSeriesIndicators(publicationSeriesId: number): Promise<AxiosResponse<EntityIndicatorResponse[]>> {
+        return super.sendRequest(axios.get, `assessment/publication-series-indicator/${publicationSeriesId}`);
+    }
+
     async createDocumentIndicator(body: DocumentIndicator): Promise<AxiosResponse<EntityIndicatorResponse>> {
         return super.sendRequest(axios.post, `assessment/document-indicator/${body.documentId}`, body, EntityIndicatorService.idempotencyKey);
     }

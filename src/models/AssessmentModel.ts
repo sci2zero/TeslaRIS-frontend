@@ -31,6 +31,10 @@ export interface EntityIndicatorResponse {
     source: EntityIndicatorSource
 }
 
+export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
+    categoryIdentifier: string;
+}
+
 export enum StatisticsType {
     VIEW = "VIEW",
     DOWNLOAD = "DOWNLOAD"

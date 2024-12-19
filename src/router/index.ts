@@ -77,7 +77,7 @@ import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
 import DocumentClaimerView from "@/views/DocumentClaimerView.vue";
 import PublisherPublicationsComparator from "@/views/comparators/publisher/PublisherPublicationsComparator.vue";
 import PublisherMetadataComparator from "@/views/comparators/publisher/PublisherMetadataComparator.vue";
-import IndicatorsView from "@/views/assessment/listViews/IndicatorsView.vue";
+import IndicatorsListView from "@/views/assessment/listViews/IndicatorsListView.vue";
 import AssessmentRulebooksView from "@/views/assessment/listViews/AssessmentRulebooksView.vue";
 import AssessmentRulebookLandingView from "@/views/assessment/landingPages/AssessmentRulebookLandingView.vue";
 import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
@@ -879,7 +879,7 @@ const router = createRouter({
                         {
                             path: "indicators",
                             name: "indicators",
-                            component: IndicatorsView,
+                            component: IndicatorsListView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],
