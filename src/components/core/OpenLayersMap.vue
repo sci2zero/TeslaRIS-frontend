@@ -3,7 +3,7 @@
         v-if="showInput" 
         v-model="address" :readonly="readOnly" :label="$t('addressLabel')" :placeholder="$t('addressLabel')"
         @update:focused="onAddressChange"></v-text-field>
-    <div ref="map" :style="'height: ' + height" class="openlayers-map"></div>
+    <div v-show="address" ref="map" :style="'height: ' + height" class="openlayers-map"></div>
 </template>
 
 <script lang="ts">

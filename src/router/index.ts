@@ -72,11 +72,17 @@ import MonographPublicationMetadataComparatorView from "@/views/comparators/docu
 import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/BookSeriesMetadataComparatorView.vue";
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
-import IndicatorsView from "@/views/assessment/listViews/IndicatorsView.vue";
+import CountryListView from "@/views/CountryListView.vue";
+import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
+import DocumentClaimerView from "@/views/DocumentClaimerView.vue";
+import PublisherPublicationsComparator from "@/views/comparators/publisher/PublisherPublicationsComparator.vue";
+import PublisherMetadataComparator from "@/views/comparators/publisher/PublisherMetadataComparator.vue";
+import IndicatorsListView from "@/views/assessment/listViews/IndicatorsListView.vue";
 import AssessmentRulebooksView from "@/views/assessment/listViews/AssessmentRulebooksView.vue";
 import AssessmentRulebookLandingView from "@/views/assessment/landingPages/AssessmentRulebookLandingView.vue";
 import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
 import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
+import LanguageTagListView from "@/views/LanguageTagListView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -400,7 +406,25 @@ const router = createRouter({
                                 authenticated: true,
                                 authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
-                        }
+                        },
+                        {
+                            path: 'publications-comparator/:leftId/:rightId',
+                            name: "publisherPublicationsComparator",
+                            component: PublisherPublicationsComparator,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "publisherMetadataComparator",
+                            component: PublisherMetadataComparator,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                 },
                 {
@@ -484,7 +508,6 @@ const router = createRouter({
                             },
                         },
                     ]
-                    
                 },
                 {
                     path: "scientific-results",                
@@ -815,12 +838,48 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "countries",
+                    name: "countries",
+                    component: CountryListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "language-tags",
+                    name: "languageTags",
+                    component: LanguageTagListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "research-areas",
+                    name: "researchAreas",
+                    component: ResearchAreaListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "document-claim",
+                    name: "documentClaim",
+                    component: DocumentClaimerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher],
+                    },
+                },
+                {
                     path: "assessment",                 
                     children: [
                         {
                             path: "indicators",
                             name: "indicators",
-                            component: IndicatorsView,
+                            component: IndicatorsListView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

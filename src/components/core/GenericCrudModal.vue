@@ -1,8 +1,8 @@
 <template>
-    <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="600px">
+    <div justify="start">
+        <v-dialog v-model="dialog" persistent :class="wide ? 'wide' : 'narrow'">
             <template #activator="scope">
-                <div v-if="isSectionUpdate" class="edit-pen">
+                <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
@@ -11,10 +11,10 @@
                     </v-btn>
                 </div>
                 <v-btn
-                    v-else
+                    v-if="!isSectionUpdate && !readOnly"
                     density="compact" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
-                    {{ isUpdate ? $t("updateLabel") : $t("createNew" + entityName + "Label") }}
+                    {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
                 </v-btn>
             </template>
             <v-card>
@@ -29,6 +29,7 @@
                             v-bind="formProps"
                             in-modal
                             @create="emitToParent"
+                            @update="emitToParent"
                         />
                     </v-container>
                 </v-card-text>
@@ -43,7 +44,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
+    </div>
 </template>
 
 
@@ -52,13 +53,17 @@ import { type PropType, ref } from "vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-    name: "GenericModal",
+    name: "GenericCrudModal",
     props: {
         isUpdate: {
             type: Boolean,
             default: false
         },
         isSectionUpdate: {
+            type: Boolean,
+            default: false
+        },
+        readOnly: {
             type: Boolean,
             default: false
         },
@@ -73,6 +78,10 @@ export default defineComponent({
         entityName: {
             type: String,
             required: true
+        },
+        wide: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "update"],
@@ -81,7 +90,6 @@ export default defineComponent({
         const formRef = ref<InstanceType<typeof props.formComponent>>();
 
         const emitToParent = (formData: any) => {
-            console.log(formData);
             if (props.isUpdate) {
                 emit("update", formData);
             } else {
@@ -95,3 +103,17 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.wide {
+    width: 100%;
+    max-width: 1500px;
+}
+
+.narrow {
+    width: 100%;
+    max-width: 700px;
+}
+
+</style>

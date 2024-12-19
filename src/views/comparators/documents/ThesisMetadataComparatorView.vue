@@ -142,10 +142,12 @@ export default defineComponent({
         const fetchThesiss = () => {
             DocumentPublicationService.readThesis(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftThesis.value = response.data;
+                leftThesis.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readThesis(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightThesis.value = response.data;
+                rightThesis.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -199,12 +201,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateThesis();
-            updateRightRef.value?.updateThesis();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightThesis.value, leftThesis.value] = mergeThesisMetadata(rightThesis.value as Thesis, leftThesis.value as Thesis);
@@ -237,9 +239,8 @@ export default defineComponent({
             leftThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
             leftThesis.value!.languageTagIds = updatedInfo.languageTagIds;
             leftThesis.value!.thesisType = updatedInfo.thesisType;
-            leftThesis.value!.eventId = updatedInfo.eventId;
             leftThesis.value!.publisherId = updatedInfo.publisherId;
-            leftThesis.value!.scopusId = updatedInfo.scopusId;
+            leftThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -260,9 +261,8 @@ export default defineComponent({
             rightThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
             rightThesis.value!.languageTagIds = updatedInfo.languageTagIds;
             rightThesis.value!.thesisType = updatedInfo.thesisType;
-            rightThesis.value!.eventId = updatedInfo.eventId;
             rightThesis.value!.publisherId = updatedInfo.publisherId;
-            rightThesis.value!.scopusId = updatedInfo.scopusId;
+            rightThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
@@ -272,12 +272,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateThesis();
-            updateRightRef.value?.updateThesis();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

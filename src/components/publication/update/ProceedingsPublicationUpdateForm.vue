@@ -221,7 +221,7 @@ export default defineComponent({
             });
         };
 
-        const updateProceedingsPublication = () => {
+        const submit = () => {
             const updatedProceedingsPublication: ProceedingsPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -278,7 +278,7 @@ export default defineComponent({
             selectedProceedings, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent, titleRef, subtitleRef,
-            updateProceedingsPublication, toMultilingualTextInput,
+            submit, toMultilingualTextInput,
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,
             selectNewlyAddedProceedings, scopusIdValidationRules,

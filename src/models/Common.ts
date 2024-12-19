@@ -25,13 +25,18 @@ export interface LanguageTagResponse {
     display: string;
 }
 
+export interface LanguageTag {
+    languageCode: string;
+    display: string;
+}
+
 export interface ExternalValidation {
     passed: boolean;
     message: string;
 }
 
 export interface Country {
-    id: number;
+    id?: number;
     code: string;
     name: MultilingualContent[];
 }
@@ -54,13 +59,28 @@ export interface ErrorResponse {
 export enum NotificationAction {
     APPROVE = "APPROVE",
     REMOVE_FROM_PUBLICATION = "REMOVE_FROM_PUBLICATION",
-    PERFORM_DEDUPLICATION = "PERFORM_DEDUPLICATION"
+    PERFORM_DEDUPLICATION = "PERFORM_DEDUPLICATION",
+    BROWSE_CLAIMABLE_DOCUMENTS = "BROWSE_CLAIMABLE_DOCUMENTS"
 }
 
 export interface Notification {
     id: number;
     notificationText: string;
     possibleActions: NotificationAction[];
+}
+
+export interface ResearchAreaResponse {
+    id? : number;
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    superResearchAreaId?: number;
+    superResearchAreaName?: MultilingualContent[];
+}
+
+export interface ResearchAreaRequest {
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    superResearchAreaId?: number;
 }
 
 export enum AccessLevel {
@@ -75,5 +95,6 @@ export enum ApplicableEntityType {
     DOCUMENT = "DOCUMENT",
     PERSON = "PERSON",
     ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    PUBLICATION_SERIES = "PUBLICATION_SERIES",
     ALL = "ALL"
 }

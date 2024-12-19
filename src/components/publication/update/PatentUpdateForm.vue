@@ -18,11 +18,8 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
+            <v-col cols="10">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -38,11 +35,6 @@
         <v-row>
             <v-col cols="10">
                 <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
-                <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
             </v-col>
         </v-row>
         
@@ -69,12 +61,11 @@ import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "PatentUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, EventAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
     props: {
         presetPatent: {
             type: Object as PropType<Patent | undefined>,
@@ -118,19 +109,17 @@ export default defineComponent({
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetPatent?.documentDate);
         const doi = ref(props.presetPatent?.doi);
-        const scopus = ref(props.presetPatent?.scopusId);
         const patentNumber = ref(props.presetPatent?.number);
         const uris = ref<string[]>(props.presetPatent?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
-        const updatePatent = () => {
+        const submit = () => {
             const updatedPatent: Patent = {
                 title: title.value as MultilingualContent[],
                 number: patentNumber.value as string,
@@ -140,10 +129,8 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: props.presetPatent?.contributions,
                 documentDate: publicationYear.value,
-                scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -162,7 +149,6 @@ export default defineComponent({
             patentNumber.value = props.presetPatent?.number;
             publicationYear.value = props.presetPatent?.documentDate;
             doi.value = props.presetPatent?.doi;
-            scopus.value = props.presetPatent?.scopusId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -174,18 +160,15 @@ export default defineComponent({
         return {
             isFormValid,
             title,
-            subtitle,
+            subtitle, doi,
             publicationYear, 
-            doi, scopus,
             selectedPublisher, 
             patentNumber, uris, 
             requiredFieldRules,
-            updatePatent,
+            submit,
             toMultilingualTextInput,
             languageTags,
-            selectedEvent,
             doiValidationRules,
-            scopusIdValidationRules,
             titleRef, subtitleRef,
             refreshForm, urisRef
         };

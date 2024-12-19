@@ -59,6 +59,10 @@ export class UserService extends BaseService {
     return super.sendRequest(axios.post, "user/take-role", body);
   }
 
+  async getAccountsWithRoleTakingAllowed(): Promise<AxiosResponse<number[]>> {
+    return super.sendRequest(axios.get, "user/take-role");
+  }
+
   async allowRoleTaking(): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, "user/allow-role-taking");
   }

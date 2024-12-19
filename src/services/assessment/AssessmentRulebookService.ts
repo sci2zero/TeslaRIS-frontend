@@ -5,6 +5,7 @@ import type { AssessmentMeasure, AssessmentRulebook, AssessmentRulebookResponse 
 import type { Page } from "@/models/Common";
 import { License, ResourceType, type DocumentFileResponse } from "@/models/DocumentFileModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import i18n from "@/i18n";
 
 
 export class AssessmentRulebookService extends BaseService {
@@ -12,7 +13,7 @@ export class AssessmentRulebookService extends BaseService {
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
     async fetchAllAssessmentRulebooks(pageable: string): Promise<AxiosResponse<Page<AssessmentRulebookResponse>>> {
-        return super.sendRequest(axios.get, `assessment/assessment-rulebook?${pageable}`);
+        return super.sendRequest(axios.get, `assessment/assessment-rulebook?${pageable}&lang=${i18n.vueI18n.global.locale}`);
     }
 
     async getAssessmentMeasuresForRulebook(rulebookId: number, pageable: string): Promise<AxiosResponse<Page<AssessmentMeasure>>> {

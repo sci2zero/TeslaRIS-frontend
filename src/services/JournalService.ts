@@ -32,6 +32,10 @@ export class JournalService extends BaseService {
     return super.sendRequest(axios.delete, `journal/${journalId}`);
   }
 
+  async forceDeleteJournal(journalId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `journal/force/${journalId}`);
+  }
+
   async canEdit(journalId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `journal/${journalId}/can-edit`);
   }

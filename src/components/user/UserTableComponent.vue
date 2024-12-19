@@ -7,6 +7,7 @@
         :items-length="totalUsers"
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -23,7 +24,9 @@
                     <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
                         {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
                     </v-btn>
-                    <v-btn color="blue" dark class="inline-action" @click="takeRoleOfUser(row.item.email)">
+                    <v-btn
+                        color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
+                        @click="takeRoleOfUser(row.item.email)">
                         {{ $t("takeRoleLabel") }}
                     </v-btn>
                 </td>
@@ -46,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
@@ -78,6 +81,14 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarText = ref("");
         const timeout = 5000;
+
+        const accountsThatAllowedRoleTaking = ref<number[]>([]);
+
+        onMounted(() => {
+            UserService.getAccountsWithRoleTakingAllowed().then(response => {
+                accountsThatAllowedRoleTaking.value = response.data;
+            });
+        });
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const emailLabel = computed(() => i18n.t("emailLabel"));
@@ -149,17 +160,27 @@ export default defineComponent({
                 localStorage.setItem("refreshToken", response.data.refreshToken);
 
                 loginStore.emitLoginSuccess();
-                router.push({ name: "home" });
+                router.push({ name: "home" }).then(() => {
+                    window.location.reload();
+                });
             }).catch(() => {
                 snackbar.value = true;
                 snackbarText.value = userDidNotAllowNotification.value;
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, changeActivationStatus, takeRoleOfUser,
             displayFormNotification, displayTextOrPlaceholder,
-            getTitleFromValueAutoLocale};
+            getTitleFromValueAutoLocale, setSortOption,
+            accountsThatAllowedRoleTaking
+        };
     }
 });
 </script>

@@ -10,18 +10,7 @@
                 <v-form v-model="isFormValid" @submit.prevent>
                     <v-row justify="center">
                         <v-col cols="6" class="bg-blue-grey-lighten-5">
-                            <password-input-with-meter :label="$t('newPasswordLabel')" @password-change="newPassword = $event" @show-repeated-password="showRepeatedPassword = !showRepeatedPassword"></password-input-with-meter>
-                        </v-col>
-                    </v-row>
-                    <v-row justify="center">
-                        <v-col cols="6" class="bg-blue-grey-lighten-5">
-                            <v-text-field
-                                v-model="repeatNewPassword"
-                                :label="$t('repeatNewPasswordLabel')"
-                                :rules="repeatPasswordRules"
-                                validate-on-blur
-                                :type="showRepeatedPassword ? 'text' : 'password'"
-                            ></v-text-field>
+                            <password-input-with-meter :label="$t('newPasswordLabel')" repeat-password @password-change="newPassword = $event"></password-input-with-meter>
                         </v-col>
                     </v-row>
                     <v-row justify="center">
@@ -54,7 +43,7 @@
 import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue";
 import type { ResetPasswordRequest } from "@/models/AuthenticationModel";
 import AuthenticationService from "@/services/AuthenticationService";
-import { computed, onMounted } from "vue";
+import { onMounted } from "vue";
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
@@ -66,32 +55,20 @@ export default defineComponent(
     name: "ResetPasswordView",
     components: { PasswordInputWithMeter },
     setup() {
-        const showRepeatedPassword = ref(false);
         const isFormValid = ref(false);
 
         const success = ref<boolean | null>(null); 
 
         const newPassword = ref("");
-        const repeatNewPassword = ref("");
 
         const router = useRouter();
         const currentRoute = useRoute();
 
         const i18n = useI18n();
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const passwordsDontMatchMessage = computed(() => i18n.t("passwordsDontMatchMessage"));
 
         onMounted(() => {
             document.title = i18n.t("resetPasswordLabel");
         });
-        
-        const repeatPasswordRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                if (newPassword.value !== repeatNewPassword.value) return passwordsDontMatchMessage.value;
-                return true;
-            }
-        ];
 
         const setNewPassword = async () => {
             await router.isReady();
@@ -107,7 +84,7 @@ export default defineComponent(
             });
         }
 
-        return {isFormValid, showRepeatedPassword, setNewPassword, repeatPasswordRules, newPassword, repeatNewPassword, success};
+        return {isFormValid, setNewPassword, newPassword, success};
     }
 }
 );

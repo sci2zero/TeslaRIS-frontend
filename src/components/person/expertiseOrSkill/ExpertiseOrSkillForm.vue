@@ -9,7 +9,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="description" :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.description, languageList)" :label="$t('descriptionLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input v-model="description" :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.description, languageList)" :label="$t('abstractLabel')" is-area></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>

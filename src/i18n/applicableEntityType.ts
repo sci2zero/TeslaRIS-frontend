@@ -7,6 +7,7 @@ export const applicableEntityTypeSr = [
     { title: "Dokument", value: ApplicableEntityType.DOCUMENT },
     { title: "Istraživač", value: ApplicableEntityType.PERSON },
     { title: "Organizaciona jedinica", value: ApplicableEntityType.ORGANISATION_UNIT },
+    { title: "Serija publikacija", value: ApplicableEntityType.PUBLICATION_SERIES },
     { title: "Svi", value: ApplicableEntityType.ALL }
 ];
 
@@ -16,6 +17,7 @@ export const applicableEntityTypeEn = [
     { title: "Document", value: ApplicableEntityType.DOCUMENT },
     { title: "Researcher", value: ApplicableEntityType.PERSON },
     { title: "Organisation unit", value: ApplicableEntityType.ORGANISATION_UNIT },
+    { title: "Publication series", value: ApplicableEntityType.PUBLICATION_SERIES },
     { title: "All", value: ApplicableEntityType.ALL }
 ];
 

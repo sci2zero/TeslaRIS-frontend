@@ -1,5 +1,5 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
+    <v-container v-for="(input, index) in inputs" :key="input.key" class="bottom-spacer">
         <v-row>
             <v-col cols="10">
                 <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
@@ -9,7 +9,7 @@
                     <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
-                    <v-btn v-show="index === inputs.length - 1" icon @click="addInput">
+                    <v-btn v-show="index === inputs.length - 1 && !limitOne" icon @click="addInput">
                         <v-icon>mdi-plus</v-icon>
                     </v-btn>
                 </v-col>
@@ -27,9 +27,6 @@
             </v-col>
         </v-row>
         <v-row v-if="!basic">
-            <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
-                <v-checkbox v-model="input.isMainContributor" :label="$t('mainContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
-            </v-col>
             <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
@@ -60,6 +57,10 @@ export default defineComponent({
             default: () => []
         },
         boardMembersAllowed: {
+            type: Boolean,
+            default: false
+        },
+        limitOne: {
             type: Boolean,
             default: false
         }
@@ -149,8 +150,9 @@ export default defineComponent({
                                   dateFrom: input.contribution.selectedOtherName[3],
                                   dateTo: input.contribution.selectedOtherName[4]}
                 }
+                
                 returnObject.push({contributionDescription: input.contribution.description,
-                                    personId: input.contribution.personId,
+                                    personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
                                     displayAffiliationStatement: input.contribution.affiliationStatement,
                                     orderNumber: index + 1,
                                     personName: personName,

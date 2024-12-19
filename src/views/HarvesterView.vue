@@ -5,31 +5,37 @@
                 {{ $t("harvestDataLabel") }}
             </h1>
             <br />
-            <v-row class="d-flex flex-row justify-center">
-                <v-col cols="4">
-                    <date-picker
-                        v-model="startDate"
-                        :label="$t('startDateLabel')"
-                        color="primary"
-                        required
-                    ></date-picker>
-                </v-col>
-                <v-col cols="4">
-                    <date-picker
-                        v-model="endDate"
-                        :label="$t('endDateLabel')"
-                        color="primary"
-                        required
-                    ></date-picker>
-                </v-col>
-            </v-row>
-            <v-row class="d-flex flex-row justify-center">
-                <v-col cols="auto">
-                    <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
-                        {{ $t("scanSourcesLabel") }}
-                    </v-btn>
-                </v-col>
-            </v-row>
+            <div v-if="canPerformHarvest">
+                <v-row class="d-flex flex-row justify-center">
+                    <v-col cols="4">
+                        <date-picker
+                            v-model="startDate"
+                            :label="$t('startDateLabel')"
+                            color="primary"
+                            required
+                        ></date-picker>
+                    </v-col>
+                    <v-col cols="4">
+                        <date-picker
+                            v-model="endDate"
+                            :label="$t('endDateLabel')"
+                            color="primary"
+                            required
+                        ></date-picker>
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row justify-center">
+                    <v-col cols="auto">
+                        <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
+                            {{ $t("scanSourcesLabel") }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </div>
+            <h2 v-else class="d-flex flex-row justify-center">
+                {{ $t("setupIdentifiersMessage") }}
+            </h2>
+
             <v-container class="d-flex flex-row justify-center">
                 <h2>{{ $t("documentsReadyForImportLabel") }}: {{ numberOfHarvestedDocuments }}</h2>
             </v-container>
@@ -90,6 +96,7 @@ export default defineComponent({
     components: {DatePicker},
     setup() {
         const isFormValid = ref(false);
+        const canPerformHarvest = ref(false);
         
         const snackbar = ref(false);
         const errorMessage = ref("");
@@ -107,12 +114,16 @@ export default defineComponent({
 
             fetchNumberOfHarvestedDocuments();
 
+            ImportService.canPerformHarvest().then(response => {
+                canPerformHarvest.value = response.data;
+            });
+
             // Fetch number of imported documents 10 seconds
             setInterval(fetchNumberOfHarvestedDocuments, 1000 * 10);
         });
 
         const fetchNumberOfHarvestedDocuments = () => {
-            ImportService.getHarvestedDocumentsCound().then(response => {
+            ImportService.getHarvestedDocumentsCount().then(response => {
                 numberOfHarvestedDocuments.value = response.data;
             });
         };
@@ -143,7 +154,7 @@ export default defineComponent({
             newDocumentsHarvested,
             harvestComplete,
             isFormValid, snackbar,
-            errorMessage
+            errorMessage, canPerformHarvest
         };
     },
 });

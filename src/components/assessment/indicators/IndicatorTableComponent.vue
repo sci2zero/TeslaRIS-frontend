@@ -4,10 +4,11 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <generic-assessment-modal
+    <generic-crud-modal
         :form-component="IndicatorForm"
         :form-props="{ presetIndicator: undefined }"
         entity-name="Indicator"
+        :read-only="false"
         @create="createNewIndicator"
     />
 
@@ -37,11 +38,12 @@
                 <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
                 <td>{{ row.item.code }}</td>
                 <td>
-                    <generic-assessment-modal
+                    <generic-crud-modal
                         :form-component="IndicatorForm"
                         :form-props="{ presetIndicator: row.item }"
                         is-update
                         entity-name="Indicator"
+                        :read-only="false"
                         @update="updateIndicator(row.item.id, $event)"
                     />
                 </td>
@@ -71,13 +73,13 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 import type { IndicatorRequest, IndicatorResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import IndicatorService from '@/services/assessment/IndicatorService';
-import GenericAssessmentModal from '../GenericAssessmentModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import IndicatorForm from './IndicatorForm.vue';
 
 
 export default defineComponent({
     name: "IndicatorTableComponent",
-    components: { GenericAssessmentModal },
+    components: { GenericCrudModal },
     props: {
         indicators: {
             type: Array<IndicatorResponse>,
@@ -106,8 +108,8 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "title", order: "asc"}]});
 
         const headers = [
-          { title: titleLabel, align: "start", sortable: true, key: "title"},
-          { title: descriptionLabel, align: "start", sortable: true, key: "description"},
+          { title: titleLabel, align: "start", sortable: true, key: "title.content"},
+          { title: descriptionLabel, align: "start", sortable: true, key: "description.content"},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: actionLabel},
         ];

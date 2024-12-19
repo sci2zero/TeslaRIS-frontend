@@ -14,7 +14,6 @@
                     <v-card-title class="text-center">
                         <v-container>
                             <h2>CRIS UNS</h2>
-                            <h3>(New Generation CRIS)</h3>
                             <p class="text-wrap">
                                 {{ $t("homePageMessage") }}
                             </p>

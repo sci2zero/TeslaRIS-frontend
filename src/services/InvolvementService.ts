@@ -50,6 +50,10 @@ export class InvolvementService extends BaseService {
   async deleteInvolvement(personId: number, involvementId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `involvement/${involvementId}/${personId}`);
   }
+
+  async terminateEmployment(personId: number, institutionId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `involvement/employment/${institutionId}/${personId}`);
+  }
 }
 
 export default new InvolvementService();

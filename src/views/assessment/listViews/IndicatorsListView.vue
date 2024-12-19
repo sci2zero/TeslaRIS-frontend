@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import IndicatorService from '@/services/assessment/IndicatorService';
 import { ref } from 'vue';
 import type { IndicatorResponse } from '@/models/AssessmentModel';
@@ -35,6 +35,10 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("indicatorListLabel");
+        });
+
+        watch(i18n.locale, () => {
+            search();
         });
 
         const search = () => {
