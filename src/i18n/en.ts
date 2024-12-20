@@ -471,5 +471,8 @@ export default {
     contentTypeLabel: "Content type",
     numericLabel: "Numeric value",
     textLabel: "Text",
-    boolLabel: "Yes/No value"
+    boolLabel: "Yes/No value",
+    scheduleLoadingLabel: "Scheduled loading processes",
+    sourceLabel: "Source",
+    dateLabel: "Date"
 }

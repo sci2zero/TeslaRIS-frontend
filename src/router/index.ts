@@ -83,6 +83,7 @@ import AssessmentRulebookLandingView from "@/views/assessment/landingPages/Asses
 import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
 import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
 import LanguageTagListView from "@/views/LanguageTagListView.vue";
+import IndicatorsLoadView from "@/views/IndicatorsLoadView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -880,6 +881,15 @@ const router = createRouter({
                             path: "indicators",
                             name: "indicators",
                             component: IndicatorsListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "indicator-load",
+                            name: "indicatorLoad",
+                            component: IndicatorsLoadView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

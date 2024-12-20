@@ -98,3 +98,8 @@ export enum ApplicableEntityType {
     PUBLICATION_SERIES = "PUBLICATION_SERIES",
     ALL = "ALL"
 }
+
+export interface ScheduledTaskResponse {
+    taskId: string;
+    executionTime: string;
+}

@@ -470,5 +470,8 @@ export default {
     contentTypeLabel: "Tip sadržaja",
     numericLabel: "Numerička vrednost",
     textLabel: "Tekst",
-    boolLabel: "Da/Ne vrednost"
+    boolLabel: "Da/Ne vrednost",
+    scheduleLoadingLabel: "Zakazana učitavanja",
+    sourceLabel: "Izvor",
+    dateLabel: "Datum"
 }
