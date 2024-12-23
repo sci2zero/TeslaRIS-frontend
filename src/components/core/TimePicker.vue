@@ -4,7 +4,7 @@
             <v-text-field
                 :label="label"
                 :model-value="formattedTime"
-                :rules="required ? requiredFieldRules : []"
+                :rules="applyRules()"
                 readonly
                 v-bind="props"
                 variant="solo"
@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { useValidationUtils } from "@/utils/ValidationUtils";
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, watch, type PropType } from "vue";
 import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
 export default defineComponent({
@@ -46,8 +46,17 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        inFuture: {
+            type: Boolean,
+            default: false,
+        },
+        modelValue: {
+            type: Object as PropType<string | undefined>,
+            required: true,
+        }
     },
-    setup() {
+    emits: ["update:modelValue"],
+    setup(props, {emit}) {
         const isTimeMenuOpen = ref(false);
         const selectedTime = ref(null);
 
@@ -55,10 +64,28 @@ export default defineComponent({
             selectedTime.value ? selectedTime.value : ""
         );
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, timeTodayOrFutureRules } = useValidationUtils();
 
         const clearTime = () => {
             selectedTime.value = null;
+        };
+
+        watch(selectedTime, () => {
+            emit("update:modelValue", selectedTime.value);
+        });
+
+        const applyRules = () => {
+            const rules = [];
+            
+            if (props.required) {
+                rules.push(requiredFieldRules[0]);
+            }
+
+            if (props.inFuture) {
+                rules.push(timeTodayOrFutureRules[0]);
+            }
+
+            return rules;
         };
 
         return {
@@ -66,7 +93,7 @@ export default defineComponent({
             selectedTime,
             formattedTime,
             requiredFieldRules,
-            clearTime,
+            clearTime, applyRules
         };
     },
 });

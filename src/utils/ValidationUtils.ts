@@ -18,6 +18,8 @@ export const useValidationUtils = () => {
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
+    const requiredFutureDateMessage = computed(() => i18n.t("requiredFutureDateMessage"));
+    const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
 
     
     const requiredFieldRules = [
@@ -176,11 +178,42 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const dateTodayOrFutureRules = [
+        (value: string) => {
+            const dateTokens = value.split(".");
+            if (dateTokens.length !== 4) return requiredFieldMessage.value;
+
+            const inputDate = new Date(parseInt(dateTokens[2].trim()), parseInt(dateTokens[1].trim()) - 1, parseInt(dateTokens[0].trim()));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (isNaN(inputDate.getTime())) return requiredFieldMessage.value;
+
+            if (inputDate < today) return requiredFutureDateMessage.value;
+            return true;
+        }
+    ];
+    
+    const timeTodayOrFutureRules = [
+        (value: string) => {
+            const now = new Date();
+            const [hours, minutes] = value.split(":").map(Number);
+    
+            if (isNaN(hours) || isNaN(minutes)) return requiredFieldMessage.value;
+
+            const inputTime = new Date();
+            inputTime.setHours(hours, minutes, 0, 0);
+    
+            if (inputTime < now) return requiredFutureTimeMessage.value;
+            return true;
+        }
+    ];    
+
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
-        emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules
+        emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
+        dateTodayOrFutureRules, timeTodayOrFutureRules
     };
 };

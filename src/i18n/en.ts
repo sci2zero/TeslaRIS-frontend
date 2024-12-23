@@ -474,5 +474,11 @@ export default {
     boolLabel: "Yes/No value",
     scheduleLoadingLabel: "Scheduled loading processes",
     sourceLabel: "Source",
-    dateLabel: "Date"
+    dateLabel: "Date",
+    scheduleLabel: "Schedule",
+    timeLabel: "Time",
+    scheduleSuccessMessage: "Scheduled successfully",
+    cancelSuccessMessage: "Canceled successfully",
+    cantScheduleInPastMessage: "You can only schedule events in future.",
+    indicatorLoadingLabel: "Indicator Loading"
 }

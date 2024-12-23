@@ -181,6 +181,7 @@ export default defineComponent(
             const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
             const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
+            const indicatorLoadingLabel = computed(() => i18n.t("indicatorLoadingLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -241,6 +242,7 @@ export default defineComponent(
 
             const assessmentsMenu = ref<MenuItem[]>([
                 { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
+                { title: indicatorLoadingLabel, type:'icon-link', pathName: 'assessment/indicator-load' },
                 { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
                 { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
             ]);
@@ -252,9 +254,9 @@ export default defineComponent(
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER' && personId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
-                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
-                { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') }
+                { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
+                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') }
             ]);
 
             const menuItems = ref<MenuItem[]>([

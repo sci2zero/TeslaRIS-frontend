@@ -473,5 +473,11 @@ export default {
     boolLabel: "Da/Ne vrednost",
     scheduleLoadingLabel: "Zakazana učitavanja",
     sourceLabel: "Izvor",
-    dateLabel: "Datum"
+    dateLabel: "Datum",
+    scheduleLabel: "Zakaži",
+    timeLabel: "Vreme",
+    scheduleSuccessMessage: "Uspešno zakazano",
+    cancelSuccessMessage: "Uspešno otkazano",
+    cantScheduleInPastMessage: "Možete zakazivati događaje samo ako su u budućnosti.",
+    indicatorLoadingLabel: "Učitavanje Indikatora"
 }
