@@ -56,9 +56,12 @@
                         <td>{{ row.item.taskId }}</td>
                         <td>{{ `${localiseDate(row.item.executionTime.split("T")[0])} ${$t("inLabel")} ${row.item.executionTime.split("T")[1]}` }}</td>
                         <td>
-                            <v-btn @click="deleteScheduledLoadTask(row.item.taskId)">
+                            <v-btn v-if="!isDateTimeInPast(row.item.executionTime)" @click="deleteScheduledLoadTask(row.item.taskId)">
                                 {{ $t("cancelLabel") }}
                             </v-btn>
+                            <p v-else>
+                                {{ $t("inProgressLabel") }}
+                            </p>
                         </td>
                     </tr>
                 </template>
@@ -176,6 +179,14 @@ export default defineComponent({
             return `${localDate}T${localTime}`;
         };
 
+        const isDateTimeInPast = (dateTime: string) => {
+            const date = new Date(dateTime);
+            const now = new Date();
+            console.log(date, now)
+
+            return date <= now;
+        };
+
         return {
             scheduleDate, scheduledTasks,
             applicableTypes, selectedEntityType,
@@ -183,7 +194,8 @@ export default defineComponent({
             sources, localiseDate, headers,
             scheduleLoadTask, scheduledTime,
             isFormValid, snackbar, message,
-            deleteScheduledLoadTask
+            deleteScheduledLoadTask,
+            isDateTimeInPast
         };
     },
 });

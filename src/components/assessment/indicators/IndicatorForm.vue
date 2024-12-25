@@ -11,7 +11,7 @@
             <v-col>
                 <multilingual-text-input
                     ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetIndicator?.description, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetIndicator?.description, languageTags)" is-area></multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>

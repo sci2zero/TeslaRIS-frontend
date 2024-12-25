@@ -480,5 +480,6 @@ export default {
     scheduleSuccessMessage: "Scheduled successfully",
     cancelSuccessMessage: "Canceled successfully",
     cantScheduleInPastMessage: "You can only schedule events in future.",
-    indicatorLoadingLabel: "Indicator Loading"
+    indicatorLoadingLabel: "Indicator Loading",
+    inProgressLabel: "In progress..."
 }

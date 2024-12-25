@@ -128,7 +128,7 @@ export default defineComponent({
 
             let title = `${returnCurrentLocaleContent(entityIndicator.indicatorResponse.title)}: ${displayValue} (${getIndicatorSourceTitleFromValueAutoLocale(entityIndicator.source)})`;
 
-            if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
+            if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES && (entityIndicator as PublicationSeriesIndicatorResponse).categoryIdentifier) {
                 title += ` ${i18n.t("inLabel")} ${(entityIndicator as PublicationSeriesIndicatorResponse).categoryIdentifier}`;
             }
 
