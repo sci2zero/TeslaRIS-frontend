@@ -126,6 +126,7 @@ export default defineComponent({
             fetchScheduledTasks();
 
             populateSelectionData();
+            setInterval(fetchScheduledTasks, 1000 * 60);
         });
 
         watch(i18n.locale, () => {
