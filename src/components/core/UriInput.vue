@@ -92,7 +92,8 @@ export default defineComponent({
         return { 
             uris, addUri, removeUri, 
             sendContentToParent, clearInput,
-            uriValidationRules, refreshModelValue };
+            uriValidationRules, refreshModelValue
+        };
     },
 });
 </script>

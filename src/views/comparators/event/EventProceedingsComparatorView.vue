@@ -45,19 +45,7 @@
             </v-btn>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
 
         <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsProceedingsMessage')"></persistent-stop-dialog>
     </v-container>
@@ -75,11 +63,12 @@ import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import PersistentStopDialog from '@/components/core/PersistentStopDialog.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "EventProceedingsComparator",
-    components: { ProceedingsList, PersistentStopDialog },
+    components: { ProceedingsList, PersistentStopDialog, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

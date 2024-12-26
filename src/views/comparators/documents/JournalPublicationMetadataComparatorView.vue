@@ -74,19 +74,7 @@
 
         <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -110,11 +98,12 @@ import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationMetadataComparator",
-    components: { PersonDocumentContributionList, JournalPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, JournalPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

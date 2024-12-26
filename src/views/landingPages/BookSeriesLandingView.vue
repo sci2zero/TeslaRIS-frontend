@@ -94,19 +94,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -129,11 +117,12 @@ import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPub
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast },
     setup() {
         const currentTab = ref("");
 

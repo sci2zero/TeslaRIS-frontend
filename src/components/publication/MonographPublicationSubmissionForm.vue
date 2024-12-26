@@ -105,19 +105,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -138,11 +127,12 @@ import { monographPublicationTypeSr, monographPublicationTypeEn } from "@/i18n/m
 import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitMonographPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch, Toast },
     props: {
         inModal: {
             type: Boolean,

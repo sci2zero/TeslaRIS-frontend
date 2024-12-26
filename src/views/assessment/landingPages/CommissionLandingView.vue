@@ -72,19 +72,7 @@
             </v-col>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -103,11 +91,12 @@ import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from '@/components/assessment/commission/CommissionForm.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { LocalizedLink, GenericCrudModal },
+    components: { LocalizedLink, GenericCrudModal, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

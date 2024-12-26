@@ -27,19 +27,7 @@
         </v-list-item>
     </v-list>
 
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <toast v-model="snackbar" :message="message" />
 </template>
   
 <script lang="ts">
@@ -53,11 +41,12 @@ import { useI18n } from 'vue-i18n';
 import EventService from '@/services/EventService';
 import { getEventsRelationTitleFromValueAutoLocale } from '@/i18n/eventsRelationType';
 import EventsRelationSubmissionModal from './update/EventsRelationSubmissionModal.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
 name: "EventsRelationList",
-components: { EventsRelationSubmissionModal },
+components: { EventsRelationSubmissionModal, Toast },
 props: {
     presetEvent: {
         type: Object as PropType<Conference | undefined>,

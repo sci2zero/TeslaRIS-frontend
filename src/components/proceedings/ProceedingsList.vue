@@ -58,19 +58,7 @@
         {{ $t("noAvailableProceedingsMessage") }}
     </h3>
 
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <toast v-model="snackbar" :message="message" />
 </template>
   
 <script lang="ts">
@@ -86,11 +74,12 @@ import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next'
 import { computed } from 'vue';
 import UserService from '@/services/UserService';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "ProceedingsList",
-    components: { ProceedingsSubmissionModal, draggable: VueDraggableNext },
+    components: { ProceedingsSubmissionModal, draggable: VueDraggableNext, Toast },
     props: {
         presetEvent: {
             type: Object as PropType<Conference | undefined>,

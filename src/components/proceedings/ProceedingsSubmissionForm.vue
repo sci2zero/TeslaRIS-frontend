@@ -108,19 +108,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -146,11 +135,12 @@ import ProceedingsService from '@/services/ProceedingsService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { PropType } from 'vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitProceedings",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast},
     props: {
         inModal: {
             type: Boolean,

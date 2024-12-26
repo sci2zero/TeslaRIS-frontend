@@ -219,19 +219,7 @@
 
         <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="performMigrationToUnmanaged"></persistent-question-dialog>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -274,11 +262,12 @@ import StatisticsService from '@/services/StatisticsService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
     setup() {
         const currentTab = ref("additionalInfo");
 

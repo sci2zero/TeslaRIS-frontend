@@ -104,19 +104,7 @@
 
         <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -141,11 +129,12 @@ import MergeService from '@/services/MergeService';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import { ComparisonSide } from '@/models/MergeModel';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "PersonMetadataComparator",
-    components: { PersonUpdateForm, InvolvementList, ExpertiseOrSkillList, PrizeList, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { PersonUpdateForm, Toast, InvolvementList, ExpertiseOrSkillList, PrizeList, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

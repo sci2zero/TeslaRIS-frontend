@@ -120,19 +120,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -157,11 +146,12 @@ import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i1
 import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal, Toast},
     props: {
         inModal: {
             type: Boolean,

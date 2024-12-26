@@ -91,19 +91,7 @@
             </v-btn>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ snackbarText }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <toast v-model="snackbar" :message="snackbarText" />
 </template>
 
 <script lang="ts">
@@ -124,10 +112,11 @@ import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriods";
 import { useRouter } from "vue-router";
+import Toast from "../core/Toast.vue";
 
 export default defineComponent({
     name: "UserProfileForm",
-    components: {PasswordInputWithMeter},
+    components: {PasswordInputWithMeter, Toast},
     setup() {
         const snackbar = ref(false);
         const snackbarText = ref("");

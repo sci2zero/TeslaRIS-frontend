@@ -69,19 +69,7 @@
         </v-col>
     </v-row>
 
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -97,11 +85,12 @@ import { EntityIndicatorSource } from "@/models/AssessmentModel";
 import { getIndicatorSourceForGivenLocale, getIndicatorSourceTitleFromValueAutoLocale } from "@/i18n/entityIndicatorSource";
 import { localiseDate } from "@/i18n/dateLocalisation";
 import { getErrorMessageForErrorKey } from "@/i18n";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent({
     name: "IndicatorsLoadView",
-    components: { TimePicker, DatePicker },
+    components: { TimePicker, DatePicker, Toast },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);

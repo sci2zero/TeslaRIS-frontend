@@ -59,19 +59,7 @@
             {{ $t('finishLoadLabel') }}
         </v-btn>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ errorMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
     <v-container v-else>
         <h1 class="d-flex flex-row justify-center">
@@ -97,11 +85,12 @@ import type { JournalPublication, PersonDocumentContribution, ProceedingsPublica
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import Deduplicator from "@/components/import/Deduplicator.vue";
 import ImportProceedings from "@/components/import/ImportProceedings.vue";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings},
+    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings, Toast},
     setup() {
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();

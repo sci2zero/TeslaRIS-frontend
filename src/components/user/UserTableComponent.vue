@@ -33,19 +33,8 @@
             </tr>
         </template>
     </v-data-table-server>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ snackbarText }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="snackbarText" />
 </template>
 
 <script lang="ts">
@@ -59,10 +48,12 @@ import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import Toast from '../core/Toast.vue';
+
 
 export default defineComponent({
     name: "UserTableComponent",
-    components: { RegisterEmployeeModal },
+    components: { RegisterEmployeeModal, Toast },
     props: {
         users: {
             type: Array<UserAccountIndex>,

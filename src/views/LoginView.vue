@@ -54,19 +54,8 @@
                 </div>
             </div>
         </div>
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="timeout">
-            {{ $t("emailOrPasswordIncorrectError") }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+
+        <toast v-model="snackbar" :message="$t('emailOrPasswordIncorrectError')" />
     </v-container>
 </template>
 
@@ -82,12 +71,13 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useRouteStore } from "@/stores/routeStore";
 import { useValidationUtils } from "@/utils/ValidationUtils";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent(
     {
         name: "LoginView",
-        components: { LocalizedLink },
+        components: { LocalizedLink, Toast },
         setup() {
             const route = useRoute();
             const router = useRouter();

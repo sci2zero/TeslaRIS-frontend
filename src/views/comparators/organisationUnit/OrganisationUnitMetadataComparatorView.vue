@@ -78,19 +78,7 @@
             supports-force-delete :left-warning-message="leftWarningMessage" :right-warning-message="rightWarningMessage" @update="updateAll"
             @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -111,11 +99,12 @@ import MergeService from '@/services/MergeService';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import OrganisationUnitRelationUpdateForm from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateForm.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitMetadataComparator",
-    components: { OrganisationUnitUpdateForm, KeywordUpdateForm, ComparisonActions, ResearchAreaHierarchy, OrganisationUnitRelationUpdateForm },
+    components: { OrganisationUnitUpdateForm, KeywordUpdateForm, ComparisonActions, ResearchAreaHierarchy, OrganisationUnitRelationUpdateForm, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

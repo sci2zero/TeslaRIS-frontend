@@ -121,19 +121,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -153,11 +142,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import { getTypesForGivenLocale } from '@/i18n/journalPublicationType';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast},
     props: {
         inModal: {
             type: Boolean,

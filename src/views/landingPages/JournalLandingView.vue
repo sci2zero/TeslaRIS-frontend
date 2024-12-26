@@ -106,19 +106,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -146,11 +134,12 @@ import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import type { EntityIndicatorResponse } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast },
     setup() {
         const currentTab = ref("");
 
