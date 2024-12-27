@@ -14,6 +14,7 @@ export interface OrganisationUnitIndex {
     researchAreasOther: string;
     researchAreasOtherSortable: string;
     databaseId: number;
+    superOUId: number;
     superOUNameSr: string;
     superOUNameSrSortable: string;
     superOUNameOther: string;
@@ -28,6 +29,7 @@ export interface OrganisationUnitRequest {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
+    uris: string[];
 }
 
 export interface OrganisationUnitResponse {
@@ -39,6 +41,7 @@ export interface OrganisationUnitResponse {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
+    uris: string[]
 }
 
 export enum OrganisationUnitsRelationType {
@@ -76,6 +79,11 @@ export interface ResearchArea {
     name: MultilingualContent[];
     description: MultilingualContent[];
     superResearchArea?: ResearchArea;
+}
+
+export interface ResearchAreaNode {
+    id : number;
+    name: MultilingualContent[];
 }
 
 interface Contact {

@@ -8,11 +8,6 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <multilingual-text-input v-model="affiliationStatement" :initial-value="toMultilingualTextInput(presetInvolvement?.affiliationStatement, languageList)" :label="$t('affiliationStatementLabel')" is-area></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
                     <v-col cols="6">
                         <date-picker
                             v-model="dateFrom"
@@ -67,7 +62,7 @@
             <v-col>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageList)" :label="$t('contributionDescriptionLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageList)" :label="$t('contributionabstractLabel')" is-area></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -85,8 +80,7 @@
                         <v-select
                             v-model="selectedEmploymentPosition"
                             :items="employmentPositions"
-                            :label="$t('employmentPositionLabel') + '*'"
-                            :rules="requiredSelectionRules"
+                            :label="$t('employmentPositionLabel')"
                             return-object>
                         </v-select>
                     </v-col>
@@ -120,7 +114,7 @@ import { getInvolvementTypesForGivenLocale, getInvolvementTypeTitleFromValueAuto
 import { InvolvementType, type Education, type Employment, type Involvement, type Membership } from '@/models/InvolvementModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
-import { getEmploymentPositionsForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
+import { getEmploymentPositionsForGivenLocale, getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import type { EmploymentPosition } from '@/models/PersonModel';
 import DatePicker from '@/components/core/DatePicker.vue';
 
@@ -157,7 +151,7 @@ export default defineComponent({
             }
 
             if(props.presetInvolvement && (props.presetInvolvement as Employment).employmentPosition) {
-                selectedEmploymentPosition.value = {title: getTitleFromValueAutoLocale((props.presetInvolvement as Employment).employmentPosition as EmploymentPosition) as string, value: (props.presetInvolvement as Employment).employmentPosition};
+                selectedEmploymentPosition.value = {title: getEmploymentPositionTitleFromValueAutoLocale((props.presetInvolvement as Employment).employmentPosition as EmploymentPosition) as string, value: (props.presetInvolvement as Employment).employmentPosition};
             }
         });
 
@@ -165,7 +159,6 @@ export default defineComponent({
 
         const dateFrom = ref(props.presetInvolvement?.dateFrom);
         const dateTo = ref(props.presetInvolvement?.dateTo);
-        const affiliationStatement = ref([]);
         const contributionDescription = ref([]);
         const role = ref([]);
         const title = ref([]);
@@ -189,7 +182,7 @@ export default defineComponent({
                 dateFrom: dateFrom.value as string,
                 dateTo: dateTo.value as string,
                 involvementType: selectedInvolvementType.value?.value as InvolvementType,
-                affiliationStatement: affiliationStatement.value,
+                affiliationStatement: [],
                 organisationUnitId: selectedOrganisationUnit.value.value
             };
 
@@ -221,7 +214,7 @@ export default defineComponent({
 
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
-            dateFrom, dateTo, saveInvolvement, affiliationStatement,
+            dateFrom, dateTo, saveInvolvement,
             languageList, selectedInvolvementType, requiredSelectionRules,
             ouAutocompleteRef, selectedOrganisationUnit, contributionDescription,
             role, title, abbreviationTitle, thesisTitle, employmentPositions,

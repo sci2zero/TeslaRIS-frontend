@@ -114,7 +114,7 @@ export default defineComponent({
 
         const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
-        const updatePublicationSeries = () => {
+        const submit = () => {
             const updatedPublicationSeries: PublicationSeries = {
                 title: title.value,
                 eissn: eIssn.value as string,
@@ -150,14 +150,14 @@ export default defineComponent({
             title, nameAbbreviations,
             eIssn, printIssn,
             requiredFieldRules,
-            updatePublicationSeries,
             languageList, languageTags,
             selectedLanguages,
             toMultilingualTextInput,
             eIssnValidationRules,
             printIssnValidationRules,
             titleRef, abbreviationsRef,
-            refreshForm, uris, urisRef
+            refreshForm, uris, urisRef,
+            submit
         };
     }
 });

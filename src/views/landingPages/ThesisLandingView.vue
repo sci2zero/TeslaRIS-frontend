@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <thesis-update-modal :preset-thesis="thesis" :read-only="!canEdit" @update="updateBasicInfo"></thesis-update-modal>
+                        <generic-crud-modal
+                            :form-component="ThesisUpdateForm"
+                            :form-props="{ presetThesis: thesis }"
+                            entity-name="Thesis"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -34,19 +42,28 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <div v-if="thesis?.thesisType">
+                                    {{ $t("typeOfPublicationLabel") }}:
+                                </div>
+                                <div v-if="thesis?.thesisType" class="response">
+                                    {{ getThesisTitleFromValueAutoLocale(thesis.thesisType) }}
+                                </div>
                                 <div v-if="thesis?.documentDate">
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="thesis?.documentDate" class="response">
                                     {{ localiseDate(thesis.documentDate) }}
                                 </div>
-                                <div v-if="thesis?.organisationUnitId">
+                                <div v-if="thesis?.organisationUnitId || (thesis?.externalOrganisationUnitName && thesis?.externalOrganisationUnitName.length > 0)">
                                     {{ $t("organisationUnitLabel") }}:
                                 </div>
                                 <div v-if="thesis?.organisationUnitId" class="response">
                                     <localized-link :to="'organisation-units/' + thesis?.organisationUnitId">
                                         {{ returnCurrentLocaleContent(organisationUnit?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else class="response">
+                                    {{ returnCurrentLocaleContent(thesis?.externalOrganisationUnitName) }}
                                 </div>
                                 <div v-if="thesis?.publisherId">
                                     {{ $t("publisherLabel") }}:
@@ -64,10 +81,6 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="thesis?.numberOfPages">
@@ -76,17 +89,11 @@
                                 <div v-if="thesis?.numberOfPages" class="response">
                                     {{ thesis.numberOfPages }}
                                 </div>
-                                <div v-if="thesis?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="thesis?.scopusId" class="response">
-                                    {{ thesis.scopusId }}
-                                </div>
                                 <div v-if="thesis?.doi">
                                     DOI:
                                 </div>
                                 <div v-if="thesis?.doi" class="response">
-                                    <doi-link :doi="thesis.doi"></doi-link>
+                                    <identifier-link :identifier="thesis.doi"></identifier-link>
                                 </div>
                                 <div v-if="thesis?.uris && thesis?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -109,45 +116,58 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="thesis?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <!-- Research Area -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                <!-- Description -->
+                <description-section :description="thesis?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <!-- Contributions -->
-        <person-document-contribution-tabs
-            :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
-            @update="updateContributions"></person-document-contribution-tabs>
+                <!-- Research Area -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="thesis?.proofs ? thesis.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, thesis)"
-                    @delete="deleteAttachment($event, true, thesis)" @update="updateAttachment($event, true, thesis)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="thesis?.fileItems ? thesis.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, thesis)" @delete="deleteAttachment($event, false, thesis)"
-                    @update="updateAttachment($event, false, thesis)"></attachment-list>
-            </v-col>
-        </v-row>
+                <attachment-section :document="thesis" :can-edit="canEdit" :proofs="thesis?.proofs" :file-items="thesis?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs
+                    :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
+                    @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -167,7 +187,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -177,7 +197,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Thesis } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
@@ -185,9 +204,9 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import ThesisUpdateModal from '@/components/publication/update/ThesisUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse, ResearchArea } from '@/models/OrganisationUnitModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
@@ -195,6 +214,11 @@ import ResearchAreaService from '@/services/ResearchAreaService';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
+import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -203,8 +227,10 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, DoiLink, ThesisUpdateModal, ResearchAreaHierarchy, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -217,6 +243,7 @@ export default defineComponent({
         const event = ref<Conference>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const i18n = useI18n();
@@ -228,8 +255,14 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchThesis();
@@ -237,7 +270,7 @@ export default defineComponent({
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -251,9 +284,11 @@ export default defineComponent({
 
                 thesis.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                OrganisationUnitService.readOU(thesis.value.organisationUnitId).then((response) => {
-                    organisationUnit.value = response.data;
-                });
+                if (thesis.value.organisationUnitId) {
+                    OrganisationUnitService.readOU(thesis.value.organisationUnitId).then((response) => {
+                        organisationUnit.value = response.data;
+                    });
+                }
 
                 if(thesis.value.publisherId) {
                     PublisherService.readPublisher(thesis.value.publisherId).then((publisherResponse) => {
@@ -320,7 +355,7 @@ export default defineComponent({
             thesis.value!.numberOfPages = basicInfo.numberOfPages;
             thesis.value!.languageTagIds = basicInfo.languageTagIds;
             thesis.value!.researchAreaId = basicInfo.researchAreaId;
-            thesis.value!.eventId = basicInfo.eventId;
+            thesis.value!.externalOrganisationUnitName = basicInfo.externalOrganisationUnitName;
 
             performUpdate(true);
         };
@@ -341,15 +376,22 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             thesis, icon, publisher,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, currentTab,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, localiseDate,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, organisationUnit, StatisticsType,
-            researchAreaHierarchy, event, documentIndicators
+            updateBasicInfo, organisationUnit, ThesisUpdateForm,
+            researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
+            handleResearcherUnbind, userRole, StatisticsType, documentIndicators
         };
 }})
 

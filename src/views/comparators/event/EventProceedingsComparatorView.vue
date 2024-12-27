@@ -39,6 +39,12 @@
             ></v-progress-circular>
         </v-row>
 
+        <v-row class="d-flex flex-row justify-center mt-10">
+            <v-btn @click="navigateToMetadataComparison">
+                {{ $t("compareMetadataLabel") }}
+            </v-btn>
+        </v-row>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -61,7 +67,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import MergeService from '@/services/MergeService';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -87,6 +93,7 @@ export default defineComponent({
         const rightEvent = ref<Conference>();
 
         const i18n = useI18n();
+        const router = useRouter();
 
         onMounted(() => {
             document.title = i18n.t("compareProceedingsLabel");
@@ -147,11 +154,18 @@ export default defineComponent({
             });
         };
 
+        const navigateToMetadataComparison = () => {
+            router.push({name: "eventMetadataComparator", params: {
+                leftId: parseInt(currentRoute.params.leftId as string), rightId: parseInt(currentRoute.params.rightId as string)
+            }});
+        };
+
         return {
             snackbar, snackbarMessage,
             leftEvent, rightEvent, handleDrag,
             moveAll, loading, showStopDialog,
-            returnCurrentLocaleContent
+            returnCurrentLocaleContent,
+            navigateToMetadataComparison
         };
 }})
 

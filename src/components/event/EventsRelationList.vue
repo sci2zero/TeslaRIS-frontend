@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col cols="4">
+        <v-col v-if="relations && relations.length > 0" cols="4">
             <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
         </v-col>
         <v-col v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission" cols="3">
@@ -114,9 +114,7 @@ setup(props) {
     };
 
     const navigateToTargetEvent = (eventId: number) => {
-        router.push({ name: "conferenceLandingPage", params: {id: eventId} }).then(() => {
-            router.go(0);
-        });
+        router.push({ name: "conferenceLandingPage", params: {id: eventId} });
     };
 
     const refreshRelationsList = () => {

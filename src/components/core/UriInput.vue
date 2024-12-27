@@ -2,7 +2,7 @@
     <v-row v-for="(element, index) in uris" :key="index">
         <v-col cols="10">
             <v-text-field
-                v-model="element.value" :label="$t('uriInputLabel')" placeholder="URI" outlined
+                v-model="element.value" :label="isWebsite ? $t('websiteLabel') : $t('uriInputLabel')" placeholder="URI" outlined
                 :rules="uriValidationRules" @input="sendContentToParent"></v-text-field>
         </v-col>
         <v-col cols="2">
@@ -27,6 +27,10 @@ export default defineComponent({
         modelValue: {
             type: Array<string>,
             required: true,
+        },
+        isWebsite: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -38,6 +42,7 @@ export default defineComponent({
         });
 
         const populateUriList = (uriList: string[]) => {
+            uris.value = [];
             if (uriList && uriList.length > 0) {
                 uris.value = [];
                 uriList.forEach((uri) => {
@@ -46,6 +51,8 @@ export default defineComponent({
                     }
                     uris.value.push({value: uri});
                 });
+            } else {
+                uris.value.push({value: ""});
             }
             sendContentToParent();
         };
@@ -56,12 +63,19 @@ export default defineComponent({
 
         const removeUri = (index: number) => {
             uris.value.splice(index, 1);
+            if (uris.value.length === 0) {
+                addUri();
+            }
             sendContentToParent();
         };
 
         const sendContentToParent = () => {
             const arrayOfUris: string[] = [];
-            uris.value.forEach(uri => arrayOfUris.push(uri.value));
+            uris.value.forEach(uri => {
+                if (uri.value.trim() !== "") {
+                    arrayOfUris.push(uri.value);
+                }
+            });
             emit("update:modelValue", arrayOfUris);
         };
 

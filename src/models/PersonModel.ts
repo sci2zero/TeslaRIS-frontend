@@ -28,7 +28,7 @@ export interface BasicPerson {
     eNaukaId?: string | null;
     orcid?: string | null;
     scopusAuthorId?: string | null;
-    organisationUnitId: number;
+    organisationUnitId?: number;
     employmentPosition?: EmploymentPosition;
   }
 
@@ -94,6 +94,7 @@ export enum EmploymentPosition {
     RESEARCH_ASSOCIATE,
     SCIENTIFIC_COLLABORATOR,
     SENIOR_SCIENTIFIC_COLLABORATOR,
+    TEACHING_ASSOCIATE
 }
 
 export enum Sex {
@@ -114,6 +115,7 @@ export interface PersonResponse {
     membershipIds: number[];
     expertisesOrSkills: ExpertiseOrSkillResponse[];
     prizes: PrizeResponse[];
+    imageServerFilename?: string;
 }
 
 export interface PersonalInfo {
@@ -127,6 +129,7 @@ export interface PersonalInfo {
     eNaukaId?: string;
     orcid?: string;
     scopusAuthorId?: string;
+    uris: string[];
 }
 
 export interface ExpertiseOrSkillResponse {
@@ -155,4 +158,12 @@ export interface Prize {
     title: MultilingualContent[];
     description: MultilingualContent[];
     date: string;
+}
+
+export interface PersonProfileImageRequest {
+    file: File
+    top: number;
+    left: number;
+    height: number;
+    width: number;
 }

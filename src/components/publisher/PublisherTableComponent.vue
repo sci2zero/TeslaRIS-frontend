@@ -5,8 +5,16 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        density="compact" class="compare-button" :disabled="selectedPublishers.length !== 2">
-        {{ $t("compareLabel") }}
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button"
+        :disabled="selectedPublishers.length !== 2"
+        @click="startMetadataComparison">
+        {{ $t("compareMetadataLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN'" density="compact" class="compare-button"
+        :disabled="selectedPublishers.length !== 2"
+        @click="startPublicationComparison">
+        {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-data-table-server
         v-model="selectedPublishers"
@@ -19,6 +27,7 @@
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -77,6 +86,7 @@ import type { PublisherIndex } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -93,9 +103,10 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedPublishers = ref([]);
+        const selectedPublishers = ref<PublisherIndex[]>([]);
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -163,22 +174,43 @@ export default defineComponent({
                 selectedPublishers.value = selectedPublishers.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
                 refreshTable(tableOptions.value);
             });
-        }
+        };
 
         const addNotification = (message: string) => {
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
             setTimeout(() => removeNotification(notificationId), 2000);
-        }
+        };
 
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
-        }
+        };
 
-        return {selectedPublishers, headers, notifications,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        const startMetadataComparison = () => {
+            router.push({name: "publisherMetadataComparator", params: {
+                leftId: selectedPublishers.value[0].databaseId, rightId: selectedPublishers.value[1].databaseId
+            }});
+        };
+
+        const startPublicationComparison = () => {
+            router.push({name: "publisherPublicationsComparator", params: {
+                leftId: selectedPublishers.value[0].databaseId, rightId: selectedPublishers.value[1].databaseId
+            }});
+        };
+
+        return {
+            selectedPublishers, headers, notifications,
             refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder};
+            tableOptions, displayTextOrPlaceholder,
+            setSortOption, startMetadataComparison,
+            startPublicationComparison
+        };
     }
 });
 </script>

@@ -4,40 +4,35 @@ import type { DocumentFileResponse } from "./DocumentFileModel";
 
 export interface IndicatorResponse {
     id: number;
-
     code: string;
-
     title: MultilingualContent[];
-
     description: MultilingualContent[];
-
     applicableEntityTypes: ApplicableEntityType[];
+    contentType: IndicatorContentType;
 }
 
 export interface IndicatorRequest {
     code: string;
-
     title: MultilingualContent[];
-
     description: MultilingualContent[];
-
     indicatorAccessLevel: AccessLevel;
-
     applicableTypes: ApplicableEntityType[];
+    contentType: IndicatorContentType;
 }
 
 export interface EntityIndicatorResponse {
-    numericValue: number,
+    id: number;
+    numericValue?: number;
+    booleanValue?: boolean;
+    textualValue?: string;
+    fromDate?: string;
+    toDate?: string;
+    indicatorResponse: IndicatorResponse;
+    source: EntityIndicatorSource
+}
 
-    booleanValue: boolean,
-
-    textualValue: string,
-
-    fromDate: string,
-
-    toDate: string,
-
-    indicatorResponse: IndicatorResponse
+export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
+    categoryIdentifier: string;
 }
 
 export enum StatisticsType {
@@ -47,15 +42,10 @@ export enum StatisticsType {
 
 export interface AssessmentMeasure {
     id?: number;
-
     formalDescriptionOfRule: string;
-    
-    code: string;
-    
+    code: string;    
     value: number;
-    
     title: MultilingualContent[];
-
     assessmentRulebookId: number;
 }
 
@@ -100,4 +90,34 @@ export interface CommissionResponse {
     formalDescriptionOfRule: string;
     superCommissionId: number;
     superCommissionDescription: MultilingualContent[];
+}
+
+export interface EntityIndicator {
+    numericValue?: number;
+    booleanValue?: boolean;
+    textualValue?: string;
+    fromDate?: string;
+    toDate?: string;
+    indicatorId: number;
+}
+
+export interface DocumentIndicator extends EntityIndicator {
+    documentId: number;
+}
+
+export interface EventIndicator extends EntityIndicator {
+    eventId: number;
+}
+
+export enum IndicatorContentType {
+    TEXT = "TEXT",
+    BOOL = "BOOL",
+    NUMBER = "NUMBER",
+    ANYTHING = "ANYTHING"
+}
+
+export enum EntityIndicatorSource {
+    MANUAL = "MANUAL",
+    WEB_OF_SCIENCE = "WEB_OF_SCIENCE",
+    SCIMAGO = "SCIMAGO"
 }

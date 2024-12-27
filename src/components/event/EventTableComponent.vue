@@ -25,6 +25,7 @@
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -85,7 +86,6 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
-
 
 export default defineComponent({
     name: "EventTableComponent",
@@ -225,10 +225,18 @@ export default defineComponent({
             }});
         };
 
-        return {selectedEvents, headers, notifications,
+        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            tableOptions.value.sortBy = sortBy;
+        };
+
+        return {
+            selectedEvents, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startProceedingsComparison, startMetadataComparison};
+            startProceedingsComparison, startMetadataComparison,
+            setSortOption
+        };
     }
 });
 </script>

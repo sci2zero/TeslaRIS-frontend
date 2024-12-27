@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <event-update-modal :preset-event="conference" :read-only="!canEdit" @update="updateBasicInfo"></event-update-modal>
+                        <generic-crud-modal
+                            :form-component="EventUpdateForm"
+                            :form-props="{ presetEvent: conference }"
+                            entity-name="Software"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -36,19 +44,13 @@
                                     {{ $t("eventDateLabel") }}:
                                 </div>
                                 <div v-if="!conference?.serialEvent" class="response">
-                                    {{ getDates(conference?.dateFrom as string, conference?.dateTo as string) }}
+                                    {{ localiseDateRange(conference?.dateFrom as string, conference?.dateTo as string) }}
                                 </div>
-                                <div v-if="conference?.description && conference.description.length > 0">
-                                    {{ $t("descriptionLabel") }}:
-                                </div>
-                                <div v-if="conference?.description && conference.description.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(conference?.description) }}
-                                </div>
-                                <div v-if="conference?.state && conference.state.length > 0">
+                                <div v-if="conference?.countryId">
                                     {{ $t("stateLabel") }}:
                                 </div>
-                                <div v-if="conference?.state && conference.state.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(conference?.state) }}
+                                <div v-if="conference?.countryId" class="response">
+                                    {{ returnCurrentLocaleContent(country?.name) }}
                                 </div>
                                 <div v-if="conference?.place && conference.place.length > 0">
                                     {{ $t("placeLabel") }}:
@@ -94,28 +96,58 @@
             </v-col>
         </v-row>
 
-        <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (conference?.contributions && conference?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="eventIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
+                <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
+            
+                <!-- Proceedings List -->
+                <div v-if="!conference?.serialEvent">
+                    <br />
+                    <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
+                </div>
 
-        <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
+                <div>
+                    <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
+                </div>
 
-        <!-- Proceedings List -->
-        <div v-if="!conference?.serialEvent">
-            <br />
-            <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
-        </div>
-
-        <!-- Relations List -->
-        <div>
-            <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
-        </div>
-
-        <!-- Publication Table -->
-        <div v-if="!conference?.serialEvent">
-            <h2>{{ $t("publicationsLabel") }}</h2>
-            <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
-        </div>
+                <!-- Publication Table -->
+                <div v-if="!conference?.serialEvent">
+                    <h2>{{ $t("publicationsLabel") }}</h2>
+                    <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+                </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="eventIndicators" 
+                    :applicable-types="[ApplicableEntityType.EVENT]" 
+                    :entity-id="conference?.id" 
+                    :entity-type="ApplicableEntityType.EVENT" 
+                    :can-edit="canEdit"
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+        </v-tabs-window>
         
         <v-snackbar
             v-model="snackbar"
@@ -146,20 +178,27 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
-import type { MultilingualContent } from '@/models/Common';
-import EventUpdateModal from '@/components/event/update/EventUpdateModal.vue';
+import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDateRange } from '@/i18n/dateLocalisation';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import CountryService from '@/services/CountryService';
+import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import type { EntityIndicatorResponse, EventIndicator } from '@/models/AssessmentModel';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, EventUpdateModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -179,6 +218,9 @@ export default defineComponent({
         const icon = ref("mdi-presentation");
 
         const canEdit = ref(false);
+        const country = ref<Country>();
+
+        const eventIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
             EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -186,7 +228,14 @@ export default defineComponent({
             });
 
             fetchConference();
+            fetchIndicators();
         });
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchEventIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                eventIndicators.value = response.data;
+            });
+        };
 
         const fetchConference = () => {
             EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -195,7 +244,16 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(conference.value.name) as string;
 
                 fetchPublications();
+                fetchDetails();
             });
+        };
+
+        const fetchDetails = () => {
+            if (conference.value?.countryId) {
+                CountryService.readCountry(conference.value.countryId as number).then((response) => {
+                    country.value = response.data;
+                });
+            }
         };
 
         const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -215,24 +273,6 @@ export default defineComponent({
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
-        };
-
-        const getDates = (from: string, to: string): string => {
-            if(!from || !to) {
-                return "";
-            }
-
-            const fromDate = new Date(Date.parse(from));
-            const toDate = new Date(Date.parse(to));
-
-            const diffInMonths = Math.abs((toDate.getMonth() - fromDate.getMonth()) + 
-                      12 * (toDate.getFullYear() - fromDate.getFullYear()));
-
-            if (diffInMonths > 3) {
-                return fromDate.getFullYear().toString();
-            }
-
-            return `${fromDate.toLocaleDateString("sr")} - ${toDate.toLocaleDateString("sr")}`;
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -255,7 +295,7 @@ export default defineComponent({
             conference.value!.nameAbbreviation = basicInfo.nameAbbreviation;
             conference.value!.dateFrom = basicInfo.dateFrom;
             conference.value!.dateTo = basicInfo.dateTo;
-            conference.value!.state = basicInfo.state;
+            conference.value!.countryId = basicInfo.countryId;
             conference.value!.place = basicInfo.place;
             conference.value!.serialEvent = basicInfo.serialEvent;
             conference.value!.fee = basicInfo.fee;
@@ -263,7 +303,7 @@ export default defineComponent({
             conference.value!.confId = basicInfo.confId;
             conference.value!.uris = basicInfo.uris;
 
-            performUpdate(false);
+            performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
@@ -282,14 +322,22 @@ export default defineComponent({
             });
         };
 
+        const createIndicator = (eventIndicator: EventIndicator) => {
+            EntityIndicatorService.createEventIndicator(eventIndicator).then(() => {
+                fetchIndicators();
+            });
+        };
+
         return {
-            conference, icon, publications, 
+            conference, icon, publications,
             totalPublications, switchPublicationsPage,
-            keywords, getDates, updateBasicInfo,
+            keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
-            localiseDate
+            country, EventUpdateForm, ApplicableEntityType,
+            eventIndicators, fetchIndicators, createIndicator,
+            currentTab
         };
 }})
 

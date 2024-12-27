@@ -73,15 +73,24 @@ label {
     right: 0px;
     position: absolute;
     z-index: 10;
+}
+
+
+.edit-pen-container .edit-pen button {
     opacity: 0;
 }
 
-.edit-pen-container:hover .edit-pen {
-    opacity: 0.3;
+.edit-pen-container:hover .edit-pen button {
+    opacity: 0.5;
 }
 
 .edit-pen-container .edit-pen:hover {
     opacity: 1;
+}
+ 
+.edit-pen-container:hover .non-solid-bg .edit-pen > button {
+    opacity: 0.7;
+    background: white;
 }
 
 .modal-spacer-top {
@@ -118,4 +127,10 @@ label {
 .middle-arrow {
     margin-left: 25px;
     margin-top: 120px;
+}
+
+/* Statistics */
+
+.statistics {
+    padding: 10px;
 }

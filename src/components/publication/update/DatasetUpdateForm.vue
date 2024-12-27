@@ -18,11 +18,8 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
+            <v-col cols="10">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="5">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -38,11 +35,6 @@
         <v-row>
             <v-col cols="10">
                 <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
-                <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
             </v-col>
         </v-row>
         
@@ -69,13 +61,12 @@ import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 import { watch } from 'vue';
 
 
 export default defineComponent({
     name: "DatasetUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, EventAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
     props: {
         presetDataset: {
             type: Object as PropType<Dataset | undefined>,
@@ -115,23 +106,21 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
-        const urisRef = ref<typeof UriInput>()
+        const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetDataset?.documentDate);
         const doi = ref(props.presetDataset?.doi);
-        const scopus = ref(props.presetDataset?.scopusId);
         const datasetNumber = ref(props.presetDataset?.internalNumber);
         const uris = ref<string[]>(props.presetDataset?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
-        const updateDataset = () => {
+        const submit = () => {
             const updatedDataset: Dataset = {
                 title: title.value as MultilingualContent[],
                 internalNumber: datasetNumber.value as string,
@@ -141,10 +130,8 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: props.presetDataset?.contributions,
                 documentDate: publicationYear.value,
-                scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -163,7 +150,6 @@ export default defineComponent({
             datasetNumber.value = props.presetDataset?.internalNumber;
             publicationYear.value = props.presetDataset?.documentDate;
             doi.value = props.presetDataset?.doi;
-            scopus.value = props.presetDataset?.scopusId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -173,13 +159,11 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
-            publicationYear, doi, scopus,
+            isFormValid, title, subtitle,
+            publicationYear, doi, languageTags,
             selectedPublisher, datasetNumber,
             uris, requiredFieldRules, doiValidationRules,
-            updateDataset, toMultilingualTextInput,
-            languageTags, selectedEvent, scopusIdValidationRules,
+            submit, toMultilingualTextInput,
             titleRef, subtitleRef, urisRef
         };
     }

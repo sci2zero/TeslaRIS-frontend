@@ -3,6 +3,7 @@ import { BaseService } from "../BaseService";
 import axios from "axios";
 import type { Commission, CommissionResponse } from "@/models/AssessmentModel";
 import type { Page } from "@/models/Common";
+import i18n from "@/i18n";
 
 
 export class CommissionService extends BaseService {
@@ -10,7 +11,7 @@ export class CommissionService extends BaseService {
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
     async fetchAllCommissions(parameters: string): Promise<AxiosResponse<Page<CommissionResponse>>> {
-        return super.sendRequest(axios.get, `assessment/commission?${parameters}`);
+        return super.sendRequest(axios.get, `assessment/commission?${parameters}&lang=${i18n.vueI18n.global.locale}`);
     }
 
     async readCommission(commissionId: number): Promise<AxiosResponse<CommissionResponse>> {

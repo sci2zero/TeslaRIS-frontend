@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <dataset-update-modal :preset-dataset="dataset" :read-only="!canEdit" @update="updateBasicInfo"></dataset-update-modal>
+                        <generic-crud-modal
+                            :form-component="DatasetUpdateForm"
+                            :form-props="{ presetDataset: dataset }"
+                            entity-name="Dataset"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -54,10 +62,6 @@
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="dataset?.scopusId">
@@ -70,7 +74,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="dataset?.doi" class="response">
-                                    <doi-link :doi="dataset.doi"></doi-link>
+                                    <identifier-link :identifier="dataset.doi"></identifier-link>
                                 </div>
                                 <div v-if="dataset?.uris && dataset?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -85,30 +89,44 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="dataset?.keywords ? dataset.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (dataset?.contributions && dataset?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="dataset?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="dataset?.keywords ? dataset.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <person-document-contribution-tabs :document-id="dataset?.id" :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <!-- Description -->
+                <description-section :description="dataset?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="dataset?.proofs ? dataset.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, dataset)"
-                    @delete="deleteAttachment($event, true, dataset)" @update="updateAttachment($event, true, dataset)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="dataset?.fileItems ? dataset.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, dataset)" @delete="deleteAttachment($event, false, dataset)"
-                    @update="updateAttachment($event, false, dataset)"></attachment-list>
-            </v-col>
-        </v-row>
+                <attachment-section :document="dataset" :can-edit="canEdit" :proofs="dataset?.proofs" :file-items="dataset?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="dataset?.id" :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(dataset?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -128,7 +146,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -138,7 +156,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Dataset } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
@@ -146,10 +163,14 @@ import type { Publisher } from '@/models/PublisherModel';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import DatasetUpdateModal from '@/components/publication/update/DatasetUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -159,8 +180,9 @@ import { localiseDate } from '@/i18n/dateLocalisation';
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, DatasetUpdateModal, UriList, DoiLink, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("contributions");
         const snackbar = ref(false);
         const snackbarMessage = ref("");
         
@@ -171,6 +193,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const i18n = useI18n();
@@ -180,8 +203,14 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchDataset();
@@ -189,7 +218,7 @@ export default defineComponent({
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -273,13 +302,20 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
-            dataset, icon, publisher,
-            returnCurrentLocaleContent, localiseDate,
+            dataset, icon, publisher, userRole, currentTab,
+            returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo, documentIndicators, StatisticsType
+            updateContributions, updateBasicInfo, DatasetUpdateForm,
+            StatisticsType, documentIndicators, localiseDate
         };
 }})
 

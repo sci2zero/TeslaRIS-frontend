@@ -11,5 +11,9 @@ export const useLoginStore = defineStore('login', {
         userLoggedOut() {
             this.userLoggedIn = false;
         },
+        initialize() {
+            const token = localStorage.getItem('jwt');
+            this.userLoggedIn = !!token;
+        }
     },
 });

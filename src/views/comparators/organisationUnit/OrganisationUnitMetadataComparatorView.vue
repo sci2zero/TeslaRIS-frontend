@@ -74,7 +74,9 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions
+            supports-force-delete :left-warning-message="leftWarningMessage" :right-warning-message="rightWarningMessage" @update="updateAll"
+            @delete="deleteSide"></comparison-actions>
 
         <v-snackbar
             v-model="snackbar"
@@ -93,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -136,12 +138,20 @@ export default defineComponent({
         const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
         const leftRelationsRef = ref<typeof OrganisationUnitRelationUpdateForm>();
         const rightRelationsRef = ref<typeof OrganisationUnitRelationUpdateForm>();
+
+        const leftWarningMessage = ref("");
+        const rightWarningMessage = ref("");
         
         const i18n = useI18n();
 
         onMounted(() => {
             document.title = i18n.t("organisationUnitMetadataComparatorLabel");
             fetchOrganisationUnits();
+            constructPotentialWarningMessages();
+        });
+
+        watch(i18n.locale, () => {
+            constructPotentialWarningMessages();
         });
 
         const fetchOrganisationUnits = () => {
@@ -153,6 +163,20 @@ export default defineComponent({
             OrganisationUnitService.readOU(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightOrganisationUnit.value = response.data;
                 fetchRightDetails();
+            });
+        };
+
+        const constructPotentialWarningMessages = () => {
+            OrganisationUnitService.checkIfInstitutionalAdminsExist(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                if (response.data) {
+                    leftWarningMessage.value = i18n.t("organisationUnitAdminExistsMessage");
+                }
+            });
+
+            OrganisationUnitService.checkIfInstitutionalAdminsExist(parseInt(currentRoute.params.rightId as string)).then((response) => {
+                if (response.data) {
+                    rightWarningMessage.value = i18n.t("organisationUnitAdminExistsMessage");
+                }
             });
         };
 
@@ -186,6 +210,13 @@ export default defineComponent({
 
             organisationUnit1.researchAreas = organisationUnit2.researchAreas;
 
+            organisationUnit2.uris!.forEach(uri => {
+                if (!organisationUnit1.uris!.includes(uri)) {
+                    organisationUnit1.uris!.push(uri);
+                }
+            });
+            organisationUnit2.uris = [];
+
             organisationUnit1.location!.latitude = organisationUnit2.location?.latitude as number;
             organisationUnit1.location!.longitude = organisationUnit2.location?.longitude as number;
             organisationUnit1.location!.address = organisationUnit2.location?.address;
@@ -194,10 +225,10 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftRef.value?.updateOU();
-            updateRightRef.value?.updateOU();
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightOrganisationUnit.value, leftOrganisationUnit.value] = mergeOrganisationUnitMetadata(rightOrganisationUnit.value as OrganisationUnitResponse, leftOrganisationUnit.value as OrganisationUnitResponse);
@@ -226,6 +257,7 @@ export default defineComponent({
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
+            leftOrganisationUnit.value!.uris = updatedData.uris;
 
             leftUpdateRequest.value = updatedData;
             
@@ -242,6 +274,7 @@ export default defineComponent({
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
+            rightOrganisationUnit.value!.uris = updatedData.uris;
 
             rightUpdateRequest.value = updatedData;
             
@@ -253,10 +286,10 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftRef.value?.updateOU();
-            updateRightRef.value?.updateOU();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
             leftRelationsRef.value?.updateOURelations();
             rightRelationsRef.value?.updateOURelations();
         };
@@ -309,12 +342,18 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            OrganisationUnitService.deleteOrganisationUnit(side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.id as number : rightOrganisationUnit.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.id as number : rightOrganisationUnit.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.name : rightOrganisationUnit.value?.name;
+
+            const deleteAction = isForceDelete 
+                ? OrganisationUnitService.forceDeleteOrganisationUnit(id)
+                : OrganisationUnitService.deleteOrganisationUnit(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "organisationUnits" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.name : rightOrganisationUnit.value?.name;
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: name });
+                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             });
         };
@@ -363,7 +402,8 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             leftRelations, rightRelations, snackbar,
             leftRelationsRef, rightRelationsRef,
-            updateLeftRelations, updateRightRelations
+            updateLeftRelations, updateRightRelations,
+            leftWarningMessage, rightWarningMessage
         };
 }})
 

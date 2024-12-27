@@ -1,9 +1,17 @@
 <template>
-    <v-row>
+    <v-row v-if="canEdit || (parsedKeywords && parsedKeywords.length > 0)">
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <keyword-update-modal :preset-keywords="keywords ? keywords : []" :read-only="!canEdit" @update="emitToParent"></keyword-update-modal>
+                    <generic-crud-modal
+                        :form-component="KeywordUpdateForm"
+                        :form-props="{ presetKeywords: keywords ? keywords : [] }"
+                        entity-name="Keywords"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="emitToParent"
+                    />
 
                     <div><b>{{ $t("keywordsLabel") }}</b></div>
                     <strong v-if="!parsedKeywords || parsedKeywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
@@ -18,17 +26,18 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
-import KeywordUpdateModal from './update/KeywordUpdateModal.vue';
+import GenericCrudModal from './GenericCrudModal.vue';
 import type { MultilingualContent } from '@/models/Common';
 import { watch } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import KeywordUpdateForm from './update/KeywordUpdateForm.vue';
 
 
 export default defineComponent({
     name: "KeywordList",
-    components: { KeywordUpdateModal },
+    components: { GenericCrudModal },
     props: {
         canEdit: {
             type: Boolean,
@@ -61,7 +70,10 @@ export default defineComponent({
             parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
         });
 
-        return { searchKeyword, parsedKeywords, emitToParent };
+        return { 
+            searchKeyword, parsedKeywords, 
+            KeywordUpdateForm, emitToParent 
+        };
     },
 });
 </script>

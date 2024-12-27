@@ -4,10 +4,11 @@
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
-    <generic-assessment-modal
+    <generic-crud-modal
         :form-component="AssessmentRulebookForm"
         :form-props="{ presetAssessmentRulebook: undefined }"
         entity-name="AssessmentRulebook"
+        :read-only="false"
         @create="createNewAssessmentRulebook"
     />
 
@@ -75,13 +76,13 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import GenericAssessmentModal from '../GenericAssessmentModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentRulebookForm from './AssessmentRulebookForm.vue';
 
 
 export default defineComponent({
     name: "AssessmentRulebookTableComponent",
-    components: { LocalizedLink, GenericAssessmentModal },
+    components: { LocalizedLink, GenericCrudModal },
     props: {
         assessmentRulebooks: {
             type: Array<AssessmentRulebookResponse>,
@@ -110,9 +111,9 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name", order: "asc"}]});
 
         const headers = [
-          { title: nameLabel, align: "start", sortable: true, key: "name"},
-          { title: descriptionLabel, align: "start", sortable: true, key: "description"},
-          { title: dateLabel, align: "start", sortable: true, key: "code"},
+          { title: nameLabel, align: "start", sortable: true, key: "name.content"},
+          { title: descriptionLabel, align: "start", sortable: true, key: "description.content"},
+          { title: dateLabel, align: "start", sortable: true, key: "issueDate"},
           { title: publisherLabel, align: "start", sortable: false}
         ];
 

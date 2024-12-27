@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <monograph-update-modal :read-only="!canEdit" :preset-monograph="monograph" @update="updateBasicInfo"></monograph-update-modal>
+                        <generic-crud-modal
+                            :form-component="MonographUpdateForm"
+                            :form-props="{ presetMonograph: monograph}"
+                            entity-name="Monograph"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -84,10 +92,6 @@
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="monograph?.scopusId">
@@ -100,7 +104,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="monograph?.doi" class="response">
-                                    <doi-link :doi="monograph.doi"></doi-link>
+                                    <identifier-link :identifier="monograph.doi"></identifier-link>
                                 </div>
                                 <div v-if="monograph?.eventId">
                                     {{ $t("conferenceLabel") }}:
@@ -131,50 +135,74 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="researchAreaHierarchy" value="researchArea">
+                {{ $t("researchAreaLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <!-- Research Area -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-        
-        <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <!-- Description -->
+                <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                
+                <!-- Publications Table -->
+                <v-row>
+                    <v-col cols="12">
+                        <h2>{{ $t("monographPublicationsLabel") }}</h2>
+                        <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                    </v-col>
+                </v-row>
 
-        <!-- Publications Table -->
-        <v-row>
-            <h2>{{ $t("monographPublicationsLabel") }}</h2>
-            <v-col cols="12">
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-            </v-col>
-        </v-row>
+                <attachment-section :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchArea">
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <research-areas-update-modal :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []" :read-only="!canEdit" limit-one @update="updateResearchAreas"></research-areas-update-modal>
+                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="documentIndicators" 
+                    :applicable-types="[ApplicableEntityType.MONOGRAPH]" 
+                    :entity-id="monograph?.id" 
+                    :entity-type="ApplicableEntityType.DOCUMENT" 
+                    :can-edit="canEdit"
+                    show-statistics
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+        </v-tabs-window>
 
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="monograph?.proofs ? monograph.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, monograph)"
-                    @delete="deleteAttachment($event, true, monograph)" @update="updateAttachment($event, true, monograph)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="monograph?.fileItems ? monograph.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, monograph)" @delete="deleteAttachment($event, false, monograph)"
-                    @update="updateAttachment($event, false, monograph)"></attachment-list>
-            </v-col>
-        </v-row>
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -193,8 +221,8 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -204,7 +232,6 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
@@ -212,7 +239,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import MonographUpdateModal from '@/components/publication/update/MonographUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import EventService from '@/services/EventService';
@@ -221,19 +248,27 @@ import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
-import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
+import EntityIndicatorForm from '@/components/assessment/indicators/EntityIndicatorForm.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, MonographUpdateModal, LocalizedLink, UriList, DoiLink, PublicationTableComponent, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection },
     setup() {
+        const currentTab = ref("contributions");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -243,6 +278,7 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const i18n = useI18n();
@@ -265,16 +301,26 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
             fetchMonograph();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            fetchIndicators();
+        };
+
+        const fetchIndicators = () => {
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
@@ -370,6 +416,12 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            monograph.value!.researchAreaId = researchAreaIds[0];
+
+            performUpdate(true);
+        };
+
         const updateBasicInfo = (basicInfo: Monograph) => {
             monograph.value!.title = basicInfo.title;
             monograph.value!.subTitle = basicInfo.subTitle;
@@ -405,19 +457,36 @@ export default defineComponent({
             });
         };
 
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
+        const createIndicator = (documentIndicator: DocumentIndicator) => {
+            EntityIndicatorService.createDocumentIndicator(documentIndicator).then(() => {
+                fetchIndicators();
+            });
+        };
+
         return {
             monograph, icon,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment,
+            addAttachment, updateAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, event,
             researchAreaHierarchy, updateContributions,
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,
-            documentIndicators, StatisticsType
+            MonographUpdateForm, deleteAttachment,
+            handleResearcherUnbind, userRole,
+            documentIndicators, StatisticsType,
+            currentTab, updateResearchAreas,
+            ApplicableEntityType, EntityIndicatorForm,
+            createIndicator, fetchIndicators
         };
 }})
 

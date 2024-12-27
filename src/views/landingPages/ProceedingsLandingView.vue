@@ -26,7 +26,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <proceedings-update-modal :preset-proceedings="proceedings" :read-only="!canEdit" @update="updateBasicInfo"></proceedings-update-modal>
+                        <generic-crud-modal
+                            :form-component="ProceedingsUpdateForm"
+                            :form-props="{ presetProceedings: proceedings}"
+                            entity-name="Proceedings"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -84,10 +92,6 @@
                                         {{ languageTagMap.get(languageTagId)?.display }}
                                     </v-chip>
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="proceedings?.eISBN">
@@ -112,7 +116,7 @@
                                     DOI:
                                 </div>
                                 <div v-if="proceedings?.doi" class="response">
-                                    <doi-link :doi="proceedings.doi"></doi-link>
+                                    <identifier-link :identifier="proceedings.doi"></identifier-link>
                                 </div>
                                 <div v-if="proceedings?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
@@ -133,38 +137,54 @@
             </v-col>
         </v-row>
 
-        <!-- Keywords -->
-        <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <br />
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (proceedings?.contributions && proceedings?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Description -->
-        <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
-
-        <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
-
-        <v-row>
-            <h2>{{ $t("proofsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="proceedings?.proofs ? proceedings.proofs : []" :can-edit="canEdit" is-proof @create="addAttachment($event, true, proceedings)"
-                    @delete="deleteAttachment($event, true, proceedings)" @update="updateAttachment($event, true, proceedings)"></attachment-list>
-            </v-col>
-        </v-row>
-        <v-row>
-            <h2>{{ $t("fileItemsLabel") }}</h2>
-            <v-col cols="12">
-                <attachment-list
-                    :attachments="proceedings?.fileItems ? proceedings.fileItems : []" :can-edit="canEdit" @create="addAttachment($event, false, proceedings)" @delete="deleteAttachment($event, false, proceedings)"
-                    @update="updateAttachment($event, false, proceedings)"></attachment-list>
-            </v-col>
-        </v-row>
-
-        <!-- All Publications Table -->
-        <v-row>
-            <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
-            <v-col cols="12">
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="publications">
+                <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
                 <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-            </v-col>
-        </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <br />
+                <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+
+                <!-- Description -->
+                <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+
+                <br />
+                <attachment-section :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"></attachment-section>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedings?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <v-snackbar
             v-model="snackbar"
@@ -184,7 +204,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
@@ -192,7 +212,6 @@ import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/mod
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import AttachmentList from '@/components/core/AttachmentList.vue';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -208,12 +227,16 @@ import type { Publisher } from '@/models/PublisherModel';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
-import ProceedingsUpdateModal from '@/components/proceedings/update/ProceedingsUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import UriList from '@/components/core/UriList.vue';
-import DoiLink from '@/components/core/DoiLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -222,14 +245,17 @@ import { StatisticsType, type EntityIndicatorResponse } from '@/models/Assessmen
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentList, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, ProceedingsUpdateModal, UriList, DoiLink, PublicationTableComponent, StatisticsView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
     setup() {
+        const currentTab = ref("");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
         const router = useRouter();
 
+        const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
 
         const proceedings = ref<Proceedings>();
@@ -255,22 +281,28 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         onMounted(() => {
+            fetchDisplayData();
+        });
+
+        const fetchDisplayData = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            }).catch(() => {
+                canEdit.value = false;
             });
 
-            fetchProceedings();
+            fetchProceedings(true);
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();
         });
 
-        const fetchProceedings = () => {
+        const fetchProceedings = (uponStartup: boolean) => {
             ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
                 proceedings.value = response.data;
 
@@ -281,7 +313,12 @@ export default defineComponent({
                 fetchConnectedEntities();
 
                 populateData();
-                fetchPublications();
+                
+                if(uponStartup) {
+                    Promise.all([fetchPublications()]).then(() => {
+                        setStartTab();
+                    });
+                }
             });
         };
 
@@ -302,11 +339,7 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!proceedings.value?.id) {
-                return;
-            }
-
-            DocumentPublicationService.findPublicationsInProceedings(proceedings.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsInProceedings(proceedings.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
@@ -390,20 +423,34 @@ export default defineComponent({
                 snackbar.value = true;
                 fetchConnectedEntities();
                 if(reload) {
-                    fetchProceedings();
+                    fetchProceedings(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchProceedings();
+                    fetchProceedings(false);
                 }
             });
         };
 
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else {
+                currentTab.value = "contributions";
+            }
+        };
+
+        const handleResearcherUnbind = () => {
+            snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
+            snackbar.value = true;
+            fetchDisplayData();
+        };
+
         return {
             proceedings, icon,
-            publications, event,
+            publications, event, currentTab,
             totalPublications, switchPage,
             returnCurrentLocaleContent, localiseDate,
             languageTagMap, publicationSeriesType,
@@ -411,6 +458,7 @@ export default defineComponent({
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
+            ProceedingsUpdateForm, handleResearcherUnbind, userRole,
             documentIndicators, StatisticsType
         };
 }})

@@ -7,14 +7,19 @@ import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import type { Page } from "@/models/Common";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
+import type { PersonResponse } from "@/models/PersonModel";
 
 export class ImportService extends BaseService {
+  
+    async canPerformHarvest(): Promise<AxiosResponse<boolean>> {
+      return super.sendRequest(axios.get, "import-common/can-perform");
+    }
   
     async startHarvest(dateFrom: string, dateTo: string): Promise<AxiosResponse<number>> {
       return super.sendRequest(axios.get, `import-common/documents-by-author?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}`);
     }
 
-    async getHarvestedDocumentsCound(): Promise<AxiosResponse<number>> {
+    async getHarvestedDocumentsCount(): Promise<AxiosResponse<number>> {
       return super.sendRequest(axios.get, "load/load-wizard/count-remaining");
     }
 
@@ -32,6 +37,10 @@ export class ImportService extends BaseService {
 
     async createNewInstitution(scopusAfid: string, idempotencyKey: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
       return super.sendRequest(axios.post, `load/institution/${scopusAfid}`, {}, idempotencyKey);
+    }
+
+    async createNewPerson(scopusAuthorId: string, idempotencyKey: string): Promise<AxiosResponse<PersonResponse>> {
+      return super.sendRequest(axios.post, `load/person/${scopusAuthorId}`, {}, idempotencyKey);
     }
 
     async createNewJournal(eIssn: string, printIssn: string, idempotencyKey: string): Promise<AxiosResponse<PublicationSeries>> {

@@ -6,7 +6,6 @@
                 :label="$t('bookSeriesLabel') + (required ? '*' : '')"
                 :items="bookSeries"
                 :custom-filter="((): boolean => true)"
-                :auto-select-first="true"
                 :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
                 :no-data-text="$t('noDataMessage')"
                 return-object

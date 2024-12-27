@@ -6,7 +6,6 @@
                 :label="$t('journalLabel') + (required ? '*' : '')"
                 :items="journals"
                 :custom-filter="((): boolean => true)"
-                :auto-select-first="true"
                 :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
                 :no-data-text="$t('noDataMessage')"
                 return-object
@@ -102,7 +101,7 @@ export default defineComponent({
         });
 
         const searchJournals = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
+            if (!input || input.includes("|")) {
                 return;
             }
             if (input.length >= 3) {

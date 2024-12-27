@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <publication-series-update-modal :read-only="!canEdit" :preset-publication-series="journal" input-type="JOURNAL" @update="updateBasicInfo"></publication-series-update-modal>
+                        <generic-crud-modal
+                            :form-component="PublicationSeriesUpdateForm"
+                            :form-props="{ presetPublicationSeries: journal, inputType: 'JOURNAL' }"
+                            entity-name="Journal"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -61,15 +69,42 @@
             </v-col>
         </v-row>
 
-        <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+        <br />
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab v-if="canEdit || journalIndicators.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Publications Table -->
-        <v-row>
-            <h2>{{ $t("journalPublicationsLabel") }}</h2>
-            <v-col cols="12">
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="publications">
+                <!-- Publications Table -->
+                <h2>{{ $t("journalPublicationsLabel") }}</h2>
                 <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
-            </v-col>
-        </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="journalIndicators" 
+                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]" 
+                    :entity-id="journal?.id"
+                    :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
+                    :can-edit="false"
+                />
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <v-snackbar
             v-model="snackbar"
@@ -89,7 +124,7 @@
 
 <script lang="ts">
 
-import type { LanguageTagResponse } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -102,17 +137,23 @@ import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import PublicationSeriesUpdateModal from '@/components/publicationSeries/update/PublicationSeriesUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import type { EntityIndicatorResponse } from '@/models/AssessmentModel';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, PublicationSeriesUpdateModal, PersonPublicationSeriesContributionTabs, UriList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection },
     setup() {
+        const currentTab = ref("");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -134,19 +175,22 @@ export default defineComponent({
 
         const canEdit = ref(false);
 
+        const journalIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                 canEdit.value = response.data;
             });
 
-            fetchJournal();
+            fetchJournal(true);
+            fetchIndicators();
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
 
-        const fetchJournal = () => {
+        const fetchJournal = (uponStartup: boolean) => {
             JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
                 journal.value = response.data;
 
@@ -154,8 +198,19 @@ export default defineComponent({
 
                 journal.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                fetchPublications();                
+                if(uponStartup) {
+                    Promise.all([fetchPublications()]).then(() => {
+                        setStartTab();
+                    });
+                }
+
                 populateData();
+            });
+        };
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchPublicationSeriesIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                journalIndicators.value = response.data;
             });
         };
 
@@ -176,11 +231,7 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            if (!journal.value?.id) {
-                return;
-            }
-
-            DocumentPublicationService.findPublicationsInJournal(journal.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsInJournal(journal.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
@@ -207,15 +258,23 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchJournal();
+                    fetchJournal(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchJournal();
+                    fetchJournal(false);
                 }
             });
+        };
+
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else {
+                currentTab.value = "contributions";
+            }
         };
 
         return {
@@ -225,8 +284,9 @@ export default defineComponent({
             switchPage, canEdit,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
-            snackbar, snackbarMessage,
-            updateContributions
+            snackbar, snackbarMessage, journalIndicators,
+            updateContributions, ApplicableEntityType,
+            currentTab, PublicationSeriesUpdateForm
         };
 }})
 

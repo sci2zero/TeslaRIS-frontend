@@ -8,8 +8,8 @@ export class EventService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean): Promise<AxiosResponse<Page<EventIndex>>> {
-    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}`);
+  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean): Promise<AxiosResponse<Page<EventIndex>>> {
+    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}`);
   }
 
   async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {
@@ -22,6 +22,10 @@ export class EventService extends BaseService {
 
   async deleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `conference/${conferenceId}`);
+  }
+
+  async forceDeleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `conference/force/${conferenceId}`);
   }
 
   async createConference(body: Conference): Promise<AxiosResponse<Conference>> {

@@ -17,14 +17,20 @@
         <!-- Researcher Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-researcher-icon">
-                    {{ accountIcon }}
-                </v-icon>
+                <person-profile-image :filename="person?.imageServerFilename" :person-id="person?.id" :can-edit="canEdit"></person-profile-image>
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <person-update-modal :preset-person="person" :read-only="!canEdit" @update="updatePersonalInfo"></person-update-modal>
+                        <generic-crud-modal
+                            :form-component="PersonUpdateForm"
+                            :form-props="{ presetPerson: person }"
+                            entity-name="Person"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updatePersonalInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -33,7 +39,7 @@
                         <v-row>
                             <v-col cols="6">
                                 <div class="response">
-                                    <person-other-name-modal :preset-other-names="person?.personOtherNames" :read-only="!canEdit" @update="updateOtherNames" @select-primary="selectPrimaryName"></person-other-name-modal>
+                                    <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
                                 </div>
                                 <div v-if="personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
@@ -59,19 +65,28 @@
                                 </div>
                                 <div>eCRIS-ID:</div>
                                 <div class="response">
-                                    {{ personalInfo.eCrisId ? personalInfo.eCrisId : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="personalInfo.eCrisId" :identifier="personalInfo.eCrisId" type="ecris"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
                                 <div>enaukaID:</div>
                                 <div class="response">
                                     {{ personalInfo.eNaukaId ? personalInfo.eNaukaId : $t("notYetSetMessage") }}
                                 </div>
                                 <div>ORCID:</div>
-                                <div class="response">
-                                    {{ personalInfo.orcid ? personalInfo.orcid : $t("notYetSetMessage") }}
+                                <div v-if="personalInfo.orcid" class="response">
+                                    <identifier-link :identifier="personalInfo.orcid" type="orcid"></identifier-link>
+                                </div>
+                                <div v-else class="response">
+                                    {{ $t("notYetSetMessage") }}
                                 </div>
                                 <div>Scopus Author ID:</div>
                                 <div class="response">
-                                    {{ personalInfo.scopusAuthorId ? personalInfo.scopusAuthorId : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="personalInfo.scopusAuthorId" :identifier="personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -87,17 +102,17 @@
                                 <div v-if="personalInfo.city" class="response">
                                     {{ personalInfo.city }}
                                 </div>
-                                <div v-if="personalInfo.placeOfBrith">
+                                <div v-if="personalInfo.placeOfBirth">
                                     {{ $t("placeOfBirthLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.placeOfBrith" class="response">
-                                    {{ personalInfo.placeOfBrith }}
+                                <div v-if="personalInfo.placeOfBirth" class="response">
+                                    {{ personalInfo.placeOfBirth }}
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail">
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div v-if="personalInfo.contact.contactEmail" class="response">
-                                    {{ personalInfo.contact.contactEmail }}
+                                    <identifier-link :identifier="personalInfo.contact.contactEmail" type="email"></identifier-link>
                                 </div>
                                 <div v-if="personalInfo.contact.phoneNumber">
                                     {{ $t("phoneNumberLabel") }}:
@@ -105,8 +120,11 @@
                                 <div v-if="personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
                                 </div>
-                                <div class="w-50">
-                                    <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                                <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
+                                    {{ $t("websiteLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="person?.personalInfo.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -114,56 +132,93 @@
                 </v-card>
             </v-col>
         </v-row>
-
-        <!-- Keywords -->
-        <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
-
-        <!-- Biography -->
-        <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
-
-        <v-row>
-            <v-col cols="6">
-                <!-- Expertises and Skills -->
-                <expertise-or-skill-list :expertise-or-skills="person?.expertisesOrSkills" :person="person" :can-edit="canEdit" @crud="fetchPerson"></expertise-or-skill-list>
-                <br />
-                <!-- Prizes -->
-                <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit" @crud="fetchPerson"></prize-list>
-            </v-col>
-
-
-            <!-- Involvements -->
-            <v-col cols="6">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <person-involvement-modal :read-only="!canEdit" @create="addInvolvement"></person-involvement-modal>
-
-                        <div><h2>{{ $t("involvementsLabel") }}</h2></div>
-                        <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <br />
-                        <div v-if="employments.length > 0">
-                            <h3>{{ $t("employmentsLabel") }}</h3>
-                        </div>
-                        <br />
-                        <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
-                        <div v-if="education.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
-                        </div>
-                        <br />
-                        <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
-                        <div v-if="memberships.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
-                        </div>
-                        <br />
-                        <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Publication Table -->
-        <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
     
+        <br />
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab v-if="personIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+
+                <!-- Biography -->
+                <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
+
+                <v-row>
+                    <v-col cols="6">
+                        <!-- Expertises and Skills -->
+                        <expertise-or-skill-list :expertise-or-skills="person?.expertisesOrSkills" :person="person" :can-edit="canEdit" @crud="fetchPerson"></expertise-or-skill-list>
+                        <br />
+                        <!-- Prizes -->
+                        <prize-list :prizes="person?.prizes" :person="person" :can-edit="canEdit" @crud="fetchPerson"></prize-list>
+                    </v-col>
+
+
+                    <!-- Involvements -->
+                    <v-col cols="6">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <person-involvement-modal :read-only="!canEdit" @create="addInvolvement"></person-involvement-modal>
+
+                                <div><h2>{{ $t("involvementsLabel") }}</h2></div>
+                                <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                                <br />
+                                <div v-if="employments.length > 0">
+                                    <h3>{{ $t("employmentsLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <div v-if="education.length > 0">
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <div v-if="memberships.length > 0">
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="publications">
+                <!-- Publication Table -->
+                <h1>{{ $t("publicationsLabel") }}</h1>
+                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <v-btn
+            v-if="userRole === 'ADMIN'" 
+            density="compact" class="mt-5" 
+            color="blue darken-1"
+            @click="migrateToUnmanaged">
+            {{ $t("migrateToUnmanagedResearcherLabel") }}
+        </v-btn>
+
+        <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="performMigrationToUnmanaged"></persistent-question-dialog>
+
         <v-snackbar
             v-model="snackbar"
             :timeout="5000">
@@ -184,7 +239,7 @@
 import type { MultilingualContent, Country } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -200,7 +255,7 @@ import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import PersonUpdateModal from '@/components/person/update/PersonUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
@@ -209,6 +264,12 @@ import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/Expertise
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import UriList from '@/components/core/UriList.vue';
+import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
+import UserService from '@/services/UserService';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
+import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -217,8 +278,13 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, DescriptionSection, PersonUpdateModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView },
+    components: { PublicationTableComponent, KeywordList, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
     setup() {
+        const currentTab = ref("additionalInfo");
+
+        const dialogRef = ref<typeof PersistentQuestionDialog>();
+        const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
         
@@ -237,8 +303,9 @@ export default defineComponent({
 
         const i18n = useI18n();
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         const researcherName = ref("");
-        const accountIcon = ref('mdi-account-circle')
 
         const personalInfo = ref<any>({contact: {}});
         
@@ -323,11 +390,6 @@ export default defineComponent({
         };
 
         const fetchAndSetCountryInfo = () => {
-            if (country.value !== undefined) {
-                personalInfo.value.country = returnCurrentLocaleContent(country.value.name);
-                return;
-            }
-
             if (person.value?.personalInfo.postalAddress?.countryId === null) {
                 return;
             }
@@ -448,16 +510,20 @@ export default defineComponent({
             }
         };
 
-        const updateOtherNames = (otherNames: PersonName[]) => {
-            PersonService.updateOtherNames(otherNames, person.value?.id as number).then(() => {
+        const updateNames = async (personMainName: PersonName, otherNames: PersonName[]) => {
+            try {
+                await PersonService.updatePrimaryName(person.value?.id as number, personMainName);
+                await PersonService.updateOtherNames(otherNames, person.value?.id as number);
+
                 fetchPerson();
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-            }).catch(() => {
+            } catch (error) {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
-            });
+            }
         };
+
 
         const selectPrimaryName = (personNameId: number) => {
             PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {
@@ -470,24 +536,35 @@ export default defineComponent({
             });
         };
 
+        const migrateToUnmanaged = () => {
+            dialogRef.value?.toggle();
+        };
+
+        const performMigrationToUnmanaged = () => {
+            PersonService.migrateToUnmanagedResearcher(person.value?.id as number).then(() => {
+                router.push({name:"persons"});
+            }).catch(error => {
+                if (error.response.status === 409) {
+                    snackbarMessage.value = i18n.t("researcherBindedMessage");
+                    snackbar.value = true;
+                }
+            });
+        };
+
         return {
-            researcherName, accountIcon, person, personalInfo, keywords,
+            researcherName, person, personalInfo, keywords,
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
-            updateKeywords, updateBiography, updateOtherNames, selectPrimaryName, getTitleFromValueAutoLocale,
+            updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            personIndicators, StatisticsType
+            currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
+            dialogRef, dialogMessage, personIndicators, StatisticsType
         };
-}})
-
+}});
 </script>
 
 <style scoped>
-    #researcher .large-researcher-icon {
-        font-size: 10em;
-    }
-
     #researcher .response {
         font-size: 1.2rem;
         margin-bottom: 10px;

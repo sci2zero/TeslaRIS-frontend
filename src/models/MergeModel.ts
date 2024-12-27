@@ -5,6 +5,7 @@ import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
 import type { Dataset, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "./PublicationModel";
+import type { Publisher } from "./PublisherModel";
 
 
 export interface MergedDocuments {
@@ -86,6 +87,11 @@ export interface MergedMonographs extends MergedDocuments {
 export interface MergedMonographPublications extends MergedDocuments {
     leftMonographPublication: MonographPublication;
     rightMonographPublication: MonographPublication;
+}
+
+export interface MergedPublishers {
+    leftPublisher: Publisher;
+    rightPublisher: Publisher;
 }
 
 export enum ComparisonSide {

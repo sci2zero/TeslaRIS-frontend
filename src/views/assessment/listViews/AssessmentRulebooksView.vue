@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';
 import { ref } from 'vue';
 import type { AssessmentRulebookResponse } from '@/models/AssessmentModel';
@@ -35,6 +35,10 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("assessmentRulebookPageLabel");
+        });
+
+        watch(i18n.locale, () => {
+            search();
         });
 
         const search = () => {

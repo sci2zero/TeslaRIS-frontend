@@ -26,6 +26,10 @@ export class ProceedingsService extends BaseService {
   async deleteProceedings(proceedingsId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `proceedings/${proceedingsId}`);
   }
+
+  async forceDeleteProceedings(proceedingsId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `proceedings/force/${proceedingsId}`);
+  }
 }
 
 export default new ProceedingsService();
