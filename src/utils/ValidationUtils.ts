@@ -88,7 +88,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const printIssnPattern = /^\d{4}-\d{4}([\dX])?$/i;
+    const printIssnPattern = /^(\d{4}-\d{4}|\d{4}-\d{3}[\dX]?)$/i;
     const printIssnValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;

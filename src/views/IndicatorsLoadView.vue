@@ -115,7 +115,15 @@ export default defineComponent({
             fetchScheduledTasks();
 
             populateSelectionData();
-            setInterval(fetchScheduledTasks, 1000 * 60);
+            
+            const now = new Date();
+            const secondsUntilNextMinute = 60 - now.getSeconds();
+            const millisecondsUntilNextMinute = secondsUntilNextMinute * 1000;
+
+            setTimeout(() => {
+                fetchScheduledTasks();
+                setInterval(fetchScheduledTasks, 1000 * 60);
+            }, millisecondsUntilNextMinute);
         });
 
         watch(i18n.locale, () => {
