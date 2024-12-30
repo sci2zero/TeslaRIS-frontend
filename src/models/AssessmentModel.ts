@@ -119,5 +119,6 @@ export enum IndicatorContentType {
 export enum EntityIndicatorSource {
     MANUAL = "MANUAL",
     WEB_OF_SCIENCE = "WEB_OF_SCIENCE",
-    SCIMAGO = "SCIMAGO"
+    SCIMAGO = "SCIMAGO",
+    ERIH_PLUS = "ERIH_PLUS"
 }

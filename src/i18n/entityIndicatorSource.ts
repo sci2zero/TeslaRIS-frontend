@@ -5,12 +5,14 @@ export const indicatorSourceSr = [
     { title: "Ručno unešeno", value: EntityIndicatorSource.MANUAL },
     { title: "Web Of Science", value: EntityIndicatorSource.WEB_OF_SCIENCE },
     { title: "Scimago", value: EntityIndicatorSource.SCIMAGO },
+    { title: "ERIH PLUS", value: EntityIndicatorSource.ERIH_PLUS }
 ];
 
 export const indicatorSourceEn = [
     { title: "Entered manually", value: EntityIndicatorSource.MANUAL },
     { title: "Web Of Science", value: EntityIndicatorSource.WEB_OF_SCIENCE },
     { title: "Scimago", value: EntityIndicatorSource.SCIMAGO },
+    { title: "ERIH PLUS", value: EntityIndicatorSource.ERIH_PLUS }
 ];
 
 export const getIndicatorSourceTitleFromValueAutoLocale = (value: EntityIndicatorSource) => {
