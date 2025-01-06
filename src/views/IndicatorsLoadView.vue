@@ -180,7 +180,6 @@ export default defineComponent({
         const isDateTimeInPast = (dateTime: string) => {
             const date = new Date(dateTime);
             const now = new Date();
-            console.log(date, now)
 
             return date <= now;
         };
