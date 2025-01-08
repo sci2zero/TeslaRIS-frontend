@@ -27,7 +27,13 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="formalDescriptionOfRule" :label="$t('formalDescriptionOfRuleLabel') + '*'" :placeholder="$t('formalDescriptionOfRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-select
+                    v-model="formalDescriptionOfRule"
+                    :items="ruleEngines"
+                    :label="$t('formalDescriptionOfRuleLabel') + '*'"
+                    :rules="requiredSelectionRules"
+                    return-object>
+                </v-select>
             </v-col>
         </v-row>
         <v-row>
@@ -56,6 +62,7 @@ import type { AxiosResponse } from 'axios';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import DatePicker from '@/components/core/DatePicker.vue';
 import CommissionAutocompleteSearch from './CommissionAutocompleteSearch.vue';
+import CommissionService from '@/services/assessment/CommissionService';
 
 
 export default defineComponent({
@@ -77,9 +84,18 @@ export default defineComponent({
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
+        const ruleEngines = ref<{ title: string, value: string }[]>([]);
+
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
+            });
+
+            CommissionService.readApplicableRuleEngines().then((response) => {
+                ruleEngines.value.splice(0);
+                response.data.forEach((ruleEngine) => {
+                    ruleEngines.value.push({title: ruleEngine, value: ruleEngine});
+                });
             });
 
             fetchDetails();
@@ -105,15 +121,15 @@ export default defineComponent({
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         // TODO: update this to fetch rule methods from backend
-        const formalDescriptionOfRule = ref<string>(props.presetCommission ? props.presetCommission.formalDescriptionOfRule as string : "");
+        const formalDescriptionOfRule = ref<{ title: string, value: string }>({title: props.presetCommission ? props.presetCommission.formalDescriptionOfRule as string : "", value: props.presetCommission ? props.presetCommission.formalDescriptionOfRule as string : ""});
 
         const submit = () => {
             const commission: Commission = {
                 description: description.value as MultilingualContent[],
                 assessmentDateFrom: dateFrom.value as string,
                 assessmentDateTo: dateTo.value as string,
-                formalDescriptionOfRule: formalDescriptionOfRule.value,
-                superCommissionId: selectedSuperCommission.value.value < 1 ? undefined : selectedSuperCommission.value.value as number,
+                formalDescriptionOfRule: formalDescriptionOfRule.value.value,
+                superCommissionId: (selectedSuperCommission.value.value < 1 || !selectedSuperCommission.value.value) ? undefined : selectedSuperCommission.value.value as number,
                 documentIdsForAssessment: [],
                 personIdsForAssessment: [],
                 organisationUnitIdsForAssessment: []
@@ -130,7 +146,7 @@ export default defineComponent({
             languageTags, requiredFieldRules,
             requiredSelectionRules, submit,
             dateFrom, dateTo, selectedSuperCommission,
-            formalDescriptionOfRule
+            formalDescriptionOfRule, ruleEngines
         };
     }
 });

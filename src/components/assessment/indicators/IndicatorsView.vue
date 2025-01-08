@@ -49,7 +49,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, type PropType, reactive, watch } from 'vue';
 import { ref } from 'vue';
-import { EntityIndicatorSource, type PublicationSeriesIndicatorResponse, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { EntityIndicatorSource, type PublicationSeriesIndicatorResponse, type EntityIndicatorResponse, IndicatorContentType } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useI18n } from 'vue-i18n';
 import { localiseDate } from '@/i18n/dateLocalisation';
@@ -186,10 +186,10 @@ export default defineComponent({
 
         const buildDisplayValue = (entityIndicator: EntityIndicatorResponse) => {
             let displayValue = "";
-            if (entityIndicator.textualValue) {
-                displayValue += entityIndicator.textualValue;
-            } else if (entityIndicator.numericValue !== null && entityIndicator.numericValue !== undefined) {
-                displayValue += entityIndicator.numericValue;
+            if (entityIndicator.textualValue || entityIndicator.indicatorResponse.contentType === IndicatorContentType.TEXT) {
+                displayValue += (entityIndicator.textualValue ? entityIndicator.textualValue : "N/A");
+            } else if ((entityIndicator.numericValue !== null && entityIndicator.numericValue !== undefined) || entityIndicator.indicatorResponse.contentType === IndicatorContentType.NUMBER) {
+                displayValue += (entityIndicator.numericValue ? entityIndicator.numericValue : "N/A");
             } else {
                 if (entityIndicator.booleanValue) {
                     displayValue += i18n.t("trueLabel");
