@@ -181,9 +181,7 @@ export default defineComponent({
         };
 
         const navigateToTargetCommission = (commissionId: number) => {
-            router.push({ name: "commissionLandingPage", params: {id: commissionId} }).then(() => {
-                router.go(0);
-            });
+            router.push({ name: "commissionLandingPage", params: {id: commissionId} });
         };
 
         return {

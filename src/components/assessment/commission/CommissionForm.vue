@@ -114,7 +114,7 @@ export default defineComponent({
         const selectedSuperCommission = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const name = ref<any>([]);
-        const description = ref<any>([]);
+        const description = ref<any>(props.presetCommission?.description ? props.presetCommission?.description : []);
         const dateFrom = ref(props.presetCommission?.assessmentDateFrom ? props.presetCommission.assessmentDateFrom : undefined);
         const dateTo = ref(props.presetCommission?.assessmentDateTo ? props.presetCommission.assessmentDateTo : undefined);
 
