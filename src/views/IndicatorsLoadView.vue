@@ -133,6 +133,13 @@ export default defineComponent({
         const fetchScheduledTasks = () => {
             TaskManagerService.listScheduledTasks().then((response) => {
                 scheduledTasks.value = response.data;
+                scheduledTasks.value.sort((a, b) => {
+                    if(!a.executionTime) {
+                        return 1;
+                    }
+
+                    return a.executionTime.localeCompare(b.executionTime);
+                });
             });
         };
 

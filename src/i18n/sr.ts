@@ -481,5 +481,6 @@ export default {
     cancelSuccessMessage: "Uspešno otkazano",
     cantScheduleInPastMessage: "Možete zakazivati događaje samo ako su u budućnosti.",
     indicatorLoadingLabel: "Učitavanje Indikatora",
-    inProgressLabel: "U toku..."
+    inProgressLabel: "U toku...",
+    entityClassificationsLabel: "Klasifikacije"
 }

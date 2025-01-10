@@ -482,5 +482,6 @@ export default {
     cancelSuccessMessage: "Canceled successfully",
     cantScheduleInPastMessage: "You can only schedule events in future.",
     indicatorLoadingLabel: "Indicator Loading",
-    inProgressLabel: "In progress..."
+    inProgressLabel: "In progress...",
+    entityClassificationsLabel: "Classifications"
 }

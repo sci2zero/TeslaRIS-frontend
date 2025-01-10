@@ -31,6 +31,16 @@ export interface EntityIndicatorResponse {
     source: EntityIndicatorSource
 }
 
+export interface EntityClassificationResponse {
+    id: number;
+    manual: boolean;
+    classificationTitle: MultilingualContent[];
+    commissionDescription: MultilingualContent[];
+    categoryIdentifier: string;
+    year: number;
+    timestamp: string;
+}
+
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
     categoryIdentifier: string;
 }

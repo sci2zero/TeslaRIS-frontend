@@ -84,6 +84,9 @@
             <v-tab v-if="canEdit || journalIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab v-if="canEdit || journalClassifications.length > 0" value="classifications">
+                {{ $t("entityClassificationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -101,6 +104,13 @@
                     :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]" 
                     :entity-id="journal?.id"
                     :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
+                    :can-edit="false"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="classifications">
+                <entity-classification-view
+                    :entity-classifications="journalClassifications"
+                    :entity-id="journal?.id"
                     :can-edit="false"
                 />
             </v-tabs-window-item>
@@ -132,14 +142,16 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import type { EntityIndicatorResponse } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityIndicatorResponse } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView },
     setup() {
         const currentTab = ref("");
 
@@ -165,6 +177,7 @@ export default defineComponent({
         const canEdit = ref(false);
 
         const journalIndicators = ref<EntityIndicatorResponse[]>([]);
+        const journalClassifications = ref<EntityClassificationResponse[]>([]);
 
         onMounted(() => {
             JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
@@ -173,6 +186,7 @@ export default defineComponent({
 
             fetchJournal(true);
             fetchIndicators();
+            fetchClassifications();
         });
 
         watch(i18n.locale, () => {
@@ -200,6 +214,12 @@ export default defineComponent({
         const fetchIndicators = () => {
             EntityIndicatorService.fetchPublicationSeriesIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 journalIndicators.value = response.data;
+            });
+        };
+
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchPublicationSeriesClassifications(parseInt(currentRoute.params.id as string)).then((response) => {
+                journalClassifications.value = response.data;
             });
         };
 
@@ -261,8 +281,10 @@ export default defineComponent({
         const setStartTab = () => {
             if(totalPublications.value > 0) {
                 currentTab.value = "publications";
-            } else {
+            } else if (journal.value?.contributions?.length && journal.value?.contributions?.length > 0) {
                 currentTab.value = "contributions";
+            } else {
+                currentTab.value = "indicators";
             }
         };
 
@@ -275,7 +297,8 @@ export default defineComponent({
             languageTagMap, updateBasicInfo,
             snackbar, snackbarMessage, journalIndicators,
             updateContributions, ApplicableEntityType,
-            currentTab, PublicationSeriesUpdateForm
+            currentTab, PublicationSeriesUpdateForm,
+            journalClassifications
         };
 }})
 
