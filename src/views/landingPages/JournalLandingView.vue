@@ -281,7 +281,7 @@ export default defineComponent({
         const setStartTab = () => {
             if(totalPublications.value > 0) {
                 currentTab.value = "publications";
-            } else if (journal.value?.contributions?.length && journal.value?.contributions?.length > 0) {
+            } else if ((journal.value?.contributions?.length && journal.value?.contributions?.length > 0) || canEdit.value) {
                 currentTab.value = "contributions";
             } else {
                 currentTab.value = "indicators";
