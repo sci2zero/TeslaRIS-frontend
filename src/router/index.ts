@@ -83,7 +83,7 @@ import AssessmentRulebookLandingView from "@/views/assessment/landingPages/Asses
 import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
 import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
 import LanguageTagListView from "@/views/LanguageTagListView.vue";
-import IndicatorsLoadView from "@/views/IndicatorsLoadView.vue";
+import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
@@ -887,9 +887,9 @@ const router = createRouter({
                             },
                         },
                         {
-                            path: "indicator-load",
-                            name: "indicatorLoad",
-                            component: IndicatorsLoadView,
+                            path: "scheduled-tasks",
+                            name: "scheduledTasks",
+                            component: ScheduledTasksView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

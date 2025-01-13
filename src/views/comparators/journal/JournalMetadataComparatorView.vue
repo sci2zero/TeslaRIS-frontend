@@ -248,20 +248,28 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
-            const id = side === ComparisonSide.LEFT ? leftJournal.value?.id as number : rightJournal.value?.id as number;
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftJournal.value?.id : rightJournal.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightJournal.value?.id : leftJournal.value?.id;
             const name = side === ComparisonSide.LEFT ? leftJournal.value?.title : rightJournal.value?.title;
 
-            const deleteAction = isForceDelete 
-                ? JournalService.forceDeleteJournal(id)
-                : JournalService.deleteJournal(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? JournalService.forceDeleteJournal(id as number)
+                    : JournalService.deleteJournal(id as number);
 
-            deleteAction.then(() => {
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherJournal(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "journals" } });
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+            } catch (error) {
+                snackbarMessage.value = i18n.t(
+                    "deleteFailedNotification", 
+                    { name: returnCurrentLocaleContent(name) }
+                );
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

@@ -473,7 +473,7 @@ export default {
     numericLabel: "Numeric value",
     textLabel: "Text",
     boolLabel: "Yes/No value",
-    scheduleLoadingLabel: "Scheduled loading processes",
+    scheduleTasksLabel: "Scheduled tasks",
     sourceLabel: "Source",
     dateLabel: "Date",
     scheduleLabel: "Schedule",
@@ -481,7 +481,9 @@ export default {
     scheduleSuccessMessage: "Scheduled successfully",
     cancelSuccessMessage: "Canceled successfully",
     cantScheduleInPastMessage: "You can only schedule events in future.",
-    indicatorLoadingLabel: "Indicator Loading",
     inProgressLabel: "In progress...",
-    entityClassificationsLabel: "Classifications"
+    entityClassificationsLabel: "Classifications",
+    yearsLabel: "Selected Years",
+    scheduledTaskTypeLabel: "Task Type",
+    entityTypeLabel: "Entity Type"
 }

@@ -103,3 +103,11 @@ export interface ScheduledTaskResponse {
     taskId: string;
     executionTime: string;
 }
+
+export enum ScheduledTaskType {
+    REINDEXING = "REINDEXING",
+    INDICATOR_LOAD = "INDICATOR_LOAD",
+    IF5_COMPUTATION = "IF5_COMPUTATION",
+    CLASSIFICATION_COMPUTATION = "CLASSIFICATION_COMPUTATION",
+    CLASSIFICATION_LOAD = "CLASSIFICATION_LOAD"
+}

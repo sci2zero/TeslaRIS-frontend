@@ -472,7 +472,7 @@ export default {
     numericLabel: "Numerička vrednost",
     textLabel: "Tekst",
     boolLabel: "Da/Ne vrednost",
-    scheduleLoadingLabel: "Zakazana učitavanja",
+    scheduleTasksLabel: "Zakazani zadaci",
     sourceLabel: "Izvor",
     dateLabel: "Datum",
     scheduleLabel: "Zakaži",
@@ -480,7 +480,9 @@ export default {
     scheduleSuccessMessage: "Uspešno zakazano",
     cancelSuccessMessage: "Uspešno otkazano",
     cantScheduleInPastMessage: "Možete zakazivati događaje samo ako su u budućnosti.",
-    indicatorLoadingLabel: "Učitavanje Indikatora",
     inProgressLabel: "U toku...",
-    entityClassificationsLabel: "Klasifikacije"
+    entityClassificationsLabel: "Klasifikacije",
+    yearsLabel: "Selektovane Godine",
+    scheduledTaskTypeLabel: "Tip zadatka",
+    entityTypeLabel: "Tip entiteta"
 }
