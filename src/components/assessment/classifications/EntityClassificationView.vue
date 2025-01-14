@@ -1,4 +1,12 @@
 <template>
+    <generic-crud-modal
+        class="mt-5 ml-5"
+        :form-component="EntityClassificationForm"
+        :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
+        entity-name="EntityClassification"
+        :read-only="!canEdit"
+        @create="createClassification"
+    />
     <v-row>
         <v-col>
             <h2 v-if="entityClassifications?.length > 0" class="mt-5">
@@ -15,19 +23,19 @@
                         </v-row>
                         <v-row v-if="classification.manual">
                             <div>
-                                <!-- <generic-crud-modal
-                            :form-component="EntityIndicatorForm"
-                            :form-props="{ presetDocumentIndicators: indicator, applicableTypes: indicator.indicatorResponse.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
-                            entity-name=""
-                            is-update
-                            :read-only="!canEdit"
-                            @update="updateIndicator($event, indicator.id)"
-                        /> -->
+                                <generic-crud-modal
+                                    :form-component="EntityClassificationForm"
+                                    :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
+                                    entity-name=""
+                                    is-update
+                                    :read-only="!canEdit"
+                                    @update="updateClassification($event, classification.id)"
+                                />
                             </div>
                             <div class="ml-5">
-                                <!-- <v-btn v-if="canEdit" density="compact" @click.prevent="deleteIndicator(indicator.id)">
-                            {{ $t("deleteLabel") }}
-                        </v-btn> -->
+                                <v-btn v-if="canEdit" density="compact" @click.prevent="deleteCLassification(classification.id)">
+                                    {{ $t("deleteLabel") }}
+                                </v-btn>
                             </div>
                         </v-row>
                     </v-expansion-panel-text>
@@ -44,10 +52,14 @@ import type { EntityClassificationResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useI18n } from 'vue-i18n';
 import { ApplicableEntityType } from '@/models/Common';
+import EntityClassificationForm from './EntityClassificationForm.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 
 
 export default defineComponent({
     name: "ViewIndicatorsComponent",
+    components: { GenericCrudModal },
     props: {
         entityClassifications: {
             type: Array<EntityClassificationResponse>,
@@ -60,10 +72,18 @@ export default defineComponent({
         entityId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        containingEntityType: {
+            type: Object as PropType<ApplicableEntityType>,
+            required: true
+        },
+        applicableTypes: {
+            type: Array<ApplicableEntityType>,
+            required: true
         }
     },
-    emits: ["updated"],
-    setup(props) {
+    emits: ["update", "create"],
+    setup(props, {emit}) {
         const titles = ref<string[]>([]);
         const contents = ref<string[]>([]);
 
@@ -105,32 +125,47 @@ export default defineComponent({
         };
 
         const buildDisplayTitle = (entityClassification: EntityClassificationResponse) => {
-            return `${i18n.t("entityClassificationsLabel")} ${i18n.t("inLabel")} ${entityClassification.categoryIdentifier} - ${entityClassification.year} (${returnCurrentLocaleContent(entityClassification.commissionDescription)})`;
+            let displayTitle = `${i18n.t("entityClassificationsLabel")} `;
+        
+            if (entityClassification.categoryIdentifier) {
+                displayTitle += `${i18n.t("inLabel")} ${entityClassification.categoryIdentifier} `;
+            }
+
+            displayTitle += `- ${entityClassification.year} (${returnCurrentLocaleContent(entityClassification.commissionDescription)})`;
+
+            return displayTitle;
         };
 
-        // const updateIndicator = async (entityIndicator: any, entityIndicatorId: number) => {
-        //     if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
-        //         await EntityIndicatorService.updateDocumentIndicator(entityIndicator, entityIndicatorId);
-        //     } else if (props.containingEntityType === ApplicableEntityType.EVENT) {
-        //         await EntityIndicatorService.updateEventIndicator(entityIndicator, entityIndicatorId);
-        //     }
+        const updateClassification = async (entityIndicator: any, entityIndicatorId: number) => {
+            if (props.containingEntityType === ApplicableEntityType.EVENT) {
+                await EntityClassificationService.updateEventClassification(entityIndicator, entityIndicatorId);
+            }
 
-        //     emit("updated");
-        // };
+            emit("update");
+        };
 
-        // const deleteCLassification = async (entityIndicatorId: number) => {
-        //     openedPanel.value = null;
-        //     await EntityIndicatorService.deleteEntityIndicator(entityIndicatorId);
-        //     const index = entityIndicatorsFiltered.findIndex(indicator => indicator.id === entityIndicatorId);
-        //     entityIndicatorsFiltered.splice(index, 1);
-        //     titles.value.splice(index, 1);
-        //     contents.value.splice(index, 1);
-        // };
+        const deleteCLassification = async (entityClassificationId: number) => {
+            openedPanel.value = null;
+            await EntityClassificationService.deleteEntityClassification(entityClassificationId);
+            const index = props.entityClassifications.findIndex(classification => classification.id === entityClassificationId);
+            titles.value.splice(index, 1);
+            contents.value.splice(index, 1);
+
+            emit("update");
+        };
+
+        const createClassification = (entityClassification: any) => {
+            emit("create", entityClassification);
+        };
 
         return {
             titles, contents,
             ApplicableEntityType,
-            openedPanel
+            openedPanel,
+            EntityClassificationForm,
+            updateClassification,
+            deleteCLassification,
+            createClassification
         };
     }
 });

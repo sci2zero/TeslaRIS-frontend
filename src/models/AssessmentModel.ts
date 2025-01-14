@@ -1,5 +1,6 @@
 import type { AccessLevel, ApplicableEntityType, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { EntityType } from "./MergeModel";
 
 
 export interface IndicatorResponse {
@@ -35,10 +36,13 @@ export interface EntityClassificationResponse {
     id: number;
     manual: boolean;
     classificationTitle: MultilingualContent[];
+    classificationId: number;
     commissionDescription: MultilingualContent[];
+    commissionId: number;
     categoryIdentifier: string;
     year: number;
     timestamp: string;
+    applicableEntityTypes: ApplicableEntityType[];
 }
 
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
@@ -131,4 +135,22 @@ export enum EntityIndicatorSource {
     WEB_OF_SCIENCE = "WEB_OF_SCIENCE",
     SCIMAGO = "SCIMAGO",
     ERIH_PLUS = "ERIH_PLUS"
+}
+
+export interface EntityAssessmentClassification {
+    commissionId: number;
+    assessmentClassificationId: number;
+    classificationYear: number;
+}
+
+export interface EventAssessmentClassification extends EntityAssessmentClassification {
+    eventId: number;
+}
+
+export interface AssessmentClassification {
+    id: number;
+    formalDescriptionOfRule: string;
+    code: string;
+    title: MultilingualContent[];
+    applicableEntityType: EntityType;
 }

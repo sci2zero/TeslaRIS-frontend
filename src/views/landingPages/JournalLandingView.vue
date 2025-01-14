@@ -112,6 +112,8 @@
                     :entity-classifications="journalClassifications"
                     :entity-id="journal?.id"
                     :can-edit="false"
+                    :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]"
                 />
             </v-tabs-window-item>
         </v-tabs-window>

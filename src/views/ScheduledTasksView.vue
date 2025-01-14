@@ -24,7 +24,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.REINDEXING" cols="2">
+            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.REINDEXING" cols="4">
                 <v-select
                     v-model="selectedEntityTypes"
                     :items="entityTypes"

@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { EntityClassificationResponse } from "@/models/AssessmentModel";
+import type { EntityClassificationResponse, EventAssessmentClassification } from "@/models/AssessmentModel";
 
 
 export class EntityClassificationService extends BaseService {
@@ -32,17 +32,17 @@ export class EntityClassificationService extends BaseService {
     //     return super.sendRequest(axios.post, `assessment/document-assessment-classification/${body.documentId}`, body, EntityClassificationService.idempotencyKey);
     // }
 
-    // async createEventClassification(body: EventClassification): Promise<AxiosResponse<EntityClassificationResponse>> {
-    //     return super.sendRequest(axios.post, `assessment/event-assessment-classification/${body.eventId}`, body, EntityClassificationService.idempotencyKey);
-    // }
+    async createEventClassification(body: EventAssessmentClassification): Promise<AxiosResponse<EntityClassificationResponse>> {
+        return super.sendRequest(axios.post, `assessment/event-assessment-classification`, body, EntityClassificationService.idempotencyKey);
+    }
 
     // async updateDocumentClassification(body: DocumentClassification, documentClassificationId: number): Promise<AxiosResponse<void>> {
     //     return super.sendRequest(axios.put, `assessment/document-assessment-classification/${body.documentId}/${documentClassificationId}`, body);
     // }
 
-    // async updateEventClassification(body: EventClassification, eventClassificationId: number): Promise<AxiosResponse<void>> {
-    //     return super.sendRequest(axios.put, `assessment/event-assessment-classification/${body.eventId}/${eventClassificationId}`, body);
-    // }
+    async updateEventClassification(body: EventAssessmentClassification, eventClassificationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.put, `assessment/event-assessment-classification/${eventClassificationId}`, body);
+    }
 
     async deleteEntityClassification(entityClassificationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.delete, `assessment/entity-assessment-classification/${entityClassificationId}`);

@@ -485,5 +485,7 @@ export default {
     entityClassificationsLabel: "Classifications",
     yearsLabel: "Selected Years",
     scheduledTaskTypeLabel: "Task Type",
-    entityTypeLabel: "Entity Type"
+    entityTypeLabel: "Entity Type",
+    classificationYearLabel: "Classification Year",
+    createNewEntityClassificationLabel: "Classify entity"
 }

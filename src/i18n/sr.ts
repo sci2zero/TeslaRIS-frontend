@@ -484,5 +484,7 @@ export default {
     entityClassificationsLabel: "Klasifikacije",
     yearsLabel: "Selektovane Godine",
     scheduledTaskTypeLabel: "Tip zadatka",
-    entityTypeLabel: "Tip entiteta"
+    entityTypeLabel: "Tip entiteta",
+    classificationYearLabel: "Godina klasifikacije",
+    createNewEntityClassificationLabel: "Klasifikuj entitet"
 }

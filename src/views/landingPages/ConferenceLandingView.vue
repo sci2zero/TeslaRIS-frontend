@@ -107,8 +107,11 @@
             <v-tab v-if="canEdit || (conference?.contributions && conference?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="eventIndicators?.length > 0" value="indicators">
+            <v-tab v-if="eventIndicators?.length > 0 || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-if="eventClassifications?.length > 0 || canEdit" value="classifications">
+                {{ $t("entityClassificationsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -147,6 +150,17 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="classifications">
+                <entity-classification-view
+                    :entity-classifications="eventClassifications"
+                    :entity-id="conference?.id"
+                    :can-edit="canEdit"
+                    :containing-entity-type="ApplicableEntityType.EVENT"
+                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -177,14 +191,16 @@ import CountryService from '@/services/CountryService';
 import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import type { EntityIndicatorResponse, EventIndicator } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityIndicatorResponse, EventAssessmentClassification, EventIndicator } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView },
     setup() {
         const currentTab = ref("contributions");
 
@@ -210,6 +226,7 @@ export default defineComponent({
         const country = ref<Country>();
 
         const eventIndicators = ref<EntityIndicatorResponse[]>([]);
+        const eventClassifications = ref<EntityClassificationResponse[]>([]);
 
         onMounted(() => {
             EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -218,11 +235,18 @@ export default defineComponent({
 
             fetchConference();
             fetchIndicators();
+            fetchClassifications();
         });
 
         const fetchIndicators = () => {
             EntityIndicatorService.fetchEventIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 eventIndicators.value = response.data;
+            });
+        };
+
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchEventClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+                eventClassifications.value = response.data;
             });
         };
 
@@ -317,6 +341,12 @@ export default defineComponent({
             });
         };
 
+        const createClassification = (eventClassification: EventAssessmentClassification) => {
+            EntityClassificationService.createEventClassification(eventClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
             conference, icon, publications,
             totalPublications, switchPublicationsPage,
@@ -326,7 +356,8 @@ export default defineComponent({
             snackbar, snackbarMessage, updateDescription,
             country, EventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
-            currentTab
+            currentTab, eventClassifications, createClassification,
+            fetchClassifications
         };
 }})
 
