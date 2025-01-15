@@ -43,6 +43,15 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const requiredMultiSelectionRules = [
+        (values: { title: string, value: number }[]) => {
+            if (!values || values.length === 0) {
+                return requiredFieldMessage.value;
+            }
+            return true;
+        }
+    ];    
+
     const doiPattern = /^10\.\d{4,9}\/[-,._;()/:A-Z0-9]+$/i;
     const doiValidationRules = [
         (value: string) => {
@@ -214,6 +223,6 @@ export const useValidationUtils = () => {
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
-        dateTodayOrFutureRules, timeTodayOrFutureRules
+        dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules
     };
 };

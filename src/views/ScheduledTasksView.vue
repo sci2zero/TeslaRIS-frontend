@@ -29,7 +29,7 @@
                     v-model="selectedEntityTypes"
                     :items="entityTypes"
                     :label="$t('entityTypeLabel') + '*'"
-                    :rules="requiredSelectionRules"
+                    :rules="requiredMultiSelectionRules"
                     multiple>
                 </v-select>
             </v-col>
@@ -50,7 +50,8 @@
                 <v-select
                     v-model="selectedYears"
                     :items="years"
-                    :label="$t('yearsLabel')"
+                    :label="$t('yearsLabel') + '*'"
+                    :rules="requiredMultiSelectionRules"
                     multiple>
                 </v-select>
             </v-col>
@@ -119,7 +120,7 @@ export default defineComponent({
         const sources = ref<{ title: string, value: EntityIndicatorSource }[]>([]);
         const selectedSource = ref<{ title: string, value: EntityIndicatorSource }>({title: getIndicatorSourceTitleFromValueAutoLocale(EntityIndicatorSource.WEB_OF_SCIENCE) as string, value: EntityIndicatorSource.WEB_OF_SCIENCE});
 
-        const { requiredSelectionRules } = useValidationUtils();
+        const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
         const i18n = useI18n();
 
@@ -260,7 +261,8 @@ export default defineComponent({
             selectedScheduledTaskType,
             ScheduledTaskType, years,
             selectedYears, selectedCommission,
-            entityTypes, selectedEntityTypes
+            entityTypes, selectedEntityTypes,
+            requiredMultiSelectionRules
         };
     },
 });

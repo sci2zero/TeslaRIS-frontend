@@ -85,7 +85,7 @@
                 {{ $t("indicatorListLabel") }}
             </v-tab>
             <v-tab v-if="canEdit || journalClassifications.length > 0" value="classifications">
-                {{ $t("entityClassificationsLabel") }}
+                {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
 

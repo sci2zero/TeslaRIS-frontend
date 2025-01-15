@@ -111,7 +111,7 @@
                 {{ $t("indicatorListLabel") }}
             </v-tab>
             <v-tab v-if="eventClassifications?.length > 0 || canEdit" value="classifications">
-                {{ $t("entityClassificationsLabel") }}
+                {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
 

@@ -36,7 +36,7 @@
                     v-model="selectedApplicableTypes"
                     :items="applicableTypes"
                     :label="$t('applicableTypeLabel') + '*'"
-                    :rules="requiredSelectionRules"
+                    :rules="requiredMultiSelectionRules"
                     return-object
                     multiple>
                 </v-select>
@@ -133,7 +133,7 @@ export default defineComponent({
         const description = ref<any>([]);
         const code = ref<string>(props.presetIndicator ? props.presetIndicator.code as string : "");
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
         const submit = () => {
             const indicator: IndicatorRequest = {
@@ -157,7 +157,8 @@ export default defineComponent({
             requiredFieldRules, code, submit,
             accessLevels, requiredSelectionRules,
             applicableTypes, selectedApplicableTypes,
-            contentTypes, selectedContentType
+            contentTypes, selectedContentType,
+            requiredMultiSelectionRules
         };
     }
 });

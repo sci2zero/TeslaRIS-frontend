@@ -482,10 +482,11 @@ export default {
     cancelSuccessMessage: "Canceled successfully",
     cantScheduleInPastMessage: "You can only schedule events in future.",
     inProgressLabel: "In progress...",
-    entityClassificationsLabel: "Classifications",
+    classificationsLabel: "Classifications",
     yearsLabel: "Selected Years",
     scheduledTaskTypeLabel: "Task Type",
     entityTypeLabel: "Entity Type",
     classificationYearLabel: "Classification Year",
-    createNewEntityClassificationLabel: "Classify entity"
+    createNewEntityClassificationLabel: "Classify entity",
+    createNewClassificationLabel: "Create New Classification"
 }

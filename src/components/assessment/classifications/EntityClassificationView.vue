@@ -10,7 +10,7 @@
     <v-row>
         <v-col>
             <h2 v-if="entityClassifications?.length > 0" class="mt-5">
-                {{ $t("entityClassificationsLabel") }}
+                {{ $t("classificationsLabel") }}
             </h2>
         
             <v-expansion-panels v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
@@ -125,7 +125,7 @@ export default defineComponent({
         };
 
         const buildDisplayTitle = (entityClassification: EntityClassificationResponse) => {
-            let displayTitle = `${i18n.t("entityClassificationsLabel")} `;
+            let displayTitle = `${i18n.t("classificationsLabel")} `;
         
             if (entityClassification.categoryIdentifier) {
                 displayTitle += `${i18n.t("inLabel")} ${entityClassification.categoryIdentifier} `;

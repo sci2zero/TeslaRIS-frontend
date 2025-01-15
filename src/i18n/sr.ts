@@ -481,10 +481,11 @@ export default {
     cancelSuccessMessage: "Uspešno otkazano",
     cantScheduleInPastMessage: "Možete zakazivati događaje samo ako su u budućnosti.",
     inProgressLabel: "U toku...",
-    entityClassificationsLabel: "Klasifikacije",
+    classificationsLabel: "Klasifikacije",
     yearsLabel: "Selektovane Godine",
     scheduledTaskTypeLabel: "Tip zadatka",
     entityTypeLabel: "Tip entiteta",
     classificationYearLabel: "Godina klasifikacije",
-    createNewEntityClassificationLabel: "Klasifikuj entitet"
+    createNewEntityClassificationLabel: "Klasifikuj entitet",
+    createNewClassificationLabel: "Kreiraj novu klasifikaciju"
 }

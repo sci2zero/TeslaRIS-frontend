@@ -182,6 +182,7 @@ export default defineComponent(
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
             const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
+            const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -242,6 +243,7 @@ export default defineComponent(
 
             const assessmentsMenu = ref<MenuItem[]>([
                 { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
+                { title: classificationPageLabel, type:'icon-link', pathName: 'assessment/classifications' },
                 { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
                 { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
             ]);
@@ -256,7 +258,7 @@ export default defineComponent(
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
-                { title: scheduleTasksLabel, type:'icon-link', pathName: 'assessment/scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
+                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
             ]);
 
             const menuItems = ref<MenuItem[]>([
