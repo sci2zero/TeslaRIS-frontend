@@ -7,7 +7,7 @@
             <h4 v-else>
                 <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong>
             </h4>
-            <h5 v-if="contribution.contact?.contactEmail">
+            <h5 v-if="loginStore.userLoggedIn && contribution.contact?.contactEmail">
                 <strong>{{ `${$t("emailLabel")}: ${contribution.contact?.contactEmail}` }}</strong>
             </h5>
             <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
@@ -22,6 +22,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
 import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import { VueDraggableNext } from 'vue-draggable-next'
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -38,13 +39,17 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const loginStore = useLoginStore();
+
         const reorderContributors = (event: any) => {
             if(event.moved.newIndex !== event.moved.oldIndex) {
                 DocumentPublicationService.reorderContribution(props.documentId as number, props.contributionList[event.moved.newIndex].id as number, event.moved.oldIndex + 1, event.moved.newIndex + 1);
             }
         };
 
-        return { getTitleFromValueAutoLocale, reorderContributors };
+        return { 
+            getTitleFromValueAutoLocale, reorderContributors, loginStore
+        };
     },
 });
 </script>
