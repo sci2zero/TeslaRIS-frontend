@@ -137,6 +137,10 @@ export enum EntityIndicatorSource {
     MKS_SLAVISTS = "MKS_SLAVISTS"
 }
 
+export enum EntityClassificationSource {
+    MNO = "MNO"
+}
+
 export interface EntityAssessmentClassification {
     commissionId: number;
     assessmentClassificationId: number;

@@ -3,6 +3,7 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
+import { EntityClassificationSource } from "@/models/AssessmentModel";
 
 export class TaskSchedulingService extends BaseService {
 
@@ -24,6 +25,10 @@ export class TaskSchedulingService extends BaseService {
 
     async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[]): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createClassificationYearsParameter(years)}`, {}, TaskSchedulingService.idempotencyKey);
+    }
+
+    async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${timestamp}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[]): Promise<AxiosResponse<void>> {

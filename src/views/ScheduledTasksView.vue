@@ -35,8 +35,18 @@
             </v-col>
             <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.INDICATOR_LOAD" cols="2">
                 <v-select
-                    v-model="selectedSource"
-                    :items="sources"
+                    v-model="selectedIndicatorSource"
+                    :items="indicatorSources"
+                    :label="$t('sourceLabel') + '*'"
+                    :rules="requiredSelectionRules"
+                    return-object
+                    :readonly="false">
+                </v-select>
+            </v-col>
+            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.CLASSIFICATION_LOAD" cols="2">
+                <v-select
+                    v-model="selectedClassificationSource"
+                    :items="classificationSources"
                     :label="$t('sourceLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object
@@ -89,7 +99,7 @@ import { ApplicableEntityType, ScheduledTaskType, type ScheduledTaskResponse } f
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getApplicableEntityTypesForGivenLocale, getApplicableEntityTypeTitleFromValueAutoLocale } from "@/i18n/applicableEntityType";
 import { useI18n } from "vue-i18n";
-import { EntityIndicatorSource } from "@/models/AssessmentModel";
+import { EntityClassificationSource, EntityIndicatorSource } from "@/models/AssessmentModel";
 import { getIndicatorSourceForGivenLocale, getIndicatorSourceTitleFromValueAutoLocale } from "@/i18n/entityIndicatorSource";
 import { getErrorMessageForErrorKey } from "@/i18n";
 import Toast from "@/components/core/Toast.vue";
@@ -99,6 +109,7 @@ import { AxiosError } from "axios";
 import ScheduledTasksList from "@/components/core/ScheduledTasksList.vue";
 import { getEntityTypeForGivenLocale } from "@/i18n/entityType";
 import { EntityType } from "@/models/MergeModel";
+import { getClassificationSourcesForGivenLocale, getClassificationSourceTitleFromValueAutoLocale } from "@/i18n/entityClassificationSource";
 
 
 export default defineComponent({
@@ -117,8 +128,11 @@ export default defineComponent({
         const applicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>([]);
         const selectedApplicableEntityType = ref<{ title: string, value: ApplicableEntityType }>({title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.PUBLICATION_SERIES) as string, value: ApplicableEntityType.PUBLICATION_SERIES});
 
-        const sources = ref<{ title: string, value: EntityIndicatorSource }[]>([]);
-        const selectedSource = ref<{ title: string, value: EntityIndicatorSource }>({title: getIndicatorSourceTitleFromValueAutoLocale(EntityIndicatorSource.WEB_OF_SCIENCE) as string, value: EntityIndicatorSource.WEB_OF_SCIENCE});
+        const indicatorSources = ref<{ title: string, value: EntityIndicatorSource }[]>([]);
+        const selectedIndicatorSource = ref<{ title: string, value: EntityIndicatorSource }>({title: getIndicatorSourceTitleFromValueAutoLocale(EntityIndicatorSource.WEB_OF_SCIENCE) as string, value: EntityIndicatorSource.WEB_OF_SCIENCE});
+
+        const classificationSources = getClassificationSourcesForGivenLocale();
+        const selectedClassificationSource = ref<{ title: string, value: EntityClassificationSource }>({title: getClassificationSourceTitleFromValueAutoLocale(EntityClassificationSource.MNO) as string, value: EntityClassificationSource.MNO});
 
         const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
@@ -174,7 +188,7 @@ export default defineComponent({
 
         const populateSelectionData = () => {
             applicableTypes.value = (getApplicableEntityTypesForGivenLocale() as { title: string, value: ApplicableEntityType }[]).filter(item => item.value === ApplicableEntityType.PUBLICATION_SERIES);
-            sources.value = (getIndicatorSourceForGivenLocale() as { title: string, value: EntityIndicatorSource }[]).filter(item => item.value !== EntityIndicatorSource.MANUAL);
+            indicatorSources.value = (getIndicatorSourceForGivenLocale() as { title: string, value: EntityIndicatorSource }[]).filter(item => item.value !== EntityIndicatorSource.MANUAL);
         };
 
         const scheduleTask = (taskFunction: any) => {
@@ -197,7 +211,7 @@ export default defineComponent({
                 case ScheduledTaskType.INDICATOR_LOAD:
                     scheduleTask(() => 
                         TaskManagerService.scheduleIndicatorLoadingTask(
-                            timestamp, selectedSource.value.value
+                            timestamp, selectedIndicatorSource.value.value
                         )
                     );
                     break;
@@ -222,6 +236,14 @@ export default defineComponent({
                     scheduleTask(() => 
                         TaskManagerService.scheduleDatabaseReindexing(
                             timestamp, selectedEntityTypes.value.map(entityType => entityType.value)
+                        )
+                    );
+                    break;
+
+                case ScheduledTaskType.CLASSIFICATION_LOAD:
+                    scheduleTask(() => 
+                        TaskManagerService.scheduleClassificationLoadTask(
+                            timestamp, selectedClassificationSource.value.value
                         )
                     );
                     break;
@@ -253,16 +275,18 @@ export default defineComponent({
         return {
             scheduleDate, scheduledTasks,
             applicableTypes, selectedApplicableEntityType,
-            selectedSource, requiredSelectionRules,
+            selectedIndicatorSource, requiredSelectionRules,
             scheduleLoadTask, scheduledTime,
             isFormValid, snackbar, message,
             deleteScheduledLoadTask,
-            scheduledTaskTypes, sources,
+            scheduledTaskTypes, indicatorSources,
             selectedScheduledTaskType,
             ScheduledTaskType, years,
             selectedYears, selectedCommission,
             entityTypes, selectedEntityTypes,
-            requiredMultiSelectionRules
+            requiredMultiSelectionRules,
+            classificationSources,
+            selectedClassificationSource
         };
     },
 });
