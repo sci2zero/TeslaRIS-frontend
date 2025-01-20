@@ -168,6 +168,13 @@ export default defineComponent({
         const searchPlaceholderEvent = {title: returnCurrentLocaleContent(event.value?.name) as string, value: event.value?.id as number};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholderEvent);
 
+        watch(selectedEvent, () => {
+            if (selectedEvent.value.value !== props.presetProceedingsPublication?.eventId) {
+                selectedProceedings.value = searchPlaceholderProceedings;
+                fetchProceedings(selectedEvent.value);
+            }
+        });
+
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const startPage = ref(props.presetProceedingsPublication?.startPage);
@@ -203,6 +210,7 @@ export default defineComponent({
         };
 
         const fetchProceedings = (event: { title: string, value: number }) => {
+            availableProceedings.value.splice(0);
             ProceedingsService.readProceedingsForEvent(event.value).then((response) => {
                 response.data.forEach((proceedingsResponse: ProceedingsResponse) => {
                     let title: string | undefined;

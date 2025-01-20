@@ -151,6 +151,10 @@ export interface EventAssessmentClassification extends EntityAssessmentClassific
     eventId: number;
 }
 
+export interface PublicationSeriesAssessmentClassification extends EntityAssessmentClassification {
+    publicationSeriesId: number;
+}
+
 export interface AssessmentClassification {
     id?: number;
     formalDescriptionOfRule: string;

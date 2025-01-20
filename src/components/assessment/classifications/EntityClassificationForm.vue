@@ -5,23 +5,22 @@
                 <v-select
                     v-model="selectedAssessmentClassification"
                     :items="assessmentClassifications"
-                    :label="$t('classificationLabel') + '*'"
+                    :label="$t('classificationsLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object
-                    :readonly="presetClassification !== undefined">
+                    return-object>
                 </v-select>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="entityType !== 'EVENT'">
             <v-col>
                 <v-text-field
                     v-model="classificationYear" type="number" :label="$t('classificationYearLabel') + '*'" :placeholder="$t('classificationYearLabel') + '*'"
                     :rules="requiredNumericFieldRules"></v-text-field>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="userRole !== 'COMMISSION'">
             <v-col>
-                <commission-autocomplete-search v-model="selectedCommission"></commission-autocomplete-search>
+                <commission-autocomplete-search v-model="selectedCommission" required></commission-autocomplete-search>
             </v-col>
         </v-row>
 
@@ -34,15 +33,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -70,6 +70,8 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         onMounted(() => {
             fetchDetails();
             populateFields();
@@ -79,7 +81,7 @@ export default defineComponent({
             AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(props.applicableTypes).then((response) => {
                 assessmentClassifications.value.splice(0);
                 response.data.forEach((classification) => {
-                    assessmentClassifications.value.push({title: returnCurrentLocaleContent(classification.title) as string, value: classification.id});
+                    assessmentClassifications.value.push({title: returnCurrentLocaleContent(classification.title) as string, value: classification.id as number});
                 });
             });
         };
@@ -115,6 +117,8 @@ export default defineComponent({
 
             if (props.entityType === ApplicableEntityType.EVENT) {
                 (entityClassification as EventAssessmentClassification).eventId = props.entityId as number;
+            } else if (props.entityType === ApplicableEntityType.PUBLICATION_SERIES) {
+                (entityClassification as PublicationSeriesAssessmentClassification).publicationSeriesId = props.entityId as number;
             }
 
             emit("create", entityClassification);
@@ -127,7 +131,7 @@ export default defineComponent({
             assessmentClassifications,
             selectedAssessmentClassification,
             requiredNumericFieldRules,
-            classificationYear
+            classificationYear, userRole
         };
     }
 });

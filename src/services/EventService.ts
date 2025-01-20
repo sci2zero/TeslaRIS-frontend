@@ -40,6 +40,10 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.get, `conference/${conferenceId}/can-edit`);
   }
 
+  async canClassify(conferenceId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `conference/${conferenceId}/can-classify`);
+  }
+
   async reorderContribution(conferenceId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `conference/${conferenceId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
   }

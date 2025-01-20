@@ -107,10 +107,10 @@
             <v-tab v-if="canEdit || (conference?.contributions && conference?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="eventIndicators?.length > 0 || canEdit" value="indicators">
+            <v-tab v-if="eventIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="eventClassifications?.length > 0 || canEdit" value="classifications">
+            <v-tab v-if="eventClassifications?.length > 0 || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -145,7 +145,7 @@
                     :applicable-types="[ApplicableEntityType.EVENT]" 
                     :entity-id="conference?.id" 
                     :entity-type="ApplicableEntityType.EVENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canClassify"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -154,7 +154,7 @@
                 <entity-classification-view
                     :entity-classifications="eventClassifications"
                     :entity-id="conference?.id"
-                    :can-edit="canEdit"
+                    :can-edit="canClassify"
                     :containing-entity-type="ApplicableEntityType.EVENT"
                     :applicable-types="[ApplicableEntityType.EVENT]"
                     @create="createClassification"
@@ -223,6 +223,7 @@ export default defineComponent({
         const icon = ref("mdi-presentation");
 
         const canEdit = ref(false);
+        const canClassify = ref(false);
         const country = ref<Country>();
 
         const eventIndicators = ref<EntityIndicatorResponse[]>([]);
@@ -231,6 +232,10 @@ export default defineComponent({
         onMounted(() => {
             EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
+            });
+
+            EventService.canClassify(parseInt(currentRoute.params.id as string)).then((response) => {
+                canClassify.value = response.data;
             });
 
             fetchConference();
@@ -357,7 +362,7 @@ export default defineComponent({
             country, EventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications
+            fetchClassifications, canClassify
         };
 }})
 

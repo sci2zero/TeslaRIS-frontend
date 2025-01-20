@@ -5,12 +5,14 @@ export const userTypesSr = [
     { title: "Administrator", value: UserRole.ADMIN },
     { title: "Istraživač", value: UserRole.RESEARCHER },
     { title: "Institucioni urednik", value: UserRole.INSTITUTIONAL_EDITOR },
+    { title: "Komisija", value: UserRole.COMMISSION },
 ];
 
 export const userTypesEn = [
     { title: "Administrator", value: UserRole.ADMIN },
     { title: "Researcher", value: UserRole.RESEARCHER },
     { title: "Institutional editor", value: UserRole.INSTITUTIONAL_EDITOR },
+    { title: "Commission", value: UserRole.COMMISSION },
 ];
 
 export const getTitleFromValueAutoLocale = (value: UserRole | string) => {

@@ -22,7 +22,7 @@
                             <p>{{ contents[index] }}</p>
                         </v-row>
                         <v-row v-if="classification.manual">
-                            <div>
+                            <div v-if="classification.commissionId === loggedInUser?.commissionId">
                                 <generic-crud-modal
                                     :form-component="EntityClassificationForm"
                                     :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
@@ -32,8 +32,8 @@
                                     @update="updateClassification($event, classification.id)"
                                 />
                             </div>
-                            <div class="ml-5">
-                                <v-btn v-if="canEdit" density="compact" @click.prevent="deleteCLassification(classification.id)">
+                            <div v-if="canEdit && classification.commissionId === loggedInUser?.commissionId" class="ml-5">
+                                <v-btn density="compact" @click.prevent="deleteCLassification(classification.id)">
                                     {{ $t("deleteLabel") }}
                                 </v-btn>
                             </div>
@@ -55,6 +55,8 @@ import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationForm from './EntityClassificationForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import UserService from '@/services/UserService';
+import type { UserResponse } from '@/models/UserModel';
 
 
 export default defineComponent({
@@ -90,9 +92,14 @@ export default defineComponent({
         const openedPanel = ref();
 
         const i18n = useI18n();
+
+        const loggedInUser = ref<UserResponse>();
         
         onMounted(() => {
             setClassifications();
+            UserService.getLoggedInUser().then(response => {
+                loggedInUser.value = response.data;
+            });
         });
 
         watch(() => props.entityClassifications, () => {
@@ -136,9 +143,11 @@ export default defineComponent({
             return displayTitle;
         };
 
-        const updateClassification = async (entityIndicator: any, entityIndicatorId: number) => {
+        const updateClassification = async (entityClassification: any, entityClassificationId: number) => {
             if (props.containingEntityType === ApplicableEntityType.EVENT) {
-                await EntityClassificationService.updateEventClassification(entityIndicator, entityIndicatorId);
+                await EntityClassificationService.updateEventClassification(entityClassification, entityClassificationId);
+            } else if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
+                await EntityClassificationService.updatePublicationSeriesClassification(entityClassification, entityClassificationId);
             }
 
             emit("update");
@@ -165,7 +174,8 @@ export default defineComponent({
             EntityClassificationForm,
             updateClassification,
             deleteCLassification,
-            createClassification
+            createClassification,
+            loggedInUser
         };
     }
 });

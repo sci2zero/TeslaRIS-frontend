@@ -5,12 +5,12 @@
                 <v-btn
                     color="primary" dark v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
-                    {{ $t("addInstitutionEditorLabel") }}
+                    {{ isCommission ? $t("addCommissionLabel") : $t("addInstitutionEditorLabel") }}
                 </v-btn>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("addInstitutionEditorLabel") }}</span>
+                    <span class="text-h5">{{ isCommission ? $t("addCommissionLabel") : $t("addInstitutionEditorLabel") }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -47,6 +47,9 @@
                                 </v-col>
                                 <v-col cols="12">
                                     <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                                </v-col>
+                                <v-col v-if="isCommission" cols="12">
+                                    <commission-autocomplete-search ref="commissionAutocompleteRef" v-model="selectedCommission" required></commission-autocomplete-search>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-textarea
@@ -86,16 +89,23 @@ import AuthenticationService from "@/services/AuthenticationService";
 import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageResponse } from "@/models/Common";
-import type { EmployeeRegistrationRequest } from "@/models/AuthenticationModel";
+import type { EmployeeRegistrationRequest, CommissionRegistrationRequest } from "@/models/AuthenticationModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
+import CommissionAutocompleteSearch from "../assessment/commission/CommissionAutocompleteSearch.vue";
 
 
 export default defineComponent({
     name: "RegisterEmployeeModal",
-    components: { OrganisationUnitAutocompleteSearch },
+    components: { OrganisationUnitAutocompleteSearch, CommissionAutocompleteSearch },
+    props: {
+        isCommission: {
+            type: Boolean,
+            default: false
+        }
+    },
     emits: ["success", "failure"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const dialog = ref(false);
         const isFormValid = ref(false);
 
@@ -107,9 +117,34 @@ export default defineComponent({
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
 
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
-        const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
+        const commissionAutocompleteRef = ref<typeof CommissionAutocompleteSearch>();
+
+        const searchPlaceholder = {title: "", value: -1};
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedCommission = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
+
+        const resetForm = () => {
+            name.value = "";
+            surname.value = "";
+            email.value = "";
+            note.value = "";
+            ouAutocompleteRef.value?.clearInput();
+            commissionAutocompleteRef.value?.clearInput();
+        };
+
+        const handleSuccess = (stayOnPage: boolean) => {
+            emit("success");
+            resetForm();
+            if (!stayOnPage) {
+                dialog.value = false;
+            }
+        };
+
+        const handleError = (error: AxiosError<any, any>) => {
+            emit("failure", error.response?.data.message);
+        };
 
         const registerEmployee = (stayOnPage: boolean) => {
             const newEmployee: EmployeeRegistrationRequest = {
@@ -121,19 +156,20 @@ export default defineComponent({
                 organisationUnitId: selectedOrganisationUnit.value.value
             };
 
-            AuthenticationService.registerEmployee(newEmployee).then(() => {
-                emit("success");
-                name.value = "";
-                surname.value = "";
-                email.value = "";
-                note.value = "";
-                ouAutocompleteRef.value?.clearInput();
-                if (!stayOnPage) {
-                    dialog.value = false;   
-                }
-            }).catch((error: AxiosError<any, any>) => {
-                emit("failure", error.response?.data.message)
-            });
+            if (props.isCommission) {
+                const newCommission = {
+                    ...newEmployee,
+                    commissionId: selectedCommission.value.value,
+                } as CommissionRegistrationRequest;
+
+                AuthenticationService.registerCommission(newCommission)
+                    .then(() => handleSuccess(stayOnPage))
+                    .catch(handleError);
+            } else {
+                AuthenticationService.registerEmployee(newEmployee)
+                    .then(() => handleSuccess(stayOnPage))
+                    .catch(handleError);
+            }
         };
 
         onMounted(() => {
@@ -149,16 +185,17 @@ export default defineComponent({
             });
         });
 
-        return {dialog, 
-                name, 
-                surname, 
-                ouAutocompleteRef, 
-                selectedOrganisationUnit, 
-                email, note,
-                languages, selectedLanguage, 
-                registerEmployee, 
-                emailFieldRules, requiredFieldRules, requiredSelectionRules,
-                isFormValid};
+        return {
+            dialog, name, surname, 
+            ouAutocompleteRef, 
+            selectedOrganisationUnit, 
+            email, note, selectedCommission,
+            languages, selectedLanguage, 
+            registerEmployee, isFormValid,
+            emailFieldRules, requiredFieldRules,
+            requiredSelectionRules,
+            commissionAutocompleteRef
+        };
     }
 });
 </script>

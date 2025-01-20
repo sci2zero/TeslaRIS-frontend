@@ -488,5 +488,6 @@ export default {
     entityTypeLabel: "Entity Type",
     classificationYearLabel: "Classification Year",
     createNewEntityClassificationLabel: "Classify entity",
-    createNewClassificationLabel: "Create New Classification"
+    createNewClassificationLabel: "Create New Classification",
+    addCommissionLabel: "Add Commission"
 }

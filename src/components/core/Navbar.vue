@@ -259,6 +259,8 @@ export default defineComponent(
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
+                { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
+                { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
             ]);
 
             const menuItems = ref<MenuItem[]>([

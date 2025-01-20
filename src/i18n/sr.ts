@@ -487,5 +487,6 @@ export default {
     entityTypeLabel: "Tip entiteta",
     classificationYearLabel: "Godina klasifikacije",
     createNewEntityClassificationLabel: "Klasifikuj entitet",
-    createNewClassificationLabel: "Kreiraj novu klasifikaciju"
+    createNewClassificationLabel: "Kreiraj novu klasifikaciju",
+    addCommissionLabel: "Dodaj komisiju"
 }

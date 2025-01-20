@@ -44,8 +44,8 @@
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :rules="userRole === 'RESEARCHER' ? requiredSelectionRules : []"
-                    :readonly="userRole === 'RESEARCHER'"
+                    :rules="(userRole === 'RESEARCHER' || userRole === 'COMMISSION') ? requiredSelectionRules : []"
+                    :readonly="userRole === 'RESEARCHER' || userRole === 'COMMISSION'"
                     :no-data-text="$t('noDataMessage')"
                     return-object
                     @update:search="searchOUs($event)"

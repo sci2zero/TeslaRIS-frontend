@@ -81,10 +81,10 @@
             <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || journalIndicators.length > 0" value="indicators">
+            <v-tab v-if="canClassify || journalIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || journalClassifications.length > 0" value="classifications">
+            <v-tab v-if="canClassify || journalClassifications.length > 0" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -111,9 +111,11 @@
                 <entity-classification-view
                     :entity-classifications="journalClassifications"
                     :entity-id="journal?.id"
-                    :can-edit="false"
+                    :can-edit="canClassify"
                     :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
                     :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]"
+                    @create="createJournalClassification"
+                    @update="fetchClassifications"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -144,7 +146,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import type { EntityClassificationResponse, EntityIndicatorResponse } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityIndicatorResponse, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
@@ -177,6 +179,7 @@ export default defineComponent({
         const icon = ref("mdi-book-open-blank-variant");
 
         const canEdit = ref(false);
+        const canClassify = ref(false);
 
         const journalIndicators = ref<EntityIndicatorResponse[]>([]);
         const journalClassifications = ref<EntityClassificationResponse[]>([]);
@@ -184,6 +187,10 @@ export default defineComponent({
         onMounted(() => {
             JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                 canEdit.value = response.data;
+            });
+
+            JournalService.canClassify(parseInt(currentRoute.params.id as string)).then(response => {
+                canClassify.value = response.data;
             });
 
             fetchJournal(true);
@@ -290,17 +297,21 @@ export default defineComponent({
             }
         };
 
+        const createJournalClassification = (journalClassification: PublicationSeriesAssessmentClassification) => {
+            EntityClassificationService.createPublicationSeriesClassification(journalClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
-            journal, icon,
-            publications, 
-            totalPublications,
-            switchPage, canEdit,
-            returnCurrentLocaleContent,
-            languageTagMap, updateBasicInfo,
+            journal, icon, publications, totalPublications,
+            switchPage, canEdit, returnCurrentLocaleContent,
+            languageTagMap, updateBasicInfo, canClassify,
             snackbar, snackbarMessage, journalIndicators,
             updateContributions, ApplicableEntityType,
             currentTab, PublicationSeriesUpdateForm,
-            journalClassifications
+            journalClassifications, createJournalClassification,
+            fetchClassifications
         };
 }})
 

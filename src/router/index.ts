@@ -87,7 +87,7 @@ import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
 import AssessmentClassificationsListView from "@/views/assessment/listViews/AssessmentClassificationsListView.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
+const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION" };
 
 
 const router = createRouter({
@@ -136,7 +136,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission],
                     },
                 },
                 {
@@ -157,7 +157,7 @@ const router = createRouter({
                             component: EventListView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.commission],
                             },
                         },
                         {
@@ -166,7 +166,7 @@ const router = createRouter({
                             component: ConferenceLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.commission],
                             },
                         },
                         {
@@ -284,7 +284,7 @@ const router = createRouter({
                             component: JournalListView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.commission],
                             },
                         },
                         {

@@ -1,5 +1,6 @@
 <template>
     <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+    <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
     <v-data-table-server
         :sort-by="tableOptions.sortBy"
         :items="users"
