@@ -14,13 +14,19 @@
                 :label="$t('showSerialEventsLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-checkbox
+                v-if="userRole === 'COMMISSION'"
+                v-model="returnOnlyInstitutionBoundEvents"
+                :label="$t('showEventsForMyInstitutionLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
         </span>
         <event-table-component ref="tableRef" :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
     </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { computed, defineComponent, onMounted } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import EventService from '@/services/EventService';
 import EventTableComponent from '@/components/event/EventTableComponent.vue';
@@ -29,6 +35,7 @@ import type { EventIndex } from '@/models/EventModel';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -51,11 +58,14 @@ export default defineComponent({
         const returnSerialEvents = ref(true);
         const tableRef = ref<typeof EventTableComponent>();
 
+        const userRole = computed(() => UserService.provideUserRole());
+        const returnOnlyInstitutionBoundEvents = ref(userRole.value === 'COMMISSION' ? true : false);
+
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
         });
 
-        watch(returnSerialEvents, () => {
+        watch([returnSerialEvents, returnOnlyInstitutionBoundEvents], () => {
             search(searchParams.value);
         });
 
@@ -69,7 +79,7 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            EventService.searchConferences(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, !returnSerialEvents.value, false).then((response) => {
+            EventService.searchConferences(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, !returnSerialEvents.value, false, returnOnlyInstitutionBoundEvents.value).then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
             });
@@ -90,7 +100,8 @@ export default defineComponent({
         return {
             search, events, totalEvents, switchPage,
             addConference, presetSearchParams, returnSerialEvents,
-            tableRef, clearSortAndPerformSearch
+            tableRef, clearSortAndPerformSearch, userRole,
+            returnOnlyInstitutionBoundEvents
         };
     }
 });

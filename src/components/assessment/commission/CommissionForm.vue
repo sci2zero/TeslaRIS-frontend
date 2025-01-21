@@ -37,11 +37,6 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
-                <commission-autocomplete-search v-model="selectedSuperCommission"></commission-autocomplete-search>
-            </v-col>
-        </v-row>
-        <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
             </p>
@@ -56,18 +51,17 @@ import { ref } from 'vue';
 import type { MultilingualContent, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import DatePicker from '@/components/core/DatePicker.vue';
-import CommissionAutocompleteSearch from './CommissionAutocompleteSearch.vue';
 import CommissionService from '@/services/assessment/CommissionService';
 
 
 export default defineComponent({
     name: "CommissionForm",
-    components: { MultilingualTextInput, DatePicker, CommissionAutocompleteSearch },
+    components: { MultilingualTextInput, DatePicker },
     props: {
         presetCommission: {
             type: Object as PropType<CommissionResponse | undefined>,
@@ -98,20 +92,10 @@ export default defineComponent({
                 });
             });
 
-            fetchDetails();
         });
-
-        const fetchDetails = () => {
-            if(props.presetCommission && props.presetCommission.superCommissionId) {
-                selectedSuperCommission.value = {title: returnCurrentLocaleContent(props.presetCommission.superCommissionDescription) as string, value: props.presetCommission.superCommissionId as number};
-            }
-        };
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
-
-        const searchPlaceholder = {title: "", value: -1};
-        const selectedSuperCommission = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const name = ref<any>([]);
         const description = ref<any>(props.presetCommission?.description ? props.presetCommission?.description : []);
@@ -128,11 +112,7 @@ export default defineComponent({
                 description: description.value as MultilingualContent[],
                 assessmentDateFrom: dateFrom.value as string,
                 assessmentDateTo: dateTo.value as string,
-                formalDescriptionOfRule: formalDescriptionOfRule.value.value,
-                superCommissionId: (selectedSuperCommission.value.value < 1 || !selectedSuperCommission.value.value) ? undefined : selectedSuperCommission.value.value as number,
-                documentIdsForAssessment: [],
-                personIdsForAssessment: [],
-                organisationUnitIdsForAssessment: []
+                formalDescriptionOfRule: formalDescriptionOfRule.value.value
             };
 
             emit("create", commission);
@@ -145,8 +125,8 @@ export default defineComponent({
             toMultilingualTextInput,
             languageTags, requiredFieldRules,
             requiredSelectionRules, submit,
-            dateFrom, dateTo, selectedSuperCommission,
-            formalDescriptionOfRule, ruleEngines
+            dateFrom, dateTo, ruleEngines,
+            formalDescriptionOfRule
         };
     }
 });

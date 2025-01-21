@@ -51,14 +51,6 @@
                                 <div v-if="commission?.assessmentDateTo" class="response">
                                     {{ localiseDate(commission.assessmentDateTo) }}
                                 </div>
-                                <div v-if="commission?.superCommissionId">
-                                    {{ $t("superCommissionLabel") }}:
-                                </div>
-                                <div v-if="commission?.superCommissionId" class="response" @click="navigateToTargetCommission(commission.superCommissionId)">
-                                    <localized-link :to="'assessment/commissions/' + commission?.superCommissionId">
-                                        {{ returnCurrentLocaleContent(commission?.superCommissionDescription) }}
-                                    </localized-link>
-                                </div>
                                 <div v-if="commission?.formalDescriptionOfRule">
                                     {{ $t("formalDescriptionOfRuleLabel") }}:
                                 </div>
@@ -85,7 +77,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
@@ -96,7 +87,7 @@ import Toast from '@/components/core/Toast.vue';
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { LocalizedLink, GenericCrudModal, Toast },
+    components: { GenericCrudModal, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -146,9 +137,9 @@ export default defineComponent({
         const updateBasicInfo = (basicInfo: Commission) => {
             commission.value!.description = basicInfo.description;
             commission.value!.assessmentDateFrom = basicInfo.assessmentDateFrom;
+            console.log(commission.value?.assessmentDateFrom)
             commission.value!.assessmentDateTo = basicInfo.assessmentDateTo;
             commission.value!.formalDescriptionOfRule = basicInfo.formalDescriptionOfRule;
-            commission.value!.superCommissionId = basicInfo.superCommissionId as number;
 
             performUpdate(true);
         };

@@ -84,11 +84,7 @@ export interface Commission {
     sources?: string[];
     assessmentDateFrom: string;
     assessmentDateTo: string;
-    documentIdsForAssessment: number[];
-    personIdsForAssessment: number[];
-    organisationUnitIdsForAssessment: number[];
     formalDescriptionOfRule: string;
-    superCommissionId?: number;
 }
 
 export interface CommissionResponse {
@@ -97,12 +93,7 @@ export interface CommissionResponse {
     sources?: string[];
     assessmentDateFrom: string;
     assessmentDateTo: string;
-    documentIdsForAssessment: number[];
-    personIdsForAssessment: number[];
-    organisationUnitIdsForAssessment: number[];
     formalDescriptionOfRule: string;
-    superCommissionId: number;
-    superCommissionDescription: MultilingualContent[];
 }
 
 export interface EntityIndicator {

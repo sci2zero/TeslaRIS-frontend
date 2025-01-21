@@ -219,6 +219,13 @@ export default defineComponent(
                 }
             });
 
+            watch(() => loginStore.reloadUserName, () => {
+                if (loginStore.reloadUserName) {
+                    populateUserData();
+                    loginStore.emitUsernameReloaded();
+                }
+            });
+
             onMounted(() => {
                 if (AuthenticationService.userLoggedIn()) {
                     populateUserData();

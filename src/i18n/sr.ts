@@ -488,5 +488,7 @@ export default {
     classificationYearLabel: "Godina klasifikacije",
     createNewEntityClassificationLabel: "Klasifikuj entitet",
     createNewClassificationLabel: "Kreiraj novu klasifikaciju",
-    addCommissionLabel: "Dodaj komisiju"
+    addCommissionLabel: "Dodaj komisiju",
+    emailInUseMessage: "Email {0} je već u upotrebi.",
+    showEventsForMyInstitutionLabel: "Prikaži samo događaje vezane za moju instituciju"
 }

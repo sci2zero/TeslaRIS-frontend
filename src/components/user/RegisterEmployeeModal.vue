@@ -1,5 +1,5 @@
 <template>
-    <v-row justify="start">
+    <v-col align-self="start" cols="2" class="ml-3">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
                 <v-btn
@@ -19,11 +19,11 @@
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="name"
-                                        :label="$t('firstNameLabel') + '*'"
+                                        :label="(isCommission ? $t('nameLabel') : $t('firstNameLabel')) + '*'"
                                         :rules="requiredFieldRules"
                                     ></v-text-field>
                                 </v-col>
-                                <v-col cols="12">
+                                <v-col v-if="!isCommission" cols="12">
                                     <v-text-field
                                         v-model="surname"
                                         :label="$t('surnameLabel') + '*'"
@@ -78,7 +78,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
+    </v-col>
 </template>
 
 <script lang="ts">
@@ -93,6 +93,7 @@ import type { EmployeeRegistrationRequest, CommissionRegistrationRequest } from 
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import CommissionAutocompleteSearch from "../assessment/commission/CommissionAutocompleteSearch.vue";
+import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
@@ -108,6 +109,8 @@ export default defineComponent({
     setup(props, {emit}) {
         const dialog = ref(false);
         const isFormValid = ref(false);
+
+        const i18n = useI18n();
 
         const name = ref("");
         const surname = ref("");
@@ -143,7 +146,7 @@ export default defineComponent({
         };
 
         const handleError = (error: AxiosError<any, any>) => {
-            emit("failure", error.response?.data.message);
+            emit("failure", i18n.t(error.response?.data.message, [email.value]));
         };
 
         const registerEmployee = (stayOnPage: boolean) => {

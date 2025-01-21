@@ -489,5 +489,7 @@ export default {
     classificationYearLabel: "Classification Year",
     createNewEntityClassificationLabel: "Classify entity",
     createNewClassificationLabel: "Create New Classification",
-    addCommissionLabel: "Add Commission"
+    addCommissionLabel: "Add Commission",
+    emailInUseMessage: "Email {0} is already in use.",
+    showEventsForMyInstitutionLabel: "Only show events that are bound to my institution"
 }

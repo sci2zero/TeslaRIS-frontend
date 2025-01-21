@@ -1,40 +1,45 @@
 <template>
-    <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-    <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-    <v-data-table-server
-        :sort-by="tableOptions.sortBy"
-        :items="users"
-        :headers="headers"
-        :items-length="totalUsers"
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')"
-        :page="tableOptions.page"
-        @update:options="refreshTable">
-        <template #item="row">
-            <tr>
-                <td>{{ row.item.fullName }}</td>
-                <td>{{ row.item.email }}</td>
-                <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
-                </td>
-                <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
-                </td>
-                <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
-                <td>
-                    <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
-                        {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
-                    </v-btn>
-                    <v-btn
-                        color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
-                        @click="takeRoleOfUser(row.item.email)">
-                        {{ $t("takeRoleLabel") }}
-                    </v-btn>
-                </td>
-            </tr>
-        </template>
-    </v-data-table-server>
+    <v-row no-gutters>
+        <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+        <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+    </v-row>
+
+    <v-row>
+        <v-data-table-server
+            :sort-by="tableOptions.sortBy"
+            :items="users"
+            :headers="headers"
+            :items-length="totalUsers"
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
+            :page="tableOptions.page"
+            @update:options="refreshTable">
+            <template #item="row">
+                <tr>
+                    <td>{{ row.item.fullName }}</td>
+                    <td>{{ row.item.email }}</td>
+                    <td v-if="$i18n.locale == 'sr'">
+                        {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
+                    </td>
+                    <td v-else>
+                        {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
+                    </td>
+                    <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
+                    <td>
+                        <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
+                            {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
+                        </v-btn>
+                        <v-btn
+                            color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
+                            @click="takeRoleOfUser(row.item.email)">
+                            {{ $t("takeRoleLabel") }}
+                        </v-btn>
+                    </td>
+                </tr>
+            </template>
+        </v-data-table-server>
+    </v-row>
     
     <toast v-model="snackbar" :message="snackbarText" />
 </template>
