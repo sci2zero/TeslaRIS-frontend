@@ -128,19 +128,7 @@
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(dataset?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -176,11 +164,12 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);

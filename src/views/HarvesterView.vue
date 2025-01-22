@@ -67,19 +67,7 @@
             </v-row>
         </v-form>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ errorMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
 </template>
 
@@ -90,10 +78,12 @@ import DatePicker from "@/components/core/DatePicker.vue";
 import ImportService from "@/services/ImportService";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import Toast from "@/components/core/Toast.vue";
+
 
 export default defineComponent({
     name: "HarvesterView",
-    components: {DatePicker},
+    components: {DatePicker, Toast},
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);

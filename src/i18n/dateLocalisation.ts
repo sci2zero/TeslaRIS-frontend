@@ -3,6 +3,10 @@ export const localiseDate = (iso8601DateString: string | undefined) => {
         return "";
     }
 
+    if (iso8601DateString.includes("T")) {
+        iso8601DateString = iso8601DateString.split("T")[0];
+    }
+
     if(!iso8601DateString.includes("-")) {
         return iso8601DateString;
     }

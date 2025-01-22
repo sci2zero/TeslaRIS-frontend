@@ -43,14 +43,6 @@
                 <td>
                     {{ row.item.formalDescriptionOfRule }}
                 </td>
-                <td>
-                    <localized-link v-if="row.item.superCommissionId" :to="'assessment/commissions/' + row.item.superCommissionId">
-                        {{ returnCurrentLocaleContent(row.item.superCommissionDescription) }}
-                    </localized-link>
-                    <p v-else>
-                        -
-                    </p>
-                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -110,7 +102,6 @@ export default defineComponent({
         const dateFromLabel = computed(() => i18n.t("startDateLabel"));
         const dateToLabel = computed(() => i18n.t("endDateLabel"));
         const formalDescriptionOfRuleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
-        const superCommissionLabel = computed(() => i18n.t("superCommissionLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "description", order: "asc"}]});
 
@@ -118,8 +109,7 @@ export default defineComponent({
           { title: descriptionLabel, align: "start", sortable: true, key: "description.content"},
           { title: dateFromLabel, align: "start", sortable: true, key: "assessmentDateFrom"},
           { title: dateToLabel, align: "start", sortable: true, key: "assessmentDateTo"},
-          { title: formalDescriptionOfRuleLabel, align: "start", sortable: true, key: "formalDescriptionOfRule"},
-          { title: superCommissionLabel, align: "start", sortable: false}
+          { title: formalDescriptionOfRuleLabel, align: "start", sortable: true, key: "formalDescriptionOfRule"}
         ];
 
         const refreshTable = (event: any) => {

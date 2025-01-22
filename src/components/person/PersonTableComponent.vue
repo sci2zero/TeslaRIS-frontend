@@ -28,6 +28,7 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
+            :page="tableOptions.page"
             @update:options="refreshTable">
             <template #body="props">
                 <draggable
@@ -261,9 +262,14 @@ export default defineComponent({
             emit("dragged", event);
         };
 
-        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+        const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             tableOptions.value.initialCustomConfiguration = true;
-            tableOptions.value.sortBy = sortBy;
+            if (sortBy.length === 0) {
+                tableOptions.value.sortBy.splice(0);
+            } else {
+                tableOptions.value.sortBy = sortBy;
+            }
+            tableOptions.value.page = page;
         };
 
         const notifyUserAndRefreshTable = (success: boolean) => {
@@ -281,7 +287,7 @@ export default defineComponent({
             tableOptions, displayTextOrPlaceholder,
             localiseDate, startPublicationComparison,
             startMetadataComparison, onDropCallback,
-            tableWrapper, setSortOption, notifyUserAndRefreshTable };
+            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable };
     }
 });
 </script>

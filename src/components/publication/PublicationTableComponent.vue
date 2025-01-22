@@ -29,6 +29,7 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
+            :page="tableOptions.page"
             @update:options="refreshTable">
             <template #body="props">
                 <draggable
@@ -296,9 +297,14 @@ export default defineComponent({
             }});
         };
 
-        const setSortOption = (sortBy: {key: string,  order: string}[]) => {
+        const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             tableOptions.value.initialCustomConfiguration = true;
-            tableOptions.value.sortBy = sortBy;
+            if (sortBy.length === 0) {
+                tableOptions.value.sortBy.splice(0);
+            } else {
+                tableOptions.value.sortBy = sortBy;
+            }
+            tableOptions.value.page = page;
         };
 
         const claimPublication = (documentId: number) => {
@@ -315,7 +321,7 @@ export default defineComponent({
             tableOptions, displayTextOrPlaceholder, onDropCallback,
             getPublicationTypeTitleFromValueAutoLocale,
             startMetadataComparison, getDocumentLandingPageBasePath,
-            startPublicationComparison, setSortOption, claimPublication,
+            startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim
         };
     }

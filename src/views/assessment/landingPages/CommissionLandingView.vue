@@ -51,14 +51,6 @@
                                 <div v-if="commission?.assessmentDateTo" class="response">
                                     {{ localiseDate(commission.assessmentDateTo) }}
                                 </div>
-                                <div v-if="commission?.superCommissionId">
-                                    {{ $t("superCommissionLabel") }}:
-                                </div>
-                                <div v-if="commission?.superCommissionId" class="response" @click="navigateToTargetCommission(commission.superCommissionId)">
-                                    <localized-link :to="'assessment/commissions/' + commission?.superCommissionId">
-                                        {{ returnCurrentLocaleContent(commission?.superCommissionDescription) }}
-                                    </localized-link>
-                                </div>
                                 <div v-if="commission?.formalDescriptionOfRule">
                                     {{ $t("formalDescriptionOfRuleLabel") }}:
                                 </div>
@@ -72,19 +64,7 @@
             </v-col>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -97,17 +77,17 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from '@/components/assessment/commission/CommissionForm.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { LocalizedLink, GenericCrudModal },
+    components: { GenericCrudModal, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -157,9 +137,9 @@ export default defineComponent({
         const updateBasicInfo = (basicInfo: Commission) => {
             commission.value!.description = basicInfo.description;
             commission.value!.assessmentDateFrom = basicInfo.assessmentDateFrom;
+            console.log(commission.value?.assessmentDateFrom)
             commission.value!.assessmentDateTo = basicInfo.assessmentDateTo;
             commission.value!.formalDescriptionOfRule = basicInfo.formalDescriptionOfRule;
-            commission.value!.superCommissionId = basicInfo.superCommissionId as number;
 
             performUpdate(true);
         };
@@ -192,9 +172,7 @@ export default defineComponent({
         };
 
         const navigateToTargetCommission = (commissionId: number) => {
-            router.push({ name: "commissionLandingPage", params: {id: commissionId} }).then(() => {
-                router.go(0);
-            });
+            router.push({ name: "commissionLandingPage", params: {id: commissionId} });
         };
 
         return {

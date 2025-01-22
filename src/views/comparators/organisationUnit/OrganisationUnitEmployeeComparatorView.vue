@@ -47,19 +47,7 @@
             </v-btn>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -76,11 +64,12 @@ import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitEmployeeComparator",
-    components: { PersonTableComponent },
+    components: { PersonTableComponent, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

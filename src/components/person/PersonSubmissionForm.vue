@@ -103,19 +103,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -137,11 +126,12 @@ import DatePicker from '../core/DatePicker.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
 import PersonDeduplicationTable from './PersonDeduplicationTable.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast },
     props: {
         inModal: {
             type: Boolean,

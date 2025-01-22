@@ -107,8 +107,11 @@
             <v-tab v-if="canEdit || (conference?.contributions && conference?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="eventIndicators?.length > 0" value="indicators">
+            <v-tab v-if="eventIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-if="eventClassifications?.length > 0 || canClassify" value="classifications">
+                {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -142,26 +145,25 @@
                     :applicable-types="[ApplicableEntityType.EVENT]" 
                     :entity-id="conference?.id" 
                     :entity-type="ApplicableEntityType.EVENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canClassify"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="classifications">
+                <entity-classification-view
+                    :entity-classifications="eventClassifications"
+                    :entity-id="conference?.id"
+                    :can-edit="canClassify"
+                    :containing-entity-type="ApplicableEntityType.EVENT"
+                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -189,13 +191,16 @@ import CountryService from '@/services/CountryService';
 import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import type { EntityIndicatorResponse, EventIndicator } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityIndicatorResponse, EventAssessmentClassification, EventIndicator } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import Toast from '@/components/core/Toast.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView },
     setup() {
         const currentTab = ref("contributions");
 
@@ -218,22 +223,35 @@ export default defineComponent({
         const icon = ref("mdi-presentation");
 
         const canEdit = ref(false);
+        const canClassify = ref(false);
         const country = ref<Country>();
 
         const eventIndicators = ref<EntityIndicatorResponse[]>([]);
+        const eventClassifications = ref<EntityClassificationResponse[]>([]);
 
         onMounted(() => {
             EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
             });
 
+            EventService.canClassify(parseInt(currentRoute.params.id as string)).then((response) => {
+                canClassify.value = response.data;
+            });
+
             fetchConference();
             fetchIndicators();
+            fetchClassifications();
         });
 
         const fetchIndicators = () => {
             EntityIndicatorService.fetchEventIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 eventIndicators.value = response.data;
+            });
+        };
+
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchEventClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+                eventClassifications.value = response.data;
             });
         };
 
@@ -328,6 +346,12 @@ export default defineComponent({
             });
         };
 
+        const createClassification = (eventClassification: EventAssessmentClassification) => {
+            EntityClassificationService.createEventClassification(eventClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
             conference, icon, publications,
             totalPublications, switchPublicationsPage,
@@ -337,7 +361,8 @@ export default defineComponent({
             snackbar, snackbarMessage, updateDescription,
             country, EventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
-            currentTab
+            currentTab, eventClassifications, createClassification,
+            fetchClassifications, canClassify
         };
 }})
 

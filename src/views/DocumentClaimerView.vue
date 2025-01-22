@@ -7,23 +7,12 @@
             ref="tableRef" :publications="publications" :total-publications="totalPublications" in-claimer
             @switch-page="switchPage" @claim="claimPublication" @decline-claim="declinePublicationClaim"></publication-table-component>
         
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ message }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="message" />
     </v-container>
 </template>
 
 <script lang="ts">
+import Toast from '@/components/core/Toast.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -33,7 +22,7 @@ import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     name: "DocumentClaimerView",
-    components: {PublicationTableComponent},
+    components: {PublicationTableComponent, Toast},
     setup() {
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref(0);

@@ -12,6 +12,7 @@ export interface UserResponse {
     personId: number;
     organisationUnitName: MultilingualContent[];
     notificationPeriod: UserNotificationPeriod;
+    commissionId: number;
 }
 
 export interface UserAccountIndex {
@@ -48,7 +49,8 @@ export interface UserUpdateRequest {
 export enum UserRole {
     ADMIN = "ADMIN",
     RESEARCHER = "RESEARCHER",
-    INSTITUTIONAL_EDITOR = "INSTITUTIONAL_EDITOR"
+    INSTITUTIONAL_EDITOR = "INSTITUTIONAL_EDITOR",
+    COMMISSION = "COMMISSION"
 }
 
 export enum UserNotificationPeriod {

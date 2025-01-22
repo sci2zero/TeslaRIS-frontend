@@ -56,19 +56,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -83,11 +72,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
 import UriInput from '../core/UriInput.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitOrganizationUnit",
-    components: {MultilingualTextInput, OpenLayersMap, UriInput},
+    components: {MultilingualTextInput, OpenLayersMap, UriInput, Toast},
     props: {
         inModal: {
             type: Boolean,

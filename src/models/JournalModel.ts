@@ -6,7 +6,7 @@ export interface JournalIndex {
     titleSrSortable: string;
     titleOther: string;
     titleOtherSortable: string;
-    eISSN: string;
+    eissn: string;
     printISSN: string;
     databaseId: number;
 }

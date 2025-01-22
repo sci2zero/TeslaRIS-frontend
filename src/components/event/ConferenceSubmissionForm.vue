@@ -110,19 +110,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ $t("savedMessage") }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="$t('savedMessage')" />
 </template>
 
 <script lang="ts">
@@ -142,11 +131,12 @@ import DatePicker from '../core/DatePicker.vue';
 import CountryService from '@/services/CountryService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import UriInput from '../core/UriInput.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "ConferenceSubmissionForm",
-    components: { MultilingualTextInput, DatePicker, UriInput },
+    components: { MultilingualTextInput, DatePicker, UriInput, Toast },
     props: {
         inModal: {
             type: Boolean,
