@@ -454,7 +454,7 @@ export default {
     assessmentMeasuresLabel: "Mere za vrednovanje",
     valueLabel: "Vrednost",
     formalDescriptionOfRuleLabel: "Pravilo",
-    commissionPageLabel: "Komisije",
+    commissionListLabel: "Komisije",
     superCommissionLabel: "Nad-komisija",
     commissionLabel: "Komisija",
     createNewCommissionLabel: "Kreiraj novu komisiju",
@@ -490,5 +490,8 @@ export default {
     createNewClassificationLabel: "Kreiraj novu klasifikaciju",
     addCommissionLabel: "Dodaj komisiju",
     emailInUseMessage: "Email {0} je već u upotrebi.",
-    showEventsForMyInstitutionLabel: "Prikaži samo događaje vezane za moju instituciju"
+    showEventsForMyInstitutionLabel: "Prikaži samo događaje vezane za moju instituciju",
+    commissionRelationsLabel: "Relacije sa drugim komisijama",
+    relationGroupLabel: "Relaciona grupa",
+    createNewCommissionRelationLabel: "Dodaj novu relacionu grupu"
 }

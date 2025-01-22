@@ -455,7 +455,7 @@ export default {
     assessmentMeasuresLabel: "Assessment Measures",
     valueLabel: "Value",
     formalDescriptionOfRuleLabel: "Rule",
-    commissionPageLabel: "Commissions",
+    commissionListLabel: "Commissions",
     superCommissionLabel: "Super Commission",
     commissionLabel: "Commission",
     createNewCommissionLabel: "Create New Commission",
@@ -491,5 +491,8 @@ export default {
     createNewClassificationLabel: "Create New Classification",
     addCommissionLabel: "Add Commission",
     emailInUseMessage: "Email {0} is already in use.",
-    showEventsForMyInstitutionLabel: "Only show events that are bound to my institution"
+    showEventsForMyInstitutionLabel: "Only show events that are bound to my institution",
+    commissionRelationsLabel: "Commission Relations",
+    relationGroupLabel: "Relation Group",
+    createNewCommissionRelationLabel: "Add new relation group"
 }

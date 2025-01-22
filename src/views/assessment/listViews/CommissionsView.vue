@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1>{{ $t("commissionPageLabel") }}</h1>
+        <h1>{{ $t("commissionListLabel") }}</h1>
         <br />
         <br />
         <br />
@@ -35,7 +35,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("commissionPageLabel");
+            document.title = i18n.t("commissionListLabel");
         });
 
         watch(i18n.locale, () => {

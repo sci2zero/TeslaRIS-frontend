@@ -180,7 +180,7 @@ export default defineComponent(
             const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
             const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
-            const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
+            const commissionsLabel = computed(() => i18n.t("commissionListLabel"));
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
 
