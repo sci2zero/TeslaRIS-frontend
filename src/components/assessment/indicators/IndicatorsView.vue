@@ -26,6 +26,12 @@
                             {{ $t("deleteLabel") }}
                         </v-btn>
                     </div>
+                    <div class="ml-5 mt-2">
+                        <document-file-submission-modal v-if="canEdit" :is-proof="true" @create="addIndicatorProof($event, indicator.id)"></document-file-submission-modal>
+                    </div>
+                </v-row>
+                <v-row>
+                    <indicator-proofs-list :attachments="indicator.proofs" :can-edit="canEdit" @update="updateIndicatorProof($event, indicator.id)" @delete="deleteIndicatorProof($event, indicator.id)"></indicator-proofs-list>
                 </v-row>
             </v-expansion-panel-text>
         </v-expansion-panel>
@@ -58,11 +64,14 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { getIndicatorSourceTitleFromValueAutoLocale } from '@/i18n/entityIndicatorSource';
+import DocumentFileSubmissionModal from '@/components/documentFile/DocumentFileSubmissionModal.vue';
+import type { DocumentFile } from '@/models/DocumentFileModel';
+import IndicatorProofsList from './IndicatorProofsList.vue';
 
 
 export default defineComponent({
     name: "ViewIndicatorsComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, DocumentFileSubmissionModal, IndicatorProofsList },
     props: {
         entityIndicators: {
             type: Array<EntityIndicatorResponse>,
@@ -220,6 +229,24 @@ export default defineComponent({
             contents.value.splice(index, 1);
         };
 
+        const addIndicatorProof = (documentFile: DocumentFile, entityIndicatorId: number) => {
+            EntityIndicatorService.addEntityIndicatorProof(documentFile, entityIndicatorId).then(() => {
+                emit("updated");
+            });
+        };
+
+        const updateIndicatorProof = (documentFile: DocumentFile, entityIndicatorId: number) => {
+            EntityIndicatorService.updateEntityIndicatorProof(documentFile, entityIndicatorId).then(() => {
+                emit("updated");
+            });
+        };
+
+        const deleteIndicatorProof = (proofId: number, entityIndicatorId: number) => {
+            EntityIndicatorService.deleteEntityIndicatorProof(proofId, entityIndicatorId).then(() => {
+                emit("updated");
+            });
+        };
+
         return {
             titles, contents,
             EntityIndicatorForm,
@@ -228,7 +255,10 @@ export default defineComponent({
             updateIndicator,
             EntityIndicatorSource,
             deleteIndicator,
-            openedPanel, contentMap
+            openedPanel, contentMap,
+            addIndicatorProof,
+            updateIndicatorProof,
+            deleteIndicatorProof
         };
     }
 });

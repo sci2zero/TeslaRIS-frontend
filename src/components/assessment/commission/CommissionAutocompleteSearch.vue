@@ -62,6 +62,14 @@ export default defineComponent({
             >,
             required: true,
         },
+        onlyLoadCommissions: {
+            type: Boolean,
+            default: false
+        },
+        onlyClassificationCommissions: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ['update:modelValue'],
     setup(props, { emit }) {
@@ -92,7 +100,7 @@ export default defineComponent({
             }
             if (input.length >= 3) {
                 const params = `searchExpression=${input}&page=0&size=5`;
-                CommissionService.fetchAllCommissions(params).then((response) => {
+                CommissionService.fetchAllCommissions(params, props.onlyLoadCommissions, props.onlyClassificationCommissions).then((response) => {
                     const listOfCommissions: { title: string; value: number; date?: string }[] = [];
                     response.data.content.forEach((commission: CommissionResponse) => {
                         listOfCommissions.push({

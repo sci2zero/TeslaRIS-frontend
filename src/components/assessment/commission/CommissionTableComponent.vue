@@ -101,7 +101,7 @@ export default defineComponent({
         const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const dateFromLabel = computed(() => i18n.t("startDateLabel"));
         const dateToLabel = computed(() => i18n.t("endDateLabel"));
-        const formalDescriptionOfRuleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
+        const formalDescriptionOfRuleLabel = computed(() => i18n.t("classificationRuleLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "description", order: "asc"}]});
 

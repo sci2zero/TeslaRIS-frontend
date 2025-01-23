@@ -492,7 +492,8 @@ export default {
     addCommissionLabel: "Add Commission",
     emailInUseMessage: "Email {0} is already in use.",
     showEventsForMyInstitutionLabel: "Only show events that are bound to my institution",
-    commissionRelationsLabel: "Commission Relations",
+    commissionRelationsLabel: "Commission Relations (respected during assessment)",
     relationGroupLabel: "Relation Group",
-    createNewCommissionRelationLabel: "Add new relation group"
+    createNewCommissionRelationLabel: "Add new relation group",
+    classificationRuleLabel: "Classification Rule"
 }

@@ -52,7 +52,7 @@
                                     {{ localiseDate(commission.assessmentDateTo) }}
                                 </div>
                                 <div v-if="commission?.formalDescriptionOfRule">
-                                    {{ $t("formalDescriptionOfRuleLabel") }}:
+                                    {{ $t("classificationRuleLabel") }}:
                                 </div>
                                 <div v-if="commission?.formalDescriptionOfRule" class="response">
                                     {{ commission.formalDescriptionOfRule }}

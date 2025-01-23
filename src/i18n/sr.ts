@@ -491,7 +491,8 @@ export default {
     addCommissionLabel: "Dodaj komisiju",
     emailInUseMessage: "Email {0} je već u upotrebi.",
     showEventsForMyInstitutionLabel: "Prikaži samo događaje vezane za moju instituciju",
-    commissionRelationsLabel: "Relacije sa drugim komisijama",
+    commissionRelationsLabel: "Relacije sa drugim komisijama (kod uvažavanja prilikom vrednovanja)",
     relationGroupLabel: "Relaciona grupa",
-    createNewCommissionRelationLabel: "Dodaj novu relacionu grupu"
+    createNewCommissionRelationLabel: "Dodaj novu relacionu grupu",
+    classificationRuleLabel: "Klasifikaciono pravilo"
 }

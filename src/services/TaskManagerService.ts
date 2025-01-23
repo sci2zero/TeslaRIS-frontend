@@ -27,8 +27,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createClassificationYearsParameter(years)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${timestamp}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource, commissionId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${timestamp}&source=${source}&commissionId=${commissionId}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[]): Promise<AxiosResponse<void>> {

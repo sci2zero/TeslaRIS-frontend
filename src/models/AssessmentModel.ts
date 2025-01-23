@@ -29,6 +29,7 @@ export interface EntityIndicatorResponse {
     toDate?: string;
     indicatorResponse: IndicatorResponse;
     source: EntityIndicatorSource
+    proofs: DocumentFileResponse[];
 }
 
 export interface EntityClassificationResponse {

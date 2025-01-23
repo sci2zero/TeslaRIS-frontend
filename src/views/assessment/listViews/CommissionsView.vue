@@ -43,7 +43,7 @@ export default defineComponent({
         });
 
         const search = () => {
-            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response: AxiosResponse<Page<CommissionResponse>>) => {
+            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false, false).then((response: AxiosResponse<Page<CommissionResponse>>) => {
                 commissions.value = response.data.content;
                 totalCommissions.value = response.data.totalElements;
             });

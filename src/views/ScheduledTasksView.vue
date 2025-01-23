@@ -14,7 +14,7 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5">
-            <v-col v-if="selectedScheduledTaskType !== ScheduledTaskType.REINDEXING" cols="2">
+            <v-col v-if="!taskReindexing" cols="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -24,7 +24,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.REINDEXING" cols="4">
+            <v-col v-if="taskReindexing" cols="4">
                 <v-select
                     v-model="selectedEntityTypes"
                     :items="entityTypes"
@@ -33,7 +33,7 @@
                     multiple>
                 </v-select>
             </v-col>
-            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.INDICATOR_LOAD" cols="2">
+            <v-col v-if="taskIndicatorLoad" cols="2">
                 <v-select
                     v-model="selectedIndicatorSource"
                     :items="indicatorSources"
@@ -43,7 +43,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.CLASSIFICATION_LOAD" cols="2">
+            <!-- <v-col v-if="taskClassificationLoad" cols="2">
                 <v-select
                     v-model="selectedClassificationSource"
                     :items="classificationSources"
@@ -52,11 +52,15 @@
                     return-object
                     :readonly="false">
                 </v-select>
+            </v-col> -->
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad" cols="2">
+                <commission-autocomplete-search 
+                    v-model="selectedCommission" 
+                    :only-load-commissions="taskClassificationLoad" 
+                    :only-classification-commissions="taskClassificationComputation">
+                </commission-autocomplete-search>
             </v-col>
-            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.CLASSIFICATION_COMPUTATION" cols="2">
-                <commission-autocomplete-search v-model="selectedCommission"></commission-autocomplete-search>
-            </v-col>
-            <v-col v-if="selectedScheduledTaskType === ScheduledTaskType.CLASSIFICATION_COMPUTATION || selectedScheduledTaskType === ScheduledTaskType.IF5_COMPUTATION" cols="2">
+            <v-col v-if="taskClassificationComputation || taskIF5Computation" cols="2">
                 <v-select
                     v-model="selectedYears"
                     :items="years"
@@ -91,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import TimePicker from "@/components/core/TimePicker.vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import TaskManagerService from "@/services/TaskManagerService";
@@ -140,6 +144,12 @@ export default defineComponent({
 
         const scheduledTaskTypes = getScheduledTaskTypeForGivenLocale();
         const selectedScheduledTaskType = ref<ScheduledTaskType>(ScheduledTaskType.INDICATOR_LOAD);
+
+        const taskReindexing = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REINDEXING);
+        const taskIndicatorLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.INDICATOR_LOAD);
+        const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_COMPUTATION);
+        const taskClassificationComputation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_COMPUTATION);
+        const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
 
         const years = ref<number[]>([]);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
@@ -243,7 +253,8 @@ export default defineComponent({
                 case ScheduledTaskType.CLASSIFICATION_LOAD:
                     scheduleTask(() => 
                         TaskManagerService.scheduleClassificationLoadTask(
-                            timestamp, selectedClassificationSource.value.value
+                            timestamp, selectedClassificationSource.value.value,
+                            selectedCommission.value.value
                         )
                     );
                     break;
@@ -286,7 +297,11 @@ export default defineComponent({
             entityTypes, selectedEntityTypes,
             requiredMultiSelectionRules,
             classificationSources,
-            selectedClassificationSource
+            selectedClassificationSource,
+            taskReindexing, taskIndicatorLoad,
+            taskIF5Computation,
+            taskClassificationComputation,
+            taskClassificationLoad
         };
     },
 });
