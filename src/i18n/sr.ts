@@ -494,5 +494,6 @@ export default {
     commissionRelationsLabel: "Relacije sa drugim komisijama (kod uvažavanja prilikom vrednovanja)",
     relationGroupLabel: "Relaciona grupa",
     createNewCommissionRelationLabel: "Dodaj novu relacionu grupu",
-    classificationRuleLabel: "Klasifikaciono pravilo"
+    classificationRuleLabel: "Klasifikaciono pravilo",
+    dragDropFilesLabel: "Prevucite fajlove ovde"
 }

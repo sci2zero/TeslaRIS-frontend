@@ -146,10 +146,10 @@
             <v-tab v-if="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="researchAreaHierarchy" value="researchArea">
+            <v-tab v-if="researchAreaHierarchy || canEdit" value="researchArea">
                 {{ $t("researchAreaLabel") }}
             </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-if="documentIndicators?.length > 0 || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
         </v-tabs>
@@ -247,7 +247,6 @@ import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
-import EntityIndicatorForm from '@/components/assessment/indicators/EntityIndicatorForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
 
@@ -452,9 +451,11 @@ export default defineComponent({
             fetchDisplayData();
         };
 
-        const createIndicator = (documentIndicator: DocumentIndicator) => {
-            EntityIndicatorService.createDocumentIndicator(documentIndicator).then(() => {
-                fetchIndicators();
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
+                    fetchIndicators();
+                });
             });
         };
 
@@ -474,7 +475,7 @@ export default defineComponent({
             handleResearcherUnbind, userRole,
             documentIndicators, StatisticsType,
             currentTab, updateResearchAreas,
-            ApplicableEntityType, EntityIndicatorForm,
+            ApplicableEntityType,
             createIndicator, fetchIndicators
         };
 }})

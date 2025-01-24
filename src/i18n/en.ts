@@ -495,5 +495,6 @@ export default {
     commissionRelationsLabel: "Commission Relations (respected during assessment)",
     relationGroupLabel: "Relation Group",
     createNewCommissionRelationLabel: "Add new relation group",
-    classificationRuleLabel: "Classification Rule"
+    classificationRuleLabel: "Classification Rule",
+    dragDropFilesLabel: "Drag and drop files here"
 }

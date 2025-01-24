@@ -50,10 +50,10 @@ export class EntityIndicatorService extends BaseService {
         return super.sendRequest(axios.delete, `assessment/entity-indicator/${entityIndicatorId}`);
     }
 
-    async addEntityIndicatorProof(proof: any, entityIndicatorId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+    async addEntityIndicatorProof(proof: any, entityIndicatorId: number, idempotencyKey: string | undefined): Promise<AxiosResponse<DocumentFileResponse>> {
         proof.license = getNameFromOrdinal(License, proof.license);
         proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
-        return super.sendMultipartFormDataRequest(axios.patch, `assessment/entity-indicator/add-proof/${entityIndicatorId}`, proof, EntityIndicatorService.idempotencyKey);
+        return super.sendMultipartFormDataRequest(axios.patch, `assessment/entity-indicator/add-proof/${entityIndicatorId}`, proof, idempotencyKey ? idempotencyKey : EntityIndicatorService.idempotencyKey);
     }
 
     async updateEntityIndicatorProof(proof: any, entityIndicatorId: number): Promise<AxiosResponse<DocumentFileResponse>> {
@@ -68,6 +68,26 @@ export class EntityIndicatorService extends BaseService {
 
     async deleteEntityIndicatorProof(proofId: number, entityIndicatorId: number): Promise<void> {
         return super.sendRequest(axios.delete, `assessment/entity-indicator/${entityIndicatorId}/${proofId}`);
+    }
+
+    getDisposableIdempotencyKey(): string {
+        return BaseService.generateIdempotencyKey();
+    }
+
+    async uploadFilesAndFetchIndicators(files: File[], responseDataId: number) {
+        const uploadPromises = files.map(fileItem => 
+            this.addEntityIndicatorProof(
+                {
+                    file: fileItem,
+                    description: [],
+                    resourceType: ResourceType.SUPPLEMENT,
+                    license: License.OPEN_ACCESS,
+                },
+                responseDataId,
+                this.getDisposableIdempotencyKey()
+            )
+        );
+        return Promise.all(uploadPromises);
     }
 }
 

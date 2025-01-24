@@ -14,7 +14,7 @@
                     <div>
                         <generic-crud-modal
                             :form-component="EntityIndicatorForm"
-                            :form-props="{ presetDocumentIndicators: indicator, applicableTypes: indicator.indicatorResponse.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
+                            :form-props="{ presetDocumentIndicator: indicator, applicableTypes: indicator.indicatorResponse.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
                             entity-name=""
                             is-update
                             :read-only="!canEdit"
@@ -212,9 +212,9 @@ export default defineComponent({
 
         const updateIndicator = async (entityIndicator: any, entityIndicatorId: number) => {
             if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
-                await EntityIndicatorService.updateDocumentIndicator(entityIndicator, entityIndicatorId);
+                await EntityIndicatorService.updateDocumentIndicator(entityIndicator.indicator, entityIndicatorId);
             } else if (props.containingEntityType === ApplicableEntityType.EVENT) {
-                await EntityIndicatorService.updateEventIndicator(entityIndicator, entityIndicatorId);
+                await EntityIndicatorService.updateEventIndicator(entityIndicator.indicator, entityIndicatorId);
             }
 
             emit("updated");
@@ -230,7 +230,7 @@ export default defineComponent({
         };
 
         const addIndicatorProof = (documentFile: DocumentFile, entityIndicatorId: number) => {
-            EntityIndicatorService.addEntityIndicatorProof(documentFile, entityIndicatorId).then(() => {
+            EntityIndicatorService.addEntityIndicatorProof(documentFile, entityIndicatorId, undefined).then(() => {
                 emit("updated");
             });
         };

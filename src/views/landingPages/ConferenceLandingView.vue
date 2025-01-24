@@ -340,9 +340,11 @@ export default defineComponent({
             });
         };
 
-        const createIndicator = (eventIndicator: EventIndicator) => {
-            EntityIndicatorService.createEventIndicator(eventIndicator).then(() => {
-                fetchIndicators();
+        const createIndicator = async (eventIndicator: {indicator: EventIndicator, files: File[]}) => {
+            EntityIndicatorService.createEventIndicator(eventIndicator.indicator).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(eventIndicator.files, response.data.id).then(() => {
+                    fetchIndicators();
+                });
             });
         };
 
