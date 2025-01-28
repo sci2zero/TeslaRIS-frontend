@@ -147,6 +147,9 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab v-if="documentClassifications?.length > 0 || canEdit" value="assessments">
+                {{ $t("assessmentsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -168,6 +171,18 @@
                     <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
                 </div>
             </v-tabs-window-item>
+            <v-tabs-window-item value="assessments">
+                <v-btn v-if="journalPublication?.documentDate" density="compact" @click="assessJournalPublication">
+                    {{ $t("assessPublicationLabel") }}
+                </v-btn>
+                <entity-classification-view
+                    :entity-classifications="documentClassifications"
+                    :entity-id="journalPublication?.id"
+                    :can-edit="false"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(journalPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
@@ -177,7 +192,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
 import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -209,14 +224,17 @@ import PublicationUnbindButton from '@/components/publication/PublicationUnbindB
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import Toast from '@/components/core/Toast.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
+import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView },
     setup() {
         const currentTab = ref("contributions");
 
@@ -242,6 +260,7 @@ export default defineComponent({
         const icon = ref("mdi-newspaper-variant");
 
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+        const documentClassifications = ref<EntityClassificationResponse[]>([]);
 
         onMounted(() => {
             fetchDisplayData();
@@ -256,8 +275,20 @@ export default defineComponent({
 
             fetchJournalPublication();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+
+            fetchIndicators();
+            fetchClassifications();
+        };
+
+        const fetchIndicators = () => {
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
+            });
+        };
+
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+                documentClassifications.value = response.data;
             });
         };
 
@@ -360,6 +391,14 @@ export default defineComponent({
             fetchDisplayData();
         };
 
+        const assessJournalPublication = () => {
+            AssessmentClassificationService.assessJournalPublication(parseInt(currentRoute.params.id as string)).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+                fetchClassifications();
+            });
+        };
+
         return {
             journalPublication, icon,
             publications, event, totalPublications, userRole,
@@ -369,7 +408,8 @@ export default defineComponent({
             searchKeyword, goToURL, canEdit, localiseDate,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
-            updateContributions, updateBasicInfo, getTitleFromValueAutoLocale
+            updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
+            ApplicableEntityType, documentClassifications, assessJournalPublication
         };
 }})
 

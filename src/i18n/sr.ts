@@ -389,6 +389,7 @@ export default {
     thesisMetadataComparatorLabel: "Poređenje završnih radova",
     proceedingsPublicationComparatorLabel: "Poređenje radova u zborniku radova",
     journalPublicationComparatorLabel: "Poređenje radova u časopisu",
+    assessmentsLabel: "Vrednovanja",
     assessmentLabel: "Vrednovanje",
     indicatorListLabel: "Indikatori",
     indicatorLabel: "Indikator",
@@ -482,6 +483,7 @@ export default {
     cantScheduleInPastMessage: "Možete zakazivati događaje samo ako su u budućnosti.",
     inProgressLabel: "U toku...",
     classificationsLabel: "Klasifikacije",
+    classificationLabel: "Klasifikacija",
     yearsLabel: "Selektovane Godine",
     scheduledTaskTypeLabel: "Tip zadatka",
     entityTypeLabel: "Tip entiteta",
@@ -495,5 +497,6 @@ export default {
     relationGroupLabel: "Relaciona grupa",
     createNewCommissionRelationLabel: "Dodaj novu relacionu grupu",
     classificationRuleLabel: "Klasifikaciono pravilo",
-    dragDropFilesLabel: "Prevucite fajlove ovde"
+    dragDropFilesLabel: "Prevucite fajlove ovde",
+    assessPublicationLabel: "Vrednuj publikaciju"
 }

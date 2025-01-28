@@ -35,6 +35,10 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `reindex/schedule?timestamp=${timestamp}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
     }
 
+    async scheduleJournalPublicationAssessment(timestamp: string, dateFrom: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-journal-publication-assessment?timestamp=${timestamp}&dateFrom=${dateFrom}`, {}, TaskSchedulingService.idempotencyKey);
+    }
+
     private createClassificationYearsParameter(years: number[]): string {
         let classificationYears = "";
         years.forEach(year => {

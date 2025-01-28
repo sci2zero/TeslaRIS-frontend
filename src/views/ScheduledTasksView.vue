@@ -14,7 +14,7 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5">
-            <v-col v-if="!taskReindexing" cols="2">
+            <v-col v-if="!taskReindexing && !journalPublicationsAssessment" cols="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -69,6 +69,14 @@
                     multiple>
                 </v-select>
             </v-col>
+            <v-col v-if="journalPublicationsAssessment" cols="2">
+                <date-picker
+                    v-model="startDate"
+                    :label="$t('startDateLabel') + '*'"
+                    color="primary"
+                    required
+                />
+            </v-col>
             <v-col cols="2">
                 <date-picker
                     v-model="scheduleDate"
@@ -82,7 +90,7 @@
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
             <v-col cols="1">
-                <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleLoadTask">
+                <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
                     {{ $t("scheduleLabel") }}
                 </v-btn>
             </v-col>
@@ -150,9 +158,12 @@ export default defineComponent({
         const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_COMPUTATION);
         const taskClassificationComputation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_COMPUTATION);
         const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
+        const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
 
         const years = ref<number[]>([]);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
+
+        const startDate = ref<string>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedCommission = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -214,7 +225,7 @@ export default defineComponent({
                 });
         };
 
-        const scheduleLoadTask = () => {
+        const scheduleTaskForComputation = () => {
             const timestamp = createTimestamp(scheduleDate.value, scheduledTime.value);
 
             switch (selectedScheduledTaskType.value) {
@@ -259,6 +270,14 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT:
+                    scheduleTask(() => 
+                        TaskManagerService.scheduleJournalPublicationAssessment(
+                            timestamp, (startDate.value as string).split("T")[0]
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -287,7 +306,7 @@ export default defineComponent({
             scheduleDate, scheduledTasks,
             applicableTypes, selectedApplicableEntityType,
             selectedIndicatorSource, requiredSelectionRules,
-            scheduleLoadTask, scheduledTime,
+            scheduleTaskForComputation, scheduledTime,
             isFormValid, snackbar, message,
             deleteScheduledLoadTask,
             scheduledTaskTypes, indicatorSources,
@@ -299,9 +318,10 @@ export default defineComponent({
             classificationSources,
             selectedClassificationSource,
             taskReindexing, taskIndicatorLoad,
-            taskIF5Computation,
+            taskIF5Computation, startDate,
             taskClassificationComputation,
-            taskClassificationLoad
+            taskClassificationLoad,
+            journalPublicationsAssessment
         };
     },
 });

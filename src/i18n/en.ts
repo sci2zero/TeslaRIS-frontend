@@ -390,6 +390,7 @@ export default {
     thesisMetadataComparatorLabel: "Comparing theses",
     proceedingsPublicationComparatorLabel: "Comparing proceedings publication",
     journalPublicationComparatorLabel: "Comparing journal publication",
+    assessmentsLabel: "Assessments",
     assessmentLabel: "Assessment",
     indicatorListLabel: "Indicators",
     indicatorLabel: "Indicator",
@@ -483,6 +484,7 @@ export default {
     cantScheduleInPastMessage: "You can only schedule events in future.",
     inProgressLabel: "In progress...",
     classificationsLabel: "Classifications",
+    classificationLabel: "Classification",
     yearsLabel: "Selected Years",
     scheduledTaskTypeLabel: "Task Type",
     entityTypeLabel: "Entity Type",
@@ -496,5 +498,6 @@ export default {
     relationGroupLabel: "Relation Group",
     createNewCommissionRelationLabel: "Add new relation group",
     classificationRuleLabel: "Classification Rule",
-    dragDropFilesLabel: "Drag and drop files here"
+    dragDropFilesLabel: "Drag and drop files here",
+    assessPublicationLabel: "Assess publication"
 }
