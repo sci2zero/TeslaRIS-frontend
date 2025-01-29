@@ -313,9 +313,11 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         onMounted(() => {
-            PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             fetchPerson();
             StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));

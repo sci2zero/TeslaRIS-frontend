@@ -283,9 +283,11 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         onMounted(() => {
-            OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             fetchOU(true);
             StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));

@@ -200,6 +200,7 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -233,16 +234,18 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
+        const loginStore = useLoginStore();
+
         onMounted(() => {
             fetchDisplayData();
         });
 
         const fetchDisplayData = () => {
-            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            }).catch(() => {
-                canEdit.value = false;
-            });
+            if (loginStore.userLoggedIn) {
+                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             fetchProceedingsPublication();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));

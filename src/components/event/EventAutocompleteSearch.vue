@@ -94,7 +94,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents).then((response) => {
+                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false).then((response) => {
                     const listOfEvents: { title: string, value: number, date?: string }[] = [];
                     response.data.content.forEach((conference: EventIndex) => {
                         if (i18n.locale.value === "sr") {

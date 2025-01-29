@@ -230,6 +230,7 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -262,22 +263,24 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
         const documentClassifications = ref<EntityClassificationResponse[]>([]);
 
+        const loginStore = useLoginStore();
+
         onMounted(() => {
             fetchDisplayData();
         });
 
         const fetchDisplayData = () => {
-            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            }).catch(() => {
-                canEdit.value = false;
-            });
+            if (loginStore.userLoggedIn) {
+                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+                fetchClassifications();
+            }
 
             fetchJournalPublication();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
 
             fetchIndicators();
-            fetchClassifications();
         };
 
         const fetchIndicators = () => {

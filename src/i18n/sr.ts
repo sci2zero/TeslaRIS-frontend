@@ -166,6 +166,7 @@ export default {
     internalNumberLabel: "Interni broj",
     addNewEntityLabel: "Dodaj novi...",
     noAvailableProceedingsMessage: "Nema dostupnih zbornika radova.",
+    noAvailableRelationsMessage: "Nema dostupnih relacija.",
     notYetSetMessage: "Nije unešeno.",
     researcherLabel: "Istraživač",
     personalInfoLabel: "Lični podaci",
