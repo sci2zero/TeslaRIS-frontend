@@ -53,7 +53,7 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad" cols="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment" cols="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
@@ -68,6 +68,15 @@
                     :rules="requiredMultiSelectionRules"
                     multiple>
                 </v-select>
+            </v-col>
+            <v-col v-if="journalPublicationsAssessment" cols="3">
+                <journal-autocomplete-search v-model="selectedJournals" multiple disable-submission></journal-autocomplete-search>
+            </v-col>
+            <v-col v-if="journalPublicationsAssessment" cols="3">
+                <person-autocomplete-search v-model="selectedPersons" multiple disable-submission></person-autocomplete-search>
+            </v-col>
+            <v-col v-if="journalPublicationsAssessment" cols="3">
+                <organisation-unit-autocomplete-search v-model="selectedOUs" multiple disable-submission></organisation-unit-autocomplete-search>
             </v-col>
             <v-col v-if="journalPublicationsAssessment" cols="2">
                 <date-picker
@@ -122,11 +131,14 @@ import ScheduledTasksList from "@/components/core/ScheduledTasksList.vue";
 import { getEntityTypeForGivenLocale } from "@/i18n/entityType";
 import { EntityType } from "@/models/MergeModel";
 import { getClassificationSourcesForGivenLocale, getClassificationSourceTitleFromValueAutoLocale } from "@/i18n/entityClassificationSource";
+import JournalAutocompleteSearch from "@/components/journal/JournalAutocompleteSearch.vue";
+import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
+import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 
 
 export default defineComponent({
     name: "IndicatorsLoadView",
-    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList },
+    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
@@ -170,6 +182,10 @@ export default defineComponent({
 
         const entityTypes = getEntityTypeForGivenLocale();
         const selectedEntityTypes = ref<{ title: string, value: EntityType }[]>([...entityTypes]);
+
+        const selectedJournals = ref<{title: string, value: number}[]>([]);
+        const selectedPersons = ref<{title: string, value: number}[]>([]);
+        const selectedOUs = ref<{title: string, value: number}[]>([]);
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -273,7 +289,13 @@ export default defineComponent({
                 case ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT:
                     scheduleTask(() => 
                         TaskManagerService.scheduleJournalPublicationAssessment(
-                            timestamp, (startDate.value as string).split("T")[0]
+                            timestamp, (startDate.value as string).split("T")[0],
+                            {
+                                commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
+                                authorIds: selectedPersons.value.map(person => person.value),
+                                organisationUnitIds: selectedOUs.value.map(ou => ou.value),
+                                journalIds: selectedJournals.value.map(journal => journal.value)
+                            }
                         )
                     );
                     break;
@@ -308,7 +330,7 @@ export default defineComponent({
             selectedIndicatorSource, requiredSelectionRules,
             scheduleTaskForComputation, scheduledTime,
             isFormValid, snackbar, message,
-            deleteScheduledLoadTask,
+            deleteScheduledLoadTask, selectedOUs,
             scheduledTaskTypes, indicatorSources,
             selectedScheduledTaskType,
             ScheduledTaskType, years,
@@ -321,7 +343,8 @@ export default defineComponent({
             taskIF5Computation, startDate,
             taskClassificationComputation,
             taskClassificationLoad,
-            journalPublicationsAssessment
+            journalPublicationsAssessment,
+            selectedJournals, selectedPersons
         };
     },
 });

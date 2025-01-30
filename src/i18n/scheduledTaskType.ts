@@ -5,8 +5,8 @@ export const scheduledTaskTypeSr = [
     { title: "Reindeksiranje", value: ScheduledTaskType.REINDEXING },
     { title: "Učitavanje indikatora", value: ScheduledTaskType.INDICATOR_LOAD },
     { title: "Računanje IF5 rank-a", value: ScheduledTaskType.IF5_COMPUTATION },
-    { title: "Klasifikacija", value: ScheduledTaskType.CLASSIFICATION_COMPUTATION },
-    { title: "Učitavanje klasifikacija", value: ScheduledTaskType.CLASSIFICATION_LOAD },
+    { title: "Klasifikacija časopisa", value: ScheduledTaskType.CLASSIFICATION_COMPUTATION },
+    { title: "Učitavanje klasifikacija časopisa", value: ScheduledTaskType.CLASSIFICATION_LOAD },
     { title: "Vrednovanje radova u časopisima", value: ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT }
 ];
 
@@ -14,8 +14,8 @@ export const scheduledTaskTypeEn = [
     { title: "Reindexing", value: ScheduledTaskType.REINDEXING },
     { title: "Indicator load", value: ScheduledTaskType.INDICATOR_LOAD },
     { title: "IF5 rank computation", value: ScheduledTaskType.IF5_COMPUTATION },
-    { title: "Classification", value: ScheduledTaskType.CLASSIFICATION_COMPUTATION },
-    { title: "Classification load", value: ScheduledTaskType.CLASSIFICATION_LOAD },
+    { title: "Journal classification", value: ScheduledTaskType.CLASSIFICATION_COMPUTATION },
+    { title: "Journal classification load", value: ScheduledTaskType.CLASSIFICATION_LOAD },
     { title: "Journal publications assessment", value: ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT }
 ];
 

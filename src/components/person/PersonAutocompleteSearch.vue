@@ -1,27 +1,33 @@
 <template>
     <v-row>
-        <v-col cols="11">
+        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
             <v-autocomplete
                 v-model="selectedPerson"
-                :label="$t('personLabel') + '*'"
+                :label="(multiple ? $t('personListLabel') : $t('personLabel')) + '*'"
                 :items="persons"
                 :custom-filter="((): boolean => true)"
                 :rules="requiredSelectionRules"
                 :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
                 return-object
                 @update:search="searchPersons($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
+        <v-col v-if="!disableSubmission" cols="1" class="modal-spacer-top">
             <person-submission-modal @create="selectNewlyAddedPerson"></person-submission-modal>
+        </v-col>
+        <v-col v-if="allowManualClearing && hasSelection" cols="1">
+            <v-btn icon @click="clearInput">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
         </v-col>
     </v-row>
 </template>
 
 <script lang="ts">
 import { defineComponent, watch, type PropType } from 'vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import lodash from "lodash";
 import PersonService from '@/services/PersonService';
 import type { BasicPerson, PersonIndex } from '@/models/PersonModel';
@@ -31,7 +37,6 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { removeTrailingPipeRegex } from '@/utils/StringUtil';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import PersonSubmissionModal from './PersonSubmissionModal.vue';
-
 
 export default defineComponent({
     name: "PersonAutocompleteSearch",
@@ -49,8 +54,14 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        multiple: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
-            type: Object as PropType<{ title: string, value: number } | undefined>,
+            type: [Object, Array] as PropType<
+                { title: string, value: number } | { title: string, value: number }[] | undefined
+            >,
             required: true,
         },
         returnOnlyNonSerialPersons: {
@@ -60,18 +71,24 @@ export default defineComponent({
         returnOnlySerialPersons: {
             type: Boolean,
             default: false
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
     setup(props, {emit}) {
         const i18n = useI18n();
-        const searchPlaceholder = {title: "", value: -1};
+        const searchPlaceholder = props.multiple ? [] : {title: "", value: -1};
 
         const persons = ref<{ title: string; value: number; date?: string }[]>([]);
-        const selectedPerson = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedPerson = ref(
+            props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
+        );
 
         onMounted(() => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedPerson.value = props.modelValue;
             }
             sendContentToParent();
@@ -109,23 +126,36 @@ export default defineComponent({
         };
 
         watch(() => props.modelValue, () => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedPerson.value = props.modelValue;
             }
         });
 
+        const clearInput = () => {
+            selectedPerson.value = searchPlaceholder;
+            sendContentToParent();
+        };
+
+        const hasSelection = computed(() =>
+            props.multiple ? (selectedPerson.value as any[]).length > 0 : (selectedPerson.value as { title: '', value: -1 }).value !== -1
+        );
+
         const selectNewlyAddedPerson = (person: BasicPerson) => {
-            const toSelect = {title: `${person.personName.firstname} ${person.personName.otherName} ${person.personName.lastname} | ${person.localBirthDate ? localiseDate(person.localBirthDate) : i18n.t("unknownBirthdateMessage")}`, value: person.id as number};
+            const toSelect = {title: `${person.personName.firstname} ${person.personName.otherName} ${person.personName.lastname} | ${person.localBirthDate ? localiseDate(person.localBirthDate) : i18n.t("unknownBirthdateMessage")}` , value: person.id as number};
             persons.value.push(toSelect);
-            selectedPerson.value = toSelect;
+
+            if (props.multiple) {
+                (selectedPerson.value as any[]).push(toSelect);
+            } else {
+                selectedPerson.value = toSelect;
+            }
             sendContentToParent();
         };
 
         return {
             persons, selectedPerson, searchPersons,
-            requiredSelectionRules,
-            sendContentToParent,
-            selectNewlyAddedPerson
+            requiredSelectionRules, sendContentToParent,
+            clearInput, selectNewlyAddedPerson, hasSelection
         };
     }
 });

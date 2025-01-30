@@ -184,3 +184,10 @@ export interface CommissionRelationResponse {
     priority: number;
     resultCalculationMethod: ResultCalculationMethod;
 }
+
+export interface JournalPublicationAssessmentRequest {
+    commissionId: number | null;
+    authorIds: number[];
+    organisationUnitIds: number[];
+    journalIds: number[];
+}

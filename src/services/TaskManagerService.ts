@@ -3,7 +3,7 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
-import { EntityClassificationSource } from "@/models/AssessmentModel";
+import { EntityClassificationSource, type JournalPublicationAssessmentRequest } from "@/models/AssessmentModel";
 
 export class TaskSchedulingService extends BaseService {
 
@@ -35,8 +35,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `reindex/schedule?timestamp=${timestamp}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleJournalPublicationAssessment(timestamp: string, dateFrom: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-journal-publication-assessment?timestamp=${timestamp}&dateFrom=${dateFrom}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleJournalPublicationAssessment(timestamp: string, dateFrom: string, body: JournalPublicationAssessmentRequest): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-journal-publication-assessment?timestamp=${timestamp}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
     }
 
     private createClassificationYearsParameter(years: number[]): string {

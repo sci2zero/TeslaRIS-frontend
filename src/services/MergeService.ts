@@ -18,6 +18,10 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/journal-indicator/source/${sourceJournalId}/target/${targetJournalId}`);
     }
 
+    async switchAllClassificationsToOtherJournal(sourceJournalId: number, targetJournalId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/journal-classification/source/${sourceJournalId}/target/${targetJournalId}`);
+    }
+
     async switchPublisherPublicationToOtherPublisher(sourcePublisherId: number, publicationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/publisher/${sourcePublisherId}/publication/${publicationId}`);
     }
@@ -68,6 +72,14 @@ export class MergeService extends BaseService {
 
     async switchAllProceedingsToOtherConference(sourceConferenceId: number, targetConferenceId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/conference/${sourceConferenceId}/target/${targetConferenceId}`);
+    }
+
+    async switchAllIndicatorsToOtherConference(sourceConferenceId: number, targetConferenceId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/conference-indicator/source/${sourceConferenceId}/target/${targetConferenceId}`);
+    }
+
+    async switchAllClassificationsToOtherConference(sourceConferenceId: number, targetConferenceId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/conference-classification/source/${sourceConferenceId}/target/${targetConferenceId}`);
     }
 
     async switchProceedingsPublicationToOtherProceedings(targetProceedingsId: number, publicationId: number): Promise<AxiosResponse<void>> {
