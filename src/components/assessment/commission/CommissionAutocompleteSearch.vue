@@ -12,6 +12,7 @@
                 :no-data-text="$t('noDataMessage')"
                 :multiple="multiple"
                 return-object
+                :class="comfortable ? 'comfortable' : ''"
                 @update:search="searchCommissions"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
@@ -53,6 +54,10 @@ export default defineComponent({
             default: false,
         },
         multiple: {
+            type: Boolean,
+            default: false,
+        },
+        comfortable: {
             type: Boolean,
             default: false,
         },
@@ -171,3 +176,11 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+
+.comfortable {
+    height: 90px;
+}
+
+</style>

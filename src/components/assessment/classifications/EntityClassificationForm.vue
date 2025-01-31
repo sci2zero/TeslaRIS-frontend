@@ -112,7 +112,7 @@ export default defineComponent({
             const entityClassification: EntityAssessmentClassification = {
                 commissionId: selectedCommission.value.value,
                 assessmentClassificationId: selectedAssessmentClassification.value.value,
-                classificationYear: classificationYear.value
+                classificationYear: classificationYear.value ? classificationYear.value : 1000
             };
 
             if (props.entityType === ApplicableEntityType.EVENT) {

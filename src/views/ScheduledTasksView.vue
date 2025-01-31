@@ -57,7 +57,8 @@
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
-                    :only-classification-commissions="taskClassificationComputation">
+                    :only-classification-commissions="taskClassificationComputation"
+                    :comfortable="journalPublicationsAssessment">
                 </commission-autocomplete-search>
             </v-col>
             <v-col v-if="taskClassificationComputation || taskIF5Computation" cols="2">

@@ -139,7 +139,11 @@ export default defineComponent({
                 displayTitle += `${i18n.t("inLabel")} ${entityClassification.categoryIdentifier} `;
             }
 
-            displayTitle += `- ${entityClassification.year} (${returnCurrentLocaleContent(entityClassification.commissionDescription)})`;
+            if (entityClassification.year) {
+                displayTitle += `- ${entityClassification.year} (${returnCurrentLocaleContent(entityClassification.commissionDescription)})`;
+            } else {
+                displayTitle += `- ${returnCurrentLocaleContent(entityClassification.commissionDescription)}`;
+            }
 
             return displayTitle;
         };
