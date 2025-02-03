@@ -1,24 +1,25 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && selectedEvent.value !== -1 ? 10 : 11">
+        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
             <v-autocomplete
                 v-model="selectedEvent"
                 :readonly="readOnly"
-                :label="$t('conferenceLabel') + (required ? '*' : '')"
+                :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
                 :items="events"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
                 return-object
                 @update:search="searchEvents($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
+        <v-col v-if="!disableSubmission" cols="1" class="modal-spacer-top">
             <conference-submission-modal :read-only="readOnly" @create="selectNewlyAddedEvent"></conference-submission-modal>
         </v-col>
-        <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedEvent.value !== -1" icon @click="clearInput()">
+        <v-col v-if="allowManualClearing && hasSelection" cols="1">
+            <v-btn icon @click="clearInput">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </v-col>
@@ -26,16 +27,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
-import { ref } from 'vue';
+import { defineComponent, watch, computed, type PropType, ref, onMounted } from 'vue';
 import lodash from "lodash";
 import EventService from '@/services/EventService';
 import type { Conference, EventIndex } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
-import { onMounted } from 'vue';
 import ConferenceSubmissionModal from './ConferenceSubmissionModal.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-
 
 export default defineComponent({
     name: "EventAutocompleteSearch",
@@ -53,10 +51,6 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
-        modelValue: {
-            type: Object as PropType<{ title: string, value: number } | undefined>,
-            required: true,
-        },
         returnOnlyNonSerialEvents: {
             type: Boolean,
             default: true
@@ -64,18 +58,32 @@ export default defineComponent({
         returnOnlySerialEvents: {
             type: Boolean,
             default: false
+        },
+        multiple: {
+            type: Boolean,
+            default: false
+        },
+        modelValue: {
+            type: [Object, Array] as PropType<{ title: string, value: number } | { title: string, value: number }[] | undefined>,
+            required: true,
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
-    setup(props, {emit}) {
+    setup(props, { emit }) {
         const i18n = useI18n();
-        const searchPlaceholder = {title: "", value: -1};
-
+        const searchPlaceholder = props.multiple ? [] : { title: "", value: -1 };
+        
         const events = ref<{ title: string; value: number; date?: string }[]>([]);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedEvent = ref(
+            props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
+        );
 
         onMounted(() => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedEvent.value = props.modelValue;
             }
             sendContentToParent();
@@ -84,26 +92,15 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
 
         const searchEvents = lodash.debounce((input: string) => {
-            if (!input || input.includes("|")) {
-                return;
-            }
+            if (!input || input.includes("|")) return;
             if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
+                const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false).then((response) => {
-                    const listOfEvents: { title: string, value: number, date?: string }[] = [];
-                    response.data.content.forEach((conference: EventIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfEvents.push({title: `${conference.nameSr} | ${extractDate(conference.dateFromTo)}`, value: conference.databaseId, date: conference.dateFromTo});
-                        } else {
-                            listOfEvents.push({title: `${conference.nameOther} | ${extractDate(conference.dateFromTo)}`, value: conference.databaseId, date: conference.dateFromTo});
-                        }
-                    })
-                    events.value = listOfEvents;
+                    events.value = response.data.content.map((conference: EventIndex) => ({
+                        title: `${i18n.locale.value === "sr" ? conference.nameSr : conference.nameOther} | ${extractDate(conference.dateFromTo)}`,
+                        value: conference.databaseId,
+                        date: conference.dateFromTo
+                    }));
                 });
             }
         }, 300);
@@ -113,7 +110,7 @@ export default defineComponent({
         };
 
         watch(() => props.modelValue, () => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedEvent.value = props.modelValue;
             }
         });
@@ -123,56 +120,34 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const hasSelection = computed(() =>
+            props.multiple ? (selectedEvent.value as any[]).length > 0 : (selectedEvent.value as { title: '', value: -1 }).value !== -1
+        );
+
         const selectNewlyAddedEvent = (event: Conference) => {
-            let title: string | undefined;
-            event.name.forEach(multilingualContent => {
-                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                    title = multilingualContent.content;
-                    return;
-                }
-            });
-
-            event.nameAbbreviation.forEach(multilingualContent => {
-                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                    title += " " + multilingualContent.content;
-                    return;
-                }
-            });
-
-            if (!title && event.name.length > 0) {
-                title = event.name[0].content;
-                if (event.nameAbbreviation.length > 0) {
-                    title += " " + event.nameAbbreviation[0].content
-                }
-            }
-            
-            const toSelect = {title: `${title} | ${extractDate(event.dateFrom)}`, value: event.id as number};
+            let title = event.name.find(m => m.languageTag === i18n.locale.value.toUpperCase())?.content || event.name[0].content;
+            const abbreviation = event.nameAbbreviation.find(m => m.languageTag === i18n.locale.value.toUpperCase())?.content || event.nameAbbreviation[0]?.content;
+            if (abbreviation) title += ` ${abbreviation}`;
+            const toSelect = { title: `${title} | ${extractDate(event.dateFrom)}`, value: event.id as number };
             events.value.push(toSelect);
-            selectedEvent.value = toSelect;
+            
+            if (props.multiple) {
+                (selectedEvent.value as any[]).push(toSelect);
+            } else {
+                selectedEvent.value = toSelect;
+            }
             sendContentToParent();
         };
 
         const extractDate = (text: string): string => {
-            if (!text) {
-                return i18n.t("serialEventLabel");
-            }
-
-            const yyyy_mm_dd_regex = /\b\d{4}-\d{2}-\d{2}\b/g;
-            
-            let match;
-            
-            while ((match = yyyy_mm_dd_regex.exec(text)) !== null) {
-                return match[0].split("-")[0];
-            }
-
-            return text.split(".")[2];
+            const match = text?.match(/\d{2}\.\d{2}\.\d{4}\./);
+            return match ? match[0].split(".")[2] : i18n.t("serialEventLabel");
         };
 
         return {
             events, selectedEvent, searchEvents,
-            requiredSelectionRules,
-            sendContentToParent, clearInput,
-            selectNewlyAddedEvent
+            requiredSelectionRules, sendContentToParent,
+            clearInput, selectNewlyAddedEvent, hasSelection
         };
     }
 });

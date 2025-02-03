@@ -41,6 +41,10 @@ export class AssessmentClassificationService extends BaseService {
     async assessJournalPublication(journalPublicationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/journal-publication/${journalPublicationId}`, {}, AssessmentClassificationService.idempotencyKey);
     }
+
+    async assessProceedingsPublication(proceedingsPublicationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/proceedings-publication/${proceedingsPublicationId}`, {}, AssessmentClassificationService.idempotencyKey);
+    }
 }
 
 export default new AssessmentClassificationService();

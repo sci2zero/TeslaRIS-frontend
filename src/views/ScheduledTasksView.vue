@@ -14,7 +14,7 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5">
-            <v-col v-if="!taskReindexing && !journalPublicationsAssessment" cols="2">
+            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment" cols="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -53,12 +53,12 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment" cols="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
                     :only-classification-commissions="taskClassificationComputation"
-                    :comfortable="journalPublicationsAssessment">
+                    :comfortable="journalPublicationsAssessment || proceedingsPublicationsAssessment">
                 </commission-autocomplete-search>
             </v-col>
             <v-col v-if="taskClassificationComputation || taskIF5Computation" cols="2">
@@ -73,13 +73,16 @@
             <v-col v-if="journalPublicationsAssessment" cols="3">
                 <journal-autocomplete-search v-model="selectedJournals" multiple disable-submission></journal-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment" cols="3">
+            <v-col v-if="proceedingsPublicationsAssessment" cols="3">
+                <event-autocomplete-search v-model="selectedEvents" multiple disable-submission></event-autocomplete-search>
+            </v-col>
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
                 <person-autocomplete-search v-model="selectedPersons" multiple disable-submission></person-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment" cols="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
                 <organisation-unit-autocomplete-search v-model="selectedOUs" multiple disable-submission></organisation-unit-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment" cols="2">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="2">
                 <date-picker
                     v-model="startDate"
                     :label="$t('startDateLabel') + '*'"
@@ -135,11 +138,13 @@ import { getClassificationSourcesForGivenLocale, getClassificationSourceTitleFro
 import JournalAutocompleteSearch from "@/components/journal/JournalAutocompleteSearch.vue";
 import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import EventAutocompleteSearch from "@/components/event/EventAutocompleteSearch.vue";
+import { PublicationType } from "@/models/PublicationModel";
 
 
 export default defineComponent({
     name: "IndicatorsLoadView",
-    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch },
+    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch, EventAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
@@ -172,6 +177,7 @@ export default defineComponent({
         const taskClassificationComputation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_COMPUTATION);
         const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
+        const proceedingsPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT);
 
         const years = ref<number[]>([]);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
@@ -185,6 +191,7 @@ export default defineComponent({
         const selectedEntityTypes = ref<{ title: string, value: EntityType }[]>([...entityTypes]);
 
         const selectedJournals = ref<{title: string, value: number}[]>([]);
+        const selectedEvents = ref<{title: string, value: number}[]>([]);
         const selectedPersons = ref<{title: string, value: number}[]>([]);
         const selectedOUs = ref<{title: string, value: number}[]>([]);
 
@@ -289,14 +296,30 @@ export default defineComponent({
 
                 case ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT:
                     scheduleTask(() => 
-                        TaskManagerService.scheduleJournalPublicationAssessment(
+                        TaskManagerService.schedulePublicationAssessment(
                             timestamp, (startDate.value as string).split("T")[0],
                             {
                                 commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
                                 authorIds: selectedPersons.value.map(person => person.value),
                                 organisationUnitIds: selectedOUs.value.map(ou => ou.value),
-                                journalIds: selectedJournals.value.map(journal => journal.value)
-                            }
+                                publishedInIds: selectedJournals.value.map(journal => journal.value)
+                            },
+                            PublicationType.JOURNAL_PUBLICATION
+                        )
+                    );
+                    break;
+                
+                case ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT:
+                    scheduleTask(() => 
+                        TaskManagerService.schedulePublicationAssessment(
+                            timestamp, (startDate.value as string).split("T")[0],
+                            {
+                                commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
+                                authorIds: selectedPersons.value.map(person => person.value),
+                                organisationUnitIds: selectedOUs.value.map(ou => ou.value),
+                                publishedInIds: selectedEvents.value.map(journal => journal.value)
+                            },
+                            PublicationType.PROCEEDINGS_PUBLICATION
                         )
                     );
                     break;
@@ -345,7 +368,9 @@ export default defineComponent({
             taskClassificationComputation,
             taskClassificationLoad,
             journalPublicationsAssessment,
-            selectedJournals, selectedPersons
+            selectedJournals, selectedPersons,
+            proceedingsPublicationsAssessment,
+            selectedEvents
         };
     },
 });

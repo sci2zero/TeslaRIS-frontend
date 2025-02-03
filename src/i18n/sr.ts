@@ -72,6 +72,7 @@ export default {
     typeOfPublicationLabel: "Tip Publikacije",
     eventListLabel: "Događaji",
     conferenceLabel: "Konferencija",
+    conferenceListLabel: "Konferencije",
     eventDateLabel: "Datum održavanja",
     countryLabel: "Zemlja",
     stateLabel: "Zemlja",

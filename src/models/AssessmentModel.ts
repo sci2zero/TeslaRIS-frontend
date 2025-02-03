@@ -185,9 +185,9 @@ export interface CommissionRelationResponse {
     resultCalculationMethod: ResultCalculationMethod;
 }
 
-export interface JournalPublicationAssessmentRequest {
+export interface PublicationAssessmentRequest {
     commissionId: number | null;
     authorIds: number[];
     organisationUnitIds: number[];
-    journalIds: number[];
+    publishedInIds: number[];
 }

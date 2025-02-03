@@ -7,7 +7,8 @@ export const scheduledTaskTypeSr = [
     { title: "Računanje IF5 rank-a", value: ScheduledTaskType.IF5_COMPUTATION },
     { title: "Klasifikacija časopisa", value: ScheduledTaskType.CLASSIFICATION_COMPUTATION },
     { title: "Učitavanje klasifikacija časopisa", value: ScheduledTaskType.CLASSIFICATION_LOAD },
-    { title: "Vrednovanje radova u časopisima", value: ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT }
+    { title: "Vrednovanje radova u časopisima", value: ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT },
+    { title: "Vrednovanje radova na konferencijama", value: ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT }
 ];
 
 export const scheduledTaskTypeEn = [
@@ -16,7 +17,8 @@ export const scheduledTaskTypeEn = [
     { title: "IF5 rank computation", value: ScheduledTaskType.IF5_COMPUTATION },
     { title: "Journal classification", value: ScheduledTaskType.CLASSIFICATION_COMPUTATION },
     { title: "Journal classification load", value: ScheduledTaskType.CLASSIFICATION_LOAD },
-    { title: "Journal publications assessment", value: ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT }
+    { title: "Journal publications assessment", value: ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT },
+    { title: "Proceedings publications assessment", value: ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT }
 ];
 
 export const getScheduledTaskTypeTitleFromValueAutoLocale = (value: ScheduledTaskType) => {

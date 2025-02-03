@@ -72,6 +72,7 @@ export default {
     typeOfPublicationLabel: "Type of Publication",
     eventListLabel: "Events",
     conferenceLabel: "Conference",
+    conferenceListLabel: "Conferences",
     eventDateLabel: "Event Date",
     countryLabel: "Country",
     stateLabel: "State",

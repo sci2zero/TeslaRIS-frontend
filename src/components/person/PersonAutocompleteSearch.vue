@@ -3,7 +3,7 @@
         <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
             <v-autocomplete
                 v-model="selectedPerson"
-                :label="(multiple ? $t('personListLabel') : $t('personLabel')) + '*'"
+                :label="(multiple ? $t('personListLabel') : $t('personLabel')) + (required ? '*' : '')"
                 :items="persons"
                 :custom-filter="((): boolean => true)"
                 :rules="requiredSelectionRules"
