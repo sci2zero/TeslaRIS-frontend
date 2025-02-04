@@ -119,7 +119,7 @@ export default defineComponent({
         };
 
         const deleteRelation = (relationId: number) => {
-            CommissionRelationService.deleteCommissionRelation(relationId).then(() => {
+            CommissionRelationService.deleteCommissionRelation(props.sourceCommissionId as number, relationId).then(() => {
                 emit("update");
             });
         };

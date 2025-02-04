@@ -11,7 +11,7 @@
                 </v-select>
             </v-col>
         </v-row>
-        <v-row v-if="entityType !== 'EVENT'">
+        <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT'">
             <v-col>
                 <v-text-field
                     v-model="classificationYear" type="number" :label="$t('classificationYearLabel') + '*'" :placeholder="$t('classificationYearLabel') + '*'"
@@ -20,7 +20,7 @@
         </v-row>
         <v-row v-if="userRole !== 'COMMISSION'">
             <v-col>
-                <commission-autocomplete-search v-model="selectedCommission" required></commission-autocomplete-search>
+                <commission-autocomplete-search v-model="selectedCommission" :read-only="presetClassification !== undefined" required></commission-autocomplete-search>
             </v-col>
         </v-row>
 
@@ -39,7 +39,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification, DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import UserService from '@/services/UserService';
@@ -119,6 +119,8 @@ export default defineComponent({
                 (entityClassification as EventAssessmentClassification).eventId = props.entityId as number;
             } else if (props.entityType === ApplicableEntityType.PUBLICATION_SERIES) {
                 (entityClassification as PublicationSeriesAssessmentClassification).publicationSeriesId = props.entityId as number;
+            } else if (props.entityType === ApplicableEntityType.DOCUMENT) {
+                (entityClassification as DocumentAssessmentClassification).documentId = props.entityId as number;
             }
 
             emit("create", entityClassification);

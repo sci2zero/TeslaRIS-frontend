@@ -3,7 +3,7 @@
         class="mt-5 ml-5"
         :form-component="EntityClassificationForm"
         :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
-        entity-name="EntityClassification"
+        :entity-name="containingEntityType === ApplicableEntityType.DOCUMENT ? 'EntityAssessment' : 'EntityClassification'"
         :read-only="!canEdit"
         @create="createClassification"
     />
@@ -153,6 +153,8 @@ export default defineComponent({
                 await EntityClassificationService.updateEventClassification(entityClassification, entityClassificationId);
             } else if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
                 await EntityClassificationService.updatePublicationSeriesClassification(entityClassification, entityClassificationId);
+            } else if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
+                await EntityClassificationService.updateDocumentClassification(entityClassification, entityClassificationId);
             }
 
             emit("update");

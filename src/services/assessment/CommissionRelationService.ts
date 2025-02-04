@@ -13,15 +13,15 @@ export class CommissionRelationService extends BaseService {
     }
 
     async addCommissionRelation(body: CommissionRelation): Promise<AxiosResponse<CommissionRelationResponse[]>> {
-        return super.sendRequest(axios.patch, "assessment/commission-relation", body, CommissionRelationService.idempotencyKey);
+        return super.sendRequest(axios.patch, `assessment/commission-relation/${body.sourceCommissionId}`, body, CommissionRelationService.idempotencyKey);
     }
 
     async updateCommissionRelation(body: CommissionRelation, commissionRelationId: number): Promise<AxiosResponse<CommissionRelationResponse[]>> {
-        return super.sendRequest(axios.patch, `assessment/commission-relation/${commissionRelationId}`, body);
+        return super.sendRequest(axios.put, `assessment/commission-relation/${body.sourceCommissionId}/${commissionRelationId}`, body);
     }
 
-    async deleteCommissionRelation(commissionRelationId: number): Promise<AxiosResponse<CommissionRelationResponse[]>> {
-        return super.sendRequest(axios.delete, `assessment/commission-relation/${commissionRelationId}`);
+    async deleteCommissionRelation(commissionId: number, commissionRelationId: number): Promise<AxiosResponse<CommissionRelationResponse[]>> {
+        return super.sendRequest(axios.delete, `assessment/commission-relation/${commissionId}/${commissionRelationId}`);
     }
 
     async reorderCommissionRelations(body: ReorderCommissionRelation, commissionId: number, commissionRelationId: number): Promise<AxiosResponse<CommissionRelationResponse[]>> {

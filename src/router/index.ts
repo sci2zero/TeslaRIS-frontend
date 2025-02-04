@@ -946,7 +946,7 @@ const router = createRouter({
                                     component: CommissionLandingView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.commission],
                                     },
                                 },
                             ]

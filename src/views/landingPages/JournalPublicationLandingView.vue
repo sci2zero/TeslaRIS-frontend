@@ -144,10 +144,10 @@
             <v-tab v-if="canEdit || (journalPublication?.contributions && journalPublication?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canEdit" value="assessments">
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
@@ -172,15 +172,17 @@
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <v-btn v-if="journalPublication?.documentDate" density="compact" @click="assessJournalPublication">
+                <v-btn v-if="journalPublication?.documentDate && canEdit" density="compact" class="ml-5" @click="assessJournalPublication">
                     {{ $t("assessPublicationLabel") }}
                 </v-btn>
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="journalPublication?.id"
-                    :can-edit="false"
+                    :can-edit="canClassify && journalPublication?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -224,7 +226,7 @@ import PublicationUnbindButton from '@/components/publication/PublicationUnbindB
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
@@ -247,6 +249,7 @@ export default defineComponent({
 
         const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
+        const canClassify = ref(false);
 
         const journalPublication = ref<JournalPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
@@ -274,6 +277,11 @@ export default defineComponent({
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+
+                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canClassify.value = response.data;
+                });
+
                 fetchClassifications();
             }
 
@@ -402,8 +410,14 @@ export default defineComponent({
             });
         };
 
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
-            journalPublication, icon,
+            journalPublication, icon, canClassify,
             publications, event, totalPublications, userRole,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, journal, JournalPublicationUpdateForm,
@@ -412,7 +426,8 @@ export default defineComponent({
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
-            ApplicableEntityType, documentClassifications, assessJournalPublication
+            ApplicableEntityType, documentClassifications, assessJournalPublication,
+            createClassification, fetchClassifications
         };
 }})
 

@@ -20,7 +20,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
                     <v-col><h3>{{ $t("noRecentPublicationsJournalLabel") }}</h3></v-col>
                 </v-row>
 
@@ -143,6 +143,7 @@ import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import { getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -209,8 +210,10 @@ export default defineComponent({
             }
         };
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         watch(selectedJournal, (newValue) => {
-            if (newValue) {
+            if (newValue && userRole.value === "RESEARCHER") {
                 listPublications(newValue);
             }
         });
@@ -276,17 +279,11 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            volume, issue, startPage, endPage,
-            publicationYear, doi, scopus,
-            articleNumber, numberOfPages,
-            description, descriptionRef,
-            keywords, keywordsRef,
-            uris, urisRef, doiValidationRules,
+            isFormValid, subtitleRef,
+            additionalFields, snackbar, error, title, titleRef, subtitle,
+            volume, issue, startPage, endPage, publicationYear, doi, scopus,
+            articleNumber, numberOfPages, description, descriptionRef,
+            keywords, keywordsRef, userRole, uris, urisRef, doiValidationRules,
             selectedJournal, journalAutocompleteRef, myPublications,
             publicationTypes, selectedpublicationType, listPublications,
             contributions, contributionsRef, scopusIdValidationRules,

@@ -267,6 +267,7 @@ export default {
     nextLabel: "Next",
     previousLabel: "Previous",
     researcherProfileLabel: "Researcher Profile",
+    commissionProfileLabel: "Commission Profile",
     otherDetailsLabel: "Other details",
     currentlyLoadingLabel: "Currently loading",
     foundAsLabel: "Found as {0} in the system.",
@@ -501,5 +502,6 @@ export default {
     createNewCommissionRelationLabel: "Add new relation group",
     classificationRuleLabel: "Classification Rule",
     dragDropFilesLabel: "Drag and drop files here",
-    assessPublicationLabel: "Assess publication"
+    assessPublicationLabel: "Assess publication",
+    createNewEntityAssessmentLabel: "Enter assessment"
 }

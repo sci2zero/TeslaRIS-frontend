@@ -267,6 +267,7 @@ export default {
     nextLabel: "Sledeće",
     previousLabel: "Prethodno",
     researcherProfileLabel: "Profil istraživača",
+    commissionProfileLabel: "Profil komisije",
     otherDetailsLabel: "Ostali detalji",
     currentlyLoadingLabel: "Trenutno se učitava",
     foundAsLabel: "Pronađen kao {0} u sistemu.",
@@ -500,5 +501,6 @@ export default {
     createNewCommissionRelationLabel: "Dodaj novu relacionu grupu",
     classificationRuleLabel: "Klasifikaciono pravilo",
     dragDropFilesLabel: "Prevucite fajlove ovde",
-    assessPublicationLabel: "Vrednuj publikaciju"
+    assessPublicationLabel: "Vrednuj publikaciju",
+    createNewEntityAssessmentLabel: "Unesi vrednovanje"
 }

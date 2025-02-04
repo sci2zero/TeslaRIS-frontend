@@ -166,9 +166,11 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="proceedingsPublication?.id"
-                    :can-edit="false"
+                    :can-edit="canClassify && proceedingsPublication?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -212,7 +214,7 @@ import PublicationUnbindButton from '@/components/publication/PublicationUnbindB
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { type DocumentAssessmentClassification, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
@@ -235,6 +237,7 @@ export default defineComponent({
 
         const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
+        const canClassify = ref(false);
 
         const proceedingsPublication = ref<ProceedingsPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
@@ -264,6 +267,11 @@ export default defineComponent({
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+
+                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canClassify.value = response.data;
+                });
+
                 fetchClassifications();
             }
 
@@ -386,6 +394,12 @@ export default defineComponent({
             });
         };
 
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, userRole,
@@ -395,7 +409,8 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
-            documentClassifications, assessProceedingsPublication
+            documentClassifications, assessProceedingsPublication,
+            fetchClassifications, canClassify, createClassification
         };
 }})
 

@@ -143,6 +143,10 @@ export interface EventAssessmentClassification extends EntityAssessmentClassific
     eventId: number;
 }
 
+export interface DocumentAssessmentClassification extends EntityAssessmentClassification {
+    documentId: number;
+}
+
 export interface PublicationSeriesAssessmentClassification extends EntityAssessmentClassification {
     publicationSeriesId: number;
 }
