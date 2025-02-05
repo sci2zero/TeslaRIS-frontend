@@ -41,6 +41,17 @@
                                 <div class="response">
                                     <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
                                 </div>
+                                <div v-if="canEdit" class="response">
+                                    <generic-crud-modal
+                                        :form-component="AssessmentResearchAreaForm"
+                                        :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
+                                        entity-name="ResearchArea"
+                                        is-update
+                                        primary-color
+                                        :read-only="!canEdit"
+                                        @update="fetchPerson"
+                                    />
+                                </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
                                 </div>
@@ -119,6 +130,12 @@
                                 </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn">
+                                    {{ $t("researchAreaLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn" class="response">
+                                    {{ researchArea ? returnCurrentLocaleContent(researchArea.name) : $t("notYetSetMessage") }}
                                 </div>
                                 <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
                                     {{ $t("websiteLabel") }}:
@@ -259,11 +276,13 @@ import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
-import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { type AssessmentResearchArea, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
+import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasure/AssessmentResearchAreaForm.vue';
+import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 
 
 export default defineComponent({
@@ -312,11 +331,15 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
+        const researchArea = ref<AssessmentResearchArea>();
+
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+                
+                fetchAssessmentResearchArea();
             }
 
             fetchPerson();
@@ -368,6 +391,12 @@ export default defineComponent({
 
                 fetchPublications();                
                 populateData();
+            });
+        };
+
+        const fetchAssessmentResearchArea = () => {
+            AssessmentResearchAreaService.readPersonAssessmentResearchArea(parseInt(currentRoute.params.id as string)).then(response => {
+                researchArea.value = response.data;
             });
         };
 
@@ -546,14 +575,14 @@ export default defineComponent({
         };
 
         return {
-            researcherName, person, personalInfo, keywords, loginStore,
+            researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
-            dialogRef, dialogMessage, personIndicators, StatisticsType
+            dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm
         };
 }});
 </script>

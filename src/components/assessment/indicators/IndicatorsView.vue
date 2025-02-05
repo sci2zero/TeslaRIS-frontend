@@ -30,7 +30,7 @@
                         <document-file-submission-modal v-if="canEdit" :is-proof="true" @create="addIndicatorProof($event, indicator.id)"></document-file-submission-modal>
                     </div>
                 </v-row>
-                <v-row>
+                <v-row v-if="canViewProofs">
                     <indicator-proofs-list :attachments="indicator.proofs" :can-edit="canEdit" @update="updateIndicatorProof($event, indicator.id)" @delete="deleteIndicatorProof($event, indicator.id)"></indicator-proofs-list>
                 </v-row>
             </v-expansion-panel-text>
@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType, reactive, watch } from 'vue';
+import { computed, defineComponent, onMounted, type PropType, reactive, watch } from 'vue';
 import { ref } from 'vue';
 import { EntityIndicatorSource, type PublicationSeriesIndicatorResponse, type EntityIndicatorResponse, IndicatorContentType } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -67,6 +67,7 @@ import { getIndicatorSourceTitleFromValueAutoLocale } from '@/i18n/entityIndicat
 import DocumentFileSubmissionModal from '@/components/documentFile/DocumentFileSubmissionModal.vue';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import IndicatorProofsList from './IndicatorProofsList.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -105,6 +106,15 @@ export default defineComponent({
         const openedPanel = ref();
 
         const i18n = useI18n();
+
+        const canViewProofs = computed(() => {
+            const role = UserService.provideUserRole();
+            if (role === "COMMISSION" || role === "ADMIN") {
+                return true;
+            }
+
+            return false;
+        });
         
         onMounted(() => {
             setIndicators();
@@ -258,7 +268,8 @@ export default defineComponent({
             openedPanel, contentMap,
             addIndicatorProof,
             updateIndicatorProof,
-            deleteIndicatorProof
+            deleteIndicatorProof,
+            canViewProofs
         };
     }
 });

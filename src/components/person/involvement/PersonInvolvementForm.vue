@@ -13,6 +13,7 @@
                             v-model="dateFrom"
                             :label="$t('fromLabel')"
                             color="primary"
+                            persistent
                         ></date-picker>
                     </v-col>
                     <v-col cols="6">
@@ -20,6 +21,7 @@
                             v-model="dateTo"
                             :label="$t('toLabel')"
                             color="primary"
+                            persistent
                         ></date-picker>
                     </v-col>
                 </v-row>

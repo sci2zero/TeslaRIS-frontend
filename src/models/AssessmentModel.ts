@@ -195,3 +195,8 @@ export interface PublicationAssessmentRequest {
     organisationUnitIds: number[];
     publishedInIds: number[];
 }
+
+export interface AssessmentResearchArea {
+    name: MultilingualContent[],
+    code: string
+}
