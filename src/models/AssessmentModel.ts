@@ -86,6 +86,7 @@ export interface Commission {
     assessmentDateFrom: string;
     assessmentDateTo: string;
     formalDescriptionOfRule: string;
+    recognisedResearchAreas: string[];
 }
 
 export interface CommissionResponse {
@@ -95,6 +96,7 @@ export interface CommissionResponse {
     assessmentDateFrom: string;
     assessmentDateTo: string;
     formalDescriptionOfRule: string;
+    recognisedResearchAreas: string[];
 }
 
 export interface EntityIndicator {

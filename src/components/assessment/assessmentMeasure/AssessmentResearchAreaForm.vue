@@ -6,17 +6,19 @@
                     v-model="selectedResearchArea"
                     :items="researchAreas"
                     :label="$t('researchAreaLabel') + '*'"
-                    :rules="requiredSelectionRules"
+                    :rules="requiredStringSelectionRules"
                     return-object>
                 </v-select>
             </v-col>
         </v-row>
         <v-row>
-            <v-btn
-                density="compact" class="bottom-spacer" :disabled="!selectedResearchArea.value"
-                @click="removeResearchArea">
-                {{ $t("deleteLabel") }}
-            </v-btn>
+            <v-col>
+                <v-btn
+                    density="compact" class="bottom-spacer" :disabled="!selectedResearchArea.value"
+                    @click="removeResearchArea">
+                    {{ $t("deleteLabel") }}
+                </v-btn>
+            </v-col>
         </v-row>
 
         <v-row>
@@ -71,7 +73,7 @@ export default defineComponent({
             });
         });
 
-        const { requiredSelectionRules } = useValidationUtils();
+        const { requiredStringSelectionRules } = useValidationUtils();
 
         const submit = () => {
             AssessmentResearchAreaService.setPersonAssessmentResearchArea(props.personId, selectedResearchArea.value.value).then(() => {
@@ -88,7 +90,7 @@ export default defineComponent({
         return {
             isFormValid,
             researchAreas, submit,
-            requiredSelectionRules,
+            requiredStringSelectionRules,
             selectedResearchArea,
             removeResearchArea
         };

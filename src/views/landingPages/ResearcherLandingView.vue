@@ -49,7 +49,7 @@
                                         is-update
                                         primary-color
                                         :read-only="!canEdit"
-                                        @update="fetchPerson"
+                                        @update="fetchAssessmentResearchArea"
                                     />
                                 </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
@@ -582,7 +582,8 @@ export default defineComponent({
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
-            dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm
+            dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
+            fetchAssessmentResearchArea
         };
 }});
 </script>

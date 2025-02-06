@@ -370,12 +370,14 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();
+                    assessProceedingsPublication();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();
+                    assessProceedingsPublication();
                 }
             });
         };

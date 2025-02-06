@@ -241,8 +241,10 @@ export default defineComponent({
         const userRole = computed(() => UserService.provideUserRole());
 
         watch(selectedEvent, (newValue) => {
-            if (newValue && userRole.value === "RESEARCHER") {
-                listPublications(newValue);
+            if (newValue) {
+                if (userRole.value === "RESEARCHER") {
+                    listPublications(newValue);
+                }
                 availableProceedings.value = [];
                 selectedProceedings.value = searchPlaceholder;
                 fetchProceedings(newValue);

@@ -75,7 +75,7 @@
             </v-col>
         </v-row>
 
-        <v-row v-if="selectedInvolvementType?.value === 'EMPLOYED_AT' || selectedInvolvementType?.value === 'HIRED_BY'">
+        <v-row v-if="selectedInvolvementType?.value === 'EMPLOYED_AT' || selectedInvolvementType?.value === 'HIRED_BY' || selectedInvolvementType?.value === 'CANDIDATE'">
             <v-col>
                 <v-row>
                     <v-col>
@@ -193,7 +193,8 @@ export default defineComponent({
                 (involvement as Membership).role = role.value;
             } 
             else if(involvement.involvementType == InvolvementType.HIRED_BY ||
-                    involvement.involvementType == InvolvementType.EMPLOYED_AT) {
+                    involvement.involvementType == InvolvementType.EMPLOYED_AT ||
+                    involvement.involvementType == InvolvementType.CANDIDATE) {
                 (involvement as Employment).role = role.value;
                 (involvement as Employment).employmentPosition = selectedEmploymentPosition.value.value;
             } 

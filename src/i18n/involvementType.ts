@@ -8,6 +8,7 @@ const involvementTypeEn = [
     { title: "Member Of", value: InvolvementType.MEMBER_OF },
     { title: "Employed At", value: InvolvementType.EMPLOYED_AT },
     { title: "Hired By", value: InvolvementType.HIRED_BY },
+    { title: "Candidate", value: InvolvementType.CANDIDATE }
 ];
 
 const involvementTypeSr = [
@@ -17,6 +18,7 @@ const involvementTypeSr = [
     { title: "Članstvo", value: InvolvementType.MEMBER_OF },
     { title: "Zaposlenje", value: InvolvementType.EMPLOYED_AT },
     { title: "Angažovanje", value: InvolvementType.HIRED_BY },
+    { title: "Kandidat", value: InvolvementType.CANDIDATE },
 ];
 
 export const getTitleFromValue = (value: InvolvementType, resourceTypeArray: {title: string, value: InvolvementType}[]) => {
@@ -58,8 +60,9 @@ export const getSimilarInvolvementTypes = (type: InvolvementType) => {
         return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.MEMBER_OF);
     } 
     else if(type == InvolvementType.HIRED_BY ||
-            type == InvolvementType.EMPLOYED_AT) {
-        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.HIRED_BY || involvementType.value === InvolvementType.EMPLOYED_AT);
+            type == InvolvementType.EMPLOYED_AT ||
+            type == InvolvementType.CANDIDATE) {
+        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.HIRED_BY || involvementType.value === InvolvementType.EMPLOYED_AT || involvementType.value === InvolvementType.CANDIDATE);
     } 
     else if(type == InvolvementType.STUDIED_AT ||
             type == InvolvementType.POSTDOC_AT ||
