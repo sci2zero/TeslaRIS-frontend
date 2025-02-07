@@ -502,5 +502,7 @@ export default {
     classificationRuleLabel: "Klasifikaciono pravilo",
     dragDropFilesLabel: "Prevucite fajlove ovde",
     assessPublicationLabel: "Vrednuj publikaciju",
-    createNewEntityAssessmentLabel: "Unesi vrednovanje"
+    createNewEntityAssessmentLabel: "Unesi vrednovanje",
+    createNewAssessmentResearcherLabel: "Dodaj istraživača"
+    
 }

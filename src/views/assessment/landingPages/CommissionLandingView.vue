@@ -80,11 +80,17 @@
             <v-tab value="relations">
                 {{ $t("commissionRelationsLabel") }}
             </v-tab>
+            <v-tab v-if="commission?.recognisedResearchAreas && commission.recognisedResearchAreas.length > 0" value="researchersForAssessment">
+                {{ $t("researchAreasLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="relations">
                 <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations"></commission-relations-view>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchersForAssessment">
+                <commission-researchers-view :commission-id="(commission?.id as number)" :research-areas="(commission?.recognisedResearchAreas as string[])"></commission-researchers-view>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -110,11 +116,12 @@ import Toast from '@/components/core/Toast.vue';
 import CommissionRelationService from '@/services/assessment/CommissionRelationService';
 import CommissionRelationsView from '@/components/assessment/commission/CommissionRelationsView.vue';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import CommissionResearchersView from '@/components/assessment/commission/CommissionResearchersView.vue';
 
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { GenericCrudModal, Toast, CommissionRelationsView },
+    components: { GenericCrudModal, Toast, CommissionRelationsView, CommissionResearchersView },
     setup() {
         const currentTab = ref("relations");
 

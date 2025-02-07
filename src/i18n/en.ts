@@ -503,5 +503,6 @@ export default {
     classificationRuleLabel: "Classification Rule",
     dragDropFilesLabel: "Drag and drop files here",
     assessPublicationLabel: "Assess publication",
-    createNewEntityAssessmentLabel: "Enter assessment"
+    createNewEntityAssessmentLabel: "Enter assessment",
+    createNewAssessmentResearcherLabel: "Add researcher"
 }

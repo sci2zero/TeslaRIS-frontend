@@ -64,13 +64,9 @@ export default defineComponent({
             >,
             required: true,
         },
-        returnOnlyNonSerialPersons: {
-            type: Boolean,
-            default: true
-        },
-        returnOnlySerialPersons: {
-            type: Boolean,
-            default: false
+        institutionId: {
+            type: Number,
+            default: 0
         },
         disableSubmission: {
             type: Boolean,
@@ -107,7 +103,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                PersonService.searchResearchers(params, false).then((response) => {
+                PersonService.searchResearchersFromInstitution(params, false, props.institutionId).then((response) => {
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value === "sr") {

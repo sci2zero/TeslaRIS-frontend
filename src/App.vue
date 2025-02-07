@@ -55,6 +55,9 @@ export default defineComponent({
                             decodedToken.role === authority
                         )
                     ) {
+                        if (to.name === "login") {
+                            routeStore.setRouteAndParams(from.name, from.params);
+                        }
                         next();
                     } else {
                         next({ name: "login", params: { locale: newLocale } });
@@ -67,6 +70,9 @@ export default defineComponent({
                     }
                 }
             } else {
+                if (to.name === "login") {
+                    routeStore.setRouteAndParams(from.name, from.params);
+                }
                 next();
             }
         });
