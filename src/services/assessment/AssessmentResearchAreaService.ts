@@ -2,6 +2,7 @@ import axios, { type AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import { type AssessmentResearchArea } from "@/models/AssessmentModel";
 import { type PersonResponse } from "@/models/PersonModel";
+import { type Page } from "@/models/Common";
 
 
 export class AssessmentResearchAreaService extends BaseService {
@@ -16,7 +17,7 @@ export class AssessmentResearchAreaService extends BaseService {
         return super.sendRequest(axios.get, `assessment/research-area/${personId}`);
     }
 
-    async readPersonAssessmentResearchAreaForCommission(commissionId: number, code: string): Promise<AxiosResponse<PersonResponse[]>> {
+    async readPersonAssessmentResearchAreaForCommission(commissionId: number, code: string): Promise<AxiosResponse<Page<PersonResponse>>> {
         return super.sendRequest(axios.get, `assessment/research-area/${code}/${commissionId}?page=0&size=10`);
     }
 

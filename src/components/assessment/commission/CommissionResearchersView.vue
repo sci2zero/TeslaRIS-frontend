@@ -14,7 +14,7 @@
             <generic-crud-modal
                 class="ml-5"
                 :form-component="CommissionResearcherForm"
-                :form-props="{ commissionId: commissionId, presetResearchArea: area, institutionId: 1 }"
+                :form-props="{ commissionId: commissionId, presetResearchArea: area, institutionId: institutionId }"
                 entity-name="AssessmentResearcher"
                 :read-only="false"
                 @create="fetchDisplayData"
@@ -73,6 +73,10 @@ export default defineComponent({
         commissionId: {
             type: Number,
             required: true
+        },
+        institutionId: {
+            type: Number,
+            required: true
         }
     },
     emits: ["create"],
@@ -101,7 +105,7 @@ export default defineComponent({
             researchersByArea.value.clear();
             props.researchAreas.forEach((researchArea: string) => {
                 AssessmentResearchAreaService.readPersonAssessmentResearchAreaForCommission(props.commissionId, researchArea).then(response => {
-                    researchersByArea.value.set(researchArea, response.data);
+                    researchersByArea.value.set(researchArea, response.data.content);
                 });
             });
         };

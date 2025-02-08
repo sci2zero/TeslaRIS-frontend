@@ -18,6 +18,10 @@ export class CommissionService extends BaseService {
         return super.sendRequest(axios.get, `assessment/commission/${commissionId}`);
     }
 
+    async fetchInstitutionIdForCommission(commissionId: number): Promise<AxiosResponse<number>> {
+        return super.sendRequest(axios.get, `assessment/commission/institution/${commissionId}`);
+    }
+
     async readApplicableRuleEngines(): Promise<AxiosResponse<string[]>> {
         return super.sendRequest(axios.get, "assessment/commission/rule-engines");
     }

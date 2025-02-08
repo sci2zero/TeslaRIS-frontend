@@ -80,7 +80,7 @@
             <v-tab value="relations">
                 {{ $t("commissionRelationsLabel") }}
             </v-tab>
-            <v-tab v-if="commission?.recognisedResearchAreas && commission.recognisedResearchAreas.length > 0" value="researchersForAssessment">
+            <v-tab v-if="institutionId && commission?.recognisedResearchAreas && commission.recognisedResearchAreas.length > 0" value="researchersForAssessment">
                 {{ $t("researchAreasLabel") }}
             </v-tab>
         </v-tabs>
@@ -90,7 +90,7 @@
                 <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations"></commission-relations-view>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchersForAssessment">
-                <commission-researchers-view :commission-id="(commission?.id as number)" :research-areas="(commission?.recognisedResearchAreas as string[])"></commission-researchers-view>
+                <commission-researchers-view :institution-id="institutionId" :commission-id="(commission?.id as number)" :research-areas="(commission?.recognisedResearchAreas as string[])"></commission-researchers-view>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -142,6 +142,8 @@ export default defineComponent({
         const router = useRouter();
         const researchAreas = ref<AssessmentResearchArea[]>([]);
 
+        const institutionId = ref<number>(0);
+
         onMounted(() => {
             AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
                 researchAreas.value = response.data;
@@ -161,6 +163,10 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(commission.value.description) as string;
     
                 populateData();
+
+                CommissionService.fetchInstitutionIdForCommission(commission.value.id).then(response => {
+                    institutionId.value = response.data;
+                });
             });
         };
 
@@ -233,7 +239,7 @@ export default defineComponent({
             updateBasicInfo, localiseDate, snackbarMessage,
             updateDescription, snackbar, navigateToTargetCommission,
             CommissionForm, commissionRelations, fetchRelations,
-            currentTab, getResearchAreaTitle
+            currentTab, getResearchAreaTitle, institutionId
         };
 }})
 
