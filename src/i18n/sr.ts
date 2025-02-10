@@ -503,6 +503,6 @@ export default {
     dragDropFilesLabel: "Prevucite fajlove ovde",
     assessPublicationLabel: "Vrednuj publikaciju",
     createNewEntityAssessmentLabel: "Unesi vrednovanje",
-    createNewAssessmentResearcherLabel: "Dodaj istraživača"
-    
+    createNewAssessmentResearcherLabel: "Dodaj istraživača",
+    removeResearcherLabel: "Ukloni istraživača"
 }

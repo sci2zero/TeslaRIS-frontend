@@ -5,7 +5,7 @@
                 <v-select
                     v-model="selectedAssessmentClassification"
                     :items="assessmentClassifications"
-                    :label="$t('classificationsLabel') + '*'"
+                    :label="$t('classificationLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object>
                 </v-select>

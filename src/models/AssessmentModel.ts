@@ -56,9 +56,9 @@ export enum StatisticsType {
 
 export interface AssessmentMeasure {
     id?: number;
-    formalDescriptionOfRule: string;
     code: string;    
-    value: number;
+    pointRule: string;
+    scalingRule: string;
     title: MultilingualContent[];
     assessmentRulebookId: number;
 }

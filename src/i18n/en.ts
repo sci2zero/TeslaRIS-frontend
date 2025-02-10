@@ -504,5 +504,6 @@ export default {
     dragDropFilesLabel: "Drag and drop files here",
     assessPublicationLabel: "Assess publication",
     createNewEntityAssessmentLabel: "Enter assessment",
-    createNewAssessmentResearcherLabel: "Add researcher"
+    createNewAssessmentResearcherLabel: "Add researcher",
+    removeResearcherLabel: "Remove researcher"
 }

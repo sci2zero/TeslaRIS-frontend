@@ -12,39 +12,21 @@
     <v-tabs-window v-model="currentTab">
         <v-tabs-window-item v-for="area in researchAreas" :key="area" :value="area">
             <generic-crud-modal
-                class="ml-5"
                 :form-component="CommissionResearcherForm"
                 :form-props="{ commissionId: commissionId, presetResearchArea: area, institutionId: institutionId }"
                 entity-name="AssessmentResearcher"
                 :read-only="false"
                 @create="fetchDisplayData"
             />
-            <v-list
-                :lines="false"
-                density="comfortable"
-                class="bigger-font"
-            >
-                <v-list-item
-                    v-for="person in researchersByArea.get(area)" :key="person.id"
-                    :value="person"
-                    color="grey-lighten-5"
-                    @click="navigateToPerson(person.id as number)"
-                >
-                    <v-list-item-title>
-                        {{ person.personName.firstname }} {{ person.personName.lastname }}
-                    </v-list-item-title>
-
-                    <template #append>
-                        <v-row>
-                            <v-col cols="auto">
-                                <v-icon @click.stop="removePersonFromConsideration(person.id as number)">
-                                    mdi-delete
-                                </v-icon>
-                            </v-col>
-                        </v-row>
-                    </template>
-                </v-list-item>
-            </v-list>
+            
+            <person-table-component
+                :ref="(el) => (personTableRefs[area] = el)"
+                :persons="(researchersByArea.get(area) as PersonIndex[])"
+                :total-persons="(researcherCountByArea.get(area) as number)"
+                is-commission-researchers-table
+                @switch-page="(page, itemsPerPage, sortField, sortDir) => switchPage(page, itemsPerPage, sortField, sortDir, area)"
+                @delete="removePersonsFromConsideration"
+            ></person-table-component>
         </v-tabs-window-item>
     </v-tabs-window>
 </template>
@@ -56,15 +38,16 @@ import { onMounted } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { AssessmentResearchArea } from '@/models/AssessmentModel';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
-import { type PersonResponse } from '@/models/PersonModel';
+import { type PersonIndex } from '@/models/PersonModel';
 import CommissionResearcherForm from './CommissionResearcherForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { useRouter } from 'vue-router';
+import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 
 
 export default defineComponent({
     name: "CommissionResearchersView",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersonTableComponent },
     props: {
         researchAreas: {
             type: Array<string>,
@@ -87,7 +70,10 @@ export default defineComponent({
 
         const researchAreas = ref<AssessmentResearchArea[]>([]);
 
-        const researchersByArea = ref<Map<string, PersonResponse[]>>(new Map());
+        const researchersByArea = ref<Map<string, PersonIndex[]>>(new Map());
+        const researcherCountByArea = ref<Map<string, number>>(new Map());
+
+        const personTableRefs = ref<Record<string, any>>({});
 
         onMounted(() => {
             AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
@@ -104,9 +90,15 @@ export default defineComponent({
         const fetchDisplayData = () => {
             researchersByArea.value.clear();
             props.researchAreas.forEach((researchArea: string) => {
-                AssessmentResearchAreaService.readPersonAssessmentResearchAreaForCommission(props.commissionId, researchArea).then(response => {
-                    researchersByArea.value.set(researchArea, response.data.content);
-                });
+                const tableRef = personTableRefs.value[researchArea];
+                if (tableRef) {
+                    tableRef.notifyUserAndRefreshTable(true);
+                } else {
+                    AssessmentResearchAreaService.readPersonAssessmentResearchAreaForCommission(props.commissionId, researchArea, `page=0&size=10`).then(response => {
+                        researchersByArea.value.set(researchArea, response.data.content);
+                        researcherCountByArea.value.set(researchArea, response.data.totalElements);
+                    });
+                }
             });
         };
 
@@ -114,24 +106,37 @@ export default defineComponent({
             return returnCurrentLocaleContent(researchAreas.value.find(researchArea => researchArea.code === code)?.name) as string;
         };
 
-        const removePersonFromConsideration = (personId: number) => {
-            AssessmentResearchAreaService.removePersonAssessmentResearchAreaForCommission(personId, props.commissionId).then(() => {
-                fetchDisplayData();
-            });
+        const removePersonsFromConsideration = async (personIds: number[]) => {
+            await Promise.allSettled(
+                personIds.map(personId => 
+                    AssessmentResearchAreaService.removePersonAssessmentResearchAreaForCommission(personId, props.commissionId)
+                )
+            );
+
+            fetchDisplayData();
         };
 
         const navigateToPerson = (personId: number) => {
             router.push({ name: "researcherLandingPage", params: {id: personId} });
         };
 
+        const switchPage = (page: number, itemsPerPage: number, sortField: string, sortDir: string, area: string) => {
+            AssessmentResearchAreaService.readPersonAssessmentResearchAreaForCommission(props.commissionId, area, `&page=${page}&size=${itemsPerPage}&sort=${sortField},${sortDir}`).then(response => {
+                researchersByArea.value.set(area, response.data.content);
+                researcherCountByArea.value.set(area, response.data.totalElements);
+            });
+        };
+
         return {
-            currentTab,
+            currentTab, switchPage,
             getResearchAreaTitle,
             researchersByArea,
-            removePersonFromConsideration,
+            removePersonsFromConsideration,
             fetchDisplayData,
             CommissionResearcherForm,
-            navigateToPerson
+            navigateToPerson,
+            researcherCountByArea,
+            personTableRefs
         };
     }
 });

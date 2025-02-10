@@ -37,9 +37,9 @@
                     {{ returnCurrentLocaleContent(row.item.title) }}
                 </td>
                 <td>{{ row.item.code }}</td>
-                <td>{{ row.item.value }}</td>
+                <td>{{ row.item.pointRule }}</td>
                 <td>
-                    {{ row.item.formalDescriptionOfRule }}
+                    {{ row.item.scalingRule }}
                 </td>
                 <td>
                     <generic-crud-modal
@@ -48,7 +48,7 @@
                         is-update
                         entity-name="AssessmentMeasure"
                         :read-only="false"
-                        @update="updateAssessmentMeasure(row.item.id, $event)"
+                        @update="updateAssessmentMeasure(row.item.id as number, $event)"
                     />
                 </td>
             </tr>
@@ -107,8 +107,8 @@ export default defineComponent({
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
         const codeLabel = computed(() => i18n.t("codeLabel"));
-        const valueLabel = computed(() => i18n.t("valueLabel"));
-        const ruleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
+        const pointRuleLabel = computed(() => i18n.t("pointRuleLabel"));
+        const scalingRuleLabel = computed(() => i18n.t("scalingRuleLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "code", order: "asc"}]});
@@ -116,8 +116,8 @@ export default defineComponent({
         const headers = [
           { title: titleLabel, align: "start", sortable: false},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
-          { title: valueLabel, align: "start", sortable: true, key: "value"},
-          { title: ruleLabel, align: "start", sortable: true, key: "rule"},
+          { title: pointRuleLabel, align: "start", sortable: true, key: "value"},
+          { title: scalingRuleLabel, align: "start", sortable: true, key: "rule"},
           { title: actionLabel, align: "start", sortable: false}
         ];
 
@@ -170,6 +170,7 @@ export default defineComponent({
         const updateAssessmentMeasure = (assessmentMeasureId: number, assessmentMeasure: AssessmentMeasure) => {
             AssessmentMeasureService.updateAssessmentMeasure(assessmentMeasureId, assessmentMeasure).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
+                assessmentMeasure.id = assessmentMeasureId;
                 emit("update", assessmentMeasureId, assessmentMeasure);
             });
         };

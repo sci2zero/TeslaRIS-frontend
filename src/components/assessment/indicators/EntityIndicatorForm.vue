@@ -139,7 +139,6 @@ export default defineComponent({
                     applicableIndicators.value.push({title: returnCurrentLocaleContent(indicator.title) as string, value: indicator.id});
                 });
 
-                console.log(props.presetDocumentIndicator)
                 if(props.presetDocumentIndicator) {
                     selectedIndicator.value = {title: returnCurrentLocaleContent(props.presetDocumentIndicator.indicatorResponse.title) as string, value: props.presetDocumentIndicator.indicatorResponse.id};
                 }
