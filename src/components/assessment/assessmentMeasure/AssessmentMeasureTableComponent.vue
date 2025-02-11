@@ -43,6 +43,7 @@
                 </td>
                 <td>
                     <generic-crud-modal
+                        class="mt-5"
                         :form-component="AssessmentMeasureForm"
                         :form-props="{ presetAssessmentMeasure: row.item }"
                         is-update

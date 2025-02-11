@@ -504,5 +504,7 @@ export default {
     assessPublicationLabel: "Vrednuj publikaciju",
     createNewEntityAssessmentLabel: "Unesi vrednovanje",
     createNewAssessmentResearcherLabel: "Dodaj istraživača",
-    removeResearcherLabel: "Ukloni istraživača"
+    removeResearcherLabel: "Ukloni istraživača",
+    pointRuleLabel: "Pravilo za dodelu bodova",
+    scalingRuleLabel: "Pravilo za skaliranje bodova"
 }

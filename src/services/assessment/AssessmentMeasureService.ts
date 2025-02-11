@@ -21,6 +21,10 @@ export class AssessmentMeasureService extends BaseService {
         return super.sendRequest(axios.get, "assessment/assessment-measure/scaling-rules");
     }
 
+    async fetchAssessmentGroups(): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, "assessment/assessment-measure/assessment-groups");
+    }
+
     async createAssessmentMeasure(body: AssessmentMeasure): Promise<AxiosResponse<AssessmentMeasure>> {
         return super.sendRequest(axios.post, "assessment/assessment-measure", body, AssessmentMeasureService.idempotencyKey);
     }

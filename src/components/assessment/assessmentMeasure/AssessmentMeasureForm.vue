@@ -22,7 +22,7 @@
                 <v-select
                     v-model="selectedScalingRule"
                     :items="scalingRules"
-                    :label="$t('pointRuleLabel') + '*'"
+                    :label="$t('scalingRuleLabel') + '*'"
                     :rules="requiredSelectionRules">
                 </v-select>
             </v-col>
@@ -30,11 +30,10 @@
         <v-row>
             <v-col>
                 <v-select
-                    v-model="selectedAssessmentClassification"
-                    :items="assessmentClassifications"
+                    v-model="selectedAssessmentClassificationGroup"
+                    :items="assessmentClassificationGroups"
                     :label="$t('classificationLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                    return-object>
+                    :rules="requiredSelectionRules">
                 </v-select>
             </v-col>
         </v-row>
@@ -51,16 +50,15 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import { AccessLevel, ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
+import { AccessLevel, type LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { AssessmentMeasure } from '@/models/AssessmentModel';
 import { getAccessLevelForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/accessLevel';
 import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
-import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 
 
 export default defineComponent({
@@ -79,10 +77,7 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
         const pointRules = ref<string[]>([]);
         const scalingRules = ref<string[]>([]);
-
-        const searchPlaceholder = {title: "", value: ""};
-        const assessmentClassifications = ref<{ title: string, value: string }[]>([]);
-        const selectedAssessmentClassification = ref<{ title: string, value: string }>(searchPlaceholder);
+        const assessmentClassificationGroups = ref<string[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
@@ -97,15 +92,8 @@ export default defineComponent({
                 scalingRules.value = response.data;
             });
 
-            AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType([ApplicableEntityType.DOCUMENT, ApplicableEntityType.ALL]).then((response) => {
-                assessmentClassifications.value.splice(0);
-                response.data.forEach((classification) => {
-                    assessmentClassifications.value.push({title: returnCurrentLocaleContent(classification.title) as string, value: classification.code});
-                });
-
-                if (props.presetAssessmentMeasure?.code) {
-                    selectedAssessmentClassification.value = {title: returnCurrentLocaleContent(response.data.find(classification => classification.code === props.presetAssessmentMeasure?.code)?.title) as string, value: props.presetAssessmentMeasure.code}
-                }
+            AssessmentMeasureService.fetchAssessmentGroups().then(response => {
+                assessmentClassificationGroups.value = response.data;
             });
         });
 
@@ -117,6 +105,7 @@ export default defineComponent({
         const title = ref<any>([]);
         const selectedPointRule = ref<string>(props.presetAssessmentMeasure?.pointRule ? props.presetAssessmentMeasure.pointRule : "");
         const selectedScalingRule = ref<string>(props.presetAssessmentMeasure?.scalingRule ? props.presetAssessmentMeasure.scalingRule : "");
+        const selectedAssessmentClassificationGroup = ref<string>(props.presetAssessmentMeasure?.code ? props.presetAssessmentMeasure.code : "");
 
         const { requiredFieldRules, requiredNumericFieldRules, requiredSelectionRules } = useValidationUtils();
 
@@ -125,7 +114,7 @@ export default defineComponent({
                 title: title.value,
                 pointRule: selectedPointRule.value,
                 scalingRule: selectedScalingRule.value,
-                code: selectedAssessmentClassification.value.value,
+                code: selectedAssessmentClassificationGroup.value,
                 assessmentRulebookId: props.presetAssessmentMeasure?.assessmentRulebookId as number
             };
 
@@ -141,8 +130,8 @@ export default defineComponent({
             requiredFieldRules, submit,
             accessLevels, requiredSelectionRules,
             requiredNumericFieldRules,
-            assessmentClassifications,
-            selectedAssessmentClassification
+            assessmentClassificationGroups,
+            selectedAssessmentClassificationGroup
         };
     }
 });

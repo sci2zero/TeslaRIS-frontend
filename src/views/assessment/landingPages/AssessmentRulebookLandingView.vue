@@ -61,7 +61,7 @@
         </v-row>
 
         <!-- Description -->
-        <description-section :description="assessmentRulebook?.description" can-edit @update="updateDescription"></description-section>
+        <description-section :description="assessmentRulebook?.description" can-edit is-general-description @update="updateDescription"></description-section>
 
         <!-- Assessment Measures -->
         <br />

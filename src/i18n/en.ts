@@ -505,5 +505,7 @@ export default {
     assessPublicationLabel: "Assess publication",
     createNewEntityAssessmentLabel: "Enter assessment",
     createNewAssessmentResearcherLabel: "Add researcher",
-    removeResearcherLabel: "Remove researcher"
+    removeResearcherLabel: "Remove researcher",
+    pointRuleLabel: "Rule for awarding points",
+    scalingRuleLabel: "Rule for scaling points"
 }
