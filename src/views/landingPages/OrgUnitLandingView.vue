@@ -58,10 +58,10 @@
                                         {{ $t("notYetSetMessage") }}
                                     </span>
                                 </div>
-                                <div>
+                                <div v-if="loginStore.userLoggedIn">
                                     {{ $t("phoneNumberLabel") }}:
                                 </div>
-                                <div class="response">
+                                <div v-if="loginStore.userLoggedIn" class="response">
                                     {{ organisationUnit?.contact?.phoneNumber ? organisationUnit?.contact?.phoneNumber : $t("notYetSetMessage") }}
                                 </div>
                                 <div>
@@ -218,6 +218,7 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -278,6 +279,8 @@ export default defineComponent({
         const totalSubUnits = ref<number>(0);
 
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
+
+        const loginStore = useLoginStore();
 
         onMounted(() => {
             OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -515,7 +518,7 @@ export default defineComponent({
             subUnits, totalSubUnits, switchSubUnitsPage,
             alumni, totalAlumni, switchAlumniPage,
             OrganisationUnitUpdateForm, fetchEmployees,
-            ouIndicators, StatisticsType
+            ouIndicators, StatisticsType, loginStore
         };
 }})
 
