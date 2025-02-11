@@ -41,22 +41,22 @@
                                 <div class="response">
                                     <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
                                 </div>
-                                <div v-if="personalInfo.localBirthDate">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.localBirthDate" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate" class="response">
                                     {{ localiseDate(personalInfo.localBirthDate) }}
                                 </div>
-                                <div v-if="personalInfo.sex">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.sex">
                                     {{ $t("sexLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.sex" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.sex" class="response">
                                     {{ getTitleFromValueAutoLocale(personalInfo.sex) }}
                                 </div>
-                                <div v-if="personalInfo.country">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.country">
                                     {{ $t("countryLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.country" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.country" class="response">
                                     {{ personalInfo.country }}
                                 </div>
                                 <div>APVNT:</div>
@@ -90,34 +90,34 @@
                                 </div>
                             </v-col>
                             <v-col cols="6">
-                                <div v-if="personalInfo.streetAndNumber">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber">
                                     {{ $t("streetAndNumberLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.streetAndNumber" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber" class="response">
                                     {{ personalInfo.streetAndNumber }}
                                 </div>
-                                <div v-if="personalInfo.city">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.city">
                                     {{ $t("cityLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.city" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.city" class="response">
                                     {{ personalInfo.city }}
                                 </div>
-                                <div v-if="personalInfo.placeOfBirth">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.placeOfBirth">
                                     {{ $t("placeOfBirthLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.placeOfBirth" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.placeOfBirth" class="response">
                                     {{ personalInfo.placeOfBirth }}
                                 </div>
-                                <div v-if="personalInfo.contact.contactEmail">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.contactEmail">
                                     {{ $t("emailLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.contact.contactEmail" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.contactEmail" class="response">
                                     <identifier-link :identifier="personalInfo.contact.contactEmail" type="email"></identifier-link>
                                 </div>
-                                <div v-if="personalInfo.contact.phoneNumber">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber">
                                     {{ $t("phoneNumberLabel") }}:
                                 </div>
-                                <div v-if="personalInfo.contact.phoneNumber" class="response">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
                                 </div>
                                 <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
@@ -263,6 +263,7 @@ import { type EntityIndicatorResponse, StatisticsType } from '@/models/Assessmen
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -308,6 +309,8 @@ export default defineComponent({
         const canEdit = ref(false);
 
         const personIndicators = ref<EntityIndicatorResponse[]>([]);
+
+        const loginStore = useLoginStore();
 
         onMounted(() => {
             PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -541,7 +544,7 @@ export default defineComponent({
         };
 
         return {
-            researcherName, person, personalInfo, keywords,
+            researcherName, person, personalInfo, keywords, loginStore,
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
