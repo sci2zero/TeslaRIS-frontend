@@ -242,11 +242,13 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
-        return {selectedOUs, headers, notifications,
+        return {
+            selectedOUs, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
-            startMetadataComparison};
+            startMetadataComparison
+        };
     }
 });
 </script>
