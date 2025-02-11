@@ -34,13 +34,11 @@ export const getEntityTypeTitleFromValueAutoLocale = (value: EntityType) => {
     return (resourceTypeArray.find(item => item.value === value) || {}).title;
 };
 
-export const getEntityTypeForGivenLocale = (): { title: string, value: EntityType }[] => {
+export const getEntityTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return entityTypeSr;
         case "en":
             return entityTypeEn;
     }
-
-    return entityTypeEn;
 };
