@@ -506,5 +506,10 @@ export default {
     createNewAssessmentResearcherLabel: "Dodaj istraživača",
     removeResearcherLabel: "Ukloni istraživača",
     pointRuleLabel: "Pravilo za dodelu bodova",
-    scalingRuleLabel: "Pravilo za skaliranje bodova"
+    scalingRuleLabel: "Pravilo za skaliranje bodova",
+    markLabel: "Oznaka",
+    numberOfPublicationsLabel: "Broj publikacija",
+    totalPointsLabel: "Ukupan broj bodova",
+    publicationsWithPointsLabel: "Publikacije sa brojem bodova",
+    noAssessedPublicationsMessage: "Nema vrednovanih publikacija u selektovanom periodu."
 }

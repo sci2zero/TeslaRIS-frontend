@@ -507,5 +507,10 @@ export default {
     createNewAssessmentResearcherLabel: "Add researcher",
     removeResearcherLabel: "Remove researcher",
     pointRuleLabel: "Rule for awarding points",
-    scalingRuleLabel: "Rule for scaling points"
+    scalingRuleLabel: "Rule for scaling points",
+    markLabel: "Mark",
+    numberOfPublicationsLabel: "Number of publications",
+    totalPointsLabel: "Total points",
+    publicationsWithPointsLabel: "Publications with points",
+    noAssessedPublicationsMessage: "There are no assessed publications in selected time frame."
 }

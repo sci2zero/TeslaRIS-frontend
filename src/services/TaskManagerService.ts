@@ -21,11 +21,11 @@ export class TaskSchedulingService extends BaseService {
     async scheduleIF5RankComputationTask(timestamp: string, years: number[]): Promise<AxiosResponse<void>> {
         
 
-        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-compute?timestamp=${timestamp}${this.createClassificationYearsParameter(years)}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-compute?timestamp=${timestamp}${this.createNumericalParameter("classificationYears", years)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[]): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createClassificationYearsParameter(years)}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[], journalIds: number[]): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createNumericalParameter("classificationYears", years)}${this.createNumericalParameter("journalIds", journalIds)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource, commissionId: number): Promise<AxiosResponse<void>> {
@@ -40,12 +40,12 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${timestamp}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
     }
 
-    private createClassificationYearsParameter(years: number[]): string {
-        let classificationYears = "";
-        years.forEach(year => {
-            classificationYears += `&classificationYears=${year}`;
+    private createNumericalParameter(paramName: string, values: number[]): string {
+        let params = "";
+        values.forEach(value => {
+            params += `&${paramName}=${value}`;
         });
-        return classificationYears;
+        return params;
     }
 
     async canceltask(taskId: string): Promise<AxiosResponse<void>> {

@@ -165,6 +165,9 @@
             <v-tab v-if="personIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab v-if="personAssessments?.length > 0" value="assessments">
+                {{ $t("assessmentsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -213,6 +216,14 @@
                         </v-card>
                     </v-col>
                 </v-row>
+
+                <v-btn
+                    v-if="userRole === 'ADMIN'" 
+                    density="compact" class="mt-5" 
+                    color="blue darken-1"
+                    @click="migrateToUnmanaged">
+                    {{ $t("migrateToUnmanagedResearcherLabel") }}
+                </v-btn>
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
@@ -224,15 +235,10 @@
                     <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
                 </div>
             </v-tabs-window-item>
+            <v-tabs-window-item value="assessments">
+                <person-assessments-view :assessments="personAssessments" :is-loading="assessmentsLoading" @fetch="fetchAssessment"></person-assessments-view>
+            </v-tabs-window-item>
         </v-tabs-window>
-
-        <v-btn
-            v-if="userRole === 'ADMIN'" 
-            density="compact" class="mt-5" 
-            color="blue darken-1"
-            @click="migrateToUnmanaged">
-            {{ $t("migrateToUnmanagedResearcherLabel") }}
-        </v-btn>
 
         <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="performMigrationToUnmanaged"></persistent-question-dialog>
 
@@ -276,18 +282,20 @@ import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
-import { type AssessmentResearchArea, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { type AssessmentResearchArea, type EntityIndicatorResponse, type ResearcherAssessmentResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
 import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasure/AssessmentResearchAreaForm.vue';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -333,6 +341,10 @@ export default defineComponent({
 
         const researchArea = ref<AssessmentResearchArea>();
 
+        const personAssessments = ref<ResearcherAssessmentResponse[]>([]);
+
+        const assessmentsLoading = ref(false);
+
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -347,11 +359,21 @@ export default defineComponent({
             EntityIndicatorService.fetchPersonIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 personIndicators.value = response.data;
             });
+
+            fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchAssessment = (startDate: string, endDate: string) => {
+            assessmentsLoading.value = true;
+            EntityClassificationService.fetchPersonAssessment(parseInt(currentRoute.params.id as string), startDate, endDate).then(response => {
+                personAssessments.value = response.data;
+                assessmentsLoading.value = false;
+            });
+        };
 
         const fetchPerson = () => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -583,7 +605,7 @@ export default defineComponent({
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
-            fetchAssessmentResearchArea
+            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading
         };
 }});
 </script>

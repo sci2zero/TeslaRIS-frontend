@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { DocumentAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification, PublicationSeriesAssessmentClassification } from "@/models/AssessmentModel";
+import type { DocumentAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification, PublicationSeriesAssessmentClassification, ResearcherAssessmentResponse } from "@/models/AssessmentModel";
 
 
 export class EntityClassificationService extends BaseService {
@@ -22,6 +22,10 @@ export class EntityClassificationService extends BaseService {
 
     async fetchPersonClassifications(personId: number): Promise<AxiosResponse<EntityClassificationResponse[]>> {
         return super.sendRequest(axios.get, `assessment/person-assessment-classification/${personId}`);
+    }
+
+    async fetchPersonAssessment(personId: number, startDate: string, endDate: string): Promise<AxiosResponse<ResearcherAssessmentResponse[]>> {
+        return super.sendRequest(axios.get, `assessment/person-assessment-classification/assess/${personId}?startDate=${startDate}&endDate=${endDate}`);
     }
 
     async fetchPublicationSeriesClassifications(publicationSeriesId: number): Promise<AxiosResponse<EntityClassificationResponse[]>> {

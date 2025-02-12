@@ -202,3 +202,9 @@ export interface AssessmentResearchArea {
     name: MultilingualContent[],
     code: string
 }
+
+export interface ResearcherAssessmentResponse {
+    commissionDescription: MultilingualContent[];
+    commissionId: number;
+    publicationsPerCategory: Record<string, {a: string, b:number}[]>;
+}
