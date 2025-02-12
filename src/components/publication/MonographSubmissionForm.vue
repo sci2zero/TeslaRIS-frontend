@@ -131,19 +131,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -172,11 +161,12 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast},
     props: {
         inModal: {
             type: Boolean,

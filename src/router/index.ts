@@ -83,9 +83,11 @@ import AssessmentRulebookLandingView from "@/views/assessment/landingPages/Asses
 import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
 import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
 import LanguageTagListView from "@/views/LanguageTagListView.vue";
+import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
+import AssessmentClassificationsListView from "@/views/assessment/listViews/AssessmentClassificationsListView.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
+const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION" };
 
 
 const router = createRouter({
@@ -134,7 +136,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission],
                     },
                 },
                 {
@@ -155,7 +157,7 @@ const router = createRouter({
                             component: EventListView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.commission],
                             },
                         },
                         {
@@ -164,7 +166,7 @@ const router = createRouter({
                             component: ConferenceLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.commission],
                             },
                         },
                         {
@@ -282,7 +284,7 @@ const router = createRouter({
                             component: JournalListView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.commission],
                             },
                         },
                         {
@@ -874,12 +876,30 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "scheduled-tasks",
+                    name: "scheduledTasks",
+                    component: ScheduledTasksView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
                     path: "assessment",                 
                     children: [
                         {
                             path: "indicators",
                             name: "indicators",
                             component: IndicatorsListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "classifications",
+                            name: "classifications",
+                            component: AssessmentClassificationsListView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

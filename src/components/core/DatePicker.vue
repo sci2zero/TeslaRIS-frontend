@@ -4,7 +4,7 @@
             <v-text-field
                 :label="label"
                 :model-value="formattedDate"
-                :rules="required ? requiredFieldRules : []"
+                :rules="applyRules()"
                 readonly
                 v-bind="props"
                 variant="solo"
@@ -45,6 +45,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    inFuture: {
+      type: Boolean,
+      default: false
+    },
     modelValue: {
       type: Object as PropType<string | undefined>,
       required: true,
@@ -55,7 +59,7 @@ export default defineComponent({
     const isMenuOpen = ref(false);
     const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
 
-    const { requiredFieldRules } = useValidationUtils();
+    const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
 
     const toIsoString = (date: Date) => {
       const pad = function(num : number) {
@@ -93,12 +97,25 @@ export default defineComponent({
       }
     });
 
+    const applyRules = () => {
+      const rules = [];
+      
+      if (props.required) {
+        rules.push(requiredFieldRules[0]);
+      }
+
+      if (props.inFuture) {
+        rules.push(dateTodayOrFutureRules[0]);
+      }
+
+      return rules;
+    };
+
     return {
       isMenuOpen,
       selectedDate,
       formattedDate,
-      requiredFieldRules,
-      clearDate
+      clearDate, applyRules
     };
   },
 });

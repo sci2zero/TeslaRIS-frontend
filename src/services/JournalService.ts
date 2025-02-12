@@ -39,6 +39,10 @@ export class JournalService extends BaseService {
   async canEdit(journalId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `journal/${journalId}/can-edit`);
   }
+
+  async canClassify(journalId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `journal/${journalId}/can-classify`);
+  }
 }
 
 export default new JournalService();

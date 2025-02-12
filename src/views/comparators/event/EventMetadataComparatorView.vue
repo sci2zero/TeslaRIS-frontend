@@ -70,19 +70,7 @@
 
         <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
 
         <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsMetadataMessage')"></persistent-stop-dialog>
     </v-container>
@@ -106,11 +94,12 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "ConferenceMetadataComparator",
-    components: { EventUpdateForm, PersonEventContributionList, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { EventUpdateForm, PersonEventContributionList, Toast, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

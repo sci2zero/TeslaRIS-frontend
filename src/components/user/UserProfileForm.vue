@@ -1,25 +1,25 @@
 <template>
-    <v-checkbox v-if="userRole !== 'ADMIN'" v-model="allowAccountTakeover" :label="$t('allowTakeoverLabel')" @click="updateAccountTakeoverPermission"></v-checkbox>
+    <v-checkbox v-if="!isAdmin" v-model="allowAccountTakeover" :label="$t('allowTakeoverLabel')" @click="updateAccountTakeoverPermission"></v-checkbox>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="6">
+            <v-col :cols="isCommission ? 12 : 6">
                 <v-text-field
                     v-model="name"
-                    :label="$t('firstNameLabel')"
+                    :label="isCommission ? $t('nameLabel') : $t('firstNameLabel')"
                     :rules="requiredFieldRules"
-                    :readonly="userRole === 'RESEARCHER'"
+                    :readonly="isResearcher"
                 ></v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col v-if="!isCommission" cols="6">
                 <v-text-field
                     v-model="surname"
                     :label="$t('surnameLabel')"
                     :rules="requiredFieldRules"
-                    :readonly="userRole === 'RESEARCHER'"
+                    :readonly="isResearcher"
                 ></v-text-field>
             </v-col>
         </v-row>
-        <v-btn v-if="userRole === 'RESEARCHER'" color="blue darken-1" class="update-researcher" @click="navigateToResearcherPage()">
+        <v-btn v-if="isResearcher" color="blue darken-1" class="update-researcher" @click="navigateToResearcherPage()">
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
@@ -38,14 +38,14 @@
                     return-object
                 ></v-select>
             </v-col>
-            <v-col v-if="userRole !== 'ADMIN'" cols="6">
+            <v-col v-if="!isAdmin" cols="6">
                 <v-autocomplete
                     v-model="selectedOrganisationUnit"
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :rules="userRole === 'RESEARCHER' ? requiredSelectionRules : []"
-                    :readonly="userRole === 'RESEARCHER'"
+                    :rules="(isResearcher || isCommission) ? requiredSelectionRules : []"
+                    :readonly="isResearcher || isCommission"
                     :no-data-text="$t('noDataMessage')"
                     return-object
                     @update:search="searchOUs($event)"
@@ -91,19 +91,7 @@
             </v-btn>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ snackbarText }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <toast v-model="snackbar" :message="snackbarText" />
 </template>
 
 <script lang="ts">
@@ -124,16 +112,19 @@ import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriods";
 import { useRouter } from "vue-router";
+import Toast from "../core/Toast.vue";
+import { useLoginStore } from "@/stores/loginStore";
 
 export default defineComponent({
     name: "UserProfileForm",
-    components: {PasswordInputWithMeter},
+    components: {PasswordInputWithMeter, Toast},
     setup() {
         const snackbar = ref(false);
         const snackbarText = ref("");
         const timeout = 5000;
 
         const router = useRouter();
+        const loginStore = useLoginStore();
 
         const changePassword = ref(false);
         const isFormValid = ref(false);
@@ -153,7 +144,9 @@ export default defineComponent({
         const oldPassword = ref("");
         const newPassword = ref("");
 
-        const userRole = ref("");
+        const isResearcher = ref(false);
+        const isAdmin = ref(false);
+        const isCommission = ref(false);
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
@@ -164,6 +157,17 @@ export default defineComponent({
 
         const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
+        const fetchUserRole = () => {
+            const userRole = UserService.provideUserRole();
+            if (userRole === 'RESEARCHER') {
+                isResearcher.value = true;
+            } else if (userRole === 'ADMIN') {
+                isAdmin.value = true;
+            } else if (userRole === "COMMISSION") {
+                isCommission.value = true;
+            }
+        };
+
         const populateUserData = () => {
             UserService.getLoggedInUser().then((response) => {
                 name.value = response.data.firstname;
@@ -172,7 +176,7 @@ export default defineComponent({
                 allowAccountTakeover.value = response.data.canTakeRole;
                 selectedNotificationPeriod.value = {title: getTitleFromValueAutoLocale(response.data.notificationPeriod) as string, value: response.data.notificationPeriod};
 
-                userRole.value = UserService.provideUserRole();
+                fetchUserRole();
                 
                 let ouNameSr = "";
                 let ouNameOther = "";
@@ -268,7 +272,9 @@ export default defineComponent({
                 localStorage.setItem("refreshToken", response.data.refreshToken);
                 snackbarText.value = savedMessage.value;
                 snackbar.value = true;
+
                 UserService.invalidateCaches();
+                loginStore.emitReloadUsername();
             }).catch((error: AxiosError<any, any>) => {
                 snackbarText.value = i18n.t(error.response?.data.message);
                 snackbar.value = true;
@@ -293,15 +299,13 @@ export default defineComponent({
         return {
             changePassword, name, surname,
             organisationUnits, selectedOrganisationUnit, 
-            email, showOldPassword,
-            languages, selectedLanguage, 
+            email, showOldPassword, languages, selectedLanguage, 
             searchOUs, filterOUs, allowAccountTakeover,
             updateUser, setNewPassword, selectedNotificationPeriod,
             emailFieldRules, requiredFieldRules, requiredSelectionRules,
-            isFormValid, userRole, notificationPeriods,
-            oldPassword, newPassword,
+            isFormValid, notificationPeriods, oldPassword, newPassword,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
-            navigateToResearcherPage
+            navigateToResearcherPage, isAdmin, isResearcher, isCommission
         };
     }
 });

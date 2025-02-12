@@ -14,6 +14,10 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/journal/source/${sourceJournalId}/target/${targetJournalId}`);
     }
 
+    async switchAllIndicatorsToOtherJournal(sourceJournalId: number, targetJournalId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/journal-indicator/source/${sourceJournalId}/target/${targetJournalId}`);
+    }
+
     async switchPublisherPublicationToOtherPublisher(sourcePublisherId: number, publicationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/publisher/${sourcePublisherId}/publication/${publicationId}`);
     }

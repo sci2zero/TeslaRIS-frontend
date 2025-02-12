@@ -41,8 +41,11 @@ export default defineComponent({
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
-            tableRef.value?.setSortOption([]);
-            search(tokenParams); 
+            tableRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            search(tokenParams);
         };
 
         const search = (tokenParams: string) => {

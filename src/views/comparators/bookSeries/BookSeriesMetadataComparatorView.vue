@@ -62,19 +62,7 @@
 
         <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -93,11 +81,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { ComparisonSide } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "BookSeriesMetadataComparator",
-    components: { PersonPublicationSeriesContributionList, PublicationSeriesUpdateForm, ComparisonActions },
+    components: { PersonPublicationSeriesContributionList, PublicationSeriesUpdateForm, ComparisonActions, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

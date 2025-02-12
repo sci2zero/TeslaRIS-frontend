@@ -43,8 +43,12 @@ export default defineComponent(
             });
 
             const onSearch = () => {
+                if(searchInput.value === undefined) {
+                    return;
+                }
+
                 let tokens: string[] = searchInput.value.trim().split(" ");
-                if (tokens.length === 1 && tokens[0] === "") {
+                if ((tokens.length === 1 && tokens[0] === "")) {
                     tokens = ["*"]
                 }
                 

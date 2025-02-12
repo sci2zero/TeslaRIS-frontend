@@ -182,19 +182,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -229,12 +217,13 @@ import StatisticsService from '@/services/StatisticsService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
     setup() {
         const currentTab = ref("");
 

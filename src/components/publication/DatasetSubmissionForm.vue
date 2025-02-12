@@ -71,19 +71,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -100,11 +89,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitDataset",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast},
     props: {
         inModal: {
             type: Boolean,

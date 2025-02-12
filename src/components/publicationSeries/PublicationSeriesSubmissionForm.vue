@@ -49,19 +49,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -80,11 +69,12 @@ import BookSeriesService from '@/services/BookSeriesService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import UriInput from '@/components/core/UriInput.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitPublicationSeries",
-    components: { MultilingualTextInput, UriInput },
+    components: { MultilingualTextInput, UriInput, Toast },
     props: {
         inputType: {
             type: String,

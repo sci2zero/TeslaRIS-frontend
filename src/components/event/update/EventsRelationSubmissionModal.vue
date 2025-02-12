@@ -52,19 +52,7 @@
             </v-card>
         </v-dialog>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ message }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="message" />
     </v-row>
 </template>
 
@@ -78,11 +66,12 @@ import { type Conference, type EventsRelation, EventsRelationType } from "@/mode
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import EventService from "@/services/EventService";
 import { getErrorMessageForErrorKey } from "@/i18n";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent({
     name: "EventsRelationSubmissionModal",
-    components: { EventAutocompleteSearch },
+    components: { EventAutocompleteSearch, Toast },
     props: {
         readOnly: {
             type: Boolean,

@@ -47,19 +47,7 @@
             </v-btn>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -75,11 +63,12 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import MergeService from '@/services/MergeService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationsComparator",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

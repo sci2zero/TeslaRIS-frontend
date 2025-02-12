@@ -78,19 +78,7 @@
             </v-col>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -116,11 +104,12 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentMeasureTableComponent from '@/components/assessment/assessmentMeasure/AssessmentMeasureTableComponent.vue';
 import type { AxiosResponse } from 'axios';
 import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "AssessmentRulebookLandingPage",
-    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericCrudModal, AssessmentMeasureTableComponent },
+    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericCrudModal, AssessmentMeasureTableComponent, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

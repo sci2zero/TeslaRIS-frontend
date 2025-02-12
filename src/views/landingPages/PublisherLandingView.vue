@@ -65,19 +65,7 @@
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
         
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -99,11 +87,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import CountryService from '@/services/CountryService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal },
+    components: { PublicationTableComponent, GenericCrudModal, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

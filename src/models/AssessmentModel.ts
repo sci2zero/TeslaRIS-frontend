@@ -31,6 +31,19 @@ export interface EntityIndicatorResponse {
     source: EntityIndicatorSource
 }
 
+export interface EntityClassificationResponse {
+    id: number;
+    manual: boolean;
+    classificationTitle: MultilingualContent[];
+    classificationId: number;
+    commissionDescription: MultilingualContent[];
+    commissionId: number;
+    categoryIdentifier: string;
+    year: number;
+    timestamp: string;
+    applicableEntityTypes: ApplicableEntityType[];
+}
+
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
     categoryIdentifier: string;
 }
@@ -71,11 +84,7 @@ export interface Commission {
     sources?: string[];
     assessmentDateFrom: string;
     assessmentDateTo: string;
-    documentIdsForAssessment: number[];
-    personIdsForAssessment: number[];
-    organisationUnitIdsForAssessment: number[];
     formalDescriptionOfRule: string;
-    superCommissionId?: number;
 }
 
 export interface CommissionResponse {
@@ -84,12 +93,7 @@ export interface CommissionResponse {
     sources?: string[];
     assessmentDateFrom: string;
     assessmentDateTo: string;
-    documentIdsForAssessment: number[];
-    personIdsForAssessment: number[];
-    organisationUnitIdsForAssessment: number[];
     formalDescriptionOfRule: string;
-    superCommissionId: number;
-    superCommissionDescription: MultilingualContent[];
 }
 
 export interface EntityIndicator {
@@ -119,5 +123,33 @@ export enum IndicatorContentType {
 export enum EntityIndicatorSource {
     MANUAL = "MANUAL",
     WEB_OF_SCIENCE = "WEB_OF_SCIENCE",
-    SCIMAGO = "SCIMAGO"
+    SCIMAGO = "SCIMAGO",
+    ERIH_PLUS = "ERIH_PLUS",
+    MKS_SLAVISTS = "MKS_SLAVISTS"
+}
+
+export enum EntityClassificationSource {
+    MNO = "MNO"
+}
+
+export interface EntityAssessmentClassification {
+    commissionId: number;
+    assessmentClassificationId: number;
+    classificationYear: number;
+}
+
+export interface EventAssessmentClassification extends EntityAssessmentClassification {
+    eventId: number;
+}
+
+export interface PublicationSeriesAssessmentClassification extends EntityAssessmentClassification {
+    publicationSeriesId: number;
+}
+
+export interface AssessmentClassification {
+    id?: number;
+    formalDescriptionOfRule: string;
+    code: string;
+    title: MultilingualContent[];
+    applicableTypes: ApplicableEntityType[];
 }

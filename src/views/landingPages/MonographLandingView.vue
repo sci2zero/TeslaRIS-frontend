@@ -204,19 +204,7 @@
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -261,11 +249,12 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import EntityIndicatorForm from '@/components/assessment/indicators/EntityIndicatorForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection },
     setup() {
         const currentTab = ref("contributions");
 
