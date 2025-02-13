@@ -313,7 +313,8 @@ export default defineComponent({
                 ResearchAreaService.readResearchAreaHierarchy(thesis.value?.researchAreaId).then(response => {
                     researchAreaHierarchy.value = response.data;
                 });
-            }  
+            }
+            citationRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -362,14 +363,12 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchThesis();
-                    citationRef.value?.fetchCitations();
                 }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
                 if(reload) {
                     fetchThesis();
-                    citationRef.value?.fetchCitations();
                 }
             });
         };

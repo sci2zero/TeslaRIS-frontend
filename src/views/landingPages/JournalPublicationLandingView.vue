@@ -339,6 +339,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+            citationRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -391,7 +392,6 @@ export default defineComponent({
                 if(reload) {
                     fetchJournalPublication();
                     assessJournalPublication();
-                    citationRef.value?.fetchCitations();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
@@ -399,7 +399,6 @@ export default defineComponent({
                 if(reload) {
                     fetchJournalPublication();
                     assessJournalPublication();
-                    citationRef.value?.fetchCitations();
                 }
             });
         };

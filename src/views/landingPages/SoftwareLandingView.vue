@@ -249,6 +249,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+            citationRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -293,14 +294,12 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchSoftware();
-                    citationRef.value?.fetchCitations();
                 }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
                 if(reload) {
                     fetchSoftware();
-                    citationRef.value?.fetchCitations();
                 }
             });
         };

@@ -346,7 +346,8 @@ export default defineComponent({
                 ResearchAreaService.readResearchAreaHierarchy(monograph.value?.researchAreaId).then(response => {
                     researchAreaHierarchy.value = response.data;
                 });
-            }  
+            }
+            citationRef.value?.fetchCitations();
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -442,14 +443,12 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchMonograph();
-                    citationRef.value?.fetchCitations();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchMonograph();
-                    citationRef.value?.fetchCitations();
                 }
             });
         };

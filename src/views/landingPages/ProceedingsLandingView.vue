@@ -324,6 +324,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+            citationRef.value?.fetchCitations();
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -420,14 +421,12 @@ export default defineComponent({
                 fetchConnectedEntities();
                 if(reload) {
                     fetchProceedings(false);
-                    citationRef.value?.fetchCitations();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedings(false);
-                    citationRef.value?.fetchCitations();
                 }
             });
         };
