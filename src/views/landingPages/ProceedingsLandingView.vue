@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedings?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>
@@ -231,11 +232,12 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, CitationSelector },
     setup() {
         const currentTab = ref("");
 
@@ -271,6 +273,8 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore= useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -416,12 +420,14 @@ export default defineComponent({
                 fetchConnectedEntities();
                 if(reload) {
                     fetchProceedings(false);
+                    citationRef.value?.fetchCitations();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedings(false);
+                    citationRef.value?.fetchCitations();
                 }
             });
         };
@@ -451,7 +457,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, userRole,
-            documentIndicators, StatisticsType
+            documentIndicators, StatisticsType, currentRoute, citationRef
         };
 }})
 

@@ -512,5 +512,8 @@ export default {
     numberOfPublicationsLabel: "Number of publications",
     totalPointsLabel: "Total points",
     publicationsWithPointsLabel: "Publications with points",
-    noAssessedPublicationsMessage: "There are no assessed publications in selected time frame."
+    noAssessedPublicationsMessage: "There are no assessed publications in selected time frame.",
+    defaultLabel: "Default",
+    setDefaultLabel: "Set default",
+    citePublicationLabel: "Cite document"
 }

@@ -71,6 +71,7 @@ export interface AssessmentRulebookResponse {
     pdfFile?: DocumentFileResponse;
     publisherId: number;
     publisherName: MultilingualContent[];
+    isDefault: boolean;
 }
 
 export interface AssessmentRulebook {

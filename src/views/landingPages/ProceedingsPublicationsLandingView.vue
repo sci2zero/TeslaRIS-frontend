@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
                                     {{ $t("typeOfPublicationLabel") }}:
                                 </div>
@@ -221,11 +222,12 @@ import { useLoginStore } from '@/stores/loginStore';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector },
     setup() {
         const currentTab = ref("contributions");
 
@@ -257,6 +259,8 @@ export default defineComponent({
         const documentClassifications = ref<EntityClassificationResponse[]>([]);
 
         const loginStore = useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -371,6 +375,7 @@ export default defineComponent({
                 if(reload) {
                     fetchProceedingsPublication();
                     assessProceedingsPublication();
+                    citationRef.value?.fetchCitations();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
@@ -378,6 +383,7 @@ export default defineComponent({
                 if(reload) {
                     fetchProceedingsPublication();
                     assessProceedingsPublication();
+                    citationRef.value?.fetchCitations();
                 }
             });
         };
@@ -412,7 +418,8 @@ export default defineComponent({
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
             documentClassifications, assessProceedingsPublication,
-            fetchClassifications, canClassify, createClassification
+            fetchClassifications, canClassify, createClassification,
+            currentRoute, citationRef
         };
 }})
 

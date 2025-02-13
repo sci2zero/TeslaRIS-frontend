@@ -218,3 +218,11 @@ export interface Thesis extends Document {
     publisherId?: number;
     languageTagNames?: string[];
 }
+
+export interface CitationResponse {
+    apa: string;
+    mla: string;
+    chicago: string;
+    harvard: string;
+    vancouver: string;
+}

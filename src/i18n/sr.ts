@@ -511,5 +511,8 @@ export default {
     numberOfPublicationsLabel: "Broj publikacija",
     totalPointsLabel: "Ukupan broj bodova",
     publicationsWithPointsLabel: "Publikacije sa brojem bodova",
-    noAssessedPublicationsMessage: "Nema vrednovanih publikacija u selektovanom periodu."
+    noAssessedPublicationsMessage: "Nema vrednovanih publikacija u selektovanom periodu.",
+    defaultLabel: "Podrazumevan",
+    setDefaultLabel: "Postavi podrazumevan",
+    citePublicationLabel: "Citiraj dokument"
 }

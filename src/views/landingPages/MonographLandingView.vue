@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="monograph?.monographType">
                                     {{ $t("monographTypeLabel") }}:
                                 </div>
@@ -250,11 +251,12 @@ import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector },
     setup() {
         const currentTab = ref("contributions");
 
@@ -290,6 +292,8 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -438,12 +442,14 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchMonograph();
+                    citationRef.value?.fetchCitations();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchMonograph();
+                    citationRef.value?.fetchCitations();
                 }
             });
         };
@@ -463,7 +469,7 @@ export default defineComponent({
         };
 
         return {
-            monograph, icon,
+            monograph, icon, citationRef,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
@@ -478,7 +484,7 @@ export default defineComponent({
             handleResearcherUnbind, userRole,
             documentIndicators, StatisticsType,
             currentTab, updateResearchAreas,
-            ApplicableEntityType,
+            ApplicableEntityType, currentRoute,
             createIndicator, fetchIndicators
         };
 }})
