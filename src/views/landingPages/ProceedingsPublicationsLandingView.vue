@@ -161,7 +161,7 @@
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <v-btn v-if="proceedingsPublication?.documentDate" density="compact" @click="assessProceedingsPublication">
+                <v-btn v-if="proceedingsPublication?.documentDate" density="compact" class="ml-5" @click="assessProceedingsPublication">
                     {{ $t("assessPublicationLabel") }}
                 </v-btn>
                 <entity-classification-view

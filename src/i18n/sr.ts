@@ -514,5 +514,6 @@ export default {
     noAssessedPublicationsMessage: "Nema vrednovanih publikacija u selektovanom periodu.",
     defaultLabel: "Podrazumevan",
     setDefaultLabel: "Postavi podrazumevan",
-    citePublicationLabel: "Citiraj dokument"
+    citePublicationLabel: "Citiraj dokument",
+    manualLabel: "Ručno unešeno"
 }

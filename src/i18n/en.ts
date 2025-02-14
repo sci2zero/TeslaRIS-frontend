@@ -515,5 +515,6 @@ export default {
     noAssessedPublicationsMessage: "There are no assessed publications in selected time frame.",
     defaultLabel: "Default",
     setDefaultLabel: "Set default",
-    citePublicationLabel: "Cite document"
+    citePublicationLabel: "Cite document",
+    manualLabel: "Entered manually"
 }

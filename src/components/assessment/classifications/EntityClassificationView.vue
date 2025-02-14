@@ -16,7 +16,7 @@
             <v-expansion-panels v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
                 <v-expansion-panel
                     v-for="(classification, index) in entityClassifications"
-                    :key="classification.id" :title="titles[index]">
+                    :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
                     <v-expansion-panel-text>
                         <v-row class="mt-4 mb-1">
                             <p>{{ contents[index] }}</p>
