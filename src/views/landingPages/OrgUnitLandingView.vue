@@ -219,7 +219,6 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
-import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
