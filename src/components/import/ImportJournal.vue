@@ -202,7 +202,7 @@ export default defineComponent({
                     titleSr: returnCurrentLocaleContent(response.data.title) as string,
                     titleOther: returnCurrentLocaleContent(response.data.title) as string,
                     databaseId: response.data.id as number,
-                    eISSN: response.data.eissn,
+                    eissn: response.data.eissn,
                     printISSN: response.data.printISSN as string,
                     titleOtherSortable: "",
                     titleSrSortable: "",

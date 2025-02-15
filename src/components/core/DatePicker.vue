@@ -121,7 +121,7 @@ export default defineComponent({
       isMenuOpen,
       selectedDate,
       formattedDate,
-      clearDate, applyRules,
+      clearDate, applyRules
     };
   },
 });

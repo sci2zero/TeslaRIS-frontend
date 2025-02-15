@@ -45,5 +45,5 @@ export default {
     return _i18n;
   },
   setup,
-  setLocale,
+  setLocale
 };
