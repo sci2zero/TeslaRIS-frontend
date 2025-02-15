@@ -13,7 +13,7 @@
                     <v-col>
                         <multilingual-text-input
                             ref="descriptionRef" v-model="description" :initial-value="toMultilingualTextInput(presetDocumentFile?.description, languageTags)" is-area
-                            :label="$t('abstractLabel')"></multilingual-text-input>
+                            :label="$t('descriptionLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row v-if="!isProof">
@@ -138,7 +138,8 @@ export default defineComponent({
                 file: file.value as File,
                 description: description.value,
                 resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
-                license: selectedLicense.value.value
+                // license: selectedLicense.value.value,
+                license: isOpenAccess.value ? License.OPEN_ACCESS : License.SUBSCRIPTION_BASED_ACCESS
             }
 
             if(props.edit) {

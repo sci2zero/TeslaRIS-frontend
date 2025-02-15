@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
                     <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -147,6 +147,7 @@ import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -237,9 +238,13 @@ export default defineComponent({
             });
         };
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         watch(selectedEvent, (newValue) => {
             if (newValue) {
-                listPublications(newValue);
+                if (userRole.value === "RESEARCHER") {
+                    listPublications(newValue);
+                }
                 availableProceedings.value = [];
                 selectedProceedings.value = searchPlaceholder;
                 fetchProceedings(newValue);
@@ -329,7 +334,7 @@ export default defineComponent({
             myPublications, doiValidationRules, selectNewlyAddedProceedings,
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType, errorMessage,
-            contributions, contributionsRef, scopusIdValidationRules,
+            contributions, contributionsRef, scopusIdValidationRules, userRole,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
             searchPlaceholder

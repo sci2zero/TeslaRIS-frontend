@@ -41,6 +41,17 @@
                                 <div class="response">
                                     <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
                                 </div>
+                                <div v-if="canEdit" class="response">
+                                    <generic-crud-modal
+                                        :form-component="AssessmentResearchAreaForm"
+                                        :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
+                                        entity-name="ResearchArea"
+                                        is-update
+                                        primary-color
+                                        :read-only="!canEdit"
+                                        @update="fetchAssessmentResearchArea"
+                                    />
+                                </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
                                 </div>
@@ -120,6 +131,12 @@
                                 <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber" class="response">
                                     {{ personalInfo.contact.phoneNumber }}
                                 </div>
+                                <div v-if="loginStore.userLoggedIn">
+                                    {{ $t("researchAreaLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn" class="response">
+                                    {{ researchArea ? returnCurrentLocaleContent(researchArea.name) : $t("notYetSetMessage") }}
+                                </div>
                                 <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
                                     {{ $t("websiteLabel") }}:
                                 </div>
@@ -147,6 +164,9 @@
             </v-tab>
             <v-tab v-if="personIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-if="personAssessments?.length > 0" value="assessments">
+                {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -196,6 +216,14 @@
                         </v-card>
                     </v-col>
                 </v-row>
+
+                <v-btn
+                    v-if="userRole === 'ADMIN'" 
+                    density="compact" class="mt-5" 
+                    color="blue darken-1"
+                    @click="migrateToUnmanaged">
+                    {{ $t("migrateToUnmanagedResearcherLabel") }}
+                </v-btn>
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
@@ -207,15 +235,10 @@
                     <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
                 </div>
             </v-tabs-window-item>
+            <v-tabs-window-item value="assessments">
+                <person-assessments-view :assessments="personAssessments" :is-loading="assessmentsLoading" @fetch="fetchAssessment"></person-assessments-view>
+            </v-tabs-window-item>
         </v-tabs-window>
-
-        <v-btn
-            v-if="userRole === 'ADMIN'" 
-            density="compact" class="mt-5" 
-            color="blue darken-1"
-            @click="migrateToUnmanaged">
-            {{ $t("migrateToUnmanagedResearcherLabel") }}
-        </v-btn>
 
         <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="performMigrationToUnmanaged"></persistent-question-dialog>
 
@@ -259,16 +282,20 @@ import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
-import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { type AssessmentResearchArea, type EntityIndicatorResponse, type ResearcherAssessmentResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
-import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import Toast from '@/components/core/Toast.vue';
+import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasure/AssessmentResearchAreaForm.vue';
+import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -312,21 +339,41 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
+        const researchArea = ref<AssessmentResearchArea>();
+
+        const personAssessments = ref<ResearcherAssessmentResponse[]>([]);
+
+        const assessmentsLoading = ref(false);
+
         onMounted(() => {
-            PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+                
+                fetchAssessmentResearchArea();
+            }
 
             fetchPerson();
             StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
             EntityIndicatorService.fetchPersonIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 personIndicators.value = response.data;
             });
+
+            fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchAssessment = (startDate: string, endDate: string) => {
+            assessmentsLoading.value = true;
+            EntityClassificationService.fetchPersonAssessment(parseInt(currentRoute.params.id as string), startDate, endDate).then(response => {
+                personAssessments.value = response.data;
+                assessmentsLoading.value = false;
+            });
+        };
 
         const fetchPerson = () => {
             PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -366,6 +413,12 @@ export default defineComponent({
 
                 fetchPublications();                
                 populateData();
+            });
+        };
+
+        const fetchAssessmentResearchArea = () => {
+            AssessmentResearchAreaService.readPersonAssessmentResearchArea(parseInt(currentRoute.params.id as string)).then(response => {
+                researchArea.value = response.data;
             });
         };
 
@@ -544,14 +597,15 @@ export default defineComponent({
         };
 
         return {
-            researcherName, person, personalInfo, keywords, loginStore,
+            researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
-            dialogRef, dialogMessage, personIndicators, StatisticsType
+            dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
+            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading
         };
 }});
 </script>

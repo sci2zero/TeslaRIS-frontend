@@ -7,7 +7,7 @@
             <proceedings-submission-modal :conference="convertToListEntry(presetEvent)" @create="refreshProceedingsList"></proceedings-submission-modal>
         </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="proceedings?.length > 0">
         <v-btn
             v-if="userRole === 'ADMIN'"
             density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsPublicationComparison">
@@ -54,7 +54,7 @@
             </v-list-item>
         </draggable>
     </v-list>
-    <h3 v-if="!proceedings || proceedings.length === 0" class="no-proceedings-message">
+    <h3 v-if="proceedings?.length === 0" class="no-proceedings-message">
         {{ $t("noAvailableProceedingsMessage") }}
     </h3>
 

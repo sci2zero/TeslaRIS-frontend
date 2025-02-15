@@ -37,6 +37,18 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedResearchAreas"
+                    :items="researchAreas"
+                    :label="$t('researchAreasLabel') + '*'"
+                    :rules="requiredMultiSelectionRules"
+                    multiple
+                    return-object>
+                </v-select>
+            </v-col>
+        </v-row>
+        <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
             </p>
@@ -51,12 +63,13 @@ import { ref } from 'vue';
 import type { MultilingualContent, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import DatePicker from '@/components/core/DatePicker.vue';
 import CommissionService from '@/services/assessment/CommissionService';
+import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 
 
 export default defineComponent({
@@ -80,6 +93,9 @@ export default defineComponent({
 
         const ruleEngines = ref<{ title: string, value: string }[]>([]);
 
+        const researchAreas = ref<{title: string, value: string}[]>([]);
+        const selectedResearchAreas = ref<{title: string, value: string}[]>([]);
+
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
@@ -92,6 +108,21 @@ export default defineComponent({
                 });
             });
 
+            AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
+                response.data.forEach(researchArea => {
+                    researchAreas.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.code});
+                });
+
+                if (props.presetCommission && props.presetCommission.recognisedResearchAreas.length > 0) {
+                    const areas: any[] = [];
+                    props.presetCommission.recognisedResearchAreas.forEach(researchArea => {
+                        areas.push({title: (researchAreas.value.find(item => item.value === researchArea) || {}).title as string, value: researchArea});
+                    });
+                    selectedResearchAreas.value = areas;
+                } else {
+                    selectedResearchAreas.value = researchAreas.value;
+                }
+            });
         });
 
         const nameRef = ref<typeof MultilingualTextInput>();
@@ -102,9 +133,8 @@ export default defineComponent({
         const dateFrom = ref(props.presetCommission?.assessmentDateFrom ? props.presetCommission.assessmentDateFrom : undefined);
         const dateTo = ref(props.presetCommission?.assessmentDateTo ? props.presetCommission.assessmentDateTo : undefined);
 
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
-        // TODO: update this to fetch rule methods from backend
         const formalDescriptionOfRule = ref<{ title: string, value: string }>({title: props.presetCommission ? props.presetCommission.formalDescriptionOfRule as string : "", value: props.presetCommission ? props.presetCommission.formalDescriptionOfRule as string : ""});
 
         const submit = () => {
@@ -112,7 +142,8 @@ export default defineComponent({
                 description: description.value as MultilingualContent[],
                 assessmentDateFrom: dateFrom.value as string,
                 assessmentDateTo: dateTo.value as string,
-                formalDescriptionOfRule: formalDescriptionOfRule.value.value
+                formalDescriptionOfRule: formalDescriptionOfRule.value.value,
+                recognisedResearchAreas: selectedResearchAreas.value.map(researchArea => researchArea.value)
             };
 
             emit("create", commission);
@@ -126,7 +157,9 @@ export default defineComponent({
             languageTags, requiredFieldRules,
             requiredSelectionRules, submit,
             dateFrom, dateTo, ruleEngines,
-            formalDescriptionOfRule
+            formalDescriptionOfRule,
+            researchAreas, selectedResearchAreas,
+            requiredMultiSelectionRules
         };
     }
 });

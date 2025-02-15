@@ -14,7 +14,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="formalDescriptionOfRule" :label="$t('formalDescriptionOfRuleLabel') + '*'" :placeholder="$t('formalDescriptionOfRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="formalDescriptionOfRule" :label="$t('classificationRuleLabel') + '*'" :placeholder="$t('classificationRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>

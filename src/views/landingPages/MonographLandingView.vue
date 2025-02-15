@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="monograph?.monographType">
                                     {{ $t("monographTypeLabel") }}:
                                 </div>
@@ -146,11 +147,14 @@
             <v-tab v-if="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="researchAreaHierarchy" value="researchArea">
+            <v-tab v-if="researchAreaHierarchy || canEdit" value="researchArea">
                 {{ $t("researchAreaLabel") }}
             </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-if="documentIndicators?.length > 0 || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="classifications">
+                {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -200,6 +204,17 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="classifications">
+                <entity-classification-view
+                    :entity-classifications="documentClassifications"
+                    :entity-id="monograph?.id"
+                    :can-edit="canClassify && monograph?.documentDate !== ''"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
@@ -244,17 +259,20 @@ import MonographUpdateForm from '@/components/publication/update/MonographUpdate
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
-import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse, type EntityClassificationResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
-import EntityIndicatorForm from '@/components/assessment/indicators/EntityIndicatorForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector, EntityClassificationView },
     setup() {
         const currentTab = ref("contributions");
 
@@ -269,6 +287,7 @@ export default defineComponent({
 
         const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
+        const canClassify = ref(false);
 
         const i18n = useI18n();
 
@@ -288,17 +307,28 @@ export default defineComponent({
         const direction = ref("");
 
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+        const documentClassifications = ref<EntityClassificationResponse[]>([]);
+
+        const loginStore = useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
         });
 
         const fetchDisplayData = () => {
-            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            }).catch(() => {
-                canEdit.value = false;
-            });
+            if (loginStore.userLoggedIn) {
+                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+
+                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canClassify.value = response.data;
+                });
+
+                fetchClassifications();
+            }
 
             fetchMonograph();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
@@ -329,6 +359,12 @@ export default defineComponent({
             });
         };
 
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+                documentClassifications.value = response.data;
+            });
+        };
+
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
                 response.data.forEach(languageTag => {
@@ -340,7 +376,8 @@ export default defineComponent({
                 ResearchAreaService.readResearchAreaHierarchy(monograph.value?.researchAreaId).then(response => {
                     researchAreaHierarchy.value = response.data;
                 });
-            }  
+            }
+            citationRef.value?.fetchCitations();
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -452,14 +489,22 @@ export default defineComponent({
             fetchDisplayData();
         };
 
-        const createIndicator = (documentIndicator: DocumentIndicator) => {
-            EntityIndicatorService.createDocumentIndicator(documentIndicator).then(() => {
-                fetchIndicators();
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
+                    fetchIndicators();
+                });
+            });
+        };
+
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
+                fetchClassifications();
             });
         };
 
         return {
-            monograph, icon,
+            monograph, icon, citationRef,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
@@ -474,8 +519,10 @@ export default defineComponent({
             handleResearcherUnbind, userRole,
             documentIndicators, StatisticsType,
             currentTab, updateResearchAreas,
-            ApplicableEntityType, EntityIndicatorForm,
-            createIndicator, fetchIndicators
+            ApplicableEntityType, currentRoute,
+            createIndicator, fetchIndicators,
+            createClassification, fetchClassifications,
+            documentClassifications, canClassify
         };
 }})
 

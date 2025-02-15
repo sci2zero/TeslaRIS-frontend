@@ -48,6 +48,15 @@
                         -
                     </p>
                 </td>
+                <td>
+                    <v-icon v-if="row.item.isDefault" icon="mdi-check" />
+                    <v-btn
+                        v-else        
+                        density="compact" class="bottom-spacer"
+                        @click="setDefault(row.item.id)">
+                        {{ $t("setDefaultLabel") }}
+                    </v-btn>
+                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -107,6 +116,7 @@ export default defineComponent({
         const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const dateLabel = computed(() => i18n.t("issueDateLabel"));
         const publisherLabel = computed(() => i18n.t("publisherLabel"));
+        const isDefaultLabel = computed(() => i18n.t("defaultLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name", order: "asc"}]});
 
@@ -114,7 +124,8 @@ export default defineComponent({
           { title: nameLabel, align: "start", sortable: true, key: "name.content"},
           { title: descriptionLabel, align: "start", sortable: true, key: "description.content"},
           { title: dateLabel, align: "start", sortable: true, key: "issueDate"},
-          { title: publisherLabel, align: "start", sortable: false}
+          { title: publisherLabel, align: "start", sortable: false},
+          { title: isDefaultLabel, align: "start", sortable: false}
         ];
 
         const refreshTable = (event: any) => {
@@ -172,9 +183,15 @@ export default defineComponent({
             });
         };
 
+        const setDefault = (rulebookId: number) => {
+            AssessmentRulebookService.setDefaultRulebook(rulebookId).then(() => {
+                refreshTable(tableOptions.value);
+            });
+        };
+
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
-            getTitleFromValueAutoLocale, returnCurrentLocaleContent,
+            getTitleFromValueAutoLocale, returnCurrentLocaleContent, setDefault,
             selectedAssessmentRulebooks, notifications, createNewAssessmentRulebook,
             updateAssessmentRulebook, localiseDate, AssessmentRulebookForm
         };

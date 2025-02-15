@@ -29,6 +29,7 @@ export interface EntityIndicatorResponse {
     toDate?: string;
     indicatorResponse: IndicatorResponse;
     source: EntityIndicatorSource
+    proofs: DocumentFileResponse[];
 }
 
 export interface EntityClassificationResponse {
@@ -55,9 +56,9 @@ export enum StatisticsType {
 
 export interface AssessmentMeasure {
     id?: number;
-    formalDescriptionOfRule: string;
     code: string;    
-    value: number;
+    pointRule: string;
+    scalingRule: string;
     title: MultilingualContent[];
     assessmentRulebookId: number;
 }
@@ -70,6 +71,7 @@ export interface AssessmentRulebookResponse {
     pdfFile?: DocumentFileResponse;
     publisherId: number;
     publisherName: MultilingualContent[];
+    isDefault: boolean;
 }
 
 export interface AssessmentRulebook {
@@ -85,6 +87,7 @@ export interface Commission {
     assessmentDateFrom: string;
     assessmentDateTo: string;
     formalDescriptionOfRule: string;
+    recognisedResearchAreas: string[];
 }
 
 export interface CommissionResponse {
@@ -94,6 +97,7 @@ export interface CommissionResponse {
     assessmentDateFrom: string;
     assessmentDateTo: string;
     formalDescriptionOfRule: string;
+    recognisedResearchAreas: string[];
 }
 
 export interface EntityIndicator {
@@ -142,6 +146,10 @@ export interface EventAssessmentClassification extends EntityAssessmentClassific
     eventId: number;
 }
 
+export interface DocumentAssessmentClassification extends EntityAssessmentClassification {
+    documentId: number;
+}
+
 export interface PublicationSeriesAssessmentClassification extends EntityAssessmentClassification {
     publicationSeriesId: number;
 }
@@ -152,4 +160,52 @@ export interface AssessmentClassification {
     code: string;
     title: MultilingualContent[];
     applicableTypes: ApplicableEntityType[];
+}
+
+export enum ResultCalculationMethod {
+    BEST_VALUE = "BEST_VALUE",
+    WORST_VALUE = "WORST_VALUE"
+}
+
+export interface CommissionRelation {
+    sourceCommissionId: number;
+    targetCommissionIds: number[];
+    priority: number;
+    resultCalculationMethod: ResultCalculationMethod;
+}
+
+export interface ReorderCommissionRelation {
+    oldRelationPriority: number;
+    newRelationPriority: number;
+}
+
+export interface SimpleCommissionResponse {
+    id: number;
+    description: MultilingualContent[];
+}
+
+export interface CommissionRelationResponse {
+    id: number;
+    sourceCommissionId: number;
+    targetCommissions: SimpleCommissionResponse[];
+    priority: number;
+    resultCalculationMethod: ResultCalculationMethod;
+}
+
+export interface PublicationAssessmentRequest {
+    commissionId: number | null;
+    authorIds: number[];
+    organisationUnitIds: number[];
+    publishedInIds: number[];
+}
+
+export interface AssessmentResearchArea {
+    name: MultilingualContent[],
+    code: string
+}
+
+export interface ResearcherAssessmentResponse {
+    commissionDescription: MultilingualContent[];
+    commissionId: number;
+    publicationsPerCategory: Record<string, {a: string, b:number}[]>;
 }

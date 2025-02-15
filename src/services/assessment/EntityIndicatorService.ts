@@ -2,6 +2,8 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
 import type { DocumentIndicator, EntityIndicatorResponse, EventIndicator } from "@/models/AssessmentModel";
+import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import { type DocumentFileResponse, License, ResourceType } from "@/models/DocumentFileModel";
 
 
 export class EntityIndicatorService extends BaseService {
@@ -44,8 +46,48 @@ export class EntityIndicatorService extends BaseService {
         return super.sendRequest(axios.put, `assessment/event-indicator/${body.eventId}/${eventIndicatorId}`, body);
     }
 
-    async deleteEntityIndicator(documentIndicatorId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.delete, `assessment/entity-indicator/${documentIndicatorId}`);
+    async deleteEntityIndicator(entityIndicatorId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `assessment/entity-indicator/${entityIndicatorId}`);
+    }
+
+    async addEntityIndicatorProof(proof: any, entityIndicatorId: number, idempotencyKey: string | undefined): Promise<AxiosResponse<DocumentFileResponse>> {
+        proof.license = getNameFromOrdinal(License, proof.license);
+        proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        return super.sendMultipartFormDataRequest(axios.patch, `assessment/entity-indicator/add-proof/${entityIndicatorId}`, proof, idempotencyKey ? idempotencyKey : EntityIndicatorService.idempotencyKey);
+    }
+
+    async updateEntityIndicatorProof(proof: any, entityIndicatorId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        if (typeof proof.license === "number") {
+            proof.license = getNameFromOrdinal(License, proof.license);
+        }
+        if (typeof proof.resourceType === "number") {
+            proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        }
+        return super.sendMultipartFormDataRequest(axios.patch, `assessment/entity-indicator/update-proof/${entityIndicatorId}`, proof, EntityIndicatorService.idempotencyKey);
+    }
+
+    async deleteEntityIndicatorProof(proofId: number, entityIndicatorId: number): Promise<void> {
+        return super.sendRequest(axios.delete, `assessment/entity-indicator/${entityIndicatorId}/${proofId}`);
+    }
+
+    getDisposableIdempotencyKey(): string {
+        return BaseService.generateIdempotencyKey();
+    }
+
+    async uploadFilesAndFetchIndicators(files: File[], responseDataId: number) {
+        const uploadPromises = files.map(fileItem => 
+            this.addEntityIndicatorProof(
+                {
+                    file: fileItem,
+                    description: [],
+                    resourceType: ResourceType.SUPPLEMENT,
+                    license: License.OPEN_ACCESS,
+                },
+                responseDataId,
+                this.getDisposableIdempotencyKey()
+            )
+        );
+        return Promise.all(uploadPromises);
     }
 }
 

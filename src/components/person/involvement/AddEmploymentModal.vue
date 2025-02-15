@@ -17,7 +17,7 @@
                         <v-form v-model="isFormValid" @submit.prevent>
                             <v-row>
                                 <v-col>
-                                    <person-autocomplete-search v-model="selectedPerson" required :return-only-non-serial-events="false"></person-autocomplete-search>
+                                    <person-autocomplete-search v-model="selectedPerson" required></person-autocomplete-search>
                                 </v-col>
                             </v-row>
                             <v-row>

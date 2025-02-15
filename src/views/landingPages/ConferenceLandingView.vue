@@ -126,12 +126,12 @@
                     <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
                 </div>
 
-                <div>
+                <div class="mt-10">
                     <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
                 </div>
 
                 <!-- Publication Table -->
-                <div v-if="!conference?.serialEvent">
+                <div v-if="!conference?.serialEvent" class="mt-10">
                     <h2>{{ $t("publicationsLabel") }}</h2>
                     <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
                 </div>
@@ -196,6 +196,7 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -229,18 +230,21 @@ export default defineComponent({
         const eventIndicators = ref<EntityIndicatorResponse[]>([]);
         const eventClassifications = ref<EntityClassificationResponse[]>([]);
 
-        onMounted(() => {
-            EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+        const loginStore = useLoginStore();
 
-            EventService.canClassify(parseInt(currentRoute.params.id as string)).then((response) => {
-                canClassify.value = response.data;
-            });
+        onMounted(() => {
+            if (loginStore.userLoggedIn) {
+                EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+                EventService.canClassify(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canClassify.value = response.data;
+                });
+                fetchClassifications();
+            }
 
             fetchConference();
             fetchIndicators();
-            fetchClassifications();
         });
 
         const fetchIndicators = () => {
@@ -340,9 +344,11 @@ export default defineComponent({
             });
         };
 
-        const createIndicator = (eventIndicator: EventIndicator) => {
-            EntityIndicatorService.createEventIndicator(eventIndicator).then(() => {
-                fetchIndicators();
+        const createIndicator = async (eventIndicator: {indicator: EventIndicator, files: File[]}) => {
+            EntityIndicatorService.createEventIndicator(eventIndicator.indicator).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(eventIndicator.files, response.data.id).then(() => {
+                    fetchIndicators();
+                });
             });
         };
 

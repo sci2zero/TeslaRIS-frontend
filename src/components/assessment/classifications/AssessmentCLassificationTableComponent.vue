@@ -101,7 +101,7 @@ export default defineComponent({
         const timeout = 5000;
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
-        const ruleLabel = computed(() => i18n.t("formalDescriptionOfRuleLabel"));
+        const ruleLabel = computed(() => i18n.t("classificationRuleLabel"));
         const codeLabel = computed(() => i18n.t("codeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 

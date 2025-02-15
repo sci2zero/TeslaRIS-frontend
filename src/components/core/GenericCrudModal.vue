@@ -12,7 +12,8 @@
                 </div>
                 <v-btn
                     v-if="!isSectionUpdate && !readOnly"
-                    density="compact" class="bottom-spacer" v-bind="scope.props"
+                    :color="primaryColor ? 'primary' : ''"
+                    :density="primaryColor ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
                     {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
                 </v-btn>
@@ -80,6 +81,10 @@ export default defineComponent({
             required: true
         },
         wide: {
+            type: Boolean,
+            default: false
+        },
+        primaryColor: {
             type: Boolean,
             default: false
         }

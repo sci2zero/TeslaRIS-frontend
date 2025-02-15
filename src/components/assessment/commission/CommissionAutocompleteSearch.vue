@@ -1,22 +1,24 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && selectedCommission.value !== -1 ? 10 : 11">
+        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
             <v-autocomplete
                 v-model="selectedCommission"
                 :readonly="readOnly"
-                :label="$t('commissionLabel') + (required ? '*' : '')"
+                :label="(multiple ? $t('commissionListLabel') : $t('commissionLabel')) + (required ? '*' : '')"
                 :items="commissions"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :auto-select-first="true"
                 :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
                 return-object
+                :class="comfortable ? 'comfortable' : ''"
                 @update:search="searchCommissions"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
         <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedCommission.value !== -1" icon @click="clearInput()">
+            <v-btn v-show="allowManualClearing && hasSelection" icon @click="clearInput">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </v-col>
@@ -25,8 +27,8 @@
 
 <script lang="ts">
 import { defineComponent, watch, type PropType } from 'vue';
-import { ref } from 'vue';
-import lodash from "lodash";
+import { ref, computed } from 'vue';
+import lodash from 'lodash';
 import CommissionService from '@/services/assessment/CommissionService';
 import type { CommissionResponse } from '@/models/AssessmentModel';
 import type { MultilingualContent } from '@/models/Common';
@@ -37,67 +39,97 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
-    name: "CommissionAutocompleteSearch",
+    name: 'CommissionAutocompleteSearch',
     props: {
         required: {
             type: Boolean,
-            default: false
+            default: false,
         },
         readOnly: {
             type: Boolean,
-            default: false
+            default: false,
         },
         allowManualClearing: {
             type: Boolean,
-            default: false
+            default: false,
+        },
+        multiple: {
+            type: Boolean,
+            default: false,
+        },
+        comfortable: {
+            type: Boolean,
+            default: false,
         },
         modelValue: {
-            type: Object as PropType<{ title: string, value: number } | undefined>,
+            type: [Object, Array] as PropType<
+                { title: string; value: number } | { title: string; value: number }[] | undefined
+            >,
             required: true,
         },
+        onlyLoadCommissions: {
+            type: Boolean,
+            default: false
+        },
+        onlyClassificationCommissions: {
+            type: Boolean,
+            default: false
+        }
     },
-    emits: ["update:modelValue"],
-    setup(props, {emit}) {
+    emits: ['update:modelValue'],
+    setup(props, { emit }) {
         const i18n = useI18n();
-        const searchPlaceholder = {title: "", value: -1};
+        const searchPlaceholder = props.multiple ? [] : { title: '', value: -1 };
 
         const commissions = ref<{ title: string; value: number; date?: string }[]>([]);
-        const selectedCommission = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedCommission = ref(
+            props.multiple ? (props.modelValue as Array<any> || []) : (props.modelValue || searchPlaceholder)
+        );
+
+        const { requiredSelectionRules } = useValidationUtils();
+
+        const hasSelection = computed(() =>
+            props.multiple ? (selectedCommission.value as any[]).length > 0 : (selectedCommission.value as { title: '', value: -1 }).value !== -1
+        );
 
         onMounted(() => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedCommission.value = props.modelValue;
             }
             sendContentToParent();
         });
-        
-        const { requiredSelectionRules } = useValidationUtils();
 
         const searchCommissions = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
+            if (input.includes('|')) {
                 return;
             }
             if (input.length >= 3) {
                 const params = `searchExpression=${input}&page=0&size=5`;
-                CommissionService.fetchAllCommissions(params).then((response) => {
-                    const listOfCommissions: { title: string, value: number, date?: string }[] = [];
+                CommissionService.fetchAllCommissions(params, props.onlyLoadCommissions, props.onlyClassificationCommissions).then((response) => {
+                    const listOfCommissions: { title: string; value: number; date?: string }[] = [];
                     response.data.content.forEach((commission: CommissionResponse) => {
-                        listOfCommissions.push({title: `${returnCurrentLocaleContent(commission.description)} | ${commission.formalDescriptionOfRule}`, value: commission.id});
-                    })
+                        listOfCommissions.push({
+                            title: `${returnCurrentLocaleContent(commission.description)} | ${commission.formalDescriptionOfRule}`,
+                            value: commission.id,
+                        });
+                    });
                     commissions.value = listOfCommissions;
                 });
             }
         }, 300);
 
         const sendContentToParent = () => {
-            emit("update:modelValue", selectedCommission.value);
+            emit('update:modelValue', selectedCommission.value);
         };
 
-        watch(() => props.modelValue, () => {
-            if(props.modelValue && props.modelValue.value !== -1) {
-                selectedCommission.value = props.modelValue;
+        watch(
+            () => props.modelValue,
+            () => {
+                if (props.modelValue) {
+                    selectedCommission.value = props.modelValue;
+                }
             }
-        });
+        );
 
         const clearInput = () => {
             selectedCommission.value = searchPlaceholder;
@@ -107,7 +139,7 @@ export default defineComponent({
         const selectNewlyAddedCommission = (commission: CommissionResponse) => {
             let title: string | undefined;
             commission.description.forEach((multilingualContent: MultilingualContent) => {
-                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                if (multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
                     title = multilingualContent.content;
                     return;
                 }
@@ -116,19 +148,39 @@ export default defineComponent({
             if (!title && commission.description.length > 0) {
                 title = commission.description[0].content;
             }
-            
-            const toSelect = {title: `${title} | ${commission.formalDescriptionOfRule}`, value: commission.id as number};
+
+            const toSelect = {
+                title: `${title} | ${commission.formalDescriptionOfRule}`,
+                value: commission.id as number,
+            };
             commissions.value.push(toSelect);
-            selectedCommission.value = toSelect;
+
+            if (props.multiple) {
+                (selectedCommission.value as any[]).push(toSelect);
+            } else {
+                selectedCommission.value = toSelect;
+            }
             sendContentToParent();
         };
 
         return {
-            commissions, selectedCommission, searchCommissions,
+            commissions,
+            selectedCommission,
+            searchCommissions,
             requiredSelectionRules,
-            sendContentToParent, clearInput,
-            selectNewlyAddedCommission
+            sendContentToParent,
+            clearInput,
+            selectNewlyAddedCommission,
+            hasSelection,
         };
-    }
+    },
 });
 </script>
+
+<style scoped>
+
+.comfortable {
+    height: 90px;
+}
+
+</style>

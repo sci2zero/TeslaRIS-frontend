@@ -34,4 +34,4 @@ export const getSexForGivenLocale = () => {
         case "en":
             return sexEn;
     }
-}
+};

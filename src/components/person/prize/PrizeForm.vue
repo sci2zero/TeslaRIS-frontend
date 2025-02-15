@@ -18,7 +18,7 @@
                             v-model="dateOfAcquisition"
                             :label="$t('dateOfAcquisitionLabel')"
                             color="primary"
-                            @click.stop
+                            persistent
                         ></date-picker>
                     </v-col>
                 </v-row>

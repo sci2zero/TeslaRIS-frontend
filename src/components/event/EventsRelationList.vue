@@ -1,31 +1,36 @@
 <template>
     <v-row>
-        <v-col v-if="relations && relations.length > 0" cols="4">
+        <div class="ml-3">
             <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
-        </v-col>
-        <v-col v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission" cols="3">
+        </div>
+        <div v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission">
             <events-relation-submission-modal :source-event="presetEvent" @create="refreshRelationsList"></events-relation-submission-modal>
-        </v-col>
+        </div>
     </v-row>
-    <v-list lines="two">
-        <v-list-item
-            v-for="item in relations"
-            :key="item.id"
-            :title="(returnCurrentLocaleContent(item.targetEventName) as string)"
-            :subtitle="presetEvent?.serialEvent ? '' : getEventsRelationTitleFromValueAutoLocale(item.eventsRelationType)"
-            @click="navigateToTargetEvent(item.targetId as number)"
-        >
-            <template v-if="!readonly" #append>
-                <v-row>
-                    <v-col cols="auto">
-                        <v-icon @click.stop="deleteRelation(item)">
-                            mdi-delete
-                        </v-icon>
-                    </v-col>
-                </v-row>
-            </template>
-        </v-list-item>
-    </v-list>
+    <v-row>
+        <v-list lines="two">
+            <v-list-item
+                v-for="item in relations"
+                :key="item.id"
+                :title="(returnCurrentLocaleContent(item.targetEventName) as string)"
+                :subtitle="presetEvent?.serialEvent ? '' : getEventsRelationTitleFromValueAutoLocale(item.eventsRelationType)"
+                @click="navigateToTargetEvent(item.targetId as number)"
+            >
+                <template v-if="!readonly" #append>
+                    <v-row>
+                        <v-col cols="auto">
+                            <v-icon @click.stop="deleteRelation(item)">
+                                mdi-delete
+                            </v-icon>
+                        </v-col>
+                    </v-row>
+                </template>
+            </v-list-item>
+        </v-list>
+        <h3 v-if="relations?.length === 0" class="ml-3">
+            {{ $t("noAvailableRelationsMessage") }}
+        </h3>
+    </v-row>
 
     <toast v-model="snackbar" :message="message" />
 </template>
@@ -136,6 +141,7 @@ setup(props) {
 
 .events-relation-submission {
     margin-top: 10px;
+    margin-left: 25px;
 }
 
 </style>

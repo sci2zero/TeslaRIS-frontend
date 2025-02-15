@@ -1,5 +1,5 @@
 <template>
-    <v-menu v-model="isMenuOpen" :close-on-content-click="false">
+    <v-menu v-model="isMenuOpen" :close-on-content-click="false" :persistent="persistent">
         <template #activator="{ props }">
             <v-text-field
                 :label="label"
@@ -11,13 +11,15 @@
                 hide-details
             ></v-text-field>
         </template>
-        <v-date-picker v-model="selectedDate" hide-actions title="" :color="color">
+        <v-date-picker
+            v-model="selectedDate" hide-actions title="" :color="color"
+            @click.stop>
             <template #header></template>
             <template #actions>
-                <v-btn @click="clearDate">
+                <v-btn @click.stop="clearDate">
                     {{ $t("deleteLabel") }}
                 </v-btn>
-                <v-btn @click="isMenuOpen = false">
+                <v-btn @click.stop="isMenuOpen = false">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </template>
@@ -46,6 +48,10 @@ export default defineComponent({
       default: false
     },
     inFuture: {
+      type: Boolean,
+      default: false
+    },
+    persistent: {
       type: Boolean,
       default: false
     },

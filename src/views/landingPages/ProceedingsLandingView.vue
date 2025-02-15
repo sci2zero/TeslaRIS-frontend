@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedings?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>
@@ -230,11 +231,13 @@ import StatisticsView from '@/components/assessment/statistics/StatisticsView.vu
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, CitationSelector },
     setup() {
         const currentTab = ref("");
 
@@ -269,16 +272,20 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
+        const loginStore= useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
+
         onMounted(() => {
             fetchDisplayData();
         });
 
         const fetchDisplayData = () => {
-            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            }).catch(() => {
-                canEdit.value = false;
-            });
+            if (loginStore.userLoggedIn) {
+                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             fetchProceedings(true);
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
@@ -317,6 +324,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+            citationRef.value?.fetchCitations();
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -448,7 +456,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, userRole,
-            documentIndicators, StatisticsType
+            documentIndicators, StatisticsType, currentRoute, citationRef
         };
 }})
 

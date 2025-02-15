@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="software?.internalNumber">
                                     {{ $t("internalNumberLabel") }}:
                                 </div>
@@ -103,6 +104,9 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+                {{ $t("assessmentsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -119,10 +123,27 @@
                 <person-document-contribution-tabs :document-id="software?.id" :contribution-list="software?.contributions ? software?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                </div>
+                <indicators-section 
+                    :indicators="documentIndicators" 
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]" 
+                    :entity-id="software?.id" 
+                    :entity-type="ApplicableEntityType.DOCUMENT" 
+                    :can-edit="canEdit"
+                    show-statistics
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="assessments">
+                <entity-classification-view
+                    :entity-classifications="documentClassifications"
+                    :entity-id="software?.id"
+                    :can-edit="canClassify && software?.documentDate !== ''"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
+                />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -133,7 +154,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
 import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -159,15 +180,19 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
-import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, Toast },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, CitationSelector, EntityClassificationView, IndicatorsSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -183,12 +208,18 @@ export default defineComponent({
 
         const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
+        const canClassify = ref(false);
 
         const i18n = useI18n();
 
         const icon = ref("mdi-desktop-classic");
 
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+        const documentClassifications = ref<EntityClassificationResponse[]>([]);
+
+        const loginStore = useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -201,17 +232,21 @@ export default defineComponent({
         };
 
         const fetchDisplayData = () => {
-            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            }).catch(() => {
-                canEdit.value = false;
-            });
+            if (loginStore.userLoggedIn) {
+                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+
+                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canClassify.value = response.data;
+                });
+
+                fetchClassifications();
+            }
 
             fetchSoftware();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
-            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
-                documentIndicators.value = response.data;
-            });
+            fetchIndicators();
         };
 
         watch(i18n.locale, () => {
@@ -236,12 +271,25 @@ export default defineComponent({
             });
         };
 
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIndicators.value = response.data;
+            });
+        };
+
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+                documentClassifications.value = response.data;
+            });
+        };
+
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
                 response.data.forEach(languageTag => {
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+            citationRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -296,16 +344,32 @@ export default defineComponent({
             });
         };
 
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
+                    fetchIndicators();
+                });
+            });
+        };
+
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
-            software, icon, publisher,
-            returnCurrentLocaleContent, currentTab,
+            software, icon, publisher, ApplicableEntityType,
+            returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
-            updateKeywords, updateDescription,
+            updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, SoftwareUpdateForm,
-            handleResearcherUnbind, userRole,
-            StatisticsType, documentIndicators
+            updateBasicInfo, SoftwareUpdateForm, userRole,
+            handleResearcherUnbind, documentIndicators,
+            citationRef, currentRoute, createClassification,
+            fetchClassifications, documentClassifications,
+            fetchIndicators, createIndicator
         };
 }})
 

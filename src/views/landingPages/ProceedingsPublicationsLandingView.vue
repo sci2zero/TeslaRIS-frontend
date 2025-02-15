@@ -42,6 +42,7 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
                                     {{ $t("typeOfPublicationLabel") }}:
                                 </div>
@@ -135,6 +136,9 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab v-if="documentClassifications?.length > 0 || canEdit" value="assessments">
+                {{ $t("assessmentsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="currentTab">
@@ -156,6 +160,20 @@
                     <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
                 </div>
             </v-tabs-window-item>
+            <v-tabs-window-item value="assessments">
+                <v-btn v-if="proceedingsPublication?.documentDate" density="compact" class="ml-5" @click="assessProceedingsPublication">
+                    {{ $t("assessPublicationLabel") }}
+                </v-btn>
+                <entity-classification-view
+                    :entity-classifications="documentClassifications"
+                    :entity-id="proceedingsPublication?.id"
+                    :can-edit="canClassify && proceedingsPublication?.documentDate !== ''"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    @create="createClassification"
+                    @update="fetchClassifications"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
@@ -165,7 +183,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
 import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -197,14 +215,19 @@ import PublicationUnbindButton from '@/components/publication/PublicationUnbindB
 import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { type DocumentAssessmentClassification, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
+import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
+import CitationSelector from '@/components/publication/CitationSelector.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector },
     setup() {
         const currentTab = ref("contributions");
 
@@ -216,6 +239,7 @@ export default defineComponent({
 
         const userRole = computed(() => UserService.provideUserRole());
         const canEdit = ref(false);
+        const canClassify = ref(false);
 
         const proceedingsPublication = ref<ProceedingsPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
@@ -232,22 +256,43 @@ export default defineComponent({
         const icon = ref("mdi-newspaper-variant");
 
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+        const documentClassifications = ref<EntityClassificationResponse[]>([]);
+
+        const loginStore = useLoginStore();
+
+        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
         });
 
         const fetchDisplayData = () => {
-            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            }).catch(() => {
-                canEdit.value = false;
-            });
+            if (loginStore.userLoggedIn) {
+                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+
+                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canClassify.value = response.data;
+                });
+
+                fetchClassifications();
+            }
 
             fetchProceedingsPublication();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            fetchIndicators();
+        };
+
+        const fetchIndicators = () => {
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
+            });
+        };
+
+        const fetchClassifications = () => {
+            EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+                documentClassifications.value = response.data;
             });
         };
 
@@ -281,6 +326,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
+            citationRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -329,12 +375,14 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();
+                    assessProceedingsPublication();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();
+                    assessProceedingsPublication();
                 }
             });
         };
@@ -345,6 +393,20 @@ export default defineComponent({
             fetchDisplayData();
         };
 
+        const assessProceedingsPublication = () => {
+            AssessmentClassificationService.assessProceedingsPublication(parseInt(currentRoute.params.id as string)).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+                fetchClassifications();
+            });
+        };
+
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
+                fetchClassifications();
+            });
+        };
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, userRole,
@@ -353,7 +415,10 @@ export default defineComponent({
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
-            StatisticsType, documentIndicators, currentTab
+            StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
+            documentClassifications, assessProceedingsPublication,
+            fetchClassifications, canClassify, createClassification,
+            currentRoute, citationRef
         };
 }})
 

@@ -43,14 +43,21 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const requiredStringSelectionRules = [
+        (value: { title: string, value: string }) => {
+            if (!value || value.value === null || value.value === "") return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
     const requiredMultiSelectionRules = [
-        (values: { title: string, value: number }[]) => {
+        (values: { title: string, value: number | string }[]) => {
             if (!values || values.length === 0) {
                 return requiredFieldMessage.value;
             }
             return true;
         }
-    ];    
+    ];
 
     const doiPattern = /^10\.\d{4,9}\/[-,._;()/:A-Z0-9]+$/i;
     const doiValidationRules = [
@@ -223,6 +230,7 @@ export const useValidationUtils = () => {
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
-        dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules
+        dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
+        requiredStringSelectionRules
     };
 };

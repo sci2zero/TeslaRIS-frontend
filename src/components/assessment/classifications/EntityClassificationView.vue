@@ -3,26 +3,26 @@
         class="mt-5 ml-5"
         :form-component="EntityClassificationForm"
         :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
-        entity-name="EntityClassification"
+        :entity-name="containingEntityType === ApplicableEntityType.DOCUMENT ? 'EntityAssessment' : 'EntityClassification'"
         :read-only="!canEdit"
         @create="createClassification"
     />
     <v-row>
         <v-col>
             <h2 v-if="entityClassifications?.length > 0" class="mt-5">
-                {{ $t("classificationsLabel") }}
+                {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("classificationsLabel") : $t("assessmentsLabel") }}
             </h2>
         
             <v-expansion-panels v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
                 <v-expansion-panel
                     v-for="(classification, index) in entityClassifications"
-                    :key="classification.id" :title="titles[index]">
+                    :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
                     <v-expansion-panel-text>
                         <v-row class="mt-4 mb-1">
                             <p>{{ contents[index] }}</p>
                         </v-row>
                         <v-row v-if="classification.manual">
-                            <div v-if="classification.commissionId === loggedInUser?.commissionId">
+                            <div v-if="classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN'">
                                 <generic-crud-modal
                                     :form-component="EntityClassificationForm"
                                     :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
@@ -32,7 +32,7 @@
                                     @update="updateClassification($event, classification.id)"
                                 />
                             </div>
-                            <div v-if="canEdit && classification.commissionId === loggedInUser?.commissionId" class="ml-5">
+                            <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN')" class="ml-5">
                                 <v-btn density="compact" @click.prevent="deleteCLassification(classification.id)">
                                     {{ $t("deleteLabel") }}
                                 </v-btn>
@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType, watch } from 'vue';
+import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
 import { ref } from 'vue';
 import type { EntityClassificationResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -60,7 +60,7 @@ import type { UserResponse } from '@/models/UserModel';
 
 
 export default defineComponent({
-    name: "ViewIndicatorsComponent",
+    name: "ViewClassificationsComponent",
     components: { GenericCrudModal },
     props: {
         entityClassifications: {
@@ -94,6 +94,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const loggedInUser = ref<UserResponse>();
+        const userRole = computed(() => UserService.provideUserRole());
         
         onMounted(() => {
             setClassifications();
@@ -132,13 +133,17 @@ export default defineComponent({
         };
 
         const buildDisplayTitle = (entityClassification: EntityClassificationResponse) => {
-            let displayTitle = `${i18n.t("classificationsLabel")} `;
+            let displayTitle = `${(props.containingEntityType !== ApplicableEntityType.DOCUMENT) ? i18n.t("classificationLabel") : i18n.t("assessmentLabel")} `;
         
             if (entityClassification.categoryIdentifier) {
                 displayTitle += `${i18n.t("inLabel")} ${entityClassification.categoryIdentifier} `;
             }
 
-            displayTitle += `- ${entityClassification.year} (${returnCurrentLocaleContent(entityClassification.commissionDescription)})`;
+            if (entityClassification.year) {
+                displayTitle += `- ${entityClassification.year} (${returnCurrentLocaleContent(entityClassification.commissionDescription)})`;
+            } else {
+                displayTitle += `- ${returnCurrentLocaleContent(entityClassification.commissionDescription)}`;
+            }
 
             return displayTitle;
         };
@@ -148,6 +153,8 @@ export default defineComponent({
                 await EntityClassificationService.updateEventClassification(entityClassification, entityClassificationId);
             } else if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
                 await EntityClassificationService.updatePublicationSeriesClassification(entityClassification, entityClassificationId);
+            } else if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
+                await EntityClassificationService.updateDocumentClassification(entityClassification, entityClassificationId);
             }
 
             emit("update");
@@ -170,7 +177,7 @@ export default defineComponent({
         return {
             titles, contents,
             ApplicableEntityType,
-            openedPanel,
+            openedPanel, userRole,
             EntityClassificationForm,
             updateClassification,
             deleteCLassification,

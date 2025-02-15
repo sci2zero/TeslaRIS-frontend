@@ -1,16 +1,21 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        v-if="userRole === 'ADMIN' && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="(userRole === 'ADMIN' || userRole === 'COMMISSION') && isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        @click="removeSelection">
+        {{ $t("removeResearcherLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="userRole === 'ADMIN' && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !isAlumniTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="userRole === 'ADMIN' && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -139,6 +144,10 @@ export default defineComponent({
             default: -1
         },
         isAlumniTable: {
+            type: Boolean,
+            default: false
+        },
+        isCommissionResearchersTable: {
             type: Boolean,
             default: false
         }
@@ -282,12 +291,18 @@ export default defineComponent({
             refreshTable(tableOptions.value);
         };
 
-        return {selectedPersons, headers, notifications,
+        const removeSelection = () => {
+            emit("delete", selectedPersons.value.map(person => person.databaseId));
+        };
+
+        return {
+            selectedPersons, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             localiseDate, startPublicationComparison,
-            startMetadataComparison, onDropCallback,
-            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable };
+            startMetadataComparison, onDropCallback, removeSelection,
+            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable
+        };
     }
 });
 </script>

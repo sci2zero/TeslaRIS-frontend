@@ -261,6 +261,7 @@ export default defineComponent({
                 await deleteAction;
 
                 await MergeService.switchAllIndicatorsToOtherJournal(id as number, transferTargetId as number);
+                await MergeService.switchAllClassificationsToOtherJournal(id as number, transferTargetId as number);
 
                 router.push({ name: "deduplication", query: { tab: "journals" } });
             } catch (error) {

@@ -49,6 +49,10 @@ export class AssessmentRulebookService extends BaseService {
     async deleteAssessmentRulebookFileAttachment(assessmentRulebookId: number, documentFileId: number): Promise<void> {
         return super.sendRequest(axios.delete, `assessment/assessment-rulebook/${assessmentRulebookId}/${documentFileId}`);
     }
+
+    async setDefaultRulebook(assessmentRulebookId: number): Promise<void> {
+        return super.sendRequest(axios.patch, `assessment/assessment-rulebook/set-default/${assessmentRulebookId}`);
+    }
 }
 
 export default new AssessmentRulebookService();

@@ -1,9 +1,9 @@
 <template>
-    <v-row justify="start">
+    <div justify="start">
         <v-dialog v-model="dialog" persistent max-width="850px">
             <template #activator="scope">
                 <v-btn
-                    color="primary" dark v-bind="scope.props" class="bottom-spacer"
+                    color="primary" dark v-bind="scope.props" :class="readOnly ? 'bottom-spacer' : ''"
                     v-on="scope.isActive">
                     {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>
@@ -87,7 +87,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
+    </div>
 </template>
 
 <script lang="ts">

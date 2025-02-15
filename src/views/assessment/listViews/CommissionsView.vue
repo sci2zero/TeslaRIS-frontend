@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1>{{ $t("commissionPageLabel") }}</h1>
+        <h1>{{ $t("commissionListLabel") }}</h1>
         <br />
         <br />
         <br />
@@ -35,7 +35,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("commissionPageLabel");
+            document.title = i18n.t("commissionListLabel");
         });
 
         watch(i18n.locale, () => {
@@ -43,7 +43,7 @@ export default defineComponent({
         });
 
         const search = () => {
-            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response: AxiosResponse<Page<CommissionResponse>>) => {
+            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false, false).then((response: AxiosResponse<Page<CommissionResponse>>) => {
                 commissions.value = response.data.content;
                 totalCommissions.value = response.data.totalElements;
             });

@@ -10,12 +10,16 @@ export class CommissionService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async fetchAllCommissions(parameters: string): Promise<AxiosResponse<Page<CommissionResponse>>> {
-        return super.sendRequest(axios.get, `assessment/commission?${parameters}&lang=${i18n.vueI18n.global.locale}`);
+    async fetchAllCommissions(parameters: string, onlyLoadCommissions: boolean, onlyClassificationCommissions: boolean): Promise<AxiosResponse<Page<CommissionResponse>>> {
+        return super.sendRequest(axios.get, `assessment/commission?${parameters}&lang=${i18n.vueI18n.global.locale}&onlyLoad=${onlyLoadCommissions}&onlyClassification=${onlyClassificationCommissions}`);
     }
 
     async readCommission(commissionId: number): Promise<AxiosResponse<CommissionResponse>> {
         return super.sendRequest(axios.get, `assessment/commission/${commissionId}`);
+    }
+
+    async fetchInstitutionIdForCommission(commissionId: number): Promise<AxiosResponse<number>> {
+        return super.sendRequest(axios.get, `assessment/commission/institution/${commissionId}`);
     }
 
     async readApplicableRuleEngines(): Promise<AxiosResponse<string[]>> {

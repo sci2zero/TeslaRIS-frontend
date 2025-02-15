@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
                     <v-col><h3>{{ $t("noRecentPublicationsMonographLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -128,6 +128,7 @@ import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
 import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -193,8 +194,10 @@ export default defineComponent({
             }
         };
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         watch(selectedMonograph, (newValue) => {
-            if (newValue) {
+            if (newValue && userRole.value === "RESEARCHER") {
                 listPublications(newValue);
             }
         });
@@ -263,7 +266,7 @@ export default defineComponent({
             description, descriptionRef, keywords, keywordsRef,
             uris, urisRef, myPublications, doiValidationRules,
             selectedMonograph, monographAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType,
+            publicationTypes, selectedpublicationType, userRole,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
             availableMonograph, errorMessage

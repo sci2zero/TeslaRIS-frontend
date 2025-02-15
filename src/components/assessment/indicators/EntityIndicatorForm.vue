@@ -8,7 +8,7 @@
                     :label="$t('indicatorLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object
-                    :readonly="presetDocumentIndicators !== undefined">
+                    :readonly="presetDocumentIndicator !== undefined">
                 </v-select>
             </v-col>
         </v-row>
@@ -65,6 +65,11 @@
                 <v-text-field v-model="textualValue" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
             </v-col>
         </v-row>
+        <v-row v-if="!presetDocumentIndicator">
+            <v-col>
+                <v-file-upload v-model="files" :title="$t('dragDropFilesLabel')" density="compact" multiple></v-file-upload>
+            </v-col>
+        </v-row>
 
         <v-row>
             <p class="required-fields-message">
@@ -90,7 +95,7 @@ export default defineComponent({
     name: "EntityIndicatorForm",
     components: { DatePicker },
     props: {
-        presetDocumentIndicators: {
+        presetDocumentIndicator: {
             type: Object as PropType<EntityIndicatorResponse | undefined>,
             default: undefined
         },
@@ -115,6 +120,8 @@ export default defineComponent({
 
         const inputType = ref<IndicatorContentType>(IndicatorContentType.TEXT);
 
+        const files = ref<File[]>([]);
+
         const applicableIndicatorsRaw = ref<IndicatorResponse[]>([]);
         const applicableIndicators = ref<{title: string, value: number}[]>([]);
 
@@ -132,8 +139,8 @@ export default defineComponent({
                     applicableIndicators.value.push({title: returnCurrentLocaleContent(indicator.title) as string, value: indicator.id});
                 });
 
-                if(props.presetDocumentIndicators) {
-                    selectedIndicator.value = {title: returnCurrentLocaleContent(props.presetDocumentIndicators.indicatorResponse.title) as string, value: props.presetDocumentIndicators.indicatorResponse.id};
+                if(props.presetDocumentIndicator) {
+                    selectedIndicator.value = {title: returnCurrentLocaleContent(props.presetDocumentIndicator.indicatorResponse.title) as string, value: props.presetDocumentIndicator.indicatorResponse.id};
                 }
             });
         };
@@ -153,10 +160,10 @@ export default defineComponent({
         });
 
         const deduceStartingType = () => {
-            if (props.presetDocumentIndicators) {
-                if (props.presetDocumentIndicators.textualValue) {
+            if (props.presetDocumentIndicator) {
+                if (props.presetDocumentIndicator.textualValue) {
                     inputType.value = IndicatorContentType.TEXT;
-                } else if (props.presetDocumentIndicators.numericValue !== null) {
+                } else if (props.presetDocumentIndicator.numericValue !== null) {
                     inputType.value = IndicatorContentType.NUMBER;
                 } else {
                     inputType.value = IndicatorContentType.BOOL;
@@ -164,11 +171,11 @@ export default defineComponent({
             }
         };
 
-        const numericValue = ref<number>(props.presetDocumentIndicators?.numericValue as number);
-        const booleanValue = ref<boolean>(props.presetDocumentIndicators?.booleanValue as boolean);
-        const textualValue = ref<string>(props.presetDocumentIndicators?.textualValue as string);
-        const fromDate = ref<string | undefined>(props.presetDocumentIndicators?.fromDate ? props.presetDocumentIndicators.fromDate : undefined);
-        const toDate = ref<string | undefined>(props.presetDocumentIndicators?.toDate ? props.presetDocumentIndicators.toDate : undefined);
+        const numericValue = ref<number>(props.presetDocumentIndicator?.numericValue as number);
+        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean);
+        const textualValue = ref<string>(props.presetDocumentIndicator?.textualValue as string);
+        const fromDate = ref<string | undefined>(props.presetDocumentIndicator?.fromDate ? props.presetDocumentIndicator.fromDate : undefined);
+        const toDate = ref<string | undefined>(props.presetDocumentIndicator?.toDate ? props.presetDocumentIndicator.toDate : undefined);
 
         const { requiredFieldRules, requiredSelectionRules, requiredNumericFieldRules } = useValidationUtils();
 
@@ -188,7 +195,7 @@ export default defineComponent({
                 (entityIndicator as EventIndicator).eventId = props.entityId as number
             }
 
-            emit("create", entityIndicator);
+            emit("create", { indicator: entityIndicator, files: files.value});
         };
 
         return {
@@ -199,7 +206,7 @@ export default defineComponent({
             requiredSelectionRules, submit,
             applicableIndicators, selectedIndicator,
             IndicatorContentType, typeSelectionEnebled,
-            requiredNumericFieldRules
+            requiredNumericFieldRules, files
         };
     }
 });
