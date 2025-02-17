@@ -153,8 +153,6 @@ export interface AssessmentClassification {
     title: MultilingualContent[];
     applicableTypes: ApplicableEntityType[];
 }
-<<<<<<< Updated upstream
-=======
 
 export enum ResultCalculationMethod {
     BEST_VALUE = "BEST_VALUE",
@@ -203,4 +201,3 @@ export interface ResearcherAssessmentResponse {
     commissionId: number;
     publicationsPerCategory: Record<string, {a: string, b :number, c :number}[]>;
 }
->>>>>>> Stashed changes
