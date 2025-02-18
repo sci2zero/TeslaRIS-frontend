@@ -156,6 +156,7 @@ export default defineComponent(
 
             const i18n = useI18n();
             const personId = ref(-1);
+            const commissionId = ref(-1);
 
             const homeLabel = computed(() => i18n.t("homeLabel"));
             
@@ -173,6 +174,7 @@ export default defineComponent(
             const publisherListLabel = computed(() => i18n.t("publisherListLabel"));
             const importerLabel = computed(() => i18n.t("importerLabel"));
             const researcherProfileLabel = computed(() => i18n.t("researcherProfileLabel"));
+            const commissionProfileLabel = computed(() => i18n.t("commissionProfileLabel"));
             const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
             const countryListLabel = computed(() => i18n.t("countryListLabel"));
             const researchAreaListLabel = computed(() => i18n.t("researchAreaListLabel"));
@@ -180,7 +182,7 @@ export default defineComponent(
             const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
             const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
-            const commissionsLabel = computed(() => i18n.t("commissionPageLabel"));
+            const commissionsLabel = computed(() => i18n.t("commissionListLabel"));
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
 
@@ -199,6 +201,9 @@ export default defineComponent(
                 UserService.getLoggedInUser().then((response) => {
                     userName.value = response.data.firstname + " " + response.data.lastName;
                     userRole.value = UserService.provideUserRole();
+                    if (userRole.value === "COMMISSION") {
+                        commissionId.value = response.data.commissionId;
+                    }
                 });
                 PersonService.getPersonId().then(response => {
                     if(response.data) {
@@ -261,6 +266,7 @@ export default defineComponent(
                 { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER' && personId.value > 0) },
+                { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION' && commissionId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },

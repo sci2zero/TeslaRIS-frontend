@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { EntityClassificationResponse, EventAssessmentClassification, PublicationSeriesAssessmentClassification } from "@/models/AssessmentModel";
+import type { DocumentAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification, PublicationSeriesAssessmentClassification, ResearcherAssessmentResponse } from "@/models/AssessmentModel";
 
 
 export class EntityClassificationService extends BaseService {
@@ -24,13 +24,17 @@ export class EntityClassificationService extends BaseService {
         return super.sendRequest(axios.get, `assessment/person-assessment-classification/${personId}`);
     }
 
+    async fetchPersonAssessment(personId: number, startDate: string, endDate: string): Promise<AxiosResponse<ResearcherAssessmentResponse[]>> {
+        return super.sendRequest(axios.get, `assessment/person-assessment-classification/assess/${personId}?startDate=${startDate}&endDate=${endDate}`);
+    }
+
     async fetchPublicationSeriesClassifications(publicationSeriesId: number): Promise<AxiosResponse<EntityClassificationResponse[]>> {
         return super.sendRequest(axios.get, `assessment/publication-series-assessment-classification/${publicationSeriesId}`);
     }
 
-    // async createDocumentClassification(body: DocumentClassification): Promise<AxiosResponse<EntityClassificationResponse>> {
-    //     return super.sendRequest(axios.post, `assessment/document-assessment-classification/${body.documentId}`, body, EntityClassificationService.idempotencyKey);
-    // }
+    async createDocumentClassification(body: DocumentAssessmentClassification): Promise<AxiosResponse<EntityClassificationResponse>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/${body.documentId}`, body, EntityClassificationService.idempotencyKey);
+    }
 
     async createEventClassification(body: EventAssessmentClassification): Promise<AxiosResponse<EntityClassificationResponse>> {
         return super.sendRequest(axios.post, `assessment/event-assessment-classification`, body, EntityClassificationService.idempotencyKey);
@@ -40,9 +44,9 @@ export class EntityClassificationService extends BaseService {
         return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification`, body, EntityClassificationService.idempotencyKey);
     }
 
-    // async updateDocumentClassification(body: DocumentClassification, documentClassificationId: number): Promise<AxiosResponse<void>> {
-    //     return super.sendRequest(axios.put, `assessment/document-assessment-classification/${body.documentId}/${documentClassificationId}`, body);
-    // }
+    async updateDocumentClassification(body: DocumentAssessmentClassification, documentClassificationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.put, `assessment/document-assessment-classification/${body.documentId}/${documentClassificationId}`, body);
+    }
 
     async updateEventClassification(body: EventAssessmentClassification, eventClassificationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `assessment/event-assessment-classification/${eventClassificationId}`, body);
@@ -54,6 +58,10 @@ export class EntityClassificationService extends BaseService {
 
     async deleteEntityClassification(entityClassificationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.delete, `assessment/entity-assessment-classification/${entityClassificationId}`);
+    }
+
+    async canClassifyDocument(documentId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `assessment/document-assessment-classification/${documentId}/can-classify`);
     }
 }
 

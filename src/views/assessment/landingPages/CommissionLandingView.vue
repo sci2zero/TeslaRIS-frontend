@@ -52,10 +52,18 @@
                                     {{ localiseDate(commission.assessmentDateTo) }}
                                 </div>
                                 <div v-if="commission?.formalDescriptionOfRule">
-                                    {{ $t("formalDescriptionOfRuleLabel") }}:
+                                    {{ $t("classificationRuleLabel") }}:
                                 </div>
                                 <div v-if="commission?.formalDescriptionOfRule" class="response">
                                     {{ commission.formalDescriptionOfRule }}
+                                </div>
+                            </v-col>
+                            <v-col>
+                                <div v-if="commission?.recognisedResearchAreas && commission.recognisedResearchAreas.length > 0">
+                                    {{ $t("researchAreasLabel") }}:
+                                </div>
+                                <div v-for="researchArea in commission?.recognisedResearchAreas" :key="researchArea" class="response">
+                                    {{ getResearchAreaTitle(researchArea) }}
                                 </div>
                             </v-col>
                         </v-row>
@@ -63,6 +71,28 @@
                 </v-card>
             </v-col>
         </v-row>
+
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="relations">
+                {{ $t("commissionRelationsLabel") }}
+            </v-tab>
+            <v-tab v-if="institutionId && commission?.recognisedResearchAreas && commission.recognisedResearchAreas.length > 0" value="researchersForAssessment">
+                {{ $t("researchAreasLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="relations">
+                <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations"></commission-relations-view>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchersForAssessment">
+                <commission-researchers-view :institution-id="institutionId" :commission-id="(commission?.id as number)" :research-areas="(commission?.recognisedResearchAreas as string[])"></commission-researchers-view>
+            </v-tabs-window-item>
+        </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -77,24 +107,32 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
+import { type CommissionRelationResponse, type Commission, type CommissionResponse, type AssessmentResearchArea } from '@/models/AssessmentModel';
 import CommissionService from '@/services/assessment/CommissionService';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from '@/components/assessment/commission/CommissionForm.vue';
 import Toast from '@/components/core/Toast.vue';
+import CommissionRelationService from '@/services/assessment/CommissionRelationService';
+import CommissionRelationsView from '@/components/assessment/commission/CommissionRelationsView.vue';
+import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import CommissionResearchersView from '@/components/assessment/commission/CommissionResearchersView.vue';
 
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { GenericCrudModal, Toast },
+    components: { GenericCrudModal, Toast, CommissionRelationsView, CommissionResearchersView },
     setup() {
+        const currentTab = ref("relations");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
 
         const commission = ref<CommissionResponse>();
+        const commissionRelations = ref<CommissionRelationResponse[]>([]);
+
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const i18n = useI18n();
@@ -102,8 +140,15 @@ export default defineComponent({
         const icon = ref("mdi-account-group-outline");
 
         const router = useRouter();
+        const researchAreas = ref<AssessmentResearchArea[]>([]);
+
+        const institutionId = ref<number>(0);
 
         onMounted(() => {
+            AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
+                researchAreas.value = response.data;
+            });
+
             fetchCommission();
         });
 
@@ -118,6 +163,10 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(commission.value.description) as string;
     
                 populateData();
+
+                CommissionService.fetchInstitutionIdForCommission(commission.value.id).then(response => {
+                    institutionId.value = response.data;
+                });
             });
         };
 
@@ -126,6 +175,15 @@ export default defineComponent({
                 response.data.forEach(languageTag => {
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
+            });
+
+            fetchRelations();
+        };
+
+        const fetchRelations = () => {
+            CommissionRelationService.fetchAllCommissionRelations(commission.value?.id as number).then((response) => {
+                commissionRelations.value.splice(0);
+                commissionRelations.value = response.data;
             });
         };
 
@@ -137,9 +195,9 @@ export default defineComponent({
         const updateBasicInfo = (basicInfo: Commission) => {
             commission.value!.description = basicInfo.description;
             commission.value!.assessmentDateFrom = basicInfo.assessmentDateFrom;
-            console.log(commission.value?.assessmentDateFrom)
             commission.value!.assessmentDateTo = basicInfo.assessmentDateTo;
             commission.value!.formalDescriptionOfRule = basicInfo.formalDescriptionOfRule;
+            commission.value!.recognisedResearchAreas = basicInfo.recognisedResearchAreas;
 
             performUpdate(true);
         };
@@ -149,11 +207,8 @@ export default defineComponent({
                 description: commission.value?.description as MultilingualContent[],
                 assessmentDateFrom: commission.value?.assessmentDateFrom as string,
                 assessmentDateTo: commission.value?.assessmentDateTo as string,
-                superCommissionId: commission.value?.superCommissionId as number,
                 formalDescriptionOfRule: commission.value?.formalDescriptionOfRule as string,
-                documentIdsForAssessment: [],
-                personIdsForAssessment: [],
-                organisationUnitIdsForAssessment: []
+                recognisedResearchAreas: commission.value?.recognisedResearchAreas as string[]
             };
 
             CommissionService.updateCommission(commission.value?.id as number, updateRequest).then(() => {
@@ -175,11 +230,16 @@ export default defineComponent({
             router.push({ name: "commissionLandingPage", params: {id: commissionId} });
         };
 
+        const getResearchAreaTitle = (code: string): string => {
+            return returnCurrentLocaleContent(researchAreas.value.find(researchArea => researchArea.code === code)?.name) as string;
+        };
+
         return {
             commission, icon, returnCurrentLocaleContent,
             updateBasicInfo, localiseDate, snackbarMessage,
             updateDescription, snackbar, navigateToTargetCommission,
-            CommissionForm
+            CommissionForm, commissionRelations, fetchRelations,
+            currentTab, getResearchAreaTitle, institutionId
         };
 }})
 

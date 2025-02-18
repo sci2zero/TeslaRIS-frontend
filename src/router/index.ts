@@ -165,8 +165,8 @@ const router = createRouter({
                             name: "conferenceLandingPage",
                             component: ConferenceLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.commission],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
@@ -946,7 +946,7 @@ const router = createRouter({
                                     component: CommissionLandingView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.commission],
                                     },
                                 },
                             ]

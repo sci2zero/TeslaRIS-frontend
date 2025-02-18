@@ -29,6 +29,7 @@ export interface EntityIndicatorResponse {
     toDate?: string;
     indicatorResponse: IndicatorResponse;
     source: EntityIndicatorSource
+    proofs: DocumentFileResponse[];
 }
 
 export interface EntityClassificationResponse {
@@ -55,9 +56,9 @@ export enum StatisticsType {
 
 export interface AssessmentMeasure {
     id?: number;
-    formalDescriptionOfRule: string;
     code: string;    
-    value: number;
+    pointRule: string;
+    scalingRule: string;
     title: MultilingualContent[];
     assessmentRulebookId: number;
 }
@@ -70,6 +71,7 @@ export interface AssessmentRulebookResponse {
     pdfFile?: DocumentFileResponse;
     publisherId: number;
     publisherName: MultilingualContent[];
+    isDefault: boolean;
 }
 
 export interface AssessmentRulebook {
@@ -85,6 +87,7 @@ export interface Commission {
     assessmentDateFrom: string;
     assessmentDateTo: string;
     formalDescriptionOfRule: string;
+    recognisedResearchAreas: string[];
 }
 
 export interface CommissionResponse {
@@ -94,6 +97,7 @@ export interface CommissionResponse {
     assessmentDateFrom: string;
     assessmentDateTo: string;
     formalDescriptionOfRule: string;
+    recognisedResearchAreas: string[];
 }
 
 export interface EntityIndicator {
@@ -140,6 +144,10 @@ export interface EntityAssessmentClassification {
 
 export interface EventAssessmentClassification extends EntityAssessmentClassification {
     eventId: number;
+}
+
+export interface DocumentAssessmentClassification extends EntityAssessmentClassification {
+    documentId: number;
 }
 
 export interface PublicationSeriesAssessmentClassification extends EntityAssessmentClassification {

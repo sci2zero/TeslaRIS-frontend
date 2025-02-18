@@ -88,6 +88,7 @@ import CountryService from '@/services/CountryService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -116,10 +117,14 @@ export default defineComponent({
         const canEdit = ref(false);
         const country = ref<Country>();
 
+        const loginStore = useLoginStore();
+
         onMounted(() => {
-            PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
                 publisher.value = response.data;

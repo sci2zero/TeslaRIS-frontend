@@ -217,8 +217,8 @@ import StatisticsService from '@/services/StatisticsService';
 import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
-import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
@@ -283,9 +283,11 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         onMounted(() => {
-            OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             fetchOU(true);
             StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));

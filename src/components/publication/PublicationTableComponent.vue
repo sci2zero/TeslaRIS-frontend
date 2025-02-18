@@ -92,10 +92,10 @@
                             {{ displayTextOrPlaceholder(item.doi) }}
                         </td>
                         <td v-if="inClaimer">
-                            <v-btn size="small" color="primary" @click="claimPublication(item.databaseId)">
+                            <v-btn size="small" color="primary" @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
-                            <v-btn class="ml-1" size="small" color="primary" @click="declinePublicationClaim(item.databaseId)">
+                            <v-btn class="ml-1" size="small" color="primary" @click="declinePublicationClaim(item.databaseId as number)">
                                 {{ $t("declineClaimLabel") }}
                             </v-btn>
                         </td>
