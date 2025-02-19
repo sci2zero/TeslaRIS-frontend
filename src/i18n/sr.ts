@@ -515,5 +515,6 @@ export default {
     defaultLabel: "Podrazumevan",
     setDefaultLabel: "Postavi podrazumevan",
     citePublicationLabel: "Citiraj dokument",
-    manualLabel: "Ručno unešeno"
+    manualLabel: "Ručno unešeno",
+    reportTypeLabel: "Tip izveštaja"
 }

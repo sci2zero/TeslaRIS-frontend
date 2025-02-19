@@ -516,5 +516,6 @@ export default {
     defaultLabel: "Default",
     setDefaultLabel: "Set default",
     citePublicationLabel: "Cite document",
-    manualLabel: "Entered manually"
+    manualLabel: "Entered manually",
+    reportTypeLabel: "Report type"
 }
