@@ -6,7 +6,7 @@
                     <generic-crud-modal
                         :form-component="DescriptionOrBiographyUpdateForm"
                         :form-props="{ presetDescriptionOrBiography: description ? description : [] }"
-                        :entity-name="isBiography ? 'Biography' : 'Abstract'"
+                        :entity-name="isGeneralDescription ? '' : (isBiography ? 'Biography' : 'Abstract')"
                         is-update
                         is-section-update
                         :read-only="!canEdit"
@@ -14,7 +14,7 @@
                         @update="emitToParent"
                     />
 
-                    <div><b>{{ isBiography ? $t("biographyLabel") : $t("abstractLabel") }}</b></div>
+                    <div><b>{{ isGeneralDescription ? $t('descriptionLabel') : (isBiography ? $t("biographyLabel") : $t("abstractLabel")) }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <rich-text-editor v-model="descriptionDisplay" :editable="false"></rich-text-editor>
                 </v-card-text>
@@ -42,6 +42,10 @@ export default defineComponent({
             default: false
         },
         isBiography: {
+            type: Boolean,
+            default: false
+        },
+        isGeneralDescription: {
             type: Boolean,
             default: false
         },

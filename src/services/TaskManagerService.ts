@@ -3,7 +3,8 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
-import { EntityClassificationSource } from "@/models/AssessmentModel";
+import { EntityClassificationSource, type PublicationAssessmentRequest } from "@/models/AssessmentModel";
+import { PublicationType } from "@/models/PublicationModel";
 
 export class TaskSchedulingService extends BaseService {
 
@@ -20,27 +21,31 @@ export class TaskSchedulingService extends BaseService {
     async scheduleIF5RankComputationTask(timestamp: string, years: number[]): Promise<AxiosResponse<void>> {
         
 
-        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-compute?timestamp=${timestamp}${this.createClassificationYearsParameter(years)}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-compute?timestamp=${timestamp}${this.createNumericalParameter("classificationYears", years)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[]): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createClassificationYearsParameter(years)}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[], journalIds: number[]): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createNumericalParameter("classificationYears", years)}${this.createNumericalParameter("journalIds", journalIds)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${timestamp}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource, commissionId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${timestamp}&source=${source}&commissionId=${commissionId}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[]): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `reindex/schedule?timestamp=${timestamp}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
     }
 
-    private createClassificationYearsParameter(years: number[]): string {
-        let classificationYears = "";
-        years.forEach(year => {
-            classificationYears += `&classificationYears=${year}`;
+    async schedulePublicationAssessment(timestamp: string, dateFrom: string, body: PublicationAssessmentRequest, type: PublicationType): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${timestamp}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
+    }
+
+    private createNumericalParameter(paramName: string, values: number[]): string {
+        let params = "";
+        values.forEach(value => {
+            params += `&${paramName}=${value}`;
         });
-        return classificationYears;
+        return params;
     }
 
     async canceltask(taskId: string): Promise<AxiosResponse<void>> {

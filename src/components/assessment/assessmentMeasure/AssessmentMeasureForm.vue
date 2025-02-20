@@ -9,19 +9,32 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field
-                    v-model="value" type="number" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredNumericFieldRules"></v-text-field>
+                <v-select
+                    v-model="selectedPointRule"
+                    :items="pointRules"
+                    :label="$t('pointRuleLabel') + '*'"
+                    :rules="requiredSelectionRules">
+                </v-select>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-select
+                    v-model="selectedScalingRule"
+                    :items="scalingRules"
+                    :label="$t('scalingRuleLabel') + '*'"
+                    :rules="requiredSelectionRules">
+                </v-select>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="formalDescriptionOfRule" :label="$t('formalDescriptionOfRuleLabel') + '*'" :placeholder="$t('formalDescriptionOfRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-select
+                    v-model="selectedAssessmentClassificationGroup"
+                    :items="assessmentClassificationGroups"
+                    :label="$t('classificationLabel') + '*'"
+                    :rules="requiredSelectionRules">
+                </v-select>
             </v-col>
         </v-row>
 
@@ -45,6 +58,7 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { AssessmentMeasure } from '@/models/AssessmentModel';
 import { getAccessLevelForGivenLocale, getTitleFromValueAutoLocale } from '@/i18n/accessLevel';
+import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
 
 
 export default defineComponent({
@@ -61,10 +75,25 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const languageTags = ref<LanguageTagResponse[]>([]);
+        const pointRules = ref<string[]>([]);
+        const scalingRules = ref<string[]>([]);
+        const assessmentClassificationGroups = ref<string[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
+            });
+
+            AssessmentMeasureService.fetchPointRules().then(response => {
+                pointRules.value = response.data;
+            });
+
+            AssessmentMeasureService.fetchScalingRules().then(response => {
+                scalingRules.value = response.data;
+            });
+
+            AssessmentMeasureService.fetchAssessmentGroups().then(response => {
+                assessmentClassificationGroups.value = response.data;
             });
         });
 
@@ -74,20 +103,18 @@ export default defineComponent({
         const selectedAccessLevel = ref<{ title: string, value: AccessLevel }>({title: getTitleFromValueAutoLocale(AccessLevel.OPEN) as string, value: AccessLevel.OPEN});
 
         const title = ref<any>([]);
-        const value = ref<number>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.value as number : 0);
-        const code = ref<string>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.code as string : "");
-
-        // TODO: update this to fetch rule methods from backend
-        const formalDescriptionOfRule = ref<string>(props.presetAssessmentMeasure ? props.presetAssessmentMeasure.formalDescriptionOfRule as string : "");
+        const selectedPointRule = ref<string>(props.presetAssessmentMeasure?.pointRule ? props.presetAssessmentMeasure.pointRule : "");
+        const selectedScalingRule = ref<string>(props.presetAssessmentMeasure?.scalingRule ? props.presetAssessmentMeasure.scalingRule : "");
+        const selectedAssessmentClassificationGroup = ref<string>(props.presetAssessmentMeasure?.code ? props.presetAssessmentMeasure.code : "");
 
         const { requiredFieldRules, requiredNumericFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const submit = () => {
             const assessmentMeasure: AssessmentMeasure = {
-                code: code.value,
                 title: title.value,
-                value: value.value,
-                formalDescriptionOfRule: formalDescriptionOfRule.value,
+                pointRule: selectedPointRule.value,
+                scalingRule: selectedScalingRule.value,
+                code: selectedAssessmentClassificationGroup.value,
                 assessmentRulebookId: props.presetAssessmentMeasure?.assessmentRulebookId as number
             };
 
@@ -95,13 +122,16 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, titleRef, formalDescriptionOfRule,
-            toMultilingualTextInput, value,
+            isFormValid, title, titleRef,
+            toMultilingualTextInput, pointRules,
+            scalingRules, selectedPointRule,
+            selectedScalingRule,
             languageTags, selectedAccessLevel,
-            requiredFieldRules, code, submit,
+            requiredFieldRules, submit,
             accessLevels, requiredSelectionRules,
-            requiredNumericFieldRules
+            requiredNumericFieldRules,
+            assessmentClassificationGroups,
+            selectedAssessmentClassificationGroup
         };
     }
 });

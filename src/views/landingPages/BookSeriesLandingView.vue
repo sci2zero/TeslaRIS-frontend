@@ -118,6 +118,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -147,10 +148,14 @@ export default defineComponent({
 
         const canEdit = ref(false);
 
+        const loginStore = useLoginStore();
+
         onMounted(() => {
-            BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
+                    canEdit.value = response.data;
+                });
+            }
 
             fetchBookSeries(true);
         });

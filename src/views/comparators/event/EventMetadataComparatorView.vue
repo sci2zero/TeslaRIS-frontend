@@ -302,20 +302,29 @@ export default defineComponent({
             rightConference.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
-            const id = side === ComparisonSide.LEFT ? leftConference.value?.id as number : rightConference.value?.id as number;
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftConference.value?.id : rightConference.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightConference.value?.id : leftConference.value?.id;
             const name = side === ComparisonSide.LEFT ? leftConference.value?.name : rightConference.value?.name;
 
-            const deleteAction = isForceDelete 
-                ? EventService.forceDeleteConference(id)
-                : EventService.deleteConference(id);
+            try {
+                const deleteAction = isForceDelete
+                    ? EventService.forceDeleteConference(id as number)
+                    : EventService.deleteConference(id as number);
 
-            deleteAction.then(() => {
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherConference(id as number, transferTargetId as number);
+                await MergeService.switchAllClassificationsToOtherConference(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "events" } });
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+            } catch (error) {
+                snackbarMessage.value = i18n.t(
+                    "deleteFailedNotification", 
+                    { name: returnCurrentLocaleContent(name) }
+                );
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

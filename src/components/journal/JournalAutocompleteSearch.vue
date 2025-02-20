@@ -1,23 +1,24 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && selectedJournal.value !== -1 ? 10 : 11">
+        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
             <v-autocomplete
                 v-model="selectedJournal"
-                :label="$t('journalLabel') + (required ? '*' : '')"
+                :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
                 :items="journals"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
                 :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
                 return-object
                 @update:search="searchJournals($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
+        <v-col v-if="!disableSubmission" cols="1" class="modal-spacer-top">
             <publication-series-submission-modal :input-type="inputType" @create="selectNewlyAddedJournal"></publication-series-submission-modal>
         </v-col>
-        <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedJournal.value !== -1" icon @click="clearInput()">
+        <v-col v-if="allowManualClearing && hasSelection" cols="1">
+            <v-btn icon @click="clearInput()">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </v-col>
@@ -25,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { computed, defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
 import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
@@ -50,13 +51,23 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        multiple: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
-            type: Object as PropType<{ title: string, value: number } | undefined>,
+            type: [Object, Array] as PropType<
+                { title: string, value: number } | { title: string, value: number }[] | undefined
+            >,
             required: true,
         },
         externalValidation: {
             type: Object as PropType<{ passed: boolean, message: string } | undefined>,
             default: () => ({ passed: true, message: "" })
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -66,14 +77,20 @@ export default defineComponent({
         const inputType = PublicationSeriesType.JOURNAL.toString();
 
         const journals = ref<{ title: string; value: number; }[]>([]);
-        const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedJournal = ref(
+            props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
+        );
 
         onMounted(() => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedJournal.value = props.modelValue;
             }
             sendContentToParent();
         });
+
+        const hasSelection = computed(() =>
+            props.multiple ? (selectedJournal.value as any[]).length > 0 : (selectedJournal.value as { title: '', value: -1 }).value !== -1
+        );
 
         const i18n = useI18n();
         const { requiredSelectionRules } = useValidationUtils();
@@ -95,7 +112,7 @@ export default defineComponent({
         });
 
         watch(() => props.modelValue, () => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if(props.modelValue) {
                 selectedJournal.value = props.modelValue;
             }
         });
@@ -155,7 +172,7 @@ export default defineComponent({
             journals, selectedJournal, searchJournals,
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
-            selectNewlyAddedJournal
+            selectNewlyAddedJournal, hasSelection
         };
     }
 });

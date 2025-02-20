@@ -151,6 +151,7 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
@@ -184,18 +185,21 @@ export default defineComponent({
         const journalIndicators = ref<EntityIndicatorResponse[]>([]);
         const journalClassifications = ref<EntityClassificationResponse[]>([]);
 
-        onMounted(() => {
-            JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
-                canEdit.value = response.data;
-            });
+        const loginStore = useLoginStore();
 
-            JournalService.canClassify(parseInt(currentRoute.params.id as string)).then(response => {
-                canClassify.value = response.data;
-            });
+        onMounted(() => {
+            if (loginStore.userLoggedIn) {
+                JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
+                    canEdit.value = response.data;
+                });
+                JournalService.canClassify(parseInt(currentRoute.params.id as string)).then(response => {
+                    canClassify.value = response.data;
+                });
+                fetchClassifications();
+            }
 
             fetchJournal(true);
             fetchIndicators();
-            fetchClassifications();
         });
 
         watch(i18n.locale, () => {

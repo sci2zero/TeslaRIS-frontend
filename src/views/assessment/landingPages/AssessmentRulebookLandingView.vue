@@ -39,6 +39,17 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
+                                <div v-if="assessmentRulebook?.isDefault" class="response">
+                                    {{ $t("defaultLabel") }}
+                                </div>
+                                <div v-else>
+                                    <v-btn
+                                        density="compact" class="bottom-spacer"
+                                        color="primary"
+                                        @click="setDefault">
+                                        {{ $t("setDefaultLabel") }}
+                                    </v-btn>
+                                </div>
                                 <div v-if="assessmentRulebook?.issueDate">
                                     {{ $t("issueDateLabel") }}:
                                 </div>
@@ -61,7 +72,7 @@
         </v-row>
 
         <!-- Description -->
-        <description-section :description="assessmentRulebook?.description" can-edit @update="updateDescription"></description-section>
+        <description-section :description="assessmentRulebook?.description" can-edit is-general-description @update="updateDescription"></description-section>
 
         <!-- Assessment Measures -->
         <br />
@@ -237,13 +248,19 @@ export default defineComponent({
             assessmentMeasures.value[index] = assessmentMeasure;
         };
 
+        const setDefault = () => {
+            AssessmentRulebookService.setDefaultRulebook(assessmentRulebook.value?.id as number).then(() => {
+                fetchAssessmentRulebook();
+            });
+        };
+
         return {
             assessmentRulebook, icon, returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo, updateAttachment,
             addAttachment, deleteAttachment, localiseDate,
             updateDescription, snackbar, snackbarMessage,
             AssessmentRulebookForm, assessmentMeasures,
-            totalAssessmentMeasures, switchPage,
+            totalAssessmentMeasures, switchPage, setDefault,
             addAssessmentMeasure, updateAssessmentMeasure
         };
 }})

@@ -14,7 +14,7 @@
                     <div>
                         <generic-crud-modal
                             :form-component="EntityIndicatorForm"
-                            :form-props="{ presetDocumentIndicators: indicator, applicableTypes: indicator.indicatorResponse.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
+                            :form-props="{ presetDocumentIndicator: indicator, applicableTypes: indicator.indicatorResponse.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
                             entity-name=""
                             is-update
                             :read-only="!canEdit"
@@ -26,6 +26,12 @@
                             {{ $t("deleteLabel") }}
                         </v-btn>
                     </div>
+                    <div class="ml-5 mt-2">
+                        <document-file-submission-modal v-if="canEdit" :is-proof="true" @create="addIndicatorProof($event, indicator.id)"></document-file-submission-modal>
+                    </div>
+                </v-row>
+                <v-row v-if="canViewProofs">
+                    <indicator-proofs-list :attachments="indicator.proofs" :can-edit="canEdit" @update="updateIndicatorProof($event, indicator.id)" @delete="deleteIndicatorProof($event, indicator.id)"></indicator-proofs-list>
                 </v-row>
             </v-expansion-panel-text>
         </v-expansion-panel>
@@ -47,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType, reactive, watch } from 'vue';
+import { computed, defineComponent, onMounted, type PropType, reactive, watch } from 'vue';
 import { ref } from 'vue';
 import { EntityIndicatorSource, type PublicationSeriesIndicatorResponse, type EntityIndicatorResponse, IndicatorContentType } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -58,11 +64,15 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { getIndicatorSourceTitleFromValueAutoLocale } from '@/i18n/entityIndicatorSource';
+import DocumentFileSubmissionModal from '@/components/documentFile/DocumentFileSubmissionModal.vue';
+import type { DocumentFile } from '@/models/DocumentFileModel';
+import IndicatorProofsList from './IndicatorProofsList.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
     name: "ViewIndicatorsComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, DocumentFileSubmissionModal, IndicatorProofsList },
     props: {
         entityIndicators: {
             type: Array<EntityIndicatorResponse>,
@@ -96,6 +106,15 @@ export default defineComponent({
         const openedPanel = ref();
 
         const i18n = useI18n();
+
+        const canViewProofs = computed(() => {
+            const role = UserService.provideUserRole();
+            if (role === "COMMISSION" || role === "ADMIN") {
+                return true;
+            }
+
+            return false;
+        });
         
         onMounted(() => {
             setIndicators();
@@ -203,9 +222,9 @@ export default defineComponent({
 
         const updateIndicator = async (entityIndicator: any, entityIndicatorId: number) => {
             if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
-                await EntityIndicatorService.updateDocumentIndicator(entityIndicator, entityIndicatorId);
+                await EntityIndicatorService.updateDocumentIndicator(entityIndicator.indicator, entityIndicatorId);
             } else if (props.containingEntityType === ApplicableEntityType.EVENT) {
-                await EntityIndicatorService.updateEventIndicator(entityIndicator, entityIndicatorId);
+                await EntityIndicatorService.updateEventIndicator(entityIndicator.indicator, entityIndicatorId);
             }
 
             emit("updated");
@@ -220,6 +239,24 @@ export default defineComponent({
             contents.value.splice(index, 1);
         };
 
+        const addIndicatorProof = (documentFile: DocumentFile, entityIndicatorId: number) => {
+            EntityIndicatorService.addEntityIndicatorProof(documentFile, entityIndicatorId, undefined).then(() => {
+                emit("updated");
+            });
+        };
+
+        const updateIndicatorProof = (documentFile: DocumentFile, entityIndicatorId: number) => {
+            EntityIndicatorService.updateEntityIndicatorProof(documentFile, entityIndicatorId).then(() => {
+                emit("updated");
+            });
+        };
+
+        const deleteIndicatorProof = (proofId: number, entityIndicatorId: number) => {
+            EntityIndicatorService.deleteEntityIndicatorProof(proofId, entityIndicatorId).then(() => {
+                emit("updated");
+            });
+        };
+
         return {
             titles, contents,
             EntityIndicatorForm,
@@ -228,7 +265,11 @@ export default defineComponent({
             updateIndicator,
             EntityIndicatorSource,
             deleteIndicator,
-            openedPanel, contentMap
+            openedPanel, contentMap,
+            addIndicatorProof,
+            updateIndicatorProof,
+            deleteIndicatorProof,
+            canViewProofs
         };
     }
 });

@@ -7,7 +7,8 @@ export enum InvolvementType {
     POSTDOC_AT = "POSTDOC_AT",
     MEMBER_OF = "MEMBER_OF",
     EMPLOYED_AT = "EMPLOYED_AT",
-    HIRED_BY = "HIRED_BY"
+    HIRED_BY = "HIRED_BY",
+    CANDIDATE = "CANDIDATE"
 }
 
 enum EmploymentPosition {
