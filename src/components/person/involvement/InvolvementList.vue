@@ -21,14 +21,12 @@
                     </div>
                 </template>
 
-                <v-card min-width="150">
-                    <v-list>
-                        <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
-                        <v-list-item @click="deleteInvolvement(involvement.id)">
-                            <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-card>
+                <v-list min-width="150">
+                    <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
+                    <v-list-item @click="deleteInvolvement(involvement.id)">
+                        <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
             </v-menu>
             <h4>
                 <localized-link :to="'organisation-units/' + involvement.organisationUnitId">

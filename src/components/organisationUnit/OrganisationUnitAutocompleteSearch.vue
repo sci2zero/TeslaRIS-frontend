@@ -3,13 +3,14 @@
         <v-col :cols="calculateAutocompleteWidth()">
             <v-autocomplete
                 v-model="selectedOrganisationUnit"
-                :label="(multiple ? $t('ouListLabel') : $t('organisationUnitLabel')) + (required ? '*' : '')"
+                :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
                 :items="organisationUnits"
                 :custom-filter="((): boolean => true)"
-                :rules="required ? requiredSelectionRules : []"
+                :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
                 :no-data-text="$t('noDataMessage')"
                 :multiple="multiple"
                 return-object
+                :class="comfortable ? 'comfortable' : ''"
                 @update:search="searchOUs($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
@@ -53,6 +54,14 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        comfortable: {
+            type: Boolean,
+            default: false,
+        },
+        label: {
+            type: String,
+            default: "",
+        },
         modelValue: {
             type: [Object, Array] as PropType<
                 { title: string; value: number } | { title: string; value: number }[] | undefined
@@ -67,7 +76,7 @@ export default defineComponent({
     emits: ["update:modelValue"],
     setup(props, { emit }) {
         const i18n = useI18n();
-        const { requiredSelectionRules } = useValidationUtils();
+        const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
         
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const searchPlaceholder = props.multiple ? [] : { title: '', value: -1 };
@@ -148,7 +157,7 @@ export default defineComponent({
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth,
             sendContentToParent, clearInput, userRole,
-            selectNewlyAddedOU, hasSelection
+            selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules
         };
     }
 });

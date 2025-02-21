@@ -1,7 +1,21 @@
 <template>
-    <v-row no-gutters>
-        <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-        <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+    <v-row class="mb-5">
+        <v-menu open-on-hover>
+            <template #activator="{ props }">
+                <v-btn
+                    color="primary"
+                    v-bind="props"
+                >
+                    {{ $t("addEmployeeLabel") }}
+                </v-btn>
+            </template>
+
+            <v-list>
+                <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal is-vice-dean-for-science @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+            </v-list>
+        </v-menu>
     </v-row>
 
     <v-row>

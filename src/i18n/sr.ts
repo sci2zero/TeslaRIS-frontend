@@ -516,5 +516,10 @@ export default {
     setDefaultLabel: "Postavi podrazumevan",
     citePublicationLabel: "Citiraj dokument",
     manualLabel: "Ručno unešeno",
-    reportTypeLabel: "Tip izveštaja"
+    reportTypeLabel: "Tip izveštaja",
+    reportYearLabel: "Godina izveštavanja",
+    topLevelInstitutionLabel: "Vrhovna institucija",
+    addViceDeanForScienceLabel: "Dodaj prodekana za nauku",
+    reportingLabel: "Izveštavanje",
+    alreadyGeneratedReportsLabel: "Već generisano za ovu selekciju"
 }

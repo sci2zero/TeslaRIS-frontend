@@ -85,9 +85,10 @@ import CommissionLandingView from "@/views/assessment/landingPages/CommissionLan
 import LanguageTagListView from "@/views/LanguageTagListView.vue";
 import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
 import AssessmentClassificationsListView from "@/views/assessment/listViews/AssessmentClassificationsListView.vue";
+import ReportsView from "@/components/assessment/reporting/ReportsView.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION" };
+const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE" };
 
 
 const router = createRouter({
@@ -136,7 +137,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission, roles.viceDeanForScience],
                     },
                 },
                 {
@@ -243,7 +244,7 @@ const router = createRouter({
                             component: BookSeriesLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience],
                             },
                         },
                         {
@@ -406,7 +407,7 @@ const router = createRouter({
                             component: PublisherLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience],
                             },
                         },
                         {
@@ -827,7 +828,7 @@ const router = createRouter({
                     component: NotificationsView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin],
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience],
                     },
                 },
                 {
@@ -950,7 +951,16 @@ const router = createRouter({
                                     },
                                 },
                             ]
-                        }
+                        },
+                        {
+                            path: "reporting",
+                            name: "reporting",
+                            component: ReportsView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin, roles.viceDeanForScience],
+                            },
+                        },
                     ]
                 },
             ]

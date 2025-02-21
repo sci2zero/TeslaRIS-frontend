@@ -7,7 +7,8 @@ export const reportTypeSr = [
     { title: "Tabela 6.7. sa zvanjima", value: ReportType.TABLE_67_POSITIONS },
     { title: "Tabela 6.4.", value: ReportType.TABLE_64 },
     { title: "Tabela za vrhovnu instituciju", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION },
-    { title: "Zbirna tabela za vrhovnu instituciju", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY }
+    { title: "Zbirna tabela za vrhovnu instituciju", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY },
+    { title: "Tabela za vrhovnu instituciju sa obojenim angažovanjima", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED }
 ];
 
 export const reportTypeEn = [
@@ -16,7 +17,8 @@ export const reportTypeEn = [
     { title: "Table 6.7. with positions", value: ReportType.TABLE_67_POSITIONS },
     { title: "Table 6.4.", value: ReportType.TABLE_64 },
     { title: "Top level institution table", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION },
-    { title: "Top level institution table with summary", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY }
+    { title: "Top level institution table with summary", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY },
+    { title: "Top level institution table with colored involvements", value: ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED }
 ];
 
 export const getReportTypeTitleFromValueAutoLocale = (value: ReportType) => {

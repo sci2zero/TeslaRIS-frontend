@@ -517,5 +517,10 @@ export default {
     setDefaultLabel: "Set default",
     citePublicationLabel: "Cite document",
     manualLabel: "Entered manually",
-    reportTypeLabel: "Report type"
+    reportTypeLabel: "Report type",
+    reportYearLabel: "Report year",
+    topLevelInstitutionLabel: "Top level institution",
+    addViceDeanForScienceLabel: "Add vice dean for science",
+    reportingLabel: "Reporting",
+    alreadyGeneratedReportsLabel: "Already generated for this selection"
 }

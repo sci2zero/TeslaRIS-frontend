@@ -26,6 +26,10 @@ a,
     }
 }
 
+.comfortable {
+    height: 90px;
+}
+
 /* Forms */
 .semi-transparent {
     opacity: 0.9;

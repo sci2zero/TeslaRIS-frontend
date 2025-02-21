@@ -185,6 +185,7 @@ export default defineComponent(
             const commissionsLabel = computed(() => i18n.t("commissionListLabel"));
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
+            const reportingLabel = computed(() => i18n.t("reportingLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -274,6 +275,7 @@ export default defineComponent(
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
+                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (userRole.value === 'ADMIN' || userRole.value === 'VICE_DEAN_FOR_SCIENCE')) },
             ]);
 
             const menuItems = ref<MenuItem[]>([

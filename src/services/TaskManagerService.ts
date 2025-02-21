@@ -14,6 +14,10 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.get, "scheduled-task");
     }
 
+    async listScheduledReportGenerationTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
+        return super.sendRequest(axios.get, "scheduled-task/report-generation");
+    }
+
     async scheduleIndicatorLoadingTask(timestamp: string, source: string): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-load?timestamp=${timestamp}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
     }
@@ -40,8 +44,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${timestamp}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleReportGeneration(timestamp: string, reportType: ReportType, commissionId: number, year: number[], lang: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&commissionId=${commissionId}&year=${year}&lang=${lang}&timestamp=${timestamp}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleReportGeneration(timestamp: string, reportType: ReportType, commissionIds: number[], year: number[] | number, topLevelInstitutionId: number | undefined, lang: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}&timestamp=${timestamp}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     private createNumericalParameter(paramName: string, values: number[]): string {

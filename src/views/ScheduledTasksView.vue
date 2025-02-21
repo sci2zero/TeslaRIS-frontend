@@ -30,6 +30,7 @@
                     v-model="selectedReportType"
                     :items="reportTypes"
                     :label="$t('reportTypeLabel') + '*'"
+                    :class="isSummaryReport() ? 'comfortable' : ''"
                     :rules="requiredSelectionRules"
                     :readonly="false">
                 </v-select>
@@ -63,7 +64,7 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || reportGeneration" cols="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
@@ -72,13 +73,21 @@
                     :required="taskClassificationComputation || taskClassificationLoad || reportGeneration">
                 </commission-autocomplete-search>
             </v-col>
+            <v-col v-if="reportGeneration && isSummaryReport()" cols="2">
+                <commission-autocomplete-search 
+                    v-model="selectedCommissions" 
+                    only-load-commissions
+                    required
+                    multiple>
+                </commission-autocomplete-search>
+            </v-col>
             <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="2">
                 <v-select
                     v-model="selectedYears"
                     :items="years"
-                    :label="$t('yearsLabel') + '*'"
+                    :label="(reportGeneration ? $t('reportYearLabel') : $t('yearsLabel')) + '*'"
                     :rules="requiredMultiSelectionRules"
-                    :class="taskClassificationComputation ? 'comfortable' : ''"
+                    :class="(taskClassificationComputation || isSummaryReport()) ? 'comfortable' : ''"
                     :multiple="!reportGeneration">
                 </v-select>
             </v-col>
@@ -91,8 +100,10 @@
             <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
                 <person-autocomplete-search v-model="selectedPersons" multiple disable-submission></person-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
-                <organisation-unit-autocomplete-search v-model="selectedOUs" multiple disable-submission></organisation-unit-autocomplete-search>
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || isTopLevelReport()" cols="3">
+                <organisation-unit-autocomplete-search
+                    v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
+                    :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
@@ -212,7 +223,8 @@ export default defineComponent({
         const selectedJournals = ref<{title: string, value: number}[]>([]);
         const selectedEvents = ref<{title: string, value: number}[]>([]);
         const selectedPersons = ref<{title: string, value: number}[]>([]);
-        const selectedOUs = ref<{title: string, value: number}[]>([]);
+        const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
+        const selectedCommissions = ref<{title: string, value: number}[]>([]);
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -324,7 +336,7 @@ export default defineComponent({
                             {
                                 commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
                                 authorIds: selectedPersons.value.map(person => person.value),
-                                organisationUnitIds: selectedOUs.value.map(ou => ou.value),
+                                organisationUnitIds: (selectedOUs.value as {title: string, value: number}[]).map(ou => ou.value),
                                 publishedInIds: selectedJournals.value.map(journal => journal.value)
                             },
                             PublicationType.JOURNAL_PUBLICATION
@@ -339,7 +351,7 @@ export default defineComponent({
                             {
                                 commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
                                 authorIds: selectedPersons.value.map(person => person.value),
-                                organisationUnitIds: selectedOUs.value.map(ou => ou.value),
+                                organisationUnitIds: (selectedOUs.value as {title: string, value: number}[]).map(ou => ou.value),
                                 publishedInIds: selectedEvents.value.map(journal => journal.value)
                             },
                             PublicationType.PROCEEDINGS_PUBLICATION
@@ -351,8 +363,8 @@ export default defineComponent({
                     scheduleTask(() => 
                         TaskManagerService.scheduleReportGeneration(
                             timestamp, selectedReportType.value,
-                            selectedCommission.value.value,
-                            selectedYears.value, "sr"
+                            selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? selectedCommissions.value.map(commission => commission.value) : [selectedCommission.value.value],
+                            selectedYears.value, (selectedOUs.value as {title: string, value: number}).value, "sr"
                         )
                     );
                     break;
@@ -381,6 +393,28 @@ export default defineComponent({
             return `${localDate}T${localTime}`;
         };
 
+        const isTopLevelReport = () => {
+            if (reportGeneration.value && 
+                (
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION || 
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED || 
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY
+                )
+            ) {
+                return true;
+            }
+
+            return false;
+        };
+
+        const isSummaryReport = () => {
+            if (reportGeneration.value && selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY) {
+                return true;
+            }
+
+            return false;
+        };
+
         return {
             scheduleDate, scheduledTasks,
             applicableTypes, selectedApplicableEntityType,
@@ -402,16 +436,10 @@ export default defineComponent({
             journalPublicationsAssessment,
             selectedJournals, selectedPersons,
             proceedingsPublicationsAssessment,
-            selectedEvents, selectedReportType
+            selectedEvents, selectedReportType,
+            isTopLevelReport, isSummaryReport,
+            selectedCommissions
         };
     },
 });
 </script>
-
-<style scoped>
-
-.comfortable {
-    height: 90px;
-}
-
-</style>

@@ -176,11 +176,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped>
-
-.comfortable {
-    height: 90px;
-}
-
-</style>
