@@ -209,3 +209,18 @@ export interface ResearcherAssessmentResponse {
     commissionId: number;
     publicationsPerCategory: Record<string, {a: string, b :number, c :number}[]>;
 }
+
+export enum ReportType {
+    TABLE_63 = "TABLE_63",
+    TABLE_67 = "TABLE_67",
+    TABLE_67_POSITIONS = "TABLE_67_POSITIONS",
+    TABLE_64 = "TABLE_64",
+    TABLE_TOP_LEVEL_INSTITUTION = "TABLE_TOP_LEVEL_INSTITUTION",
+    TABLE_TOP_LEVEL_INSTITUTION_SUMMARY = "TABLE_TOP_LEVEL_INSTITUTION_SUMMARY",
+    TABLE_TOP_LEVEL_INSTITUTION_COLORED = "TABLE_TOP_LEVEL_INSTITUTION_COLORED"
+}
+
+export interface Report {
+    commissionId: number;
+    reportFileName: string;
+}

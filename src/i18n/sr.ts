@@ -521,5 +521,7 @@ export default {
     topLevelInstitutionLabel: "Vrhovna institucija",
     addViceDeanForScienceLabel: "Dodaj prodekana za nauku",
     reportingLabel: "Izveštavanje",
-    alreadyGeneratedReportsLabel: "Već generisano za ovu selekciju"
+    alreadyGeneratedReportsLabel: "Već generisano za ovu komisiju",
+    unauthorizedReportGenerationAttemptMessage: "Ne možete generisati izveštaj za instituciju na kojoj niste zaposleni",
+    generatedReportsLabel: "Generisani izveštaji"
 }

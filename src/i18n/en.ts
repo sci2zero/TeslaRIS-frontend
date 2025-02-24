@@ -522,5 +522,7 @@ export default {
     topLevelInstitutionLabel: "Top level institution",
     addViceDeanForScienceLabel: "Add vice dean for science",
     reportingLabel: "Reporting",
-    alreadyGeneratedReportsLabel: "Already generated for this selection"
+    alreadyGeneratedReportsLabel: "Already generated for this commission",
+    unauthorizedReportGenerationAttemptMessage: "Zou can't generate report for an institution where you are not employed.",
+    generatedReportsLabel: "Generated reports"
 }

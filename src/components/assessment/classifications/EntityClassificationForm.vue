@@ -18,7 +18,7 @@
                     :rules="requiredNumericFieldRules"></v-text-field>
             </v-col>
         </v-row>
-        <v-row v-if="userRole !== 'COMMISSION'">
+        <v-row v-if="userRole !== 'COMMISSION' && userRole !== 'VICE_DEAN_FOR_SCIENCE'">
             <v-col>
                 <commission-autocomplete-search v-model="selectedCommission" :read-only="presetClassification !== undefined" required></commission-autocomplete-search>
             </v-col>

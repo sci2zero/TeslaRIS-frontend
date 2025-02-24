@@ -6,7 +6,7 @@
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-menu
-            v-if="userRole !== 'COMMISSION'"
+            v-if="userRole !== 'COMMISSION' && userRole !== 'VICE_DEAN_FOR_SCIENCE'"
             open-on-hover
         >
             <template #activator="{ props }">

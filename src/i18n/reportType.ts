@@ -1,4 +1,4 @@
-import { ReportType } from "@/models/Common";
+import { ReportType } from "@/models/AssessmentModel";
 import i18n from ".";
 
 export const reportTypeSr = [
