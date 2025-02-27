@@ -524,5 +524,15 @@ export default {
     reportingLabel: "Reporting",
     alreadyGeneratedReportsLabel: "Already generated for this commission",
     unauthorizedReportGenerationAttemptMessage: "Zou can't generate report for an institution where you are not employed.",
-    generatedReportsLabel: "Generated reports"
+    generatedReportsLabel: "Generated reports",
+    assessmentResultsLabel: "Assessment result",
+    assessmentCodeLabel: "Assessment code",
+    assessmentReasonLabel: "Assessment reason",
+    rawPointsLabel: "Number of points",
+    rawPointsReasonLabel: "Reason for awarding points",
+    scaledPointsLabel: "Number of points after scaling",
+    scaledPointsReasonLabel: "Reason for scaling",
+    authorCountLabel: "Author count",
+    journalMServiceLabel: "M-service for journals",
+    noAssessmentForSelectionMessage: "It is not possible to perform an assessment for given selection."
 }

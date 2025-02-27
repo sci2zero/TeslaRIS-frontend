@@ -36,6 +36,13 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const requiredNumericGreaterThanZeroFieldRules = [
+        (value: number) => {
+            if (!value || value <= 0) return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
     const requiredSelectionRules = [
         (value: { title: string, value: number }) => {
             if (!value || value.value === null || value.value === -1) return requiredFieldMessage.value;
@@ -231,6 +238,6 @@ export const useValidationUtils = () => {
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
         dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
-        requiredStringSelectionRules
+        requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules
     };
 };

@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
+        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedPerson"
                 :label="(multiple ? $t('personListLabel') : $t('personLabel')) + (required ? '*' : '')"

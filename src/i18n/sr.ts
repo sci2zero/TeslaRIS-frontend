@@ -523,5 +523,15 @@ export default {
     reportingLabel: "Izveštavanje",
     alreadyGeneratedReportsLabel: "Već generisano za ovu komisiju",
     unauthorizedReportGenerationAttemptMessage: "Ne možete generisati izveštaj za instituciju na kojoj niste zaposleni",
-    generatedReportsLabel: "Generisani izveštaji"
+    generatedReportsLabel: "Generisani izveštaji",
+    assessmentResultsLabel: "Rezultat vrednovanja",
+    assessmentCodeLabel: "Oznaka",
+    assessmentReasonLabel: "Razlog vrednovanja",
+    rawPointsLabel: "Broj poena",
+    rawPointsReasonLabel: "Razlog dodele poena",
+    scaledPointsLabel: "Broj poena nakon skaliranja",
+    scaledPointsReasonLabel: "Razlog skaliranja",
+    authorCountLabel: "Broj autora",
+    journalMServiceLabel: "M-servis za časopise",
+    noAssessmentForSelectionMessage: "Nije moguće izvršiti vrednovanje za datu selekciju."
 }

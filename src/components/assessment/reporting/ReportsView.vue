@@ -20,7 +20,7 @@
         <v-tabs-window-item value="scheduling">
             <v-form v-model="isFormValid" @submit.prevent>
                 <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-                    <v-col cols="2">
+                    <v-col cols="12" sm="3" md="2">
                         <v-select
                             v-model="selectedReportType"
                             :items="reportTypes"
@@ -30,7 +30,7 @@
                             :readonly="false">
                         </v-select>
                     </v-col>
-                    <v-col cols="2">
+                    <v-col cols="12" sm="3" md="2">
                         <commission-autocomplete-search
                             v-model="selectedCommissions"
                             only-load-commissions
@@ -38,12 +38,12 @@
                             :multiple="isSummaryReport()">
                         </commission-autocomplete-search>
                     </v-col>
-                    <v-col v-if="isTopLevelReport()" cols="3">
+                    <v-col v-if="isTopLevelReport()" cols="12" sm="3" md="3">
                         <organisation-unit-autocomplete-search
                             v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
                             :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
                     </v-col>
-                    <v-col cols="2">
+                    <v-col cols="12" sm="3" md="2">
                         <v-select
                             v-model="selectedYear"
                             :items="years"
@@ -52,7 +52,7 @@
                             :class="isSummaryReport() ? 'comfortable' : ''">
                         </v-select>
                     </v-col>
-                    <v-col cols="1">
+                    <v-col cols="12" sm="3" md="1">
                         <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleReportGeneration">
                             {{ $t("scheduleLabel") }}
                         </v-btn>

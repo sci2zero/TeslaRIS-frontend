@@ -123,7 +123,11 @@ export default defineComponent({
         };
 
         const buildDisplayData = (entityClassification: EntityClassificationResponse) => {
-            const displayValue = returnCurrentLocaleContent(entityClassification.classificationTitle);
+            let displayValue = returnCurrentLocaleContent(entityClassification.classificationTitle);
+
+            if (entityClassification.assessmentReason.length > 0) {
+                displayValue += " " + returnCurrentLocaleContent(entityClassification.assessmentReason);
+            }
 
             const title = buildDisplayTitle(entityClassification);
 

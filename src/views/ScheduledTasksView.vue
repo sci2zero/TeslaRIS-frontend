@@ -3,7 +3,7 @@
         {{ $t("scheduleTasksLabel") }}
     </h1>
     <v-row class="d-flex flex-row justify-center mt-10">
-        <v-col cols="2">
+        <v-col cols="12" sm="3" md="2">
             <v-select
                 v-model="selectedScheduledTaskType"
                 :items="scheduledTaskTypes"
@@ -14,7 +14,7 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration" cols="2">
+            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -25,7 +25,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="reportGeneration" cols="2">
+            <v-col v-if="reportGeneration" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedReportType"
                     :items="reportTypes"
@@ -35,7 +35,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="taskReindexing" cols="4">
+            <v-col v-if="taskReindexing" cols="12" md="4">
                 <v-select
                     v-model="selectedEntityTypes"
                     :items="entityTypes"
@@ -44,7 +44,7 @@
                     multiple>
                 </v-select>
             </v-col>
-            <v-col v-if="taskIndicatorLoad" cols="2">
+            <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedIndicatorSource"
                     :items="indicatorSources"
@@ -64,7 +64,7 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
@@ -73,7 +73,7 @@
                     :required="taskClassificationComputation || taskClassificationLoad || reportGeneration">
                 </commission-autocomplete-search>
             </v-col>
-            <v-col v-if="reportGeneration && isSummaryReport()" cols="2">
+            <v-col v-if="reportGeneration && isSummaryReport()" cols="12" sm="3" md="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommissions" 
                     only-load-commissions
@@ -81,7 +81,7 @@
                     multiple>
                 </commission-autocomplete-search>
             </v-col>
-            <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="2">
+            <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedYears"
                     :items="years"
@@ -91,23 +91,23 @@
                     :multiple="!reportGeneration">
                 </v-select>
             </v-col>
-            <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="3">
+            <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="12" md="3">
                 <journal-autocomplete-search v-model="selectedJournals" multiple disable-submission></journal-autocomplete-search>
             </v-col>
-            <v-col v-if="proceedingsPublicationsAssessment" cols="3">
+            <v-col v-if="proceedingsPublicationsAssessment" cols="12" md="3">
                 <event-autocomplete-search v-model="selectedEvents" multiple disable-submission></event-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" md="3">
                 <person-autocomplete-search v-model="selectedPersons" multiple disable-submission></person-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || isTopLevelReport()" cols="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || isTopLevelReport()" cols="12" md="3">
                 <organisation-unit-autocomplete-search
                     v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
                     :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="2">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" sm="3" md="2">
                 <date-picker
                     v-model="startDate"
                     :label="$t('startDateLabel') + '*'"
@@ -115,7 +115,7 @@
                     required
                 />
             </v-col>
-            <v-col cols="2">
+            <v-col cols="12" sm="3" md="2">
                 <date-picker
                     v-model="scheduleDate"
                     :label="$t('dateLabel') + '*'"
@@ -124,10 +124,10 @@
                     in-future
                 />
             </v-col>
-            <v-col cols="1">
+            <v-col cols="12" sm="3" md="1">
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
-            <v-col cols="1">
+            <v-col cols="12" sm="3" md="1">
                 <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
                     {{ $t("scheduleLabel") }}
                 </v-btn>

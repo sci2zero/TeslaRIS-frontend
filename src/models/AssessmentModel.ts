@@ -43,6 +43,7 @@ export interface EntityClassificationResponse {
     year: number;
     timestamp: string;
     applicableEntityTypes: ApplicableEntityType[];
+    assessmentReason: MultilingualContent[];
 }
 
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
@@ -223,4 +224,32 @@ export enum ReportType {
 export interface Report {
     commissionId: number;
     reportFileName: string;
+}
+
+export interface ImaginaryJournalPublicationAssessmentRequest {
+
+    journalId: number;
+
+    commissionId: number;
+
+    classificationYear: number;
+
+    researchAreaCode: string;
+
+    authorCount: number;
+}
+
+export interface ImaginaryJournalPublicationAssessmentResponse {
+
+    assessmentCode: string;
+
+    assessmentReason: MultilingualContent[];
+
+    rawPoints: number;
+
+    rawPointsReason: MultilingualContent[];
+
+    scaledPoints: number;
+
+    scaledPointsReason: MultilingualContent[];
 }

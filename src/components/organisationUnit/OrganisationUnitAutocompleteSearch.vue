@@ -131,7 +131,7 @@ export default defineComponent({
 
         const calculateAutocompleteWidth = () => {
             let numberOfColumns = props.allowManualClearing && hasSelection.value ? 10 : 11;
-            if (userRole.value !== "ADMIN") {
+            if (props.disableSubmission || userRole.value !== "ADMIN") {
                 numberOfColumns += 1;
             }
             return numberOfColumns;
