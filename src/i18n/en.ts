@@ -534,5 +534,9 @@ export default {
     scaledPointsReasonLabel: "Reason for scaling",
     authorCountLabel: "Author count",
     journalMServiceLabel: "M-service for journals",
-    noAssessmentForSelectionMessage: "It is not possible to perform an assessment for given selection."
+    noAssessmentForSelectionMessage: "It is not possible to perform an assessment for given selection.",
+    impactFactorTableLabel: "Impact factor table",
+    experimentalPublicationLabel: "Experimental paper",
+    theoreticalPublicationLabel: "Theoretical paper",
+    simulationPublicationLabel: "Simulation"
 }

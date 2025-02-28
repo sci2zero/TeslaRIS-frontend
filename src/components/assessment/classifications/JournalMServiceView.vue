@@ -46,6 +46,30 @@
                     ></v-text-field>
                 </v-col>
             </v-row>
+            <v-row justify="center" class="mt-5">
+                <v-col cols="10" md="6">
+                    <v-radio-group
+                        v-model="publicationType"
+                        inline
+                    >
+                        <v-radio
+                            :label="$t('experimentalPublicationLabel')"
+                            value="experimental"
+                            color="primary"
+                        ></v-radio>
+                        <v-radio
+                            :label="$t('theoreticalPublicationLabel')"
+                            value="theoretical"
+                            color="primary"
+                        ></v-radio>
+                        <v-radio
+                            :label="$t('simulationPublicationLabel')"
+                            value="simulation"
+                            color="primary"
+                        ></v-radio>
+                    </v-radio-group>
+                </v-col>
+            </v-row>
   
             <v-row justify="center" class="mt-5">
                 <v-col cols="12" sm="6" md="3">
@@ -56,6 +80,8 @@
                     </v-btn>
                 </v-col>
             </v-row>
+
+            <i-f-table-component :json-data="ifTableData" class="mt-15"></i-f-table-component>
 
             <h2 v-if="assessmentResponse" class="mt-15">
                 {{ $t("assessmentResultsLabel") }}
@@ -125,20 +151,23 @@
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
 import { ref } from 'vue';
-import type { ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from '@/models/AssessmentModel';
+import type { IFCategoryData, ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
+import IFTableComponent from '@/components/assessment/indicators/IFTableComponent.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 
 
 export default defineComponent({
     name: "JournalMServiceView",
-    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch },
+    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent },
     setup() {
         const isFormValid = ref(false);
+        const ifTableData = ref<IFCategoryData[]>([]);
 
         const researchAreas = ref<{title: string, value: string}[]>([]);
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
@@ -160,6 +189,8 @@ export default defineComponent({
         const authorCount = ref(1);
         const yearOfPublication = ref((new Date()).getFullYear());
 
+        const publicationType = ref("experimental");
+
         const { requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules } = useValidationUtils();
 
         const assessImaginaryPublication = () => {
@@ -168,11 +199,18 @@ export default defineComponent({
                 classificationYear: yearOfPublication.value,
                 researchAreaCode: selectedResearchArea.value.value,
                 commissionId: selectedCommission.value.value,
-                journalId: selectedJournal.value.value
+                journalId: selectedJournal.value.value,
+                experimental: publicationType.value === "experimental",
+                theoretical: publicationType.value === "theoretical",
+                simulation: publicationType.value === "simulation"
             };
 
             AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest).then(response => {
                 assessmentResponse.value = response.data;
+            });
+
+            EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(selectedJournal.value.value).then(response => {
+                ifTableData.value = response.data;
             });
         };
 
@@ -182,7 +220,8 @@ export default defineComponent({
             requiredStringSelectionRules, authorCount,
             requiredNumericGreaterThanZeroFieldRules,
             assessImaginaryPublication, yearOfPublication,
-            assessmentResponse, returnCurrentLocaleContent
+            assessmentResponse, returnCurrentLocaleContent,
+            ifTableData, publicationType
         };
     }
 });

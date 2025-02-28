@@ -533,5 +533,9 @@ export default {
     scaledPointsReasonLabel: "Razlog skaliranja",
     authorCountLabel: "Broj autora",
     journalMServiceLabel: "M-servis za časopise",
-    noAssessmentForSelectionMessage: "Nije moguće izvršiti vrednovanje za datu selekciju."
+    noAssessmentForSelectionMessage: "Nije moguće izvršiti vrednovanje za datu selekciju.",
+    impactFactorTableLabel: "Tabela impakt faktora",
+    experimentalPublicationLabel: "Eksperimentalan rad",
+    theoreticalPublicationLabel: "Teoretski rad",
+    simulationPublicationLabel: "SImulacija"
 }

@@ -227,29 +227,34 @@ export interface Report {
 }
 
 export interface ImaginaryJournalPublicationAssessmentRequest {
-
     journalId: number;
-
     commissionId: number;
-
     classificationYear: number;
-
     researchAreaCode: string;
-
     authorCount: number;
+    experimental: boolean;
+    theoretical: boolean;
+    simulation: boolean;
 }
 
 export interface ImaginaryJournalPublicationAssessmentResponse {
-
     assessmentCode: string;
-
     assessmentReason: MultilingualContent[];
-
     rawPoints: number;
-
     rawPointsReason: MultilingualContent[];
-
     scaledPoints: number;
-
     scaledPointsReason: MultilingualContent[];
+}
+
+export interface IFValue {
+    a: number;
+    b: string;
+}
+  
+export interface IFCategoryData {
+    category: string;
+    if2Values: IFValue[];
+    if2Ranks: IFValue[];
+    if5Values: IFValue[];
+    if5Ranks: IFValue[];
 }
