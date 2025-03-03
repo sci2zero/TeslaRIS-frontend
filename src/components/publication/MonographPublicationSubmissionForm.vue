@@ -7,7 +7,7 @@
                         <monograph-autocomplete-search ref="eventAutocompleteRef" v-model="selectedMonograph" required></monograph-autocomplete-search>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedMonograph.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedMonograph.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
                     <v-col><h3>{{ $t("noRecentPublicationsMonographLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -82,16 +82,8 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -113,19 +105,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -146,11 +127,13 @@ import { monographPublicationTypeSr, monographPublicationTypeEn } from "@/i18n/m
 import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
+import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
     name: "SubmitMonographPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch, Toast },
     props: {
         inModal: {
             type: Boolean,
@@ -203,14 +186,20 @@ export default defineComponent({
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => i18n.locale.value === "sr" ? monographPublicationTypeSr : monographPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
 
-        const listPublications = (event: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInMonograph(event.value).then((response) => {
+        const listPublications = (monograph: { title: string, value: number }) => {
+            if (monograph.value > 0) {
+                DocumentPublicationService.findMyPublicationsInMonograph(monograph.value).then((response) => {
                 myPublications.value = response.data;
             });
+            }
         };
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         watch(selectedMonograph, (newValue) => {
-            listPublications(newValue);
+            if (newValue && userRole.value === "RESEARCHER") {
+                listPublications(newValue);
+            }
         });
 
         const submitMonographPublication = (stayOnPage: boolean) => {
@@ -240,7 +229,6 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     monographAutocompleteRef.value?.clearInput();
                     availableMonograph.value = [];
                     selectedMonograph.value = searchPlaceholder;
@@ -251,6 +239,7 @@ export default defineComponent({
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -277,7 +266,7 @@ export default defineComponent({
             description, descriptionRef, keywords, keywordsRef,
             uris, urisRef, myPublications, doiValidationRules,
             selectedMonograph, monographAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType,
+            publicationTypes, selectedpublicationType, userRole,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
             availableMonograph, errorMessage

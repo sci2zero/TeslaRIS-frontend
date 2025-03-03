@@ -74,19 +74,7 @@
 
         <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -110,11 +98,12 @@ import ComparisonActions from '@/components/core/comparators/ComparisonActions.v
 import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "SoftwareMetadataComparator",
-    components: { PersonDocumentContributionList, SoftwareUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, SoftwareUpdateForm, Toast, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -142,10 +131,12 @@ export default defineComponent({
         const fetchSoftwares = () => {
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftSoftware.value = response.data;
+                leftSoftware.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readSoftware(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightSoftware.value = response.data;
+                rightSoftware.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -188,12 +179,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateSoftware();
-            updateRightRef.value?.updateSoftware();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightSoftware.value, leftSoftware.value] = mergeSoftwareMetadata(rightSoftware.value as Software, leftSoftware.value as Software);
@@ -253,12 +244,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateSoftware();
-            updateRightRef.value?.updateSoftware();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

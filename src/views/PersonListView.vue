@@ -3,14 +3,14 @@
         <h1>{{ $t("personListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch($event)"></search-bar-component>
         <br />
         <v-btn v-if="userRole === 'ADMIN' || userRole === 'INSTITUTIONAL_EDITOR'" color="primary" @click="addPerson">
             {{ $t("addPersonLabel") }}
         </v-btn>
         <br />
         <br />
-        <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+        <person-table-component ref="tableRef" :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
     </v-container>
 </template>
 
@@ -41,6 +41,7 @@ export default defineComponent({
         const router = useRouter();
 
         const userRole = computed(() => UserService.provideUserRole());
+        const tableRef = ref<typeof PersonTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("personListLabel");
@@ -48,10 +49,18 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false).then((response) => {
                 persons.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
             });
+        };
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            search(tokenParams);
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -66,7 +75,11 @@ export default defineComponent({
             router.push({name: "submitPerson"});
         };
 
-        return {search, persons, totalPersons, switchPage, addPerson, userRole};
+        return {
+            search, persons, totalPersons,
+            switchPage, addPerson, userRole,
+            tableRef, clearSortAndPerformSearch
+        };
     }
 });
 </script>

@@ -24,6 +24,7 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
             @update:options="refreshTable">
             <template #item="row">
                 <tr>
@@ -93,6 +94,8 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
+
         const affiliationBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedAffiliation = ref<OrganisationUnitIndex>();
@@ -168,12 +171,14 @@ export default defineComponent({
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
         const researchAreasColumn = computed(() => i18n.t("researchAreasColumn"));
         const superOUColumn = computed(() => i18n.t("superOUColumn"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: superOULabel, align: "start", sortable: true, key: superOUColumn},
           { title: keywordsLabel, align: "start", sortable: true, key: keywordsColumn},
-          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn}
+          { title: researchAreasLabel, align: "start", sortable: true, key: researchAreasColumn},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"},
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -211,6 +216,11 @@ export default defineComponent({
         };
 
         const addNew = async () => {
+            if (creationInProgress.value) {
+                return;
+            }
+            creationInProgress.value = true;
+
             await new Promise(r => setTimeout(r, Math.floor(Math.random() * (500 - 10 + 1)) + 10));
 
             ImportService.createNewInstitution(props.ouForLoading.scopusAfid, idempotencyKey).then((response) => {
@@ -230,20 +240,23 @@ export default defineComponent({
                     superOUNameSrSortable: "",
                     superOUNameOther: "",
                     superOUNameOtherSortable: "",
-                    id: ""
+                    id: "",
+                    superOUId: -1
                 };
 
                 hadToBeCreated.value = true;
                 affiliationBinded.value = true;
                 automaticProcessCompleted.value = true;
+                showTable.value = false;
+                creationInProgress.value = false;
             }).catch(() => {
                 OrganisationUnitService.findOUByScopusAfid(props.ouForLoading.scopusAfid).then(response => {
                     selectedAffiliation.value = response.data;
                     hadToBeCreated.value = true;
                     affiliationBinded.value = true;
                     automaticProcessCompleted.value = true;
+                    creationInProgress.value = false;
                 });
-                
             });
         };
 

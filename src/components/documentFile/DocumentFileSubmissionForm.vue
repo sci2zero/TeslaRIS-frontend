@@ -16,7 +16,7 @@
                             :label="$t('descriptionLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="!isProof">
                     <v-col>
                         <v-select
                             v-model="selectedResourceType"
@@ -27,7 +27,7 @@
                         </v-select>
                     </v-col>
                 </v-row>
-                <v-row>
+                <!-- <v-row>
                     <v-col>
                         <v-select
                             v-model="selectedLicense"
@@ -37,6 +37,9 @@
                             return-object>
                         </v-select>
                     </v-col>
+                </v-row> -->
+                <v-row>
+                    <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
                 </v-row>
             </v-col>
         </v-row>
@@ -67,7 +70,7 @@ import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
 
 export default defineComponent({
-    name: "ConferenceSubmissionForm",
+    name: "DocumentFileSubmissionForm",
     components: {MultilingualTextInput},
     props: {
         edit: {
@@ -77,6 +80,10 @@ export default defineComponent({
         presetDocumentFile: {
             type: Object as PropType<DocumentFileResponse>,
             default: undefined
+        },
+        isProof: {
+            type: Boolean,
+            default: false
         },
     },
     emits: ["create", "update"],
@@ -90,14 +97,20 @@ export default defineComponent({
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
             });
+            
             if(props.edit && props.presetDocumentFile) {
-                    file.value.push(new File([], props.presetDocumentFile.fileName));
+                    file.value = new File([], props.presetDocumentFile.fileName);
                     selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.license };
+
+                    if (props.presetDocumentFile.license.toString() !== "OPEN_ACCESS") {
+                        isOpenAccess.value = false;
+                    }
+
                     selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
             } 
         });
 
-        const file = ref<File[]>([]);
+        const file = ref<File>();
 
         const description = ref([]);
         const descriptionRef = ref<typeof MultilingualTextInput>();
@@ -116,16 +129,17 @@ export default defineComponent({
         ];
 
         const selectedLicense = ref({ title: "Open Access", value: License.OPEN_ACCESS });
+        const isOpenAccess = ref<boolean>(true);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         const addDocumentFile = () => {
-
             const newDocumentFile: DocumentFile = {
-                file: file.value![0],
+                file: file.value as File,
                 description: description.value,
-                resourceType: selectedResourceType.value.value,
-                license: selectedLicense.value.value
+                resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
+                // license: selectedLicense.value.value,
+                license: isOpenAccess.value ? License.OPEN_ACCESS : License.SUBSCRIPTION_BASED_ACCESS
             }
 
             if(props.edit) {
@@ -137,7 +151,7 @@ export default defineComponent({
         };
 
         return {isFormValid, file,
-            description, descriptionRef,
+            description, descriptionRef, isOpenAccess,
             requiredFieldRules, licenses, resourceTypes,
             selectedLicense, selectedResourceType,
             addDocumentFile, requiredSelectionRules, 

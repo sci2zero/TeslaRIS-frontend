@@ -68,21 +68,9 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
 
         <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsMetadataMessage')"></persistent-stop-dialog>
     </v-container>
@@ -106,11 +94,12 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "ConferenceMetadataComparator",
-    components: { EventUpdateForm, PersonEventContributionList, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { EventUpdateForm, PersonEventContributionList, Toast, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -145,6 +134,7 @@ export default defineComponent({
                 }
 
                 leftConference.value = response.data;
+                leftConference.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             EventService.readConference(parseInt(currentRoute.params.rightId as string)).then((response) => {
@@ -154,6 +144,7 @@ export default defineComponent({
                 }
 
                 rightConference.value = response.data;
+                rightConference.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -163,8 +154,8 @@ export default defineComponent({
             mergeMultilingualContentField(conference1.nameAbbreviation, conference2.nameAbbreviation);
             conference2.nameAbbreviation = [];
 
-            mergeMultilingualContentField(conference1.state, conference2.state);
-            conference2.state = [];
+            conference1.countryId = conference2.countryId;
+            conference2.countryId = undefined;
 
             mergeMultilingualContentField(conference1.place, conference2.place);
             conference2.place = [];
@@ -184,6 +175,13 @@ export default defineComponent({
             conference1.confId = conference2.confId;
             conference2.confId = "";
 
+            conference2.uris.forEach(uri => {
+                if (!conference1.uris.includes(uri)) {
+                    conference1.uris.push(uri);
+                }
+            });
+            conference2.uris = [];
+
             conference1.contributions = conference1.contributions?.concat(conference2.contributions as PersonEventContribution[]);
             conference2.contributions = [];
 
@@ -191,12 +189,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateEvent();
-            updateRightRef.value?.updateEvent();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightConference.value, leftConference.value] = mergeConferenceMetadata(rightConference.value as Conference, leftConference.value as Conference);
@@ -221,12 +219,13 @@ export default defineComponent({
             leftConference.value!.nameAbbreviation = basicInfo.nameAbbreviation;
             leftConference.value!.dateFrom = basicInfo.dateFrom;
             leftConference.value!.dateTo = basicInfo.dateTo;
-            leftConference.value!.state = basicInfo.state;
+            leftConference.value!.countryId = basicInfo.countryId;
             leftConference.value!.place = basicInfo.place;
             leftConference.value!.serialEvent = basicInfo.serialEvent;
             leftConference.value!.fee = basicInfo.fee;
             leftConference.value!.number = basicInfo.number;
             leftConference.value!.confId = basicInfo.confId;
+            leftConference.value!.uris = basicInfo.uris;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -239,12 +238,13 @@ export default defineComponent({
             rightConference.value!.nameAbbreviation = basicInfo.nameAbbreviation;
             rightConference.value!.dateFrom = basicInfo.dateFrom;
             rightConference.value!.dateTo = basicInfo.dateTo;
-            rightConference.value!.state = basicInfo.state;
+            rightConference.value!.countryId = basicInfo.countryId;
             rightConference.value!.place = basicInfo.place;
             rightConference.value!.serialEvent = basicInfo.serialEvent;
             rightConference.value!.fee = basicInfo.fee;
             rightConference.value!.number = basicInfo.number;
             rightConference.value!.confId = basicInfo.confId;
+            rightConference.value!.uris = basicInfo.uris;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
@@ -254,12 +254,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateEvent();
-            updateRightRef.value?.updateEvent();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {
@@ -302,14 +302,29 @@ export default defineComponent({
             rightConference.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            EventService.deleteConference(side === ComparisonSide.LEFT ? leftConference.value?.id as number : rightConference.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftConference.value?.id : rightConference.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightConference.value?.id : leftConference.value?.id;
+            const name = side === ComparisonSide.LEFT ? leftConference.value?.name : rightConference.value?.name;
+
+            try {
+                const deleteAction = isForceDelete
+                    ? EventService.forceDeleteConference(id as number)
+                    : EventService.deleteConference(id as number);
+
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherConference(id as number, transferTargetId as number);
+                await MergeService.switchAllClassificationsToOtherConference(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "events" } });
-            }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftConference.value?.name : rightConference.value?.name;
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+            } catch (error) {
+                snackbarMessage.value = i18n.t(
+                    "deleteFailedNotification", 
+                    { name: returnCurrentLocaleContent(name) }
+                );
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

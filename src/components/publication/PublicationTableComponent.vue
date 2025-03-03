@@ -1,5 +1,6 @@
 <template>
     <v-btn
+        v-if="userRole === 'ADMIN'"
         density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
@@ -24,10 +25,11 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            show-select
+            :show-select="userRole === 'ADMIN'"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
+            :page="tableOptions.page"
             @update:options="refreshTable">
             <template #body="props">
                 <draggable
@@ -35,10 +37,16 @@
                     tag="tbody"
                     :disabled="!inComparator"
                     group="publications"
+                    handle=".handle"
                     @change="onDropCallback"
                 >
-                    <tr v-for="item in props.items" :key="item.id">
-                        <td>
+                    <tr v-if="props.items?.length === 0">
+                        <td colspan="10" class="text-center">
+                            <p>{{ $t("noDataInTableMessage") }}</p>
+                        </td>
+                    </tr>
+                    <tr v-for="item in props.items" :key="item.id" class="handle">
+                        <td v-if="userRole === 'ADMIN'">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -57,7 +65,19 @@
                             </localized-link>
                         </td>
                         <td>
-                            {{ displayTextOrPlaceholder(item.authorNames) }}
+                            <!-- {{ displayTextOrPlaceholder(item.authorNames) }} -->
+                            <span v-if="item.authorNames.trim() === ''">
+                                {{ displayTextOrPlaceholder(item.authorNames) }}
+                            </span>
+                            <span v-for="(employment, index) in item.authorNames.split('; ')" v-else :key="index">
+                                <localized-link
+                                    v-if="item.authorIds[index] !== -1"
+                                    :to="'persons/' + item.authorIds[index]"
+                                >
+                                    {{ `${employment}; ` }}
+                                </localized-link>
+                                <span v-else>{{ `${employment}; ` }}</span>
+                            </span>
                         </td>
                         <td>
                             {{ item.year !== -1 ? item.year : "-" }}
@@ -66,10 +86,18 @@
                             {{ getPublicationTypeTitleFromValueAutoLocale(item.type) }}
                         </td>
                         <td v-if="item.doi">
-                            <doi-link :doi="item.doi"></doi-link>
+                            <identifier-link :identifier="item.doi"></identifier-link>
                         </td>
                         <td v-else>
                             {{ displayTextOrPlaceholder(item.doi) }}
+                        </td>
+                        <td v-if="inClaimer">
+                            <v-btn size="small" color="primary" @click="claimPublication(item.databaseId)">
+                                {{ $t("claimLabel") }}
+                            </v-btn>
+                            <v-btn class="ml-1" size="small" color="primary" @click="declinePublicationClaim(item.databaseId)">
+                                {{ $t("declineClaimLabel") }}
+                            </v-btn>
                         </td>
                     </tr>
                 </draggable>
@@ -91,24 +119,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type {DocumentPublicationIndex} from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import DoiLink from '../core/DoiLink.vue';
+import IdentifierLink from '../core/IdentifierLink.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
 import { useRouter } from 'vue-router';
 
+
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, DoiLink, draggable: VueDraggableNext },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -121,10 +150,14 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        inClaimer: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["switchPage", "dragged"],
-    setup(_, {emit}) {
+    emits: ["switchPage", "dragged", "claim", "declineClaim"],
+    setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
 
         const i18n = useI18n();
@@ -133,6 +166,12 @@ export default defineComponent({
         const notifications = ref<Map<string, string>>(new Map());
 
         const tableWrapper = ref<any>(null);
+
+        onMounted(() => {
+            if (props.inClaimer) {
+                headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
+            }
+        })
 
         watch(tableWrapper, () => {
             if (tableWrapper.value) {
@@ -148,6 +187,7 @@ export default defineComponent({
         const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
@@ -155,13 +195,13 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
-        const headers = [
+        const headers = ref([
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
           { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
           { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
           { title: typeOfPublicationLabel, align: "start", sortable: true, key: "type"},
           { title: "DOI", align: "start", sortable: true, key: "doi"},
-        ];
+        ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
@@ -189,6 +229,25 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
+                if (publication.type === PublicationType.MONOGRAPH) {
+                    return DocumentPublicationService.deleteMonograph(publication.databaseId as number)
+                        .then(() => {
+                            if (i18n.locale.value === "sr") {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
+                            }
+                        })
+                        .catch(() => {
+                            if (i18n.locale.value === "sr") {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
+                            }
+                            return publication;
+                    });
+                }
+                
                 return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
                     .then(() => {
                         if (i18n.locale.value === "sr") {
@@ -204,7 +263,7 @@ export default defineComponent({
                             addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
                         }
                         return publication;
-                    });
+                });
             })).then((failedDeletions) => {
                 selectedPublications.value = selectedPublications.value.filter((publication) => failedDeletions.includes(publication));
                 refreshTable(tableOptions.value);
@@ -238,13 +297,32 @@ export default defineComponent({
             }});
         };
 
+        const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            if (sortBy.length === 0) {
+                tableOptions.value.sortBy.splice(0);
+            } else {
+                tableOptions.value.sortBy = sortBy;
+            }
+            tableOptions.value.page = page;
+        };
+
+        const claimPublication = (documentId: number) => {
+            emit("claim", documentId);
+        };
+
+        const declinePublicationClaim = (documentId: number) => {
+            emit("declineClaim", documentId);
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, userRole, deleteSelection, tableWrapper,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
             getPublicationTypeTitleFromValueAutoLocale,
             startMetadataComparison, getDocumentLandingPageBasePath,
-            startPublicationComparison
+            startPublicationComparison, setSortAndPageOption, claimPublication,
+            declinePublicationClaim
         };
     }
 });

@@ -18,7 +18,7 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
+                            <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -37,6 +37,11 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col>
+                            <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="12">
                             <open-layers-map ref="mapRef" :read-only="false"></open-layers-map>
                         </v-col>
@@ -51,19 +56,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -77,11 +71,13 @@ import OrganisationUnitService from "@/services/OrganisationUnitService";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
+import UriInput from '../core/UriInput.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitOrganizationUnit",
-    components: {MultilingualTextInput, OpenLayersMap},
+    components: {MultilingualTextInput, OpenLayersMap, UriInput, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -109,8 +105,9 @@ export default defineComponent({
         const scopusAfid = ref("");
         const phoneNumber = ref("");
         const keywords = ref([]);
+        const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, scopusAfidValidationRules } = useValidationUtils();
+        const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
 
         const submitOU = (stayOnPage: boolean) => {
             const newOu: OrganisationUnitRequest = {
@@ -120,7 +117,8 @@ export default defineComponent({
                 researchAreasId: [],
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
                 contact: {contactEmail: email.value, phoneNumber: phoneNumber.value},
-                scopusAfid: scopusAfid.value
+                scopusAfid: scopusAfid.value,
+                uris: uris.value
             };
 
             OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
@@ -159,8 +157,9 @@ export default defineComponent({
             keywords, keywordsRef,
             requiredFieldRules,
             submitOU, mapRef,
-            scopusAfid,
-            scopusAfidValidationRules
+            scopusAfid, uris,
+            scopusAfidValidationRules,
+            nonMandatoryEmailFieldRules
         };
     }
 });

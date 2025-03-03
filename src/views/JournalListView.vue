@@ -3,14 +3,14 @@
         <h1>{{ $t("journalListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn color="primary" @click="addJournal">
             {{ $t("addJournalLabel") }}
         </v-btn>
         <br />
         <br />
-        <journal-table-component :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+        <journal-table-component ref="tableRef" :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
     </v-container>
 </template>
 
@@ -38,10 +38,19 @@ export default defineComponent({
 
         const i18n = useI18n();
         const router = useRouter();
+        const tableRef = ref<typeof JournalTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("journalListLabel");
         });
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            search(tokenParams);
+        };
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -57,13 +66,16 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
         const addJournal = () => {
             router.push({name: "submitJournal"});
-        }
+        };
 
-        return {search, journals, totalJournals, switchPage, addJournal};
+        return {
+            search, journals, totalJournals, switchPage, addJournal,
+            tableRef, clearSortAndPerformSearch
+        };
     }
 });
 </script>

@@ -101,9 +101,9 @@ export default defineComponent({
         const searchResearchers = lodash.debounce((input: string) => {
                 const token = input
                 const params = `tokens=${token}&page=0&size=7`
-                PersonService.searchResearchers(params).then((response) => {
+                PersonService.searchResearchers(params, true).then((response) => {
                     suggestions.value = response.data.content;
-                })
+                });
         }, 300);
 
         const registrationNextStep = () => {
@@ -117,7 +117,7 @@ export default defineComponent({
                     const email = response.data.user.email;
                     router.push({name:"login", path:'/login/', query: { "email": email }})
                 } else {
-                    registerStore.setRegisterPersonData(response.data)
+                    registerStore.setRegisterPersonData(response.data);
                     emit("registration-next-step", {});
                 }
             }).catch(() => {

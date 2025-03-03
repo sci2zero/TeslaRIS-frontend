@@ -24,7 +24,15 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <publisher-update-modal :read-only="!canEdit" :preset-publisher="publisher" @update="updateBasicInfo"></publisher-update-modal>
+                        <generic-crud-modal
+                            :form-component="PublisherUpdateForm"
+                            :form-props="{ presetPublisher: publisher }"
+                            entity-name="Publisher"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -32,11 +40,11 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div v-if="publisher?.state && publisher?.state.length > 0">
+                                <div v-if="publisher?.countryId">
                                     {{ $t("stateLabel") }}:
                                 </div>
-                                <div v-if="publisher?.state && publisher?.state.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(publisher?.state) }}
+                                <div v-if="publisher?.countryId" class="response">
+                                    {{ returnCurrentLocaleContent(country?.name) }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -57,24 +65,12 @@
         <br />
         <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
         
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import type { Country, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -87,13 +83,17 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import PublisherUpdateModal from '@/components/publisher/update/PublisherUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import CountryService from '@/services/CountryService';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
+import Toast from '@/components/core/Toast.vue';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, PublisherUpdateModal },
+    components: { PublicationTableComponent, GenericCrudModal, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -115,11 +115,16 @@ export default defineComponent({
         const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
+        const country = ref<Country>();
+
+        const loginStore = useLoginStore();
 
         onMounted(() => {
-            PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
 
             PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
                 publisher.value = response.data;
@@ -128,12 +133,21 @@ export default defineComponent({
 
                 fetchPublications();     
                 populateData();
+                fetchDetails();
             });
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchDetails = () => {
+            if (publisher.value?.countryId) {
+                CountryService.readCountry(publisher.value.countryId as number).then((response) => {
+                    country.value = response.data;
+                });
+            }
+        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -165,11 +179,12 @@ export default defineComponent({
         const updateBasicInfo = (updatedBasicInfo: Publisher) => {
             publisher.value!.name = updatedBasicInfo.name;
             publisher.value!.place = updatedBasicInfo.place;
-            publisher.value!.state = updatedBasicInfo.state;
+            publisher.value!.countryId = updatedBasicInfo.countryId;
 
             PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                fetchDetails();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
@@ -180,9 +195,9 @@ export default defineComponent({
             publisher, icon,
             publications, 
             totalPublications,
-            switchPage,
+            switchPage, country,
             returnCurrentLocaleContent,
-            languageTagMap, canEdit,
+            languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage
         };
 }})

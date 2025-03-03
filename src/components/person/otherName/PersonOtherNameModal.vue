@@ -1,11 +1,11 @@
 <template>
-    <v-row justify="start">
+    <div justify="start">
         <v-dialog v-model="dialog" persistent max-width="850px">
             <template #activator="scope">
                 <v-btn
-                    color="primary" dark v-bind="scope.props" class="bottom-spacer"
+                    color="primary" dark v-bind="scope.props" :class="readOnly ? 'bottom-spacer' : ''"
                     v-on="scope.isActive">
-                    {{ $t("viewOtherNamesLabel") }}
+                    {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>
             </template>
             <v-card>
@@ -15,7 +15,24 @@
                 <v-card-text>
                     <v-container>
                         <v-form v-model="isFormValid" @submit.prevent>
-                            <h3 v-if="readOnly && presetOtherNames && presetOtherNames.length === 0">
+                            <v-row>
+                                <v-col :cols="readOnly ? 4 : 3">
+                                    <v-text-field
+                                        v-model="primaryName.firstname" :label="$t('firstNameLabel') + (readOnly ? '' : '*')" :placeholder="$t('firstNameLabel')" outlined
+                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
+                                </v-col>
+                                <v-col v-if="readOnly ? primaryName.otherName : true" :cols="readOnly ? 4 : 3">
+                                    <v-text-field
+                                        v-model="primaryName.otherName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" outlined
+                                        :readonly="readOnly"></v-text-field>
+                                </v-col>
+                                <v-col :cols="readOnly ? 4 : 3">
+                                    <v-text-field
+                                        v-model="primaryName.lastname" :label="$t('surnameLabel') + (readOnly ? '' : '*')" :placeholder="$t('surnameLabel')" outlined
+                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <h3 v-if="readOnly && presetPerson && presetPerson.personOtherNames.length === 0">
                                 {{ $t("noOtherNamesMessage") }}
                             </h3>
                             <v-row v-for="(element, index) in otherNames" v-else :key="index">
@@ -35,13 +52,20 @@
                                         :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
                                 </v-col>
                                 <v-col cols="3">
-                                    <v-btn v-if="!readOnly && ((presetOtherNames && presetOtherNames?.length > 0) || index > 0)" icon @click="removeOtherName(index)">
+                                    <v-btn v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0))" icon @click="removeOtherName(index)">
                                         <v-icon>mdi-delete</v-icon>
                                     </v-btn>
                                     <v-btn v-if="!readOnly && element.id" icon @click="selectOtherName(element)">
                                         <v-icon>mdi-check-circle</v-icon>
                                     </v-btn>
                                     <v-btn v-if="!readOnly && (index === otherNames.length - 1)" icon @click="addOtherName">
+                                        <v-icon>mdi-plus</v-icon>
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-btn v-if="!readOnly && (otherNames.length === 0)" icon @click="addOtherName">
                                         <v-icon>mdi-plus</v-icon>
                                     </v-btn>
                                 </v-col>
@@ -63,7 +87,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
+    </div>
 </template>
 
 <script lang="ts">
@@ -71,16 +95,16 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import type { PropType } from "vue";
-import type { PersonName } from "@/models/PersonModel";
+import type { PersonName, PersonResponse } from "@/models/PersonModel";
 import { watch } from "vue";
 
 
 export default defineComponent({
     name: "PersonOtherNameModal",
     props: {
-        presetOtherNames: {
-            type: Array as PropType<PersonName[] | undefined>,
-            required: true,
+        presetPerson: {
+            type: Object as PropType<PersonResponse | undefined>,
+            required: true
         },
         readOnly: {
             type: Boolean,
@@ -92,18 +116,22 @@ export default defineComponent({
         const dialog = ref(false);
         const isFormValid = ref(false);
 
-        const otherNames = ref<PersonName[]>([{firstname: "", lastname: "", otherName: ""}]);
+        const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: ""});
+        const otherNames = ref<PersonName[]>([]);
 
         const { requiredFieldRules } = useValidationUtils();
 
-        watch(() => props.presetOtherNames, () => {
-            if (props.presetOtherNames && props.presetOtherNames.length > 0) {
+        watch(() => props.presetPerson, () => {
+            if (props.presetPerson && props.presetPerson.personOtherNames.length > 0) {
                 otherNames.value = [];
-                props.presetOtherNames.forEach((personName) => {
+                props.presetPerson.personOtherNames.forEach((personName) => {
                     otherNames.value.push({id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName});
                 });
-            } else {
-                otherNames.value = [{firstname: "", lastname: "", otherName: ""}];
+            }
+
+            if (props.presetPerson) {
+                const personName = props.presetPerson.personName;
+                primaryName.value = {id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName};
             }
         });
 
@@ -123,13 +151,13 @@ export default defineComponent({
         const update = () => {
             const newOtherNames: PersonName[] = [];
             otherNames.value.forEach(personName => newOtherNames.push({id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName}));
-            emit("update", newOtherNames);
+            emit("update", primaryName.value, newOtherNames);
             dialog.value = false;
         };
 
         return { dialog, isFormValid, requiredFieldRules,
                 addOtherName, otherNames, removeOtherName,
-                update, selectOtherName };
+                update, selectOtherName, primaryName };
     }
 });
 </script>

@@ -7,19 +7,19 @@
                         <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
-                            v-for="(publicationIndex, i) in myPublications"
-                            :key="i"
-                            :value="publicationIndex"
+                            v-for="(publication) in myPublications"
+                            :key="publication.id"
+                            :value="publication"
                         >
-                            {{ $i18n.locale === "sr" ? publicationIndex.titleSr : publicationIndex.titleOther }}
+                            {{ returnCurrentLocaleContent(publication.title) + ` ${$t("inLabel")} ` + returnCurrentLocaleContent(publication.proceedingsTitle) }}
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
                     <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -28,13 +28,13 @@
                             v-model="selectedProceedings"
                             :items="availableProceedings"
                             :label="$t('proceedingsLabel') + '*'"
-                            :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
+                            :no-data-text="(selectedEvent && selectedEvent.value === -1) ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
                             :rules="requiredSelectionRules"
                             return-object
                         ></v-select>
                     </v-col>
                     <v-col class="proceedings-submission">
-                        <proceedings-submission-modal :conference="selectedEvent" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
+                        <proceedings-submission-modal :conference="selectedEvent ? selectedEvent : searchPlaceholder" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -98,7 +98,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -120,19 +120,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -143,7 +132,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
-import type { DocumentPublicationIndex, ProceedingsPublicationType } from "@/models/PublicationModel";
+import type { ProceedingsPublicationResponse, ProceedingsPublicationType } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
@@ -156,11 +145,14 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
 import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -189,7 +181,7 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const myPublications = ref<DocumentPublicationIndex[]>([]);
+        const myPublications = ref<ProceedingsPublicationResponse[]>([]);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -216,9 +208,11 @@ export default defineComponent({
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
 
         const listPublications = (event: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInEvent(event.value).then((response) => {
-                myPublications.value = response.data;
-            });
+            if (event.value > 0) {
+                DocumentPublicationService.findMyPublicationsInEvent(event.value).then((response) => {
+                    myPublications.value = response.data;
+                });
+            }
         };
 
         const fetchProceedings = (event: { title: string, value: number }) => {
@@ -244,11 +238,17 @@ export default defineComponent({
             });
         };
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         watch(selectedEvent, (newValue) => {
-            listPublications(newValue);
-            availableProceedings.value = [];
-            selectedProceedings.value = searchPlaceholder;
-            fetchProceedings(newValue);
+            if (newValue) {
+                if (userRole.value === "RESEARCHER") {
+                    listPublications(newValue);
+                }
+                availableProceedings.value = [];
+                selectedProceedings.value = searchPlaceholder;
+                fetchProceedings(newValue);
+            }
         });
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
@@ -296,8 +296,7 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
-                    eventAutocompleteRef.value?.clearInput();
+                    eventAutocompleteRef.value!.clearInput();
                     availableProceedings.value = [];
                     selectedProceedings.value = searchPlaceholder;
                     selectedpublicationType.value = {title: "", value: null};
@@ -307,6 +306,8 @@ export default defineComponent({
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
+                    myPublications.value = [];
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -326,24 +327,17 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            startPage, endPage,
-            doi, scopus,
-            articleNumber, numberOfPages,
-            description, descriptionRef,
-            keywords, keywordsRef,
-            placeRef, uris, urisRef,
-            myPublications, doiValidationRules,
+            isFormValid, additionalFields, snackbar, error, title,
+            subtitle, subtitleRef, startPage, endPage, doi, scopus,
+            articleNumber, numberOfPages, description, descriptionRef,
+            keywords, keywordsRef, placeRef, uris, urisRef, titleRef,
+            myPublications, doiValidationRules, selectNewlyAddedProceedings,
             selectedEvent, eventAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType,
-            contributions, contributionsRef, scopusIdValidationRules,
+            publicationTypes, selectedpublicationType, errorMessage,
+            contributions, contributionsRef, scopusIdValidationRules, userRole,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
-            availableProceedings, selectedProceedings, 
-            selectNewlyAddedProceedings, errorMessage
+            availableProceedings, selectedProceedings, returnCurrentLocaleContent,
+            searchPlaceholder
         };
     }
 });

@@ -24,7 +24,7 @@
                             </template>
 
                             <v-list-item-title @click="download(attachment)">
-                                {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
+                                {{ getResourceTypeTitleFromValueAutoLocale(attachment.resourceType) }}: {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
                             </v-list-item-title>
 
                             <v-list-item-subtitle>
@@ -56,19 +56,7 @@
         </v-card-text>
     </v-card>
 
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <toast v-model="snackbar" :message="errorMessage" />
 </template>
 
 <script lang="ts">
@@ -80,11 +68,13 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next';
+import { getResourceTypeTitleFromValueAutoLocale } from '@/i18n/resourceType';
+import Toast from './Toast.vue';
 
 
 export default defineComponent({
     name: "AttachmentList",
-    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext },
+    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext, Toast },
     props: {
         attachments: {
             type: Object as PropType<DocumentFileResponse[]>,
@@ -136,7 +126,7 @@ export default defineComponent({
 
         return {download, sendDataToParent, sendDeleteRequestToParent, 
                 sendUpdateRequestToParent, returnCurrentLocaleContent, 
-                errorMessage, snackbar};
+                errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale};
     }
 });
 </script>

@@ -51,6 +51,7 @@ export enum ThesisType {
     BACHELOR = "BACHELOR",
     MR = "MR",
     PHD = "PHD",
+    PHD_ART_PROJECT = "PHD_ART_PROJECT",
     MASTER = "MASTER"
 }
   
@@ -208,11 +209,20 @@ export interface DeduplicationSuggestion {
 }
 
 export interface Thesis extends Document {
-    organisationUnitId: number;
+    organisationUnitId?: number;
+    externalOrganisationUnitName?: MultilingualContent[];
     thesisType: ThesisType;
     numberOfPages?: number;
     languageTagIds: number[];
     researchAreaId?: number;
     publisherId?: number;
     languageTagNames?: string[];
+}
+
+export interface CitationResponse {
+    apa: string;
+    mla: string;
+    chicago: string;
+    harvard: string;
+    vancouver: string;
 }

@@ -3,10 +3,10 @@
         <h1>{{ $t("scientificResultsListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-menu
-            v-if="userRole"
+            v-if="userRole !== 'COMMISSION'"
             open-on-hover
         >
             <template #activator="{ props }">
@@ -30,7 +30,7 @@
         </v-menu>
         <br />
         <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <publication-table-component ref="tableRef" :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
     </v-container>
 </template>
 
@@ -61,6 +61,7 @@ export default defineComponent({
 
         const router = useRouter();
         const userRole = UserService.provideUserRole();
+        const tableRef = ref<typeof PublicationTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
@@ -74,22 +75,29 @@ export default defineComponent({
             });
         };
 
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            search(tokenParams);
+        };
+
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
             size.value = pageSize;
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
         const navigateToPage = (name: string) => {
             router.push({name: name});
-        }
+        };
 
         const i18n = useI18n();
         const addJournalPublicationLabel = computed(() => i18n.t("addJournalPublicationLabel"));
         const addProceedingsPublicationLabel = computed(() => i18n.t("addProceedingsPublicationLabel"));
-        const addProceedingsLabel = computed(() => i18n.t("addProceedingsLabel"));
         const addPatentLabel = computed(() => i18n.t("addPatentLabel"));
         const addSoftwareLabel = computed(() => i18n.t("addSoftwareLabel"));
         const addDatasetLabel = computed(() => i18n.t("addDatasetLabel"));
@@ -100,7 +108,6 @@ export default defineComponent({
         const items = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
             { title: addProceedingsPublicationLabel, value: "submitProceedingsPublication" },
-            { title: addProceedingsLabel, value: "submitProceedings" },
             { title: addPatentLabel, value: "submitPatent" },
             { title: addSoftwareLabel, value: "submitSoftware" },
             { title: addDatasetLabel, value: "submitDataset" },
@@ -109,7 +116,11 @@ export default defineComponent({
             { title: addThesisLabel, value: "submitThesis" },
         ]);
 
-        return {search, publications, totalPublications, switchPage, userRole, items, navigateToPage};
+        return {
+            search, publications, totalPublications,
+            switchPage, userRole, items, navigateToPage,
+            tableRef, clearSortAndPerformSearch
+        };
     }
 });
 </script>

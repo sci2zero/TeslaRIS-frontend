@@ -24,6 +24,10 @@ export interface EmployeeRegistrationRequest {
     organisationUnitId: number;
 }
 
+export interface CommissionRegistrationRequest extends EmployeeRegistrationRequest {
+    commissionId: number;
+}
+
 export interface RefreshTokenRequest {
     refreshTokenValue: string;
 }

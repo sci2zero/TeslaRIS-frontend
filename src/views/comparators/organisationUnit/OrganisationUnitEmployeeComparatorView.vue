@@ -41,19 +41,13 @@
             ></v-progress-circular>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <v-row class="d-flex flex-row justify-center mt-10">
+            <v-btn @click="navigateToMetadataComparison">
+                {{ $t("compareMetadataLabel") }}
+            </v-btn>
+        </v-row>
+
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -61,7 +55,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PersonService from '@/services/PersonService';
 import MergeService from '@/services/MergeService';
 import type { PersonIndex } from '@/models/PersonModel';
@@ -70,11 +64,12 @@ import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitEmployeeComparator",
-    components: { PersonTableComponent },
+    components: { PersonTableComponent, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -100,6 +95,7 @@ export default defineComponent({
         const rightDirection = ref("");
 
         const i18n = useI18n();
+        const router = useRouter();
 
         onMounted(() => {
             document.title = i18n.t("compareEmployeesLabel");
@@ -124,14 +120,14 @@ export default defineComponent({
         };
 
         const fetchLeftEmployees = () => {
-            PersonService.findEmployeesForOU(parseInt(currentRoute.params.leftId as string), `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`).then((response) => {
+            PersonService.findEmployeesForOU(parseInt(currentRoute.params.leftId as string), `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`, false).then((response) => {
                 leftEmployees.value = response.data.content;
                 leftTotalEmployees.value = response.data.totalElements;
             });
         };
 
         const fetchRightEmployees = () => {
-            PersonService.findEmployeesForOU(parseInt(currentRoute.params.rightId as string), `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`).then((response) => {
+            PersonService.findEmployeesForOU(parseInt(currentRoute.params.rightId as string), `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`, false).then((response) => {
                 rightEmployees.value = response.data.content;
                 rightTotalEmployees.value = response.data.totalElements;
             });
@@ -186,6 +182,12 @@ export default defineComponent({
             });
         };
 
+        const navigateToMetadataComparison = () => {
+            router.push({name: "organisationUnitMetadataComparator", params: {
+                leftId: parseInt(currentRoute.params.leftId as string), rightId: parseInt(currentRoute.params.rightId as string)
+            }});
+        };
+
         return {
             snackbar, snackbarMessage,
             switchPageLeft, switchPageRight,
@@ -193,7 +195,8 @@ export default defineComponent({
             rightEmployees, rightTotalEmployees,
             leftOU, rightOU, handleDrag,
             moveAll, loading,
-            returnCurrentLocaleContent
+            returnCurrentLocaleContent,
+            navigateToMetadataComparison
         };
 }})
 

@@ -74,19 +74,7 @@
 
         <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -110,11 +98,12 @@ import ComparisonActions from '@/components/core/comparators/ComparisonActions.v
 import { ComparisonSide } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "PatentMetadataComparator",
-    components: { PersonDocumentContributionList, PatentUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, PatentUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -142,10 +131,12 @@ export default defineComponent({
         const fetchPatents = () => {
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftPatent.value = response.data;
+                leftPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readPatent(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightPatent.value = response.data;
+                rightPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -188,12 +179,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updatePatent();
-            updateRightRef.value?.updatePatent();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightPatent.value, leftPatent.value] = mergePatentMetadata(rightPatent.value as Patent, leftPatent.value as Patent);
@@ -253,12 +244,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updatePatent();
-            updateRightRef.value?.updatePatent();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

@@ -8,7 +8,6 @@
                 :items="monographs"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
-                :auto-select-first="true"
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchMonographs($event)"

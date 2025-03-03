@@ -3,11 +3,11 @@
         <h1>{{ $t("userListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="search"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <br />
         <br />
-        <user-table-component :users="users" :total-users="totalUsers" @switch-page="switchPage"></user-table-component>
+        <user-table-component ref="tableRef" :users="users" :total-users="totalUsers" @switch-page="switchPage"></user-table-component>
     </v-container>
 </template>
 
@@ -34,10 +34,19 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
+        const tableRef = ref<typeof UserTableComponent>();
 
         onMounted(() => {
             document.title = i18n.t("userListLabel");
         });
+
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            tableRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            search(tokenParams);
+        };
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
@@ -53,9 +62,12 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search(searchParams.value);
-        }
+        };
 
-        return {search, users, totalUsers, switchPage};
+        return {
+            search, users, totalUsers, switchPage,
+            clearSortAndPerformSearch, tableRef
+        };
     }
 });
 </script>

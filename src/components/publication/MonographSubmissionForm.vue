@@ -34,11 +34,26 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="6">
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+
+                <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
                         <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
+                
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -50,7 +65,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -79,18 +94,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
+                        <v-col cols="12">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
@@ -127,19 +131,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -168,11 +161,12 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -331,7 +325,6 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     eventAutocompleteRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     doi.value = "";
                     scopus.value = "";
                     numberOfPages.value = null;
@@ -340,6 +333,7 @@ export default defineComponent({
                     eIsbn.value = "";
                     printIsbn.value = "";
                     publicationYear.value = "";
+                    contributionsRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;

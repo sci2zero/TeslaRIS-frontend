@@ -31,19 +31,7 @@
             {{ $t("registerLabel") }}
         </v-btn>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ message }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="message" />
     </div>
 </template>
 
@@ -60,11 +48,12 @@ import { useRegisterStore } from '@/stores/registerStore';
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getErrorMessageForErrorKey } from "@/i18n";
 import { useRouter } from "vue-router";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent({
     name: "RegistrationSecondStep",
-    components: {OrganisationUnitAutocompleteSearch, PasswordInputWithMeter},
+    components: {OrganisationUnitAutocompleteSearch, PasswordInputWithMeter, Toast},
     props: {
         firstname: {
             type: String,

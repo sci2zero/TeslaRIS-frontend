@@ -25,6 +25,8 @@
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
+        :page="tableOptions.page"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -47,16 +49,40 @@
                     </localized-link>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                    <localized-link v-if="row.item.superOUId" :to="'organisation-units/' + row.item.superOUId">
+                        {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                    </localized-link>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                    </span>
                 </td>
                 <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                    <localized-link v-if="row.item.superOUId" :to="'organisation-units/' + row.item.superOUId">
+                        {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                    </localized-link>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                    </span>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.keywordsSr) }}
+                    <span v-if="row.item.keywordsSr">
+                        <localized-link v-for="(keyword, index) in row.item.keywordsSr.split('\n')" :key="index" :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`">
+                            {{ `${displayTextOrPlaceholder(keyword)}; ` }}
+                        </localized-link>
+                    </span>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.keywordsSr) }}
+                    </span>
                 </td>
                 <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
+                    <span v-if="row.item.keywordsOther">
+                        <localized-link v-for="(keyword, index) in row.item.keywordsOther.split('\n')" :key="index" :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`">
+                            {{ `${displayTextOrPlaceholder(keyword)}; ` }}
+                        </localized-link>
+                    </span>
+                    <span v-else>
+                        {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
+                    </span>
                 </td>
                 <td v-if="$i18n.locale == 'sr'">
                     {{ displayTextOrPlaceholder(row.item.researchAreasSr) }}
@@ -206,11 +232,23 @@ export default defineComponent({
             }});
         };
 
-        return {selectedOUs, headers, notifications,
+        const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            if (sortBy.length === 0) {
+                tableOptions.value.sortBy.splice(0);
+            } else {
+                tableOptions.value.sortBy = sortBy;
+            }
+            tableOptions.value.page = page;
+        };
+
+        return {
+            selectedOUs, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startEmploymentComparison,
-            startMetadataComparison};
+            startEmploymentComparison, setSortAndPageOption,
+            startMetadataComparison
+        };
     }
 });
 </script>

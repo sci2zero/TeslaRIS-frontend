@@ -1,52 +1,51 @@
 <template>
-    <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-    <v-data-table-server
-        :sort-by="tableOptions.sortBy"
-        :items="users"
-        :headers="headers"
-        :items-length="totalUsers"
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        @update:options="refreshTable">
-        <template #item="row">
-            <tr>
-                <td>{{ row.item.fullName }}</td>
-                <td>{{ row.item.email }}</td>
-                <td v-if="$i18n.locale == 'sr'">
-                    {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
-                </td>
-                <td v-else>
-                    {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
-                </td>
-                <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
-                <td>
-                    <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
-                        {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
-                    </v-btn>
-                    <v-btn color="blue" dark class="inline-action" @click="takeRoleOfUser(row.item.email)">
-                        {{ $t("takeRoleLabel") }}
-                    </v-btn>
-                </td>
-            </tr>
-        </template>
-    </v-data-table-server>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout">
-        {{ snackbarText }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    <v-row no-gutters>
+        <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+        <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+    </v-row>
+
+    <v-row>
+        <v-data-table-server
+            :sort-by="tableOptions.sortBy"
+            :items="users"
+            :headers="headers"
+            :items-length="totalUsers"
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
+            :page="tableOptions.page"
+            @update:options="refreshTable">
+            <template #item="row">
+                <tr>
+                    <td>{{ row.item.fullName }}</td>
+                    <td>{{ row.item.email }}</td>
+                    <td v-if="$i18n.locale == 'sr'">
+                        {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
+                    </td>
+                    <td v-else>
+                        {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
+                    </td>
+                    <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
+                    <td>
+                        <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
+                            {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
+                        </v-btn>
+                        <v-btn
+                            color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
+                            @click="takeRoleOfUser(row.item.email)">
+                            {{ $t("takeRoleLabel") }}
+                        </v-btn>
+                    </td>
+                </tr>
+            </template>
+        </v-data-table-server>
+    </v-row>
+    
+    <toast v-model="snackbar" :message="snackbarText" />
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
@@ -56,10 +55,12 @@ import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import Toast from '../core/Toast.vue';
+
 
 export default defineComponent({
     name: "UserTableComponent",
-    components: { RegisterEmployeeModal },
+    components: { RegisterEmployeeModal, Toast },
     props: {
         users: {
             type: Array<UserAccountIndex>,
@@ -78,6 +79,14 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarText = ref("");
         const timeout = 5000;
+
+        const accountsThatAllowedRoleTaking = ref<number[]>([]);
+
+        onMounted(() => {
+            UserService.getAccountsWithRoleTakingAllowed().then(response => {
+                accountsThatAllowedRoleTaking.value = response.data;
+            });
+        });
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const emailLabel = computed(() => i18n.t("emailLabel"));
@@ -149,17 +158,32 @@ export default defineComponent({
                 localStorage.setItem("refreshToken", response.data.refreshToken);
 
                 loginStore.emitLoginSuccess();
-                router.push({ name: "home" });
+                router.push({ name: "home" }).then(() => {
+                    window.location.reload();
+                });
             }).catch(() => {
                 snackbar.value = true;
                 snackbarText.value = userDidNotAllowNotification.value;
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            if (sortBy.length === 0) {
+                tableOptions.value.sortBy.splice(0);
+            } else {
+                tableOptions.value.sortBy = sortBy;
+            }
+            tableOptions.value.page = page;
+        };
+
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, changeActivationStatus, takeRoleOfUser,
             displayFormNotification, displayTextOrPlaceholder,
-            getTitleFromValueAutoLocale};
+            getTitleFromValueAutoLocale, setSortAndPageOption,
+            accountsThatAllowedRoleTaking
+        };
     }
 });
 </script>

@@ -74,19 +74,7 @@
 
         <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -109,11 +97,12 @@ import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationMetadataComparatorView",
-    components: { PersonDocumentContributionList, MonographPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, MonographPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -141,10 +130,12 @@ export default defineComponent({
         const fetchMonographs = () => {
             DocumentPublicationService.readMonographPublication(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftMonographPublication.value = response.data;
+                leftMonographPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readMonographPublication(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightMonographPublication.value = response.data;
+                rightMonographPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -194,12 +185,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateMonographPublication();
-            updateRightRef.value?.updateMonographPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submits();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightMonographPublication.value, leftMonographPublication.value] = mergeMonographMetadata(rightMonographPublication.value as MonographPublication, leftMonographPublication.value as MonographPublication);
@@ -267,12 +258,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateMonographPublication();
-            updateRightRef.value?.updateMonographPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

@@ -10,9 +10,14 @@
                         <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <person-deduplication-table ref="deduplicationTableRef" :person-first-name="firstName" :person-last-name="lastName"></person-deduplication-table>
+                </v-row>
+
                 <v-row>
                     <v-col cols="12">
-                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit"></organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -98,19 +103,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ message }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -131,11 +125,13 @@ import { getEmploymentPositionsForGivenLocale } from '@/i18n/employmentPosition'
 import DatePicker from '../core/DatePicker.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
+import PersonDeduplicationTable from './PersonDeduplicationTable.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch, DatePicker },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast },
     props: {
         inModal: {
             type: Boolean,
@@ -189,6 +185,8 @@ export default defineComponent({
         const sexes = getSexForGivenLocale();
         const selectedSex = ref(selectionPlaceholder);
 
+        const deduplicationTableRef = ref<typeof PersonDeduplicationTable>();
+
         const submitPerson = (stayOnPage: boolean) => {
             const newPerson: BasicPerson = {
                 personName: {firstname: firstName.value, otherName: middleName.value, lastname: lastName.value, dateFrom: birthdate.value, dateTo: null},
@@ -201,7 +199,7 @@ export default defineComponent({
                 scopusAuthorId: scopus.value,
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
-                organisationUnitId: selectedOrganisationUnit.value.value,
+                organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
                 employmentPosition: selectedEmploymentPosition.value.value
             };
 
@@ -226,6 +224,7 @@ export default defineComponent({
                     selectedSex.value = selectionPlaceholder;
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
+                    deduplicationTableRef.value?.resetTable();
                     
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -238,12 +237,14 @@ export default defineComponent({
             });
         };
 
-        return {isFormValid, additionalFields, snackbar, message,
+        return {
+            isFormValid, additionalFields, snackbar, message, deduplicationTableRef,
             firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submitPerson,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules};
+            scopusAuthorIdValidationRules
+        };
     }
 });
 </script>

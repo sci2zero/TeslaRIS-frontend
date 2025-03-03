@@ -41,19 +41,13 @@
             ></v-progress-circular>
         </v-row>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <v-row class="d-flex flex-row justify-center mt-10">
+            <v-btn @click="navigateToMetadataComparison">
+                {{ $t("compareMetadataLabel") }}
+            </v-btn>
+        </v-row>
+
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -61,7 +55,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
@@ -69,16 +63,18 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import MonographService from '@/services/DocumentPublicationService';
 import type { Monograph } from '@/models/PublicationModel';
 import MergeService from '@/services/MergeService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationsComparator",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
         const loading = ref(false);
 
+        const router = useRouter();
         const currentRoute = useRoute();
 
         const leftMonograph = ref<Monograph>();
@@ -144,10 +140,12 @@ export default defineComponent({
         const fetchMonographs = () => {
             MonographService.readMonograph(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftMonograph.value = response.data;
+                leftMonograph.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             MonographService.readMonograph(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightMonograph.value = response.data;
+                rightMonograph.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -174,6 +172,12 @@ export default defineComponent({
             });
         };
 
+        const navigateToMetadataComparison = () => {
+            router.push({name: "monographMetadataComparator", params: {
+                leftId: parseInt(currentRoute.params.leftId as string), rightId: parseInt(currentRoute.params.rightId as string)
+            }});
+        };
+
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
@@ -181,7 +185,7 @@ export default defineComponent({
             leftPublications, leftTotalPublications,
             rightPublications, rightTotalPublications,
             leftMonograph, rightMonograph, handleDrag,
-            moveAll, loading
+            moveAll, loading, navigateToMetadataComparison
         };
 }})
 

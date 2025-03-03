@@ -1,13 +1,22 @@
 <template>
-    <v-row>
+    <v-row v-if="canEdit || (description && description.length > 0)">
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <description-or-biography-update-modal :preset-description-or-biography="description ? description : []" :is-biography="isBiography" :read-only="!canEdit" @update="emitToParent"></description-or-biography-update-modal>
+                    <generic-crud-modal
+                        :form-component="DescriptionOrBiographyUpdateForm"
+                        :form-props="{ presetDescriptionOrBiography: description ? description : [] }"
+                        :entity-name="isGeneralDescription ? '' : (isBiography ? 'Biography' : 'Abstract')"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        wide
+                        @update="emitToParent"
+                    />
 
-                    <div><b>{{ $t("descriptionLabel") }}</b></div>
+                    <div><b>{{ isGeneralDescription ? $t('descriptionLabel') : (isBiography ? $t("biographyLabel") : $t("abstractLabel")) }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <p>{{ returnCurrentLocaleContent(description) }}</p>
+                    <rich-text-editor v-model="descriptionDisplay" :editable="false"></rich-text-editor>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -15,15 +24,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, ref, watch, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
-import DescriptionOrBiographyUpdateModal from './update/DescriptionOrBiographyUpdateModal.vue';
+import GenericCrudModal from './GenericCrudModal.vue';
+import DescriptionOrBiographyUpdateForm from './update/DescriptionOrBiographyUpdateForm.vue';
+import RichTextEditor from './RichTextEditor.vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
     name: "DescriptionSection",
-    components: { DescriptionOrBiographyUpdateModal },
+    components: { GenericCrudModal, RichTextEditor },
     props: {
         canEdit: {
             type: Boolean,
@@ -33,19 +45,34 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        isGeneralDescription: {
+            type: Boolean,
+            default: false
+        },
         description: {
             type: Object as PropType<MultilingualContent[] | undefined>,
             required: true
         }
     },
     emits: ["update"],
-    setup(_, { emit }) {
-        
+    setup(props, { emit }) {
+        const descriptionDisplay = ref("");
+
+        const i18n = useI18n();
+
         const emitToParent = (description: MultilingualContent[]) => {
-            emit("update", description)
+            emit("update", description);
         };
 
-        return { emitToParent, returnCurrentLocaleContent };
+        watch([() => props.description, i18n.locale], () => {
+            descriptionDisplay.value = returnCurrentLocaleContent(props.description) as string;
+        });
+
+        return { 
+            emitToParent, returnCurrentLocaleContent,
+            DescriptionOrBiographyUpdateForm,
+            descriptionDisplay
+        };
     },
 });
 </script>

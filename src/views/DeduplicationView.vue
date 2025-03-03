@@ -69,19 +69,7 @@
             </v-card-text>
         </v-card>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ message }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="message" />
     </v-container>
 </template>
 
@@ -96,11 +84,12 @@ import DeduplicationService from "@/services/DeduplicationService";
 import { EntityType } from "@/models/MergeModel";
 import { useRoute, useRouter } from "vue-router";
 import { watch } from "vue";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent({
     name: "DeduplicationView",
-    components: { DocumentDeduplicationTable },
+    components: { DocumentDeduplicationTable, Toast },
     setup() {
         const route = useRoute();
         const currentTab = ref(route.query.tab || "documents");

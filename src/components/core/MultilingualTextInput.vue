@@ -2,13 +2,14 @@
     <v-row v-for="(input, index) in inputs" :key="index" class="multi-lingual-input">
         <v-col cols="7">
             <v-text-field
-                v-if="!isArea"
+                v-if="!isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-text-field>
             <v-textarea
-                v-if="isArea"
+                v-if="isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-textarea>
+            <rich-text-editor v-if="isRich" ref="richEditorRef" v-model="input.text" @input="sendContentToParent"></rich-text-editor>
         </v-col>
         <v-col cols="3">
             <v-select
@@ -41,16 +42,23 @@ import type { AxiosResponse } from 'axios';
 import UserService from '@/services/UserService';
 import type { UserResponse } from '@/models/UserModel';
 import { watch } from 'vue';
+import RichTextEditor from './RichTextEditor.vue';
 
 
 export default defineComponent({
     name: "MultilingualTextInput",
+    components: { RichTextEditor },
     props: {
         label: {
             type: String,
             required: true
         },
         isArea: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        isRich: {
             type: Boolean,
             required: false,
             default: false
@@ -74,6 +82,8 @@ export default defineComponent({
         const userPreferredLanguage = ref<{tag: string, id: number}>({tag: "", id: -1});
         const supportedLanguages = ref<{title: string, value: number}[]>([]);
         const inputs = ref<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]>([]);
+
+        const richEditorRef = ref<typeof RichTextEditor[]>([]);
 
         const initialValueSet = ref(false);
 
@@ -126,8 +136,7 @@ export default defineComponent({
                 setInitialModelValue();
                 initialValueSet.value = true;
             }
-            
-        })
+        });
 
         const addInput = () => {
             let languageChoice = supportedLanguages.value;
@@ -187,7 +196,10 @@ export default defineComponent({
         const sendContentToParent = () => {
             const returnObject: MultilingualContent[] = [];
             inputs.value.forEach((input, index) => {
-                if(input.text.trim() === "") {
+                if (!input.text || input.text === "<p></p>") {
+                    input.text = "";
+                    return;
+                } else if(input.text.trim() === "") {
                     return;
                 }
                 returnObject.push({content: input.text, 
@@ -206,19 +218,23 @@ export default defineComponent({
             sendContentToParent,
             clearInput,
             updatedLanguage,
-            forceRefreshModelValue
+            forceRefreshModelValue,
+            richEditorRef
         };
     }
 });
 </script>
 
 <style scoped>
+    
     .multi-lingual-input:first-child:not(:last-child) > div.v-col{
         padding-bottom: 0;
     }
+    
     .multi-lingual-input:last-child:not(:first-child) > div.v-col{
         padding-top: 0;
     }
+    
     .multi-lingual-input:not(:first-child):not(:last-child)  > div.v-col{
         padding-bottom: 0;
         padding-top: 0;

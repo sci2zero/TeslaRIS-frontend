@@ -18,6 +18,8 @@ export const useValidationUtils = () => {
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
+    const requiredFutureDateMessage = computed(() => i18n.t("requiredFutureDateMessage"));
+    const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
 
     
     const requiredFieldRules = [
@@ -27,9 +29,32 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const requiredNumericFieldRules = [
+        (value: string) => {
+            if (!value) return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
     const requiredSelectionRules = [
         (value: { title: string, value: number }) => {
             if (!value || value.value === null || value.value === -1) return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
+    const requiredStringSelectionRules = [
+        (value: { title: string, value: string }) => {
+            if (!value || value.value === null || value.value === "") return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
+    const requiredMultiSelectionRules = [
+        (values: { title: string, value: number | string }[]) => {
+            if (!values || values.length === 0) {
+                return requiredFieldMessage.value;
+            }
             return true;
         }
     ];
@@ -79,7 +104,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const printIssnPattern = /^\d{4}-\d{4}([\dX])?$/i;
+    const printIssnPattern = /^(\d{4}-\d{4}|\d{4}-\d{3}[\dX]?)$/i;
     const printIssnValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -160,11 +185,52 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const nonMandatoryEmailFieldRules = [
+        (value: string) => {
+            if (!value) return true;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) return emailFormatMessage.value;
+            return true;
+        }
+    ];
+
+    const dateTodayOrFutureRules = [
+        (value: string) => {
+            const dateTokens = value.split(".");
+            if (dateTokens.length !== 4) return requiredFieldMessage.value;
+
+            const inputDate = new Date(parseInt(dateTokens[2].trim()), parseInt(dateTokens[1].trim()) - 1, parseInt(dateTokens[0].trim()));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (isNaN(inputDate.getTime())) return requiredFieldMessage.value;
+
+            if (inputDate < today) return requiredFutureDateMessage.value;
+            return true;
+        }
+    ];
+    
+    const timeTodayOrFutureRules = [
+        (value: string) => {
+            const now = new Date();
+            const [hours, minutes] = value.split(":").map(Number);
+    
+            if (isNaN(hours) || isNaN(minutes)) return requiredFieldMessage.value;
+
+            const inputTime = new Date();
+            inputTime.setHours(hours, minutes, 0, 0);
+    
+            if (inputTime < now) return requiredFutureTimeMessage.value;
+            return true;
+        }
+    ];    
+
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
         apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
-        emailFieldRules
+        emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
+        dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
+        requiredStringSelectionRules
     };
 };

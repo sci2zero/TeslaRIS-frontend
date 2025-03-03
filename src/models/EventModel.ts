@@ -53,9 +53,10 @@ interface Event {
     serialEvent: boolean;
     dateFrom: string;
     dateTo: string;
-    state: MultilingualContent[];
     place: MultilingualContent[];
     contributions?: PersonEventContribution[];
+    countryId?: number;
+    uris: string[]
 }
 
 export interface Conference extends Event {

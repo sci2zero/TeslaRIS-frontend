@@ -34,6 +34,7 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
+        const isFormValid = ref(true);
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const keywords = ref<any>([]);
 
@@ -45,7 +46,10 @@ export default defineComponent({
             });
         });
 
-        const updateKeywords = () => {
+        const submit = () => {
+            keywords.value.forEach((keywordMC: MultilingualContent) => {
+                keywordMC.content = keywordMC.content.trim();
+            });
             emit("update", keywords.value)
         };
 
@@ -63,8 +67,9 @@ export default defineComponent({
 
         return {
             keywords, keywordsRef,
-            updateKeywords, toMultilingualTextInput,
-            languageTags, refreshForm
+            submit, toMultilingualTextInput,
+            languageTags, refreshForm,
+            isFormValid
         };
     }
 });

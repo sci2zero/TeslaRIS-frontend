@@ -104,11 +104,12 @@ import type { Journal } from '@/models/JournalModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import { watch } from 'vue';
+import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch},
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
@@ -175,7 +176,7 @@ export default defineComponent({
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
 
-        const updateJournalPublication = () => {
+        const submit = () => {
             const updatedJournalPublication: JournalPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -236,7 +237,7 @@ export default defineComponent({
             selectedJournal, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
-            updateJournalPublication, toMultilingualTextInput,
+            submit, toMultilingualTextInput,
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,

@@ -72,9 +72,22 @@ import MonographPublicationMetadataComparatorView from "@/views/comparators/docu
 import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/BookSeriesMetadataComparatorView.vue";
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
+import CountryListView from "@/views/CountryListView.vue";
+import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
+import DocumentClaimerView from "@/views/DocumentClaimerView.vue";
+import PublisherPublicationsComparator from "@/views/comparators/publisher/PublisherPublicationsComparator.vue";
+import PublisherMetadataComparator from "@/views/comparators/publisher/PublisherMetadataComparator.vue";
+import IndicatorsListView from "@/views/assessment/listViews/IndicatorsListView.vue";
+import AssessmentRulebooksView from "@/views/assessment/listViews/AssessmentRulebooksView.vue";
+import AssessmentRulebookLandingView from "@/views/assessment/landingPages/AssessmentRulebookLandingView.vue";
+import CommissionsView from "@/views/assessment/listViews/CommissionsView.vue";
+import CommissionLandingView from "@/views/assessment/landingPages/CommissionLandingView.vue";
+import LanguageTagListView from "@/views/LanguageTagListView.vue";
+import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
+import AssessmentClassificationsListView from "@/views/assessment/listViews/AssessmentClassificationsListView.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR" };
+const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION" };
 
 
 const router = createRouter({
@@ -123,7 +136,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission],
                     },
                 },
                 {
@@ -144,7 +157,7 @@ const router = createRouter({
                             component: EventListView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.commission],
                             },
                         },
                         {
@@ -152,8 +165,8 @@ const router = createRouter({
                             name: "conferenceLandingPage",
                             component: ConferenceLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
@@ -271,7 +284,7 @@ const router = createRouter({
                             component: JournalListView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.commission],
                             },
                         },
                         {
@@ -395,7 +408,25 @@ const router = createRouter({
                                 authenticated: true,
                                 authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
                             },
-                        }
+                        },
+                        {
+                            path: 'publications-comparator/:leftId/:rightId',
+                            name: "publisherPublicationsComparator",
+                            component: PublisherPublicationsComparator,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'metadata-comparator/:leftId/:rightId',
+                            name: "publisherMetadataComparator",
+                            component: PublisherMetadataComparator,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                     ]
                 },
                 {
@@ -479,7 +510,6 @@ const router = createRouter({
                             },
                         },
                     ]
-                    
                 },
                 {
                     path: "scientific-results",                
@@ -808,6 +838,120 @@ const router = createRouter({
                         authenticated: true,
                         authorities: [roles.admin],
                     },
+                },
+                {
+                    path: "countries",
+                    name: "countries",
+                    component: CountryListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "language-tags",
+                    name: "languageTags",
+                    component: LanguageTagListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "research-areas",
+                    name: "researchAreas",
+                    component: ResearchAreaListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "document-claim",
+                    name: "documentClaim",
+                    component: DocumentClaimerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher],
+                    },
+                },
+                {
+                    path: "scheduled-tasks",
+                    name: "scheduledTasks",
+                    component: ScheduledTasksView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "assessment",                 
+                    children: [
+                        {
+                            path: "indicators",
+                            name: "indicators",
+                            component: IndicatorsListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "classifications",
+                            name: "classifications",
+                            component: AssessmentClassificationsListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "assessment-rulebooks",
+                            children: [
+                                {
+                                    path: "",
+                                    name: "assessmentRulebooks",
+                                    component: AssessmentRulebooksView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                                {
+                                    path: ":id",
+                                    name: "assessmentRulebookLandingPage",
+                                    component: AssessmentRulebookLandingView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                            ]
+                        },
+                        {
+                            path: "commissions",
+                            children: [
+                                {
+                                    path: "",
+                                    name: "commissions",
+                                    component: CommissionsView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin],
+                                    },
+                                },
+                                {
+                                    path: ":id",
+                                    name: "commissionLandingPage",
+                                    component: CommissionLandingView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.commission],
+                                    },
+                                },
+                            ]
+                        }
+                    ]
                 },
             ]
         },

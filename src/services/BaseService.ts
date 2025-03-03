@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 
 export class BaseService {
   basePath: string = import.meta.env.VITE_BASE_URL as string;
@@ -26,6 +26,29 @@ export class BaseService {
     URL.revokeObjectURL(link.href);
   }
 
+  async fetchImageForDisplay(personId: number, fullSize: boolean): Promise<[string | null, string | null]> {
+    try {
+      const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/image/${personId}?fullSize=${fullSize}`, {
+        responseType: 'blob',
+      });
+
+      if (response.status === 204) {
+        return [null, null];
+      }
+
+      let imageName = null;
+      if (response.headers["content-disposition"]) {
+        imageName = response.headers["content-disposition"].split("=")[1].replaceAll('"', '');
+      }
+  
+      const imageUrl = URL.createObjectURL(response.data);
+      return [imageUrl, imageName];
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return [null, null];
+    }
+  }
+
   async sendRequest(
     restMethod: any = axios.get,
     path: string = "",
@@ -49,19 +72,25 @@ export class BaseService {
     idempotencyKey: string = ""
   ): Promise<any> {
     const formData = new FormData();
-  
-    for (const key in requestBody) {
-        if (Array.isArray(requestBody[key])) {
-            requestBody[key].forEach((item: any, index: number) => {
-                for (const nestedKey in item) {
-                    formData.append(`${key}[${index}].${nestedKey}`, item[nestedKey]);
-                }
+
+    const appendFormData = (data: any, parentKey: string | null = null) => {
+        if (data instanceof Object && !Array.isArray(data) && !(data instanceof File)) {
+            for (const key in data) {
+                appendFormData(data[key], parentKey ? `${parentKey}.${key}` : key);
+            }
+        } else if (Array.isArray(data)) {
+            data.forEach((item, index) => {
+                appendFormData(item, `${parentKey}[${index}]`);
             });
         } else {
-            formData.append(key, requestBody[key]);
+            formData.append(parentKey!, data);
         }
+    };
+
+    for (const key in requestBody) {
+        appendFormData(requestBody[key], key);
     }
-  
+
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
@@ -69,7 +98,7 @@ export class BaseService {
         },
         withCredentials: true
     };
-  
+
     return restMethod(this.basePath + path, formData, config);
   }
 }

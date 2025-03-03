@@ -60,21 +60,9 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -93,11 +81,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { ComparisonSide } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "BookSeriesMetadataComparator",
-    components: { PersonPublicationSeriesContributionList, PublicationSeriesUpdateForm, ComparisonActions },
+    components: { PersonPublicationSeriesContributionList, PublicationSeriesUpdateForm, ComparisonActions, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -168,6 +157,13 @@ export default defineComponent({
             });
             bookSeries2.languageTagIds = [];
 
+            bookSeries2.uris.forEach(uri => {
+                if (!bookSeries1.uris.includes(uri)) {
+                    bookSeries1.uris.push(uri);
+                }
+            });
+            bookSeries2.uris = [];
+
             bookSeries1.contributions = bookSeries1.contributions?.concat(bookSeries2.contributions as PersonPublicationSeriesContribution[]);
             bookSeries2.contributions = [];
 
@@ -175,8 +171,8 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftRef.value?.updatePublicationSeries();
-            updateRightRef.value?.updatePublicationSeries();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightBookSeries.value, leftBookSeries.value] = mergeBookSeriesMetadata(rightBookSeries.value as BookSeries, leftBookSeries.value as BookSeries);
@@ -198,6 +194,7 @@ export default defineComponent({
             leftBookSeries.value!.eissn = updatedBookSeries.eissn;
             leftBookSeries.value!.printISSN = updatedBookSeries.printISSN;
             leftBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            leftBookSeries.value!.uris = updatedBookSeries.uris;
             leftUpdateComplete.value = true;
             
             if (update.value) {
@@ -211,6 +208,7 @@ export default defineComponent({
             rightBookSeries.value!.eissn = updatedBookSeries.eissn;
             rightBookSeries.value!.printISSN = updatedBookSeries.printISSN;
             rightBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            rightBookSeries.value!.uris = updatedBookSeries.uris;
             rightUpdateComplete.value = true;
             
             if (update.value) {
@@ -220,8 +218,8 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftRef.value?.updatePublicationSeries();
-            updateRightRef.value?.updatePublicationSeries();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {
@@ -248,11 +246,17 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            BookSeriesService.deleteBookSeries(side === ComparisonSide.LEFT ? leftBookSeries.value?.id as number : rightBookSeries.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftBookSeries.value?.id as number : rightBookSeries.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftBookSeries.value?.title : rightBookSeries.value?.title;
+
+            const deleteAction = isForceDelete 
+                ? BookSeriesService.forceDeleteBookSeries(id)
+                : BookSeriesService.deleteBookSeries(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "bookSeries" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftBookSeries.value?.title : rightBookSeries.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             });

@@ -1,23 +1,25 @@
 <template>
-    <v-menu v-model="isMenuOpen" :close-on-content-click="false">
+    <v-menu v-model="isMenuOpen" :close-on-content-click="false" :persistent="persistent">
         <template #activator="{ props }">
             <v-text-field
                 :label="label"
                 :model-value="formattedDate"
-                :rules="required ? requiredFieldRules : []"
+                :rules="applyRules()"
                 readonly
                 v-bind="props"
                 variant="solo"
                 hide-details
             ></v-text-field>
         </template>
-        <v-date-picker v-model="selectedDate" hide-actions title="" :color="color">
+        <v-date-picker
+            v-model="selectedDate" hide-actions title="" :color="color"
+            @click.stop>
             <template #header></template>
             <template #actions>
-                <v-btn @click="clearDate">
+                <v-btn @click.stop="clearDate">
                     {{ $t("deleteLabel") }}
                 </v-btn>
-                <v-btn @click="isMenuOpen = false">
+                <v-btn @click.stop="isMenuOpen = false">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </template>
@@ -45,6 +47,14 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    inFuture: {
+      type: Boolean,
+      default: false
+    },
+    persistent: {
+      type: Boolean,
+      default: false
+    },
     modelValue: {
       type: Object as PropType<string | undefined>,
       required: true,
@@ -55,7 +65,7 @@ export default defineComponent({
     const isMenuOpen = ref(false);
     const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
 
-    const { requiredFieldRules } = useValidationUtils();
+    const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
 
     const toIsoString = (date: Date) => {
       const pad = function(num : number) {
@@ -93,12 +103,25 @@ export default defineComponent({
       }
     });
 
+    const applyRules = () => {
+      const rules = [];
+      
+      if (props.required) {
+        rules.push(requiredFieldRules[0]);
+      }
+
+      if (props.inFuture) {
+        rules.push(dateTodayOrFutureRules[0]);
+      }
+
+      return rules;
+    };
+
     return {
       isMenuOpen,
       selectedDate,
       formattedDate,
-      requiredFieldRules,
-      clearDate
+      clearDate, applyRules
     };
   },
 });

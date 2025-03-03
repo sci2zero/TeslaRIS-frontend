@@ -8,7 +8,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row v-if="selectedJournal.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -20,7 +20,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedJournal.value != -1 && myPublications.length == 0">
+                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
                     <v-col><h3>{{ $t("noRecentPublicationsJournalLabel") }}</h3></v-col>
                 </v-row>
 
@@ -30,8 +30,39 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                    <v-col cols="5">
+                        <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="5">
+                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-select
+                            v-model="selectedpublicationType"
+                            :items="publicationTypes"
+                            :label="$t('typeOfPublicationLabel')"
+                            return-object>
+                        </v-select>
                     </v-col>
                 </v-row>
 
@@ -47,42 +78,13 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                        <v-col>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-select
-                                v-model="selectedpublicationType"
-                                :items="publicationTypes"
-                                :label="$t('typeOfPublicationLabel')"
-                                return-object>
-                            </v-select>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -97,7 +99,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -110,11 +112,6 @@
                             <uri-input ref="urisRef" v-model="uris"></uri-input>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
-                        </v-col>
-                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -124,19 +121,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -147,7 +133,6 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import type { DocumentPublicationIndex, JournalPublication, JournalPublicationType } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
@@ -157,11 +142,13 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import { getTypesForGivenLocale } from '@/i18n/journalPublicationType';
+import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, JournalAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -184,12 +171,10 @@ export default defineComponent({
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
 
-        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const myPublications = ref<DocumentPublicationIndex[]>([]);
 
@@ -218,13 +203,19 @@ export default defineComponent({
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
 
         const listPublications = (journal: { title: string, value: number }) => {
-            DocumentPublicationService.findMyPublicationsInJournal(journal.value).then((response) => {
-                myPublications.value = response.data;
-            });
+            if (journal.value > 0) {
+                DocumentPublicationService.findMyPublicationsInJournal(journal.value).then((response) => {
+                    myPublications.value = response.data;
+                });
+            }
         };
 
+        const userRole = computed(() => UserService.provideUserRole());
+
         watch(selectedJournal, (newValue) => {
-            listPublications(newValue);
+            if (newValue && userRole.value === "RESEARCHER") {
+                listPublications(newValue);
+            }
         });
 
         const submitJournalPublication = (stayOnPage: boolean) => {
@@ -246,7 +237,6 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -258,8 +248,6 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
-                    eventAutocompleteRef.value?.clearInput();
                     journalAutocompleteRef.value?.clearInput();
                     selectedpublicationType.value = {title: "", value: null};
                     volume.value = "";
@@ -271,6 +259,7 @@ export default defineComponent({
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -290,20 +279,13 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            volume, issue, startPage, endPage,
-            publicationYear, doi, scopus,
-            articleNumber, numberOfPages,
-            description, descriptionRef,
-            keywords, keywordsRef,
-            uris, urisRef, doiValidationRules,
+            isFormValid, subtitleRef,
+            additionalFields, snackbar, error, title, titleRef, subtitle,
+            volume, issue, startPage, endPage, publicationYear, doi, scopus,
+            articleNumber, numberOfPages, description, descriptionRef,
+            keywords, keywordsRef, userRole, uris, urisRef, doiValidationRules,
             selectedJournal, journalAutocompleteRef, myPublications,
-            selectedEvent, eventAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType,
+            publicationTypes, selectedpublicationType, listPublications,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, submitJournalPublication, errorMessage
         };

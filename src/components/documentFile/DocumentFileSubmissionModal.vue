@@ -24,8 +24,8 @@
                 <v-card-text>
                     <v-container>
                         <document-file-submission-form
-                            ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></document-file-submission-form>
+                            ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" :is-proof="isProof"
+                            @create="emitCreateToParent" @update="emitUpdateToParent"></document-file-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -51,7 +51,7 @@ import type { PropType } from "vue";
 
 
 export default defineComponent({
-    name: "SubmitDocumentFileModal",
+    name: "DocumentFileSubmissionModal",
     components: { DocumentFileSubmissionForm },
     props: {
         edit: {
@@ -78,7 +78,7 @@ export default defineComponent({
         const submissionFormRef = ref<typeof DocumentFileSubmissionForm>();
 
         const emitCreateToParent = (documentFile: DocumentFile) => {
-            emit("create", documentFile)
+            emit("create", documentFile);
             dialog.value = false;
         };
 

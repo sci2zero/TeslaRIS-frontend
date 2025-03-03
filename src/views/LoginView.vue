@@ -54,19 +54,8 @@
                 </div>
             </div>
         </div>
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="timeout">
-            {{ $t("emailOrPasswordIncorrectError") }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+
+        <toast v-model="snackbar" :message="$t('emailOrPasswordIncorrectError')" />
     </v-container>
 </template>
 
@@ -82,12 +71,13 @@ import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useRouteStore } from "@/stores/routeStore";
 import { useValidationUtils } from "@/utils/ValidationUtils";
+import Toast from "@/components/core/Toast.vue";
 
 
 export default defineComponent(
     {
         name: "LoginView",
-        components: { LocalizedLink },
+        components: { LocalizedLink, Toast },
         setup() {
             const route = useRoute();
             const router = useRouter();
@@ -147,13 +137,15 @@ export default defineComponent(
             ];
 
             const login = () => {
-                AuthenticationService.login({email: email.value, password: password.value}).then((response) => {
+                AuthenticationService.login({email: email.value as string, password: password.value}).then((response) => {
                     localStorage.setItem("jwt", response.data.token);
                     localStorage.setItem("refreshToken", response.data.refreshToken);
 
                     loginStore.emitLoginSuccess();
                     if (routeStore.nextRoute != null) {
-                        router.push({ name: routeStore.fetchAndClearRoute() });
+                        const routeName = routeStore.fetchAndClearRoute();
+                        const routeParams = routeStore.fetchAndClearParams();
+                        router.push({ name: routeName, params: routeParams });
                         return;
                     }
                     router.push({ name: "home" });
@@ -163,7 +155,7 @@ export default defineComponent(
             };
 
             const forgotPassword = () => {
-                AuthenticationService.submitForgottenPassword({userEmail: email.value}).then(() => {
+                AuthenticationService.submitForgottenPassword({userEmail: email.value as string}).then(() => {
                     forgotPasswordSubmissionSent.value = true;
                 });
                 startCooldown();

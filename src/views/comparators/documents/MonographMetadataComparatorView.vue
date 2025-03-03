@@ -72,21 +72,9 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -110,11 +98,12 @@ import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "MonographMetadataComparator",
-    components: { PersonDocumentContributionList, MonographUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, MonographUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -142,10 +131,12 @@ export default defineComponent({
         const fetchMonographs = () => {
             DocumentPublicationService.readMonograph(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftMonograph.value = response.data;
+                leftMonograph.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readMonograph(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightMonograph.value = response.data;
+                rightMonograph.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -205,12 +196,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateMonograph();
-            updateRightRef.value?.updateMonograph();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightMonograph.value, leftMonograph.value] = mergeMonographMetadata(rightMonograph.value as Monograph, leftMonograph.value as Monograph);
@@ -282,12 +273,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateMonograph();
-            updateRightRef.value?.updateMonograph();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {
@@ -333,11 +324,17 @@ export default defineComponent({
             rightMonograph.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteMonograph(side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number).then(() => {
+        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+            const id = side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number;
+            const name = side === ComparisonSide.LEFT ? leftMonograph.value?.title : rightMonograph.value?.title;
+
+            const deleteAction = isForceDelete 
+                ? DocumentPublicationService.forceDeleteMonograph(id)
+                : DocumentPublicationService.deleteMonograph(id);
+
+            deleteAction.then(() => {
                 router.push({ name: "deduplication", query: { tab: "documents" } });
             }).catch(() => {
-                const name = side === ComparisonSide.LEFT ? leftMonograph.value?.title : rightMonograph.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             });

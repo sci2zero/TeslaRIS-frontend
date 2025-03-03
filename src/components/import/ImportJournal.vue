@@ -24,6 +24,7 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
             @update:options="refreshTable">
             <template #item="row">
                 <tr>
@@ -81,6 +82,7 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
         const journalBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedJournal = ref<JournalIndex>();
@@ -147,12 +149,15 @@ export default defineComponent({
         };
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
+
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
           { title: "eISSN", align: "start", sortable: true, key: "eISSN"},
           { title: "Print ISSN", align: "start", sortable: true, key: "printISSN"},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -186,12 +191,18 @@ export default defineComponent({
         };
 
         const addNew = () => {
+            if (creationInProgress.value) {
+                return;
+            }
+
+            creationInProgress.value = true;
+
             ImportService.createNewJournal(props.publicationForLoading.journalEIssn, props.publicationForLoading.journalPrintIssn, idempotencyKey).then((response) => {
                 selectedJournal.value = {
                     titleSr: returnCurrentLocaleContent(response.data.title) as string,
                     titleOther: returnCurrentLocaleContent(response.data.title) as string,
                     databaseId: response.data.id as number,
-                    eISSN: response.data.eissn,
+                    eissn: response.data.eissn,
                     printISSN: response.data.printISSN as string,
                     titleOtherSortable: "",
                     titleSrSortable: "",
@@ -202,6 +213,7 @@ export default defineComponent({
                 journalBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
+                creationInProgress.value = false;
             });
         };
 

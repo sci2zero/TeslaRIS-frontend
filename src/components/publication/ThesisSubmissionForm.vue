@@ -1,20 +1,27 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="8">
                 <v-row>
-                    <v-col cols="11">
+                    <v-col v-if="!enterExternalOU" cols="10">
                         <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                    </v-col>
+                </v-row>
+                <v-row v-if="enterExternalOU">
+                    <v-col>
+                        <multilingual-text-input ref="externalOUNameRef" v-model="externalOUName" :rules="requiredFieldRules" :label="$t('externalOUNameLabel') + '*'"></multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
+                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                        </v-btn>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -38,7 +45,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" basic limit-one @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -47,21 +54,23 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
+                        <v-col>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="10">
                             <v-select
                                 v-model="selectedResearchArea"
-                                :label="$t('researchAreaLabel') + '*'"
+                                :label="$t('researchAreaLabel')"
                                 :items="researchAreasSelectable"
                                 return-object
                             ></v-select>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="5">
+                        <v-col cols="10">
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -71,7 +80,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -89,11 +98,6 @@
                             <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <event-autocomplete-search ref="eventRef" v-model="selectedEvent"></event-autocomplete-search>
-                        </v-col>
-                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -103,19 +107,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -132,7 +125,6 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
 import type { ErrorResponse, LanguageTagResponse } from '@/models/Common';
-import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
@@ -140,14 +132,16 @@ import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, EventAutocompleteSearch, OrganisationUnitAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
+        const enterExternalOU = ref(false);
 
         const snackbar = ref(false);
         const error = ref(false);
@@ -190,26 +184,25 @@ export default defineComponent({
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
         const titleRef = ref<typeof MultilingualTextInput>();
+        const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
-        const eventRef = ref<typeof EventAutocompleteSearch>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
+        const externalOUName = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
-        const scopus = ref("");
         const numberOfPages = ref<number|null>();
         const uris = ref<string[]>([]);
 
@@ -219,7 +212,7 @@ export default defineComponent({
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
             const newThesis: Thesis = {
@@ -227,17 +220,17 @@ export default defineComponent({
                 thesisType: selectedThesisType.value.value as ThesisType,
                 languageTagIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value as number,
-                organisationUnitId: selectedOrganisationUnit.value.value,
+                organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
+                externalOrganisationUnitName: externalOUName.value,
                 description: description.value,
                 keywords: keywords.value,
                 subTitle: subtitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
-                scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
+                researchAreaId: selectedResearchArea.value.value as number,
                 fileItems: [],
                 proofs: []
             };
@@ -245,21 +238,20 @@ export default defineComponent({
             DocumentPublicationService.createThesis(newThesis).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
+                    externalOUNameRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
-                    eventRef.value?.clearInput();
                     ouAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
-                    scopus.value = "";
                     numberOfPages.value = null;
                     selectedThesisType.value = { title: "", value: null };
                     selectedResearchArea.value = { title: "", value: null };
-                    ouAutocompleteRef.value?.clearInput();
+                    selectedOrganisationUnit.value = {title: "", value: -1};
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -284,16 +276,17 @@ export default defineComponent({
             snackbar, error,
             title, titleRef,
             subtitle, subtitleRef,
-            publicationYear, doi, scopus,
+            publicationYear, doi,
             publisherAutocompleteRef,
             selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef,
-            contributions, contributionsRef, eventRef, selectedEvent,
+            contributions, contributionsRef,
             requiredFieldRules, submitThesis, errorMessage,
-            scopusIdValidationRules, requiredSelectionRules,
+            requiredSelectionRules, enterExternalOU,
             researchAreasSelectable, selectedResearchArea,
-            selectedThesisType, thesisTypes, selectedOrganisationUnit
+            selectedThesisType, thesisTypes, selectedOrganisationUnit,
+            externalOUName, externalOUNameRef, ouAutocompleteRef
         };
     }
 });

@@ -74,19 +74,7 @@
 
         <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -110,11 +98,12 @@ import ComparisonActions from '@/components/core/comparators/ComparisonActions.v
 import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "DatasetMetadataComparator",
-    components: { PersonDocumentContributionList, DatasetUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, DatasetUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -142,10 +131,12 @@ export default defineComponent({
         const fetchDatasets = () => {
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftDataset.value = response.data;
+                leftDataset.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readDataset(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightDataset.value = response.data;
+                rightDataset.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -188,12 +179,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateDataset();
-            updateRightRef.value?.updateDataset();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightDataset.value, leftDataset.value] = mergeDatasetMetadata(rightDataset.value as Dataset, leftDataset.value as Dataset);
@@ -253,12 +244,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateDataset();
-            updateRightRef.value?.updateDataset();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {

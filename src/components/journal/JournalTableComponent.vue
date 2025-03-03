@@ -25,6 +25,8 @@
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
+        :no-data-text="$t('noDataInTableMessage')"
+        :page="tableOptions.page"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
@@ -47,7 +49,7 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.eISSN) }}
+                    {{ displayTextOrPlaceholder(row.item.eissn) }}
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(row.item.printISSN) }}
@@ -122,6 +124,7 @@ export default defineComponent({
         ]);
 
         const refreshTable = (event: any) => {
+            console.log(event)
             if (tableOptions.value.initialCustomConfiguration) {
                 tableOptions.value.initialCustomConfiguration = false;
                 event = tableOptions.value;
@@ -183,10 +186,23 @@ export default defineComponent({
             }});
         };
 
-        return {selectedJournals, headers, notifications,
+        const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            tableOptions.value.initialCustomConfiguration = true;
+            if (sortBy.length === 0) {
+                tableOptions.value.sortBy.splice(0);
+            } else {
+                tableOptions.value.sortBy = sortBy;
+            }
+            tableOptions.value.page = page;
+        };
+
+        return {
+            selectedJournals, headers, notifications,
             refreshTable, userRole, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startPublicationComparison, startMetadataComparison};
+            startPublicationComparison, startMetadataComparison,
+            setSortAndPageOption
+        };
     }
 });
 </script>

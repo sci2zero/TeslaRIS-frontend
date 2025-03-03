@@ -5,6 +5,7 @@ import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
 import type { Dataset, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "./PublicationModel";
+import type { Publisher } from "./PublisherModel";
 
 
 export interface MergedDocuments {
@@ -88,6 +89,11 @@ export interface MergedMonographPublications extends MergedDocuments {
     rightMonographPublication: MonographPublication;
 }
 
+export interface MergedPublishers {
+    leftPublisher: Publisher;
+    rightPublisher: Publisher;
+}
+
 export enum ComparisonSide {
     LEFT = "LEFT",
     RIGHT = "RIGHT"
@@ -99,5 +105,7 @@ export enum EntityType {
     EVENT = "EVENT",
     PERSON = "PERSON",
     BOOK_SERIES = "BOOK_SERIES",
-    ORGANISATION_UNIT = "ORGANISATION_UNIT"
+    ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    PUBLISHER = "PUBLISHER",
+    USER_ACCOUNT = "USER_ACCOUNT"
 }

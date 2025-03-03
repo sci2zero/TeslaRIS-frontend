@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { MultilingualContent, Page } from "@/models/Common";
-import type { BasicPerson, PersonIndex, PersonName, PersonResponse, PersonalInfo } from "@/models/PersonModel";
+import type { BasicPerson, PersonIndex, PersonName, PersonProfileImageRequest, PersonResponse, PersonalInfo } from "@/models/PersonModel";
 import type { PersonUserResponse } from "@/models/PersonUserModel";
 import type { Involvement } from "@/models/InvolvementModel";
 
@@ -18,8 +18,12 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, "person/for-user");
   }
 
-  async searchResearchers(tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
-    return super.sendRequest(axios.get, `person/simple-search?${tokens}`);
+  async searchResearchers(tokens: string, strict: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}`);
+  }
+
+  async searchResearchersFromInstitution(tokens: string, strict: boolean, institutionId: number): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}&institutionId=${institutionId}`);
   }
 
   async findResearcherByScopusAuthorId(scopusId: string): Promise<AxiosResponse<PersonIndex | null>> {
@@ -35,6 +39,14 @@ export class PersonService extends BaseService {
 
   async deleteResearcher(researcherId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `person/${researcherId}`);
+  }
+
+  async forceDeleteResearcher(researcherId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `person/force/${researcherId}`);
+  }
+
+  async migrateToUnmanagedResearcher(researcherId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `person/unmanaged/${researcherId}`);
   }
 
   async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
@@ -61,12 +73,16 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.patch, `person/personal-info/${personId}`, personalInfo);
   }
 
-  async findEmployeesForOU(organisationUnitId: number, tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
-    return super.sendRequest(axios.get, `person/employed-at/${organisationUnitId}?${tokens}`);
+  async findEmployeesForOU(organisationUnitId: number, tokens: string, fetchAlumni: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/employed-at/${organisationUnitId}?${tokens}&fetchAlumni=${fetchAlumni}`);
   }
 
   async updateOtherNames(otherNames: PersonName[], personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `person/other-names/${personId}`, otherNames);
+  }
+
+  async updatePrimaryName(personId: number, name: PersonName): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `person/name/${personId}`, name);
   }
 
   async selectPrimaryName(otherNameId: number, personId: number): Promise<AxiosResponse<void>> {
@@ -75,6 +91,18 @@ export class PersonService extends BaseService {
 
   async getLatestAffiliation(personId: number): Promise<AxiosResponse<Involvement>> {
     return super.sendRequest(axios.get, `person/${personId}/latest-involvement`);
+  }
+
+  async isPersonBoundToAUser(personId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `person/is-bound/${personId}`);
+  }
+
+  async updatePersonProfileImage(imageFile: PersonProfileImageRequest, personId: number): Promise<AxiosResponse<string>> {
+    return super.sendMultipartFormDataRequest(axios.patch, `person/profile-image/${personId}`, imageFile, PersonService.idempotencyKey);
+  }
+
+  async removePersonProfileImage(personId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `person/profile-image/${personId}`);
   }
 }
 

@@ -8,8 +8,16 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                    <v-col cols="10">
+                        <v-text-field v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="5">
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field v-model="softwareNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
                     </v-col>
                 </v-row>
 
@@ -25,26 +33,13 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
-                        <v-col cols="10">
-                            <v-text-field v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-text-field v-model="softwareNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
+                        <v-col>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('descriptionLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -62,11 +57,6 @@
                             <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <event-autocomplete-search ref="eventRef" v-model="selectedEvent"></event-autocomplete-search>
-                        </v-col>
-                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -76,19 +66,8 @@
             </p>
         </v-row>
     </v-form>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="5000">
-        {{ !error ? $t("savedMessage") : errorMessage }}
-        <template #actions>
-            <v-btn
-                color="blue"
-                variant="text"
-                @click="snackbar = false">
-                {{ $t("closeLabel") }}
-            </v-btn>
-        </template>
-    </v-snackbar>
+    
+    <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script lang="ts">
@@ -105,12 +84,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
 import type { ErrorResponse } from '@/models/Common';
-import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
+import Toast from '../core/Toast.vue';
 
 
 export default defineComponent({
     name: "SubmitSoftware",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, EventAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -135,12 +114,10 @@ export default defineComponent({
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
-        const eventRef = ref<typeof EventAutocompleteSearch>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref([]);
         const subtitle = ref([]);
@@ -149,11 +126,10 @@ export default defineComponent({
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
-        const scopus = ref("");
         const softwareNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
         const submitSoftware = (stayOnPage: boolean) => {
             const newSoftware: Software = {
@@ -165,10 +141,8 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
-                scopusId: scopus.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                eventId: selectedEvent.value.value === -1 ? undefined : selectedEvent.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -180,13 +154,11 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
-                    eventRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
-                    scopus.value = "";
                     softwareNumber.value = "";
+                    contributionsRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -211,14 +183,13 @@ export default defineComponent({
             snackbar, error,
             title, titleRef,
             subtitle, subtitleRef,
-            publicationYear, doi, scopus,
+            publicationYear, doi,
             publisherAutocompleteRef,
             selectedPublisher, softwareNumber,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef,
-            contributions, contributionsRef, eventRef, selectedEvent,
-            requiredFieldRules, submitSoftware, errorMessage,
-            scopusIdValidationRules
+            contributions, contributionsRef, errorMessage,
+            requiredFieldRules, submitSoftware
         };
     }
 });

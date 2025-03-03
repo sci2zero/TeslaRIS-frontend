@@ -8,8 +8,8 @@ export class EventService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean): Promise<AxiosResponse<Page<EventIndex>>> {
-    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}`);
+  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean): Promise<AxiosResponse<Page<EventIndex>>> {
+    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}`);
   }
 
   async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {
@@ -24,6 +24,10 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.delete, `conference/${conferenceId}`);
   }
 
+  async forceDeleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `conference/force/${conferenceId}`);
+  }
+
   async createConference(body: Conference): Promise<AxiosResponse<Conference>> {
     return super.sendRequest(axios.post, "conference", body, EventService.idempotencyKey);
   }
@@ -34,6 +38,10 @@ export class EventService extends BaseService {
 
   async canEdit(conferenceId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `conference/${conferenceId}/can-edit`);
+  }
+
+  async canClassify(conferenceId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `conference/${conferenceId}/can-classify`);
   }
 
   async reorderContribution(conferenceId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {

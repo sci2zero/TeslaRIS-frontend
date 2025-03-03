@@ -24,6 +24,7 @@
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
             @update:options="refreshTable">
             <template #item="row">
                 <tr>
@@ -60,7 +61,7 @@
 
 <script lang="ts">
 import type { OrganisationUnitLoad, PersonLoad } from "@/models/LoadModel";
-import type { BasicPerson, PersonIndex } from "@/models/PersonModel";
+import type { PersonIndex } from "@/models/PersonModel";
 import PersonService from "@/services/PersonService";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import type { PropType } from "vue";
@@ -72,6 +73,7 @@ import { useI18n } from "vue-i18n";
 import PublicationsDialog from "@/components/core/PublicationsDialog.vue"
 import { watch } from "vue";
 import ImportAffiliation from "./ImportAffiliation.vue";
+import ImportService from "@/services/ImportService";
 
 
 export default defineComponent({
@@ -88,6 +90,7 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const creationInProgress = ref(false);
         const importAffiliationsRef = ref<any[]>([]);
         const automaticProcessCompleted = ref(false);
 
@@ -136,7 +139,7 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
-            PersonService.searchResearchers(`tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`).then(response => {
+            PersonService.searchResearchers(`tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`, true).then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
                 if (totalPersons.value === 0) {
@@ -158,6 +161,7 @@ export default defineComponent({
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
         const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
@@ -166,7 +170,7 @@ export default defineComponent({
           { title: organisationUnitLabel, align: "start", sortable: true, key: employmentColumn},
           { title: birthdateLabel, align: "start", sortable: true, key: "birthdate"},
           { title: "ORCID", align: "start", sortable: true, key: "orcid"},
-          { title: "Actions", align: "start", sortable: false, key: "actions"},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -215,25 +219,14 @@ export default defineComponent({
         };
 
         const addNew = async () => {
+            if (creationInProgress.value) {
+                return;
+            }
+
+            creationInProgress.value = true;
             await waitForImportAffiliations();
 
-            console.log(importAffiliationsRef.value, props.personForLoading.firstName)
-            const newPerson: BasicPerson = {
-                personName: {firstname: props.personForLoading.firstName, otherName: props.personForLoading.middleName, lastname: props.personForLoading.lastName, dateFrom: null, dateTo: null},
-                contactEmail: "",
-                phoneNumber: "",
-                apvnt: props.personForLoading.apvnt,
-                eCrisId: props.personForLoading.eCrisId,
-                eNaukaId: props.personForLoading.eNaukaId,
-                orcid: props.personForLoading.orcid,
-                scopusAuthorId: props.personForLoading.scopusAuthorId,
-                sex: undefined,
-                localBirthDate: "",
-                organisationUnitId: importAffiliationsRef.value[0].selectedAffiliation.databaseId,
-                employmentPosition: undefined
-            };
-
-            PersonService.createPerson(newPerson, idempotencyKey).then((response) => {
+            ImportService.createNewPerson(props.personForLoading.scopusAuthorId, idempotencyKey.value).then(response => {
                 selectedResearcher.value = {
                     name: `${props.personForLoading.firstName} ${props.personForLoading.lastName}`,
                     birthdate: "",
@@ -253,6 +246,7 @@ export default defineComponent({
                 researcherBinded.value = true;
                 automaticProcessCompleted.value = true;
                 showTable.value = false;
+                creationInProgress.value = false;
             });
         };
 
@@ -278,7 +272,7 @@ export default defineComponent({
                 s4()
             );
         };
-        const idempotencyKey = generateIdempotencyKey();
+        const idempotencyKey = ref(generateIdempotencyKey());
 
         const isHandled = () => {
             const allAffiliationsBinded = importAffiliationsRef.value
@@ -295,6 +289,10 @@ export default defineComponent({
             return automaticProcessCompleted.value && allAffiliationProcessesCompleted;
         };
 
+        const resetIdempotencyKey = () => {
+            idempotencyKey.value = generateIdempotencyKey();
+        };
+
         return {
             potentialMatches, switchPage, 
             tableOptions, headers, refreshTable,
@@ -302,7 +300,7 @@ export default defineComponent({
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
             hadToBeCreated, importAffiliationsRef,
-            isHandled, isReady
+            isHandled, isReady, resetIdempotencyKey
         };
     },
 });

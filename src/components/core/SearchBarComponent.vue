@@ -43,18 +43,39 @@ export default defineComponent(
             });
 
             const onSearch = () => {
+                if(searchInput.value === undefined) {
+                    return;
+                }
+
                 let tokens: string[] = searchInput.value.trim().split(" ");
-                if (tokens.length === 1 && tokens[0] === "") {
+                if ((tokens.length === 1 && tokens[0] === "")) {
                     tokens = ["*"]
                 }
+                
                 let searchParams: string = "";
+                let parsingPhrase = false;
+                let currentToken = "";
                 tokens.forEach(token => {
-                    if (token !== "") {
-                        searchParams += `tokens=${token}&`;
+                    if (token === "") {
+                        return;
+                    }
+
+                    if (token.startsWith('"')) {
+                        parsingPhrase = true;
+                    } else if (token.endsWith('"')) {
+                        parsingPhrase = false;
+                    }
+
+                    currentToken += token;
+                    if (!parsingPhrase) {
+                        searchParams += `tokens=${encodeURIComponent(currentToken)}&`;
+                        currentToken = "";
+                    } else {
+                        currentToken += " ";
                     }
                 });
                 emit("search", searchParams.slice(0, -1));
-            }
+            };
 
             return {searchInput, onSearch};
         }

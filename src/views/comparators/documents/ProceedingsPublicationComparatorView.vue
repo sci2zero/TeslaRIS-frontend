@@ -74,19 +74,7 @@
 
         <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
 
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -96,7 +84,6 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import ProceedingsService from '@/services/ProceedingsService';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
@@ -110,11 +97,12 @@ import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationMetadataComparator",
-    components: { PersonDocumentContributionList, ProceedingsPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, ProceedingsPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -142,10 +130,12 @@ export default defineComponent({
         const fetchProceedingss = () => {
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 leftProceedingsPublication.value = response.data;
+                leftProceedingsPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
             DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 rightProceedingsPublication.value = response.data;
+                rightProceedingsPublication.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
@@ -195,12 +185,12 @@ export default defineComponent({
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateProceedingsPublication();
-            updateRightRef.value?.updateProceedingsPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightProceedingsPublication.value, leftProceedingsPublication.value] = mergeProceedingsMetadata(rightProceedingsPublication.value as ProceedingsPublication, leftProceedingsPublication.value as ProceedingsPublication);
@@ -268,12 +258,12 @@ export default defineComponent({
 
         const updateAll = () => {
             update.value = true;
-            updateLeftKeywordsRef.value?.updateKeywords();
-            updateRightKeywordsRef.value?.updateKeywords();
-            updateLeftDescriptionRef.value?.updateDescription();
-            updateRightDescriptionRef.value?.updateDescription();
-            updateLeftRef.value?.updateProceedingsPublication();
-            updateRightRef.value?.updateProceedingsPublication();
+            updateLeftKeywordsRef.value?.submit();
+            updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
+            updateLeftRef.value?.submit();
+            updateRightRef.value?.submit();
         };
 
         const finishUpdates = () => {
@@ -320,7 +310,7 @@ export default defineComponent({
         };
 
         const deleteSide = (side: ComparisonSide) => {
-            ProceedingsService.deleteProceedings(side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.id as number : rightProceedingsPublication.value?.id as number).then(() => {
+            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.id as number : rightProceedingsPublication.value?.id as number).then(() => {
                 router.push({ name: "deduplication", query: { tab: "documents" } });
             }).catch(() => {
                 const name = side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.title : rightProceedingsPublication.value?.title;

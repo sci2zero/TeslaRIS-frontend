@@ -26,7 +26,16 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
-                        <organisation-unit-update-modal :preset-o-u="organisationUnit" :read-only="!canEdit" @update="updateBasicInfo"></organisation-unit-update-modal>
+                        <!-- <organisation-unit-update-modal :preset-o-u="organisationUnit" :read-only="!canEdit" @update="updateBasicInfo"></organisation-unit-update-modal> -->
+                        <generic-crud-modal
+                            :form-component="OrganisationUnitUpdateForm"
+                            :form-props="{ presetOU: organisationUnit }"
+                            entity-name="OrganisationUnit"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
 
                         <!-- Personal Info -->
                         <div class="mb-5">
@@ -44,19 +53,31 @@
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div class="response">
-                                    {{ organisationUnit?.contact?.contactEmail ? organisationUnit?.contact?.contactEmail : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
                                 </div>
-                                <div>
+                                <div v-if="loginStore.userLoggedIn">
                                     {{ $t("phoneNumberLabel") }}:
                                 </div>
-                                <div class="response">
+                                <div v-if="loginStore.userLoggedIn" class="response">
                                     {{ organisationUnit?.contact?.phoneNumber ? organisationUnit?.contact?.phoneNumber : $t("notYetSetMessage") }}
                                 </div>
                                 <div>
                                     Scopus AFID:
                                 </div>
                                 <div class="response">
-                                    {{ organisationUnit?.scopusAfid ? organisationUnit?.scopusAfid : $t("notYetSetMessage") }}
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div v-if="organisationUnit?.uris && organisationUnit.uris.length > 0">
+                                    {{ $t("websiteLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
                             </v-col>
                             <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
@@ -75,57 +96,93 @@
         <!-- Keywords -->
         <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
-        <!-- Research Area -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <research-ares-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-ares-update-modal>
-
-                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-
-        <!-- Relations -->
-        <v-row>
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit" @update="updateRelations"></organisation-unit-relation-update-modal>
-
-                        <div><b>{{ $t("relationsLabel") }}</b></div>
-                        <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Employee Table -->
         <br />
-        <h1>{{ $t("employeesLabel") }}</h1>
-        <person-table-component :persons="employees" :total-persons="totalEmployees" @switch-page="switchEmployeesPage"></person-table-component>
+        <v-tabs
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab v-if="totalPublications > 0" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab v-if="totalEmployees > 0 || canEdit" value="employees">
+                {{ $t("employeesLabel") }}
+            </v-tab>
+            <v-tab value="relations">
+                {{ $t("relationsLabel") }}
+            </v-tab>
+            <v-tab value="researchAreas">
+                {{ $t("researchAreasLabel") }}
+            </v-tab>
+            <v-tab v-if="ouIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+        </v-tabs>
 
-        <!-- Publication Table -->
-        <br />
-        <h1>{{ $t("publicationsLabel") }}</h1>
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="5000">
-            {{ snackbarMessage }}
-            <template #actions>
-                <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snackbar = false">
-                    {{ $t("closeLabel") }}
-                </v-btn>
-            </template>
-        </v-snackbar>
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="publications">
+                <!-- Publication Table -->
+                <h1>{{ $t("publicationsLabel") }}</h1>
+                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="employees">
+                <!-- Employees -->
+                <h1>{{ $t("employeesLabel") }}</h1>
+                <person-table-component
+                    :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"
+                    @delete="fetchEmployees(true)"></person-table-component>
+
+                <div v-if="totalAlumni > 0">
+                    <h1>{{ $t("alumniLabel") }}</h1>
+                    <person-table-component :persons="alumni" :total-persons="totalAlumni" is-alumni-table @switch-page="switchAlumniPage"></person-table-component>
+                </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="relations">
+                <!-- Relations -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit" @update="updateRelations"></organisation-unit-relation-update-modal>
+
+                                <div><b>{{ $t("relationsLabel") }}</b></div>
+                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                <div v-if="totalSubUnits > 0">
+                    <h1>{{ $t("subUnitsLabel") }}</h1>
+                    <v-row>
+                        <v-col>
+                            <organisation-unit-table-component :organisation-units="subUnits" :total-o-us="totalSubUnits" @switch-page="switchSubUnitsPage"></organisation-unit-table-component>
+                        </v-col>
+                    </v-row>
+                </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchAreas">
+                <!-- Research Area -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <research-areas-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-areas-update-modal>
+
+                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <div class="w-50 statistics">
+                    <statistics-view :entity-indicators="ouIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -138,7 +195,7 @@ import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import type { OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
+import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
@@ -147,17 +204,29 @@ import type { MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
-import OrganisationUnitUpdateModal from '@/components/organisationUnit/update/OrganisationUnitUpdateModal.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import ResearchAresUpdateModal from '@/components/core/ResearchAresUpdateModal.vue';
+import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import UriList from '@/components/core/UriList.vue';
+import OrganisationUnitUpdateForm from '@/components/organisationUnit/update/OrganisationUnitUpdateForm.vue';
+import StatisticsService from '@/services/StatisticsService';
+import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
+import { useLoginStore } from '@/stores/loginStore';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, RelationsGraph, KeywordList, PersonTableComponent, OrganisationUnitUpdateModal, OrganisationUnitRelationUpdateModal, ResearchAresUpdateModal },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
     setup() {
+        const currentTab = ref("");
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
         
@@ -177,6 +246,9 @@ export default defineComponent({
         const employees = ref<PersonIndex[]>([]);
         const totalEmployees = ref<number>(0);
 
+        const alumni = ref<PersonIndex[]>([]);
+        const totalAlumni = ref<number>(0);
+
         const publicationsPage = ref(0);
         const publicationsSize = ref(1);
         const publicationsSort = ref("");
@@ -187,19 +259,41 @@ export default defineComponent({
         const employeesSort = ref("");
         const employeesDirection = ref("");
 
+        const alumniPage = ref(0);
+        const alumniSize = ref(1);
+        const alumniSort = ref("");
+        const alumniDirection = ref("");
+
+        const subUnitsPage = ref(0);
+        const subUnitsSize = ref(1);
+        const subUnitsSort = ref("");
+        const subUnitsDirection = ref("");
+
         const canEdit = ref(false);
 
         const i18n = useI18n();
 
         const relations = ref<OrganisationUnitRelationResponse[]>([]);
+        
+        const subUnits = ref<OrganisationUnitIndex[]>([]);
+        const totalSubUnits = ref<number>(0);
+
+        const ouIndicators = ref<EntityIndicatorResponse[]>([]);
+
+        const loginStore = useLoginStore();
 
         onMounted(() => {
-            OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
+            if (loginStore.userLoggedIn) {
+                OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+            }
+
+            fetchOU(true);
+            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
+            EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                ouIndicators.value = response.data;
             });
-
-            fetchOU();
-
             fetchRelations();
 
             OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -207,14 +301,29 @@ export default defineComponent({
             });
         });
 
-        const fetchOU = () => {
+        const fetchOU = (uponStartup: boolean) => {
             OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 organisationUnit.value = response.data;
 
                 document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                 
-                fetchEmployees();
-                fetchPublications();
+                if(uponStartup) {
+                    Promise.all([fetchPublications(), fetchEmployees(false), fetchEmployees(true)]).then(() => {
+                        setStartTab();
+                    });
+                }
+
+                fetchSubUnits();
+            });
+        };
+
+        const fetchSubUnits = () => {
+            OrganisationUnitService.readOUSubUnits(
+                parseInt(currentRoute.params.id as string),
+                `page=${subUnitsPage.value}&size=${subUnitsSize.value}&sort=${subUnitsSort.value}`
+            ).then((response) => {
+                subUnits.value = response.data.content;
+                totalSubUnits.value = response.data.totalElements;
             });
         };
 
@@ -225,6 +334,14 @@ export default defineComponent({
                     graphRef.value.rendered = false;
                 }
             });
+        };
+
+        const switchSubUnitsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            subUnitsPage.value = nextPage;
+            subUnitsSize.value = pageSize;
+            subUnitsSort.value = sortField;
+            subUnitsDirection.value = sortDir;
+            fetchSubUnits();
         };
 
         const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -240,25 +357,51 @@ export default defineComponent({
             employeesSize.value = pageSize;
             employeesSort.value = sortField;
             employeesDirection.value = sortDir;
-            fetchEmployees();
+            fetchEmployees(false);
+        };
+
+        const switchAlumniPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            alumniPage.value = nextPage;
+            alumniSize.value = pageSize;
+            alumniSort.value = sortField;
+            alumniDirection.value = sortDir;
+            fetchEmployees(true);
         };
 
         const fetchPublications = () => {
-            if (!organisationUnit.value?.id) {
-                return;
-            }
-
-            DocumentPublicationService.findPublicationsForOrganisationUnit(organisationUnit.value?.id as number, `page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsForOrganisationUnit(
+                parseInt(currentRoute.params.id as string),
+                `page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`
+            ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
-                totalPublications.value = publicationResponse.data.totalElements
+                totalPublications.value = publicationResponse.data.totalElements;
             });
         };
 
-        const fetchEmployees = () => {
-            PersonService.findEmployeesForOU(parseInt(currentRoute.params.id as string), `page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`).then((response) => {
-                employees.value = response.data.content;
-                totalEmployees.value = response.data.totalElements;
+        const fetchEmployees = (fetchAlumni: boolean) => {
+            return PersonService.findEmployeesForOU(
+                parseInt(currentRoute.params.id as string),
+                `page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`,
+                fetchAlumni
+            ).then((response) => {
+                if (fetchAlumni) {
+                    alumni.value = response.data.content;
+                    totalAlumni.value = response.data.totalElements;
+                } else {
+                    employees.value = response.data.content;
+                    totalEmployees.value = response.data.totalElements;
+                }
             });
+        };
+
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else if( totalEmployees.value > 0) {
+                currentTab.value = "employees";
+            } else {
+                currentTab.value = "relations";
+            }
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -272,6 +415,7 @@ export default defineComponent({
             organisationUnit.value!.location = basicInfo.location;
             organisationUnit.value!.contact = basicInfo.contact;
             organisationUnit.value!.scopusAfid = basicInfo.scopusAfid;
+            organisationUnit.value!.uris = basicInfo.uris;
             performUpdate(false);
         };
 
@@ -314,17 +458,18 @@ export default defineComponent({
                 keyword: organisationUnit.value!.keyword,
                 researchAreasId: researchAreaIds,
                 location: organisationUnit.value?.location,
-                contact: organisationUnit.value?.contact
+                contact: organisationUnit.value?.contact,
+                uris: organisationUnit.value?.uris as string[]
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-                fetchOU();
+                fetchOU(false);
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
-                fetchOU();
+                fetchOU(false);
             });
         };
 
@@ -336,20 +481,21 @@ export default defineComponent({
                 researchAreasId: organisationUnit.value!.researchAreas.map(leafResearchArea => leafResearchArea.id as number),
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
-                scopusAfid: organisationUnit.value?.scopusAfid
+                scopusAfid: organisationUnit.value?.scopusAfid,
+                uris: organisationUnit.value?.uris as string[]
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchOU();
+                    fetchOU(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchOU();
+                    fetchOU(false);
                 }
             });
         };
@@ -360,7 +506,7 @@ export default defineComponent({
 
         return {
             organisationUnit,
-            ouIcon,
+            ouIcon, currentTab,
             publications, 
             totalPublications,
             employees, totalEmployees,
@@ -370,7 +516,11 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
             snackbar, snackbarMessage, relations,
-            updateRelations, graphRef, updateResearchAreas
+            updateRelations, graphRef, updateResearchAreas,
+            subUnits, totalSubUnits, switchSubUnitsPage,
+            alumni, totalAlumni, switchAlumniPage,
+            OrganisationUnitUpdateForm, fetchEmployees,
+            ouIndicators, StatisticsType, loginStore
         };
 }})
 

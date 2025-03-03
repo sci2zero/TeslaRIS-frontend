@@ -3,22 +3,22 @@
         <v-col :cols="calculateAutocompleteWidth()">
             <v-autocomplete
                 v-model="selectedOrganisationUnit"
-                :label="$t('organisationUnitLabel') + (required ? '*' : '')"
+                :label="(multiple ? $t('ouListLabel') : $t('organisationUnitLabel')) + (required ? '*' : '')"
                 :items="organisationUnits"
                 :custom-filter="((): boolean => true)"
-                :auto-select-first="true"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
                 return-object
                 @update:search="searchOUs($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="userRole === 'ADMIN'" cols="1" class="modal-spacer-top">
+        <v-col v-if="!disableSubmission && userRole === 'ADMIN'" cols="1" class="modal-spacer-top">
             <organisation-unit-submission-modal @create="selectNewlyAddedOU"></organisation-unit-submission-modal>
         </v-col>
-        <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedOrganisationUnit.value !== -1" icon @click="clearInput()">
+        <v-col v-if="allowManualClearing && hasSelection" cols="1">
+            <v-btn icon @click="clearInput">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </v-col>
@@ -27,10 +27,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, watch, type PropType } from 'vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
-import { onMounted } from 'vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitIndex, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitSubmissionModal from './OrganisationUnitSubmissionModal.vue';
@@ -50,53 +49,64 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        multiple: {
+            type: Boolean,
+            default: false,
+        },
         modelValue: {
-            type: Object as PropType<{ title: string, value: number } | undefined>,
+            type: [Object, Array] as PropType<
+                { title: string; value: number } | { title: string; value: number }[] | undefined
+            >,
             required: true,
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
-    setup(props, {emit}) {
+    setup(props, { emit }) {
+        const i18n = useI18n();
+        const { requiredSelectionRules } = useValidationUtils();
+        
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
-        const ouPlaceholder = {title: "", value: -1};
-        const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
+        const searchPlaceholder = props.multiple ? [] : { title: '', value: -1 };
+        
+        const selectedOrganisationUnit = ref(
+            props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
+        );
 
         const userRole = computed(() => UserService.provideUserRole());
+        
+        const hasSelection = computed(() =>
+            props.multiple ? (selectedOrganisationUnit.value as any[]).length > 0 : (selectedOrganisationUnit.value as { title: '', value: -1 }).value !== -1
+        );
 
         onMounted(() => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
             }
             sendContentToParent();
         });
 
         watch(() => props.modelValue, () => {
-            if(props.modelValue && props.modelValue.value !== -1) {
+            if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
             }
         });
 
-        const i18n = useI18n();
-        const { requiredSelectionRules } = useValidationUtils();
-
         const searchOUs = lodash.debounce((input: string) => {
             if (input.length >= 3) {
                 let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
+                input.split(" ").forEach(token => {
+                    params += `tokens=${token}&`;
                 });
                 params += "page=0&size=5";
                 OrganisationUnitService.searchOUs(params).then((response) => {
-                    const listOfOUs: { title: string, value: number }[] = [];
-                    response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfOUs.push({title: organisationUnit.nameSr, value: organisationUnit.databaseId});
-                        } else {
-                            listOfOUs.push({title: organisationUnit.nameOther, value: organisationUnit.databaseId});
-                        }
-                    })
-                    organisationUnits.value = listOfOUs;
+                    organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
+                        title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
+                        value: organisationUnit.databaseId,
+                    }));
                 });
             }
         }, 300);
@@ -106,12 +116,12 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            selectedOrganisationUnit.value = ouPlaceholder;
+            selectedOrganisationUnit.value = searchPlaceholder;
             sendContentToParent();
         };
 
         const calculateAutocompleteWidth = () => {
-            let numberOfColumns = props.allowManualClearing && selectedOrganisationUnit.value.value !== -1 ? 10 : 11;
+            let numberOfColumns = props.allowManualClearing && hasSelection.value ? 10 : 11;
             if (userRole.value !== "ADMIN") {
                 numberOfColumns += 1;
             }
@@ -119,21 +129,18 @@ export default defineComponent({
         };
 
         const selectNewlyAddedOU = (organisationUnit: OrganisationUnitResponse) => {
-            let title: string | undefined;
-            organisationUnit.name.forEach(multilingualContent => {
-                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
-                    title = multilingualContent.content;
-                    return;
-                }
-            });
-            
+            let title = organisationUnit.name.find(multilingualContent => multilingualContent.languageTag === i18n.locale.value.toUpperCase())?.content;
             if (!title && organisationUnit.name.length > 0) {
                 title = organisationUnit.name[0].content;
             }
-
-            const toSelect = {title: `${title} | ${organisationUnit.nameAbbreviation}`, value: organisationUnit.id as number};
+            const toSelect = { title: `${title} | ${organisationUnit.nameAbbreviation}`, value: organisationUnit.id };
             organisationUnits.value.push(toSelect);
-            selectedOrganisationUnit.value = toSelect;
+            
+            if (props.multiple) {
+                (selectedOrganisationUnit.value as any[]).push(toSelect);
+            } else {
+                selectedOrganisationUnit.value = toSelect;
+            }
             sendContentToParent();
         };
 
@@ -141,7 +148,7 @@ export default defineComponent({
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth,
             sendContentToParent, clearInput, userRole,
-            selectNewlyAddedOU
+            selectNewlyAddedOU, hasSelection
         };
     }
 });
