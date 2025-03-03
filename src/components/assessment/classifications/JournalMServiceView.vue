@@ -81,7 +81,9 @@
                 </v-col>
             </v-row>
 
-            <i-f-table-component :json-data="ifTableData" class="mt-15"></i-f-table-component>
+            <i-f-table-component
+                class="mt-15" :json-data="ifTableData" :preset-from-year="yearOfPublication - 2" :preset-to-year="yearOfPublication"
+                @years-updated="fetchIFTableData"></i-f-table-component>
 
             <h2 v-if="assessmentResponse" class="mt-15">
                 {{ $t("assessmentResultsLabel") }}
@@ -146,20 +148,20 @@
             </h3>
         </v-form>
     </v-container>
-</template>  
+</template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 import { ref } from 'vue';
 import type { IFCategoryData, ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import IFTableComponent from '@/components/assessment/indicators/IFTableComponent.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { useResearchAreas } from '@/composables/useResearchAreas';
 
 
 export default defineComponent({
@@ -169,18 +171,10 @@ export default defineComponent({
         const isFormValid = ref(false);
         const ifTableData = ref<IFCategoryData[]>([]);
 
-        const researchAreas = ref<{title: string, value: string}[]>([]);
+        const { researchAreas } = useResearchAreas();
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
 
         const assessmentResponse = ref<ImaginaryJournalPublicationAssessmentResponse>();
-
-        onMounted(() => {
-            AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
-                response.data.forEach(researchArea => {
-                    researchAreas.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.code});
-                });
-            });
-        });
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedJournal = ref<{title: string, value: number}>(searchPlaceholder);
@@ -209,7 +203,11 @@ export default defineComponent({
                 assessmentResponse.value = response.data;
             });
 
-            EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(selectedJournal.value.value).then(response => {
+            fetchIFTableData(yearOfPublication.value - 2, yearOfPublication.value);
+        };
+
+        const fetchIFTableData = (fromYear: number, toYear: number) => {
+            EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(selectedJournal.value.value, fromYear, toYear).then(response => {
                 ifTableData.value = response.data;
             });
         };
@@ -221,7 +219,7 @@ export default defineComponent({
             requiredNumericGreaterThanZeroFieldRules,
             assessImaginaryPublication, yearOfPublication,
             assessmentResponse, returnCurrentLocaleContent,
-            ifTableData, publicationType
+            ifTableData, publicationType, fetchIFTableData
         };
     }
 });

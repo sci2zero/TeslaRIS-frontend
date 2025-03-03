@@ -51,7 +51,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewJournalLabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("addJournalLabel") }}
+                {{ $t("createNewJournalLabel") }}
             </v-btn>
         </h3>
     </v-container>

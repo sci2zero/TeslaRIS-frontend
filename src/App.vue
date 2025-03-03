@@ -71,7 +71,11 @@ export default defineComponent({
                 }
             } else {
                 if (to.name === "login") {
-                    routeStore.setRouteAndParams(from.name, from.params);
+                    if (loginStore.explicitlyLoggedOut) {
+                        loginStore.reachedLoginPage();
+                    } else {
+                        routeStore.setRouteAndParams(from.name, from.params);
+                    }
                 }
                 next();
             }

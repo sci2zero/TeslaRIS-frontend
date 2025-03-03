@@ -216,7 +216,8 @@ export default defineComponent(
 
             const logout = () => {
                 AuthenticationService.logoutUser();
-                loginStore.userLoggedOut();
+                loginStore.explicitlyLogout();
+                loginStore
                 router.push({ name: "login" });
             };
 

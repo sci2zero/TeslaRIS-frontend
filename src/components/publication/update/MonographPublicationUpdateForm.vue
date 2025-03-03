@@ -84,20 +84,19 @@
 import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { MonographPublication, MonographPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import MonographService from '@/services/DocumentPublicationService';
 import type { Monograph } from '@/models/PublicationModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getMonographPublicationTypesForGivenLocale } from '@/i18n/monographPublicationType';
 import MonographAutocompleteSearch from '../MonographAutocompleteSearch.vue';
 import { watch } from 'vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -116,13 +115,9 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const event = ref<Conference>();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchDetails();
         });
 

@@ -101,9 +101,8 @@
 import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { Country, ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, ExternalValidation, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Conference } from '@/models/EventModel';
@@ -112,6 +111,7 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import DatePicker from '@/components/core/DatePicker.vue';
 import CountryService from '@/services/CountryService';
 import UriInput from '@/components/core/UriInput.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -133,13 +133,9 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchCountries();
         });
 

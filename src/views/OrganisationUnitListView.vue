@@ -6,7 +6,7 @@
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
-            {{ $t("addOULabel") }}
+            {{ $t("createNewOULabel") }}
         </v-btn>
         <br />
         <br />

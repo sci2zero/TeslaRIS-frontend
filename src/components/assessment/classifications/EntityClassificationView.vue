@@ -1,6 +1,6 @@
 <template>
     <generic-crud-modal
-        class="mt-5 ml-5"
+        class="mt-5"
         :form-component="EntityClassificationForm"
         :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
         :entity-name="containingEntityType === ApplicableEntityType.DOCUMENT ? 'EntityAssessment' : 'EntityClassification'"
@@ -9,11 +9,11 @@
     />
     <v-row>
         <v-col>
-            <h2 v-if="entityClassifications?.length > 0" class="mt-5">
+            <h2 class="mt-5">
                 {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("classificationsLabel") : $t("assessmentsLabel") }}
             </h2>
         
-            <v-expansion-panels v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
+            <v-expansion-panels v-if="entityClassifications?.length > 0" v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
                 <v-expansion-panel
                     v-for="(classification, index) in entityClassifications"
                     :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
@@ -41,6 +41,9 @@
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
+            <h3 v-else>
+                {{ $t("noClassificationsLabel") }}
+            </h3>
         </v-col>
     </v-row>
 </template>

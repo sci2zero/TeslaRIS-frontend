@@ -77,12 +77,12 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="cityRef" v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageList)" :label="$t('cityLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="cityRef" v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageTags)" :label="$t('cityLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageList)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageTags)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -98,9 +98,8 @@
 <script lang="ts">
 import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { Country, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PersonalInfo, PersonResponse, Sex } from '@/models/PersonModel';
@@ -111,6 +110,7 @@ import DatePicker from '@/components/core/DatePicker.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import UriInput from '@/components/core/UriInput.vue';
 import { useI18n } from 'vue-i18n';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -125,15 +125,11 @@ export default defineComponent({
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
-        const languageList = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         const i18n = useI18n();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             fetchCountries();
         });
 
@@ -239,14 +235,14 @@ export default defineComponent({
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
             urisRef.value?.refreshModelValue(uris.value);
 
-            cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageList.value));
-            streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageList.value));
+            cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
+            streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageTags.value));
         };
 
         return {
             isFormValid, email, phoneNumber, birthdate,
             orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
-            toMultilingualTextInput, languageList, submit,
+            toMultilingualTextInput, languageTags, submit,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,

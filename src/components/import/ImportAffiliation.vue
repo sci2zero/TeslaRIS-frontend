@@ -63,7 +63,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewOULabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("addOULabel") }}
+                {{ $t("createNewOULabel") }}
             </v-btn>
         </h3>
     </v-container>

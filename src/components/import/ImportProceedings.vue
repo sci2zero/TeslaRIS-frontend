@@ -63,7 +63,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewEventLabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("addConferenceLabel") }}
+                {{ $t("createNewConferenceLabel") }}
             </v-btn>
         </h3>
     </v-container>

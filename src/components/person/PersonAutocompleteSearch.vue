@@ -14,8 +14,14 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission" cols="1" class="modal-spacer-top">
-            <person-submission-modal @create="selectNewlyAddedPerson"></person-submission-modal>
+        <v-col v-if="!disableSubmission" cols="1">
+            <generic-crud-modal
+                :form-component="PersonSubmissionForm"
+                entity-name="Person"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedPerson"
+            />
         </v-col>
         <v-col v-if="allowManualClearing && hasSelection" cols="1">
             <v-btn icon @click="clearInput">
@@ -36,11 +42,13 @@ import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { removeTrailingPipeRegex } from '@/utils/StringUtil';
 import { localiseDate } from '@/i18n/dateLocalisation';
-import PersonSubmissionModal from './PersonSubmissionModal.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import PersonSubmissionForm from './PersonSubmissionForm.vue';
+
 
 export default defineComponent({
     name: "PersonAutocompleteSearch",
-    components: { PersonSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -151,7 +159,8 @@ export default defineComponent({
         return {
             persons, selectedPerson, searchPersons,
             requiredSelectionRules, sendContentToParent,
-            clearInput, selectNewlyAddedPerson, hasSelection
+            clearInput, selectNewlyAddedPerson, hasSelection,
+            PersonSubmissionForm
         };
     }
 });

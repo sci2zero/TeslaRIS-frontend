@@ -19,6 +19,10 @@ export const useRouteStore = defineStore('route', {
             const params = this.params;
             this.params = null;
             return params;
+        },
+        clearRouteAndParams() {
+            this.nextRoute = null;
+            this.params = null;
         }
     },
 });

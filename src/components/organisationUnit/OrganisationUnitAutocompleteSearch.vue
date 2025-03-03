@@ -15,8 +15,14 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission && userRole === 'ADMIN'" cols="1" class="modal-spacer-top">
-            <organisation-unit-submission-modal @create="selectNewlyAddedOU"></organisation-unit-submission-modal>
+        <v-col v-if="!disableSubmission && userRole === 'ADMIN'" cols="1">
+            <generic-crud-modal
+                :form-component="OrganisationUnitSubmissionForm"
+                entity-name="OU"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedOU"
+            />
         </v-col>
         <v-col v-if="allowManualClearing && hasSelection" cols="1">
             <v-btn icon @click="clearInput">
@@ -33,14 +39,15 @@ import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitIndex, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import OrganisationUnitSubmissionModal from './OrganisationUnitSubmissionModal.vue';
 import UserService from '@/services/UserService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import OrganisationUnitSubmissionForm from './OrganisationUnitSubmissionForm.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitAutocompleteSearch",
-    components: { OrganisationUnitSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -156,7 +163,7 @@ export default defineComponent({
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth,
-            sendContentToParent, clearInput, userRole,
+            sendContentToParent, clearInput, userRole, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules
         };
     }

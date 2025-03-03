@@ -30,8 +30,8 @@ export class EntityIndicatorService extends BaseService {
         return super.sendRequest(axios.get, `assessment/publication-series-indicator/${publicationSeriesId}`);
     }
 
-    async fetchPublicationSeriesIFTableIndicators(publicationSeriesId: number): Promise<AxiosResponse<IFCategoryData[]>> {
-        return super.sendRequest(axios.get, `assessment/publication-series-indicator/if-table/${publicationSeriesId}`);
+    async fetchPublicationSeriesIFTableIndicators(publicationSeriesId: number, fromYear: number, toYear: number): Promise<AxiosResponse<IFCategoryData[]>> {
+        return super.sendRequest(axios.get, `assessment/publication-series-indicator/if-table/${publicationSeriesId}?fromYear=${fromYear}&toYear=${toYear}`);
     }
 
     async createDocumentIndicator(body: DocumentIndicator): Promise<AxiosResponse<EntityIndicatorResponse>> {

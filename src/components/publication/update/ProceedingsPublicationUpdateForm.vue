@@ -18,7 +18,14 @@
                 ></v-select>
             </v-col>
             <v-col class="proceedings-submission">
-                <proceedings-submission-modal :conference="selectedEvent" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
+                <generic-crud-modal
+                    :form-component="ProceedingsSubmissionForm"
+                    :form-props="{conference: selectedEvent}"
+                    entity-name="Proceedings"
+                    is-submission
+                    :read-only="false"
+                    @create="selectNewlyAddedProceedings"
+                />
             </v-col>
         </v-row>
 
@@ -91,14 +98,12 @@
 import { computed, defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/proceedingsPublicationType';
 import { useI18n } from 'vue-i18n';
@@ -106,12 +111,14 @@ import EventService from '@/services/EventService';
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
-import ProceedingsSubmissionModal from '@/components/proceedings/ProceedingsSubmissionModal.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import ProceedingsSubmissionForm from '@/components/proceedings/ProceedingsSubmissionForm.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, ProceedingsSubmissionModal},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal},
     props: {
         presetProceedingsPublication: {
             type: Object as PropType<ProceedingsPublication | undefined>,
@@ -126,13 +133,9 @@ export default defineComponent({
         const proceedings = ref<Proceedings>();
         const event = ref<Conference>();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchDetails();
         });
 
@@ -290,7 +293,7 @@ export default defineComponent({
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,
             selectNewlyAddedProceedings, scopusIdValidationRules,
-            refreshForm, urisRef
+            refreshForm, urisRef, ProceedingsSubmissionForm
 
         };
     }

@@ -6,7 +6,7 @@
                     <v-col cols="12">
                         <multilingual-text-input
                             ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetOU?.name, languageList)"></multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(presetOU?.name, languageTags)"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -54,15 +54,13 @@
 import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
+import type { MultilingualContent } from '@/models/Common';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
 import UriInput from '@/components/core/UriInput.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -78,13 +76,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const languageList = ref<LanguageTagResponse[]>([]);
-
-        onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-        });
+        const { languageTags } = useLanguageTags();
 
         watch(() => props.presetOU, () => {
             if (props.presetOU) {
@@ -131,7 +123,7 @@ export default defineComponent({
             scopusAfid.value = props.presetOU?.scopusAfid;
             urisRef.value?.refreshModelValue(uris.value);
 
-            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageList.value));
+            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
         };
 
         return {
@@ -139,7 +131,7 @@ export default defineComponent({
             nameAbbreviation, refreshForm,
             email, phoneNumber, scopusAfid,
             requiredFieldRules, submit,
-            toMultilingualTextInput, languageList,
+            toMultilingualTextInput, languageTags,
             scopusAfidValidationRules, nameRef, uris,
             nonMandatoryEmailFieldRules
         };

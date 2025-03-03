@@ -120,11 +120,10 @@ import { ref } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { useI18n } from 'vue-i18n';
 import EventService from "@/services/EventService";
-import type { Country, LanguageTagResponse } from '@/models/Common';
+import type { Country } from '@/models/Common';
 import type { Conference } from '@/models/EventModel';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import DatePicker from '../core/DatePicker.vue';
@@ -155,13 +154,7 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
 
-        const languageList = ref<LanguageTagResponse[]>();
-
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             fetchCountries();
         });
 
@@ -204,7 +197,7 @@ export default defineComponent({
 
         const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
 
-        const addConference = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
             if (!timePeriodInput.value) {
                 dateFrom.value = new Date(eventYear.value, 1, 1);
                 dateTo.value = new Date(eventYear.value, 11, 31);
@@ -266,7 +259,7 @@ export default defineComponent({
             name, nameAbbreviation, description, keywords,
             dateFrom, dateTo, eventYear, countries, selectedCountry,
             place, conferenceNumber, entryFee, serialEvent,
-            requiredFieldRules, addConference, timePeriodInput,
+            requiredFieldRules, submit, timePeriodInput,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
             confIdValidationRules, confId, uris, urisRef
         };

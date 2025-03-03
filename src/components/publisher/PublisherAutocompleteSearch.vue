@@ -12,8 +12,14 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
-            <publisher-submission-modal @create="selectNewlyAddedPublisher"></publisher-submission-modal>
+        <v-col cols="1">
+            <generic-crud-modal
+                :form-component="PublisherSubmissionForm"
+                entity-name="Publisher"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedPublisher"
+            />
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedPublisher.value !== -1" icon @click="clearInput()">
@@ -31,12 +37,13 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher, PublisherIndex } from '@/models/PublisherModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-import PublisherSubmissionModal from './PublisherSubmissionModal.vue';
+import PublisherSubmissionForm from './PublisherSubmissionForm.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "PublisherAutocompleteSearch",
-    components: { PublisherSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         allowManualClearing: {
             type: Boolean,
@@ -121,7 +128,8 @@ export default defineComponent({
 
         return {
             publishers, selectedPublisher, searchPublishers,
-            sendContentToParent, clearInput, selectNewlyAddedPublisher
+            sendContentToParent, clearInput, selectNewlyAddedPublisher,
+            PublisherSubmissionForm
         };
     }
 });

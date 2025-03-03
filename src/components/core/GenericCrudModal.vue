@@ -11,7 +11,13 @@
                     </v-btn>
                 </div>
                 <v-btn
-                    v-if="!isSectionUpdate && !readOnly"
+                    v-if="!isSectionUpdate && !readOnly && isSubmission"
+                    color="primary" icon v-bind="scope.props" class="bottom-spacer"
+                    v-on="scope.isActive">
+                    <v-icon>mdi-pencil-plus-outline</v-icon>
+                </v-btn>
+                <v-btn
+                    v-if="!isSectionUpdate && !readOnly && !isSubmission"
                     :color="primaryColor ? 'primary' : ''"
                     :density="primaryColor ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
@@ -61,6 +67,10 @@ export default defineComponent({
             default: false
         },
         isSectionUpdate: {
+            type: Boolean,
+            default: false
+        },
+        isSubmission: {
             type: Boolean,
             default: false
         },
