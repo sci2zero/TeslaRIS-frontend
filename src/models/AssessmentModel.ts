@@ -253,8 +253,12 @@ export interface IFValue {
   
 export interface IFCategoryData {
     category: string;
-    if2Values: IFValue[];
     if2Ranks: IFValue[];
-    if5Values: IFValue[];
     if5Ranks: IFValue[];
+}
+
+export interface IFTableResponse {
+    if2Values: IFValue[];
+    if5Values: IFValue[];
+    ifTableContent: IFCategoryData[];
 }

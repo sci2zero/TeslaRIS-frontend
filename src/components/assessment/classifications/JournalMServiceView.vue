@@ -153,7 +153,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
-import type { IFCategoryData, ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from '@/models/AssessmentModel';
+import type { IFTableResponse, ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
@@ -169,7 +169,7 @@ export default defineComponent({
     components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent },
     setup() {
         const isFormValid = ref(false);
-        const ifTableData = ref<IFCategoryData[]>([]);
+        const ifTableData = ref<IFTableResponse>();
 
         const { researchAreas } = useResearchAreas();
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});

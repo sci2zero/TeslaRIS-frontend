@@ -1,5 +1,4 @@
 export default {
-    homePageMessage: "CRIS UNS je informacioni sistem naučno-istraživačke delatnosti Univerziteta u Novom Sadu. U ovom sistemu možete pronaći informacije o istraživačima, organizacionim jedinicama i objavljenim rezultatima ovog univerziteta. Informacioni sistem je barizan na TeslaRIS open-source platformi.",
     emailLabel: "Email",
     passwordLabel: "Lozinka",
     loginLabel: "Uloguj se",
@@ -534,9 +533,15 @@ export default {
     authorCountLabel: "Broj autora",
     journalMServiceLabel: "M-servis za časopise",
     noAssessmentForSelectionMessage: "Nije moguće izvršiti vrednovanje za datu selekciju.",
-    impactFactorTableLabel: "Tabela impakt faktora",
+    impactFactorTableLabel: "Tabela Impakt Faktora",
     experimentalPublicationLabel: "Eksperimentalan rad",
     theoreticalPublicationLabel: "Teoretski rad",
     simulationPublicationLabel: "SImulacija",
-    noClassificationsLabel: "Nema klasifikacija za ovaj entitet."
+    noClassificationsLabel: "Nema klasifikacija za ovaj entitet.",
+    typeLabel: "Tip",
+    ifValuesLabel: "Impakt Faktori",
+    if2ValueLabel: "IF2 broj",
+    if5ValueLabel: "IF5 broj",
+    updateBrandingInformationLabel: "Ažuriraj informacije o brendiranju",
+    brandingLabel: "Brendiranje"
 }

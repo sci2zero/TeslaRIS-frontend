@@ -87,6 +87,7 @@ import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
 import AssessmentClassificationsListView from "@/views/assessment/listViews/AssessmentClassificationsListView.vue";
 import ReportsView from "@/components/assessment/reporting/ReportsView.vue";
 import JournalMServiceView from "@/components/assessment/classifications/JournalMServiceView.vue";
+import BrandingInformationView from "@/views/BrandingInformationView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE" };
@@ -887,6 +888,15 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "branding",
+                    name: "branding",
+                    component: BrandingInformationView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
                     path: "assessment",                 
                     children: [
                         {
@@ -970,7 +980,7 @@ const router = createRouter({
                                 authenticated: true,
                                 authorities: [roles.admin, roles.researcher],
                             },
-                        },
+                        }
                     ]
                 },
             ]

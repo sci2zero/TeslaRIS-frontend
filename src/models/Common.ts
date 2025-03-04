@@ -114,3 +114,8 @@ export enum ScheduledTaskType {
     PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT",
     REPORT_GENERATION = "REPORT_GENERATION"
 }
+
+export interface BrandingInformation {
+    title: MultilingualContent[];
+    description: MultilingualContent[];
+}

@@ -9,7 +9,7 @@
                 <div class="d-flex">
                     <v-toolbar-title>
                         <router-link to="/" class="logo-link app-title">
-                            {{ appTitle }}
+                            {{ returnCurrentLocaleContent(appTitle) }}
                         </router-link>
                     </v-toolbar-title>
 
@@ -130,6 +130,8 @@ import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import BrandingService from '@/services/BrandingService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 interface MenuItem {
@@ -187,11 +189,12 @@ export default defineComponent(
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
             const reportingLabel = computed(() => i18n.t("reportingLabel"));
             const journalServiceLabel = computed(() => i18n.t("journalMServiceLabel"));
+            const brandingLabel = computed(() => i18n.t("brandingLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
             
-            const appTitle = ref("CRIS UNS");
+            const appTitle = ref();
             const sidebar = ref(false);
             const userRole = ref("");
 
@@ -235,6 +238,10 @@ export default defineComponent(
             });
 
             onMounted(() => {
+                BrandingService.fetchBrandingInfo().then((response) => {
+                    appTitle.value = response.data.title;
+                });
+
                 if (AuthenticationService.userLoggedIn()) {
                     populateUserData();
                 }
@@ -253,7 +260,8 @@ export default defineComponent(
                 { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
                 { title: countryListLabel, type:'icon-link', pathName: "countries"},
-                { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"}
+                { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},
+                { title: brandingLabel, type:'icon-link', pathName: "branding"}
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
@@ -294,7 +302,8 @@ export default defineComponent(
 
             return { 
                 userName, userRole, logout, appTitle,
-                sidebar, menuItems, leftMenuItems, loginStore 
+                sidebar, menuItems, leftMenuItems, loginStore,
+                returnCurrentLocaleContent
             };
         }
     });

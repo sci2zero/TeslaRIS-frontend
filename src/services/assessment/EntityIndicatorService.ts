@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { DocumentIndicator, EntityIndicatorResponse, EventIndicator, IFCategoryData } from "@/models/AssessmentModel";
+import type { DocumentIndicator, EntityIndicatorResponse, EventIndicator, IFTableResponse } from "@/models/AssessmentModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import { type DocumentFileResponse, License, ResourceType } from "@/models/DocumentFileModel";
 
@@ -30,7 +30,7 @@ export class EntityIndicatorService extends BaseService {
         return super.sendRequest(axios.get, `assessment/publication-series-indicator/${publicationSeriesId}`);
     }
 
-    async fetchPublicationSeriesIFTableIndicators(publicationSeriesId: number, fromYear: number, toYear: number): Promise<AxiosResponse<IFCategoryData[]>> {
+    async fetchPublicationSeriesIFTableIndicators(publicationSeriesId: number, fromYear: number, toYear: number): Promise<AxiosResponse<IFTableResponse>> {
         return super.sendRequest(axios.get, `assessment/publication-series-indicator/if-table/${publicationSeriesId}?fromYear=${fromYear}&toYear=${toYear}`);
     }
 
