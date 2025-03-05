@@ -32,8 +32,8 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
 
-  async searchOUs(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
-    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
+  async searchOUs(tokens: string, forPersonId: number | null): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}`);
   }
 
   async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {

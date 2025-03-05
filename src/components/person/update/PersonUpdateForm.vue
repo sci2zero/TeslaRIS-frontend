@@ -93,6 +93,8 @@
             </v-col>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -111,11 +113,13 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import UriInput from '@/components/core/UriInput.vue';
 import { useI18n } from 'vue-i18n';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import PersonService from '@/services/PersonService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "PersonUpdateForm",
-    components: { MultilingualTextInput, DatePicker, UriInput },
+    components: { MultilingualTextInput, DatePicker, UriInput, Toast },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
@@ -127,6 +131,8 @@ export default defineComponent({
         const isFormValid = ref(false);
         const { languageTags } = useLanguageTags();
 
+        const snackbar = ref(false);
+        const message = ref("");
         const i18n = useI18n();
 
         onMounted(() => {
@@ -194,23 +200,51 @@ export default defineComponent({
         const { apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            const personId = props.presetPerson?.id as number;
+            const identifiers = [
+                { value: eNaukaId.value, error: "eNaukaIdExistsError" },
+                { value: scopus.value, error: "scopusIdExistsError" },
+                { value: apvnt.value, error: "apvntExistsError" },
+                { value: eCrisId.value, error: "eCrisIdExistsError" },
+                { value: orcid.value, error: "orcidIdExistsError" }
+            ].filter(id => id.value);
+
+            const results = await Promise.all(
+                identifiers.map(id => PersonService.checkIdentifierUsage(id.value as string, personId))
+            );
+
+            const firstDuplicate = identifiers.find((_, index) => results[index].data);
+            if (firstDuplicate) {
+                message.value = i18n.t(firstDuplicate.error);
+                snackbar.value = true;
+                return;
+            }
+
             const updatedPerson: PersonalInfo = {
-                contact: {phoneNumber: phoneNumber.value as string, contactEmail: email.value},
-                localBirthDate: birthdate.value ? birthdate.value : "",
+                contact: {
+                    phoneNumber: phoneNumber.value as string,
+                    contactEmail: email.value
+                },
+                localBirthDate: birthdate.value || "",
                 sex: selectedSex.value.value as Sex,
                 apvnt: apvnt.value,
                 eCrisId: eCrisId.value,
                 eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 placeOfBirth: placeOfBirth.value,
-                postalAddress: {city: city.value, countryId: selectedCountry.value?.value as number, streetAndNumber: streetAndNumber.value},
+                postalAddress: {
+                    city: city.value,
+                    countryId: selectedCountry.value?.value as number,
+                    streetAndNumber: streetAndNumber.value
+                },
                 scopusAuthorId: scopus.value,
                 uris: uris.value
             };
 
             emit("update", updatedPerson);
         };
+
 
         const refreshForm = () => {
             cityRef.value?.clearInput();
@@ -240,9 +274,9 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, email, phoneNumber, birthdate,
+            isFormValid, email, phoneNumber, birthdate, snackbar,
             orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
-            toMultilingualTextInput, languageTags, submit,
+            toMultilingualTextInput, languageTags, submit, message,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,

@@ -25,7 +25,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            :show-select="userRole === 'ADMIN'"
+            :show-select="userRole === 'ADMIN' || allowSelection"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -46,7 +46,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="userRole === 'ADMIN'">
+                        <td v-if="userRole === 'ADMIN' || allowSelection">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -154,9 +154,13 @@ export default defineComponent({
         inClaimer: {
             type: Boolean,
             default: false
+        },
+        allowSelection: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["switchPage", "dragged", "claim", "declineClaim"],
+    emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated"],
     setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
 
@@ -181,6 +185,10 @@ export default defineComponent({
                 tbody!.parentNode!.append(sortableTbody!)
                 tbody!.remove()
             }
+        });
+
+        watch(selectedPublications, () => {
+            emit("selectionUpdated", selectedPublications.value);
         });
 
         const titleLabel = computed(() => i18n.t("titleLabel"));

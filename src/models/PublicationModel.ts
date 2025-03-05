@@ -226,3 +226,8 @@ export interface CitationResponse {
     harvard: string;
     vancouver: string;
 }
+
+export interface DocumentAffiliationRequest {
+    documentIds: number[];
+    deleteOthers: boolean;
+}

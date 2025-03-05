@@ -88,6 +88,7 @@ import AssessmentClassificationsListView from "@/views/assessment/listViews/Asse
 import ReportsView from "@/components/assessment/reporting/ReportsView.vue";
 import JournalMServiceView from "@/components/assessment/classifications/JournalMServiceView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
+import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE" };
@@ -894,6 +895,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "mass-institution-assignment",
+                    name: "massInstitutionAssignment",
+                    component: MassInstitutionAssignmentView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher],
                     },
                 },
                 {

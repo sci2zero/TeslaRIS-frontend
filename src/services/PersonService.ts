@@ -104,6 +104,10 @@ export class PersonService extends BaseService {
   async removePersonProfileImage(personId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `person/profile-image/${personId}`);
   }
+
+  async checkIdentifierUsage(identifier: string, personId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `person/identifier-usage/${personId}/${identifier}`);
+  }
 }
 
 export default new PersonService();

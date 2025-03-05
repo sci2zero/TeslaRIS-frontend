@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { CitationResponse, Dataset, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, Software, Thesis } from "@/models/PublicationModel";
+import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, Software, Thesis } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -196,6 +196,14 @@ export class DocumentPublicationService extends BaseService {
 
   async fetchCitations(documentId: number): Promise<AxiosResponse<CitationResponse>> {
     return super.sendRequest(axios.get, `document/${documentId}/cite?lang=${i18n.vueI18n.global.locale}`);
+  }
+
+  async fetchNonAffiliatedDocuments(institutionId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `document/non-affiliated/${institutionId}?${pageable}`);
+  }
+
+  async updateDocumentAffiliations(institutionId: number, affiliationRequest: DocumentAffiliationRequest): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.patch, `document/add-affiliation/${institutionId}`, affiliationRequest);
   }
 }
 

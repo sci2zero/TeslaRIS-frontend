@@ -229,7 +229,7 @@ export const useValidationUtils = () => {
             if (inputTime < now) return requiredFutureTimeMessage.value;
             return true;
         }
-    ];    
+    ];
 
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 

@@ -78,6 +78,10 @@ export default defineComponent({
         disableSubmission: {
             type: Boolean,
             default: false
+        },
+        forPersonId: {
+            type: Number,
+            default: null
         }
     },
     emits: ["update:modelValue"],
@@ -118,7 +122,7 @@ export default defineComponent({
                     params += `tokens=${token}&`;
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params).then((response) => {
+                OrganisationUnitService.searchOUs(params, props.forPersonId ? props.forPersonId : null).then((response) => {
                     organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
                         title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
                         value: organisationUnit.databaseId,

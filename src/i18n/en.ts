@@ -544,5 +544,8 @@ export default {
     if2ValueLabel: "IF2 value",
     if5ValueLabel: "IF5 value",
     updateBrandingInformationLabel: "Update branding information",
-    brandingLabel: "Branding"
+    brandingLabel: "Branding",
+    massInstitutionAssignmentLabel: "Mass affiliation change",
+    addAffiliationLabel: "Add affiliation",
+    removeOthersAndAddAffiliationLabel: "Add affiliation and remove others"
 }

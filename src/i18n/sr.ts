@@ -543,5 +543,8 @@ export default {
     if2ValueLabel: "IF2 broj",
     if5ValueLabel: "IF5 broj",
     updateBrandingInformationLabel: "Ažuriraj informacije o brendiranju",
-    brandingLabel: "Brendiranje"
+    brandingLabel: "Brendiranje",
+    massInstitutionAssignmentLabel: "Masovna promena afilijacije",
+    addAffiliationLabel: "Dodaj afilijaciju",
+    removeOthersAndAddAffiliationLabel: "Dodaj afilijaciju i ukloni ostale"
 }
