@@ -46,6 +46,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -61,11 +63,15 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PublicationSeries } from '@/models/PublicationSeriesModel';
 import { watch } from 'vue';
 import UriInput from '@/components/core/UriInput.vue';
+import JournalService from '@/services/JournalService';
+import { useI18n } from 'vue-i18n';
+import Toast from '@/components/core/Toast.vue';
+import BookSeriesService from '@/services/BookSeriesService';
 
 
 export default defineComponent({
     name: "PublicationSeriesUpdateForm",
-    components: { MultilingualTextInput, UriInput },
+    components: { MultilingualTextInput, UriInput, Toast },
     props: {
         presetPublicationSeries: {
             type: Object as PropType<PublicationSeries | undefined>,
@@ -79,6 +85,10 @@ export default defineComponent({
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const abbreviationsRef = ref<typeof MultilingualTextInput>();
@@ -114,7 +124,30 @@ export default defineComponent({
 
         const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            const publicationSeriesId = props.presetPublicationSeries?.id as number;
+            const identifiers = [
+                { value: eIssn.value, error: "eissnExistsError" },
+                { value: printIssn.value, error: "printIssnExistsError" }
+            ].filter(id => id.value);
+
+            const results = await Promise.all(
+                identifiers.map(id => {
+                    if (props.inputType === "JOURNAL") {
+                        return JournalService.checkIdentifierUsage(id.value as string, publicationSeriesId)
+                    } else {
+                        return BookSeriesService.checkIdentifierUsage(id.value as string, publicationSeriesId)
+                    }
+                })
+            );
+
+            const firstDuplicate = identifiers.find((_, index) => results[index].data);
+            if (firstDuplicate) {
+                message.value = i18n.t(firstDuplicate.error);
+                snackbar.value = true;
+                return;
+            }
+
             const updatedPublicationSeries: PublicationSeries = {
                 title: title.value,
                 eissn: eIssn.value as string,
@@ -157,7 +190,7 @@ export default defineComponent({
             printIssnValidationRules,
             titleRef, abbreviationsRef,
             refreshForm, uris, urisRef,
-            submit
+            submit, snackbar, message
         };
     }
 });

@@ -48,6 +48,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -61,11 +63,14 @@ import type { OrganisationUnitRequest, OrganisationUnitResponse } from '@/models
 import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import Toast from '@/components/core/Toast.vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
     name: "OrganisationUnitUpdateForm",
-    components: { MultilingualTextInput, OpenLayersMap, UriInput },
+    components: { MultilingualTextInput, OpenLayersMap, UriInput, Toast },
     props: {
         presetOU: {
             type: Object as PropType<OrganisationUnitResponse | undefined>,
@@ -77,6 +82,10 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const { languageTags } = useLanguageTags();
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         watch(() => props.presetOU, () => {
             if (props.presetOU) {
@@ -97,7 +106,23 @@ export default defineComponent({
 
         const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            const organisationUnitId = props.presetOU?.id as number;
+            const identifiers = [
+                { value: scopusAfid.value, error: "scopusAfidExistsError" }
+            ].filter(id => id.value);
+
+            const results = await Promise.all(
+                identifiers.map(id => OrganisationUnitService.checkIdentifierUsage(id.value as string, organisationUnitId))
+            );
+
+            const firstDuplicate = identifiers.find((_, index) => results[index].data);
+            if (firstDuplicate) {
+                message.value = i18n.t(firstDuplicate.error);
+                snackbar.value = true;
+                return;
+            }
+
             const updatedOU: OrganisationUnitRequest = {
                 name: name.value,
                 nameAbbreviation: nameAbbreviation.value,
@@ -130,10 +155,10 @@ export default defineComponent({
             isFormValid, name, mapRef,
             nameAbbreviation, refreshForm,
             email, phoneNumber, scopusAfid,
-            requiredFieldRules, submit,
+            requiredFieldRules, submit, message,
             toMultilingualTextInput, languageTags,
             scopusAfidValidationRules, nameRef, uris,
-            nonMandatoryEmailFieldRules
+            nonMandatoryEmailFieldRules, snackbar
         };
     }
 });

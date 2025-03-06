@@ -41,6 +41,10 @@ export class BookSeriesService extends BaseService {
   async findPublicationsForBookSeries(bookSeriesId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     return super.sendRequest(axios.get, `book-series/publications/${bookSeriesId}?${pageable}`);
   }
+
+  async checkIdentifierUsage(identifier: string, bookSeriesId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `book-series/identifier-usage/${bookSeriesId}/${identifier}`);
+  }
 }
 
 export default new BookSeriesService();

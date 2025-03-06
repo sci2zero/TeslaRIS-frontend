@@ -226,8 +226,8 @@ export interface Report {
     reportFileName: string;
 }
 
-export interface ImaginaryJournalPublicationAssessmentRequest {
-    journalId: number;
+export interface ImaginaryPublicationAssessmentRequest {
+    containingEntityId: number;
     commissionId: number;
     classificationYear: number;
     researchAreaCode: string;
@@ -235,9 +235,11 @@ export interface ImaginaryJournalPublicationAssessmentRequest {
     experimental: boolean;
     theoretical: boolean;
     simulation: boolean;
+    journalPublicationType: string;
+    proceedingsPublicationType: string;
 }
 
-export interface ImaginaryJournalPublicationAssessmentResponse {
+export interface ImaginaryPublicationAssessmentResponse {
     assessmentCode: string;
     assessmentReason: MultilingualContent[];
     rawPoints: number;

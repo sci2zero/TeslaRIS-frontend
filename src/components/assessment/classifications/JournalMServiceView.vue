@@ -1,13 +1,29 @@
 <template>
     <v-container>
         <h1 class="d-flex justify-center text-center">
-            {{ $t("journalMServiceLabel") }}
+            {{ $t("mServiceLabel") }}
         </h1>
   
         <v-form v-model="isFormValid" @submit.prevent>
             <v-row justify="center" class="mt-5">
+                <v-col cols="12" sm="6">
+                    <v-select
+                        v-model="selectedApplicableType"
+                        :items="applicableTypes"
+                        :label="$t('applicableTypeLabel') + '*'"
+                        :rules="requiredStringSelectionRules"
+                        return-object
+                    ></v-select>
+                </v-col>
+            </v-row>
+            <v-row v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION" justify="center" class="mt-5">
                 <v-col cols="12" md="6">
                     <journal-autocomplete-search v-model="selectedJournal" required disable-submission></journal-autocomplete-search>
+                </v-col>
+            </v-row>
+            <v-row v-if="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION" justify="center" class="mt-5">
+                <v-col cols="12" md="6">
+                    <event-autocomplete-search v-model="selectedEvent" required disable-submission return-only-non-serial-events></event-autocomplete-search>
                 </v-col>
             </v-row>
   
@@ -34,6 +50,7 @@
                         :label="$t('yearOfPublicationLabel') + '*'"
                         :placeholder="$t('yearOfPublicationLabel') + '*'"
                         :rules="requiredNumericGreaterThanZeroFieldRules"
+                        :readonly="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
@@ -47,7 +64,25 @@
                 </v-col>
             </v-row>
             <v-row justify="center" class="mt-5">
-                <v-col cols="10" md="6">
+                <v-col cols="12" sm="6" md="3">
+                    <v-select
+                        v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
+                        v-model="selectedJournalPublicationType"
+                        :items="journalPublicationTypes"
+                        :label="$t('typeOfPublicationLabel') + '*'"
+                        :rules="requiredStringSelectionRules"
+                        return-object
+                    ></v-select>
+                    <v-select
+                        v-if="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION"
+                        v-model="selectedProceedingsPublicationType"
+                        :items="proceedingsPublicationTypes"
+                        :label="$t('typeOfPublicationLabel') + '*'"
+                        :rules="requiredStringSelectionRules"
+                        return-object
+                    ></v-select>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
                     <v-radio-group
                         v-model="publicationType"
                         inline
@@ -82,7 +117,8 @@
             </v-row>
 
             <i-f-table-component
-                class="mt-15" :json-data="ifTableData" :preset-from-year="yearOfPublication - 2" :preset-to-year="yearOfPublication"
+                v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
+                class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="yearOfPublication - 2" :preset-to-year="yearOfPublication"
                 @years-updated="fetchIFTableData"></i-f-table-component>
 
             <h2 v-if="assessmentResponse" class="mt-15">
@@ -151,9 +187,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import { ref } from 'vue';
-import type { IFTableResponse, ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from '@/models/AssessmentModel';
+import type { IFTableResponse, ImaginaryPublicationAssessmentRequest, ImaginaryPublicationAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
@@ -162,11 +198,17 @@ import AssessmentClassificationService from '@/services/assessment/AssessmentCla
 import IFTableComponent from '@/components/assessment/indicators/IFTableComponent.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { useResearchAreas } from '@/composables/useResearchAreas';
+import { JournalPublicationType, MServiceApplicableTypes, ProceedingsPublicationType } from '@/models/PublicationModel';
+import { getNameFromOrdinal } from '@/utils/EnumUtil';
+import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
+import { getMServiceApplicableTypesForGivenLocale, getMServiceApplicableTypeTitleFromValueAutoLocale } from '@/i18n/mServiceApplicableTypes';
+import { getTypesForGivenLocale as getJournalPublicationTypes, getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@/i18n/journalPublicationType';
+import { getTypesForGivenLocale as getProceedingsPublicationTypes, getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
 
 
 export default defineComponent({
     name: "JournalMServiceView",
-    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent },
+    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent, EventAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const ifTableData = ref<IFTableResponse>();
@@ -174,36 +216,62 @@ export default defineComponent({
         const { researchAreas } = useResearchAreas();
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
 
-        const assessmentResponse = ref<ImaginaryJournalPublicationAssessmentResponse>();
+        const applicableTypes = computed(() => getMServiceApplicableTypesForGivenLocale());
+        const selectedApplicableType = ref<{title: string, value: MServiceApplicableTypes}>({title: getMServiceApplicableTypeTitleFromValueAutoLocale(MServiceApplicableTypes.JOURNAL_PUBLICATION) as string, value: MServiceApplicableTypes.JOURNAL_PUBLICATION});
+
+        const assessmentResponse = ref<ImaginaryPublicationAssessmentResponse>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedJournal = ref<{title: string, value: number}>(searchPlaceholder);
+        const selectedEvent = ref<{title: string, value: number}>(searchPlaceholder);
         const selectedCommission = ref<{title: string, value: number}>(searchPlaceholder);
+
+        watch(selectedEvent, () => {
+            if (selectedEvent.value.value) {
+                const year = selectedEvent.value.title.split("|")[1].trim();
+                yearOfPublication.value = parseInt(year);
+            }
+        });
 
         const authorCount = ref(1);
         const yearOfPublication = ref((new Date()).getFullYear());
 
         const publicationType = ref("experimental");
 
+        const journalPublicationTypes = computed(() => getJournalPublicationTypes());
+        const proceedingsPublicationTypes = computed(() => getProceedingsPublicationTypes());
+        const selectedJournalPublicationType = ref<{ title: string, value: JournalPublicationType }>({title: getJournalPublicationTypeTitle(JournalPublicationType.RESEARCH_ARTICLE) as string, value: JournalPublicationType.RESEARCH_ARTICLE});
+        const selectedProceedingsPublicationType = ref<{ title: string, value: ProceedingsPublicationType }>({title: getProceedingsPublicationTypeTitle(ProceedingsPublicationType.REGULAR_FULL_ARTICLE) as string, value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE});
+
         const { requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules } = useValidationUtils();
 
         const assessImaginaryPublication = () => {
-            const assessmentRequest: ImaginaryJournalPublicationAssessmentRequest = {
+            const isJournalPublication = selectedApplicableType.value.value === MServiceApplicableTypes.JOURNAL_PUBLICATION;
+
+            const assessmentRequest: ImaginaryPublicationAssessmentRequest = {
                 authorCount: authorCount.value,
                 classificationYear: yearOfPublication.value,
                 researchAreaCode: selectedResearchArea.value.value,
                 commissionId: selectedCommission.value.value,
-                journalId: selectedJournal.value.value,
+                containingEntityId: isJournalPublication ? selectedJournal.value.value : selectedEvent.value.value,
                 experimental: publicationType.value === "experimental",
                 theoretical: publicationType.value === "theoretical",
-                simulation: publicationType.value === "simulation"
+                simulation: publicationType.value === "simulation",
+                journalPublicationType: getNameFromOrdinal(JournalPublicationType, selectedJournalPublicationType.value.value) as string,
+                proceedingsPublicationType: getNameFromOrdinal(ProceedingsPublicationType, selectedProceedingsPublicationType.value.value) as string
             };
 
-            AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest).then(response => {
-                assessmentResponse.value = response.data;
-            });
+            if (isJournalPublication) {
+                AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest).then(response => {
+                    assessmentResponse.value = response.data;
+                });
 
-            fetchIFTableData(yearOfPublication.value - 2, yearOfPublication.value);
+                fetchIFTableData(yearOfPublication.value - 2, yearOfPublication.value);
+            } else {
+                AssessmentClassificationService.assessImaginaryProceedingsPublication(assessmentRequest).then(response => {
+                    assessmentResponse.value = response.data;
+                });
+            }
         };
 
         const fetchIFTableData = (fromYear: number, toYear: number) => {
@@ -213,13 +281,17 @@ export default defineComponent({
         };
 
         return {
-            researchAreas, selectedResearchArea,
+            researchAreas, selectedResearchArea, selectedEvent,
             isFormValid, selectedJournal, selectedCommission,
             requiredStringSelectionRules, authorCount,
             requiredNumericGreaterThanZeroFieldRules,
             assessImaginaryPublication, yearOfPublication,
             assessmentResponse, returnCurrentLocaleContent,
-            ifTableData, publicationType, fetchIFTableData
+            ifTableData, publicationType, fetchIFTableData,
+            selectedApplicableType, applicableTypes,
+            MServiceApplicableTypes, journalPublicationTypes,
+            proceedingsPublicationTypes, selectedJournalPublicationType,
+            selectedProceedingsPublicationType
         };
     }
 });

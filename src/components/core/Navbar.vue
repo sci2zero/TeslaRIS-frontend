@@ -188,7 +188,7 @@ export default defineComponent(
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
             const reportingLabel = computed(() => i18n.t("reportingLabel"));
-            const journalServiceLabel = computed(() => i18n.t("journalMServiceLabel"));
+            const journalServiceLabel = computed(() => i18n.t("mServiceLabel"));
             const brandingLabel = computed(() => i18n.t("brandingLabel"));
             const massInstitutionAssignmentLabel = computed(() => i18n.t("massInstitutionAssignmentLabel"));
 

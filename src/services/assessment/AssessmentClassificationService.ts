@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { AssessmentClassification, ImaginaryJournalPublicationAssessmentRequest, ImaginaryJournalPublicationAssessmentResponse } from "@/models/AssessmentModel";
+import type { AssessmentClassification, ImaginaryPublicationAssessmentRequest, ImaginaryPublicationAssessmentResponse } from "@/models/AssessmentModel";
 import type { ApplicableEntityType, Page } from "@/models/Common";
 import i18n from "@/i18n";
 
@@ -42,8 +42,12 @@ export class AssessmentClassificationService extends BaseService {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/journal-publication/${journalPublicationId}`, {}, AssessmentClassificationService.idempotencyKey);
     }
 
-    async assessImaginaryJournalPublication(body: ImaginaryJournalPublicationAssessmentRequest): Promise<AxiosResponse<ImaginaryJournalPublicationAssessmentResponse>> {
+    async assessImaginaryJournalPublication(body: ImaginaryPublicationAssessmentRequest): Promise<AxiosResponse<ImaginaryPublicationAssessmentResponse>> {
         return super.sendRequest(axios.post, "assessment/document-assessment-classification/imaginary-journal-publication", body);
+    }
+
+    async assessImaginaryProceedingsPublication(body: ImaginaryPublicationAssessmentRequest): Promise<AxiosResponse<ImaginaryPublicationAssessmentResponse>> {
+        return super.sendRequest(axios.post, "assessment/document-assessment-classification/imaginary-proceedings-publication", body);
     }
 
     async assessProceedingsPublication(proceedingsPublicationId: number): Promise<AxiosResponse<void>> {

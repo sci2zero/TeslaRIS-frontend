@@ -43,6 +43,10 @@ export class JournalService extends BaseService {
   async canClassify(journalId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `journal/${journalId}/can-classify`);
   }
+
+  async checkIdentifierUsage(identifier: string, journalId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `journal/identifier-usage/${journalId}/${identifier}`);
+  }
 }
 
 export default new JournalService();

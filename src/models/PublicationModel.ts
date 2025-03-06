@@ -231,3 +231,8 @@ export interface DocumentAffiliationRequest {
     documentIds: number[];
     deleteOthers: boolean;
 }
+
+export enum MServiceApplicableTypes {
+    JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
+    PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION"
+}

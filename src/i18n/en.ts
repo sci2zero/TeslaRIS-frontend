@@ -532,7 +532,7 @@ export default {
     scaledPointsLabel: "Number of points after scaling",
     scaledPointsReasonLabel: "Reason for scaling",
     authorCountLabel: "Author count",
-    journalMServiceLabel: "M-service for journals",
+    mServiceLabel: "M-service",
     noAssessmentForSelectionMessage: "It is not possible to perform an assessment for given selection.",
     impactFactorTableLabel: "Impact factor table",
     experimentalPublicationLabel: "Experimental paper",
