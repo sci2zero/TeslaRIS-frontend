@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <patent-update-form ref="updateLeftRef" :preset-patent="leftPatent" in-comparator @update="updateLeft"></patent-update-form>
+                <patent-update-form
+                    ref="updateLeftRef" :preset-patent="leftPatent" in-comparator :in-modal="false"
+                    @update="updateLeft"></patent-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <patent-update-form ref="updateRightRef" :preset-patent="rightPatent" in-comparator @update="updateRight"></patent-update-form>
+                <patent-update-form
+                    ref="updateRightRef" :preset-patent="rightPatent" in-comparator :in-modal="false"
+                    @update="updateRight"></patent-update-form>
 
                 <br />
 

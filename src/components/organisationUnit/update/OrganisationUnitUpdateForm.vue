@@ -75,6 +75,10 @@ export default defineComponent({
         presetOU: {
             type: Object as PropType<OrganisationUnitResponse | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -107,20 +111,22 @@ export default defineComponent({
         const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
 
         const submit = async () => {
-            const organisationUnitId = props.presetOU?.id as number;
-            const identifiers = [
-                { value: scopusAfid.value, error: "scopusAfidExistsError" }
-            ].filter(id => id.value);
+            if (props.inModal) {
+                const organisationUnitId = props.presetOU?.id as number;
+                const identifiers = [
+                    { value: scopusAfid.value, error: "scopusAfidExistsError" }
+                ].filter(id => id.value);
 
-            const results = await Promise.all(
-                identifiers.map(id => OrganisationUnitService.checkIdentifierUsage(id.value as string, organisationUnitId))
-            );
+                const results = await Promise.all(
+                    identifiers.map(id => OrganisationUnitService.checkIdentifierUsage(id.value as string, organisationUnitId))
+                );
 
-            const firstDuplicate = identifiers.find((_, index) => results[index].data);
-            if (firstDuplicate) {
-                message.value = i18n.t(firstDuplicate.error);
-                snackbar.value = true;
-                return;
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
             }
 
             const updatedOU: OrganisationUnitRequest = {

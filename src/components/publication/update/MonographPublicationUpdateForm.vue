@@ -78,6 +78,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -97,15 +99,22 @@ import { getTitleFromValueAutoLocale, getMonographPublicationTypesForGivenLocale
 import MonographAutocompleteSearch from '../MonographAutocompleteSearch.vue';
 import { watch } from 'vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import { useI18n } from 'vue-i18n';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
     name: "MonographPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, MonographAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, MonographAutocompleteSearch, Toast},
     props: {
         presetMonographPublication: {
             type: Object as PropType<MonographPublication | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -114,6 +123,10 @@ export default defineComponent({
 
         const monograph = ref<Monograph>();
         const event = ref<Conference>();
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const { languageTags } = useLanguageTags();
 
@@ -162,7 +175,26 @@ export default defineComponent({
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const documentId = props.presetMonographPublication?.id as number;
+                const identifiers = [
+                    { value: doi.value, error: "doiExistsError" },
+                    { value: scopus.value, error: "scopusIdExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             const updatedMonographPublication: MonographPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -213,8 +245,8 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
+            isFormValid, snackbar,
+            title, subtitle, message,
             publicationYear, doi, scopus,
             selectedMonograph, articleNumber,
             uris, numberOfPages, doiValidationRules,

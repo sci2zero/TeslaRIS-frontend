@@ -44,6 +44,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -60,15 +62,22 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import { useI18n } from 'vue-i18n';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
     name: "PatentUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast},
     props: {
         presetPatent: {
             type: Object as PropType<Patent | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -76,6 +85,10 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const publisher = ref<Publisher>();
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const { languageTags } = useLanguageTags();
 
@@ -114,7 +127,25 @@ export default defineComponent({
 
         const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const documentId = props.presetPatent?.id as number;
+                const identifiers = [
+                    { value: doi.value, error: "doiExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             const updatedPatent: Patent = {
                 title: title.value as MultilingualContent[],
                 number: patentNumber.value as string,
@@ -160,7 +191,7 @@ export default defineComponent({
             selectedPublisher, 
             patentNumber, uris, 
             requiredFieldRules,
-            submit,
+            submit, message, snackbar,
             toMultilingualTextInput,
             languageTags,
             doiValidationRules,

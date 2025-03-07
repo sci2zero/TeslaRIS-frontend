@@ -92,6 +92,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -116,15 +118,22 @@ import { computed } from 'vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { watch } from 'vue';
+import Toast from '@/components/core/Toast.vue';
+import { useI18n } from 'vue-i18n';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
     name: "ThesisUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast},
     props: {
         presetThesis: {
             type: Object as PropType<Thesis | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -133,6 +142,10 @@ export default defineComponent({
         const enterExternalOU = ref(false);
 
         const publisher = ref<Publisher>();
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -219,7 +232,25 @@ export default defineComponent({
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
         const selectedThesisType = ref<{ title: string, value: ThesisType | undefined }>({title: getThesisTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string, value: props.presetThesis?.thesisType as ThesisType});
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const documentId = props.presetThesis?.id as number;
+                const identifiers = [
+                    { value: doi.value, error: "doiExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             const updatedThesis: Thesis = {
                 organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
                 externalOrganisationUnitName: externalOUName.value,
@@ -269,9 +300,8 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle, urisRef,
-            publicationYear, doi,
+            isFormValid, title, subtitle, urisRef,
+            publicationYear, doi, message, snackbar,
             numberOfPages, selectedPublisher,
             uris, requiredFieldRules, requiredSelectionRules,
             submit, toMultilingualTextInput,

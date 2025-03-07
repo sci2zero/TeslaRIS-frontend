@@ -57,10 +57,10 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN"></v-text-field>
+                <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN"></v-text-field>
+                <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -101,6 +101,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -127,15 +129,21 @@ import { watch } from 'vue';
 import EventService from '@/services/EventService';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "MonographUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, EventAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, EventAutocompleteSearch, Toast},
     props: {
         presetMonograph: {
             type: Object as PropType<Monograph | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -145,7 +153,10 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
 
+        const snackbar = ref(false);
+        const message = ref("");
         const i18n = useI18n();
+
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
 
         const selectedLanguages = ref<number[]>([]);
@@ -238,7 +249,7 @@ export default defineComponent({
         const volume = ref(props.presetMonograph?.volume);
 
         const { requiredFieldRules, requiredSelectionRules,
-            doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+            doiValidationRules, scopusIdValidationRules, isbnValidationRules } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -253,7 +264,28 @@ export default defineComponent({
             validatePublicationSeriesSelection();
         });
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const monographId = props.presetMonograph?.id as number;
+                const identifiers = [
+                    { value: eIsbn.value, error: "eisbnExistsError" },
+                    { value: printIsbn.value, error: "printIsbnExistsError" },
+                    { value: doi.value, error: "doiExistsError" },
+                    { value: scopus.value, error: "scopusIdExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkMonographIdentifierUsage(id.value as string, monographId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
                 publicationSeriesId = undefined;
@@ -327,7 +359,8 @@ export default defineComponent({
             requiredSelectionRules, uris,
             selectedResearchArea, doiValidationRules,
             scopusIdValidationRules, titleRef,
-            subtitleRef, refreshForm, urisRef
+            subtitleRef, refreshForm, urisRef,
+            isbnValidationRules, snackbar, message
         };
     }
 });

@@ -106,7 +106,7 @@ export class PersonService extends BaseService {
   }
 
   async checkIdentifierUsage(identifier: string, personId: number): Promise<AxiosResponse<boolean>> {
-    return super.sendRequest(axios.get, `person/identifier-usage/${personId}/${identifier}`);
+    return super.sendRequest(axios.get, `person/identifier-usage/${personId}?identifier=${encodeURIComponent(identifier)}`);
   }
 }
 

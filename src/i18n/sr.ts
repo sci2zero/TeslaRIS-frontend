@@ -290,6 +290,7 @@ export default {
     detailsNotReviewedMessage: "Niste završili povezivanje za detalje publikacije.",
     finishLoadLabel: "Uvezi",
     invalidDOIError: "Neispravan DOI format",
+    doiExistsError: "DOI je već u upotrebi",
     potentialDuplicateMessage: "Ovaj dokument je detektovan kao potencijalni duplikat. Selektujte rad u listi ispod ako isti odgovara ovom dokumentu:",
     loadSuccessMessage: "Uspešno uvezeno.",
     invalidUriError: "Neispravan URL format",

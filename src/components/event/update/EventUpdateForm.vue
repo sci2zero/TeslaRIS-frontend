@@ -129,6 +129,10 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -205,25 +209,27 @@ export default defineComponent({
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
         const submit = async () => {
-            const eventId = props.presetEvent?.id as number;
-            const identifiers = [
-                { value: confId.value, error: "confIdExistsError" }
-            ].filter(id => id.value);
+            if (props.inModal) {
+                const eventId = props.presetEvent?.id as number;
+                const identifiers = [
+                    { value: confId.value, error: "confIdExistsError" }
+                ].filter(id => id.value);
 
-            const results = await Promise.all(
-                identifiers.map(id => EventService.checkIdentifierUsage(id.value as string, eventId))
-            );
+                const results = await Promise.all(
+                    identifiers.map(id => EventService.checkIdentifierUsage(id.value as string, eventId))
+                );
 
-            const firstDuplicate = identifiers.find((_, index) => results[index].data);
-            if (firstDuplicate) {
-                message.value = i18n.t(firstDuplicate.error);
-                snackbar.value = true;
-                return;
-            }
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
 
-            if (!timePeriodInput.value) {
-                dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
-                dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
+                if (!timePeriodInput.value) {
+                    dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
+                    dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
+                }
             }
 
             const updatedEvent: Conference = {

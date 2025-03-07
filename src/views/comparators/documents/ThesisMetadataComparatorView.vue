@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <thesis-update-form ref="updateLeftRef" :preset-thesis="leftThesis" in-comparator @update="updateLeft"></thesis-update-form>
+                <thesis-update-form
+                    ref="updateLeftRef" :preset-thesis="leftThesis" in-comparator :in-modal="false"
+                    @update="updateLeft"></thesis-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <thesis-update-form ref="updateRightRef" :preset-thesis="rightThesis" in-comparator @update="updateRight"></thesis-update-form>
+                <thesis-update-form
+                    ref="updateRightRef" :preset-thesis="rightThesis" in-comparator :in-modal="false"
+                    @update="updateRight"></thesis-update-form>
 
                 <br />
 

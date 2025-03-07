@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <software-update-form ref="updateLeftRef" :preset-software="leftSoftware" in-comparator @update="updateLeft"></software-update-form>
+                <software-update-form
+                    ref="updateLeftRef" :preset-software="leftSoftware" in-comparator :in-modal="false"
+                    @update="updateLeft"></software-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <software-update-form ref="updateRightRef" :preset-software="rightSoftware" in-comparator @update="updateRight"></software-update-form>
+                <software-update-form
+                    ref="updateRightRef" :preset-software="rightSoftware" in-comparator :in-modal="false"
+                    @update="updateRight"></software-update-form>
 
                 <br />
 

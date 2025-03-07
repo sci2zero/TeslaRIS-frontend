@@ -124,6 +124,10 @@ export default defineComponent({
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -201,24 +205,26 @@ export default defineComponent({
             orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
 
         const submit = async () => {
-            const personId = props.presetPerson?.id as number;
-            const identifiers = [
-                { value: eNaukaId.value, error: "eNaukaIdExistsError" },
-                { value: scopus.value, error: "scopusIdExistsError" },
-                { value: apvnt.value, error: "apvntExistsError" },
-                { value: eCrisId.value, error: "eCrisIdExistsError" },
-                { value: orcid.value, error: "orcidIdExistsError" }
-            ].filter(id => id.value);
+            if (props.inModal) {
+                const personId = props.presetPerson?.id as number;
+                const identifiers = [
+                    { value: eNaukaId.value, error: "eNaukaIdExistsError" },
+                    { value: scopus.value, error: "scopusIdExistsError" },
+                    { value: apvnt.value, error: "apvntExistsError" },
+                    { value: eCrisId.value, error: "eCrisIdExistsError" },
+                    { value: orcid.value, error: "orcidIdExistsError" }
+                ].filter(id => id.value);
 
-            const results = await Promise.all(
-                identifiers.map(id => PersonService.checkIdentifierUsage(id.value as string, personId))
-            );
+                const results = await Promise.all(
+                    identifiers.map(id => PersonService.checkIdentifierUsage(id.value as string, personId))
+                );
 
-            const firstDuplicate = identifiers.find((_, index) => results[index].data);
-            if (firstDuplicate) {
-                message.value = i18n.t(firstDuplicate.error);
-                snackbar.value = true;
-                return;
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
             }
 
             const updatedPerson: PersonalInfo = {

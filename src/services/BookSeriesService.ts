@@ -43,7 +43,7 @@ export class BookSeriesService extends BaseService {
   }
 
   async checkIdentifierUsage(identifier: string, bookSeriesId: number): Promise<AxiosResponse<boolean>> {
-    return super.sendRequest(axios.get, `book-series/identifier-usage/${bookSeriesId}/${identifier}`);
+    return super.sendRequest(axios.get, `book-series/identifier-usage/${bookSeriesId}?identifier=${encodeURIComponent(identifier)}`);
   }
 }
 

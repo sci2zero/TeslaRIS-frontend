@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <publisher-update-form ref="updateLeftRef" input-type="JOURNAL" :preset-publisher="leftPublisher" @update="updateLeft"></publisher-update-form>
+                <publisher-update-form
+                    ref="updateLeftRef" input-type="JOURNAL" :preset-publisher="leftPublisher" :in-modal="false"
+                    @update="updateLeft"></publisher-update-form>
             </v-col>
 
             <v-col cols="1">
@@ -26,7 +28,9 @@
 
                 <br />
 
-                <publisher-update-form ref="updateRightRef" input-type="JOURNAL" :preset-publisher="rightPublisher" @update="updateRight"></publisher-update-form>
+                <publisher-update-form
+                    ref="updateRightRef" input-type="JOURNAL" :preset-publisher="rightPublisher" :in-modal="false"
+                    @update="updateRight"></publisher-update-form>
             </v-col>
         </v-row>
 

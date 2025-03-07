@@ -205,6 +205,14 @@ export class DocumentPublicationService extends BaseService {
   async updateDocumentAffiliations(institutionId: number, affiliationRequest: DocumentAffiliationRequest): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     return super.sendRequest(axios.patch, `document/add-affiliation/${institutionId}`, affiliationRequest);
   }
+
+  async checkIdentifierUsage(identifier: string, documentId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `document/identifier-usage/${documentId}?identifier=${encodeURIComponent(identifier)}`);
+  }
+
+  async checkMonographIdentifierUsage(identifier: string, monographId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `monograph/identifier-usage/${monographId}?identifier=${encodeURIComponent(identifier)}`);
+  }
 }
 
 export default new DocumentPublicationService();

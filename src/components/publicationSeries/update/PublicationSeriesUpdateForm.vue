@@ -80,6 +80,10 @@ export default defineComponent({
         inputType: {
             type: String,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -125,27 +129,29 @@ export default defineComponent({
         const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
         const submit = async () => {
-            const publicationSeriesId = props.presetPublicationSeries?.id as number;
-            const identifiers = [
-                { value: eIssn.value, error: "eissnExistsError" },
-                { value: printIssn.value, error: "printIssnExistsError" }
-            ].filter(id => id.value);
+            if (props.inModal) {
+                const publicationSeriesId = props.presetPublicationSeries?.id as number;
+                const identifiers = [
+                    { value: eIssn.value, error: "eissnExistsError" },
+                    { value: printIssn.value, error: "printIssnExistsError" }
+                ].filter(id => id.value);
 
-            const results = await Promise.all(
-                identifiers.map(id => {
-                    if (props.inputType === "JOURNAL") {
-                        return JournalService.checkIdentifierUsage(id.value as string, publicationSeriesId)
-                    } else {
-                        return BookSeriesService.checkIdentifierUsage(id.value as string, publicationSeriesId)
-                    }
-                })
-            );
+                const results = await Promise.all(
+                    identifiers.map(id => {
+                        if (props.inputType === "JOURNAL") {
+                            return JournalService.checkIdentifierUsage(id.value as string, publicationSeriesId)
+                        } else {
+                            return BookSeriesService.checkIdentifierUsage(id.value as string, publicationSeriesId)
+                        }
+                    })
+                );
 
-            const firstDuplicate = identifiers.find((_, index) => results[index].data);
-            if (firstDuplicate) {
-                message.value = i18n.t(firstDuplicate.error);
-                snackbar.value = true;
-                return;
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
             }
 
             const updatedPublicationSeries: PublicationSeries = {

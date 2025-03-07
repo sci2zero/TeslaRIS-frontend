@@ -65,7 +65,7 @@ export class EventService extends BaseService {
   }
 
   async checkIdentifierUsage(identifier: string, conferenceId: number): Promise<AxiosResponse<boolean>> {
-    return super.sendRequest(axios.get, `conference/identifier-usage/${conferenceId}/${identifier}`);
+    return super.sendRequest(axios.get, `conference/identifier-usage/${conferenceId}?identifier=${encodeURIComponent(identifier)}`);
   }
 }
 

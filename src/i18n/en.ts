@@ -291,6 +291,7 @@ export default {
     detailsNotReviewedMessage: "You did not review publication details.",
     finishLoadLabel: "Import",
     invalidDOIError: "Invalid DOI format",
+    doiExistsError: "DOI is already in use",
     potentialDuplicateMessage: "This document has been detected as a potential duplicate. Select the publication from the list below if it matches this document:",
     loadSuccessMessage: "Successfully loaded.",
     invalidUriError: "Invalid URL format",

@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <publication-series-update-form ref="updateLeftRef" input-type="JOURNAL" :preset-publication-series="leftBookSeries" @update="updateLeft"></publication-series-update-form>
+                <publication-series-update-form
+                    ref="updateLeftRef" input-type="JOURNAL" :preset-publication-series="leftBookSeries" :in-modal="false"
+                    @update="updateLeft"></publication-series-update-form>
 
                 <br />
 
@@ -41,7 +43,9 @@
 
                 <br />
 
-                <publication-series-update-form ref="updateRightRef" input-type="JOURNAL" :preset-publication-series="rightBookSeries" @update="updateRight"></publication-series-update-form>
+                <publication-series-update-form
+                    ref="updateRightRef" input-type="JOURNAL" :preset-publication-series="rightBookSeries" :in-modal="false"
+                    @update="updateRight"></publication-series-update-form>
 
                 <br />
 

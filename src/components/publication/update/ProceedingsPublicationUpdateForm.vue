@@ -92,6 +92,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -114,15 +116,21 @@ import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import ProceedingsSubmissionForm from '@/components/proceedings/ProceedingsSubmissionForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import Toast from '@/components/core/Toast.vue';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal, Toast},
     props: {
         presetProceedingsPublication: {
             type: Object as PropType<ProceedingsPublication | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -132,6 +140,9 @@ export default defineComponent({
         const availableProceedings = ref<{title: string, value: number}[]>([]);
         const proceedings = ref<Proceedings>();
         const event = ref<Conference>();
+
+        const snackbar = ref(false);
+        const message = ref("");
 
         const { languageTags } = useLanguageTags();
 
@@ -232,7 +243,26 @@ export default defineComponent({
             });
         };
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const documentId = props.presetProceedingsPublication?.id as number;
+                const identifiers = [
+                    { value: doi.value, error: "doiExistsError" },
+                    { value: scopus.value, error: "scopusIdExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             const updatedProceedingsPublication: ProceedingsPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -283,13 +313,12 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
+            isFormValid, title, subtitle,
             publicationYear, doi, scopus,
             selectedProceedings, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent, titleRef, subtitleRef,
-            submit, toMultilingualTextInput,
+            submit, toMultilingualTextInput, snackbar, message,
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,
             selectNewlyAddedProceedings, scopusIdValidationRules,

@@ -45,7 +45,7 @@ export class JournalService extends BaseService {
   }
 
   async checkIdentifierUsage(identifier: string, journalId: number): Promise<AxiosResponse<boolean>> {
-    return super.sendRequest(axios.get, `journal/identifier-usage/${journalId}/${identifier}`);
+    return super.sendRequest(axios.get, `journal/identifier-usage/${journalId}?identifier=${encodeURIComponent(identifier)}`);
   }
 }
 

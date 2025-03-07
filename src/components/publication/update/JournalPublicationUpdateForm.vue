@@ -85,6 +85,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -104,15 +106,22 @@ import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/jour
 import { watch } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import { useI18n } from 'vue-i18n';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast},
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -121,6 +130,10 @@ export default defineComponent({
 
         const journal = ref<Journal>();
         const event = ref<Conference>();
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const { languageTags } = useLanguageTags();
 
@@ -171,7 +184,26 @@ export default defineComponent({
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const documentId = props.presetJournalPublication?.id as number;
+                const identifiers = [
+                    { value: doi.value, error: "doiExistsError" },
+                    { value: scopus.value, error: "scopusIdExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             const updatedJournalPublication: JournalPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -236,7 +268,7 @@ export default defineComponent({
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
-            refreshForm, urisRef
+            refreshForm, urisRef, message, snackbar
         };
     }
 });

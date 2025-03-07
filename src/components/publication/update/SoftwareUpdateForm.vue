@@ -44,6 +44,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -61,15 +63,22 @@ import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { watch } from 'vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import { useI18n } from 'vue-i18n';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 
 
 export default defineComponent({
     name: "SoftwareUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast},
     props: {
         presetSoftware: {
             type: Object as PropType<Software | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -77,6 +86,10 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const publisher = ref<Publisher>();
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const { languageTags } = useLanguageTags();
 
@@ -115,7 +128,25 @@ export default defineComponent({
 
         const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const documentId = props.presetSoftware?.id as number;
+                const identifiers = [
+                    { value: doi.value, error: "doiExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+            }
+
             const updatedSoftware: Software = {
                 title: title.value as MultilingualContent[],
                 internalNumber: softwareNumber.value as string,
@@ -154,14 +185,13 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
-            publicationYear, doi,
+            isFormValid, doi, snackbar, message,
+            title, subtitle, publicationYear,
             selectedPublisher, softwareNumber,
-            uris, requiredFieldRules, titleRef, subtitleRef,
+            uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,
             languageTags, doiValidationRules,
-            refreshForm, urisRef
+            refreshForm, urisRef, subtitleRef
         };
     }
 });

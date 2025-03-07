@@ -76,7 +76,7 @@ export class OrganisationUnitService extends BaseService {
   }
 
   async checkIdentifierUsage(identifier: string, organisationUnitId: number): Promise<AxiosResponse<boolean>> {
-    return super.sendRequest(axios.get, `organisation-unit/identifier-usage/${organisationUnitId}/${identifier}`);
+    return super.sendRequest(axios.get, `organisation-unit/identifier-usage/${organisationUnitId}?identifier=${encodeURIComponent(identifier)}`);
   }
 }
 
