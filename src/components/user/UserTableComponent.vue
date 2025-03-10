@@ -115,13 +115,13 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
 
-        const headers = [
+        const headers = ref<any>([
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},
           { title: emailLabel, align: "start", sortable: true, key: "email"},
           { title: organisationUnitLabel, align: "start", sortable: true, key: ouColumn},
           { title: roleLabel, align: "start", sortable: true, key: "userRole"},
           { title: actionLabel},
-        ];
+        ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["fullName", "full_name_sortable"],

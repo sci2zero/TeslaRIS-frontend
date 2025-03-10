@@ -89,6 +89,7 @@ import ReportsView from "@/components/assessment/reporting/ReportsView.vue";
 import JournalMServiceView from "@/components/assessment/classifications/JournalMServiceView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
+import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE" };
@@ -907,6 +908,15 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "api-key-management",
+                    name: "apiKeyManagement",
+                    component: ApiKeysManagementView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
                     path: "assessment",                 
                     children: [
                         {
@@ -987,8 +997,8 @@ const router = createRouter({
                             name: "mService",
                             component: JournalMServiceView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin, roles.researcher],
+                                authenticated: false,
+                                authorities: [],
                             },
                         }
                     ]

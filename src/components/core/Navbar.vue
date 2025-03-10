@@ -188,9 +188,10 @@ export default defineComponent(
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
             const reportingLabel = computed(() => i18n.t("reportingLabel"));
-            const journalServiceLabel = computed(() => i18n.t("mServiceLabel"));
+            const mServiceLabel = computed(() => i18n.t("mServiceLabel"));
             const brandingLabel = computed(() => i18n.t("brandingLabel"));
             const massInstitutionAssignmentLabel = computed(() => i18n.t("massInstitutionAssignmentLabel"));
+            const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -262,7 +263,8 @@ export default defineComponent(
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
                 { title: countryListLabel, type:'icon-link', pathName: "countries"},
                 { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},
-                { title: brandingLabel, type:'icon-link', pathName: "branding"}
+                { title: brandingLabel, type:'icon-link', pathName: "branding"},
+                { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"}
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
@@ -287,7 +289,7 @@ export default defineComponent(
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
                 { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (userRole.value === 'ADMIN' || userRole.value === 'VICE_DEAN_FOR_SCIENCE')) },
-                { title: journalServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: computed(() => loginStore.userLoggedIn && (userRole.value === 'ADMIN' || userRole.value === 'RESEARCHER')) },
+                { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: true },
                 { title: massInstitutionAssignmentLabel, type:'icon-link', pathName: 'mass-institution-assignment', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
             ]);
 

@@ -547,5 +547,11 @@ export default {
     brandingLabel: "Brendiranje",
     massInstitutionAssignmentLabel: "Masovna promena afilijacije",
     addAffiliationLabel: "Dodaj afilijaciju",
-    removeOthersAndAddAffiliationLabel: "Dodaj afilijaciju i ukloni ostale"
+    removeOthersAndAddAffiliationLabel: "Dodaj afilijaciju i ukloni ostale",
+    validUntilLabel: "Važi do",
+    createNewApiKeyLabel: "Kreiraj novi API ključ",
+    apiKeyManagementLabel: "Menadžer API ključeva",
+    apiKeyTypeLabel: "Tip ključa",
+    clientEmailLabel: "Email klijenta",
+    clientPreferredLanguageLabel: "Izabrani jezik klijenta"
 }

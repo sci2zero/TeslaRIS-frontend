@@ -42,12 +42,12 @@ export class AssessmentClassificationService extends BaseService {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/journal-publication/${journalPublicationId}`, {}, AssessmentClassificationService.idempotencyKey);
     }
 
-    async assessImaginaryJournalPublication(body: ImaginaryPublicationAssessmentRequest): Promise<AxiosResponse<ImaginaryPublicationAssessmentResponse>> {
-        return super.sendRequest(axios.post, "assessment/document-assessment-classification/imaginary-journal-publication", body);
+    async assessImaginaryJournalPublication(body: ImaginaryPublicationAssessmentRequest, captchaToken: string): Promise<AxiosResponse<ImaginaryPublicationAssessmentResponse>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/imaginary-journal-publication?token=${captchaToken}`, body);
     }
 
-    async assessImaginaryProceedingsPublication(body: ImaginaryPublicationAssessmentRequest): Promise<AxiosResponse<ImaginaryPublicationAssessmentResponse>> {
-        return super.sendRequest(axios.post, "assessment/document-assessment-classification/imaginary-proceedings-publication", body);
+    async assessImaginaryProceedingsPublication(body: ImaginaryPublicationAssessmentRequest, captchaToken: string): Promise<AxiosResponse<ImaginaryPublicationAssessmentResponse>> {
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/imaginary-proceedings-publication?token=${captchaToken}`, body);
     }
 
     async assessProceedingsPublication(proceedingsPublicationId: number): Promise<AxiosResponse<void>> {

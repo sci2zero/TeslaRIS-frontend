@@ -119,3 +119,23 @@ export interface BrandingInformation {
     title: MultilingualContent[];
     description: MultilingualContent[];
 }
+
+export enum ApiKeyType {
+    M_SERVICE = "M_SERVICE"
+}
+
+export interface ApiKeyRequest {
+    name: MultilingualContent[],
+    type: ApiKeyType,
+    clientEmail: string,
+    validUntil: string,
+    clientPreferredLanguageId: number
+}
+
+export interface ApiKeyResponse {
+    id: number,
+    name: MultilingualContent[],
+    type: ApiKeyType,
+    validUntil: string,
+    clientEmail: string
+}

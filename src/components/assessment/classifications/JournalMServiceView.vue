@@ -105,21 +105,32 @@
                     </v-radio-group>
                 </v-col>
             </v-row>
-  
+
+            <v-row justify="center" class="mt-5">
+                <v-col cols="12" sm="4" md="2">
+                    <vue-recaptcha 
+                        ref="vueRecaptcha"
+                        :sitekey="siteKey" 
+                        size="normal"
+                        theme="light"
+                        :hl="locale"
+                        :loading-timeout="30000"
+                        @verify="handleVerifyCallback"
+                        @expire="resetChallenge"
+                        @error="resetChallenge">
+                    </vue-recaptcha>
+                </v-col>
+            </v-row>
+
             <v-row justify="center" class="mt-5">
                 <v-col cols="12" sm="6" md="3">
                     <v-btn
-                        class="mt-3" color="primary" block :disabled="!isFormValid"
+                        class="mt-3" color="primary" block :disabled="!isFormValid || !token"
                         @click="assessImaginaryPublication">
                         {{ $t("assessPublicationLabel") }}
                     </v-btn>
                 </v-col>
             </v-row>
-
-            <i-f-table-component
-                v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
-                class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="yearOfPublication - 2" :preset-to-year="yearOfPublication"
-                @years-updated="fetchIFTableData"></i-f-table-component>
 
             <h2 v-if="assessmentResponse" class="mt-15">
                 {{ $t("assessmentResultsLabel") }}
@@ -182,6 +193,11 @@
             <h3 v-if="assessmentResponse && !assessmentResponse.assessmentCode">
                 {{ $t("noAssessmentForSelectionMessage") }}
             </h3>
+
+            <i-f-table-component
+                v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
+                class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="yearOfPublication - 2" :preset-to-year="yearOfPublication"
+                @years-updated="fetchIFTableData"></i-f-table-component>
         </v-form>
     </v-container>
 </template>
@@ -204,14 +220,21 @@ import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.
 import { getMServiceApplicableTypesForGivenLocale, getMServiceApplicableTypeTitleFromValueAutoLocale } from '@/i18n/mServiceApplicableTypes';
 import { getTypesForGivenLocale as getJournalPublicationTypes, getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@/i18n/journalPublicationType';
 import { getTypesForGivenLocale as getProceedingsPublicationTypes, getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
+import VueRecaptcha from 'vue3-recaptcha2';
+import { useI18n } from 'vue-i18n';
+import { useLoginStore } from '@/stores/loginStore';
 
 
 export default defineComponent({
     name: "JournalMServiceView",
-    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent, EventAutocompleteSearch },
+    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent, EventAutocompleteSearch, VueRecaptcha },
     setup() {
         const isFormValid = ref(false);
         const ifTableData = ref<IFTableResponse>();
+
+        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string;
+
+        const loginStore = useLoginStore();
 
         const { researchAreas } = useResearchAreas();
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
@@ -225,6 +248,10 @@ export default defineComponent({
         const selectedJournal = ref<{title: string, value: number}>(searchPlaceholder);
         const selectedEvent = ref<{title: string, value: number}>(searchPlaceholder);
         const selectedCommission = ref<{title: string, value: number}>(searchPlaceholder);
+
+        const vueRecaptcha = ref<typeof VueRecaptcha>();
+        const i18n = useI18n();
+        const locale = computed(() => i18n.locale.value);
 
         watch(selectedEvent, () => {
             if (selectedEvent.value.value) {
@@ -245,6 +272,8 @@ export default defineComponent({
 
         const { requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules } = useValidationUtils();
 
+        const token = ref("");
+
         const assessImaginaryPublication = () => {
             const isJournalPublication = selectedApplicableType.value.value === MServiceApplicableTypes.JOURNAL_PUBLICATION;
 
@@ -262,22 +291,37 @@ export default defineComponent({
             };
 
             if (isJournalPublication) {
-                AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest).then(response => {
+                AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest, token.value).then(response => {
                     assessmentResponse.value = response.data;
+                    token.value = "";
+                    vueRecaptcha.value?.reset();
                 });
 
                 fetchIFTableData(yearOfPublication.value - 2, yearOfPublication.value);
             } else {
-                AssessmentClassificationService.assessImaginaryProceedingsPublication(assessmentRequest).then(response => {
+                AssessmentClassificationService.assessImaginaryProceedingsPublication(assessmentRequest, token.value).then(response => {
                     assessmentResponse.value = response.data;
+                    token.value = "";
+                    vueRecaptcha.value?.reset();
                 });
             }
         };
 
         const fetchIFTableData = (fromYear: number, toYear: number) => {
-            EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(selectedJournal.value.value, fromYear, toYear).then(response => {
-                ifTableData.value = response.data;
-            });
+            if (loginStore.userLoggedIn) {
+                EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(selectedJournal.value.value, fromYear, toYear).then(response => {
+                    ifTableData.value = response.data;
+                });       
+            }
+        };
+
+        const resetChallenge = () => {
+            token.value = "";
+            vueRecaptcha.value?.reset();
+        };
+        
+        const handleVerifyCallback = (response: string) => {
+            token.value = response;
         };
 
         return {
@@ -288,10 +332,11 @@ export default defineComponent({
             assessImaginaryPublication, yearOfPublication,
             assessmentResponse, returnCurrentLocaleContent,
             ifTableData, publicationType, fetchIFTableData,
-            selectedApplicableType, applicableTypes,
+            selectedApplicableType, applicableTypes, locale,
             MServiceApplicableTypes, journalPublicationTypes,
             proceedingsPublicationTypes, selectedJournalPublicationType,
-            selectedProceedingsPublicationType
+            selectedProceedingsPublicationType, resetChallenge,
+            handleVerifyCallback, vueRecaptcha, token, siteKey
         };
     }
 });

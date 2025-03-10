@@ -548,5 +548,11 @@ export default {
     brandingLabel: "Branding",
     massInstitutionAssignmentLabel: "Mass affiliation change",
     addAffiliationLabel: "Add affiliation",
-    removeOthersAndAddAffiliationLabel: "Add affiliation and remove others"
+    removeOthersAndAddAffiliationLabel: "Add affiliation and remove others",
+    validUntilLabel: "Valid until",
+    createNewApiKeyLabel: "Create new API key",
+    apiKeyManagementLabel: "API Key Manager",
+    apiKeyTypeLabel: "Key type",
+    clientEmailLabel: "Client email",
+    clientPreferredLanguageLabel: "Client preferred language"
 }

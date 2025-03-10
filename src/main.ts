@@ -6,7 +6,6 @@ import { loadFonts } from "./plugins/webfontloader";
 import { createPinia } from "pinia";
 import './assets/main.css';
 import i18n from './i18n';
-import { install } from "vue3-recaptcha-v2";
 
 const pinia = createPinia();
 
@@ -18,8 +17,4 @@ createApp(App)
 .use(pinia)
 .use(vuetify)
 .use(i18n.vueI18n)
-.use(install, {
-    sitekey: import.meta.env.RECAPTCHA_SITE_KEY as string,
-    cnDomains: false
-  })
 .mount("#app");
