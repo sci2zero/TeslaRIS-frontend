@@ -131,6 +131,7 @@ import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
@@ -153,8 +154,7 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
 
-        const snackbar = ref(false);
-        const message = ref("");
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
 
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
@@ -266,22 +266,18 @@ export default defineComponent({
 
         const submit = async () => {
             if (props.inModal) {
-                const monographId = props.presetMonograph?.id as number;
-                const identifiers = [
-                    { value: eIsbn.value, error: "eisbnExistsError" },
-                    { value: printIsbn.value, error: "printIsbnExistsError" },
-                    { value: doi.value, error: "doiExistsError" },
-                    { value: scopus.value, error: "scopusIdExistsError" }
-                ].filter(id => id.value);
-
-                const results = await Promise.all(
-                    identifiers.map(id => DocumentPublicationService.checkMonographIdentifierUsage(id.value as string, monographId))
+                const { duplicateFound } = await checkIdentifiers(
+                    [
+                        { value: eIsbn.value as string, error: "eisbnExistsError" },
+                        { value: printIsbn.value as string, error: "printIsbnExistsError" },
+                        { value: doi.value as string, error: "doiExistsError" },
+                        { value: scopus.value as string, error: "scopusIdExistsError" }
+                    ],
+                    props.presetMonograph?.id as number,
+                    (id, docId) => DocumentPublicationService.checkMonographIdentifierUsage(id, docId)
                 );
 
-                const firstDuplicate = identifiers.find((_, index) => results[index].data);
-                if (firstDuplicate) {
-                    message.value = i18n.t(firstDuplicate.error);
-                    snackbar.value = true;
+                if (duplicateFound) {
                     return;
                 }
             }

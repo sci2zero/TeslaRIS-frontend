@@ -63,8 +63,8 @@ import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
-import { useI18n } from 'vue-i18n';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
@@ -86,9 +86,7 @@ export default defineComponent({
 
         const publisher = ref<Publisher>();
 
-        const snackbar = ref(false);
-        const message = ref("");
-        const i18n = useI18n();
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
 
         const { languageTags } = useLanguageTags();
 
@@ -129,19 +127,13 @@ export default defineComponent({
 
         const submit = async () => {
             if (props.inModal) {
-                const documentId = props.presetPatent?.id as number;
-                const identifiers = [
-                    { value: doi.value, error: "doiExistsError" }
-                ].filter(id => id.value);
-
-                const results = await Promise.all(
-                    identifiers.map(id => DocumentPublicationService.checkIdentifierUsage(id.value as string, documentId))
+                const { duplicateFound } = await checkIdentifiers(
+                    [{ value: doi.value as string, error: "doiExistsError" }],
+                    props.presetPatent?.id as number,
+                    (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
                 );
 
-                const firstDuplicate = identifiers.find((_, index) => results[index].data);
-                if (firstDuplicate) {
-                    message.value = i18n.t(firstDuplicate.error);
-                    snackbar.value = true;
+                if (duplicateFound) {
                     return;
                 }
             }

@@ -39,11 +39,23 @@
         </v-row>
         <v-row>
             <v-col cols="12">
+                <v-text-field
+                    v-model="dailyRequests"
+                    type="number"
+                    :label="$t('dailyRequestsLabel') + '*'"
+                    :placeholder="$t('dailyRequestsLabel') + '*'"
+                    :rules="requiredNumericGreaterThanZeroFieldRules"
+                ></v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
                 <v-select
                     v-model="selectedLanguage"
                     :label="$t('clientPreferredLanguageLabel') + '*'"
                     :items="languages"
                     return-object
+                    :readonly="presetApiKey !== undefined"
                 ></v-select>
             </v-col>
         </v-row>
@@ -115,8 +127,9 @@ export default defineComponent({
         const name = ref<any>([]);
         const validUntil = ref(props.presetApiKey?.validUntil ? props.presetApiKey.validUntil : undefined);
         const clientEmail = ref(props.presetApiKey?.clientEmail ? props.presetApiKey.clientEmail : "");
+        const dailyRequests = ref(props.presetApiKey?.dailyRequests ? props.presetApiKey.dailyRequests : 100)
         
-        const { requiredFieldRules, requiredMultiSelectionRules, emailFieldRules } = useValidationUtils();
+        const { requiredFieldRules, requiredMultiSelectionRules, emailFieldRules, requiredNumericGreaterThanZeroFieldRules } = useValidationUtils();
 
         const submit = () => {
             const apiKeyRequest: ApiKeyRequest = {
@@ -124,7 +137,8 @@ export default defineComponent({
                 type: selectedApiKeyType.value.value,
                 validUntil: validUntil.value as string,
                 clientEmail: clientEmail.value,
-                clientPreferredLanguageId: selectedLanguage.value.value
+                clientPreferredLanguageId: selectedLanguage.value.value,
+                dailyRequests: dailyRequests.value
             };
 
             emit("create", apiKeyRequest);
@@ -137,7 +151,8 @@ export default defineComponent({
             toMultilingualTextInput,
             languageTags, requiredFieldRules,
             submit, requiredMultiSelectionRules,
-            selectedLanguage, languages
+            selectedLanguage, languages, dailyRequests,
+            requiredNumericGreaterThanZeroFieldRules
         };
     }
 });

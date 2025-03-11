@@ -129,7 +129,8 @@ export interface ApiKeyRequest {
     type: ApiKeyType,
     clientEmail: string,
     validUntil: string,
-    clientPreferredLanguageId: number
+    clientPreferredLanguageId: number,
+    dailyRequests: number
 }
 
 export interface ApiKeyResponse {
@@ -137,5 +138,6 @@ export interface ApiKeyResponse {
     name: MultilingualContent[],
     type: ApiKeyType,
     validUntil: string,
-    clientEmail: string
+    clientEmail: string,
+    dailyRequests: number
 }

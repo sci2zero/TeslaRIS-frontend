@@ -554,5 +554,6 @@ export default {
     apiKeyManagementLabel: "API Key Manager",
     apiKeyTypeLabel: "Key type",
     clientEmailLabel: "Client email",
-    clientPreferredLanguageLabel: "Client preferred language"
+    clientPreferredLanguageLabel: "Client preferred language",
+    dailyRequestsLabel: "Daily request limit"
 }

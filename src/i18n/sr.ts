@@ -553,5 +553,6 @@ export default {
     apiKeyManagementLabel: "Menadžer API ključeva",
     apiKeyTypeLabel: "Tip ključa",
     clientEmailLabel: "Email klijenta",
-    clientPreferredLanguageLabel: "Izabrani jezik klijenta"
+    clientPreferredLanguageLabel: "Izabrani jezik klijenta",
+    dailyRequestsLabel: "Dnevni limit zahtjeva"
 }

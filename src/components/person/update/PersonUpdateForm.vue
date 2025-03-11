@@ -115,6 +115,7 @@ import { useI18n } from 'vue-i18n';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PersonService from '@/services/PersonService';
 import Toast from '@/components/core/Toast.vue';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
@@ -135,8 +136,7 @@ export default defineComponent({
         const isFormValid = ref(false);
         const { languageTags } = useLanguageTags();
 
-        const snackbar = ref(false);
-        const message = ref("");
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
 
         onMounted(() => {
@@ -206,23 +206,19 @@ export default defineComponent({
 
         const submit = async () => {
             if (props.inModal) {
-                const personId = props.presetPerson?.id as number;
-                const identifiers = [
-                    { value: eNaukaId.value, error: "eNaukaIdExistsError" },
-                    { value: scopus.value, error: "scopusIdExistsError" },
-                    { value: apvnt.value, error: "apvntExistsError" },
-                    { value: eCrisId.value, error: "eCrisIdExistsError" },
-                    { value: orcid.value, error: "orcidIdExistsError" }
-                ].filter(id => id.value);
-
-                const results = await Promise.all(
-                    identifiers.map(id => PersonService.checkIdentifierUsage(id.value as string, personId))
+                const { duplicateFound } = await checkIdentifiers(
+                    [
+                        { value: eNaukaId.value as string, error: "eNaukaIdExistsError" },
+                        { value: scopus.value as string, error: "scopusIdExistsError" },
+                        { value: apvnt.value as string, error: "apvntExistsError" },
+                        { value: eCrisId.value as string, error: "eCrisIdExistsError" },
+                        { value: orcid.value as string, error: "orcidIdExistsError" }
+                    ],
+                    props.presetPerson?.id as number,
+                    (id, docId) => PersonService.checkIdentifierUsage(id, docId)
                 );
 
-                const firstDuplicate = identifiers.find((_, index) => results[index].data);
-                if (firstDuplicate) {
-                    message.value = i18n.t(firstDuplicate.error);
-                    snackbar.value = true;
+                if (duplicateFound) {
                     return;
                 }
             }

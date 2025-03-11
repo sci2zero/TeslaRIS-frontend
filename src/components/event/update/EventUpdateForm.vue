@@ -116,6 +116,7 @@ import UriInput from '@/components/core/UriInput.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import EventService from '@/services/EventService';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
@@ -139,8 +140,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const snackbar = ref(false);
-        const message = ref("");
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
 
         const { languageTags } = useLanguageTags();
@@ -210,26 +210,20 @@ export default defineComponent({
         
         const submit = async () => {
             if (props.inModal) {
-                const eventId = props.presetEvent?.id as number;
-                const identifiers = [
-                    { value: confId.value, error: "confIdExistsError" }
-                ].filter(id => id.value);
-
-                const results = await Promise.all(
-                    identifiers.map(id => EventService.checkIdentifierUsage(id.value as string, eventId))
+                const { duplicateFound } = await checkIdentifiers(
+                    [{ value: confId.value as string, error: "confIdExistsError" }],
+                    props.presetEvent?.id as number,
+                    (id, docId) => EventService.checkIdentifierUsage(id, docId)
                 );
 
-                const firstDuplicate = identifiers.find((_, index) => results[index].data);
-                if (firstDuplicate) {
-                    message.value = i18n.t(firstDuplicate.error);
-                    snackbar.value = true;
+                if (duplicateFound) {
                     return;
                 }
+            }
 
-                if (!timePeriodInput.value) {
-                    dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
-                    dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
-                }
+            if (!timePeriodInput.value) {
+                dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
+                dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
             }
 
             const updatedEvent: Conference = {
