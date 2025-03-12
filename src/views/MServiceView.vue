@@ -196,7 +196,7 @@
 
             <i-f-table-component
                 v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
-                class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="yearOfPublication - 2" :preset-to-year="yearOfPublication"
+                class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="(yearOfPublication as number) - 2" :preset-to-year="(yearOfPublication as number)"
                 @years-updated="fetchIFTableData"></i-f-table-component>
         </v-form>
     </v-container>
@@ -257,6 +257,14 @@ export default defineComponent({
             document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
         });
 
+        watch(selectedApplicableType, () => {
+            if (selectedApplicableType.value.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION) {
+                yearOfPublication.value = null;
+            } else {
+                yearOfPublication.value = (new Date()).getFullYear();
+            }
+        });
+
         watch(selectedEvent, () => {
             if (selectedEvent.value.value) {
                 const year = selectedEvent.value.title.split("|")[1].trim();
@@ -265,7 +273,7 @@ export default defineComponent({
         });
 
         const authorCount = ref(1);
-        const yearOfPublication = ref((new Date()).getFullYear());
+        const yearOfPublication = ref<number | null>((new Date()).getFullYear());
 
         const publicationType = ref("experimental");
 
@@ -283,7 +291,7 @@ export default defineComponent({
 
             const assessmentRequest: ImaginaryPublicationAssessmentRequest = {
                 authorCount: authorCount.value,
-                classificationYear: yearOfPublication.value,
+                classificationYear: yearOfPublication.value as number,
                 researchAreaCode: selectedResearchArea.value.value,
                 commissionId: selectedCommission.value.value,
                 containingEntityId: isJournalPublication ? selectedJournal.value.value : selectedEvent.value.value,
@@ -301,7 +309,7 @@ export default defineComponent({
                     vueRecaptcha.value?.reset();
                 });
 
-                fetchIFTableData(yearOfPublication.value - 2, yearOfPublication.value);
+                fetchIFTableData((yearOfPublication.value as number) - 2, yearOfPublication.value as number);
             } else {
                 AssessmentClassificationService.assessImaginaryProceedingsPublication(assessmentRequest, token.value).then(response => {
                     assessmentResponse.value = response.data;
