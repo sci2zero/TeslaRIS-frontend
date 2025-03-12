@@ -52,7 +52,9 @@ export enum ThesisType {
     MR = "MR",
     PHD = "PHD",
     PHD_ART_PROJECT = "PHD_ART_PROJECT",
-    MASTER = "MASTER"
+    MASTER = "MASTER",
+    BACHELOR_WITH_HONORS = "BACHELOR_WITH_HONORS",
+    UNDERGRADUATE_THESIS = "UNDERGRADUATE_THESIS"
 }
   
 export enum JournalPublicationType {
