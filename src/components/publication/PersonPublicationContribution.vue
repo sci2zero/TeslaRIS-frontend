@@ -72,19 +72,20 @@ export default defineComponent({
 
         onMounted(() => {
             if(props.presetContributions && props.presetContributions.length > 0) {
-                inputs.value = [];
+                inputs.value.splice(0);
                 props.presetContributions.forEach(contribution => {
-                    inputs.value.push({contribution: {
-                                                    personId: contribution.personId, 
-                                                    description: contribution.contributionDescription, 
-                                                    affiliationStatement: contribution.displayAffiliationStatement, 
-                                                    selectedOtherName: [
-                                                                contribution.personName?.firstname, 
-                                                                contribution.personName?.otherName, 
-                                                                contribution.personName?.lastname
-                                                            ],
-                                                    institutionIds: contribution.institutionIds
-                                                    }, 
+                    inputs.value.push({contribution: 
+                        {
+                            personId: contribution.personId, 
+                            description: contribution.contributionDescription, 
+                            affiliationStatement: contribution.displayAffiliationStatement, 
+                            selectedOtherName: [
+                                        contribution.personName?.firstname, 
+                                        contribution.personName?.otherName, 
+                                        contribution.personName?.lastname
+                                    ],
+                            institutionIds: contribution.institutionIds
+                        }, 
                     contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType}, 
                     isMainContributor: contribution.isMainContributor, 
                     isCorrespondingContributor: contribution.isCorrespondingContributor,

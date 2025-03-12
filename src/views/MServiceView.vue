@@ -203,12 +203,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
+import { computed, defineComponent, onMounted, watch } from 'vue';
 import { ref } from 'vue';
 import type { IFTableResponse, ImaginaryPublicationAssessmentRequest, ImaginaryPublicationAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
-import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
+import CommissionAutocompleteSearch from '@/components/assessment/commission/CommissionAutocompleteSearch.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import IFTableComponent from '@/components/assessment/indicators/IFTableComponent.vue';
@@ -252,6 +252,10 @@ export default defineComponent({
         const vueRecaptcha = ref<typeof VueRecaptcha>();
         const i18n = useI18n();
         const locale = computed(() => i18n.locale.value);
+
+        onMounted(() => {
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
+        });
 
         watch(selectedEvent, () => {
             if (selectedEvent.value.value) {

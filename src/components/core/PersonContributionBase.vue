@@ -289,12 +289,12 @@ export default defineComponent({
 
         watch(selectedPerson, () => {
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
-                personAffiliations.value = [];
+                personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
                     personAffiliations.value.push({title: returnCurrentLocaleContent(employment.organisationUnitName) as string, value: employment.organisationUnitId as number});
                 });
 
-                selectedAffiliations.value = [];
+                selectedAffiliations.value.splice(0);
                 if(props.basic) {
                     selectLatestAffiliation();
                 } else {
@@ -327,7 +327,7 @@ export default defineComponent({
             selectedPerson.value = personPlaceholder;
             descriptionRef.value?.clearInput();
             affiliationStatementRef.value?.clearInput();
-            personOtherNames.value = [];
+            personOtherNames.value.splice(0);
         };
 
         const selectNewlyAddedPerson = (person: BasicPerson) => {

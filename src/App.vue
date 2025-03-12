@@ -2,6 +2,7 @@
     <v-app>
         <v-main>
             <navbar />
+            <breadcrumbs />
             <router-view :key="$route.params.id" />
         </v-main>
         <footerbar />
@@ -19,11 +20,12 @@ import { jwtDecode } from "jwt-decode";
 import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
 import footerbar from "./components/core/FooterBar.vue";
+import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 
 
 export default defineComponent({
     name: "App",
-    components: {navbar, footerbar},
+    components: {navbar, footerbar, Breadcrumbs},
     beforeMount() {
         const route = useRoute();
         const router = useRouter();

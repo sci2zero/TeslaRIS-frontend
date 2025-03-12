@@ -239,6 +239,8 @@ export default defineComponent({
                 years.value.push(i);
             }
 
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.scheduledTasks")}}`;
+
             setTimeout(() => {
                 fetchScheduledTasks();
                 setInterval(fetchScheduledTasks, 1000 * 60);

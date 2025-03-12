@@ -107,7 +107,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, watch } from 'vue';
 import { ref } from 'vue';
-import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
+import CommissionAutocompleteSearch from '@/components/assessment/commission/CommissionAutocompleteSearch.vue';
 import { getReportTypesForGivenLocale } from '@/i18n/reportType';
 import { type ErrorResponse, type ScheduledTaskResponse } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
@@ -158,6 +158,8 @@ export default defineComponent({
             for(let i = 1999; i <= now.getFullYear(); i++) {
                 years.value.push(i);
             }
+
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.reporting")}}`;
 
             setTimeout(() => {
                 fetchScheduledTasks();
