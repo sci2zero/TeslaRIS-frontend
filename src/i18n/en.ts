@@ -556,6 +556,7 @@ export default {
     clientEmailLabel: "Client email",
     clientPreferredLanguageLabel: "Client preferred language",
     dailyRequestsLabel: "Daily request limit",
+    writingLanguageLabel: "Writing",
     routeLabel: {
         baseLocale: "Home",
         login: "Login",

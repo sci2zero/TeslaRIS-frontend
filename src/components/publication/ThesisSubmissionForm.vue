@@ -3,7 +3,7 @@
         <v-row>
             <v-col cols="8">
                 <v-row>
-                    <v-col v-if="!enterExternalOU" cols="10">
+                    <v-col v-if="!enterExternalOU" cols="12">
                         <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
@@ -25,7 +25,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-select
                             v-model="selectedThesisType"
                             :label="$t('thesisTypeLabel') + '*'"
@@ -36,7 +36,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-text-field
                             v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel') + '*'"
                             :rules="requiredFieldRules"></v-text-field>
@@ -59,7 +59,23 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12" md="6">
+                            <v-select
+                                v-model="selectedLanguage"
+                                :label="$t('languageLabel')"
+                                :items="languageList"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-select
+                                v-model="selectedWritingLanguage"
+                                :label="$t('writingLanguageLabel')"
+                                :items="languageTagsList"
+                            ></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
                             <v-select
                                 v-model="selectedResearchArea"
                                 :label="$t('researchAreaLabel')"
@@ -69,12 +85,12 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
@@ -94,7 +110,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
                         </v-col>
                     </v-row>
@@ -124,7 +140,7 @@ import type { Thesis, ThesisType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, LanguageTagResponse } from '@/models/Common';
+import type { ErrorResponse, LanguageResponse } from '@/models/Common';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
@@ -133,6 +149,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import Toast from '../core/Toast.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -151,17 +168,17 @@ export default defineComponent({
 
         const router = useRouter();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTagsList } = useLanguageTags();
         const languageList = ref<{title: string, value: number}[]>([]);
-        const selectedLanguages = ref<number[]>([]);
+        const selectedLanguage = ref<number>();
+        const selectedWritingLanguage = ref<number>();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageTags.value.push(languageTag);
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                    if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
-                        selectedLanguages.value.push(languageTag.id);
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
+                    if (i18n.locale.value.toUpperCase() === language.languageCode) {
+                        selectedLanguage.value = language.id;
                     }
                 })
             });
@@ -218,7 +235,8 @@ export default defineComponent({
             const newThesis: Thesis = {
                 title: title.value,
                 thesisType: selectedThesisType.value.value as ThesisType,
-                languageTagIds: selectedLanguages.value,
+                languageId: selectedLanguage.value as number,
+                writingLanguageTagId: selectedWritingLanguage.value as number,
                 numberOfPages: numberOfPages.value as number,
                 organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
                 externalOrganisationUnitName: externalOUName.value,
@@ -272,21 +290,18 @@ export default defineComponent({
 
         return {
             isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            publicationYear, doi,
-            publisherAutocompleteRef,
-            selectedPublisher, numberOfPages,
+            additionalFields, snackbar, error, title, titleRef,
+            subtitle, subtitleRef, publicationYear, doi,
+            publisherAutocompleteRef, selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
-            keywords, keywordsRef, uris, urisRef,
-            contributions, contributionsRef,
+            keywords, keywordsRef, uris, urisRef, selectedLanguage,
+            contributions, contributionsRef, languageList,
             requiredFieldRules, submitThesis, errorMessage,
-            requiredSelectionRules, enterExternalOU,
+            requiredSelectionRules, enterExternalOU, languageTagsList,
             researchAreasSelectable, selectedResearchArea,
             selectedThesisType, thesisTypes, selectedOrganisationUnit,
-            externalOUName, externalOUNameRef, ouAutocompleteRef
+            externalOUName, externalOUNameRef, ouAutocompleteRef,
+            selectedWritingLanguage
         };
     }
 });

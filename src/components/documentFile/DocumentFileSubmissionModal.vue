@@ -25,7 +25,8 @@
                     <v-container>
                         <document-file-submission-form
                             ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" :is-proof="isProof"
-                            @create="emitCreateToParent" @update="emitUpdateToParent"></document-file-submission-form>
+                            :allow-licence-selection="allowLicenceSelection" @create="emitCreateToParent"
+                            @update="emitUpdateToParent"></document-file-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -70,6 +71,10 @@ export default defineComponent({
             type: Object as PropType<DocumentFileResponse>,
             default: undefined
         },
+        allowLicenceSelection: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["create", "update"],
     setup(_, { emit }) {

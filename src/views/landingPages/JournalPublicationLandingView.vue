@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(journalPublication?.title) }}
+                        <rich-title-renderer :title="returnCurrentLocaleContent(journalPublication?.title)"></rich-title-renderer>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(journalPublication?.subTitle) }}
@@ -235,11 +235,12 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import { useLoginStore } from '@/stores/loginStore';
 import CitationSelector from '@/components/publication/CitationSelector.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer },
     setup() {
         const currentTab = ref("contributions");
 

@@ -56,12 +56,12 @@
                         </td>
                         <td v-if="$i18n.locale == 'sr'">
                             <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
-                                {{ item.titleSr }}
+                                <rich-title-renderer :title="item.titleSr"></rich-title-renderer>
                             </localized-link>
                         </td>
                         <td v-else>
                             <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
-                                {{ item.titleOther }}
+                                <rich-title-renderer :title="item.titleOther"></rich-title-renderer>
                             </localized-link>
                         </td>
                         <td>
@@ -133,11 +133,12 @@ import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
 import { useRouter } from 'vue-router';
+import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -203,7 +204,7 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
-        const headers = ref([
+        const headers = ref<any>([
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
           { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
           { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},

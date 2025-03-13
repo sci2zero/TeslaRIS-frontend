@@ -73,10 +73,18 @@
         <v-row>
             <v-col>
                 <v-select
-                    v-model="selectedLanguages"
+                    v-model="selectedLanguage"
                     :label="$t('languageLabel')"
                     :items="languageList"
-                    multiple
+                ></v-select>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedWritingLanguage"
+                    :label="$t('writingLanguageLabel')"
+                    :items="languageTagsList"
                 ></v-select>
             </v-col>
         </v-row>
@@ -100,7 +108,7 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Thesis, ThesisType } from '@/models/PublicationModel';
@@ -121,6 +129,7 @@ import { watch } from 'vue';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -145,16 +154,15 @@ export default defineComponent({
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags, languageTagsList } = useLanguageTags();
         const languageList = ref<{title: string, value: number}[]>([]);
-        const selectedLanguages = ref<number[]>(props.presetThesis?.languageTagIds as number[]);
+        const selectedLanguage = ref<number>(props.presetThesis?.languageId as number);
+        const selectedWritingLanguage = ref<number>(props.presetThesis?.writingLanguageTagId as number);
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                 });
             });
 
@@ -258,7 +266,8 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                languageTagIds: selectedLanguages.value,
+                languageId: selectedLanguage.value,
+                writingLanguageTagId: selectedWritingLanguage.value,
                 fileItems: [],
                 proofs: []
             };
@@ -276,7 +285,7 @@ export default defineComponent({
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetThesis?.subTitle as MultilingualContent[];
 
-            selectedLanguages.value = props.presetThesis?.languageTagIds as number[];
+            selectedLanguage.value = props.presetThesis?.languageId as number;
             uris.value = props.presetThesis?.uris as string[];
             numberOfPages.value = props.presetThesis?.numberOfPages;
             publicationYear.value = props.presetThesis?.documentDate;
@@ -294,13 +303,13 @@ export default defineComponent({
         return {
             isFormValid, title, subtitle, urisRef,
             publicationYear, doi, message, snackbar,
-            numberOfPages, selectedPublisher,
+            numberOfPages, selectedPublisher, languageTagsList,
             uris, requiredFieldRules, requiredSelectionRules,
-            submit, toMultilingualTextInput,
+            submit, toMultilingualTextInput, selectedWritingLanguage,
             languageTags, doiValidationRules, enterExternalOU,
             scopusIdValidationRules, selectedOrganisationUnit,
             researchAreasSelectable, selectedResearchArea,
-            selectedLanguages, publicationTypes, selectedThesisType,
+            selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
             externalOUName, externalOUNameRef
         };

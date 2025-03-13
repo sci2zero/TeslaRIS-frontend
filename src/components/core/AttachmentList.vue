@@ -1,7 +1,7 @@
 <template>
     <v-card class="pa-3" variant="flat" color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-            <document-file-submission-modal v-if="canEdit" :is-proof="isProof" @create="sendDataToParent"></document-file-submission-modal>
+            <document-file-submission-modal v-if="canEdit" :is-proof="isProof" :allow-licence-selection="allowLicenceSelection" @create="sendDataToParent"></document-file-submission-modal>
 
             <v-row>
                 <v-list
@@ -42,7 +42,9 @@
                                         </v-btn>
                                     </v-col>
                                     <v-col>
-                                        <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment" @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
+                                        <document-file-submission-modal
+                                            :is-proof="isProof" edit :preset-document-file="attachment" :allow-licence-selection="allowLicenceSelection"
+                                            @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
                                     </v-col>
                                 </v-row>
                             </template>
@@ -89,6 +91,10 @@ export default defineComponent({
             default: false
         },
         inComparator: {
+            type: Boolean,
+            default: false
+        },
+        allowLicenceSelection: {
             type: Boolean,
             default: false
         }

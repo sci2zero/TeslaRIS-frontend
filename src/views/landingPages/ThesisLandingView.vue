@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(thesis?.title) }}
+                        <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)"></rich-title-renderer>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(thesis?.subTitle) }}
@@ -102,12 +102,20 @@
                                 <div v-if="thesis?.uris && thesis?.uris.length > 0" class="response">
                                     <uri-list :uris="thesis?.uris"></uri-list>
                                 </div>
-                                <div v-if="thesis?.languageTagIds && thesis?.languageTagIds.length > 0">
+                                <div v-if="thesis?.languageId">
                                     {{ $t("languageLabel") }}:
                                 </div>
-                                <div v-if="thesis?.languageTagIds && thesis?.languageTagIds.length > 0">
-                                    <v-chip v-for="(languageTagId, index) in thesis?.languageTagIds" :key="index" outlined>
-                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                <div v-if="thesis?.languageId">
+                                    <v-chip outlined>
+                                        {{ returnCurrentLocaleContent(languageMap.get(thesis?.languageId)?.name) }}
+                                    </v-chip>
+                                </div>
+                                <div v-if="thesis?.writingLanguageTagId">
+                                    {{ $t("writingLanguageLabel") }}:
+                                </div>
+                                <div v-if="thesis?.writingLanguageTagId">
+                                    <v-chip outlined>
+                                        {{ languageTagMap.get(thesis?.writingLanguageTagId)?.display }}
                                     </v-chip>
                                 </div>
                             </v-col>
@@ -191,11 +199,11 @@
         <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </v-container>when(thesis.getThesisType()).thenReturn(ThesisType.PHD);
 </template>
 
 <script lang="ts">
-import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -237,11 +245,12 @@ import CitationSelector from '@/components/publication/CitationSelector.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer },
     setup() {
         const currentTab = ref("contributions");
 
@@ -255,6 +264,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const organisationUnit = ref<OrganisationUnitResponse>();
         const event = ref<Conference>();
+        const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const userRole = computed(() => UserService.provideUserRole());
@@ -344,6 +354,12 @@ export default defineComponent({
         };
 
         const populateData = () => {
+            LanguageService.getAllLanguages().then(response => {
+                response.data.forEach(language => {
+                    languageMap.value.set(language.id, language);
+                })
+            });
+
             LanguageService.getAllLanguageTags().then(response => {
                 response.data.forEach(languageTag => {
                     languageTagMap.value.set(languageTag.id, languageTag);
@@ -391,7 +407,8 @@ export default defineComponent({
             thesis.value!.publisherId = basicInfo.publisherId;
             thesis.value!.organisationUnitId = basicInfo.organisationUnitId;
             thesis.value!.numberOfPages = basicInfo.numberOfPages;
-            thesis.value!.languageTagIds = basicInfo.languageTagIds;
+            thesis.value!.languageId = basicInfo.languageId;
+            thesis.value!.writingLanguageTagId = basicInfo.writingLanguageTagId;
             thesis.value!.researchAreaId = basicInfo.researchAreaId;
             thesis.value!.externalOrganisationUnitName = basicInfo.externalOrganisationUnitName;
 
@@ -435,9 +452,9 @@ export default defineComponent({
         };
 
         return {
-            thesis, icon, publisher, createIndicator,
+            thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
-            languageTagMap, searchKeyword, goToURL, canEdit,
+            languageMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, localiseDate,
             snackbar, snackbarMessage, updateContributions,

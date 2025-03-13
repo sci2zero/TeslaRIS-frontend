@@ -215,10 +215,11 @@ export interface Thesis extends Document {
     externalOrganisationUnitName?: MultilingualContent[];
     thesisType: ThesisType;
     numberOfPages?: number;
-    languageTagIds: number[];
+    languageId: number;
+    writingLanguageTagId: number;
     researchAreaId?: number;
     publisherId?: number;
-    languageTagNames?: string[];
+    languageCode?: string;
 }
 
 export interface CitationResponse {

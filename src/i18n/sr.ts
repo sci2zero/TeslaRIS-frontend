@@ -555,6 +555,7 @@ export default {
     clientEmailLabel: "Email klijenta",
     clientPreferredLanguageLabel: "Izabrani jezik klijenta",
     dailyRequestsLabel: "Dnevni limit zahtjeva",
+    writingLanguageLabel: "Pismo",
     routeLabel: {
         baseLocale: "Početna",
         login: "Login",
