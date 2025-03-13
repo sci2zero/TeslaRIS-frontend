@@ -7,7 +7,7 @@
         <br />
         <span class="d-flex align-center">
             <v-btn color="primary" @click="addConference">
-                {{ $t("addConferenceLabel") }}
+                {{ $t("createNewConferenceLabel") }}
             </v-btn>
             <v-checkbox
                 v-model="returnSerialEvents"

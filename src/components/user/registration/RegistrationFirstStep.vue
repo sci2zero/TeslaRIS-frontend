@@ -53,6 +53,7 @@ import PersonService from "@/services/PersonService";
 import { useRouter } from "vue-router";
 import { useRegisterStore } from '@/stores/registerStore';
 import { watch } from "vue";
+import { type PersonIndex } from "@/models/PersonModel";
 
 
 export default defineComponent({
@@ -65,7 +66,7 @@ export default defineComponent({
         const lastName = ref("")
 
         const registerStore = useRegisterStore();
-        const suggestions = ref<typeof PersonService[]>([]);
+        const suggestions = ref<PersonIndex[]>([]);
 
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
         const firstNameRules = [
@@ -101,7 +102,7 @@ export default defineComponent({
         const searchResearchers = lodash.debounce((input: string) => {
                 const token = input
                 const params = `tokens=${token}&page=0&size=7`
-                PersonService.searchResearchers(params, true).then((response) => {
+                PersonService.searchResearchers(params, false).then((response) => {
                     suggestions.value = response.data.content;
                 });
         }, 300);

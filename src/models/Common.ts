@@ -111,5 +111,33 @@ export enum ScheduledTaskType {
     CLASSIFICATION_COMPUTATION = "CLASSIFICATION_COMPUTATION",
     CLASSIFICATION_LOAD = "CLASSIFICATION_LOAD",
     JOURNAL_PUBLICATIONS_ASSESSMENT = "JOURNAL_PUBLICATIONS_ASSESSMENT",
-    PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT"
+    PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT",
+    REPORT_GENERATION = "REPORT_GENERATION"
+}
+
+export interface BrandingInformation {
+    title: MultilingualContent[];
+    description: MultilingualContent[];
+}
+
+export enum ApiKeyType {
+    M_SERVICE = "M_SERVICE"
+}
+
+export interface ApiKeyRequest {
+    name: MultilingualContent[],
+    type: ApiKeyType,
+    clientEmail: string,
+    validUntil: string,
+    clientPreferredLanguageId: number,
+    dailyRequests: number
+}
+
+export interface ApiKeyResponse {
+    id: number,
+    name: MultilingualContent[],
+    type: ApiKeyType,
+    validUntil: string,
+    clientEmail: string,
+    dailyRequests: number
 }

@@ -6,7 +6,7 @@
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
-            {{ $t("addOULabel") }}
+            {{ $t("createNewOULabel") }}
         </v-btn>
         <br />
         <br />
@@ -56,7 +56,7 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, null).then((response) => {
                 organisationUnits.value = response.data.content;
                 totalOUs.value = response.data.totalElements;
             });

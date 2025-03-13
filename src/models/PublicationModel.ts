@@ -52,7 +52,9 @@ export enum ThesisType {
     MR = "MR",
     PHD = "PHD",
     PHD_ART_PROJECT = "PHD_ART_PROJECT",
-    MASTER = "MASTER"
+    MASTER = "MASTER",
+    BACHELOR_WITH_HONORS = "BACHELOR_WITH_HONORS",
+    UNDERGRADUATE_THESIS = "UNDERGRADUATE_THESIS"
 }
   
 export enum JournalPublicationType {
@@ -225,4 +227,14 @@ export interface CitationResponse {
     chicago: string;
     harvard: string;
     vancouver: string;
+}
+
+export interface DocumentAffiliationRequest {
+    documentIds: number[];
+    deleteOthers: boolean;
+}
+
+export enum MServiceApplicableTypes {
+    JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
+    PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION"
 }

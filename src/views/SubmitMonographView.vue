@@ -1,19 +1,19 @@
 <template>
     <v-container>
         <v-sheet class="text-center">
-            <h1>{{ $t("addMonographLabel") }}</h1>
+            <h1>{{ $t("createNewMonographLabel") }}</h1>
         </v-sheet>
         <br />
         <br />
         <monograph-submission-form ref="submissionFormRef"></monograph-submission-form>
         <v-row justify="center">
             <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitMonograph(false)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(false)">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-col>
             <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitMonograph(true)">
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(true)">
                     {{ $t("saveAndAddAnotherLabel") }}
                 </v-btn>
             </v-col>
@@ -37,7 +37,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("addMonographLabel");
+            document.title = i18n.t("createNewMonographLabel");
         });
 
         return {

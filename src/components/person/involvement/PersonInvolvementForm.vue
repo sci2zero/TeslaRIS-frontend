@@ -44,17 +44,17 @@
             <v-col>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="title" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).title : [], languageList)" :label="$t('academicTitleLabel') + '*'" :rules="requiredFieldRules"></multilingual-text-input>
+                        <multilingual-text-input v-model="title" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).title : [], languageTags)" :label="$t('academicTitleLabel') + '*'" :rules="requiredFieldRules"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="abbreviationTitle" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).abbreviationTitle : [], languageList)" :label="$t('abbreviationTitleLabel')"></multilingual-text-input>
+                        <multilingual-text-input v-model="abbreviationTitle" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).abbreviationTitle : [], languageTags)" :label="$t('abbreviationTitleLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="thesisTitle" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).thesisTitle : [], languageList)" :label="$t('thesisTitleLabel')"></multilingual-text-input>
+                        <multilingual-text-input v-model="thesisTitle" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).thesisTitle : [], languageTags)" :label="$t('thesisTitleLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -64,12 +64,12 @@
             <v-col>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageList)" :label="$t('contributionabstractLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageTags)" :label="$t('contributionabstractLabel')" is-area></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="role" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).role : [], languageList)" :label="$t('roleLabel')"></multilingual-text-input>
+                        <multilingual-text-input v-model="role" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).role : [], languageTags)" :label="$t('roleLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -89,7 +89,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="role" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).role : [], languageList)" :label="$t('roleLabel')"></multilingual-text-input>
+                        <multilingual-text-input v-model="role" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).role : [], languageTags)" :label="$t('roleLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -106,10 +106,7 @@
 <script lang="ts">
 import { computed, defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { getInvolvementTypesForGivenLocale, getInvolvementTypeTitleFromValueAutoLocale, getSimilarInvolvementTypes } from '@/i18n/involvementType';
@@ -119,6 +116,7 @@ import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/Or
 import { getEmploymentPositionsForGivenLocale, getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import type { EmploymentPosition } from '@/models/PersonModel';
 import DatePicker from '@/components/core/DatePicker.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -141,13 +139,9 @@ export default defineComponent({
     emits: ["update", "create"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
-        const languageList = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             if(props.presetInvolvement?.organisationUnitId) {
                 selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(props.presetInvolvement.organisationUnitName) as string, value: props.presetInvolvement?.organisationUnitId as number};
             }
@@ -218,7 +212,7 @@ export default defineComponent({
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
             dateFrom, dateTo, saveInvolvement,
-            languageList, selectedInvolvementType, requiredSelectionRules,
+            languageTags, selectedInvolvementType, requiredSelectionRules,
             ouAutocompleteRef, selectedOrganisationUnit, contributionDescription,
             role, title, abbreviationTitle, thesisTitle, employmentPositions,
             selectedEmploymentPosition, requiredFieldRules

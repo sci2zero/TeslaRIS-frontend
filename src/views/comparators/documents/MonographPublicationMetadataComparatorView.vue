@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <monograph-publication-update-form ref="updateLeftRef" :preset-monograph-publication="leftMonographPublication" in-comparator @update="updateLeft"></monograph-publication-update-form>
+                <monograph-publication-update-form
+                    ref="updateLeftRef" :preset-monograph-publication="leftMonographPublication" in-comparator :in-modal="false"
+                    @update="updateLeft"></monograph-publication-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <monograph-publication-update-form ref="updateRightRef" :preset-monograph-publication="rightMonographPublication" in-comparator @update="updateRight"></monograph-publication-update-form>
+                <monograph-publication-update-form
+                    ref="updateRightRef" :preset-monograph-publication="rightMonographPublication" in-comparator :in-modal="false"
+                    @update="updateRight"></monograph-publication-update-form>
 
                 <br />
 

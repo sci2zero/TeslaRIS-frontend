@@ -124,7 +124,7 @@ export default defineComponent({
 
         const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
 
-        const submitPublicationSeries = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
             const newPublicationSeries: PublicationSeries = {
                 title: title.value,
                 eissn: eIssn.value,
@@ -188,14 +188,12 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
+            isFormValid, additionalFields, submit,
             snackbar, message, printIssnValidationRules,
             title, titleRef, eIssnValidationRules,
             eIssn, printIssn, languageList, selectedLanguages,
             nameAbbreviations, abbreviationsRef,
-            requiredFieldRules, uris, urisRef,
-            submitPublicationSeries
+            requiredFieldRules, uris, urisRef
         };
     }
 });

@@ -13,8 +13,14 @@
                 @update:model-value="onPersonSelect($event)"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
-            <person-submission-modal @create="selectNewlyAddedPerson"></person-submission-modal>
+        <v-col cols="1">
+            <generic-crud-modal
+                :form-component="PersonSubmissionForm"
+                entity-name="Person"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedPerson"
+            />
         </v-col>
     </v-row>
     <v-btn color="primary" class="text-body-2 mb-2" @click="toggleExternalSelection">
@@ -95,7 +101,6 @@ import MultilingualTextInput from "./MultilingualTextInput.vue";
 import lodash from "lodash";
 import { watch } from "vue";
 import type { PersonName } from "@/models/PersonModel";
-import PersonSubmissionModal from "../person/PersonSubmissionModal.vue";
 import type { PropType } from "vue";
 import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
 import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
@@ -104,10 +109,13 @@ import LanguageService from "@/services/LanguageService";
 import InvolvementService from "@/services/InvolvementService";
 import { localiseDate } from "@/i18n/dateLocalisation";
 import { removeTrailingPipeRegex } from "@/utils/StringUtil";
+import GenericCrudModal from "./GenericCrudModal.vue";
+import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
+
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: { MultilingualTextInput, PersonSubmissionModal },
+    components: { MultilingualTextInput, GenericCrudModal },
     props: {
         basic: {
             type: Boolean,
@@ -281,12 +289,12 @@ export default defineComponent({
 
         watch(selectedPerson, () => {
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
-                personAffiliations.value = [];
+                personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
                     personAffiliations.value.push({title: returnCurrentLocaleContent(employment.organisationUnitName) as string, value: employment.organisationUnitId as number});
                 });
 
-                selectedAffiliations.value = [];
+                selectedAffiliations.value.splice(0);
                 if(props.basic) {
                     selectLatestAffiliation();
                 } else {
@@ -319,7 +327,7 @@ export default defineComponent({
             selectedPerson.value = personPlaceholder;
             descriptionRef.value?.clearInput();
             affiliationStatementRef.value?.clearInput();
-            personOtherNames.value = [];
+            personOtherNames.value.splice(0);
         };
 
         const selectNewlyAddedPerson = (person: BasicPerson) => {
@@ -337,17 +345,19 @@ export default defineComponent({
             sendContentToParent();
         };
 
-        return {persons,
+        return {
                 firstName, middleName, lastName,
                 selectedPerson, customNameInput,
-                searchPersons, filterPersons,
+                searchPersons, filterPersons, persons,
                 requiredFieldRules, requiredSelectionRules,
                 contributionDescription, affiliationStatement,
                 sendContentToParent, clearInput, onPersonSelect,
                 descriptionRef, affiliationStatementRef, toggleExternalSelection,
                 personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput,
-                languageTags, valueSet, selectedAffiliations, personAffiliations};
+                languageTags, valueSet, selectedAffiliations, personAffiliations,
+                PersonSubmissionForm
+            };
     }
 });
 </script>

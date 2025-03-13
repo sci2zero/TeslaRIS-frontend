@@ -176,7 +176,8 @@ export default defineComponent({
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedAssessmentMeasures, notifications, createNewAssessmentMeasure,

@@ -42,16 +42,15 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { MultilingualContent, LanguageTagResponse } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import type { AssessmentRulebook, AssessmentRulebookResponse } from '@/models/AssessmentModel';
 import PublisherService from '@/services/PublisherService';
 import DatePicker from '@/components/core/DatePicker.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -71,13 +70,9 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchDetails();
         });
 

@@ -1,7 +1,21 @@
 <template>
-    <v-row no-gutters>
-        <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-        <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+    <v-row class="mb-5">
+        <v-menu open-on-hover>
+            <template #activator="{ props }">
+                <v-btn
+                    color="primary"
+                    v-bind="props"
+                >
+                    {{ $t("addEmployeeLabel") }}
+                </v-btn>
+            </template>
+
+            <v-list>
+                <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal is-vice-dean-for-science @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+            </v-list>
+        </v-menu>
     </v-row>
 
     <v-row>
@@ -101,13 +115,13 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "fullName", order: "asc"}]});
 
-        const headers = [
+        const headers = ref<any>([
           { title: fullNameLabel, align: "start", sortable: true, key: "fullName"},
           { title: emailLabel, align: "start", sortable: true, key: "email"},
           { title: organisationUnitLabel, align: "start", sortable: true, key: ouColumn},
           { title: roleLabel, align: "start", sortable: true, key: "userRole"},
           { title: actionLabel},
-        ];
+        ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["fullName", "full_name_sortable"],

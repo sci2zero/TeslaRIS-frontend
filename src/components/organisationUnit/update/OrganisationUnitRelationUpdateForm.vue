@@ -31,10 +31,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { OrganisationUnitsRelationType, type OrganisationUnitRelationRequest, type OrganisationUnitRelationResponse, type OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
@@ -69,14 +66,9 @@ export default defineComponent({
         const defaultFillerData = [{relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}}];
         const data = ref<any[]>(defaultFillerData);
 
-        const languageList = ref<LanguageTagResponse[]>([]);
         const toDelete = ref<number[]>([]);
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             setRelations();
         });
 
@@ -148,7 +140,7 @@ export default defineComponent({
         return {
             isFormValid,
             requiredFieldRules, data,
-            toMultilingualTextInput, languageList,
+            toMultilingualTextInput,
             addRelation, removeRelation, relationTypes,
             updateOURelations, autocompleteSearchRef,
             onDropCallback

@@ -282,7 +282,7 @@ export default defineComponent({
             populateSelectionData();
         });
 
-        const submitMonograph = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
                 publicationSeriesId = undefined;
@@ -359,7 +359,7 @@ export default defineComponent({
             volume, number, monographTypes, selectedMonographType,
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, submitMonograph,
+            publicationSeriesExternalValidation, submit,
             selectedResearchArea, toMultilingualTextInput,
             languageTags, contributionsRef, contributions,
             isbnValidationRules, scopusIdValidationRules

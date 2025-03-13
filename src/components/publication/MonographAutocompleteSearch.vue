@@ -14,8 +14,15 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
-            <monograph-submission-modal :read-only="readOnly" in-modal @create="selectNewlyAddedMonograph"></monograph-submission-modal>
+        <v-col cols="1">
+            <generic-crud-modal
+                :form-component="MonographSubmissionForm"
+                :form-props="{readOnly: readOnly, inModal: true}"
+                entity-name="Monograph"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedMonograph"
+            />
         </v-col>
     </v-row>
 </template>
@@ -29,12 +36,13 @@ import type { DocumentPublicationIndex, Monograph } from '@/models/PublicationMo
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import MonographSubmissionModal from './MonographSubmissionModal.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import MonographSubmissionForm from './MonographSubmissionForm.vue';
 
 
 export default defineComponent({
     name: "MonographAutocompleteSearch",
-    components: { MonographSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -131,7 +139,7 @@ export default defineComponent({
 
         return {
             monographs, selectedMonograph, searchMonographs,
-            requiredSelectionRules,
+            requiredSelectionRules, MonographSubmissionForm,
             sendContentToParent, clearInput,
             selectNewlyAddedMonograph
         };

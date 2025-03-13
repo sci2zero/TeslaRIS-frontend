@@ -1,16 +1,16 @@
 <template>
-    <v-col align-self="start" cols="2" class="ml-3">
+    <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
-                <v-btn
-                    color="primary" dark v-bind="scope.props" class="bottom-spacer"
-                    v-on="scope.isActive">
-                    {{ isCommission ? $t("addCommissionLabel") : $t("addInstitutionEditorLabel") }}
-                </v-btn>
+                <v-list-item dark v-bind="scope.props" class="inline-action" v-on="scope.isActive">
+                    <v-list-item-title>
+                        {{ isCommission ? $t("addCommissionLabel") : ( isViceDeanForScience ? $t("addViceDeanForScienceLabel") : $t("addInstitutionEditorLabel")) }}
+                    </v-list-item-title>
+                </v-list-item>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ isCommission ? $t("addCommissionLabel") : $t("addInstitutionEditorLabel") }}</span>
+                    <span class="text-h5">{{ isCommission ? $t("addCommissionLabel") : ( isViceDeanForScience ? $t("addViceDeanForScienceLabel") : $t("addInstitutionEditorLabel")) }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -78,7 +78,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
@@ -101,6 +101,10 @@ export default defineComponent({
     components: { OrganisationUnitAutocompleteSearch, CommissionAutocompleteSearch },
     props: {
         isCommission: {
+            type: Boolean,
+            default: false
+        },
+        isViceDeanForScience: {
             type: Boolean,
             default: false
         }
@@ -169,7 +173,7 @@ export default defineComponent({
                     .then(() => handleSuccess(stayOnPage))
                     .catch(handleError);
             } else {
-                AuthenticationService.registerEmployee(newEmployee)
+                AuthenticationService.registerEmployee(newEmployee, props.isViceDeanForScience ? "vice-dean-for-science" : "institution-admin")
                     .then(() => handleSuccess(stayOnPage))
                     .catch(handleError);
             }

@@ -43,6 +43,7 @@ export interface EntityClassificationResponse {
     year: number;
     timestamp: string;
     applicableEntityTypes: ApplicableEntityType[];
+    assessmentReason: MultilingualContent[];
 }
 
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
@@ -207,5 +208,59 @@ export interface AssessmentResearchArea {
 export interface ResearcherAssessmentResponse {
     commissionDescription: MultilingualContent[];
     commissionId: number;
-    publicationsPerCategory: Record<string, {a: string, b:number}[]>;
+    publicationsPerCategory: Record<string, {a: string, b :number, c :number}[]>;
+}
+
+export enum ReportType {
+    TABLE_63 = "TABLE_63",
+    TABLE_67 = "TABLE_67",
+    TABLE_67_POSITIONS = "TABLE_67_POSITIONS",
+    TABLE_64 = "TABLE_64",
+    TABLE_TOP_LEVEL_INSTITUTION = "TABLE_TOP_LEVEL_INSTITUTION",
+    TABLE_TOP_LEVEL_INSTITUTION_SUMMARY = "TABLE_TOP_LEVEL_INSTITUTION_SUMMARY",
+    TABLE_TOP_LEVEL_INSTITUTION_COLORED = "TABLE_TOP_LEVEL_INSTITUTION_COLORED"
+}
+
+export interface Report {
+    commissionId: number;
+    reportFileName: string;
+}
+
+export interface ImaginaryPublicationAssessmentRequest {
+    containingEntityId: number;
+    commissionId: number;
+    classificationYear: number;
+    researchAreaCode: string;
+    authorCount: number;
+    experimental: boolean;
+    theoretical: boolean;
+    simulation: boolean;
+    journalPublicationType: string;
+    proceedingsPublicationType: string;
+}
+
+export interface ImaginaryPublicationAssessmentResponse {
+    assessmentCode: string;
+    assessmentReason: MultilingualContent[];
+    rawPoints: number;
+    rawPointsReason: MultilingualContent[];
+    scaledPoints: number;
+    scaledPointsReason: MultilingualContent[];
+}
+
+export interface IFValue {
+    a: number;
+    b: string;
+}
+  
+export interface IFCategoryData {
+    category: string;
+    if2Ranks: IFValue[];
+    if5Ranks: IFValue[];
+}
+
+export interface IFTableResponse {
+    if2Values: IFValue[];
+    if5Values: IFValue[];
+    ifTableContent: IFCategoryData[];
 }

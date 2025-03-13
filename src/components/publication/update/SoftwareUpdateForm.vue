@@ -44,13 +44,15 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Software } from '@/models/PublicationModel';
@@ -59,18 +61,24 @@ import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocom
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import { watch } from 'vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
     name: "SoftwareUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast},
     props: {
         presetSoftware: {
             type: Object as PropType<Software | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -79,13 +87,11 @@ export default defineComponent({
 
         const publisher = ref<Publisher>();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
+
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchDetails();
         });
 
@@ -120,7 +126,19 @@ export default defineComponent({
 
         const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const { duplicateFound } = await checkIdentifiers(
+                    [{ value: doi.value as string, error: "doiExistsError" }],
+                    props.presetSoftware?.id as number,
+                    (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
+                );
+
+                if (duplicateFound) {
+                    return;
+                }
+            }
+
             const updatedSoftware: Software = {
                 title: title.value as MultilingualContent[],
                 internalNumber: softwareNumber.value as string,
@@ -159,14 +177,13 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
-            publicationYear, doi,
+            isFormValid, doi, snackbar, message,
+            title, subtitle, publicationYear,
             selectedPublisher, softwareNumber,
-            uris, requiredFieldRules, titleRef, subtitleRef,
+            uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,
             languageTags, doiValidationRules,
-            refreshForm, urisRef
+            refreshForm, urisRef, subtitleRef
         };
     }
 });

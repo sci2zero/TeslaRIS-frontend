@@ -9,7 +9,7 @@
                 <div class="d-flex">
                     <v-toolbar-title>
                         <router-link to="/" class="logo-link app-title">
-                            {{ appTitle }}
+                            {{ returnCurrentLocaleContent(appTitle) }}
                         </router-link>
                     </v-toolbar-title>
 
@@ -130,6 +130,8 @@ import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import BrandingService from '@/services/BrandingService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 interface MenuItem {
@@ -185,11 +187,16 @@ export default defineComponent(
             const commissionsLabel = computed(() => i18n.t("commissionListLabel"));
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
+            const reportingLabel = computed(() => i18n.t("reportingLabel"));
+            const mServiceLabel = computed(() => i18n.t("mServiceLabel"));
+            const brandingLabel = computed(() => i18n.t("brandingLabel"));
+            const massInstitutionAssignmentLabel = computed(() => i18n.t("massInstitutionAssignmentLabel"));
+            const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
             
-            const appTitle = ref("CRIS UNS");
+            const appTitle = ref();
             const sidebar = ref(false);
             const userRole = ref("");
 
@@ -214,7 +221,8 @@ export default defineComponent(
 
             const logout = () => {
                 AuthenticationService.logoutUser();
-                loginStore.userLoggedOut();
+                loginStore.explicitlyLogout();
+                loginStore
                 router.push({ name: "login" });
             };
 
@@ -232,6 +240,10 @@ export default defineComponent(
             });
 
             onMounted(() => {
+                BrandingService.fetchBrandingInfo().then((response) => {
+                    appTitle.value = response.data.title;
+                });
+
                 if (AuthenticationService.userLoggedIn()) {
                     populateUserData();
                 }
@@ -250,7 +262,9 @@ export default defineComponent(
                 { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
                 { title: countryListLabel, type:'icon-link', pathName: "countries"},
-                { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"}
+                { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},
+                { title: brandingLabel, type:'icon-link', pathName: "branding"},
+                { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"}
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
@@ -274,6 +288,9 @@ export default defineComponent(
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
+                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (userRole.value === 'ADMIN' || userRole.value === 'VICE_DEAN_FOR_SCIENCE')) },
+                { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: true },
+                { title: massInstitutionAssignmentLabel, type:'icon-link', pathName: 'mass-institution-assignment', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
             ]);
 
             const menuItems = ref<MenuItem[]>([
@@ -289,7 +306,8 @@ export default defineComponent(
 
             return { 
                 userName, userRole, logout, appTitle,
-                sidebar, menuItems, leftMenuItems, loginStore 
+                sidebar, menuItems, leftMenuItems, loginStore,
+                returnCurrentLocaleContent
             };
         }
     });

@@ -109,7 +109,7 @@ export default defineComponent({
 
         const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
 
-        const submitOU = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
             const newOu: OrganisationUnitRequest = {
                 name: name.value,
                 nameAbbreviation: nameAbbreviation.value,
@@ -156,7 +156,7 @@ export default defineComponent({
             email, phoneNumber,
             keywords, keywordsRef,
             requiredFieldRules,
-            submitOU, mapRef,
+            submit, mapRef,
             scopusAfid, uris,
             scopusAfidValidationRules,
             nonMandatoryEmailFieldRules

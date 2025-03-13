@@ -42,9 +42,8 @@ import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import type { Country, LanguageTagResponse } from '@/models/Common';
+import type { Country } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Publisher } from "@/models/PublisherModel";
 import PublisherService from "@/services/PublisherService";
@@ -73,13 +72,7 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
 
-        const languageList = ref<LanguageTagResponse[]>();
-
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
                 countries.value = [{ title: "", value: -1}];
                 response.data.forEach(country => {
@@ -107,7 +100,7 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const submitPublisher = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
 
             const newPublisher: Publisher = {
                 name: name.value,
@@ -145,7 +138,7 @@ export default defineComponent({
             countries, selectedCountry,
             place, placeRef,
             requiredFieldRules,
-            submitPublisher
+            submit
         };
     }
 });

@@ -61,6 +61,9 @@
                     <v-icon v-if="row.item.serialEvent" icon="mdi-check"></v-icon>
                     <v-icon v-else icon="mdi-cancel"></v-icon>
                 </td>
+                <td>
+                    <event-classification-modal-content :event-id="row.item.databaseId"></event-classification-modal-content>
+                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -78,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
@@ -87,10 +90,12 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
+import EventClassificationModalContent from '../assessment/classifications/EventClassificationModalContent.vue';
+
 
 export default defineComponent({
     name: "EventTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, EventClassificationModalContent },
     props: {
         events: {
             type: Array<EventIndex>,
@@ -113,6 +118,7 @@ export default defineComponent({
         const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
         const serialEventLabel = computed(() => i18n.t("serialEventLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const userRole = computed(() => UserService.provideUserRole());
 
@@ -121,12 +127,18 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
-        const headers = [
+        const headers = ref<any[]>([
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
           { title: stateLabel, align: "start", sortable: true, key: stateColumn},
-          { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"},
-        ];
+          { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"}
+        ]);
+
+        onMounted(() => {
+            if (userRole.value === "ADMIN" || userRole.value === "COMMISSION") {
+                headers.value.push({ title: actionLabel, align: "start", sortable: false, key: "action"});
+            }
+        });
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["nameSr", "name_sr_sortable"],

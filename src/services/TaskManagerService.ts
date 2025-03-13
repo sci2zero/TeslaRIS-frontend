@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { ScheduledTaskResponse } from "@/models/Common";
+import type { ReportType, ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
 import { EntityClassificationSource, type PublicationAssessmentRequest } from "@/models/AssessmentModel";
 import { PublicationType } from "@/models/PublicationModel";
@@ -12,6 +12,10 @@ export class TaskSchedulingService extends BaseService {
 
     async listScheduledTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
         return super.sendRequest(axios.get, "scheduled-task");
+    }
+
+    async listScheduledReportGenerationTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
+        return super.sendRequest(axios.get, "scheduled-task/report-generation");
     }
 
     async scheduleIndicatorLoadingTask(timestamp: string, source: string): Promise<AxiosResponse<void>> {
@@ -38,6 +42,10 @@ export class TaskSchedulingService extends BaseService {
 
     async schedulePublicationAssessment(timestamp: string, dateFrom: string, body: PublicationAssessmentRequest, type: PublicationType): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${timestamp}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
+    }
+
+    async scheduleReportGeneration(timestamp: string, reportType: ReportType, commissionIds: number[], year: number[] | number, topLevelInstitutionId: number | undefined, lang: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}&timestamp=${timestamp}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     private createNumericalParameter(paramName: string, values: number[]): string {

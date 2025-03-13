@@ -4,12 +4,12 @@
             <v-col cols="12">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="title" :initial-value="toMultilingualTextInput(presetPrize?.title, languageList)" :label="$t('titleLabel') + '*'" :rules="requiredFieldRules"></multilingual-text-input>
+                        <multilingual-text-input v-model="title" :initial-value="toMultilingualTextInput(presetPrize?.title, languageTags)" :label="$t('titleLabel') + '*'" :rules="requiredFieldRules"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="description" :initial-value="toMultilingualTextInput(presetPrize?.description, languageList)" :label="$t('abstractLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input v-model="description" :initial-value="toMultilingualTextInput(presetPrize?.description, languageTags)" :label="$t('abstractLabel')" is-area></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -35,16 +35,13 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
-import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { PrizeResponse } from '@/models/PersonModel';
 import type { Prize } from '@/models/PersonModel';
 import DatePicker from '@/components/core/DatePicker.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -67,13 +64,7 @@ export default defineComponent({
     emits: ["update", "create"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
-        const languageList = ref<LanguageTagResponse[]>([]);
-
-        onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-        });
+        const { languageTags } = useLanguageTags();
 
         const { requiredFieldRules } = useValidationUtils();
 
@@ -99,7 +90,7 @@ export default defineComponent({
 
         return {
             isFormValid, toMultilingualTextInput, savePrize,
-            languageList, title, requiredFieldRules,
+            languageTags, title, requiredFieldRules,
             dateOfAcquisition, description
         };
     }

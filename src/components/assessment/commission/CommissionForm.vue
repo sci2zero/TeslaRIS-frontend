@@ -60,16 +60,15 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { MultilingualContent, LanguageTagResponse } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import DatePicker from '@/components/core/DatePicker.vue';
 import CommissionService from '@/services/assessment/CommissionService';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -89,7 +88,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         const ruleEngines = ref<{ title: string, value: string }[]>([]);
 
@@ -97,10 +96,6 @@ export default defineComponent({
         const selectedResearchAreas = ref<{title: string, value: string}[]>([]);
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             CommissionService.readApplicableRuleEngines().then((response) => {
                 ruleEngines.value.splice(0);
                 response.data.forEach((ruleEngine) => {
