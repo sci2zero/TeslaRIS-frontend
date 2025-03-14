@@ -16,7 +16,7 @@
                             :label="$t('descriptionLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row v-if="!isProof">
+                <v-row v-if="!isProof && !disableResourceTypeSelection">
                     <v-col>
                         <v-select
                             v-model="selectedResourceType"
@@ -86,6 +86,10 @@ export default defineComponent({
             default: false
         },
         allowLicenceSelection: {
+            type: Boolean,
+            default: false
+        },
+        disableResourceTypeSelection: {
             type: Boolean,
             default: false
         }

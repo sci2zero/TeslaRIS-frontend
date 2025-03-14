@@ -213,6 +213,14 @@ export class DocumentPublicationService extends BaseService {
   async checkMonographIdentifierUsage(identifier: string, monographId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `monograph/identifier-usage/${monographId}?identifier=${encodeURIComponent(identifier)}`);
   }
+
+  async putThesisOnPublicReview(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/put-on-public-review/${thesisId}`);
+  }
+
+  async removeThesisFromPublicReview(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/remove-from-public-review/${thesisId}`);
+  }
 }
 
 export default new DocumentPublicationService();

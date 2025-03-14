@@ -1,4 +1,4 @@
-import { License, ResourceType, type DocumentFileResponse } from "@/models/DocumentFileModel";
+import { License, ResourceType, ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
 import { BaseService } from "./BaseService";
 import axios, { type AxiosResponse } from "axios";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
@@ -40,6 +40,12 @@ export class DocumentFileService extends BaseService {
         return super.sendMultipartFormDataRequest(axios.patch, `document/${publicationId}?isProof=${isProof}`, attachment, DocumentFileService.idempotencyKey);
     }
 
+    async addThesisFileAttachment(attachment: any, thesisId: number, attachmentType: ThesisAttachmentType): Promise<AxiosResponse<DocumentFileResponse>> {
+        attachment.license = getNameFromOrdinal(License, attachment.license);
+        attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
+        return super.sendMultipartFormDataRequest(axios.patch, `thesis/${attachmentType}/${thesisId}`, attachment, DocumentFileService.idempotencyKey);
+    }
+
     async updateDocumentFileAttachment(attachment: any): Promise<AxiosResponse<DocumentFileResponse>> {
         if (typeof attachment.license === "number") {
             attachment.license = getNameFromOrdinal(License, attachment.license);
@@ -52,6 +58,10 @@ export class DocumentFileService extends BaseService {
 
     async deleteDocumentFileAttachment(publicationId: number, documentFileId: number): Promise<void> {
         return super.sendRequest(axios.delete, `document/${publicationId}/${documentFileId}`);
+    }
+
+    async deleteThesisFileAttachment(thesisId: number, documentFileId: number, attachmentType: ThesisAttachmentType): Promise<void> {
+        return super.sendRequest(axios.delete, `thesis/${attachmentType}/${thesisId}/${documentFileId}`);
     }
 
     async addExpertiseOrSkillProof(proof: any, expertiseOrSkillId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {

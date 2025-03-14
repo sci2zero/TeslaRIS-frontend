@@ -220,6 +220,12 @@ export interface Thesis extends Document {
     researchAreaId?: number;
     publisherId?: number;
     languageCode?: string;
+    preliminaryFiles?: DocumentFileResponse[];
+    preliminarySupplements?: DocumentFileResponse[];
+    commissionReports?: DocumentFileResponse[];
+    isOnPublicReview: boolean;
+    publicReviewDates: string[];
+    publicReviewEnd: string;
 }
 
 export interface CitationResponse {

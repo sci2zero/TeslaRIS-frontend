@@ -1,7 +1,13 @@
 <template>
     <v-card class="pa-3" variant="flat" color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-            <document-file-submission-modal v-if="canEdit" :is-proof="isProof" :allow-licence-selection="allowLicenceSelection" @create="sendDataToParent"></document-file-submission-modal>
+            <document-file-submission-modal
+                v-if="canEdit"
+                :is-proof="isProof"
+                :allow-licence-selection="allowLicenceSelection"
+                :disable-resource-type-selection="disableResourceTypeSelection"
+                @create="sendDataToParent">
+            </document-file-submission-modal>
 
             <v-row>
                 <v-list
@@ -41,10 +47,13 @@
                                             <v-icon size="x-large" icon="mdi-delete"></v-icon>
                                         </v-btn>
                                     </v-col>
-                                    <v-col>
+                                    <v-col v-if="!disableUpdates">
                                         <document-file-submission-modal
-                                            :is-proof="isProof" edit :preset-document-file="attachment" :allow-licence-selection="allowLicenceSelection"
-                                            @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
+                                            :is-proof="isProof" edit :preset-document-file="attachment"
+                                            :allow-licence-selection="allowLicenceSelection"
+                                            :disable-resource-type-selection="disableResourceTypeSelection"
+                                            @update="sendUpdateRequestToParent($event, attachment.id)"
+                                        ></document-file-submission-modal>
                                     </v-col>
                                 </v-row>
                             </template>
@@ -95,6 +104,14 @@ export default defineComponent({
             default: false
         },
         allowLicenceSelection: {
+            type: Boolean,
+            default: false
+        },
+        disableUpdates: {
+            type: Boolean,
+            default: false
+        },
+        disableResourceTypeSelection: {
             type: Boolean,
             default: false
         }

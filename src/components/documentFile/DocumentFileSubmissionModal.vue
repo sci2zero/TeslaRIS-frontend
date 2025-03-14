@@ -19,14 +19,14 @@
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ isProof ? $t("addProofLabel") : $t("addDocumentFileLabel") }}</span>
+                    <span class="text-h5">{{ edit ? $t("updateLabel") : (isProof ? $t("addProofLabel") : $t("addDocumentFileLabel")) }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
                         <document-file-submission-form
                             ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" :is-proof="isProof"
-                            :allow-licence-selection="allowLicenceSelection" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></document-file-submission-form>
+                            :allow-licence-selection="allowLicenceSelection" :disable-resource-type-selection="disableResourceTypeSelection"
+                            @create="emitCreateToParent" @update="emitUpdateToParent"></document-file-submission-form>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -72,6 +72,10 @@ export default defineComponent({
             default: undefined
         },
         allowLicenceSelection: {
+            type: Boolean,
+            default: false
+        },
+        disableResourceTypeSelection: {
             type: Boolean,
             default: false
         }

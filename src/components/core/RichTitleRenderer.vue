@@ -27,7 +27,6 @@ export default defineComponent({
                 return "";
             }
 
-            console.log(props.title)
             if (latexRegex.test(props.title)) {
                 const parts = props.title.split("$")
                 const processedParts = parts.map((part, index) => {
@@ -69,6 +68,7 @@ export default defineComponent({
     display: inline-block;
     overflow-wrap: break-word;
     word-break: break-word;
+    white-space: normal;
     width: 100%;
 }
 
