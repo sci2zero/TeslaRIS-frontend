@@ -37,6 +37,7 @@
                             <organisation-unit-autocomplete-search
                                 ref="ouAutocompleteRef"
                                 v-model:model-value="selectedOrganisationUnit"
+                                :top-level-institution-id="role === 'INSTITUTIONAL_EDITOR' ? loggedInUser?.organisationUnitId : undefined"
                             ></organisation-unit-autocomplete-search>
                         </v-col>
                     </v-row>
@@ -168,7 +169,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import PersonService from "@/services/PersonService";
@@ -183,6 +184,8 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
 import PersonDeduplicationTable from './PersonDeduplicationTable.vue';
 import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
+import { type UserResponse } from '@/models/UserModel';
 
 
 export default defineComponent({
@@ -203,6 +206,15 @@ export default defineComponent({
         const message = ref("");
 
         const i18n = useI18n();
+
+        const role = computed(() => UserService.provideUserRole());
+        const loggedInUser = ref<UserResponse>();
+
+        onMounted(() => {
+            UserService.getLoggedInUser().then(response => {
+                loggedInUser.value = response.data;
+            });
+        });
 
         const router = useRouter();
 
@@ -286,12 +298,12 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, additionalFields, snackbar, message, deduplicationTableRef,
+            isFormValid, additionalFields, snackbar, message, deduplicationTableRef, role,
             firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules
+            scopusAuthorIdValidationRules, loggedInUser
         };
     }
 });

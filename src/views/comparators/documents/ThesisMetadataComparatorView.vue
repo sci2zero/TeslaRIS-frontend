@@ -180,12 +180,11 @@ export default defineComponent({
             });
             thesis2.uris = [];
 
-            thesis2.languageTagIds!.forEach(languageTagId => {
-                if (!thesis1.languageTagIds!.includes(languageTagId)) {
-                    thesis1.languageTagIds!.push(languageTagId);
-                }
-            });
-            thesis2.languageTagIds = [];
+            thesis1.languageId = thesis2.languageId;
+            thesis2.languageId = undefined;
+
+            thesis1.writingLanguageTagId = thesis2.writingLanguageTagId;
+            thesis2.writingLanguageTagId = undefined;
 
             thesis1.contributions = thesis1.contributions?.concat(thesis2.contributions as PersonDocumentContribution[]);
             thesis2.contributions = [];
@@ -230,7 +229,8 @@ export default defineComponent({
             leftThesis.value!.numberOfPages = updatedInfo.numberOfPages;
             leftThesis.value!.researchAreaId = updatedInfo.researchAreaId;
             leftThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
-            leftThesis.value!.languageTagIds = updatedInfo.languageTagIds;
+            leftThesis.value!.languageId = updatedInfo.languageId;
+            leftThesis.value!.writingLanguageTagId = updatedInfo.writingLanguageTagId;
             leftThesis.value!.thesisType = updatedInfo.thesisType;
             leftThesis.value!.publisherId = updatedInfo.publisherId;
             leftThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
@@ -252,7 +252,8 @@ export default defineComponent({
             rightThesis.value!.numberOfPages = updatedInfo.numberOfPages;
             rightThesis.value!.researchAreaId = updatedInfo.researchAreaId;
             rightThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
-            rightThesis.value!.languageTagIds = updatedInfo.languageTagIds;
+            rightThesis.value!.languageId = updatedInfo.languageId;
+            rightThesis.value!.writingLanguageTagId = updatedInfo.writingLanguageTagId;
             rightThesis.value!.thesisType = updatedInfo.thesisType;
             rightThesis.value!.publisherId = updatedInfo.publisherId;
             rightThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;

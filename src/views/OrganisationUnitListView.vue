@@ -5,9 +5,17 @@
         <br />
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
-        <v-btn v-if="userRole && userRole !== 'RESEARCHER'" color="primary" @click="addOU">
-            {{ $t("createNewOULabel") }}
-        </v-btn>
+        <span class="d-flex align-center">
+            <v-btn v-if="isAdmin" color="primary" @click="addOU">
+                {{ $t("createNewOULabel") }}
+            </v-btn>
+            <v-checkbox
+                v-if="isUserBoundToOU"
+                v-model="returnOnlyInstitutionRelatedEntities"
+                :label="$t('showEventsForMyInstitutionLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+        </span>
         <br />
         <br />
         <organisation-unit-table-component ref="tableRef" :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
@@ -15,15 +23,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import { ref } from 'vue';
 import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { useRouter } from 'vue-router';
-import UserService from '@/services/UserService';
 import { useI18n } from 'vue-i18n';
+import { useUserRole } from '@/composables/useUserRole';
+
 
 export default defineComponent({
     name: "OrganisationUnitListView",
@@ -39,11 +48,16 @@ export default defineComponent({
 
         const i18n = useI18n();
         const router = useRouter();
-        const userRole = UserService.provideUserRole();
         const tableRef = ref<typeof OrganisationUnitTableComponent>();
+
+        const { isAdmin, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("ouListLabel");
+        });
+
+        watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
+            search(searchParams.value);
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -56,7 +70,7 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, null).then((response) => {
+            OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, null, returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null).then((response) => {
                 organisationUnits.value = response.data.content;
                 totalOUs.value = response.data.totalElements;
             });
@@ -76,8 +90,10 @@ export default defineComponent({
 
         return {
             search, organisationUnits, totalOUs,
-            switchPage, addOU, userRole,
-            clearSortAndPerformSearch, tableRef
+            switchPage, addOU, isAdmin,
+            clearSortAndPerformSearch, tableRef,
+            returnOnlyInstitutionRelatedEntities,
+            isUserBoundToOU
         };
     }
 });

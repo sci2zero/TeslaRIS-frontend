@@ -214,7 +214,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params, null).then((response) => {
+                OrganisationUnitService.searchOUs(params, null, null).then((response) => {
                     const listOfOUs: { title: string, value: number }[] = [];
                     response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
                         if (i18n.locale.value === "sr") {

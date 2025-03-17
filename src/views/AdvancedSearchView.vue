@@ -117,7 +117,7 @@ export default defineComponent({
                     });
                     break;
                 case "organisationUnits":
-                    OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`, null).then((response) => {
+                    OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`, null, null).then((response) => {
                         organisationUnits.value = response.data.content;
                         totalOUs.value = response.data.totalElements;
                     });

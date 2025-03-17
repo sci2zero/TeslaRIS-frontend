@@ -15,7 +15,7 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
             <v-checkbox
-                v-if="userRole === 'COMMISSION'"
+                v-if="userRole !== 'ADMIN' && userRole !== 'RESEARCHER'"
                 v-model="returnOnlyInstitutionBoundEvents"
                 :label="$t('showEventsForMyInstitutionLabel')"
                 class="ml-4 mt-5"

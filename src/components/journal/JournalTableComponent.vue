@@ -124,7 +124,6 @@ export default defineComponent({
         ]);
 
         const refreshTable = (event: any) => {
-            console.log(event)
             if (tableOptions.value.initialCustomConfiguration) {
                 tableOptions.value.initialCustomConfiguration = false;
                 event = tableOptions.value;

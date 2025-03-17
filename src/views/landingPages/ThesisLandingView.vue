@@ -43,12 +43,14 @@
                         <v-row>
                             <v-col cols="6">
                                 <v-btn
-                                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview" class="mb-5" color="primary" density="compact"
+                                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview"
+                                    class="mb-5" color="primary" density="compact"
                                     @click="changePublicReviewState(true)">
                                     {{ $t("putOnPublicReviewLabel") }}
                                 </v-btn>
                                 <v-btn
-                                    v-if="userRole === 'ADMIN' && thesis?.isOnPublicReview" class="mb-5" color="primary" density="compact"
+                                    v-if="userRole === 'ADMIN' && thesis?.isOnPublicReview"
+                                    class="mb-5" color="primary" density="compact"
                                     @click="changePublicReviewState(false)">
                                     {{ $t("removeFromPublicReviewLabel") }}
                                 </v-btn>
@@ -307,6 +309,7 @@ export default defineComponent({
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const userRole = computed(() => UserService.provideUserRole());
+        const userCanPutOnPublicReview = computed(() => userRole.value === "ADMIN" || userRole.value === "INSTITUTIONAL_EDITOR");
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
@@ -529,7 +532,7 @@ export default defineComponent({
             currentRoute, citationRef, ApplicableEntityType, canClassify,
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef,
-            changePublicReviewState, canBePutOnPublicReview
+            changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview
         };
 }})
 

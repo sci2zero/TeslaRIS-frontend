@@ -287,10 +287,11 @@ export default defineComponent({
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+
+                StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             }
 
             fetchOU(true);
-            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 ouIndicators.value = response.data;
             });
