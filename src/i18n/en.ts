@@ -586,7 +586,7 @@ export default {
     createNewClassificationLabel: "Create New Classification",
     addCommissionLabel: "Add Commission",
     emailInUseMessage: "Email {0} is already in use.",
-    showEventsForMyInstitutionLabel: "Only show events that are bound to my institution",
+    showEntitiesForMyInstitutionLabel: "Only show those that are bound to my institution",
     commissionRelationsLabel: "Commission Relations (respected during assessment)",
     relationGroupLabel: "Relation Group",
     createNewCommissionRelationLabel: "Add new relation group",
@@ -657,5 +657,8 @@ export default {
     datesOfPublicReviewLabel: "Dates when put on public review:",
     noAttachmentsMessage: "There are missing attachments",
     putOnPublicReviewWarningMessage: "When the thesis is placed under public review, all modifications will be disabled until the public review period ends.",
-    removeFromPublicReviewWarningMessage: "Removing the thesis from public review will allow modifications, but the period spent in the last public review will be reset."
+    removeFromPublicReviewWarningMessage: "Removing the thesis from public review will allow modifications, but the period spent in the last public review will be reset.",
+    classifiedByMeLabel: "Classified by me",
+    institutionProfileLabel: "Institution profile",
+    assessedByMeLabel: "Assessed by me"
 }

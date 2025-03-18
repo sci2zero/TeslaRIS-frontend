@@ -5,19 +5,17 @@
         <br />
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
-        <span class="d-flex align-center">
+        <span :class="'d-flex align-center ' + (isAdmin ? 'mb-3' : '')">
             <v-btn v-if="isAdmin" color="primary" @click="addOU">
                 {{ $t("createNewOULabel") }}
             </v-btn>
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
-                :label="$t('showEventsForMyInstitutionLabel')"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
-        <br />
-        <br />
         <organisation-unit-table-component ref="tableRef" :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
     </v-container>
 </template>
@@ -70,7 +68,15 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, null, returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null).then((response) => {
+            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                return;
+            }
+
+            OrganisationUnitService.searchOUs(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                null,
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+            .then((response) => {
                 organisationUnits.value = response.data.content;
                 totalOUs.value = response.data.totalElements;
             });

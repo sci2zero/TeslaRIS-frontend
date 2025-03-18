@@ -585,7 +585,7 @@ export default {
     createNewClassificationLabel: "Kreiraj novu klasifikaciju",
     addCommissionLabel: "Dodaj komisiju",
     emailInUseMessage: "Email {0} je već u upotrebi.",
-    showEventsForMyInstitutionLabel: "Prikaži samo događaje vezane za moju instituciju",
+    showEntitiesForMyInstitutionLabel: "Prikaži samo one vezane za moju instituciju",
     commissionRelationsLabel: "Relacije sa drugim komisijama (kod uvažavanja prilikom vrednovanja)",
     relationGroupLabel: "Relaciona grupa",
     createNewCommissionRelationLabel: "Dodaj novu relacionu grupu",
@@ -656,5 +656,8 @@ export default {
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
     noAttachmentsMessage: "Nedostaju neki od dodataka.",
     putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka periods javnog uvida.",
-    removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene ali će se poništiti period koji je rad proveo na poslednjem javnom uvidu."
+    removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene ali će se poništiti period koji je rad proveo na poslednjem javnom uvidu.",
+    classifiedByMeLabel: "Klasifikovano od strane mene",
+    institutionProfileLabel: "Profil institucije",
+    assessedByMeLabel: "Vrednovano od strane mene"
 }

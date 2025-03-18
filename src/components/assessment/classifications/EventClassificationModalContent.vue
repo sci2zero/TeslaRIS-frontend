@@ -54,8 +54,8 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ["switchPage"],
-    setup(props) {
+    emits: ["classified", "update"],
+    setup(props, {emit}) {
         const dialog = ref(false);
         const eventClassifications = ref<EntityClassificationResponse[]>([]);
 
@@ -66,12 +66,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchEventClassifications(props.eventId).then(response => {
                 eventClassifications.value = response.data;
+                emit("update", props.eventId);
             });
         };
 
         const createClassification = (eventClassification: EventAssessmentClassification) => {
             EntityClassificationService.createEventClassification(eventClassification).then(() => {
                 fetchClassifications();
+                emit("classified", props.eventId);
             });
         };
 

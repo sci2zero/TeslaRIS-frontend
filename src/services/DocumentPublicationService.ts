@@ -14,8 +14,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}`);
+  async searchDocumentPublications(tokens: string, institutionId: number | null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
   }
 
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {

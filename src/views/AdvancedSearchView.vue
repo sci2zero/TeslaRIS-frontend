@@ -111,7 +111,7 @@ export default defineComponent({
             
             switch(currentTab.value) {
                 case "persons":
-                    PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`, false).then((response) => {
+                    PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`, false, null).then((response) => {
                         persons.value = response.data.content;
                         totalPersons.value = response.data.totalElements;
                     });
@@ -123,7 +123,7 @@ export default defineComponent({
                     });
                     break;
                 case "publications":
-                    DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`).then((response) => {
+                    DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`, null).then((response) => {
                         publications.value = response.data.content;
                         totalPublications.value = response.data.totalElements;
                     });

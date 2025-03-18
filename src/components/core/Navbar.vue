@@ -132,6 +132,7 @@ import PersonService from "@/services/PersonService";
 import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
 import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 interface MenuItem {
@@ -159,6 +160,7 @@ export default defineComponent(
             const i18n = useI18n();
             const personId = ref(-1);
             const commissionId = ref(-1);
+            const institutionId = ref(-1);
 
             const homeLabel = computed(() => i18n.t("homeLabel"));
             
@@ -192,13 +194,14 @@ export default defineComponent(
             const brandingLabel = computed(() => i18n.t("brandingLabel"));
             const massInstitutionAssignmentLabel = computed(() => i18n.t("massInstitutionAssignmentLabel"));
             const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
+            const institutionProfileLabel = computed(() => i18n.t("institutionProfileLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
             
             const appTitle = ref();
             const sidebar = ref(false);
-            const userRole = ref("");
+            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isUserBoundToOU, userRole } = useUserRole();
 
             const loginStore = useLoginStore();
             const userName = ref("");
@@ -207,9 +210,13 @@ export default defineComponent(
             const populateUserData = () => {
                 UserService.getLoggedInUser().then((response) => {
                     userName.value = response.data.firstname + " " + response.data.lastName;
-                    userRole.value = UserService.provideUserRole();
-                    if (userRole.value === "COMMISSION") {
+
+                    if (isCommission.value) {
                         commissionId.value = response.data.commissionId;
+                    }
+                    
+                    if (isUserBoundToOU.value) {
+                        institutionId.value = response.data.organisationUnitId;
                     }
                 });
                 PersonService.getPersonId().then(response => {
@@ -278,19 +285,20 @@ export default defineComponent(
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
                 { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
-                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
-                { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER' && personId.value > 0) },
-                { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION' && commissionId.value > 0) },
-                { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
-                { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
-                { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
-                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
-                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'ADMIN') },
-                { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
-                { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'COMMISSION') },
-                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (userRole.value === 'ADMIN' || userRole.value === 'VICE_DEAN_FOR_SCIENCE')) },
+                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
+                { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
+                { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
+                { title: institutionProfileLabel, type: 'dynamic', pathName: `organisation-units`, dynamicValue: computed(() => institutionId.value), condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
+                { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+                { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
+                { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+                { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
+                { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
+                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isViceDeanForScience.value)) },
                 { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: true },
-                { title: massInstitutionAssignmentLabel, type:'icon-link', pathName: 'mass-institution-assignment', condition: computed(() => loginStore.userLoggedIn && userRole.value === 'RESEARCHER') },
+                { title: massInstitutionAssignmentLabel, type:'icon-link', pathName: 'mass-institution-assignment', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
             ]);
 
             const menuItems = ref<MenuItem[]>([

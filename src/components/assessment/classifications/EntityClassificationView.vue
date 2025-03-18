@@ -33,7 +33,7 @@
                                 />
                             </div>
                             <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN')" class="ml-5">
-                                <v-btn density="compact" @click.prevent="deleteCLassification(classification.id)">
+                                <v-btn density="compact" @click.prevent="deleteClassification(classification.id)">
                                     {{ $t("deleteLabel") }}
                                 </v-btn>
                             </div>
@@ -167,7 +167,7 @@ export default defineComponent({
             emit("update");
         };
 
-        const deleteCLassification = async (entityClassificationId: number) => {
+        const deleteClassification = async (entityClassificationId: number) => {
             openedPanel.value = null;
             await EntityClassificationService.deleteEntityClassification(entityClassificationId);
             const index = props.entityClassifications.findIndex(classification => classification.id === entityClassificationId);
@@ -187,7 +187,7 @@ export default defineComponent({
             openedPanel, userRole,
             EntityClassificationForm,
             updateClassification,
-            deleteCLassification,
+            deleteClassification,
             createClassification,
             loggedInUser
         };

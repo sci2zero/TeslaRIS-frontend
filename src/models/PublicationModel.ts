@@ -33,6 +33,7 @@ export interface DocumentPublicationIndex {
     monographId: number | null;
     databaseId: number | null;
     doi: string;
+    assessedBy?: number[];
 }
 
 export enum PublicationType {

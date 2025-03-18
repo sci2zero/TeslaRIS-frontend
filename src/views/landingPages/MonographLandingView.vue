@@ -208,7 +208,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="monograph?.id"
-                    :can-edit="canClassify && monograph?.documentDate !== ''"
+                    :can-edit="((canClassify && monograph?.documentDate) as boolean)"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
                     @create="createClassification"

@@ -1,18 +1,18 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'"
+        v-if="isAdmin"
         density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !inComparator" density="compact" class="compare-button"
+        v-if="isAdmin && !inComparator" density="compact" class="compare-button"
         :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !inComparator" density="compact" class="compare-button"
+        v-if="isAdmin && !inComparator" density="compact" class="compare-button"
         :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
@@ -25,7 +25,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            :show-select="userRole === 'ADMIN' || allowSelection"
+            :show-select="isAdmin || allowSelection"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -46,7 +46,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="userRole === 'ADMIN' || allowSelection">
+                        <td v-if="isAdmin || allowSelection">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -99,6 +99,10 @@
                                 {{ $t("declineClaimLabel") }}
                             </v-btn>
                         </td>
+                        <td v-if="isCommission">
+                            <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
+                            <v-icon v-else icon="mdi-cancel"></v-icon>
+                        </td>
                     </tr>
                 </draggable>
             </template>
@@ -122,7 +126,6 @@
 import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import UserService from '@/services/UserService';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
@@ -134,6 +137,7 @@ import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
 import { useRouter } from 'vue-router';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -176,6 +180,10 @@ export default defineComponent({
             if (props.inClaimer) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
+
+            if (isCommission.value) {
+                headers.value.push({ title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
+            }
         })
 
         watch(tableWrapper, () => {
@@ -197,8 +205,9 @@ export default defineComponent({
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
+        const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin, isCommission, loggedInUser } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
@@ -324,14 +333,26 @@ export default defineComponent({
             emit("declineClaim", documentId);
         };
 
+        const documentClassified = (document: DocumentPublicationIndex) => {
+            const commissionId = loggedInUser.value?.commissionId as number;
+            
+            if (document.assessedBy) {
+                if (!document.assessedBy.includes(commissionId)) {
+                    document.assessedBy.push(commissionId);
+                }
+            } else {
+                document.assessedBy = [commissionId];
+            }
+        };
+
         return {
             selectedPublications, headers, notifications,
-            refreshTable, userRole, deleteSelection, tableWrapper,
+            refreshTable, isAdmin, deleteSelection, tableWrapper,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
-            getPublicationTypeTitleFromValueAutoLocale,
+            getPublicationTypeTitleFromValueAutoLocale, isCommission,
             startMetadataComparison, getDocumentLandingPageBasePath,
             startPublicationComparison, setSortAndPageOption, claimPublication,
-            declinePublicationClaim
+            declinePublicationClaim, loggedInUser, documentClassified
         };
     }
 });

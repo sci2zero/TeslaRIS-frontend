@@ -5,47 +5,54 @@
         <br />
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
-        <v-menu
-            v-if="userRole && userRole !== 'COMMISSION' && userRole !== 'VICE_DEAN_FOR_SCIENCE'"
-            open-on-hover
-        >
-            <template #activator="{ props }">
-                <v-btn
-                    color="primary"
-                    v-bind="props"
-                >
-                    {{ $t("addNewEntityLabel") }}
-                </v-btn>
-            </template>
+        <span :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
+            <v-menu
+                v-if="canUserAddPublications"
+                open-on-hover
+            >
+                <template #activator="{ props }">
+                    <v-btn
+                        color="primary"
+                        v-bind="props"
+                    >
+                        {{ $t("addNewEntityLabel") }}
+                    </v-btn>
+                </template>
 
-            <v-list>
-                <v-list-item
-                    v-for="(item, index) in items"
-                    :key="index"
-                    @click="navigateToPage(item.value)"
-                >
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                </v-list-item>
-            </v-list>
-        </v-menu>
-        <br />
-        <br />
+                <v-list>
+                    <v-list-item
+                        v-for="(item, index) in items"
+                        :key="index"
+                        @click="navigateToPage(item.value)"
+                    >
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+            <v-checkbox
+                v-if="isUserBoundToOU"
+                v-model="returnOnlyInstitutionRelatedEntities"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+        </span>
         <publication-table-component ref="tableRef" :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
     </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { ref } from 'vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import { useRouter } from 'vue-router';
-import UserService from '@/services/UserService';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { onMounted } from 'vue';
+import { useUserRole } from '@/composables/useUserRole';
+
 
 export default defineComponent({
     name: "ScientificResultsListView",
@@ -60,16 +67,29 @@ export default defineComponent({
         const direction = ref("");
 
         const router = useRouter();
-        const userRole = UserService.provideUserRole();
         const tableRef = ref<typeof PublicationTableComponent>();
+
+        const { canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
         });
 
+        watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
+            search(searchParams.value);
+        });
+
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+
+            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                return;
+            }
+
+            DocumentPublicationService.searchDocumentPublications(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+            .then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
             });
@@ -118,8 +138,10 @@ export default defineComponent({
 
         return {
             search, publications, totalPublications,
-            switchPage, userRole, items, navigateToPage,
-            tableRef, clearSortAndPerformSearch
+            switchPage, items, navigateToPage,
+            tableRef, clearSortAndPerformSearch,
+            canUserAddPublications, isUserBoundToOU,
+            returnOnlyInstitutionRelatedEntities
         };
     }
 });

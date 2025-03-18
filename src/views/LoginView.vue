@@ -145,7 +145,6 @@ export default defineComponent(
                     if (routeStore.nextRoute != null) {
                         const routeName = routeStore.fetchAndClearRoute();
                         const routeParams = routeStore.fetchAndClearParams();
-                        console.log(routeName, routeParams)
                         router.push({ name: routeName, params: routeParams });
                         return;
                     }

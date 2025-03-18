@@ -12,12 +12,10 @@
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
-                :label="$t('showEventsForMyInstitutionLabel')"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
-        <br />
-        <br />
         <journal-table-component ref="tableRef" :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
     </v-container>
 </template>
@@ -69,7 +67,15 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            JournalService.searchJournals(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null).then((response) => {
+
+            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                return;
+            }
+
+            JournalService.searchJournals(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+            .then((response) => {
                 journals.value = response.data.content;
                 totalJournals.value = response.data.totalElements;
             });
