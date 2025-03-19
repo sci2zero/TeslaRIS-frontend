@@ -111,19 +111,32 @@ export default defineComponent({
             
             switch(currentTab.value) {
                 case "persons":
-                    PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`, false, null).then((response) => {
+                    PersonService.searchResearchers(
+                        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`,
+                        false,
+                        null
+                    ).then((response) => {
                         persons.value = response.data.content;
                         totalPersons.value = response.data.totalElements;
                     });
                     break;
                 case "organisationUnits":
-                    OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`, null, null).then((response) => {
+                    OrganisationUnitService.searchOUs(
+                        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`,
+                        null,
+                        null
+                    ).then((response) => {
                         organisationUnits.value = response.data.content;
                         totalOUs.value = response.data.totalElements;
                     });
                     break;
                 case "publications":
-                    DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`, null, false).then((response) => {
+                    DocumentPublicationService.searchDocumentPublications(
+                        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`,
+                        null,
+                        false,
+                        []
+                    ).then((response) => {
                         publications.value = response.data.content;
                         totalPublications.value = response.data.totalElements;
                     });

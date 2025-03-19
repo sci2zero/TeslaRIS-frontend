@@ -155,7 +155,7 @@ const router = createRouter({
                 },
                 {
                     path: "events",
-                    name: "events",
+                    name: "eventsParent",
                     children: [
                         {
                             path: "",
@@ -233,7 +233,7 @@ const router = createRouter({
                 },
                 {
                     path: "book-series",
-                    name: "bookSeries",
+                    name: "bookSeriesParent",
                     children: [
                         {
                             path: "",
@@ -284,7 +284,7 @@ const router = createRouter({
                 },
                 {
                     path: "journals",
-                    name: "journals",
+                    name: "journalsParent",
                     children: [
                         {
                             path: "",
@@ -398,7 +398,7 @@ const router = createRouter({
                 },
                 {
                     path: "publishers",
-                    name: "publishers",
+                    name: "publishersParent",
                     children: [
                         {
                             path: "",
@@ -440,7 +440,7 @@ const router = createRouter({
                 },
                 {
                     path: "persons",
-                    name: "persons",                  
+                    name: "personsParent",                  
                     children: [
                         {
                             path: "",
@@ -482,7 +482,7 @@ const router = createRouter({
                 },
                 {
                     path: "organisation-units",
-                    name: "organisationUnits",
+                    name: "organisationUnitsParent",
                     children: [
                         {
                             path: "",
@@ -524,7 +524,7 @@ const router = createRouter({
                 },
                 {
                     path: "scientific-results",
-                    name: "scientificResults",
+                    name: "scientificResultsParent",
                     children: [
                         {
                             path: "",
@@ -946,7 +946,7 @@ const router = createRouter({
                         },
                         {
                             path: "assessment-rulebooks",
-                            name: "assessmentRulebooks",
+                            name: "assessmentRulebooksParent",
                             children: [
                                 {
                                     path: "",
@@ -970,7 +970,7 @@ const router = createRouter({
                         },
                         {
                             path: "commissions",
-                            name: "commissions",
+                            name: "commissionsParent",
                             children: [
                                 {
                                     path: "",

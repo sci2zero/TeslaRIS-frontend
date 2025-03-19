@@ -22,7 +22,7 @@
                             <p>{{ contents[index] }}</p>
                         </v-row>
                         <v-row v-if="classification.manual">
-                            <div v-if="classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN'">
+                            <div v-if="classification.commissionId === loggedInUser?.commissionId || isAdmin">
                                 <generic-crud-modal
                                     :form-component="EntityClassificationForm"
                                     :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
@@ -32,7 +32,7 @@
                                     @update="updateClassification($event, classification.id)"
                                 />
                             </div>
-                            <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN')" class="ml-5">
+                            <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || isAdmin)" class="ml-5">
                                 <v-btn density="compact" @click.prevent="deleteClassification(classification.id)">
                                     {{ $t("deleteLabel") }}
                                 </v-btn>
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
+import { defineComponent, onMounted, type PropType, watch } from 'vue';
 import { ref } from 'vue';
 import type { EntityClassificationResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -58,8 +58,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationForm from './EntityClassificationForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
-import UserService from '@/services/UserService';
-import type { UserResponse } from '@/models/UserModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -96,14 +95,10 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const loggedInUser = ref<UserResponse>();
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin, loggedInUser } = useUserRole();
         
         onMounted(() => {
             setClassifications();
-            UserService.getLoggedInUser().then(response => {
-                loggedInUser.value = response.data;
-            });
         });
 
         watch(() => props.entityClassifications, () => {
@@ -184,7 +179,7 @@ export default defineComponent({
         return {
             titles, contents,
             ApplicableEntityType,
-            openedPanel, userRole,
+            openedPanel, isAdmin,
             EntityClassificationForm,
             updateClassification,
             deleteClassification,

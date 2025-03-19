@@ -1,25 +1,30 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN' && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        v-if="isAdmin && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="(userRole === 'ADMIN' || userRole === 'COMMISSION') && isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        v-if="(isAdmin || isCommission) && isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
         @click="removeSelection">
         {{ $t("removeResearcherLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="isAdmin && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN' && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="isAdmin && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
-    <add-employment-modal v-if="employmentInstitutionId > 0 && userRole === 'ADMIN'" :institution-id="employmentInstitutionId" @update="notifyUserAndRefreshTable"></add-employment-modal>
+    <add-employment-modal 
+        v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
+        class="mt-3"
+        :institution-id="employmentInstitutionId"
+        @update="notifyUserAndRefreshTable">
+    </add-employment-modal>
     
     <div ref="tableWrapper">
         <v-data-table-server
@@ -29,7 +34,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPersons"
-            :show-select="userRole === 'ADMIN'"
+            :show-select="isAdmin"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -50,7 +55,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="userRole === 'ADMIN'">
+                        <td v-if="isAdmin">
                             <v-checkbox
                                 v-model="selectedPersons"
                                 :value="item"
@@ -110,7 +115,6 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
-import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
@@ -121,6 +125,7 @@ import { watch } from 'vue';
 import IdentifierLink from '../core/IdentifierLink.vue';
 import InvolvementService from '@/services/InvolvementService';
 import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -177,18 +182,18 @@ export default defineComponent({
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
         const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin, isInstitutionalEditor, isCommission } = useUserRole();
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
 
-        const headers = [
+        const headers = ref<any>([
           { title: fullNameLabel, align: "start", sortable: true, key: "name"},
           { title: organisationUnitLabel, align: "start", sortable: true, key: employmentColumn},
           { title: birthdateLabel, align: "start", sortable: true, key: "birthdate"},
           { title: "ORCID", align: "start", sortable: true, key: "orcid"},
-        ];
+        ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["name", "name_sortable"],
@@ -297,9 +302,9 @@ export default defineComponent({
 
         return {
             selectedPersons, headers, notifications,
-            refreshTable, userRole, deleteSelection,
-            tableOptions, displayTextOrPlaceholder,
-            localiseDate, startPublicationComparison,
+            refreshTable, isAdmin, deleteSelection,
+            tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
+            localiseDate, startPublicationComparison, isCommission,
             startMetadataComparison, onDropCallback, removeSelection,
             tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable
         };

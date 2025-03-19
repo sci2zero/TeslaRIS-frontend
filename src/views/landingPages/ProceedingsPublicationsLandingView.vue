@@ -176,7 +176,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -212,7 +212,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -224,6 +223,7 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import CitationSelector from '@/components/publication/CitationSelector.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -238,7 +238,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -410,7 +410,7 @@ export default defineComponent({
 
         return {
             proceedingsPublication, icon, publications, event,
-            totalPublications, returnCurrentLocaleContent, userRole,
+            totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,

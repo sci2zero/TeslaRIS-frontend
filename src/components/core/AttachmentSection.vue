@@ -57,7 +57,7 @@ import AttachmentList from "./AttachmentList.vue";
 import { addAttachment, updateAttachment, deleteAttachment, addThesisAttachment, deleteThesisAttachment } from "@/utils/AttachmentUtil";
 import { ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
 import type { Document, Thesis } from "@/models/PublicationModel";
-import UserService from "@/services/UserService";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -107,9 +107,10 @@ export default defineComponent({
   },
   emits: ["update:modelValue"],
   setup(props) {
-    const userRole = UserService.provideUserRole();
+    const { isAdmin, isInstitutionalEditor } = useUserRole();
+
     const canEditThesisAttachments = computed(() => 
-        (props.canEdit && (userRole === "ADMIN" || userRole === "INSTITUTIONAL_EDITOR")) && props.isThesisSection
+        (props.canEdit && (isAdmin.value || isInstitutionalEditor.value)) && props.isThesisSection
     );
 
     return {

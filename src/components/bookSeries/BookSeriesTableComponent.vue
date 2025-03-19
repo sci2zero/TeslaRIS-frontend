@@ -1,16 +1,16 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedBookSeries.length === 0"
+        v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedBookSeries.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2"
+        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2"
+        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedBookSeries.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -21,7 +21,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalBookSeries"
-        :show-select="userRole === 'ADMIN'"
+        :show-select="isAdmin"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -30,7 +30,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="userRole === 'ADMIN'">
+                <td v-if="isAdmin">
                     <v-checkbox
                         v-model="selectedBookSeries"
                         :value="row.item"
@@ -74,12 +74,12 @@
 import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import UserService from '@/services/UserService';
 import type {BookSeriesIndex} from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -106,7 +106,7 @@ export default defineComponent({
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
@@ -198,7 +198,7 @@ export default defineComponent({
         };
 
         return {selectedBookSeries, headers, notifications, 
-            refreshTable, userRole, deleteSelection,
+            refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startPublicationComparison,
             startMetadataComparison, setSortAndPageOption

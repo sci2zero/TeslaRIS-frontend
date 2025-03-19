@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, Software, Thesis } from "@/models/PublicationModel";
+import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -14,8 +14,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}`);
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    let allowedTypesParam= "";
+    allowedTypes.forEach(allowedType => {
+      allowedTypesParam += `&allowedTypes=${allowedType}`;
+    });
+    
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}`);
   }
 
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {

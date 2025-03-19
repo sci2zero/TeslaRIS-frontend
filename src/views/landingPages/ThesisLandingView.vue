@@ -49,7 +49,7 @@
                                     {{ $t("putOnPublicReviewLabel") }}
                                 </v-btn>
                                 <v-btn
-                                    v-if="userRole === 'ADMIN' && thesis?.isOnPublicReview"
+                                    v-if="isAdmin && thesis?.isOnPublicReview"
                                     class="mb-5" color="primary" density="compact"
                                     @click="changePublicReviewState(false)">
                                     {{ $t("removeFromPublicReviewLabel") }}
@@ -161,8 +161,8 @@
             <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="classifications">
-                {{ $t("classificationsLabel") }}
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+                {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -215,7 +215,7 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item value="classifications">
+            <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="thesis?.id"
@@ -228,7 +228,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER' && !thesis?.isOnPublicReview" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher && !thesis?.isOnPublicReview" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <persistent-question-dialog ref="publicDialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="thesis?.isOnPublicReview ? removeFromPublicReview() : putOnPublicReview()"></persistent-question-dialog>
 
@@ -269,7 +269,6 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -282,6 +281,7 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -308,8 +308,8 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const userRole = computed(() => UserService.provideUserRole());
-        const userCanPutOnPublicReview = computed(() => userRole.value === "ADMIN" || userRole.value === "INSTITUTIONAL_EDITOR");
+        const { isAdmin, isResearcher } = useUserRole();
+        const userCanPutOnPublicReview = computed(() => isAdmin.value);
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
@@ -528,10 +528,10 @@ export default defineComponent({
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, organisationUnit, ThesisUpdateForm,
             researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
-            handleResearcherUnbind, userRole, StatisticsType, documentIndicators,
+            handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
             currentRoute, citationRef, ApplicableEntityType, canClassify,
             createClassification, fetchClassifications, documentClassifications,
-            removeFromPublicReview, dialogMessage, publicDialogRef,
+            removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview
         };
 }})

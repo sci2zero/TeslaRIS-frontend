@@ -188,7 +188,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(journalPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(journalPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -196,7 +196,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -224,7 +224,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
@@ -236,6 +235,7 @@ import AssessmentClassificationService from '@/services/assessment/AssessmentCla
 import { useLoginStore } from '@/stores/loginStore';
 import CitationSelector from '@/components/publication/CitationSelector.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -250,7 +250,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -426,7 +426,7 @@ export default defineComponent({
 
         return {
             journalPublication, icon, canClassify,
-            publications, event, totalPublications, userRole,
+            publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, journal, JournalPublicationUpdateForm,
             StatisticsType, documentIndicators, currentTab,

@@ -147,7 +147,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -155,7 +155,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -178,7 +178,6 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -189,6 +188,7 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -207,7 +207,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -366,7 +366,7 @@ export default defineComponent({
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, SoftwareUpdateForm, userRole,
+            updateBasicInfo, SoftwareUpdateForm, isResearcher,
             handleResearcherUnbind, documentIndicators,
             citationRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,

@@ -1,16 +1,16 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedOUs.length === 0"
+        v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedOUs.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
         @click="startEmploymentComparison">
         {{ $t("compareEmployeesLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -21,7 +21,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalOUs"
-        :show-select="userRole === 'ADMIN'"
+        :show-select="isAdmin"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -30,7 +30,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="userRole === 'ADMIN'">
+                <td v-if="isAdmin">
                     <v-checkbox
                         v-model="selectedOUs"
                         :value="row.item"
@@ -110,12 +110,12 @@
 import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import UserService from '@/services/UserService';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
+import { useUserRole } from '@/composables/useUserRole';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
@@ -143,7 +143,7 @@ export default defineComponent({
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
         const superOULabel = computed(() => i18n.t("superOULabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
@@ -244,7 +244,7 @@ export default defineComponent({
 
         return {
             selectedOUs, headers, notifications,
-            refreshTable, userRole, deleteSelection,
+            refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
             startMetadataComparison

@@ -6,15 +6,9 @@
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <span :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-            <v-menu
-                v-if="canUserAddPublications"
-                open-on-hover
-            >
+            <v-menu v-if="canUserAddPublications" open-on-hover>
                 <template #activator="{ props }">
-                    <v-btn
-                        color="primary"
-                        v-bind="props"
-                    >
+                    <v-btn color="primary" v-bind="props">
                         {{ $t("addNewEntityLabel") }}
                     </v-btn>
                 </template>
@@ -29,17 +23,30 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+        </span>
+
+        <v-select
+            v-model="selectedPublicationTypes"
+            :items="publicationTypes"
+            :label="$t('typeOfPublicationLabel')"
+            return-object
+            class="publication-type-select mt-3"
+            multiple
+        ></v-select>
+
+        <span class="d-flex align-center">
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
-                class="ml-4 mt-5"
+                class="ml-4 mt-3"
             ></v-checkbox>
+
             <v-checkbox
                 v-if="isCommission"
                 v-model="returnOnlyUnassessedEntities"
                 :label="$t('showUnassessedLabel')"
-                class="ml-4 mt-5"
+                class="ml-4 mt-3"
             ></v-checkbox>
         </span>
         <publication-table-component ref="tableRef" :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
@@ -52,12 +59,13 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { ref } from 'vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 
 
 export default defineComponent({
@@ -76,14 +84,21 @@ export default defineComponent({
         const tableRef = ref<typeof PublicationTableComponent>();
         
         const returnOnlyUnassessedEntities = ref(true);
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
+        const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const { isCommission, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
+
+            selectedPublicationTypes.value.splice(0);
+            publicationTypes.value?.forEach(publicationType => {
+                selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
+            });
         });
 
-        watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities], () => {
+        watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities, selectedPublicationTypes], () => {
             search(searchParams.value);
         });
 
@@ -97,7 +112,8 @@ export default defineComponent({
             DocumentPublicationService.searchDocumentPublications(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                isCommission.value && returnOnlyUnassessedEntities.value)
+                isCommission.value && returnOnlyUnassessedEntities.value,
+                selectedPublicationTypes.value.map(publicationType => publicationType.value))
             .then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
@@ -151,8 +167,17 @@ export default defineComponent({
             tableRef, clearSortAndPerformSearch,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
-            isCommission, returnOnlyUnassessedEntities
+            isCommission, returnOnlyUnassessedEntities,
+            publicationTypes, selectedPublicationTypes
         };
     }
 });
 </script>
+
+<style scoped>
+
+.publication-type-select {
+    max-width: 700px;
+}
+
+</style>

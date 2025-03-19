@@ -218,7 +218,7 @@
                 </v-row>
 
                 <v-btn
-                    v-if="userRole === 'ADMIN'" 
+                    v-if="isAdmin" 
                     density="compact" class="mt-5" 
                     color="blue darken-1"
                     @click="migrateToUnmanaged">
@@ -278,7 +278,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
-import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
@@ -291,6 +290,7 @@ import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasur
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -320,7 +320,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
 
         const researcherName = ref("");
 
@@ -603,7 +603,7 @@ export default defineComponent({
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
+            currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading
         };

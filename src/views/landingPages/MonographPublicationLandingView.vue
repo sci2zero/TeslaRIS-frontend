@@ -137,8 +137,8 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="classifications">
-                {{ $t("classificationsLabel") }}
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+                {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -167,7 +167,7 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item value="classifications">
+            <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="monographPublication?.id"
@@ -180,7 +180,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monographPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(monographPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -188,7 +188,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -216,7 +216,6 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -227,6 +226,7 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -241,7 +241,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -414,7 +414,7 @@ export default defineComponent({
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, monograph, MonographPublicationUpdateForm,
-            searchKeyword, goToURL, canEdit, localiseDate, userRole,
+            searchKeyword, goToURL, canEdit, localiseDate, isResearcher,
             addAttachment, deleteAttachment, updateAttachment, icon,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
