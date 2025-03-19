@@ -123,7 +123,7 @@ export default defineComponent({
                     });
                     break;
                 case "publications":
-                    DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`, null).then((response) => {
+                    DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`, null, false).then((response) => {
                         publications.value = response.data.content;
                         totalPublications.value = response.data.totalElements;
                     });

@@ -659,5 +659,7 @@ export default {
     removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene ali će se poništiti period koji je rad proveo na poslednjem javnom uvidu.",
     classifiedByMeLabel: "Klasifikovano od strane mene",
     institutionProfileLabel: "Profil institucije",
-    assessedByMeLabel: "Vrednovano od strane mene"
+    assessedByMeLabel: "Vrednovano od strane mene",
+    showUnclassifiedLabel: "Prikaži samo neklasifikovane",
+    showUnassessedLabel: "Prikaži samo nevrednovane"
 }

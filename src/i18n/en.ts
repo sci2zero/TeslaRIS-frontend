@@ -660,5 +660,7 @@ export default {
     removeFromPublicReviewWarningMessage: "Removing the thesis from public review will allow modifications, but the period spent in the last public review will be reset.",
     classifiedByMeLabel: "Classified by me",
     institutionProfileLabel: "Institution profile",
-    assessedByMeLabel: "Assessed by me"
+    assessedByMeLabel: "Assessed by me",
+    showUnclassifiedLabel: "Show only unclassified",
+    showUnassessLabel: "Show only unaccessed"
 }

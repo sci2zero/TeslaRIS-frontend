@@ -62,11 +62,12 @@
                     <v-icon v-else icon="mdi-cancel"></v-icon>
                 </td>
                 <td>
-                    <event-classification-modal-content
-                        :event-id="row.item.databaseId"
+                    <entity-classification-modal-content
+                        :entity-id="row.item.databaseId"
+                        :entity-type="ApplicableEntityType.EVENT"
                         @classified="eventClassified(row.item)"
                         @update="refreshTable(tableOptions)">
-                    </event-classification-modal-content>
+                    </entity-classification-modal-content>
                 </td>
                 <td v-if="isCommission">
                     <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
@@ -97,13 +98,14 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
-import EventClassificationModalContent from '../assessment/classifications/EventClassificationModalContent.vue';
+import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { ApplicableEntityType } from '@/models/Common';
 
 
 export default defineComponent({
     name: "EventTableComponent",
-    components: { LocalizedLink, EventClassificationModalContent },
+    components: { LocalizedLink, EntityClassificationModalContent },
     props: {
         events: {
             type: Array<EventIndex>,
@@ -283,7 +285,7 @@ export default defineComponent({
             tableOptions, displayTextOrPlaceholder,
             startProceedingsComparison, startMetadataComparison,
             setSortAndPageOption, loggedInUser, isCommission,
-            eventClassified
+            eventClassified, ApplicableEntityType
         };
     }
 });

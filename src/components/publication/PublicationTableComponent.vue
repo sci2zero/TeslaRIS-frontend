@@ -91,13 +91,23 @@
                         <td v-else>
                             {{ displayTextOrPlaceholder(item.doi) }}
                         </td>
-                        <td v-if="inClaimer">
-                            <v-btn size="small" color="primary" @click="claimPublication(item.databaseId as number)">
+                        <td>
+                            <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
-                            <v-btn class="ml-1" size="small" color="primary" @click="declinePublicationClaim(item.databaseId as number)">
+                            <v-btn
+                                v-if="inClaimer" class="ml-1" size="small" color="primary"
+                                @click="declinePublicationClaim(item.databaseId as number)">
                                 {{ $t("declineClaimLabel") }}
                             </v-btn>
+                            <entity-classification-modal-content
+                                v-if="isAdmin || isCommission"
+                                :entity-id="(item.databaseId as number)"
+                                :entity-type="ApplicableEntityType.DOCUMENT"
+                                :disabled="!item.year || item.year < 0"
+                                @classified="documentClassified(item)"
+                                @update="refreshTable(tableOptions)">
+                            </entity-classification-modal-content>
                         </td>
                         <td v-if="isCommission">
                             <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
@@ -138,11 +148,13 @@ import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPubli
 import { useRouter } from 'vue-router';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
+import { ApplicableEntityType } from '@/models/Common';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -177,7 +189,7 @@ export default defineComponent({
         const tableWrapper = ref<any>(null);
 
         onMounted(() => {
-            if (props.inClaimer) {
+            if (props.inClaimer || isAdmin || isCommission) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
 
@@ -352,7 +364,8 @@ export default defineComponent({
             getPublicationTypeTitleFromValueAutoLocale, isCommission,
             startMetadataComparison, getDocumentLandingPageBasePath,
             startPublicationComparison, setSortAndPageOption, claimPublication,
-            declinePublicationClaim, loggedInUser, documentClassified
+            declinePublicationClaim, loggedInUser, documentClassified,
+            ApplicableEntityType
         };
     }
 });

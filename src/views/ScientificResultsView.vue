@@ -35,6 +35,12 @@
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-checkbox
+                v-if="isCommission"
+                v-model="returnOnlyUnassessedEntities"
+                :label="$t('showUnassessedLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
         </span>
         <publication-table-component ref="tableRef" :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
     </v-container>
@@ -68,14 +74,16 @@ export default defineComponent({
 
         const router = useRouter();
         const tableRef = ref<typeof PublicationTableComponent>();
+        
+        const returnOnlyUnassessedEntities = ref(true);
 
-        const { canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+        const { isCommission, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
         });
 
-        watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
+        watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities], () => {
             search(searchParams.value);
         });
 
@@ -88,7 +96,8 @@ export default defineComponent({
 
             DocumentPublicationService.searchDocumentPublications(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
+                isCommission.value && returnOnlyUnassessedEntities.value)
             .then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
@@ -141,7 +150,8 @@ export default defineComponent({
             switchPage, items, navigateToPage,
             tableRef, clearSortAndPerformSearch,
             canUserAddPublications, isUserBoundToOU,
-            returnOnlyInstitutionRelatedEntities
+            returnOnlyInstitutionRelatedEntities,
+            isCommission, returnOnlyUnassessedEntities
         };
     }
 });

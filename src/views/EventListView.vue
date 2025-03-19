@@ -20,6 +20,12 @@
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-checkbox
+                v-if="isCommission"
+                v-model="returnOnlyUnclassifiedEntities"
+                :label="$t('showUnclassifiedLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
         </span>
         <event-table-component ref="tableRef" :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
     </v-container>
@@ -56,15 +62,16 @@ export default defineComponent({
         const direction = ref("");
 
         const returnSerialEvents = ref(true);
+        const returnOnlyUnclassifiedEntities = ref(true);
         const tableRef = ref<typeof EventTableComponent>();
 
-        const { isAdmin, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+        const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
         });
 
-        watch([returnSerialEvents, returnOnlyInstitutionRelatedEntities], () => {
+        watch([returnSerialEvents, returnOnlyInstitutionRelatedEntities, returnOnlyUnclassifiedEntities], () => {
             search(searchParams.value);
         });
 
@@ -87,7 +94,8 @@ export default defineComponent({
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 !returnSerialEvents.value,
                 false,
-                returnOnlyInstitutionRelatedEntities.value as boolean)
+                returnOnlyInstitutionRelatedEntities.value as boolean,
+                isCommission.value && returnOnlyUnclassifiedEntities.value)
             .then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
@@ -110,7 +118,8 @@ export default defineComponent({
             search, events, totalEvents, switchPage, isAdmin,
             addConference, presetSearchParams, returnSerialEvents,
             tableRef, clearSortAndPerformSearch, isUserBoundToOU,
-            returnOnlyInstitutionRelatedEntities
+            returnOnlyInstitutionRelatedEntities, isCommission,
+            returnOnlyUnclassifiedEntities
         };
     }
 });
