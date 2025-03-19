@@ -6,7 +6,7 @@
                     <v-col cols="12">
                         <multilingual-text-input
                             ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetPublisher?.name, languageList)"></multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(presetPublisher?.name, languageTags)"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -22,7 +22,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" :initial-value="toMultilingualTextInput(presetPublisher?.place, languageList)"></multilingual-text-input>
+                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" :initial-value="toMultilingualTextInput(presetPublisher?.place, languageTags)"></multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -40,15 +40,15 @@
 import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { Country, LanguageTagResponse } from '@/models/Common';
+import type { Country } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import type { Publisher } from "@/models/PublisherModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import CountryService from '@/services/CountryService';
 import { useI18n } from 'vue-i18n';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -66,13 +66,9 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const languageList = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             fetchCountries();
         });
 
@@ -135,8 +131,8 @@ export default defineComponent({
                 selectedCountry.value = country;
             }
 
-            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageList.value));
-            placeRef.value?.forceRefreshModelValue(toMultilingualTextInput(place.value, languageList.value));
+            nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+            placeRef.value?.forceRefreshModelValue(toMultilingualTextInput(place.value, languageTags.value));
         };
 
         return {
@@ -146,7 +142,7 @@ export default defineComponent({
             place, placeRef,
             requiredFieldRules,
             toMultilingualTextInput,
-            submit, languageList,
+            submit, languageTags,
             refreshForm
         };
     }

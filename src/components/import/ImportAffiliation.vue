@@ -63,7 +63,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewOULabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("addOULabel") }}
+                {{ $t("createNewOULabel") }}
             </v-btn>
         </h3>
     </v-container>
@@ -142,7 +142,7 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
-            OrganisationUnitService.searchOUs(`tokens=${props.ouForLoading.name[0].content}&tokens=${props.ouForLoading.nameAbbreviation}&page=0&size=10`).then(response => {
+            OrganisationUnitService.searchOUs(`tokens=${props.ouForLoading.name[0].content}&tokens=${props.ouForLoading.nameAbbreviation}&page=0&size=10`, null).then(response => {
                 potentialMatches.value = response.data.content;
                 totalOUs.value = response.data.totalElements;
                 if (totalOUs.value === 0) {

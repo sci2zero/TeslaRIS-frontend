@@ -27,14 +27,12 @@
                             </div>
                         </template>
 
-                        <v-card min-width="150">
-                            <v-list>
-                                <expertiseOrSkill-modal :read-only="!canEdit" edit :preset-expertise-or-skill="expertiseOrSkill" @update="updateExpertiseOrSkill"></expertiseOrSkill-modal>
-                                <v-list-item @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
-                                    <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-card>
+                        <v-list min-width="200">
+                            <expertiseOrSkill-modal :read-only="!canEdit" edit :preset-expertise-or-skill="expertiseOrSkill" @update="updateExpertiseOrSkill"></expertiseOrSkill-modal>
+                            <v-list-item @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
+                                <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
                     </v-menu>
 
                     <h4><strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong></h4>

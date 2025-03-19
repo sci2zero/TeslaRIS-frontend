@@ -6,7 +6,7 @@
         <search-bar-component @search="clearSortAndPerformSearch($event)"></search-bar-component>
         <br />
         <v-btn v-if="userRole === 'ADMIN' || userRole === 'INSTITUTIONAL_EDITOR'" color="primary" @click="addPerson">
-            {{ $t("addPersonLabel") }}
+            {{ $t("createNewPersonLabel") }}
         </v-btn>
         <br />
         <br />

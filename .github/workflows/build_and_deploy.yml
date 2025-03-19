@@ -25,6 +25,7 @@ on:
 
 env:
   VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
+  VITE_RECAPTCHA_SITE_KEY: ${{ inputs.site_key || vars.SITE_KEY  }}
 
 jobs:
   build-frontend:

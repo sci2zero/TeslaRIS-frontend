@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <dataset-update-form ref="updateLeftRef" :preset-dataset="leftDataset" in-comparator @update="updateLeft"></dataset-update-form>
+                <dataset-update-form
+                    ref="updateLeftRef" :preset-dataset="leftDataset" in-comparator :in-modal="false"
+                    @update="updateLeft"></dataset-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <dataset-update-form ref="updateRightRef" :preset-dataset="rightDataset" in-comparator @update="updateRight"></dataset-update-form>
+                <dataset-update-form
+                    ref="updateRightRef" :preset-dataset="rightDataset" in-comparator :in-modal="false"
+                    @update="updateRight"></dataset-update-form>
 
                 <br />
 

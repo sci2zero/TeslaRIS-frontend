@@ -27,14 +27,12 @@
                             </div>
                         </template>
 
-                        <v-card min-width="150">
-                            <v-list>
-                                <prize-modal :read-only="!canEdit" edit :preset-prize="prize" @update="updatePrize"></prize-modal>
-                                <v-list-item @click="deletePrize(prize.id)">
-                                    <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-card>
+                        <v-list min-width="150">
+                            <prize-modal :read-only="!canEdit" edit :preset-prize="prize" @update="updatePrize"></prize-modal>
+                            <v-list-item @click="deletePrize(prize.id)">
+                                <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
                     </v-menu>
 
                     <h4>

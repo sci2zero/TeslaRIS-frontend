@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
+        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedJournal"
                 :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
@@ -14,8 +14,15 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission" cols="1" class="modal-spacer-top">
-            <publication-series-submission-modal :input-type="inputType" @create="selectNewlyAddedJournal"></publication-series-submission-modal>
+        <v-col v-if="!disableSubmission" cols="1">
+            <generic-crud-modal
+                :form-component="PublicationSeriesSubmissionForm"
+                :form-props="{inputType: inputType}"
+                entity-name="Journal"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedJournal"
+            />
         </v-col>
         <v-col v-if="allowManualClearing && hasSelection" cols="1">
             <v-btn icon @click="clearInput()">
@@ -35,13 +42,14 @@ import JournalService from '@/services/JournalService';
 import type { Journal, JournalIndex } from '@/models/JournalModel';
 import { watch } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
-import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import PublicationSeriesSubmissionForm from '../publicationSeries/PublicationSeriesSubmissionForm.vue';
 
 
 export default defineComponent({
     name: "JournalAutocompleteSearch",
-    components: { PublicationSeriesSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -172,7 +180,8 @@ export default defineComponent({
             journals, selectedJournal, searchJournals,
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
-            selectNewlyAddedJournal, hasSelection
+            selectNewlyAddedJournal, hasSelection,
+            PublicationSeriesSubmissionForm
         };
     }
 });

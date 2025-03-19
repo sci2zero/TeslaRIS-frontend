@@ -117,7 +117,7 @@ export default defineComponent({
                     });
                     break;
                 case "organisationUnits":
-                    OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`).then((response) => {
+                    OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`, null).then((response) => {
                         organisationUnits.value = response.data.content;
                         totalOUs.value = response.data.totalElements;
                     });
@@ -147,7 +147,7 @@ export default defineComponent({
                     break;
             }
             search(searchParams.value as string);
-        }
+        };
 
         return {currentTab, persons, organisationUnits, publications, totalPersons, totalOUs, totalPublications, search, switchPage, searchParams};
     }

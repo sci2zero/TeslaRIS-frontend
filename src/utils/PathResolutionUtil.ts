@@ -59,3 +59,26 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
     }
     return "";
 };
+
+export const getDocumentLandingPageBasePathBasedOnAssessment = (assessmentCode: string): string => {
+    if (assessmentCode.startsWith("M1")) {
+        return "scientific-results/monograph/";
+    } else if (assessmentCode.startsWith("M2")) {
+        return "scientific-results/journal-publication/";
+    } else if (assessmentCode.startsWith("M3")) {
+        return "scientific-results/proceedings-publication/";
+    } else if (assessmentCode.startsWith("M4")) {
+        return "scientific-results/monograph/";
+    } else if (assessmentCode.startsWith("M5")) {
+        return "scientific-results/journal-publication/";
+    } else if (assessmentCode.startsWith("M6")) {
+        return "scientific-results/proceedings-publication/";
+    } else if (assessmentCode.startsWith("M7")) {
+        return "scientific-results/thesis/";
+    } else if (assessmentCode.startsWith("M8")) {
+        return "scientific-results/software/";
+    } else if (assessmentCode.startsWith("M9")) {
+        return "scientific-results/patent/";
+    }
+    return "";
+};

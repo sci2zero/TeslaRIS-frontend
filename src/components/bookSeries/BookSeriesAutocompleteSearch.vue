@@ -13,8 +13,15 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1" class="modal-spacer-top">
-            <publication-series-submission-modal :input-type="inputType" @create="selectNewlyAddedBookSeries"></publication-series-submission-modal>
+        <v-col cols="1">
+            <generic-crud-modal
+                :form-component="PublicationSeriesSubmissionForm"
+                :form-props="{inputType: inputType}"
+                entity-name="BookSeries"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedBookSeries"
+            />
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedBookSeries.value !== -1" icon @click="clearInput()">
@@ -34,14 +41,15 @@ import BookSeriesService from '@/services/BookSeriesService';
 import type { BookSeries, BookSeriesIndex } from '@/models/BookSeriesModel';
 import type { PropType } from 'vue';
 import { watch } from 'vue';
-import PublicationSeriesSubmissionModal from '../publicationSeries/PublicationSeriesSubmissionModal.vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import PublicationSeriesSubmissionForm from '../publicationSeries/PublicationSeriesSubmissionForm.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "BookSeriesAutocompleteSearch",
-    components: { PublicationSeriesSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -157,7 +165,8 @@ export default defineComponent({
             bookSeries, selectedBookSeries, searchBookSeries,
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
-            selectNewlyAddedBookSeries
+            selectNewlyAddedBookSeries,
+            PublicationSeriesSubmissionForm
         };
     }
 });

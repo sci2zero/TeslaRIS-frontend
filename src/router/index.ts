@@ -85,9 +85,14 @@ import CommissionLandingView from "@/views/assessment/landingPages/CommissionLan
 import LanguageTagListView from "@/views/LanguageTagListView.vue";
 import ScheduledTasksView from "@/views/ScheduledTasksView.vue";
 import AssessmentClassificationsListView from "@/views/assessment/listViews/AssessmentClassificationsListView.vue";
+import ReportsView from "@/views/reporting/ReportsView.vue";
+import BrandingInformationView from "@/views/BrandingInformationView.vue";
+import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
+import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
+import MServiceView from "@/views/MServiceView.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION" };
+const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE" };
 
 
 const router = createRouter({
@@ -136,7 +141,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission, roles.viceDeanForScience],
                     },
                 },
                 {
@@ -149,7 +154,8 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "events",                    
+                    path: "events",
+                    name: "events",
                     children: [
                         {
                             path: "",
@@ -226,7 +232,8 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "book-series",                    
+                    path: "book-series",
+                    name: "bookSeries",
                     children: [
                         {
                             path: "",
@@ -243,7 +250,7 @@ const router = createRouter({
                             component: BookSeriesLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience],
                             },
                         },
                         {
@@ -276,7 +283,8 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "journals",                    
+                    path: "journals",
+                    name: "journals",
                     children: [
                         {
                             path: "",
@@ -389,7 +397,8 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "publishers",                    
+                    path: "publishers",
+                    name: "publishers",
                     children: [
                         {
                             path: "",
@@ -406,7 +415,7 @@ const router = createRouter({
                             component: PublisherLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience],
                             },
                         },
                         {
@@ -430,7 +439,8 @@ const router = createRouter({
                     ]
                 },
                 {
-                    path: "persons",                    
+                    path: "persons",
+                    name: "persons",                  
                     children: [
                         {
                             path: "",
@@ -471,7 +481,8 @@ const router = createRouter({
                     ]
                 },
                 {
-                    path: "organisation-units",                 
+                    path: "organisation-units",
+                    name: "organisationUnits",
                     children: [
                         {
                             path: "",
@@ -512,7 +523,8 @@ const router = createRouter({
                     ]
                 },
                 {
-                    path: "scientific-results",                
+                    path: "scientific-results",
+                    name: "scientificResults",
                     children: [
                         {
                             path: "",
@@ -729,7 +741,7 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "proceedings",                 
+                    path: "proceedings",         
                     children: [
                         {
                             path: ":id",
@@ -827,7 +839,7 @@ const router = createRouter({
                     component: NotificationsView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin],
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience],
                     },
                 },
                 {
@@ -885,6 +897,33 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: "branding",
+                    name: "branding",
+                    component: BrandingInformationView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "mass-institution-assignment",
+                    name: "massInstitutionAssignment",
+                    component: MassInstitutionAssignmentView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.researcher],
+                    },
+                },
+                {
+                    path: "api-key-management",
+                    name: "apiKeyManagement",
+                    component: ApiKeysManagementView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
                     path: "assessment",                 
                     children: [
                         {
@@ -907,6 +946,7 @@ const router = createRouter({
                         },
                         {
                             path: "assessment-rulebooks",
+                            name: "assessmentRulebooks",
                             children: [
                                 {
                                     path: "",
@@ -930,6 +970,7 @@ const router = createRouter({
                         },
                         {
                             path: "commissions",
+                            name: "commissions",
                             children: [
                                 {
                                     path: "",
@@ -950,6 +991,24 @@ const router = createRouter({
                                     },
                                 },
                             ]
+                        },
+                        {
+                            path: "reporting",
+                            name: "reporting",
+                            component: ReportsView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin, roles.viceDeanForScience],
+                            },
+                        },
+                        {
+                            path: "m-service",
+                            name: "mService",
+                            component: MServiceView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
                         }
                     ]
                 },

@@ -85,35 +85,43 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { JournalPublication, JournalPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import { watch } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast},
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -123,13 +131,11 @@ export default defineComponent({
         const journal = ref<Journal>();
         const event = ref<Conference>();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
+
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchDetails();
         });
 
@@ -176,7 +182,22 @@ export default defineComponent({
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType as JournalPublicationType});
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const { duplicateFound } = await checkIdentifiers(
+                    [
+                        { value: doi.value as string, error: "doiExistsError" },
+                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                    ],
+                    props.presetJournalPublication?.id as number,
+                    (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
+                );
+
+                if (duplicateFound) {
+                    return;
+                }
+            }
+
             const updatedJournalPublication: JournalPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -241,7 +262,7 @@ export default defineComponent({
             languageTags, volume, issue, startPage, endPage,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
-            refreshForm, urisRef
+            refreshForm, urisRef, message, snackbar
         };
     }
 });

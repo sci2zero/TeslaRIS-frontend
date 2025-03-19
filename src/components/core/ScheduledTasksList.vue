@@ -1,6 +1,6 @@
 <template>
     <v-row class="d-flex flex-row justify-center">
-        <v-col cols="6">
+        <v-col cols="12" md="6">
             <v-data-table 
                 :items="scheduledTasks"
                 :headers="headers"

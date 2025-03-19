@@ -95,15 +95,16 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
 import { defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { Country, ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, ExternalValidation, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Conference } from '@/models/EventModel';
@@ -112,11 +113,15 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import DatePicker from '@/components/core/DatePicker.vue';
 import CountryService from '@/services/CountryService';
 import UriInput from '@/components/core/UriInput.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import EventService from '@/services/EventService';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
     name: "EventUpdateForm",
-    components: { MultilingualTextInput, DatePicker, UriInput },
+    components: { MultilingualTextInput, DatePicker, UriInput, Toast },
     props: {
         presetEvent: {
             type: Object as PropType<Conference | undefined>,
@@ -125,21 +130,22 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchCountries();
         });
 
@@ -202,7 +208,19 @@ export default defineComponent({
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const { duplicateFound } = await checkIdentifiers(
+                    [{ value: confId.value as string, error: "confIdExistsError" }],
+                    props.presetEvent?.id as number,
+                    (id, docId) => EventService.checkIdentifierUsage(id, docId)
+                );
+
+                if (duplicateFound) {
+                    return;
+                }
+            }
+
             if (!timePeriodInput.value) {
                 dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
                 dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
@@ -256,7 +274,7 @@ export default defineComponent({
 
         return {
             isFormValid,
-            name, nameAbbreviation, urisRef, refreshForm, uris,
+            name, nameAbbreviation, urisRef, refreshForm, uris, message, snackbar,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, submit,
             dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,

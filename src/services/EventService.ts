@@ -63,6 +63,10 @@ export class EventService extends BaseService {
   async deleteEventsRelation(relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `events-relation/${relationId}`);
   }
+
+  async checkIdentifierUsage(identifier: string, conferenceId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `conference/identifier-usage/${conferenceId}?identifier=${encodeURIComponent(identifier)}`);
+  }
 }
 
 export default new EventService();

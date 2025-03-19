@@ -56,7 +56,9 @@
                         <td>
                             <ul>
                                 <li v-for="(publication, index) in publications" :key="index">
-                                    {{ publication.a }} <b v-if="loginStore.userLoggedIn">→ {{ publication.b }}</b>
+                                    <localized-link :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
+                                        {{ publication.a }} <b v-if="loginStore.userLoggedIn">→ {{ publication.b }}</b>
+                                    </localized-link>
                                 </li>
                             </ul>
                         </td>
@@ -82,11 +84,13 @@ import type { ResearcherAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useLoginStore } from '@/stores/loginStore';
 import DatePicker from '@/components/core/DatePicker.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import { getDocumentLandingPageBasePathBasedOnAssessment } from '@/utils/PathResolutionUtil';
 
 
 export default defineComponent({
     name: "PersonAssessmentsView",
-    components: { DatePicker },
+    components: { DatePicker, LocalizedLink },
     props: {
         assessments: {
             type: Array<ResearcherAssessmentResponse>,
@@ -137,7 +141,8 @@ export default defineComponent({
         return {
             calculatePointSum, loginStore,
             returnCurrentLocaleContent,
-            startDate, endDate, showTable
+            startDate, endDate, showTable,
+            getDocumentLandingPageBasePathBasedOnAssessment
         };
     }
 });
