@@ -92,7 +92,7 @@ import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
 import MServiceView from "@/views/MServiceView.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE" };
+const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE", institutionalLibrarian: "INSTITUTIONAL_LIBRARIAN", headOfLibrary: "HEAD_OF_LIBRARY" };
 
 
 const router = createRouter({
@@ -141,7 +141,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission, roles.viceDeanForScience],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
                 },
                 {
@@ -250,7 +250,7 @@ const router = createRouter({
                             component: BookSeriesLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
                             },
                         },
                         {
@@ -366,7 +366,7 @@ const router = createRouter({
                     component: SubmitThesisView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.institutionalLibrarian],
                     },
                 },
                 {
@@ -415,7 +415,7 @@ const router = createRouter({
                             component: PublisherLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
                             },
                         },
                         {
@@ -839,7 +839,7 @@ const router = createRouter({
                     component: NotificationsView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience],
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
                 },
                 {

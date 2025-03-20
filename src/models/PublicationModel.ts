@@ -227,6 +227,7 @@ export interface Thesis extends Document {
     isOnPublicReview?: boolean;
     publicReviewDates?: string[];
     publicReviewEnd?: string;
+    isOnPublicReviewPause: boolean;
 }
 
 export interface CitationResponse {

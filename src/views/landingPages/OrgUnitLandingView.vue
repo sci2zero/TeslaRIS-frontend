@@ -143,7 +143,7 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit" @update="updateRelations"></organisation-unit-relation-update-modal>
+                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations"></organisation-unit-relation-update-modal>
 
                                 <div><b>{{ $t("relationsLabel") }}</b></div>
                                 <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
@@ -219,6 +219,7 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -281,6 +282,7 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
+        const { isAdmin } = useUserRole();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -512,7 +514,7 @@ export default defineComponent({
             totalPublications,
             employees, totalEmployees,
             switchPublicationsPage,
-            switchEmployeesPage,
+            switchEmployeesPage, isAdmin,
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,

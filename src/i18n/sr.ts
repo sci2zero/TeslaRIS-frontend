@@ -655,11 +655,15 @@ export default {
     missingAttachmentsMessage: "Broj preliminarnih fajlova, dodataka i izveštaja sa konferencije nije jednak.",
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
     noAttachmentsMessage: "Nedostaju neki od dodataka.",
-    putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka periods javnog uvida.",
+    putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka perioda javnog uvida.",
     removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene ali će se poništiti period koji je rad proveo na poslednjem javnom uvidu.",
     classifiedByMeLabel: "Klasifikovano od strane mene",
     institutionProfileLabel: "Profil institucije",
     assessedByMeLabel: "Vrednovano od strane mene",
     showUnclassifiedLabel: "Prikaži samo neklasifikovane",
-    showUnassessedLabel: "Prikaži samo nevrednovane"
+    showUnassessedLabel: "Prikaži samo nevrednovane",
+    addInstitutionLibrarianLabel: "Dodaj Institucionog Bibliotekara",
+    addHeadOfLibraryLabel: "Dodaj Administratora Biblioteke",
+    continuePublicReviewLabel: "Nastavi javni uvid",
+    restartPublicReviewLabel: "Restartuj javni uvid"
 }

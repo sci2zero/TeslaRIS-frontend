@@ -219,8 +219,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `monograph/identifier-usage/${monographId}?identifier=${encodeURIComponent(identifier)}`);
   }
 
-  async putThesisOnPublicReview(thesisId: number): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.patch, `thesis/put-on-public-review/${thesisId}`);
+  async putThesisOnPublicReview(thesisId: number, continueLastReview: boolean): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/put-on-public-review/${thesisId}?continue=${continueLastReview}`);
   }
 
   async removeThesisFromPublicReview(thesisId: number): Promise<AxiosResponse<void>> {

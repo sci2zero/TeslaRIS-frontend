@@ -15,7 +15,7 @@
 
                 <v-list>
                     <v-list-item
-                        v-for="(item, index) in items"
+                        v-for="(item, index) in submissionMenuItems"
                         :key="index"
                         @click="navigateToPage(item.value)"
                     >
@@ -59,13 +59,13 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { ref } from 'vue';
-import type { DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
-import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 
 
 export default defineComponent({
@@ -87,15 +87,24 @@ export default defineComponent({
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
-        const { isCommission, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+        const { isCommission, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
+            console.log(publicationTypes.value);
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
-                selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
-            });
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
+                selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
+            } else {
+                publicationTypes.value?.forEach(publicationType => {
+                    selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
+                });
+            }
+
+            if (isInstitutionalLibrarian.value) {
+                submissionMenuItems.value = submissionMenuItems.value.filter(item => item.value === "submitThesis");
+            }
         });
 
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities, selectedPublicationTypes], () => {
@@ -150,7 +159,7 @@ export default defineComponent({
         const addMonographPublicationLabel = computed(() => i18n.t("addMonographPublicationLabel"));
         const addThesisLabel = computed(() => i18n.t("addThesisLabel"));
 
-        const items = ref([
+        const submissionMenuItems = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
             { title: addProceedingsPublicationLabel, value: "submitProceedingsPublication" },
             { title: addPatentLabel, value: "submitPatent" },
@@ -163,7 +172,7 @@ export default defineComponent({
 
         return {
             search, publications, totalPublications,
-            switchPage, items, navigateToPage,
+            switchPage, submissionMenuItems, navigateToPage,
             tableRef, clearSortAndPerformSearch,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,

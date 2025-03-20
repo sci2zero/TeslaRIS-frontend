@@ -662,5 +662,9 @@ export default {
     institutionProfileLabel: "Institution profile",
     assessedByMeLabel: "Assessed by me",
     showUnclassifiedLabel: "Show only unclassified",
-    showUnassessLabel: "Show only unaccessed"
+    showUnassessLabel: "Show only unaccessed",
+    addInstitutionLibrarianLabel: "Add Institutional Librarian",
+    addHeadOfLibraryLabel: "Add Library Administrator",
+    continuePublicReviewLabel: "Continue public review",
+    restartPublicReviewLabel: "Restart public review"
 }

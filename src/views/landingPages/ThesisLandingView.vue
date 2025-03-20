@@ -45,14 +45,26 @@
                                 <v-btn
                                     v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview"
                                     class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(true)">
+                                    @click="changePublicReviewState(true, false)">
                                     {{ $t("putOnPublicReviewLabel") }}
                                 </v-btn>
                                 <v-btn
-                                    v-if="isAdmin && thesis?.isOnPublicReview"
+                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview"
                                     class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(false)">
+                                    @click="changePublicReviewState(false, false)">
                                     {{ $t("removeFromPublicReviewLabel") }}
+                                </v-btn>
+                                <v-btn
+                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
+                                    class="mb-5" color="primary" density="compact"
+                                    @click="changePublicReviewState(true, true)">
+                                    {{ $t("continuePublicReviewLabel") }}
+                                </v-btn>
+                                <v-btn
+                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
+                                    class="mb-5" color="primary" density="compact"
+                                    @click="changePublicReviewState(true, false)">
+                                    {{ $t("restartPublicReviewLabel") }}
                                 </v-btn>
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="thesis?.thesisType">
@@ -230,7 +242,7 @@
 
         <publication-unbind-button v-if="canEdit && isResearcher && !thesis?.isOnPublicReview" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
-        <persistent-question-dialog ref="publicDialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="thesis?.isOnPublicReview ? removeFromPublicReview() : putOnPublicReview()"></persistent-question-dialog>
+        <persistent-question-dialog ref="publicDialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="commitThesisStatusChange"></persistent-question-dialog>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -308,8 +320,8 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isAdmin, isResearcher } = useUserRole();
-        const userCanPutOnPublicReview = computed(() => isAdmin.value);
+        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+        const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
@@ -494,9 +506,21 @@ export default defineComponent({
             });
         };
 
-        const changePublicReviewState = (putOnPublic: boolean) => {
+        const continueLastReview = ref(false);
+        const changePublicReviewState = (putOnPublic: boolean, continueLast: boolean) => {
             if (putOnPublic) {
-                dialogMessage.value = i18n.t("putOnPublicReviewWarningMessage");
+                if (thesis.value?.isOnPublicReviewPause) {
+                    continueLastReview.value = continueLast;
+
+                    if (continueLastReview.value) {
+                        dialogMessage.value = i18n.t("continueLastReviewWarningMessage");
+                    } else {
+                        dialogMessage.value = i18n.t("restartLastReviewWarningMessage");
+                    }
+
+                } else {
+                    dialogMessage.value = i18n.t("putOnPublicReviewWarningMessage");
+                }
             } else {
                 dialogMessage.value = i18n.t("removeFromPublicReviewWarningMessage")
             }
@@ -504,8 +528,11 @@ export default defineComponent({
             publicDialogRef.value?.toggle();
         };
 
-        const putOnPublicReview = () => {
-            DocumentPublicationService.putThesisOnPublicReview(parseInt(currentRoute.params.id as string)).then(() => {
+        const putOnPublicReview = (continueLast: boolean) => {
+            DocumentPublicationService.putThesisOnPublicReview(
+                parseInt(currentRoute.params.id as string),
+                continueLast)
+            .then(() => {
                 fetchThesis();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
@@ -514,9 +541,21 @@ export default defineComponent({
         };
 
         const removeFromPublicReview = () => {
-            DocumentPublicationService.removeThesisFromPublicReview(parseInt(currentRoute.params.id as string)).then(() => {
+            DocumentPublicationService.removeThesisFromPublicReview(
+                parseInt(currentRoute.params.id as string))
+            .then(() => {
                 fetchThesis();
             });
+        };
+
+        const commitThesisStatusChange = () => {
+            if (thesis.value?.isOnPublicReview) {
+                removeFromPublicReview()
+            } else if (thesis.value?.isOnPublicReviewPause) {
+                putOnPublicReview(continueLastReview.value);
+            } else {
+                putOnPublicReview(false);
+            }
         };
 
         return {
@@ -532,7 +571,8 @@ export default defineComponent({
             currentRoute, citationRef, ApplicableEntityType, canClassify,
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
-            changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview
+            changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
+            isHeadOfLibrary, commitThesisStatusChange
         };
 }})
 

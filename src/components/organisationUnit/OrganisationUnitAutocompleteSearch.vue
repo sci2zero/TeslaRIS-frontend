@@ -11,6 +11,7 @@
                 :multiple="multiple"
                 return-object
                 :class="comfortable ? 'comfortable' : ''"
+                :readonly="readonly"
                 @update:search="searchOUs($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
@@ -86,6 +87,10 @@ export default defineComponent({
         topLevelInstitutionId: {
             type: Number,
             default: null
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],

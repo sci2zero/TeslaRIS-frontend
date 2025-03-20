@@ -107,10 +107,10 @@ export default defineComponent({
   },
   emits: ["update:modelValue"],
   setup(props) {
-    const { isAdmin, isInstitutionalEditor } = useUserRole();
+    const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian } = useUserRole();
 
     const canEditThesisAttachments = computed(() => 
-        (props.canEdit && (isAdmin.value || isInstitutionalEditor.value)) && props.isThesisSection
+        (props.canEdit && (isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)) && props.isThesisSection
     );
 
     return {

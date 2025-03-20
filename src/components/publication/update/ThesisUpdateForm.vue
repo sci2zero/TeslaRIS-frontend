@@ -2,7 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col v-if="!enterExternalOU" cols="11">
-                <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" :readonly="isInstitutionalLibrarian" required></organisation-unit-autocomplete-search>
             </v-col>
             <v-col v-else>
                 <multilingual-text-input
@@ -10,7 +10,7 @@
                     :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!isInstitutionalLibrarian">
             <v-col>
                 <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
                     {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
@@ -130,6 +130,7 @@ import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -153,6 +154,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
+        const { isInstitutionalLibrarian } = useUserRole();
 
         const { languageTags, languageTagsList } = useLanguageTags();
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -311,7 +313,7 @@ export default defineComponent({
             researchAreasSelectable, selectedResearchArea,
             selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
-            externalOUName, externalOUNameRef
+            externalOUName, externalOUNameRef, isInstitutionalLibrarian
         };
     }
 });
