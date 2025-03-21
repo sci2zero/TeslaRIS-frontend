@@ -62,7 +62,7 @@
                                 </v-btn>
                                 <v-btn
                                     v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
-                                    class="mb-5" color="primary" density="compact"
+                                    class="mb-5 ml-2" color="primary" density="compact"
                                     @click="changePublicReviewState(true, false)">
                                     {{ $t("restartPublicReviewLabel") }}
                                 </v-btn>

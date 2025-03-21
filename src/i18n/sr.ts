@@ -656,7 +656,7 @@ export default {
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
     noAttachmentsMessage: "Nedostaju neki od dodataka.",
     putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka perioda javnog uvida.",
-    removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene ali će se poništiti period koji je rad proveo na poslednjem javnom uvidu.",
+    removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene nakon čega ćete moći da započnete novi ili nastavite trenutni javni uvid. Ovo je operacija koju ne bi trebalo koristiti osim u vanrednim situacijama.",
     classifiedByMeLabel: "Klasifikovano od strane mene",
     institutionProfileLabel: "Profil institucije",
     assessedByMeLabel: "Vrednovano od strane mene",
@@ -665,5 +665,8 @@ export default {
     addInstitutionLibrarianLabel: "Dodaj Institucionog Bibliotekara",
     addHeadOfLibraryLabel: "Dodaj Administratora Biblioteke",
     continuePublicReviewLabel: "Nastavi javni uvid",
-    restartPublicReviewLabel: "Restartuj javni uvid"
+    restartPublicReviewLabel: "Restartuj javni uvid",
+    restartLastReviewWarningMessage: "Restartovanjem javnog uvida poništavate čitav period proveden na trenutnom javnom uvidu.",
+    continueLastReviewWarningMessage: "Ovom operacijom nastavljate trenutni javni uvid.",
+    documentLabel: "Dokument"
 }

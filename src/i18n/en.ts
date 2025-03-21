@@ -657,8 +657,7 @@ export default {
     datesOfPublicReviewLabel: "Dates when put on public review:",
     noAttachmentsMessage: "There are missing attachments",
     putOnPublicReviewWarningMessage: "When the thesis is placed under public review, all modifications will be disabled until the public review period ends.",
-    removeFromPublicReviewWarningMessage: "Removing the thesis from public review will allow modifications, but the period spent in the last public review will be reset.",
-    classifiedByMeLabel: "Classified by me",
+    removeFromPublicReviewWarningMessage: "By removing the thesis from public review, modifications will be allowed, after which you will be able to start a new or continue the current public review. This operation should only be used in exceptional situations.",    classifiedByMeLabel: "Classified by me",
     institutionProfileLabel: "Institution profile",
     assessedByMeLabel: "Assessed by me",
     showUnclassifiedLabel: "Show only unclassified",
@@ -666,5 +665,8 @@ export default {
     addInstitutionLibrarianLabel: "Add Institutional Librarian",
     addHeadOfLibraryLabel: "Add Library Administrator",
     continuePublicReviewLabel: "Continue public review",
-    restartPublicReviewLabel: "Restart public review"
+    restartPublicReviewLabel: "Restart public review",
+    restartLastReviewWarningMessage: "By restarting the public review, you invalidate the entire period spent in the current public review.",
+    continueLastReviewWarningMessage: "With this operation, you continue the current public review.",
+    documentLabel: "Document"
 }

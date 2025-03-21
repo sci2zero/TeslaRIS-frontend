@@ -40,7 +40,7 @@
 
                             <template #append>
                                 <v-row v-if="canEdit">
-                                    <v-col>
+                                    <v-col v-if="!disableUpdates || isAdmin || isHeadOfLibrary">
                                         <v-btn
                                             icon variant="outlined" size="x-small" color="primary"
                                             class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
@@ -81,6 +81,7 @@ import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { getResourceTypeTitleFromValueAutoLocale } from '@/i18n/resourceType';
 import Toast from './Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -121,6 +122,8 @@ export default defineComponent({
         const errorMessage = ref("");
         const snackbar = ref(false);
 
+        const { isAdmin, isHeadOfLibrary } = useUserRole();
+
         const i18n = useI18n();
 
         const download = (attachment: DocumentFileResponse) => {
@@ -147,9 +150,12 @@ export default defineComponent({
             emit("delete", attachmentId);
         };
 
-        return {download, sendDataToParent, sendDeleteRequestToParent, 
-                sendUpdateRequestToParent, returnCurrentLocaleContent, 
-                errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale};
+        return {
+            download, sendDataToParent, sendDeleteRequestToParent, 
+            sendUpdateRequestToParent, returnCurrentLocaleContent, isAdmin,
+            errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale,
+            isHeadOfLibrary
+        };
     }
 });
 </script>

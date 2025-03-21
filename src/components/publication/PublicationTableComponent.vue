@@ -196,6 +196,10 @@ export default defineComponent({
             if (isCommission.value) {
                 headers.value.push({ title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
             }
+
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
+                tableOptions.value.sortBy = [{key: "year", order: "asc"}];
+            }
         })
 
         watch(tableWrapper, () => {
@@ -219,7 +223,7 @@ export default defineComponent({
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
 
-        const { isAdmin, isCommission, loggedInUser } = useUserRole();
+        const { isAdmin, isCommission, isInstitutionalLibrarian, isHeadOfLibrary, loggedInUser } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
