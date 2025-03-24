@@ -668,5 +668,13 @@ export default {
     restartPublicReviewLabel: "Restartuj javni uvid",
     restartLastReviewWarningMessage: "Restartovanjem javnog uvida poništavate čitav period proveden na trenutnom javnom uvidu.",
     continueLastReviewWarningMessage: "Ovom operacijom nastavljate trenutni javni uvid.",
-    documentLabel: "Dokument"
+    documentLabel: "Dokument",
+    researchOutputLabel: "Rezultati istraživanja",
+    updateResearchOutputLabel: "Dodaj rezultat istraživanja",
+    cantBeOutputToItselfMessage: "Dokument ne može biti rezultat istraživanja samom sebi.",
+    publicationListedInOutputsMessage: "Dokument je već dodat kao rezultat istraživanja.",
+    notYourPublicationMessage: "Morate biti u listi autora kako biste uvezali ovaj dokument.",
+    removeLabel: "Ukloni",
+    researchOutputAddedNotification: "Dokument '{name}' uspešno dodat.",
+    researchOutputNotAddedNotification: "Dokument '{name}' nije dodat. Razlog: {error}"
 }

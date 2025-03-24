@@ -91,7 +91,6 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
-            console.log(publicationTypes.value);
 
             selectedPublicationTypes.value.splice(0);
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {

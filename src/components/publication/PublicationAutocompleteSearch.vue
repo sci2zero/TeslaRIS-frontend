@@ -7,6 +7,7 @@
                 :items="documentPublications"
                 :custom-filter="((): boolean => true)"
                 :no-data-text="$t('noDataMessage')"
+                :rules="required ? requiredSelectionRules : []"
                 return-object
                 @update:search="searchDocuments($event)"
                 @update:model-value="sendContentToParent"
@@ -26,13 +27,18 @@ import { ref } from 'vue';
 import lodash from "lodash";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { onMounted } from 'vue';
-import { DocumentPublicationIndex } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex } from '@/models/PublicationModel';
 import { useI18n } from 'vue-i18n';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 export default defineComponent({
     name: "PublicationAutocompleteSearch",
     props: {
+        required: {
+            type: Boolean,
+            default: false
+        },
         allowManualClearing: {
             type: Boolean,
             default: false
@@ -49,6 +55,8 @@ export default defineComponent({
 
         const documentPublications = ref<{ title: string; value: number; }[]>([]);
         const selectedDocumentPublication = ref<{ title: string, value: number }>(searchPlaceholder);
+
+        const { requiredSelectionRules } = useValidationUtils();
 
         onMounted(() => {
             if(props.modelValue && props.modelValue.value !== -1) {
@@ -77,9 +85,12 @@ export default defineComponent({
                 ).then((response) => {
                     const listOfDocuments: { title: string, value: number }[] = [];
                     response.data.content.forEach((documentPublication: DocumentPublicationIndex) => {
+                        const displayTitle =
+                            `${i18n.locale.value === "sr" ? documentPublication.titleSr : documentPublication.titleOther} (${documentPublication.authorNames}) ${documentPublication.year && documentPublication.year > 0 ? documentPublication.year : ""}`;
+
                         listOfDocuments.push(
                             {
-                                title: i18n.locale.value === "sr" ? documentPublication.titleSr : documentPublication.titleOther,
+                                title: displayTitle,
                                 value: documentPublication.databaseId as number
                             }
                         );
@@ -106,7 +117,7 @@ export default defineComponent({
 
         return {
             documentPublications, selectedDocumentPublication, searchDocuments,
-            sendContentToParent, clearInput
+            sendContentToParent, clearInput, requiredSelectionRules
         };
     }
 });

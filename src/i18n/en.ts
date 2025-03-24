@@ -668,5 +668,13 @@ export default {
     restartPublicReviewLabel: "Restart public review",
     restartLastReviewWarningMessage: "By restarting the public review, you invalidate the entire period spent in the current public review.",
     continueLastReviewWarningMessage: "With this operation, you continue the current public review.",
-    documentLabel: "Document"
+    documentLabel: "Document",
+    researchOutputLabel: "Research output",
+    updateResearchOutputLabel: "Add research output",
+    cantBeOutputToItselfMessage: "Document can't be a research output to itself.",
+    publicationListedInOutputsMessage: "Document is already added as research output.",
+    notYourPublicationMessage: "You have to be in author list in order to add a document.",
+    removeLabel: "Remove",
+    researchOutputAddedNotification: "Document '{name}' successfully added.",
+    researchOutputNotAddedNotification: "Document '{name}' Was not added. Reason: {error}"
 }

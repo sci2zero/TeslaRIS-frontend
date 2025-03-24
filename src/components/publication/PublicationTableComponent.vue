@@ -6,6 +6,12 @@
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
+        v-if="showsResearchOutputs && canRemoveResearchOutputs"
+        density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
+        @click="removeResearchOutputs">
+        {{ $t("removeLabel") }}
+    </v-btn>
+    <v-btn
         v-if="isAdmin && !inComparator" density="compact" class="compare-button"
         :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
         @click="startMetadataComparison">
@@ -172,12 +178,20 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        showsResearchOutputs: {
+            type: Boolean,
+            default: false
+        },
+        canRemoveResearchOutputs: {
+            type: Boolean,
+            default: false
+        },
         allowSelection: {
             type: Boolean,
             default: false
         }
     },
-    emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated"],
+    emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
     setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
 
@@ -189,7 +203,7 @@ export default defineComponent({
         const tableWrapper = ref<any>(null);
 
         onMounted(() => {
-            if (props.inClaimer || isAdmin || isCommission) {
+            if (props.inClaimer || isAdmin.value || isCommission.value) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
 
@@ -361,6 +375,10 @@ export default defineComponent({
             }
         };
 
+        const removeResearchOutputs = () => {
+            emit("removeResearchOutputs", selectedPublications.value.map(selectedPublication => selectedPublication.databaseId));
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -369,7 +387,7 @@ export default defineComponent({
             startMetadataComparison, getDocumentLandingPageBasePath,
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
-            ApplicableEntityType
+            ApplicableEntityType, removeResearchOutputs
         };
     }
 });

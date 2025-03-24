@@ -170,6 +170,9 @@
             <v-tab v-if="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="researchOutput">
+                {{ $t("researchOutputLabel") }}
+            </v-tab>
             <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -214,6 +217,14 @@
                 <person-document-contribution-tabs
                     :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit" board-members-allowed
                     @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="researchOutput">
+                <thesis-research-output-section
+                    :thesis-id="thesis?.id"
+                    :can-edit="canEdit"
+                    :researcher-id="thesis?.contributions![0].personId"
+                >
+                </thesis-research-output-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -294,11 +305,12 @@ import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import ThesisResearchOutputSection from '@/components/publication/ThesisResearchOutputSection.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection },
     setup() {
         const currentTab = ref("contributions");
 

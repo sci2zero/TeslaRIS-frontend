@@ -839,7 +839,7 @@ const router = createRouter({
                     component: NotificationsView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.commission],
                     },
                 },
                 {
