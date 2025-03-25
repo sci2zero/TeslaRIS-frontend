@@ -669,7 +669,7 @@ export default {
     restartLastReviewWarningMessage: "By restarting the public review, you invalidate the entire period spent in the current public review.",
     continueLastReviewWarningMessage: "With this operation, you continue the current public review.",
     documentLabel: "Document",
-    researchOutputLabel: "Research output",
+    researchOutputLabel: "Published output",
     updateResearchOutputLabel: "Add research output",
     cantBeOutputToItselfMessage: "Document can't be a research output to itself.",
     publicationListedInOutputsMessage: "Document is already added as research output.",

@@ -669,7 +669,7 @@ export default {
     restartLastReviewWarningMessage: "Restartovanjem javnog uvida poništavate čitav period proveden na trenutnom javnom uvidu.",
     continueLastReviewWarningMessage: "Ovom operacijom nastavljate trenutni javni uvid.",
     documentLabel: "Dokument",
-    researchOutputLabel: "Rezultati istraživanja",
+    researchOutputLabel: "Objavljeni rezultati",
     updateResearchOutputLabel: "Dodaj rezultat istraživanja",
     cantBeOutputToItselfMessage: "Dokument ne može biti rezultat istraživanja samom sebi.",
     publicationListedInOutputsMessage: "Dokument je već dodat kao rezultat istraživanja.",
