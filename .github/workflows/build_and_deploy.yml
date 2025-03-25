@@ -34,6 +34,14 @@ jobs:
     
       - uses: actions/checkout@v4
 
+      - name: Remove pre-installed Node.js versions
+        run: |
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /usr/local/bin/node
+          sudo rm -rf /usr/local/include/node
+          sudo rm -rf /usr/local/share/man/man1/node*
+          sudo rm -rf ~/.npm
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
@@ -47,7 +55,9 @@ jobs:
           restore-keys: ${{ runner.os }}-node-
 
       - name: Install package dependencies
-        run: npm ci
+        run: |
+          npm cache clean --force
+          npm ci
 
       - name: Lint project
         if: ${{ !inputs.skip_tests }}
