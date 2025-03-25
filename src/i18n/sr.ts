@@ -676,5 +676,8 @@ export default {
     notYourPublicationMessage: "Morate biti u listi autora kako biste uvezali ovaj dokument.",
     removeLabel: "Ukloni",
     researchOutputAddedNotification: "Dokument '{name}' uspešno dodat.",
-    researchOutputNotAddedNotification: "Dokument '{name}' nije dodat. Razlog: {error}"
+    researchOutputNotAddedNotification: "Dokument '{name}' nije dodat. Razlog: {error}",
+    topicAcceptanceDateLabel: "Datum prihvatanja teme",
+    unauthorizedOrgUnitEditAttemptMessage: "Morate biti zaposleni na instituciji da bi je mogli ažurirati.",
+    unauthorizedPublicationEditAttemptByEmployeeMessage: "Publikacija mora imati vezu ka vašoj instituciji."
 }

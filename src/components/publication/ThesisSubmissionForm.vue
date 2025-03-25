@@ -82,6 +82,15 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="12">
+                            <date-picker
+                                v-model="topicAcceptanceDate"
+                                :label="$t('topicAcceptanceDateLabel')"
+                                color="primary"
+                            ></date-picker>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="12" md="6">
                             <v-select
                                 v-model="selectedLanguage"
@@ -190,11 +199,12 @@ import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
+import DatePicker from '../core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -277,6 +287,7 @@ export default defineComponent({
         const doi = ref("");
         const numberOfPages = ref<number|null>();
         const uris = ref<string[]>([]);
+        const topicAcceptanceDate = ref("");
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
@@ -305,7 +316,8 @@ export default defineComponent({
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 researchAreaId: selectedResearchArea.value.value as number,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                topicAcceptanceDate: topicAcceptanceDate.value
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
@@ -357,7 +369,7 @@ export default defineComponent({
             selectedThesisType, thesisTypes, selectedOrganisationUnit,
             externalOUName, externalOUNameRef, ouAutocompleteRef,
             selectedWritingLanguage, canAddAsNonReference,
-            isInstitutionalLibrarian
+            isInstitutionalLibrarian, topicAcceptanceDate
         };
     }
 });

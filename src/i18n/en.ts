@@ -676,5 +676,8 @@ export default {
     notYourPublicationMessage: "You have to be in author list in order to add a document.",
     removeLabel: "Remove",
     researchOutputAddedNotification: "Document '{name}' successfully added.",
-    researchOutputNotAddedNotification: "Document '{name}' Was not added. Reason: {error}"
+    researchOutputNotAddedNotification: "Document '{name}' Was not added. Reason: {error}",
+    topicAcceptanceDateLabel: "Topic Acceptance Date",
+    unauthorizedOrgUnitEditAttemptMessage: "You have to be employed at an institution to be able to edit it.",
+    unauthorizedPublicationEditAttemptByEmployeeMessage: "Publication has to have a relation toward your institution."
 }

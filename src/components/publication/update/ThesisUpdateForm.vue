@@ -46,6 +46,15 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="12">
+                <date-picker
+                    v-model="topicAcceptanceDate"
+                    :label="$t('topicAcceptanceDateLabel')"
+                    color="primary"
+                ></date-picker>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <v-select
                     v-model="selectedResearchArea"
@@ -131,11 +140,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
+import DatePicker from '@/components/core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "ThesisUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker},
     props: {
         presetThesis: {
             type: Object as PropType<Thesis | undefined>,
@@ -234,6 +244,7 @@ export default defineComponent({
         const doi = ref(props.presetThesis?.doi);
         const numberOfPages = ref(props.presetThesis?.numberOfPages);
         const uris = ref<string[]>(props.presetThesis?.uris as string[]);
+        const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
 
         const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
@@ -271,7 +282,8 @@ export default defineComponent({
                 languageId: selectedLanguage.value,
                 writingLanguageTagId: selectedWritingLanguage.value,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                topicAcceptanceDate: topicAcceptanceDate.value
             };
 
             emit("update", updatedThesis);
@@ -313,7 +325,8 @@ export default defineComponent({
             researchAreasSelectable, selectedResearchArea,
             selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
-            externalOUName, externalOUNameRef, isInstitutionalLibrarian
+            externalOUName, externalOUNameRef, isInstitutionalLibrarian,
+            topicAcceptanceDate
         };
     }
 });
