@@ -234,6 +234,8 @@ export default defineComponent({
             leftThesis.value!.thesisType = updatedInfo.thesisType;
             leftThesis.value!.publisherId = updatedInfo.publisherId;
             leftThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
+            leftThesis.value!.topicAcceptanceDate = updatedInfo.topicAcceptanceDate;
+            leftThesis.value!.thesisDefenceDate = updatedInfo.thesisDefenceDate;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -257,6 +259,8 @@ export default defineComponent({
             rightThesis.value!.thesisType = updatedInfo.thesisType;
             rightThesis.value!.publisherId = updatedInfo.publisherId;
             rightThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
+            rightThesis.value!.topicAcceptanceDate = updatedInfo.topicAcceptanceDate;
+            rightThesis.value!.thesisDefenceDate = updatedInfo.thesisDefenceDate;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

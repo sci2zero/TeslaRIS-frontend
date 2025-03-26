@@ -679,5 +679,6 @@ export default {
     researchOutputNotAddedNotification: "Document '{name}' Was not added. Reason: {error}",
     topicAcceptanceDateLabel: "Topic Acceptance Date",
     unauthorizedOrgUnitEditAttemptMessage: "You have to be employed at an institution to be able to edit it.",
-    unauthorizedPublicationEditAttemptByEmployeeMessage: "Publication has to have a relation toward your institution."
+    unauthorizedPublicationEditAttemptByEmployeeMessage: "Publication has to have a relation toward your institution.",
+    defenceDateLabel: "Defence date"
 }

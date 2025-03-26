@@ -679,5 +679,6 @@ export default {
     researchOutputNotAddedNotification: "Dokument '{name}' nije dodat. Razlog: {error}",
     topicAcceptanceDateLabel: "Datum prihvatanja teme",
     unauthorizedOrgUnitEditAttemptMessage: "Morate biti zaposleni na instituciji da bi je mogli ažurirati.",
-    unauthorizedPublicationEditAttemptByEmployeeMessage: "Publikacija mora imati vezu ka vašoj instituciji."
+    unauthorizedPublicationEditAttemptByEmployeeMessage: "Publikacija mora imati vezu ka vašoj instituciji.",
+    defenceDateLabel: "Datum odbrane"
 }

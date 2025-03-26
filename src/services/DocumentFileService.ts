@@ -46,14 +46,14 @@ export class DocumentFileService extends BaseService {
         return super.sendMultipartFormDataRequest(axios.patch, `thesis/${attachmentType}/${thesisId}`, attachment, DocumentFileService.idempotencyKey);
     }
 
-    async updateDocumentFileAttachment(attachment: any): Promise<AxiosResponse<DocumentFileResponse>> {
+    async updateDocumentFileAttachment(attachment: any, documentId?: number, isProof?: boolean): Promise<AxiosResponse<DocumentFileResponse>> {
         if (typeof attachment.license === "number") {
             attachment.license = getNameFromOrdinal(License, attachment.license);
         }
         if (typeof attachment.resourceType === "number") {
             attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
         }
-        return super.sendMultipartFormDataRequest(axios.patch, "document-file", attachment);
+        return super.sendMultipartFormDataRequest(axios.patch, `document-file?isProof=${isProof ? "true" : "false"}${documentId ? `&documentId=${documentId}` : ""}`, attachment);
     }
 
     async deleteDocumentFileAttachment(publicationId: number, documentFileId: number): Promise<void> {

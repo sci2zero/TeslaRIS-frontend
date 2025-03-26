@@ -85,6 +85,12 @@
                                 <div v-if="thesis?.topicAcceptanceDate" class="response">
                                     {{ localiseDate(thesis.topicAcceptanceDate) }}
                                 </div>
+                                <div v-if="thesis?.thesisDefenceDate">
+                                    {{ $t("defenceDateLabel") }}:
+                                </div>
+                                <div v-if="thesis?.thesisDefenceDate" class="response">
+                                    {{ localiseDate(thesis.thesisDefenceDate) }}
+                                </div>
                                 <div v-if="thesis?.organisationUnitId || (thesis?.externalOrganisationUnitName && thesis?.externalOrganisationUnitName.length > 0)">
                                     {{ $t("organisationUnitLabel") }}:
                                 </div>
@@ -485,6 +491,7 @@ export default defineComponent({
             thesis.value!.researchAreaId = basicInfo.researchAreaId;
             thesis.value!.externalOrganisationUnitName = basicInfo.externalOrganisationUnitName;
             thesis.value!.topicAcceptanceDate = basicInfo.topicAcceptanceDate;
+            thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
 
             performUpdate(true);
         };

@@ -169,7 +169,6 @@ import PersonDocumentContributionTabs from '@/components/core/PersonDocumentCont
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import UriList from '@/components/core/UriList.vue';
@@ -363,7 +362,6 @@ export default defineComponent({
             software, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, SoftwareUpdateForm, isResearcher,

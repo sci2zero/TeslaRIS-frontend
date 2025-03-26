@@ -82,10 +82,17 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="6">
                             <date-picker
                                 v-model="topicAcceptanceDate"
                                 :label="$t('topicAcceptanceDateLabel')"
+                                color="primary"
+                            ></date-picker>
+                        </v-col>
+                        <v-col cols="6">
+                            <date-picker
+                                v-model="thesisDefenceDate"
+                                :label="$t('defenceDateLabel')"
                                 color="primary"
                             ></date-picker>
                         </v-col>
@@ -288,6 +295,7 @@ export default defineComponent({
         const numberOfPages = ref<number|null>();
         const uris = ref<string[]>([]);
         const topicAcceptanceDate = ref("");
+        const thesisDefenceDate = ref("");
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
@@ -317,7 +325,8 @@ export default defineComponent({
                 researchAreaId: selectedResearchArea.value.value as number,
                 fileItems: [],
                 proofs: [],
-                topicAcceptanceDate: topicAcceptanceDate.value
+                topicAcceptanceDate: topicAcceptanceDate.value,
+                thesisDefenceDate: thesisDefenceDate.value
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
@@ -337,6 +346,8 @@ export default defineComponent({
                     selectedResearchArea.value = { title: "", value: null };
                     selectedOrganisationUnit.value = {title: "", value: -1};
                     contributionsRef.value?.clearInput();
+                    topicAcceptanceDate.value = "";
+                    thesisDefenceDate.value = "";
 
                     error.value = false;
                     snackbar.value = true;
@@ -369,7 +380,8 @@ export default defineComponent({
             selectedThesisType, thesisTypes, selectedOrganisationUnit,
             externalOUName, externalOUNameRef, ouAutocompleteRef,
             selectedWritingLanguage, canAddAsNonReference,
-            isInstitutionalLibrarian, topicAcceptanceDate
+            isInstitutionalLibrarian, topicAcceptanceDate,
+            thesisDefenceDate
         };
     }
 });

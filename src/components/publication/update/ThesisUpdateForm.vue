@@ -46,10 +46,17 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="6">
                 <date-picker
                     v-model="topicAcceptanceDate"
                     :label="$t('topicAcceptanceDateLabel')"
+                    color="primary"
+                ></date-picker>
+            </v-col>
+            <v-col cols="6">
+                <date-picker
+                    v-model="thesisDefenceDate"
+                    :label="$t('defenceDateLabel')"
                     color="primary"
                 ></date-picker>
             </v-col>
@@ -245,6 +252,7 @@ export default defineComponent({
         const numberOfPages = ref(props.presetThesis?.numberOfPages);
         const uris = ref<string[]>(props.presetThesis?.uris as string[]);
         const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
+        const thesisDefenceDate = ref(props.presetThesis?.thesisDefenceDate as string);
 
         const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
@@ -283,7 +291,8 @@ export default defineComponent({
                 writingLanguageTagId: selectedWritingLanguage.value,
                 fileItems: [],
                 proofs: [],
-                topicAcceptanceDate: topicAcceptanceDate.value
+                topicAcceptanceDate: topicAcceptanceDate.value,
+                thesisDefenceDate: thesisDefenceDate.value
             };
 
             emit("update", updatedThesis);
@@ -304,6 +313,8 @@ export default defineComponent({
             numberOfPages.value = props.presetThesis?.numberOfPages;
             publicationYear.value = props.presetThesis?.documentDate;
             doi.value = props.presetThesis?.doi;
+            topicAcceptanceDate.value = props.presetThesis?.topicAcceptanceDate as string;
+            thesisDefenceDate.value = props.presetThesis?.thesisDefenceDate as string;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -326,7 +337,7 @@ export default defineComponent({
             selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
-            topicAcceptanceDate
+            topicAcceptanceDate, thesisDefenceDate
         };
     }
 });

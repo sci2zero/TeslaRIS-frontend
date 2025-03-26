@@ -30,7 +30,7 @@ export const addThesisAttachment = (attachment: DocumentFile, attachmentType: Th
 };
 
 export const updateAttachment = (attachment: DocumentFile, isProof: boolean, document?: Document) => {
-    DocumentFileService.updateDocumentFileAttachment(attachment).then((response) => {
+    DocumentFileService.updateDocumentFileAttachment(attachment, document?.id, isProof).then((response) => {
         if(isProof) {
             document!.proofs = document?.proofs?.filter(proof => proof.id !== attachment.id);
             document?.proofs?.push(response.data);
