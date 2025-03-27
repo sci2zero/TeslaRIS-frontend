@@ -26,8 +26,7 @@
                             :items="reportTypes"
                             :label="$t('reportTypeLabel') + '*'"
                             :class="isSummaryReport() ? 'comfortable' : ''"
-                            :rules="requiredSelectionRules"
-                            :readonly="false">
+                            :rules="requiredSelectionRules">
                         </v-select>
                     </v-col>
                     <v-col cols="12" sm="3" md="2">

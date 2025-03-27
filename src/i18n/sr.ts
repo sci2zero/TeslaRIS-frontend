@@ -87,7 +87,8 @@ export default {
         commissions: "Komisije",
         commissionLandingPage: "Detalji komisije",
         reporting: "Izveštavanje",
-        mService: "M-Servis"
+        mService: "M-Servis",
+        thesisLibraryReporting: "Izveštavanje biblioteke završnih radova"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -115,7 +116,7 @@ export default {
     fullNameLabel: "Ime i Prezime",
     firstNameLabel: "Ime",
     surnameLabel: "Prezime",
-    noteLabel: "Komentar",
+    noteLabel: "Napomena",
     preferredLanguageLabel: "Izabrani Jezik",
     languageLabel: "Jezik",
     organisationUnitLabel: "Organizaciona Jedinica",
@@ -680,5 +681,21 @@ export default {
     topicAcceptanceDateLabel: "Datum prihvatanja teme",
     unauthorizedOrgUnitEditAttemptMessage: "Morate biti zaposleni na instituciji da bi je mogli ažurirati.",
     unauthorizedPublicationEditAttemptByEmployeeMessage: "Publikacija mora imati vezu ka vašoj instituciji.",
-    defenceDateLabel: "Datum odbrane"
+    defenceDateLabel: "Datum odbrane",
+    generateLabel: "Generiši",
+    institutionsLabel: "Institucije",
+    defendedLabel: "Odbranjeni",
+    acceptedLabel: "Prihvaćeni",
+    publicReviewLabel: "Stavljeni na uvid",
+    publiclyAvailableLabel: "Javno dostupni",
+    thesisReportTitle: "Izveštaj o završnim radovima",
+    defendedThesesLabel: "Odbranjeni završni radovi",
+    acceptedThesesLabel: "Prihvaćeni završni radovi",
+    publicReviewThesesLabel: "Završni radovi na javnom uvidu",
+    publiclyAvailableThesesLabel: "Javno dostupni završni radovi",
+    downloadLabel: "Preuzmi",
+    thesisLibraryLabel: "Biblioteka završnih radova",
+    publicationInfoTextBeforeLink: "Ukoliko vaša publikacija nije u listi, morate je prvo",
+    publicationInfoTextAfterLink: ", pa je onda uvezati ovdje.",
+    addPublicationLabel: "dodati"
 }

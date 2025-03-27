@@ -182,7 +182,7 @@
             <v-tab v-if="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="researchOutput">
+            <v-tab v-if="thesis?.contributions![0].personId" value="researchOutput">
                 {{ $t("researchOutputLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
@@ -492,6 +492,7 @@ export default defineComponent({
             thesis.value!.externalOrganisationUnitName = basicInfo.externalOrganisationUnitName;
             thesis.value!.topicAcceptanceDate = basicInfo.topicAcceptanceDate;
             thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
+            thesis.value!.thesisType = basicInfo.thesisType;
 
             performUpdate(true);
         };

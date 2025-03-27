@@ -138,15 +138,16 @@ import { useUserRole } from '@/composables/useUserRole';
 interface MenuItem {
   title?: ComputedRef<string> | string | undefined;
   pathName?: string;
-  click?: () => void,
+  click?: () => void;
   icon?: string;
   type: string;
   condition?: Ref<boolean> | boolean;
   badge?: Ref<number> | number;
   variant?: 'text' | 'outlined' | 'flat' | 'elevated' | 'tonal' | 'plain';
   color?: string;
-  subItems?: MenuItem[] | Ref<MenuItem[]>
-  component?: Component
+  subItems?: MenuItem[] | Ref<MenuItem[]>;
+  component?: Component;
+  dynamicValue?: ComputedRef;
 }
 
 export default defineComponent(
@@ -195,13 +196,14 @@ export default defineComponent(
             const massInstitutionAssignmentLabel = computed(() => i18n.t("massInstitutionAssignmentLabel"));
             const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
             const institutionProfileLabel = computed(() => i18n.t("institutionProfileLabel"));
+            const thesisLibraryLabel = computed(() => i18n.t("thesisLibraryLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
             
             const appTitle = ref();
             const sidebar = ref(false);
-            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isUserBoundToOU, userRole } = useUserRole();
+            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole } = useUserRole();
 
             const loginStore = useLoginStore();
             const userName = ref("");
@@ -281,6 +283,10 @@ export default defineComponent(
                 { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
             ]);
 
+            const thesisLibraryMenu = ref<MenuItem[]>([
+                { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting' }
+            ]);
+
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
@@ -292,6 +298,7 @@ export default defineComponent(
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isHeadOfLibrary.value)) },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },

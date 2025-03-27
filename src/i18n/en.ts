@@ -87,7 +87,8 @@ export default {
         commissions: "Commissions",
         commissionLandingPage: "Commission Details",
         reporting: "Reporting",
-        mService: "M-Service"
+        mService: "M-Service",
+        thesisLibraryReporting: "Thesis Library Reporting"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -680,5 +681,21 @@ export default {
     topicAcceptanceDateLabel: "Topic Acceptance Date",
     unauthorizedOrgUnitEditAttemptMessage: "You have to be employed at an institution to be able to edit it.",
     unauthorizedPublicationEditAttemptByEmployeeMessage: "Publication has to have a relation toward your institution.",
-    defenceDateLabel: "Defence date"
+    defenceDateLabel: "Defence date",
+    generateLabel: "Generate",
+    institutionsLabel: "Institutions",
+    defendedLabel: "Defended",
+    acceptedLabel: "Accepted",
+    publicReviewLabel: "Put on public review",
+    publiclyAvailableLabel: "Publicly available",
+    thesisReportTitle: "Theses report",
+    defendedThesesLabel: "Defended theses",
+    acceptedThesesLabel: "Accepted theses",
+    publicReviewThesesLabel: "Theses put on public review",
+    publiclyAvailableThesesLabel: "Publicly available theses",
+    downloadLabel: "Download",
+    thesisLibraryLabel: "Thesis library",
+    publicationInfoTextBeforeLink: "If your publication is not in the list, you must first",
+    publicationInfoTextAfterLink: ", then link it here.",
+    addPublicationLabel: "add it"
 }

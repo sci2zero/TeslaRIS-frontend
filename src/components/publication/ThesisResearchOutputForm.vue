@@ -1,4 +1,14 @@
 <template>
+    <div class="mb-3">
+        <strong>{{ $t("noteLabel") }}: </strong>
+        <p>
+            {{ $t("publicationInfoTextBeforeLink") }} 
+            <localized-link to="scientific-results">
+                <a href="#"> {{ $t("addPublicationLabel") }} </a>
+            </localized-link>
+            {{ $t("publicationInfoTextAfterLink") }}
+        </p>
+    </div>
     <v-row>
         <v-col cols="12">
             <publication-table-component
@@ -35,11 +45,12 @@ import PublicationTableComponent from './PublicationTableComponent.vue';
 import { type DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useI18n } from 'vue-i18n';
+import LocalizedLink from '../localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "ThesisResearchOutputForm",
-    components: { PublicationTableComponent },
+    components: { PublicationTableComponent, LocalizedLink },
     props: {
         thesisId: {
             type: Number,

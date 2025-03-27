@@ -34,9 +34,11 @@
 </template>
   
 <script lang="ts">
-  import { defineComponent, onMounted, ref } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import { supportedLocales, defaultLocale } from '../../i18n'
+import { defineComponent, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { supportedLocales, defaultLocale } from '../../i18n'
+import { getLangItems } from '@/i18n/languages';
+
 
   export default defineComponent({
     name: "LangChangeItem",
@@ -45,18 +47,7 @@
       const router = useRouter();
 
       const selectedLocale: any = ref({});
-      const langItems = [
-        {
-          title: 'Srpski',
-          short: "SR",
-          value: 'sr',
-        },
-        {
-          title: 'English',
-          short: "EN",
-          value: 'en',
-        },
-      ];
+      const langItems = getLangItems();
   
       const switchLang = (lang: any) => {
         selectedLocale.value = lang; 
