@@ -79,6 +79,9 @@
             </tr>
         </template>
     </v-data-table>
+    <h2 v-else class="d-flex flex-row justify-center">
+        {{ $t("noReportsForSelectedPeriodLabel") }}
+    </h2>
 </template>
 
 <script lang="ts">
