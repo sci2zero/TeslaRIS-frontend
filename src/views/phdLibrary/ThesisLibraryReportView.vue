@@ -63,13 +63,13 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import ThesisLibraryReportTableComponent from './ThesisLibraryReportTableComponent.vue';
+import ThesisLibraryReportTableComponent from '@/components/thesisLibrary/ThesisLibraryReportTableComponent.vue';
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { ThesisType } from '@/models/PublicationModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { type ThesisReportRequest } from '@/models/ThesisLibraryModel';
-import DatePicker from '../core/DatePicker.vue';
-import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
+import DatePicker from '@/components/core/DatePicker.vue';
+import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 

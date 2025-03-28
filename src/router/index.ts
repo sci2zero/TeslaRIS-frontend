@@ -90,7 +90,7 @@ import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
 import MServiceView from "@/views/MServiceView.vue";
-import ThesisLibraryReportView from "@/components/thesisLibrary/ThesisLibraryReportView.vue";
+import ThesisLibraryReportView from "@/views/phdLibrary/ThesisLibraryReportView.vue";
 
 
 const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE", institutionalLibrarian: "INSTITUTIONAL_LIBRARIAN", headOfLibrary: "HEAD_OF_LIBRARY" };
