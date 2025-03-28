@@ -100,6 +100,7 @@ export interface PersonDocumentContribution extends PersonContribution {
     contributionType: DocumentContributionType;
     isMainContributor: boolean;
     isCorrespondingContributor: boolean;
+    isBoardPresident: boolean;
 }
 
 export enum DocumentContributionType {

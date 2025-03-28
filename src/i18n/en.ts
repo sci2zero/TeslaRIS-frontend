@@ -698,5 +698,6 @@ export default {
     publicationInfoTextBeforeLink: "If your publication is not in the list, you must first",
     publicationInfoTextAfterLink: ", then link it here.",
     addPublicationLabel: "add it",
-    noReportsForSelectedPeriodLabel: "There are no theses of selected type, for selected institutions, for given period."
+    noReportsForSelectedPeriodLabel: "There are no theses of selected type, for selected institutions, for given period.",
+    boardPresidentLabel: "Board president"
 }

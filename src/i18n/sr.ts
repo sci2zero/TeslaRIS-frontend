@@ -698,5 +698,6 @@ export default {
     publicationInfoTextBeforeLink: "Ukoliko vaša publikacija nije u listi, morate je prvo",
     publicationInfoTextAfterLink: ", pa je onda uvezati ovdje.",
     addPublicationLabel: "dodati",
-    noReportsForSelectedPeriodLabel: "Ne postoje završni radovi odabranog tipa, za selektovane institucije, za odabrani period."
+    noReportsForSelectedPeriodLabel: "Ne postoje završni radovi odabranog tipa, za selektovane institucije, za odabrani period.",
+    boardPresidentLabel: "Predsednik komisije"
 }
