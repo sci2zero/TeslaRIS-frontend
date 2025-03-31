@@ -43,13 +43,13 @@
                         <v-row>
                             <v-col cols="6">
                                 <v-btn
-                                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview"
+                                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived"
                                     class="mb-5" color="primary" density="compact"
                                     @click="changePublicReviewState(true, false)">
                                     {{ $t("putOnPublicReviewLabel") }}
                                 </v-btn>
                                 <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview"
+                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview && !thesis?.isArchived"
                                     class="mb-5" color="primary" density="compact"
                                     @click="changePublicReviewState(false, false)">
                                     {{ $t("removeFromPublicReviewLabel") }}
@@ -66,6 +66,20 @@
                                     @click="changePublicReviewState(true, false)">
                                     {{ $t("restartPublicReviewLabel") }}
                                 </v-btn>
+                                <div>
+                                    <v-btn
+                                        v-if="userCanPutOnPublicReview && !thesis?.isArchived"
+                                        class="mb-5" color="primary" density="compact"
+                                        @click="changeArchiveState(true)">
+                                        {{ $t("archiveLabel") }}
+                                    </v-btn>
+                                    <v-btn
+                                        v-if="(isAdmin || isHeadOfLibrary) && thesis?.isArchived"
+                                        class="mb-5" color="primary" density="compact"
+                                        @click="changeArchiveState(false)">
+                                        {{ $t("unarchiveLabel") }}
+                                    </v-btn>
+                                </div>
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="thesis?.thesisType">
                                     {{ $t("typeOfPublicationLabel") }}:
@@ -368,9 +382,7 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
-                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                    canEdit.value = response.data;
-                });
+                checkIfUserCanEdit();
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -384,6 +396,12 @@ export default defineComponent({
             fetchIndicators();
         };
 
+        const checkIfUserCanEdit = () => {
+            DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                canEdit.value = response.data;
+            });
+        };
+
         watch(i18n.locale, () => {
             populateData();
         });
@@ -391,6 +409,9 @@ export default defineComponent({
         const fetchThesis = () => {
             DocumentPublicationService.readThesis(parseInt(currentRoute.params.id as string)).then((response) => {
                 thesis.value = response.data;
+                if (thesis.value.isArchived) {
+                    canEdit.value = false;
+                }
 
                 document.title = returnCurrentLocaleContent(thesis.value.title) as string;
 
@@ -549,7 +570,20 @@ export default defineComponent({
                     dialogMessage.value = i18n.t("putOnPublicReviewWarningMessage");
                 }
             } else {
-                dialogMessage.value = i18n.t("removeFromPublicReviewWarningMessage")
+                dialogMessage.value = i18n.t("removeFromPublicReviewWarningMessage");
+            }
+
+            publicDialogRef.value?.toggle();
+        };
+
+        const changingArchiveState = ref(false);
+        const changeArchiveState = (archive: boolean) => {
+            changingArchiveState.value = true;
+
+            if (archive) {
+                dialogMessage.value = i18n.t("archiveWarningMessage");
+            } else {
+                dialogMessage.value = i18n.t("unarchiveWarningMessage");
             }
 
             publicDialogRef.value?.toggle();
@@ -576,12 +610,38 @@ export default defineComponent({
         };
 
         const commitThesisStatusChange = () => {
-            if (thesis.value?.isOnPublicReview) {
+            if (changingArchiveState.value) {
+                changingArchiveState.value = false;
+                commitArchiveStateChange();
+            }
+            else if (thesis.value?.isOnPublicReview) {
                 removeFromPublicReview()
             } else if (thesis.value?.isOnPublicReviewPause) {
                 putOnPublicReview(continueLastReview.value);
             } else {
                 putOnPublicReview(false);
+            }
+        };
+
+        const commitArchiveStateChange = () => {
+            if (thesis.value?.isArchived) {
+                DocumentPublicationService.unarchiveThesis(
+                    parseInt(currentRoute.params.id as string))
+                .then(() => {
+                    thesis.value!.isArchived = false;
+                    checkIfUserCanEdit();
+                });
+            } else {
+                DocumentPublicationService.archiveThesis(
+                    parseInt(currentRoute.params.id as string))
+                .then(() => {
+                    thesis.value!.isArchived = true;
+                    canEdit.value = false;
+                })
+                .catch((error) => {
+                    snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                    snackbar.value = true;
+                });
             }
         };
 
@@ -599,7 +659,7 @@ export default defineComponent({
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
-            isHeadOfLibrary, commitThesisStatusChange
+            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState
         };
 }})
 

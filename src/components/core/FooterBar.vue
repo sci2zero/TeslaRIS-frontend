@@ -42,7 +42,7 @@ export default defineComponent(
             const personListLabel = computed(() => i18n.t("personListLabel"));
             const ouListLabel = computed(() => i18n.t("ouListLabel"));
             const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-            const advancedSearchLabel = computed(() => i18n.t("advancedSearchLabel"));
+            const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
             const contactLabel = computed(() => i18n.t("contactLabel"));
 
 
@@ -51,7 +51,7 @@ export default defineComponent(
                     { title: personListLabel, path: "persons"},
                     { title: ouListLabel, path: "organisation-units"},
                     { title: scientificResultsListLabel, path: "scientific-results"},
-                    { title: advancedSearchLabel, path: "advanced-search"},
+                    { title: simpleSearchLabel, path: "advanced-search"},
                     { title: contactLabel, path: "contact"},
                 ]);
 

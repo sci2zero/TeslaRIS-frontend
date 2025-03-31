@@ -88,7 +88,8 @@ export default {
         commissionLandingPage: "Detalji komisije",
         reporting: "Izveštavanje",
         mService: "M-Servis",
-        thesisLibraryReporting: "Izveštavanje biblioteke završnih radova"
+        thesisLibraryReporting: "Izveštavanje biblioteke završnih radova",
+        thesisLibrarySearch: "Pretraga biblioteke završnih radova"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -174,7 +175,8 @@ export default {
     journalLabel: "Časopis",
     publisherListLabel: "Izdavači",
     publisherLabel: "Izdavač",
-    advancedSearchLabel: "Pretraga",
+    simpleSearchLabel: "Pretraga",
+    advancedSearchLabel: "Napredna pretraga",
     saveLabel: "Sačuvaj",
     saveAndAddAnotherLabel: "Sačuvaj i dodaj novo",
     userProfileLabel: "Korisnički Profil",
@@ -699,5 +701,16 @@ export default {
     publicationInfoTextAfterLink: ", pa je onda uvezati ovdje.",
     addPublicationLabel: "dodati",
     noReportsForSelectedPeriodLabel: "Ne postoje završni radovi odabranog tipa, za selektovane institucije, za odabrani period.",
-    boardPresidentLabel: "Predsednik komisije"
+    boardPresidentLabel: "Predsednik komisije",
+    boardPresidentsLabel: "Predsednici komisije",
+    searchLabel: "Pretraži",
+    filtersLabel: "Filteri",
+    onlyOpenAccessLabel: "Samo javno dostupno",
+    fieldLabel: "Polje",
+    operationLabel: "Operacija",
+    archiveLabel: "Arhiviraj",
+    unarchiveLabel: "Ukloni iz arhive",
+    missingDataToArchiveMessage: "Potrebno je da postavite minimum naslov i datum odbrane kako bi mogli da arhivirate završni rad.",
+    archiveWarningMessage: "Arhivirana publikacija će biti javno dostupna prilikom izvoza podataka. Dalje izmene biće onemogućene.",
+    unarchiveWarningMessage: "Uklanjanje iz arhive je radnja koja se izvršava samo u izuzentnim situacijama."
 }

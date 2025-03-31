@@ -24,3 +24,21 @@ export enum ThesisReportType {
     PUBLIC_REVIEW = "PUBLIC_REVIEW",
     PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE"
 }
+
+export interface ThesisSearchFieldsResponse {
+    a: string;
+    b: string;
+}
+
+export interface ThesisSearchRequest {
+    tokens: string[];
+    facultyIds: number[];
+    authorIds: number[];
+    advisorIds: number[];
+    boardMemberIds: number[];
+    boardPresidentIds: number[];
+    thesisTypes: ThesisType[];
+    showOnlyOpenAccess: boolean;
+    dateFrom: string;
+    dateTo: string;
+}

@@ -171,7 +171,7 @@ export default defineComponent(
             const personListLabel = computed(() => i18n.t("personListLabel"));
             const ouListLabel = computed(() => i18n.t("ouListLabel"));
             const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-            const advancedSearchLabel = computed(() => i18n.t("advancedSearchLabel"));
+            const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
             const userPageLabel = computed(() => i18n.t("userPageLabel"));
             const eventListLabel = computed(() => i18n.t("eventListLabel"));
             const journalListLabel = computed(() => i18n.t("journalListLabel"));
@@ -290,7 +290,7 @@ export default defineComponent(
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
-                { title: advancedSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
+                { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
                 { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },

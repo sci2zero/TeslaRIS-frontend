@@ -79,7 +79,7 @@
             </tr>
         </template>
     </v-data-table>
-    <h2 v-else class="d-flex flex-row justify-center">
+    <h2 v-else-if="searchPerformed" class="d-flex flex-row justify-center">
         {{ $t("noReportsForSelectedPeriodLabel") }}
     </h2>
 </template>
@@ -111,6 +111,7 @@ export default defineComponent({
         const reportCounts = ref<ThesisReportCounts[]>([]);
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
+        const searchPerformed = ref(false);
 
         const { requiredSelectionRules } = useValidationUtils();
         
@@ -140,6 +141,7 @@ export default defineComponent({
 
             ThesisLibraryReportingService.getReportCounts(props.reportRequest).then(response => {
                 reportCounts.value = response.data;
+                searchPerformed.value = true;
             });
         };
 
@@ -156,7 +158,7 @@ export default defineComponent({
             returnCurrentLocaleContent,
             ThesisReportType, downloadReport,
             ThesisType, langItems, selectedLang,
-            requiredSelectionRules
+            requiredSelectionRules, searchPerformed
         };
     }
 });

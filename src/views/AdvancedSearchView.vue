@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1>{{ $t("advancedSearchLabel") }}</h1>
+        <h1>{{ $t("simpleSearchLabel") }}</h1>
         <br />
         <br />
         <search-bar-component :preset-search-input="searchParams" @search="search"></search-bar-component>
@@ -91,7 +91,7 @@ export default defineComponent({
 
         onMounted(() => {
             currentTab.value = route.query.tab as string;
-            document.title = i18n.t("advancedSearchLabel");
+            document.title = i18n.t("simpleSearchLabel");
         });
     
         const search = (tokenParams: string) => {

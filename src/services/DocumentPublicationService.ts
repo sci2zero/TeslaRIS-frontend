@@ -230,6 +230,14 @@ export class DocumentPublicationService extends BaseService {
   async removeThesisFromPublicReview(thesisId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `thesis/remove-from-public-review/${thesisId}`);
   }
+
+  async archiveThesis(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/archive/${thesisId}`);
+  }
+
+  async unarchiveThesis(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/unarchive/${thesisId}`);
+  }
 }
 
 export default new DocumentPublicationService();

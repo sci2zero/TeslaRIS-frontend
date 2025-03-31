@@ -88,7 +88,8 @@ export default {
         commissionLandingPage: "Commission Details",
         reporting: "Reporting",
         mService: "M-Service",
-        thesisLibraryReporting: "Thesis Library Reporting"
+        thesisLibraryReporting: "Thesis Library Reporting",
+        thesisLibrarySearch: "Thesis Library Search"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -174,7 +175,8 @@ export default {
     journalLabel: "Journal",
     publisherListLabel: "Publishers",
     publisherLabel: "Publisher",
-    advancedSearchLabel: "Search",
+    simpleSearchLabel: "Search",
+    advancedSearchLabel: "Advanced Search",
     saveLabel: "Save",
     saveAndAddAnotherLabel: "Save and Add Another",
     userProfileLabel: "User Profile",
@@ -699,5 +701,16 @@ export default {
     publicationInfoTextAfterLink: ", then link it here.",
     addPublicationLabel: "add it",
     noReportsForSelectedPeriodLabel: "There are no theses of selected type, for selected institutions, for given period.",
-    boardPresidentLabel: "Board president"
+    boardPresidentLabel: "Board president",
+    boardPresidentsLabel: "Board presidents",
+    searchLabel: "Search",
+    filtersLabel: "Filters",
+    onlyOpenAccessLabel: "Only open-access",
+    fieldLabel: "Field",
+    operationLabel: "Operation",
+    archiveLabel: "Archive",
+    unarchiveLabel: "Unarchive",
+    missingDataToArchiveMessage: "You need to provide at least the title and defense date in order to archive the final paper.",
+    archiveWarningMessage: "An archived publication will be publicly available when exporting data. Further modifications will be disabled.",
+    unarchiveWarningMessage: "Unarchiving is an action that is performed only in exceptional situations."
 }
