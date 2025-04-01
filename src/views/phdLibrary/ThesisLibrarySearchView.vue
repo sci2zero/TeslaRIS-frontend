@@ -35,6 +35,7 @@
                 class="mt-15"
                 :publications="theses"
                 :total-publications="totalTheses"
+                show-other-formats
                 @switch-page="switchPage">
             </publication-table-component>
         </v-col>

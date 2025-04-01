@@ -98,6 +98,7 @@
                             {{ displayTextOrPlaceholder(item.doi) }}
                         </td>
                         <td>
+                            <publication-reference-formats v-if="showOtherFormats" :document-id="(item.databaseId as number)"></publication-reference-formats>
                             <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
@@ -156,11 +157,12 @@ import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
 import { ApplicableEntityType } from '@/models/Common';
+import PublicationReferenceFormats from './PublicationReferenceFormats.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -189,6 +191,10 @@ export default defineComponent({
         allowSelection: {
             type: Boolean,
             default: false
+        },
+        showOtherFormats: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -203,7 +209,7 @@ export default defineComponent({
         const tableWrapper = ref<any>(null);
 
         onMounted(() => {
-            if (props.inClaimer || isAdmin.value || isCommission.value) {
+            if (props.inClaimer || isAdmin.value || isCommission.value || props.showOtherFormats) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
 

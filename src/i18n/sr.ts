@@ -712,5 +712,8 @@ export default {
     unarchiveLabel: "Ukloni iz arhive",
     missingDataToArchiveMessage: "Potrebno je da postavite minimum naslov i datum odbrane kako bi mogli da arhivirate završni rad.",
     archiveWarningMessage: "Arhivirana publikacija će biti javno dostupna prilikom izvoza podataka. Dalje izmene biće onemogućene.",
-    unarchiveWarningMessage: "Uklanjanje iz arhive je radnja koja se izvršava samo u izuzentnim situacijama."
+    unarchiveWarningMessage: "Uklanjanje iz arhive je radnja koja se izvršava samo u izuzentnim situacijama.",
+    referenceFormatsLabel: "Formati reference",
+    citationFormatsLabel: "Citatorski",
+    libraryFormatsLabel: "Bibliotečki"
 }

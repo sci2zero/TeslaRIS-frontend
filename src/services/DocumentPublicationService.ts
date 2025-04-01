@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis } from "@/models/PublicationModel";
+import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -237,6 +237,10 @@ export class DocumentPublicationService extends BaseService {
 
   async unarchiveThesis(thesisId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `thesis/unarchive/${thesisId}`);
+  }
+
+  async getThesisLibraryFormats(thesisId: number): Promise<AxiosResponse<ThesisLibraryFormatsResponse>> {
+    return super.sendRequest(axios.get, `thesis/library-formats/${thesisId}`);
   }
 }
 

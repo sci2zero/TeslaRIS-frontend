@@ -251,3 +251,9 @@ export enum MServiceApplicableTypes {
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION"
 }
+
+export interface ThesisLibraryFormatsResponse {
+    etdMs: string;
+    dublinCore: string;
+    marc21: string;
+}

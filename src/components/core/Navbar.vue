@@ -284,7 +284,8 @@ export default defineComponent(
             ]);
 
             const thesisLibraryMenu = ref<MenuItem[]>([
-                { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting' }
+                { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting' },
+                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([
