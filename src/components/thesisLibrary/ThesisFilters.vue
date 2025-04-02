@@ -119,13 +119,26 @@ export default defineComponent({
         };
     };
 
+    const resetFilters = () => {
+        selectedOUs.value.splice(0);
+        selectedAuthors.value.splice(0);
+        selectedAdvisors.value.splice(0);
+        selectedBoardMembers.value.splice(0);
+        selectedBoardPresidents.value.splice(0);
+        selectedThesisTypes.value.splice(0);
+        fromDate.value = "";
+        toDate.value = "";
+        showOnlyOpenAccess.value = false;
+    };
+
     return {
         isExpanded, selectedOUs,
         selectedAuthors, selectedAdvisors,
         selectedBoardMembers, fromDate,
         selectedBoardPresidents, toDate,
         showOnlyOpenAccess, thesisTypes,
-        selectedThesisTypes, getFilterValues
+        selectedThesisTypes, getFilterValues,
+        resetFilters
     };
   },
 });

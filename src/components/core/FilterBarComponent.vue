@@ -6,13 +6,24 @@
         </v-btn>
   
         <v-expand-transition>
-            <v-card v-if="isExpanded" class="mt-3 pa-4">
+            <v-card v-show="isExpanded" class="mt-3 pa-4">
                 <component
                     :is="filterComponent"
                     ref="filtersRef"
                     v-bind="filterProps"
                     in-modal
                 />
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <div>
+                        <v-btn color="primary" @click="applyFilters">
+                            {{ $t("applyFiltersLabel") }}
+                        </v-btn>
+                        <v-btn v-if="showResetButton" class="ml-2" @click="resetFilters">
+                            {{ $t("resetFiltersLabel") }}
+                        </v-btn>
+                    </div>
+                </v-card-actions>
             </v-card>
         </v-expand-transition>
     </v-container>
@@ -33,8 +44,12 @@ export default defineComponent({
         type: Object as PropType<Record<string, any>>,
         default: () => ({})
     },
+    showResetButton: {
+        type: Boolean,
+        default: false
+    }
   },
-  emits: ["applyFilters"],
+  emits: ["applyFilters", "reset"],
   setup(props, { emit }) {
     const isExpanded = ref(false);
     const filtersRef = ref<InstanceType<typeof props.filterComponent>>();
@@ -49,9 +64,20 @@ export default defineComponent({
         }
     };
 
+    const applyFilters = () => {
+        emitToParent(getFilterValues());
+        isExpanded.value = false;
+    };
+
+    const resetFilters = () => {
+        filtersRef.value.resetFilters();
+        emit("reset");
+    };
+
     return {
         isExpanded, emitToParent,
-        filtersRef, getFilterValues
+        filtersRef, getFilterValues,
+        applyFilters, resetFilters
     };
   },
 });

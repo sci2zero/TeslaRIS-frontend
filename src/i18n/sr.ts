@@ -715,5 +715,9 @@ export default {
     unarchiveWarningMessage: "Uklanjanje iz arhive je radnja koja se izvršava samo u izuzentnim situacijama.",
     referenceFormatsLabel: "Formati reference",
     citationFormatsLabel: "Citatorski",
-    libraryFormatsLabel: "Bibliotečki"
+    libraryFormatsLabel: "Bibliotečki",
+    newSearchLabel: "Novi upit",
+    applyFiltersLabel: "Primeni",
+    resetFiltersLabel: "Resetuj",
+    filesForDownloadLabel: "Fajlovi za preuzimanje"
 }

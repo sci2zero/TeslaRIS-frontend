@@ -2,11 +2,12 @@
     <div justify="start">
         <v-dialog v-model="dialog" persistent class="narrow">
             <template #activator="scope">
-                <v-btn
-                    density="compact" class="mb-2" v-bind="scope.props"
+                <v-list-item
+                    v-bind="scope.props"
+                    class="inline-action"
                     v-on="scope.isActive">
-                    {{ $t("referenceFormatsLabel") }}
-                </v-btn>
+                    <v-list-item-title>{{ $t("referenceFormatsLabel") }}</v-list-item-title>
+                </v-list-item>
             </template>
             
             <v-card v-if="dialog" class="d-flex flex-column align-right pa-4">
@@ -96,7 +97,6 @@ export default defineComponent({
         const fetchLibraryFormats = () => {
             DocumentPublicationService.getThesisLibraryFormats(props.documentId).then(response => {
                 libraryFormats.value = response.data;
-                console.log(libraryFormats.value)
             });
         };
 

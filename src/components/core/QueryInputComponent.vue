@@ -9,7 +9,7 @@
                 <v-select 
                     v-model="clause.field" 
                     :items="fields"
-                    item-value
+                    item-value="value"
                     :label="$t('fieldLabel')" 
                     dense 
                 />
@@ -52,15 +52,21 @@
                 <v-btn :disabled="(queryClauses.find(clause => !clause.field || !clause.value) ? true : false)" color="primary" @click="emitQuery">
                     {{ $t("searchLabel") }}
                 </v-btn>
+                <v-btn class="ml-2" :disabled="((queryClauses.length == 1 && queryClauses.find(clause => !clause.field && !clause.value)) ? true : false)" color="primary" @click="resetQuery">
+                    {{ $t("newSearchLabel") }}
+                </v-btn>
             </v-col>
         </v-row>
     </v-container>
 </template>
 
 <script lang="ts">
-import { ref, onMounted, defineComponent } from "vue";
+import { ref, onMounted, defineComponent, watch } from "vue";
 import ThesisLibrarySearchService from "@/services/thesisLibrary/ThesisLibrarySearchService";
 import DatePicker from "../core/DatePicker.vue";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import { type ThesisSearchFieldsResponse } from "@/models/ThesisLibraryModel";
+import { useI18n } from "vue-i18n";
 
 
 interface QueryClause {
@@ -73,10 +79,13 @@ interface QueryClause {
 export default defineComponent({
     name: "QueryInputComponent",
     components: { DatePicker },
-    emits: ["search"],
+    emits: ["search", "reset"],
     setup(_, {emit}) {
         const operations = ref(["AND", "OR", "NOT"]);
+        const fieldData = ref<ThesisSearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
+
+        const i18n = useI18n();
 
         const queryClauses = ref<QueryClause[]>([
             { id: self.crypto.randomUUID(), operation: "AND", field: "", value: "" }
@@ -84,14 +93,29 @@ export default defineComponent({
 
         const fetchFields = async () => {
             ThesisLibrarySearchService.getSearchFields().then(response => {
-                fields.value.splice(0);
-                response.data.forEach(searchField => {
-                    fields.value.push({title: searchField.a, value: "", type: searchField.b});
-                });
+                fieldData.value = response.data;
+                populateFieldData();
             });
         };
 
         onMounted(fetchFields);
+
+        watch(i18n.locale, () => {
+            populateFieldData();
+        });
+
+        const populateFieldData = () => {
+            fields.value.splice(0);
+            fieldData.value.forEach(searchField => {
+                fields.value.push(
+                    {
+                        title: returnCurrentLocaleContent(searchField.b) as string,
+                        value: searchField.a,
+                        type: searchField.c
+                    }
+                );
+            });
+        };
 
         const addClause = (index: number) => {
             const newClause = { id: self.crypto.randomUUID(), operation: "AND", field: "", value: "" };
@@ -130,10 +154,24 @@ export default defineComponent({
             emit("search", tokens);
         };
 
+        const resetQuery = () => {
+            queryClauses.value.splice(0);
+            queryClauses.value.push(
+                {
+                    id: self.crypto.randomUUID(),
+                    operation: "AND",
+                    field: "",
+                    value: ""
+                }
+            );
+            emit("reset");
+        };
+
         return {
             queryClauses, operations,
             getFieldType, removeClause,
-            emitQuery, addClause, fields
+            emitQuery, addClause, fields,
+            resetQuery
         };
     }
 });

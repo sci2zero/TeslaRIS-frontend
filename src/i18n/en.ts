@@ -715,5 +715,8 @@ export default {
     unarchiveWarningMessage: "Unarchiving is an action that is performed only in exceptional situations.",
     referenceFormatsLabel: "Reference formats",
     citationFormatsLabel: "Citation",
-    libraryFormatsLabel: "Library"
+    libraryFormatsLabel: "Library",
+    newSearchLabel: "New query",
+    applyFiltersLabel: "Apply",
+    resetFiltersLabel: "Reset"
 }

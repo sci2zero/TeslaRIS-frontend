@@ -37,21 +37,21 @@
             :items-per-page-options="[5, 10, 25, 50]"
             :page="tableOptions.page"
             @update:options="refreshTable">
-            <template #body="props">
+            <template #body="properties">
                 <draggable
-                    :list="props.items"
+                    :list="properties.items"
                     tag="tbody"
                     :disabled="!inComparator"
                     group="publications"
                     handle=".handle"
                     @change="onDropCallback"
                 >
-                    <tr v-if="props.items?.length === 0">
+                    <tr v-if="properties.items?.length === 0">
                         <td colspan="10" class="text-center">
                             <p>{{ $t("noDataInTableMessage") }}</p>
                         </td>
                     </tr>
-                    <tr v-for="item in props.items" :key="item.id" class="handle">
+                    <tr v-for="item in properties.items" :key="item.id" class="handle">
                         <td v-if="isAdmin || allowSelection">
                             <v-checkbox
                                 v-model="selectedPublications"
@@ -71,7 +71,6 @@
                             </localized-link>
                         </td>
                         <td>
-                            <!-- {{ displayTextOrPlaceholder(item.authorNames) }} -->
                             <span v-if="item.authorNames.trim() === ''">
                                 {{ displayTextOrPlaceholder(item.authorNames) }}
                             </span>
@@ -98,7 +97,26 @@
                             {{ displayTextOrPlaceholder(item.doi) }}
                         </td>
                         <td>
-                            <publication-reference-formats v-if="showOtherFormats" :document-id="(item.databaseId as number)"></publication-reference-formats>
+                            <v-menu
+                                v-if="richResultsView"
+                                :close-on-content-click="true"
+                                location="bottom"
+                            >
+                                <template #activator="{ props }">
+                                    <div class="edit-pen">
+                                        <v-btn
+                                            v-bind="props"
+                                            compact>
+                                            ...
+                                        </v-btn>
+                                    </div>
+                                </template>
+
+                                <v-list min-width="150">
+                                    <publication-reference-formats :document-id="(item.databaseId as number)"></publication-reference-formats>
+                                    <publication-file-download-modal :document-id="(item.databaseId as number)"></publication-file-download-modal>
+                                </v-list>
+                            </v-menu>
                             <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
@@ -108,7 +126,7 @@
                                 {{ $t("declineClaimLabel") }}
                             </v-btn>
                             <entity-classification-modal-content
-                                v-if="isAdmin || isCommission"
+                                v-if="(isAdmin || isCommission) && !richResultsView"
                                 :entity-id="(item.databaseId as number)"
                                 :entity-type="ApplicableEntityType.DOCUMENT"
                                 :disabled="!item.year || item.year < 0"
@@ -158,11 +176,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import PublicationReferenceFormats from './PublicationReferenceFormats.vue';
+import PublicationFileDownloadModal from './PublicationFileDownloadModal.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -192,7 +211,7 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
-        showOtherFormats: {
+        richResultsView: {
             type: Boolean,
             default: false
         }
@@ -209,7 +228,7 @@ export default defineComponent({
         const tableWrapper = ref<any>(null);
 
         onMounted(() => {
-            if (props.inClaimer || isAdmin.value || isCommission.value || props.showOtherFormats) {
+            if (props.inClaimer || isAdmin.value || isCommission.value || props.richResultsView) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
 

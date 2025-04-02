@@ -22,11 +22,20 @@
             <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
         </v-tabs-window-item>
         <v-tabs-window-item value="advancedSearch">
-            <query-input-component @search="clearSortAndPerformSearch($event)"></query-input-component>
+            <query-input-component
+                @search="clearSortAndPerformSearch($event)"
+                @reset="filtersRef?.resetFilters; search([]);">
+            </query-input-component>
         </v-tabs-window-item>
     </v-tabs-window>
 
-    <filter-bar-component ref="filtersRef" :filter-component="ThesisFilters"></filter-bar-component>
+    <filter-bar-component
+        ref="filtersRef"
+        :filter-component="ThesisFilters"
+        :show-reset-button="currentTab === 'simpleSearch'"
+        @apply-filters="search(searchParams)"
+        @reset="search(searchParams)">
+    </filter-bar-component>
 
     <v-row class="d-flex flex-row justify-center mt-15">
         <v-col cols="12" sm="10">
@@ -35,7 +44,7 @@
                 class="mt-15"
                 :publications="theses"
                 :total-publications="totalTheses"
-                show-other-formats
+                rich-results-view
                 @switch-page="switchPage">
             </publication-table-component>
         </v-col>
@@ -119,8 +128,6 @@ export default defineComponent({
                     thesisTypes: []
                 };
             }
-            
-            console.log(searchRequest);
 
             if (currentTab.value === "simpleSearch") {
                 ThesisLibrarySearchService.performSimpleSearch(
@@ -172,7 +179,7 @@ export default defineComponent({
             clearSortAndPerformSearch,
             theses, totalTheses,
             switchPage, ThesisFilters,
-            filtersRef
+            filtersRef, search, searchParams
         };
     }
 });

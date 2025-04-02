@@ -27,7 +27,8 @@ export enum ThesisReportType {
 
 export interface ThesisSearchFieldsResponse {
     a: string;
-    b: string;
+    b: MultilingualContent[];
+    c: string;
 }
 
 export interface ThesisSearchRequest {

@@ -2,13 +2,17 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import type { CitationResponse, Dataset, Document, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
 export class DocumentPublicationService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
+
+  async readDocumentPublication(documentId: number): Promise<AxiosResponse<Document>> {
+    return super.sendRequest(axios.get, `document/${documentId}`);
+  }
 
   async getDocumentCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "document/count");
