@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { MultilingualContent, Page } from "@/models/Common";
+import type { MultilingualContent, Page, SearchFieldsResponse } from "@/models/Common";
 import type { BasicPerson, PersonIndex, PersonName, PersonProfileImageRequest, PersonResponse, PersonalInfo } from "@/models/PersonModel";
 import type { PersonUserResponse } from "@/models/PersonUserModel";
 import type { Involvement } from "@/models/InvolvementModel";
@@ -107,6 +107,10 @@ export class PersonService extends BaseService {
 
   async checkIdentifierUsage(identifier: string, personId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `person/identifier-usage/${personId}?identifier=${encodeURIComponent(identifier)}`);
+  }
+
+  async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, "person/fields");
   }
 }
 

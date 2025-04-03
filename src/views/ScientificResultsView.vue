@@ -49,7 +49,13 @@
                 class="ml-4 mt-3"
             ></v-checkbox>
         </span>
-        <publication-table-component ref="tableRef" :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <publication-table-component
+            ref="tableRef"
+            :publications="publications"
+            :total-publications="totalPublications"
+            enable-export
+            @switch-page="switchPage">
+        </publication-table-component>
     </v-container>
 </template>
 

@@ -32,7 +32,9 @@
                             <citation-formats :citation="citation"></citation-formats>
                         </v-tabs-window-item>
                         <v-tabs-window-item class="text-left" value="libraryFormats">
-                            <h3>ETD-MS</h3>
+                            <h3 class="mt-5">
+                                ETD-MS
+                            </h3>
                             <code-viewer :code-content="(libraryFormats?.etdMs as string)"></code-viewer>
                             <h3 class="mt-10">
                                 Dublin Core

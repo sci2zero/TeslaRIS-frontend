@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Page } from "@/models/Common";
+import type { Page, SearchFieldsResponse } from "@/models/Common";
 import type { CitationResponse, Dataset, Document, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
@@ -245,6 +245,10 @@ export class DocumentPublicationService extends BaseService {
 
   async getThesisLibraryFormats(thesisId: number): Promise<AxiosResponse<ThesisLibraryFormatsResponse>> {
     return super.sendRequest(axios.get, `thesis/library-formats/${thesisId}`);
+  }
+
+  async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, "document/fields");
   }
 }
 

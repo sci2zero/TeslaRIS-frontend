@@ -14,6 +14,16 @@
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
+
+    <table-export-modal
+        v-if="enableExport"
+        :export-entity="ExportEntity.ORGANISATION_UNIT"
+        :export-ids="(selectedOUs.map(orgUnit => orgUnit.databaseId) as number[])"
+        :disabled="selectedOUs.length === 0"
+        :potential-max-amount-requested="selectedOUs.length >= tableOptions.itemsPerPage"
+        :total-results="totalOUs">
+    </table-export-modal>
+
     <v-data-table-server
         v-model="selectedOUs"
         :sort-by="tableOptions.sortBy"
@@ -116,10 +126,12 @@ import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
 import { useUserRole } from '@/composables/useUserRole';
+import { ExportEntity } from '@/models/Common';
+import TableExportModal from '../core/TableExportModal.vue';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, TableExportModal },
     props: {
         organisationUnits: {
             type: Array<OrganisationUnitIndex>,
@@ -128,7 +140,12 @@ export default defineComponent({
         totalOUs: {
             type: Number,
             required: true
-        }},
+        },
+        enableExport: {
+            type: Boolean,
+            default: false
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedOUs = ref<OrganisationUnitIndex[]>([]);
@@ -247,7 +264,7 @@ export default defineComponent({
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
-            startMetadataComparison
+            startMetadataComparison, ExportEntity
         };
     }
 });

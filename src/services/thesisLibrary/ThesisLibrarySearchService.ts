@@ -1,14 +1,14 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { Page } from "@/models/Common";
+import type { Page, SearchFieldsResponse } from "@/models/Common";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
-import type { ThesisSearchRequest, ThesisSearchFieldsResponse } from "@/models/ThesisLibraryModel";
+import type { ThesisSearchRequest } from "@/models/ThesisLibraryModel";
 
 
 export class ThesisLibrarySearchService extends BaseService {
 
-    async getSearchFields(): Promise<AxiosResponse<ThesisSearchFieldsResponse[]>> {
+    async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
         return super.sendRequest(axios.get, "thesis-library/search/fields");
     }
 

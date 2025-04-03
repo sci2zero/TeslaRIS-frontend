@@ -16,7 +16,13 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
-        <person-table-component ref="tableRef" :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+        <person-table-component
+            ref="tableRef"
+            :persons="persons"
+            :total-persons="totalPersons"
+            enable-export
+            @switch-page="switchPage">
+        </person-table-component>
     </v-container>
 </template>
 

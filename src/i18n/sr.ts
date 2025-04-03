@@ -714,10 +714,15 @@ export default {
     archiveWarningMessage: "Arhivirana publikacija će biti javno dostupna prilikom izvoza podataka. Dalje izmene biće onemogućene.",
     unarchiveWarningMessage: "Uklanjanje iz arhive je radnja koja se izvršava samo u izuzentnim situacijama.",
     referenceFormatsLabel: "Formati reference",
-    citationFormatsLabel: "Citatorski",
-    libraryFormatsLabel: "Bibliotečki",
+    citationFormatsLabel: "Citatorski formati",
+    libraryFormatsLabel: "Bibliotečki formati",
     newSearchLabel: "Novi upit",
     applyFiltersLabel: "Primeni",
     resetFiltersLabel: "Resetuj",
-    filesForDownloadLabel: "Fajlovi za preuzimanje"
+    filesForDownloadLabel: "Fajlovi za preuzimanje",
+    exportTableLabel: "Izvoz tabele",
+    exportFileFormatLabel: "Format izvezenog fajla",
+    exportAllLabel: "Izvezi sve",
+    exportColumnsLabel: "Kolone za izvoz",
+    pageLabel: "Broj Stranice (izvozi se u stranicama od po {0} slogova)"
 }

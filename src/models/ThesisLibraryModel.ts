@@ -25,12 +25,6 @@ export enum ThesisReportType {
     PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE"
 }
 
-export interface ThesisSearchFieldsResponse {
-    a: string;
-    b: MultilingualContent[];
-    c: string;
-}
-
 export interface ThesisSearchRequest {
     tokens: string[];
     facultyIds: number[];

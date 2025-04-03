@@ -16,7 +16,13 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
-        <organisation-unit-table-component ref="tableRef" :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+        <organisation-unit-table-component
+            ref="tableRef"
+            :organisation-units="organisationUnits"
+            :total-o-us="totalOUs"
+            enable-export
+            @switch-page="switchPage">
+        </organisation-unit-table-component>
     </v-container>
 </template>
 

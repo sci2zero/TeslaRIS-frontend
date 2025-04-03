@@ -23,6 +23,15 @@
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
+    <table-export-modal
+        v-if="enableExport"
+        :export-entity="ExportEntity.DOCUMENT"
+        :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
+        :disabled="selectedPublications.length === 0"
+        :potential-max-amount-requested="selectedPublications.length >= tableOptions.itemsPerPage"
+        :total-results="totalPublications">
+    </table-export-modal>
+
     <div ref="tableWrapper">
         <v-data-table-server
             v-model="selectedPublications"
@@ -174,14 +183,15 @@ import { useRouter } from 'vue-router';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
-import { ApplicableEntityType } from '@/models/Common';
+import { ApplicableEntityType, ExportEntity } from '@/models/Common';
 import PublicationReferenceFormats from './PublicationReferenceFormats.vue';
 import PublicationFileDownloadModal from './PublicationFileDownloadModal.vue';
+import TableExportModal from '../core/TableExportModal.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal },
+    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -212,6 +222,10 @@ export default defineComponent({
             default: false
         },
         richResultsView: {
+            type: Boolean,
+            default: false
+        },
+        enableExport: {
             type: Boolean,
             default: false
         }
@@ -412,7 +426,7 @@ export default defineComponent({
             startMetadataComparison, getDocumentLandingPageBasePath,
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
-            ApplicableEntityType, removeResearchOutputs
+            ApplicableEntityType, removeResearchOutputs, ExportEntity
         };
     }
 });

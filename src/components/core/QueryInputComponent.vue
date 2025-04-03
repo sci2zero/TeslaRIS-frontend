@@ -11,7 +11,7 @@
                     :items="fields"
                     item-value="value"
                     :label="$t('fieldLabel')" 
-                    dense 
+                    dense
                 />
             </v-col>
   
@@ -65,7 +65,7 @@ import { ref, onMounted, defineComponent, watch } from "vue";
 import ThesisLibrarySearchService from "@/services/thesisLibrary/ThesisLibrarySearchService";
 import DatePicker from "../core/DatePicker.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
-import { type ThesisSearchFieldsResponse } from "@/models/ThesisLibraryModel";
+import { type SearchFieldsResponse } from "@/models/Common";
 import { useI18n } from "vue-i18n";
 
 
@@ -82,7 +82,7 @@ export default defineComponent({
     emits: ["search", "reset"],
     setup(_, {emit}) {
         const operations = ref(["AND", "OR", "NOT"]);
-        const fieldData = ref<ThesisSearchFieldsResponse[]>([]);
+        const fieldData = ref<SearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
 
         const i18n = useI18n();

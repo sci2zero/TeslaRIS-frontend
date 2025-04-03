@@ -19,6 +19,16 @@
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
+    
+    <table-export-modal
+        v-if="enableExport"
+        :export-entity="ExportEntity.PERSON"
+        :export-ids="(selectedPersons.map(person => person.databaseId) as number[])"
+        :disabled="selectedPersons.length === 0"
+        :potential-max-amount-requested="selectedPersons.length >= tableOptions.itemsPerPage"
+        :total-results="totalPersons">
+    </table-export-modal>
+
     <add-employment-modal 
         v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
         class="mt-3"
@@ -126,11 +136,13 @@ import IdentifierLink from '../core/IdentifierLink.vue';
 import InvolvementService from '@/services/InvolvementService';
 import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { ExportEntity } from '@/models/Common';
+import TableExportModal from '../core/TableExportModal.vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal },
+    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal, TableExportModal },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -153,6 +165,10 @@ export default defineComponent({
             default: false
         },
         isCommissionResearchersTable: {
+            type: Boolean,
+            default: false
+        },
+        enableExport: {
             type: Boolean,
             default: false
         }
@@ -302,7 +318,7 @@ export default defineComponent({
 
         return {
             selectedPersons, headers, notifications,
-            refreshTable, isAdmin, deleteSelection,
+            refreshTable, isAdmin, deleteSelection, ExportEntity,
             tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
             localiseDate, startPublicationComparison, isCommission,
             startMetadataComparison, onDropCallback, removeSelection,

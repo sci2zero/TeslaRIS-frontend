@@ -143,3 +143,38 @@ export interface ApiKeyResponse {
     clientEmail: string,
     dailyRequests: number
 }
+
+export interface SearchFieldsResponse {
+    a: string;
+    b: MultilingualContent[];
+    c: string;
+}
+
+export enum ExportFileFormat {
+    CSV = "CSV",
+    XLS = "XLS"
+}
+
+export enum ExportEntity {
+    PERSON = "PERSON",
+    ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    DOCUMENT = "DOCUMENT"
+}
+
+export interface CSVExportRequest {
+    columns: string[];
+    exportEntityIds: number[];
+    exportMaxPossibleAmount: boolean;
+    bulkExportOffset: number;
+    exportLanguage: string;
+    exportFileType: ExportFileFormat;
+}
+
+
+export interface DocumentCSVExportRequest extends CSVExportRequest {
+    apa: boolean;
+    mla: boolean;
+    harvard: boolean;
+    chicago: boolean;
+    vancouver: boolean;
+}

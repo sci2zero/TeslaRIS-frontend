@@ -714,8 +714,8 @@ export default {
     archiveWarningMessage: "An archived publication will be publicly available when exporting data. Further modifications will be disabled.",
     unarchiveWarningMessage: "Unarchiving is an action that is performed only in exceptional situations.",
     referenceFormatsLabel: "Reference formats",
-    citationFormatsLabel: "Citation",
-    libraryFormatsLabel: "Library",
+    citationFormatsLabel: "Citation formats",
+    libraryFormatsLabel: "Library formats",
     newSearchLabel: "New query",
     applyFiltersLabel: "Apply",
     resetFiltersLabel: "Reset"
