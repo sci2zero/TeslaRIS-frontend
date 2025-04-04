@@ -21,6 +21,8 @@
             :persons="persons"
             :total-persons="totalPersons"
             enable-export
+            :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
+            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
             @switch-page="switchPage">
         </person-table-component>
     </v-container>
@@ -36,6 +38,7 @@ import type { PersonIndex } from '@/models/PersonModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserRole } from '@/composables/useUserRole';
+import { ExportableEndpointType } from '@/models/Common';
 
 
 export default defineComponent({
@@ -107,7 +110,8 @@ export default defineComponent({
             switchPage, addPerson, isAdmin,
             tableRef, clearSortAndPerformSearch,
             isInstitutionalEditor, isUserBoundToOU,
-            returnOnlyInstitutionRelatedEntities
+            returnOnlyInstitutionRelatedEntities,
+            ExportableEndpointType, searchParams
         };
     }
 });

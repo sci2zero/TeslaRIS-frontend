@@ -54,6 +54,8 @@
             :publications="publications"
             :total-publications="totalPublications"
             enable-export
+            :endpoint-type="ExportableEndpointType.DOCUMENT_SEARCH"
+            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
             @switch-page="switchPage">
         </publication-table-component>
     </v-container>
@@ -72,6 +74,7 @@ import { computed } from 'vue';
 import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
+import { ExportableEndpointType } from '@/models/Common';
 
 
 export default defineComponent({
@@ -182,7 +185,8 @@ export default defineComponent({
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
             isCommission, returnOnlyUnassessedEntities,
-            publicationTypes, selectedPublicationTypes
+            publicationTypes, selectedPublicationTypes,
+            ExportableEndpointType, searchParams
         };
     }
 });

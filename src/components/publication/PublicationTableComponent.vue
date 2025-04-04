@@ -25,11 +25,14 @@
     </v-btn>
     <table-export-modal
         v-if="enableExport"
-        :export-entity="ExportEntity.DOCUMENT"
+        :export-entity="endpointBodyParameters ? ExportEntity.THESIS : ExportEntity.DOCUMENT"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"
         :potential-max-amount-requested="selectedPublications.length >= tableOptions.itemsPerPage"
-        :total-results="totalPublications">
+        :total-results="totalPublications"
+        :endpoint-type="endpointType"
+        :endpoint-token-parameters="endpointTokenParameters"
+        :endpoint-body-parameters="endpointBodyParameters">
     </table-export-modal>
 
     <div ref="tableWrapper">
@@ -167,7 +170,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
@@ -183,7 +186,7 @@ import { useRouter } from 'vue-router';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
-import { ApplicableEntityType, ExportEntity } from '@/models/Common';
+import { ApplicableEntityType, ExportableEndpointType, ExportEntity } from '@/models/Common';
 import PublicationReferenceFormats from './PublicationReferenceFormats.vue';
 import PublicationFileDownloadModal from './PublicationFileDownloadModal.vue';
 import TableExportModal from '../core/TableExportModal.vue';
@@ -228,6 +231,18 @@ export default defineComponent({
         enableExport: {
             type: Boolean,
             default: false
+        },
+        endpointType: {
+            type: Object as PropType<ExportableEndpointType | undefined>,
+            default: undefined
+        },
+        endpointTokenParameters: {
+            type: Array<string>,
+            default: []
+        },
+        endpointBodyParameters: {
+            type: Object as PropType<any>,
+            default: undefined
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],

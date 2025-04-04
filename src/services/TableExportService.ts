@@ -12,20 +12,20 @@ export class TableExportService extends BaseService {
 
     async exportDocumentTable(body: DocumentCSVExportRequest): Promise<void> {
         const response = await axios.post(this.basePath + "csv-export/documents", body, {responseType: 'blob'});
-        this.downloadReport(response, body.exportFileType);
+        this.downloadExportFile(response, body.exportFileType);
     }
 
     async exportPersonTable(body: CSVExportRequest): Promise<void> {
         const response = await axios.post(this.basePath + "csv-export/persons", body, {responseType: 'blob'});
-        this.downloadReport(response, body.exportFileType);
+        this.downloadExportFile(response, body.exportFileType);
     }
 
     async exportOrganisationUnitTable(body: CSVExportRequest): Promise<void> {
         const response = await axios.post(this.basePath + "csv-export/organisation-units", body, {responseType: 'blob'});
-        this.downloadReport(response, body.exportFileType);
+        this.downloadExportFile(response, body.exportFileType);
     }
 
-    async downloadReport(response: AxiosResponse<any, any>, fileType: ExportFileFormat) {
+    async downloadExportFile(response: AxiosResponse<any, any>, fileType: ExportFileFormat) {
         const extension = fileType === ExportFileFormat.CSV ? ".csv" : ".xsl";
         this.initialzeDownload(response, `report${extension}`, extension);
     }

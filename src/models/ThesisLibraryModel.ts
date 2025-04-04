@@ -1,4 +1,4 @@
-import { type MultilingualContent } from "./Common";
+import { type DocumentCSVExportRequest, type MultilingualContent } from "./Common";
 import { ThesisType } from "./PublicationModel"
 
 
@@ -36,4 +36,8 @@ export interface ThesisSearchRequest {
     showOnlyOpenAccess: boolean;
     dateFrom: string;
     dateTo: string;
+}
+
+export interface ThesisCSVExportRequest extends DocumentCSVExportRequest {
+    thesisSearchRequest: ThesisSearchRequest
 }

@@ -26,7 +26,9 @@
         :export-ids="(selectedPersons.map(person => person.databaseId) as number[])"
         :disabled="selectedPersons.length === 0"
         :potential-max-amount-requested="selectedPersons.length >= tableOptions.itemsPerPage"
-        :total-results="totalPersons">
+        :total-results="totalPersons"
+        :endpoint-type="endpointType"
+        :endpoint-token-parameters="endpointTokenParameters">
     </table-export-modal>
 
     <add-employment-modal 
@@ -121,7 +123,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
@@ -136,7 +138,7 @@ import IdentifierLink from '../core/IdentifierLink.vue';
 import InvolvementService from '@/services/InvolvementService';
 import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import { ExportEntity } from '@/models/Common';
+import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 
 
@@ -171,6 +173,14 @@ export default defineComponent({
         enableExport: {
             type: Boolean,
             default: false
+        },
+        endpointType: {
+            type: Object as PropType<ExportableEndpointType | undefined>,
+            default: undefined
+        },
+        endpointTokenParameters: {
+            type: Array<string>,
+            default: []
         }
     },
     emits: ["switchPage", "dragged", "delete"],

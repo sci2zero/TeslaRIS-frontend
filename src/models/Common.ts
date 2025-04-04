@@ -158,7 +158,19 @@ export enum ExportFileFormat {
 export enum ExportEntity {
     PERSON = "PERSON",
     ORGANISATION_UNIT = "ORGANISATION_UNIT",
-    DOCUMENT = "DOCUMENT"
+    DOCUMENT = "DOCUMENT",
+    THESIS = "THESIS"
+}
+
+export enum ExportableEndpointType {
+    PERSON_SEARCH = "PERSON_SEARCH",
+    DOCUMENT_SEARCH = "DOCUMENT_SEARCH",
+    ORGANISATION_UNIT_SEARCH = "ORGANISATION_UNIT_SEARCH",
+    PERSON_OUTPUTS = "PERSON_OUTPUTS",
+    ORGANISATION_UNIT_OUTPUTS = "ORGANISATION_UNIT_OUTPUTS",
+    ORGANISATION_UNIT_EMPLOYEES = "ORGANISATION_UNIT_EMPLOYEES",
+    THESIS_SIMPLE_SEARCH = "THESIS_SIMPLE_SEARCH",
+    THESIS_ADVANCED_SEARCH = "THESIS_ADVANCED_SEARCH"
 }
 
 export interface CSVExportRequest {
@@ -168,6 +180,8 @@ export interface CSVExportRequest {
     bulkExportOffset: number;
     exportLanguage: string;
     exportFileType: ExportFileFormat;
+    endpointType?: ExportableEndpointType;
+    endpointTokenParameters?: string[];
 }
 
 

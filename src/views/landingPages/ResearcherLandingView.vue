@@ -226,17 +226,30 @@
                 </v-btn>
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
+                    :endpoint-token-parameters="[`${person?.id}`]"
+                    @switch-page="switchPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view
+                        :entity-indicators="personIndicators"
+                        :statistics-type="StatisticsType.VIEW">
+                    </statistics-view>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <person-assessments-view :assessments="personAssessments" :is-loading="assessmentsLoading" @fetch="fetchAssessment"></person-assessments-view>
+                <person-assessments-view
+                    :assessments="personAssessments"
+                    :is-loading="assessmentsLoading"
+                    @fetch="fetchAssessment">
+                </person-assessments-view>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -247,7 +260,7 @@
 </template>
 
 <script lang="ts">
-import type { MultilingualContent, Country } from '@/models/Common';
+import { type MultilingualContent, type Country, ExportableEndpointType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
 import { computed, onMounted } from 'vue';
@@ -605,7 +618,8 @@ export default defineComponent({
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
             currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
-            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading
+            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
+            ExportableEndpointType
         };
 }});
 </script>

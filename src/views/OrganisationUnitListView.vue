@@ -21,6 +21,8 @@
             :organisation-units="organisationUnits"
             :total-o-us="totalOUs"
             enable-export
+            :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
+            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
             @switch-page="switchPage">
         </organisation-unit-table-component>
     </v-container>
@@ -36,6 +38,7 @@ import type { OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserRole } from '@/composables/useUserRole';
+import { ExportableEndpointType } from '@/models/Common';
 
 
 export default defineComponent({
@@ -102,10 +105,10 @@ export default defineComponent({
 
         return {
             search, organisationUnits, totalOUs,
-            switchPage, addOU, isAdmin,
+            switchPage, addOU, isAdmin, searchParams,
             clearSortAndPerformSearch, tableRef,
             returnOnlyInstitutionRelatedEntities,
-            isUserBoundToOU
+            isUserBoundToOU, ExportableEndpointType
         };
     }
 });

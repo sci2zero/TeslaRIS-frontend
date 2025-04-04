@@ -724,5 +724,6 @@ export default {
     exportFileFormatLabel: "Format izvezenog fajla",
     exportAllLabel: "Izvezi sve",
     exportColumnsLabel: "Kolone za izvoz",
-    pageLabel: "Broj Stranice (izvozi se u stranicama od po {0} slogova)"
+    pageLabel: "Broj Stranice (izvozi se u stranicama od po {0} slogova)",
+    exportLabel: "Izvezi"
 }

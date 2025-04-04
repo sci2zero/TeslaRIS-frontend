@@ -123,14 +123,28 @@
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    @switch-page="switchPublicationsPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
                 <!-- Employees -->
                 <h1>{{ $t("employeesLabel") }}</h1>
                 <person-table-component
-                    :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true)"></person-table-component>
+                    :persons="employees"
+                    :total-persons="totalEmployees"
+                    :employment-institution-id="organisationUnit?.id"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    @switch-page="switchEmployeesPage"
+                    @delete="fetchEmployees(true)">
+                </person-table-component>
 
                 <div v-if="totalAlumni > 0">
                     <h1>{{ $t("alumniLabel") }}</h1>
@@ -155,7 +169,11 @@
                     <h1>{{ $t("subUnitsLabel") }}</h1>
                     <v-row>
                         <v-col>
-                            <organisation-unit-table-component :organisation-units="subUnits" :total-o-us="totalSubUnits" @switch-page="switchSubUnitsPage"></organisation-unit-table-component>
+                            <organisation-unit-table-component
+                                :organisation-units="subUnits"
+                                :total-o-us="totalSubUnits"
+                                @switch-page="switchSubUnitsPage">
+                            </organisation-unit-table-component>
                         </v-col>
                     </v-row>
                 </div>
@@ -200,7 +218,7 @@ import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
-import type { MultilingualContent } from '@/models/Common';
+import { ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
@@ -508,10 +526,8 @@ export default defineComponent({
         };
 
         return {
-            organisationUnit,
-            ouIcon, currentTab,
-            publications, 
-            totalPublications,
+            organisationUnit, ouIcon, currentTab,
+            publications, totalPublications,
             employees, totalEmployees,
             switchPublicationsPage,
             switchEmployeesPage, isAdmin,
@@ -523,7 +539,8 @@ export default defineComponent({
             subUnits, totalSubUnits, switchSubUnitsPage,
             alumni, totalAlumni, switchAlumniPage,
             OrganisationUnitUpdateForm, fetchEmployees,
-            ouIndicators, StatisticsType, loginStore
+            ouIndicators, StatisticsType, loginStore,
+            ExportableEndpointType
         };
 }})
 

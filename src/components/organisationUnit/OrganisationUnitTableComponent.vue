@@ -21,7 +21,9 @@
         :export-ids="(selectedOUs.map(orgUnit => orgUnit.databaseId) as number[])"
         :disabled="selectedOUs.length === 0"
         :potential-max-amount-requested="selectedOUs.length >= tableOptions.itemsPerPage"
-        :total-results="totalOUs">
+        :total-results="totalOUs"
+        :endpoint-type="endpointType"
+        :endpoint-token-parameters="endpointTokenParameters">
     </table-export-modal>
 
     <v-data-table-server
@@ -117,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
@@ -126,7 +128,7 @@ import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
 import { useUserRole } from '@/composables/useUserRole';
-import { ExportEntity } from '@/models/Common';
+import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 
 export default defineComponent({
@@ -144,6 +146,14 @@ export default defineComponent({
         enableExport: {
             type: Boolean,
             default: false
+        },
+        endpointType: {
+            type: Object as PropType<ExportableEndpointType | undefined>,
+            default: undefined
+        },
+        endpointTokenParameters: {
+            type: Array<string>,
+            default: []
         }
     },
     emits: ["switchPage"],

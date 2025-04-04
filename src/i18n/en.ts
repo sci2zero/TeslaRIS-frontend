@@ -718,5 +718,12 @@ export default {
     libraryFormatsLabel: "Library formats",
     newSearchLabel: "New query",
     applyFiltersLabel: "Apply",
-    resetFiltersLabel: "Reset"
+    resetFiltersLabel: "Reset",
+    filesForDownloadLabel: "Downloadable files",
+    exportTableLabel: "Export table",
+    exportFileFormatLabel: "Export file format",
+    exportAllLabel: "Export all",
+    exportColumnsLabel: "Export columns",
+    pageLabel: "Page Number (export is performed in batches of {0} records)",
+    exportLabel: "Export"
 }

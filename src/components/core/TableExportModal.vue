@@ -70,7 +70,7 @@
                                     ></v-text-field>
                                 </v-col>
                             </v-row>
-                            <v-container v-if="exportEntity === ExportEntity.DOCUMENT">
+                            <v-container v-if="exportEntity === ExportEntity.DOCUMENT || exportEntity === ExportEntity.THESIS">
                                 <h4>{{ $t("citationFormatsLabel") }}</h4>
                                 <v-row>
                                     <v-col cols="3" sm="2">
@@ -124,7 +124,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, type PropType, ref, watch } from "vue";
-import { type CSVExportRequest, type DocumentCSVExportRequest, ExportEntity, ExportFileFormat, type SearchFieldsResponse } from "@/models/Common";
+import { type CSVExportRequest, type DocumentCSVExportRequest, ExportableEndpointType, ExportEntity, ExportFileFormat, type SearchFieldsResponse } from "@/models/Common";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { useI18n } from "vue-i18n";
@@ -133,6 +133,9 @@ import { useValidationUtils } from "@/utils/ValidationUtils";
 import TableExportService from "@/services/TableExportService";
 import PersonService from "@/services/PersonService";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
+import { type ThesisCSVExportRequest } from "@/models/ThesisLibraryModel";
+import ThesisLibrarySearchService from "@/services/thesisLibrary/ThesisLibrarySearchService";
+import ThesisLibraryCSVExportService from "@/services/thesisLibrary/ThesisLibraryCSVExportService";
 
 
 export default defineComponent({
@@ -157,6 +160,18 @@ export default defineComponent({
         totalResults: {
             type: Number,
             required: true
+        },
+        endpointType: {
+            type: Object as PropType<ExportableEndpointType | undefined>,
+            default: undefined
+        },
+        endpointTokenParameters: {
+            type: Array<string>,
+            default: []
+        },
+        endpointBodyParameters: {
+            type: Object as PropType<any>,
+            default: undefined
         }
     },
     setup(props) {
@@ -187,7 +202,8 @@ export default defineComponent({
         const serviceMap = {
             [ExportEntity.DOCUMENT]: DocumentPublicationService,
             [ExportEntity.PERSON]: PersonService,
-            [ExportEntity.ORGANISATION_UNIT]: OrganisationUnitService
+            [ExportEntity.ORGANISATION_UNIT]: OrganisationUnitService,
+            [ExportEntity.THESIS]: ThesisLibrarySearchService
         };
 
         const fetchFields = async () => {
@@ -233,7 +249,9 @@ export default defineComponent({
                 exportMaxPossibleAmount: exportAll.value,
                 exportEntityIds: props.exportIds,
                 exportFileType: selectedExportFileFormat.value,
-                exportLanguage: selectedLang.value.value
+                exportLanguage: selectedLang.value.value,
+                endpointType: props.endpointType,
+                endpointTokenParameters: props.endpointTokenParameters
             };
 
             switch(props.exportEntity) {
@@ -242,6 +260,16 @@ export default defineComponent({
                     break;
                 case ExportEntity.ORGANISATION_UNIT:
                     TableExportService.exportOrganisationUnitTable(exportRequest as DocumentCSVExportRequest);
+                    break;
+                case ExportEntity.THESIS:
+                    (exportRequest as ThesisCSVExportRequest).thesisSearchRequest = props.endpointBodyParameters;
+                    (exportRequest as ThesisCSVExportRequest).apa = apa.value;
+                    (exportRequest as ThesisCSVExportRequest).mla = mla.value;
+                    (exportRequest as ThesisCSVExportRequest).harvard = harvard.value;
+                    (exportRequest as ThesisCSVExportRequest).chicago = chicago.value;
+                    (exportRequest as ThesisCSVExportRequest).vancouver = vancouver.value;
+
+                    ThesisLibraryCSVExportService.exportThesisLibraryTable(exportRequest as ThesisCSVExportRequest);
                     break;
                 case ExportEntity.DOCUMENT:
                     (exportRequest as DocumentCSVExportRequest).apa = apa.value;

@@ -24,7 +24,7 @@
         <v-tabs-window-item value="advancedSearch">
             <query-input-component
                 @search="clearSortAndPerformSearch($event)"
-                @reset="filtersRef?.resetFilters; search([]);">
+                @reset="resetFiltersAndSearch">
             </query-input-component>
         </v-tabs-window-item>
     </v-tabs-window>
@@ -37,18 +37,24 @@
         @reset="search(searchParams)">
     </filter-bar-component>
 
-    <v-row class="d-flex flex-row justify-center mt-15">
-        <v-col cols="12" sm="10">
-            <publication-table-component
-                ref="tableRef"
-                class="mt-15"
-                :publications="theses"
-                :total-publications="totalTheses"
-                rich-results-view
-                @switch-page="switchPage">
-            </publication-table-component>
-        </v-col>
-    </v-row>
+    <section ref="sectionTableRef">
+        <v-row class="d-flex flex-row justify-center mt-15">
+            <v-col cols="12" sm="10">
+                <publication-table-component
+                    id="resultsTable"
+                    ref="tableRef"
+                    class="mt-15"
+                    :publications="theses"
+                    :total-publications="totalTheses"
+                    rich-results-view
+                    enable-export
+                    :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.THESIS_SIMPLE_SEARCH : ExportableEndpointType.THESIS_ADVANCED_SEARCH"
+                    :endpoint-body-parameters="lastSearchRequest"
+                    @switch-page="switchPage">
+                </publication-table-component>
+            </v-col>
+        </v-row>
+    </section>
 </template>
 
 <script lang="ts">
@@ -65,6 +71,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import ThesisLibrarySearchService from '@/services/thesisLibrary/ThesisLibrarySearchService';
 import FilterBarComponent from '@/components/core/FilterBarComponent.vue';
 import ThesisFilters from '@/components/thesisLibrary/ThesisFilters.vue';
+import { ExportableEndpointType } from '@/models/Common';
 
 
 export default defineComponent({
@@ -79,6 +86,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const tableRef = ref<typeof PublicationTableComponent>();
+        const sectionTableRef = ref<HTMLElement | null>(null);
         const searchParams = ref<string[]>([]);
         const theses = ref<DocumentPublicationIndex[]>([]);
         const totalTheses = ref(0);
@@ -86,6 +94,7 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+        const lastSearchRequest = ref<ThesisSearchRequest>();
 
         const thesisTypes = computed(() => getThesisTypesForGivenLocale());
         const selectedThesisType = ref<{title: string, value: ThesisType}>({title: getThesisTitleFromValueAutoLocale(ThesisType.PHD) as string, value: ThesisType.PHD});
@@ -98,15 +107,6 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("routeLabel.thesisLibrarySearch");
         });
-
-        const generateReportRequest = () => {
-            reportRequest.value = {
-                fromDate: dateFrom.value,
-                toDate: dateTo.value,
-                thesisType: selectedThesisType.value.value,
-                topLevelInstitutionIds: selectedOUs.value.map(selectedOU => selectedOU.value)
-            };
-        };
 
         const search = (tokenParams: string[]) => {
             searchParams.value = tokenParams;
@@ -129,6 +129,8 @@ export default defineComponent({
                 };
             }
 
+            lastSearchRequest.value = searchRequest;
+
             if (currentTab.value === "simpleSearch") {
                 ThesisLibrarySearchService.performSimpleSearch(
                     searchRequest,
@@ -146,6 +148,8 @@ export default defineComponent({
                     totalTheses.value = response.data.totalElements;
                 });
             }
+
+            sectionTableRef.value?.scrollIntoView({ behavior: 'smooth' });
         };
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
@@ -168,18 +172,27 @@ export default defineComponent({
             search(searchParams.value);
         };
 
+        const resetFiltersAndSearch = () => {
+            filtersRef.value?.resetFilters();
+            filtersRef.value!.isExpanded = false;
+            search([]);
+        };
+
         return {
             isFormValid, thesisTypes,
             selectedThesisType,
             requiredSelectionRules,
             selectedOUs, dateFrom,
             dateTo, reportRequest,
-            generateReportRequest,
             currentTab, tableRef,
             clearSortAndPerformSearch,
             theses, totalTheses,
             switchPage, ThesisFilters,
-            filtersRef, search, searchParams
+            filtersRef, search, searchParams,
+            ExportableEndpointType,
+            lastSearchRequest,
+            resetFiltersAndSearch,
+            sectionTableRef
         };
     }
 });
