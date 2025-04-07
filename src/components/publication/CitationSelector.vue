@@ -13,18 +13,7 @@
             <v-card class="d-flex flex-column align-right pa-4">
                 <v-card-title>{{ $t("citePublicationLabel") }}</v-card-title>
                 <v-card-text class="text-right">
-                    <v-list lines="two" class="w-100">
-                        <v-list-item v-for="(value, key) in citation" :key="key">
-                            <template #title>
-                                <div class="citation">
-                                    {{ value }}
-                                </div>
-                            </template>
-                            <template #subtitle>
-                                <strong>{{ key.toUpperCase() }}</strong>
-                            </template>
-                        </v-list-item>
-                    </v-list>
+                    <citation-formats :citation="citation"></citation-formats>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -43,9 +32,11 @@ import { type CitationResponse } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { onMounted, ref } from "vue";
 import { defineComponent } from "vue";
+import CitationFormats from "./CitationFormats.vue";
 
 export default defineComponent({
     name: "CitationSelector",
+    components: { CitationFormats },
     props: {
         documentId: {
             type: Number,
@@ -80,12 +71,6 @@ export default defineComponent({
 .narrow {
     width: 100%;
     max-width: 650px;
-}
-
-.citation {
-    white-space: normal;
-    word-wrap: break-word;
-    text-align: justify;
 }
 
 </style>

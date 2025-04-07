@@ -30,6 +30,9 @@
             <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
+            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
+                <v-checkbox v-model="input.isBoardPresident" :label="$t('boardPresidentLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+            </v-col>
         </v-row>
     </v-container>
 </template>
@@ -89,6 +92,7 @@ export default defineComponent({
                     contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType}, 
                     isMainContributor: contribution.isMainContributor, 
                     isCorrespondingContributor: contribution.isCorrespondingContributor,
+                    isBoardPresident: contribution.isBoardPresident,
                     id: contribution.id});
                 });
             }
@@ -107,11 +111,13 @@ export default defineComponent({
         const addInput = () => {
             inputs.value.push({
                 contributionType: {
-                    title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR), 
+                    title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR),
                     value: DocumentContributionType.AUTHOR
                 }, 
                 isMainContributor: false, 
-                isCorrespondingContributor: false});
+                isCorrespondingContributor: false,
+                isBoardPresident: false
+            });
         };
 
         const removeInput = (index: number) => {
@@ -160,13 +166,18 @@ export default defineComponent({
                                     contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
                                     isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
                                     isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
+                                    isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
                                     institutionIds: input.contribution.institutionIds
                                 });
             });
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, contributionTypes, sendContentToParent, baseContributionRef, clearInput}
+        return {
+            inputs, addInput, removeInput,
+            contributionTypes, sendContentToParent,
+            baseContributionRef, clearInput
+        }
     }
 });
 </script>

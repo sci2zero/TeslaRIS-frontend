@@ -18,7 +18,7 @@
                     :rules="requiredNumericFieldRules"></v-text-field>
             </v-col>
         </v-row>
-        <v-row v-if="userRole !== 'COMMISSION' && userRole !== 'VICE_DEAN_FOR_SCIENCE'">
+        <v-row v-if="!isCommission && !isViceDeanForScience">
             <v-col>
                 <commission-autocomplete-search v-model="selectedCommission" :read-only="presetClassification !== undefined" required></commission-autocomplete-search>
             </v-col>
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch, type PropType } from 'vue';
+import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
@@ -42,7 +42,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification, DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
-import UserService from '@/services/UserService';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -70,7 +70,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isCommission, isViceDeanForScience } = useUserRole();
 
         onMounted(() => {
             fetchDetails();
@@ -133,7 +133,8 @@ export default defineComponent({
             assessmentClassifications,
             selectedAssessmentClassification,
             requiredNumericFieldRules,
-            classificationYear, userRole
+            classificationYear, isCommission,
+            isViceDeanForScience
         };
     }
 });

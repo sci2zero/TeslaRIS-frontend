@@ -38,6 +38,7 @@ export interface EventIndex {
     databaseId: number;
     eventType: EventType;
     serialEvent: boolean;
+    classifiedBy?: number[];
 }
   
 export interface PersonEventContribution extends PersonContribution {

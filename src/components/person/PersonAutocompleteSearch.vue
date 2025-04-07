@@ -3,7 +3,7 @@
         <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedPerson"
-                :label="(multiple ? $t('personListLabel') : $t('personLabel')) + (required ? '*' : '')"
+                :label="(label ? $t(label) : (multiple ? $t('personListLabel') : $t('personLabel'))) + (required ? '*' : '')"
                 :items="persons"
                 :custom-filter="((): boolean => true)"
                 :rules="requiredSelectionRules"
@@ -79,6 +79,10 @@ export default defineComponent({
         disableSubmission: {
             type: Boolean,
             default: false
+        },
+        label: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update:modelValue"],

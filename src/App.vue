@@ -3,7 +3,7 @@
         <v-main>
             <navbar />
             <breadcrumbs />
-            <router-view :key="$route.params.id" />
+            <router-view :key="$route.fullPath" />
         </v-main>
         <footerbar />
     </v-app>

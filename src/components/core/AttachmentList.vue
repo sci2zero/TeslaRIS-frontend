@@ -1,7 +1,13 @@
 <template>
     <v-card class="pa-3" variant="flat" color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-            <document-file-submission-modal v-if="canEdit" :is-proof="isProof" @create="sendDataToParent"></document-file-submission-modal>
+            <document-file-submission-modal
+                v-if="canEdit"
+                :is-proof="isProof"
+                :allow-licence-selection="allowLicenceSelection"
+                :disable-resource-type-selection="disableResourceTypeSelection"
+                @create="sendDataToParent">
+            </document-file-submission-modal>
 
             <v-row>
                 <v-list
@@ -34,15 +40,20 @@
 
                             <template #append>
                                 <v-row v-if="canEdit">
-                                    <v-col>
+                                    <v-col v-if="!disableUpdates || isAdmin || isHeadOfLibrary">
                                         <v-btn
                                             icon variant="outlined" size="x-small" color="primary"
                                             class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
                                             <v-icon size="x-large" icon="mdi-delete"></v-icon>
                                         </v-btn>
                                     </v-col>
-                                    <v-col>
-                                        <document-file-submission-modal :is-proof="isProof" edit :preset-document-file="attachment" @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
+                                    <v-col v-if="!disableUpdates">
+                                        <document-file-submission-modal
+                                            :is-proof="isProof" edit :preset-document-file="attachment"
+                                            :allow-licence-selection="allowLicenceSelection"
+                                            :disable-resource-type-selection="disableResourceTypeSelection"
+                                            @update="sendUpdateRequestToParent($event, attachment.id)"
+                                        ></document-file-submission-modal>
                                     </v-col>
                                 </v-row>
                             </template>
@@ -70,6 +81,7 @@ import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { getResourceTypeTitleFromValueAutoLocale } from '@/i18n/resourceType';
 import Toast from './Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -91,12 +103,26 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        allowLicenceSelection: {
+            type: Boolean,
+            default: false
+        },
+        disableUpdates: {
+            type: Boolean,
+            default: false
+        },
+        disableResourceTypeSelection: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "delete", "update"],
     setup(_, { emit }) {
         const errorMessage = ref("");
         const snackbar = ref(false);
+
+        const { isAdmin, isHeadOfLibrary } = useUserRole();
 
         const i18n = useI18n();
 
@@ -124,9 +150,12 @@ export default defineComponent({
             emit("delete", attachmentId);
         };
 
-        return {download, sendDataToParent, sendDeleteRequestToParent, 
-                sendUpdateRequestToParent, returnCurrentLocaleContent, 
-                errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale};
+        return {
+            download, sendDataToParent, sendDeleteRequestToParent, 
+            sendUpdateRequestToParent, returnCurrentLocaleContent, isAdmin,
+            errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale,
+            isHeadOfLibrary
+        };
     }
 });
 </script>

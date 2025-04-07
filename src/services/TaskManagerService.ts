@@ -1,9 +1,9 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { ReportType, ScheduledTaskResponse } from "@/models/Common";
+import { type ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
-import { EntityClassificationSource, type PublicationAssessmentRequest } from "@/models/AssessmentModel";
+import { EntityClassificationSource, ReportType, type PublicationAssessmentRequest } from "@/models/AssessmentModel";
 import { PublicationType } from "@/models/PublicationModel";
 
 export class TaskSchedulingService extends BaseService {

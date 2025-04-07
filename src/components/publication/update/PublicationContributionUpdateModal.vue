@@ -88,7 +88,8 @@ export default defineComponent({
                                 },
                     contributionType: contribution.contributionType,
                     isMainContributor: contribution.isMainContributor,
-                    isCorrespondingContributor: contribution.isCorrespondingContributor
+                    isCorrespondingContributor: contribution.isCorrespondingContributor,
+                    isBoardPresident: contribution.isBoardPresident
                 });
 
             });

@@ -37,6 +37,7 @@
                             in-modal
                             @create="emitToParent"
                             @update="emitToParent"
+                            @update-persist="emitToParentAndPersist"
                         />
                     </v-container>
                 </v-card-text>
@@ -99,7 +100,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ["create", "update"],
+    emits: ["create", "update", "updatePersist"],
     setup(props, { emit }) {
         const dialog = ref(false);
         const formRef = ref<InstanceType<typeof props.formComponent>>();
@@ -114,7 +115,14 @@ export default defineComponent({
             dialog.value = false;
         }
 
-        return { dialog, formRef, emitToParent };
+        const emitToParentAndPersist = (formData: any) => {
+            emit("updatePersist", formData);
+        }
+
+        return { 
+            dialog, formRef, emitToParent,
+            emitToParentAndPersist
+        };
     }
 });
 </script>

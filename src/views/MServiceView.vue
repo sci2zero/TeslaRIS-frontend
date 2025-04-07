@@ -108,9 +108,9 @@
 
             <v-row justify="center" class="mt-5">
                 <v-col cols="12" sm="4" md="2">
-                    <vue-recaptcha 
+                    <vue-recaptcha
                         ref="vueRecaptcha"
-                        :sitekey="siteKey" 
+                        :sitekey="siteKey"
                         size="normal"
                         theme="light"
                         :hl="locale"

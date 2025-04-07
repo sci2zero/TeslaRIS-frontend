@@ -128,7 +128,6 @@ export default defineComponent({
 
         watch([fromYear, toYear], () => {
             if (fromYear.value > 1999 && toYear.value > 1999) {
-                console.log(fromYear.value, toYear.value)
                 emit("yearsUpdated", fromYear.value, toYear.value);
             }
         });

@@ -123,14 +123,28 @@
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    @switch-page="switchPublicationsPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
                 <!-- Employees -->
                 <h1>{{ $t("employeesLabel") }}</h1>
                 <person-table-component
-                    :persons="employees" :total-persons="totalEmployees" :employment-institution-id="organisationUnit?.id" @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true)"></person-table-component>
+                    :persons="employees"
+                    :total-persons="totalEmployees"
+                    :employment-institution-id="organisationUnit?.id"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    @switch-page="switchEmployeesPage"
+                    @delete="fetchEmployees(true)">
+                </person-table-component>
 
                 <div v-if="totalAlumni > 0">
                     <h1>{{ $t("alumniLabel") }}</h1>
@@ -143,7 +157,7 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit" @update="updateRelations"></organisation-unit-relation-update-modal>
+                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations"></organisation-unit-relation-update-modal>
 
                                 <div><b>{{ $t("relationsLabel") }}</b></div>
                                 <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
@@ -155,7 +169,11 @@
                     <h1>{{ $t("subUnitsLabel") }}</h1>
                     <v-row>
                         <v-col>
-                            <organisation-unit-table-component :organisation-units="subUnits" :total-o-us="totalSubUnits" @switch-page="switchSubUnitsPage"></organisation-unit-table-component>
+                            <organisation-unit-table-component
+                                :organisation-units="subUnits"
+                                :total-o-us="totalSubUnits"
+                                @switch-page="switchSubUnitsPage">
+                            </organisation-unit-table-component>
                         </v-col>
                     </v-row>
                 </div>
@@ -200,7 +218,7 @@ import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
-import type { MultilingualContent } from '@/models/Common';
+import { ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
@@ -219,6 +237,7 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -281,16 +300,18 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
+        const { isAdmin } = useUserRole();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+
+                StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             }
 
             fetchOU(true);
-            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 ouIndicators.value = response.data;
             });
@@ -505,13 +526,11 @@ export default defineComponent({
         };
 
         return {
-            organisationUnit,
-            ouIcon, currentTab,
-            publications, 
-            totalPublications,
+            organisationUnit, ouIcon, currentTab,
+            publications, totalPublications,
             employees, totalEmployees,
             switchPublicationsPage,
-            switchEmployeesPage,
+            switchEmployeesPage, isAdmin,
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
@@ -520,7 +539,8 @@ export default defineComponent({
             subUnits, totalSubUnits, switchSubUnitsPage,
             alumni, totalAlumni, switchAlumniPage,
             OrganisationUnitUpdateForm, fetchEmployees,
-            ouIndicators, StatisticsType, loginStore
+            ouIndicators, StatisticsType, loginStore,
+            ExportableEndpointType
         };
 }})
 

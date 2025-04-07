@@ -1,5 +1,38 @@
 <template>
-    <v-row v-if="canEdit || (fileItems && fileItems.length > 0)">
+    <v-row v-if="canEditThesisAttachments || (preliminaryFiles?.length > 0 && isOnPublicReview)" class="mt-10">
+        <v-col cols="12">
+            <h2>{{ $t("preliminaryFilesLabel") }}</h2>
+            <attachment-list
+                :attachments="preliminaryFiles" :can-edit="canEditThesisAttachments" :in-comparator="inComparator"
+                allow-licence-selection disable-updates
+                disable-resource-type-selection
+                @create="addThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
+                @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"></attachment-list>
+        </v-col>
+    </v-row>
+    <v-row v-if="canEditThesisAttachments || (preliminarySupplements?.length > 0 && isOnPublicReview)" class="mt-10">
+        <v-col cols="12">
+            <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
+            <attachment-list
+                :attachments="preliminarySupplements" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
+                allow-licence-selection disable-updates 
+                disable-resource-type-selection
+                @create="addThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
+                @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"></attachment-list>
+        </v-col>
+    </v-row>
+    <v-row v-if="canEditThesisAttachments || (commissionReports?.length > 0 && isOnPublicReview)" class="mt-10">
+        <v-col cols="12">
+            <h2>{{ $t("commissionReportsLabel") }}</h2>
+            <attachment-list
+                :attachments="commissionReports" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
+                allow-licence-selection disable-updates 
+                disable-resource-type-selection
+                @create="addThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
+                @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"></attachment-list>
+        </v-col>
+    </v-row>
+    <v-row v-if="canEdit || (fileItems && fileItems.length > 0)" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <attachment-list
@@ -19,11 +52,12 @@
 
 <script lang="ts">
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import AttachmentList from "./AttachmentList.vue";
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
-import type { DocumentFileResponse } from "@/models/DocumentFileModel";
-import type { Document } from "@/models/PublicationModel";
+import { addAttachment, updateAttachment, deleteAttachment, addThesisAttachment, deleteThesisAttachment } from "@/utils/AttachmentUtil";
+import { ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
+import type { Document, Thesis } from "@/models/PublicationModel";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -38,8 +72,28 @@ export default defineComponent({
         type: Array as PropType<DocumentFileResponse[] | undefined>,
         required: true
     },
+    preliminaryFiles: {
+        type: Array<DocumentFileResponse>,
+        default: []
+    },
+    preliminarySupplements: {
+        type: Array<DocumentFileResponse>,
+        default: []
+    },
+    commissionReports: {
+        type: Array<DocumentFileResponse>,
+        default: []
+    },
+    isThesisSection: {
+        type: Boolean,
+        default: false
+    },
+    isOnPublicReview: {
+        type: Boolean,
+        default: false
+    },
     document: {
-        type: Object as PropType<Document | undefined>,
+        type: Object as PropType<Document | Thesis | undefined>,
         required: true
     },
     canEdit: {
@@ -52,9 +106,20 @@ export default defineComponent({
     }
   },
   emits: ["update:modelValue"],
-  setup() {
+  setup(props) {
+    const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+
+    const canEditThesisAttachments = computed(() => 
+        (
+            (props.canEdit && (isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)) ||
+            (isHeadOfLibrary.value && !props.isOnPublicReview)
+        ) && props.isThesisSection
+    );
+
     return {
-        addAttachment, updateAttachment, deleteAttachment
+        addAttachment, updateAttachment, deleteAttachment,
+        canEditThesisAttachments, addThesisAttachment,
+        deleteThesisAttachment, ThesisAttachmentType
     };
   },
 });

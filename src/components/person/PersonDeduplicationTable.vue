@@ -77,7 +77,11 @@ export default defineComponent({
         });
 
         const searchPotentialMatches = lodash.debounce(() => {
-            PersonService.searchResearchers(`tokens=${props.personFirstName}&tokens=${props.personLastName}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, true).then(response => {
+            PersonService.searchResearchers(
+                `tokens=${props.personFirstName}&tokens=${props.personLastName}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                true,
+                null)
+            .then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
             });

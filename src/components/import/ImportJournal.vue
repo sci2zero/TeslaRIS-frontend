@@ -129,7 +129,7 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
-            JournalService.searchJournals(`tokens=${props.publicationForLoading.journalName[0].content}&page=0&size=10`).then(response => {
+            JournalService.searchJournals(`tokens=${props.publicationForLoading.journalName[0].content}&page=0&size=10`, null).then(response => {
                 potentialMatches.value = response.data.content;
                 totalJournals.value = response.data.totalElements;
                 if (totalJournals.value === 0) {

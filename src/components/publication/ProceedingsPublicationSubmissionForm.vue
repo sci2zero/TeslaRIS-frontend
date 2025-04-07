@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && isResearcher">
                     <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -153,9 +153,9 @@ import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import Toast from '../core/Toast.vue';
-import UserService from '@/services/UserService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -246,11 +246,11 @@ export default defineComponent({
             });
         };
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
 
         watch(selectedEvent, (newValue) => {
             if (newValue) {
-                if (userRole.value === "RESEARCHER") {
+                if (isResearcher.value) {
                     listPublications(newValue);
                 }
                 availableProceedings.value = [];
@@ -342,7 +342,7 @@ export default defineComponent({
             myPublications, doiValidationRules, selectNewlyAddedProceedings,
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType, errorMessage,
-            contributions, contributionsRef, scopusIdValidationRules, userRole,
+            contributions, contributionsRef, scopusIdValidationRules, isResearcher,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
             searchPlaceholder, ProceedingsSubmissionForm

@@ -104,7 +104,7 @@ export default defineComponent({
             if (!input || input.includes("|")) return;
             if (input.length >= 3) {
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
-                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false).then((response) => {
+                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
                         title: `${i18n.locale.value === "sr" ? conference.nameSr : conference.nameOther} | ${extractDate(conference.dateFromTo)}`,
                         value: conference.databaseId,

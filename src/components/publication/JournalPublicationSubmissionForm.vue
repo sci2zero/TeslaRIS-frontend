@@ -20,7 +20,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
+                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0 && isResearcher">
                     <v-col><h3>{{ $t("noRecentPublicationsJournalLabel") }}</h3></v-col>
                 </v-row>
 
@@ -143,7 +143,7 @@ import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import { getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
-import UserService from '@/services/UserService';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -210,10 +210,10 @@ export default defineComponent({
             }
         };
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
 
         watch(selectedJournal, (newValue) => {
-            if (newValue && userRole.value === "RESEARCHER") {
+            if (newValue && isResearcher.value) {
                 listPublications(newValue);
             }
         });
@@ -283,7 +283,7 @@ export default defineComponent({
             additionalFields, snackbar, error, title, titleRef, subtitle,
             volume, issue, startPage, endPage, publicationYear, doi, scopus,
             articleNumber, numberOfPages, description, descriptionRef,
-            keywords, keywordsRef, userRole, uris, urisRef, doiValidationRules,
+            keywords, keywordsRef, isResearcher, uris, urisRef, doiValidationRules,
             selectedJournal, journalAutocompleteRef, myPublications,
             publicationTypes, selectedpublicationType, listPublications,
             contributions, contributionsRef, scopusIdValidationRules,

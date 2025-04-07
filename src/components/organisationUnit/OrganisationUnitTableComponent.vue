@@ -1,19 +1,31 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedOUs.length === 0"
+        v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedOUs.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
         @click="startEmploymentComparison">
         {{ $t("compareEmployeesLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
+
+    <table-export-modal
+        v-if="enableExport && loggedInUser"
+        :export-entity="ExportEntity.ORGANISATION_UNIT"
+        :export-ids="(selectedOUs.map(orgUnit => orgUnit.databaseId) as number[])"
+        :disabled="selectedOUs.length === 0"
+        :potential-max-amount-requested="selectedOUs.length >= tableOptions.itemsPerPage"
+        :total-results="totalOUs"
+        :endpoint-type="endpointType"
+        :endpoint-token-parameters="endpointTokenParameters">
+    </table-export-modal>
+
     <v-data-table-server
         v-model="selectedOUs"
         :sort-by="tableOptions.sortBy"
@@ -21,7 +33,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalOUs"
-        :show-select="userRole === 'ADMIN'"
+        :show-select="isAdmin"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -30,7 +42,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="userRole === 'ADMIN'">
+                <td v-if="isAdmin">
                     <v-checkbox
                         v-model="selectedOUs"
                         :value="row.item"
@@ -107,19 +119,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import UserService from '@/services/UserService';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
+import { useUserRole } from '@/composables/useUserRole';
+import { ExportableEndpointType, ExportEntity } from '@/models/Common';
+import TableExportModal from '../core/TableExportModal.vue';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, TableExportModal },
     props: {
         organisationUnits: {
             type: Array<OrganisationUnitIndex>,
@@ -128,7 +142,20 @@ export default defineComponent({
         totalOUs: {
             type: Number,
             required: true
-        }},
+        },
+        enableExport: {
+            type: Boolean,
+            default: false
+        },
+        endpointType: {
+            type: Object as PropType<ExportableEndpointType | undefined>,
+            default: undefined
+        },
+        endpointTokenParameters: {
+            type: Array<string>,
+            default: []
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedOUs = ref<OrganisationUnitIndex[]>([]);
@@ -143,7 +170,7 @@ export default defineComponent({
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
         const superOULabel = computed(() => i18n.t("superOULabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin, loggedInUser } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
@@ -244,10 +271,10 @@ export default defineComponent({
 
         return {
             selectedOUs, headers, notifications,
-            refreshTable, userRole, deleteSelection,
+            refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
-            startMetadataComparison
+            startMetadataComparison, ExportEntity, loggedInUser
         };
     }
 });

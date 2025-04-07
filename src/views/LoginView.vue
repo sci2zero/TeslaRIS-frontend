@@ -72,6 +72,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useRouteStore } from "@/stores/routeStore";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import Toast from "@/components/core/Toast.vue";
+import UserService from "@/services/UserService";
 
 
 export default defineComponent(
@@ -145,9 +146,17 @@ export default defineComponent(
                     if (routeStore.nextRoute != null) {
                         const routeName = routeStore.fetchAndClearRoute();
                         const routeParams = routeStore.fetchAndClearParams();
+                        
                         router.push({ name: routeName, params: routeParams });
                         return;
                     }
+
+                    const userRole = UserService.provideUserRole();
+                    if (userRole === "INSTITUTIONAL_LIBRARIAN" || userRole === "HEAD_OF_LIBRARY") {
+                        router.push({ name: "scientificResults" });
+                        return;
+                    }
+
                     router.push({ name: "home" });
                 }).catch(() => {
                     snackbar.value = true;

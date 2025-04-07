@@ -32,3 +32,9 @@ export interface DocumentFile {
     resourceType: ResourceType;
     license: License;
 }
+
+export enum ThesisAttachmentType {
+    FILE = "FILE",
+    SUPPLEMENT = "SUPPLEMENT",
+    COMMISSION_REPORT = "COMMISSION_REPORT"
+}
