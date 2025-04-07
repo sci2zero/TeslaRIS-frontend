@@ -6,17 +6,26 @@
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <span class="d-flex align-center">
-            <v-btn v-if="isAdmin" color="primary" @click="addJournal">
+            <v-btn
+                v-if="isAdmin"
+                class="mb-5"
+                color="primary"
+                @click="addJournal">
                 {{ $t("createNewJournalLabel") }}
             </v-btn>
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
-                class="ml-4 mt-5"
+                class="ml-4"
             ></v-checkbox>
         </span>
-        <journal-table-component ref="tableRef" :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+        <journal-table-component
+            ref="tableRef"
+            :journals="journals"
+            :total-journals="totalJournals"
+            @switch-page="switchPage">
+        </journal-table-component>
     </v-container>
 </template>
 

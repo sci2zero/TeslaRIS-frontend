@@ -247,8 +247,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `thesis/library-formats/${thesisId}`);
   }
 
-  async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
-    return super.sendRequest(axios.get, "document/fields");
+  async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, `document/fields?export=${onlyExportFields}`);
   }
 }
 

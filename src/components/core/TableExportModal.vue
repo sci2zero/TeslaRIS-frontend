@@ -209,7 +209,7 @@ export default defineComponent({
         const fetchFields = async () => {
             const service = serviceMap[props.exportEntity];
             if (service) {
-                service.getSearchFields().then(response => {
+                service.getSearchFields(true).then(response => {
                     fieldData.value = response.data;
                     populateFieldData();
                 });

@@ -1029,7 +1029,7 @@ const router = createRouter({
                     component: ThesisLibrarySearchView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.headOfLibrary, roles.admin],
+                        authorities: [roles.headOfLibrary, roles.admin, roles.institutionalLibrarian, roles.institutionalEditor, roles.researcher],
                     },
                 }
             ]

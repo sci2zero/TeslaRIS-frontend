@@ -203,7 +203,7 @@ export default defineComponent(
             
             const appTitle = ref();
             const sidebar = ref(false);
-            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole } = useUserRole();
+            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian } = useUserRole();
 
             const loginStore = useLoginStore();
             const userName = ref("");
@@ -284,7 +284,7 @@ export default defineComponent(
             ]);
 
             const thesisLibraryMenu = ref<MenuItem[]>([
-                { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting' },
+                { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value)) },
                 { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' }
             ]);
 
@@ -299,7 +299,7 @@ export default defineComponent(
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isHeadOfLibrary.value)) },
+                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isHeadOfLibrary.value || isResearcher.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)) },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },

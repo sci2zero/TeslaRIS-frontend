@@ -109,8 +109,8 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, `person/identifier-usage/${personId}?identifier=${encodeURIComponent(identifier)}`);
   }
 
-  async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
-    return super.sendRequest(axios.get, "person/fields");
+  async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, `person/fields?export=${onlyExportFields}`);
   }
 }
 

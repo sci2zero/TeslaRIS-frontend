@@ -79,8 +79,8 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/identifier-usage/${organisationUnitId}?identifier=${encodeURIComponent(identifier)}`);
   }
 
-  async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
-    return super.sendRequest(axios.get, "organisation-unit/fields");
+  async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, `organisation-unit/fields?export=${onlyExportFields}`);
   }
 }
 

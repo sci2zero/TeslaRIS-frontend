@@ -21,7 +21,7 @@
     </v-btn>
     
     <table-export-modal
-        v-if="enableExport"
+        v-if="enableExport && loggedInUser"
         :export-entity="ExportEntity.PERSON"
         :export-ids="(selectedPersons.map(person => person.databaseId) as number[])"
         :disabled="selectedPersons.length === 0"
@@ -208,7 +208,7 @@ export default defineComponent({
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
         const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
 
-        const { isAdmin, isInstitutionalEditor, isCommission } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isCommission, loggedInUser } = useUserRole();
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
@@ -327,7 +327,7 @@ export default defineComponent({
         };
 
         return {
-            selectedPersons, headers, notifications,
+            selectedPersons, headers, notifications, loggedInUser,
             refreshTable, isAdmin, deleteSelection, ExportEntity,
             tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
             localiseDate, startPublicationComparison, isCommission,

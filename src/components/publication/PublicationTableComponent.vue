@@ -24,7 +24,7 @@
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <table-export-modal
-        v-if="enableExport"
+        v-if="enableExport && loggedInUser"
         :export-entity="endpointBodyParameters ? ExportEntity.THESIS : ExportEntity.DOCUMENT"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"

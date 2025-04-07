@@ -16,7 +16,7 @@
     </v-btn>
 
     <table-export-modal
-        v-if="enableExport"
+        v-if="enableExport && loggedInUser"
         :export-entity="ExportEntity.ORGANISATION_UNIT"
         :export-ids="(selectedOUs.map(orgUnit => orgUnit.databaseId) as number[])"
         :disabled="selectedOUs.length === 0"
@@ -170,7 +170,7 @@ export default defineComponent({
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
         const superOULabel = computed(() => i18n.t("superOULabel"));
 
-        const { isAdmin } = useUserRole();
+        const { isAdmin, loggedInUser } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
@@ -274,7 +274,7 @@ export default defineComponent({
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
-            startMetadataComparison, ExportEntity
+            startMetadataComparison, ExportEntity, loggedInUser
         };
     }
 });

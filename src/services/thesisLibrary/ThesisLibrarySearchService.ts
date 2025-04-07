@@ -8,8 +8,8 @@ import type { ThesisSearchRequest } from "@/models/ThesisLibraryModel";
 
 export class ThesisLibrarySearchService extends BaseService {
 
-    async getSearchFields(): Promise<AxiosResponse<SearchFieldsResponse[]>> {
-        return super.sendRequest(axios.get, "thesis-library/search/fields");
+    async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+        return super.sendRequest(axios.get, `thesis-library/search/fields?export=${onlyExportFields}`);
     }
 
     async performSimpleSearch(body: ThesisSearchRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {

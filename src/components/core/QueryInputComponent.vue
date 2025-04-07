@@ -92,7 +92,7 @@ export default defineComponent({
         ]);
 
         const fetchFields = async () => {
-            ThesisLibrarySearchService.getSearchFields().then(response => {
+            ThesisLibrarySearchService.getSearchFields(false).then(response => {
                 fieldData.value = response.data;
                 populateFieldData();
             });
