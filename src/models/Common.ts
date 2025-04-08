@@ -60,7 +60,9 @@ export enum NotificationAction {
     APPROVE = "APPROVE",
     REMOVE_FROM_PUBLICATION = "REMOVE_FROM_PUBLICATION",
     PERFORM_DEDUPLICATION = "PERFORM_DEDUPLICATION",
-    BROWSE_CLAIMABLE_DOCUMENTS = "BROWSE_CLAIMABLE_DOCUMENTS"
+    BROWSE_CLAIMABLE_DOCUMENTS = "BROWSE_CLAIMABLE_DOCUMENTS",
+    PERFORM_EVENT_CLASSIFICATION = "PERFORM_EVENT_CLASSIFICATION",
+    PERFORM_DOCUMENT_ASSESSMENT = "PERFORM_DOCUMENT_ASSESSMENT"
 }
 
 export interface Notification {
@@ -140,4 +142,53 @@ export interface ApiKeyResponse {
     validUntil: string,
     clientEmail: string,
     dailyRequests: number
+}
+
+export interface SearchFieldsResponse {
+    a: string;
+    b: MultilingualContent[];
+    c: string;
+}
+
+export enum ExportFileFormat {
+    CSV = "CSV",
+    XLS = "XLS"
+}
+
+export enum ExportEntity {
+    PERSON = "PERSON",
+    ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    DOCUMENT = "DOCUMENT",
+    THESIS = "THESIS"
+}
+
+export enum ExportableEndpointType {
+    PERSON_SEARCH = "PERSON_SEARCH",
+    DOCUMENT_SEARCH = "DOCUMENT_SEARCH",
+    ORGANISATION_UNIT_SEARCH = "ORGANISATION_UNIT_SEARCH",
+    PERSON_OUTPUTS = "PERSON_OUTPUTS",
+    ORGANISATION_UNIT_OUTPUTS = "ORGANISATION_UNIT_OUTPUTS",
+    ORGANISATION_UNIT_EMPLOYEES = "ORGANISATION_UNIT_EMPLOYEES",
+    THESIS_SIMPLE_SEARCH = "THESIS_SIMPLE_SEARCH",
+    THESIS_ADVANCED_SEARCH = "THESIS_ADVANCED_SEARCH"
+}
+
+export interface CSVExportRequest {
+    columns: string[];
+    exportEntityIds: number[];
+    exportMaxPossibleAmount: boolean;
+    bulkExportOffset: number;
+    exportLanguage: string;
+    exportFileType: ExportFileFormat;
+    endpointType?: ExportableEndpointType;
+    endpointTokenParameters?: string[];
+}
+
+
+export interface DocumentCSVExportRequest extends CSVExportRequest {
+    apa: boolean;
+    mla: boolean;
+    harvard: boolean;
+    chicago: boolean;
+    vancouver: boolean;
 }

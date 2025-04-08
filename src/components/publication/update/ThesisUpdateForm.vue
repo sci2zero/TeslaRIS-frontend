@@ -2,7 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col v-if="!enterExternalOU" cols="11">
-                <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" :readonly="isInstitutionalLibrarian" required></organisation-unit-autocomplete-search>
             </v-col>
             <v-col v-else>
                 <multilingual-text-input
@@ -10,7 +10,7 @@
                     :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!isInstitutionalLibrarian">
             <v-col>
                 <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
                     {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
@@ -46,6 +46,22 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="6">
+                <date-picker
+                    v-model="topicAcceptanceDate"
+                    :label="$t('topicAcceptanceDateLabel')"
+                    color="primary"
+                ></date-picker>
+            </v-col>
+            <v-col cols="6">
+                <date-picker
+                    v-model="thesisDefenceDate"
+                    :label="$t('defenceDateLabel')"
+                    color="primary"
+                ></date-picker>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <v-select
                     v-model="selectedResearchArea"
@@ -73,10 +89,18 @@
         <v-row>
             <v-col>
                 <v-select
-                    v-model="selectedLanguages"
+                    v-model="selectedLanguage"
                     :label="$t('languageLabel')"
                     :items="languageList"
-                    multiple
+                ></v-select>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedWritingLanguage"
+                    :label="$t('writingLanguageLabel')"
+                    :items="languageTagsList"
                 ></v-select>
             </v-col>
         </v-row>
@@ -100,7 +124,7 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { Thesis, ThesisType } from '@/models/PublicationModel';
@@ -121,11 +145,14 @@ import { watch } from 'vue';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import { useUserRole } from '@/composables/useUserRole';
+import DatePicker from '@/components/core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "ThesisUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker},
     props: {
         presetThesis: {
             type: Object as PropType<Thesis | undefined>,
@@ -144,17 +171,17 @@ export default defineComponent({
         const publisher = ref<Publisher>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
+        const { isInstitutionalLibrarian } = useUserRole();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTags, languageTagsList } = useLanguageTags();
         const languageList = ref<{title: string, value: number}[]>([]);
-        const selectedLanguages = ref<number[]>(props.presetThesis?.languageTagIds as number[]);
+        const selectedLanguage = ref<number>(props.presetThesis?.languageId as number);
+        const selectedWritingLanguage = ref<number>(props.presetThesis?.writingLanguageTagId as number);
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                 });
             });
 
@@ -224,6 +251,8 @@ export default defineComponent({
         const doi = ref(props.presetThesis?.doi);
         const numberOfPages = ref(props.presetThesis?.numberOfPages);
         const uris = ref<string[]>(props.presetThesis?.uris as string[]);
+        const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
+        const thesisDefenceDate = ref(props.presetThesis?.thesisDefenceDate as string);
 
         const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
@@ -258,9 +287,12 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                languageTagIds: selectedLanguages.value,
+                languageId: selectedLanguage.value,
+                writingLanguageTagId: selectedWritingLanguage.value,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                topicAcceptanceDate: topicAcceptanceDate.value,
+                thesisDefenceDate: thesisDefenceDate.value
             };
 
             emit("update", updatedThesis);
@@ -276,11 +308,13 @@ export default defineComponent({
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetThesis?.subTitle as MultilingualContent[];
 
-            selectedLanguages.value = props.presetThesis?.languageTagIds as number[];
+            selectedLanguage.value = props.presetThesis?.languageId as number;
             uris.value = props.presetThesis?.uris as string[];
             numberOfPages.value = props.presetThesis?.numberOfPages;
             publicationYear.value = props.presetThesis?.documentDate;
             doi.value = props.presetThesis?.doi;
+            topicAcceptanceDate.value = props.presetThesis?.topicAcceptanceDate as string;
+            thesisDefenceDate.value = props.presetThesis?.thesisDefenceDate as string;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -294,15 +328,16 @@ export default defineComponent({
         return {
             isFormValid, title, subtitle, urisRef,
             publicationYear, doi, message, snackbar,
-            numberOfPages, selectedPublisher,
+            numberOfPages, selectedPublisher, languageTagsList,
             uris, requiredFieldRules, requiredSelectionRules,
-            submit, toMultilingualTextInput,
+            submit, toMultilingualTextInput, selectedWritingLanguage,
             languageTags, doiValidationRules, enterExternalOU,
             scopusIdValidationRules, selectedOrganisationUnit,
             researchAreasSelectable, selectedResearchArea,
-            selectedLanguages, publicationTypes, selectedThesisType,
+            selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
-            externalOUName, externalOUNameRef
+            externalOUName, externalOUNameRef, isInstitutionalLibrarian,
+            topicAcceptanceDate, thesisDefenceDate
         };
     }
 });

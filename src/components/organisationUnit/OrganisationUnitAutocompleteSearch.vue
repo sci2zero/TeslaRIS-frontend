@@ -11,11 +11,12 @@
                 :multiple="multiple"
                 return-object
                 :class="comfortable ? 'comfortable' : ''"
+                :readonly="readonly"
                 @update:search="searchOUs($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission && userRole === 'ADMIN'" cols="1">
+        <v-col v-if="!disableSubmission && isAdmin" cols="1">
             <generic-crud-modal
                 :form-component="OrganisationUnitSubmissionForm"
                 entity-name="OU"
@@ -39,10 +40,10 @@ import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitIndex, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import UserService from '@/services/UserService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import OrganisationUnitSubmissionForm from './OrganisationUnitSubmissionForm.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -82,6 +83,14 @@ export default defineComponent({
         forPersonId: {
             type: Number,
             default: null
+        },
+        topLevelInstitutionId: {
+            type: Number,
+            default: null
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -96,7 +105,7 @@ export default defineComponent({
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
         
         const hasSelection = computed(() =>
             props.multiple ? (selectedOrganisationUnit.value as any[]).length > 0 : (selectedOrganisationUnit.value as { title: '', value: -1 }).value !== -1
@@ -122,7 +131,7 @@ export default defineComponent({
                     params += `tokens=${token}&`;
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params, props.forPersonId ? props.forPersonId : null).then((response) => {
+                OrganisationUnitService.searchOUs(params, props.forPersonId, props.topLevelInstitutionId).then((response) => {
                     organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
                         title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
                         value: organisationUnit.databaseId,
@@ -142,7 +151,7 @@ export default defineComponent({
 
         const calculateAutocompleteWidth = () => {
             let numberOfColumns = props.allowManualClearing && hasSelection.value ? 10 : 11;
-            if (props.disableSubmission || userRole.value !== "ADMIN") {
+            if (props.disableSubmission || !isAdmin.value) {
                 numberOfColumns += 1;
             }
             return numberOfColumns;
@@ -167,7 +176,7 @@ export default defineComponent({
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth,
-            sendContentToParent, clearInput, userRole, OrganisationUnitSubmissionForm,
+            sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules
         };
     }

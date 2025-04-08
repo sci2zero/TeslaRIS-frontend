@@ -2,10 +2,10 @@
     <draggable :list="contributionList" group="documentContributions" item-key="id" @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" :to="'persons/' + contribution.personId">
-                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong></h4>
+                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong></h4>
             </localized-link>
             <h4 v-else>
-                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong>
+                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong>
             </h4>
             <h5 v-if="loginStore.userLoggedIn && contribution.contact?.contactEmail">
                 <strong>{{ `${$t("emailLabel")}: ${contribution.contact?.contactEmail}` }}</strong>

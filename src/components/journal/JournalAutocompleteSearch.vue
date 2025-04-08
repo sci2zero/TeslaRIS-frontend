@@ -136,7 +136,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                JournalService.searchJournals(params).then((response) => {
+                JournalService.searchJournals(params, null).then((response) => {
                     const listOfJournals: { title: string, value: number }[] = [];
                     response.data.content.forEach((journal: JournalIndex) => {
                         if (i18n.locale.value === "sr") {

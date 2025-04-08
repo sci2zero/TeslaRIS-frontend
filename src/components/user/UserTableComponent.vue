@@ -11,9 +11,11 @@
             </template>
 
             <v-list>
-                <register-employee-modal @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal is-vice-dean-for-science @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal is-commission @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal :employee-role="UserRole.INSTITUTIONAL_EDITOR" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal :employee-role="UserRole.VICE_DEAN_FOR_SCIENCE" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal :employee-role="UserRole.COMMISSION" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal :employee-role="UserRole.INSTITUTIONAL_LIBRARIAN" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal :employee-role="UserRole.HEAD_OF_LIBRARY" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
             </v-list>
         </v-menu>
     </v-row>
@@ -63,7 +65,7 @@ import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
-import type { UserAccountIndex } from '@/models/UserModel';
+import { UserRole, type UserAccountIndex } from '@/models/UserModel';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
@@ -196,7 +198,7 @@ export default defineComponent({
             tableOptions, changeActivationStatus, takeRoleOfUser,
             displayFormNotification, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, setSortAndPageOption,
-            accountsThatAllowedRoleTaking
+            accountsThatAllowedRoleTaking, UserRole
         };
     }
 });

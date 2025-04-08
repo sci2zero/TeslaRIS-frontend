@@ -1,8 +1,8 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Page } from "@/models/Common";
-import type { CitationResponse, Dataset, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, Software, Thesis } from "@/models/PublicationModel";
+import type { Page, SearchFieldsResponse } from "@/models/Common";
+import type { CitationResponse, Dataset, Document, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -10,12 +10,21 @@ export class DocumentPublicationService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
+  async readDocumentPublication(documentId: number): Promise<AxiosResponse<Document>> {
+    return super.sendRequest(axios.get, `document/${documentId}`);
+  }
+
   async getDocumentCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}`);
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    let allowedTypesParam= "";
+    allowedTypes.forEach(allowedType => {
+      allowedTypesParam += `&allowedTypes=${allowedType}`;
+    });
+    
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}`);
   }
 
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {
@@ -100,6 +109,10 @@ export class DocumentPublicationService extends BaseService {
 
   async findResearcherPublications(researcherId: number, tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     return super.sendRequest(axios.get, `document/for-researcher/${researcherId}?${tokens}`);
+  }
+
+  async findResearchOutputIds(documentId: number): Promise<AxiosResponse<number[]>> {
+    return super.sendRequest(axios.get, `document/research-output/${documentId}`);
   }
 
   async deleteDocumentPublication(documentPublicationId: number): Promise<AxiosResponse<void>> {
@@ -212,6 +225,30 @@ export class DocumentPublicationService extends BaseService {
 
   async checkMonographIdentifierUsage(identifier: string, monographId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `monograph/identifier-usage/${monographId}?identifier=${encodeURIComponent(identifier)}`);
+  }
+
+  async putThesisOnPublicReview(thesisId: number, continueLastReview: boolean): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/put-on-public-review/${thesisId}?continue=${continueLastReview}`);
+  }
+
+  async removeThesisFromPublicReview(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/remove-from-public-review/${thesisId}`);
+  }
+
+  async archiveThesis(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/archive/${thesisId}`);
+  }
+
+  async unarchiveThesis(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `thesis/unarchive/${thesisId}`);
+  }
+
+  async getThesisLibraryFormats(thesisId: number): Promise<AxiosResponse<ThesisLibraryFormatsResponse>> {
+    return super.sendRequest(axios.get, `thesis/library-formats/${thesisId}`);
+  }
+
+  async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, `document/fields?export=${onlyExportFields}`);
   }
 }
 

@@ -102,7 +102,7 @@ export default defineComponent({
         const searchResearchers = lodash.debounce((input: string) => {
                 const token = input
                 const params = `tokens=${token}&page=0&size=7`
-                PersonService.searchResearchers(params, false).then((response) => {
+                PersonService.searchResearchers(params, false, null).then((response) => {
                     suggestions.value = response.data.content;
                 });
         }, 300);
