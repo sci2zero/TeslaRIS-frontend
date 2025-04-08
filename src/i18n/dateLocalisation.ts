@@ -23,7 +23,7 @@ export const localiseDate = (iso8601DateString: string | undefined) => {
 
     // Serbian standard
     return `${day}.${month}.${year}.`;
-}
+};
 
 export const localiseDateRange = (from: string, to: string): string => {
     if(!from || !to) {
@@ -48,4 +48,17 @@ export const localiseDateRange = (from: string, to: string): string => {
     }
 
     return `${fromDate.toLocaleDateString("sr")} - ${toDate.toLocaleDateString("sr")}`;
+};
+
+export const localiseTime = (timeString: string | undefined) => {
+    if(!timeString) {
+        return "";
+    }
+
+    if (timeString.includes(":")) {
+        const tokens = timeString.split(":");
+        return `${tokens[0]}:${tokens[1]}h`
+    }
+
+    return timeString;
 };

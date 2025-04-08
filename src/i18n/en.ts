@@ -89,7 +89,8 @@ export default {
         reporting: "Reporting",
         mService: "M-Service",
         thesisLibraryReporting: "Thesis Library Reporting",
-        thesisLibrarySearch: "Thesis Library Search"
+        thesisLibrarySearch: "Thesis Library Search",
+        promotions: "Promotions"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -725,5 +726,8 @@ export default {
     exportAllLabel: "Export all",
     exportColumnsLabel: "Export columns",
     pageLabel: "Page Number (export is performed in batches of {0} records)",
-    exportLabel: "Export"
+    exportLabel: "Export",
+    promotionListLabel: "Promotions",
+    createNewPromotionLabel: "Create new promotion",
+    dateTimeLabel: "Date and time"
 }

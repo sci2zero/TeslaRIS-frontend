@@ -197,6 +197,7 @@ export default defineComponent(
             const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
             const institutionProfileLabel = computed(() => i18n.t("institutionProfileLabel"));
             const thesisLibraryLabel = computed(() => i18n.t("thesisLibraryLabel"));
+            const promotionListLabel = computed(() => i18n.t("promotionListLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -285,7 +286,8 @@ export default defineComponent(
 
             const thesisLibraryMenu = ref<MenuItem[]>([
                 { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value)) },
-                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' }
+                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' },
+                { title: promotionListLabel, type:'icon-link', pathName: 'promotions', condition: computed(() => (isAdmin.value)) }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([

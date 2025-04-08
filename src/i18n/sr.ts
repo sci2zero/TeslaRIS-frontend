@@ -89,7 +89,8 @@ export default {
         reporting: "Izveštavanje",
         mService: "M-Servis",
         thesisLibraryReporting: "Izveštavanje biblioteke završnih radova",
-        thesisLibrarySearch: "Pretraga biblioteke završnih radova"
+        thesisLibrarySearch: "Pretraga biblioteke završnih radova",
+        promotions: "Promocije"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -725,5 +726,8 @@ export default {
     exportAllLabel: "Izvezi sve",
     exportColumnsLabel: "Kolone za izvoz",
     pageLabel: "Broj Stranice (izvozi se u stranicama od po {0} slogova)",
-    exportLabel: "Izvezi"
+    exportLabel: "Izvezi",
+    promotionListLabel: "Promocije",
+    createNewPromotionLabel: "Kreiraj novu promociju",
+    dateTimeLabel: "Datum i vreme"
 }

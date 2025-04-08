@@ -41,3 +41,11 @@ export interface ThesisSearchRequest {
 export interface ThesisCSVExportRequest extends DocumentCSVExportRequest {
     thesisSearchRequest: ThesisSearchRequest
 }
+
+export interface Promotion {
+    id?: number;
+    promotionDate: string;
+    promotionTime: string;
+    placeOrVenue: string;
+    description: MultilingualContent[];
+}
