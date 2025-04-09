@@ -2,7 +2,7 @@ import { PersonalTitle } from "@/models/InvolvementModel";
 import i18n from ".";
 
 
-const employmentPositionsEn = [
+const personalTitlesEn = [
     { title: "Doctor", value: PersonalTitle.DR },
     { title: "Academic", value: PersonalTitle.ACADEMIC },
     { title: "Doctor of art", value: PersonalTitle.DR_ART },
@@ -10,7 +10,7 @@ const employmentPositionsEn = [
     { title: "None", value: PersonalTitle.NONE }
 ];
 
-const employmentPositionsSr = [
+const personalTitlesSr = [
     { title: "Doktor", value: PersonalTitle.DR },
     { title: "Akademik", value: PersonalTitle.ACADEMIC },
     { title: "Doktor umetnosti", value: PersonalTitle.DR_ART },
@@ -21,9 +21,9 @@ const employmentPositionsSr = [
 export const getPersonalTitleFromValueAutoLocale = (value: PersonalTitle) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = employmentPositionsEn;
+    let resourceTypeArray = personalTitlesEn;
     if (locale == "sr") {
-        resourceTypeArray = employmentPositionsSr;
+        resourceTypeArray = personalTitlesSr;
     }
 
     return (resourceTypeArray.find(item => item.value === value) || {}).title;
@@ -32,8 +32,8 @@ export const getPersonalTitleFromValueAutoLocale = (value: PersonalTitle) => {
 export const getPersonalTitlesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
-            return employmentPositionsSr;
+            return personalTitlesSr;
         case "en":
-            return employmentPositionsEn;
+            return personalTitlesEn;
     }
 };

@@ -66,6 +66,13 @@
                                     @click="changePublicReviewState(true, false)">
                                     {{ $t("restartPublicReviewLabel") }}
                                 </v-btn>
+                                <generic-crud-modal
+                                    :form-component="RegistryBookEntryForm"
+                                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
+                                    entity-name="RegistryBookEntry"
+                                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                                    wide primary-color disable-submission
+                                />
                                 <div>
                                     <v-btn
                                         v-if="userCanPutOnPublicReview && !thesis?.isArchived"
@@ -332,6 +339,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import ThesisResearchOutputSection from '@/components/publication/ThesisResearchOutputSection.vue';
+import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
 
 
 export default defineComponent({
@@ -659,7 +667,8 @@ export default defineComponent({
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
-            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState
+            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState,
+            RegistryBookEntryForm
         };
 }})
 

@@ -2,7 +2,7 @@ import { EmploymentTitle } from "@/models/InvolvementModel";
 import i18n from ".";
 
 
-const employmentPositionsEn = [
+const employmentTitlesEn = [
     { title: "Full professor", value: EmploymentTitle.FULL_PROFESSOR },
     { title: "Assistant professor", value: EmploymentTitle.ASSISTANT_PROFESSOR },
     { title: "Associate professor", value: EmploymentTitle.ASSOCIATE_PROFESSOR },
@@ -14,7 +14,7 @@ const employmentPositionsEn = [
     { title: "Professor engineer habilitated", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED }
 ];
 
-const employmentPositionsSr = [
+const employmentTitlesSr = [
     { title: "Redovni profesor", value: EmploymentTitle.FULL_PROFESSOR },
     { title: "Vanredni profesor", value: EmploymentTitle.ASSOCIATE_PROFESSOR },
     { title: "Docent", value: EmploymentTitle.ASSISTANT_PROFESSOR },
@@ -29,9 +29,9 @@ const employmentPositionsSr = [
 export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = employmentPositionsEn;
+    let resourceTypeArray = employmentTitlesEn;
     if (locale == "sr") {
-        resourceTypeArray = employmentPositionsSr;
+        resourceTypeArray = employmentTitlesSr;
     }
 
     return (resourceTypeArray.find(item => item.value === value) || {}).title;
@@ -40,8 +40,8 @@ export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) =>
 export const getEmploymentTitlesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
-            return employmentPositionsSr;
+            return employmentTitlesSr;
         case "en":
-            return employmentPositionsEn;
+            return employmentTitlesEn;
     }
 };

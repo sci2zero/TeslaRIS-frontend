@@ -43,10 +43,16 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" @click="dialog = false">
+                    <v-btn
+                        color="blue darken-1"
+                        @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" @click="formRef?.submit(true)">
+                    <v-btn
+                        v-if="!disableSubmission"
+                        color="blue darken-1"
+                        :disabled="!formRef?.isFormValid"
+                        @click="formRef?.submit(true)">
                         {{ $t("saveLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -96,6 +102,10 @@ export default defineComponent({
             default: false
         },
         primaryColor: {
+            type: Boolean,
+            default: false
+        },
+        disableSubmission: {
             type: Boolean,
             default: false
         }
