@@ -93,9 +93,20 @@ import MServiceView from "@/views/MServiceView.vue";
 import ThesisLibraryReportView from "@/views/phdLibrary/ThesisLibraryReportView.vue";
 import ThesisLibrarySearchView from "@/views/phdLibrary/ThesisLibrarySearchView.vue";
 import PromotionListView from "@/views/phdLibrary/PromotionListView.vue";
+import RegistryBookView from "@/views/phdLibrary/RegistryBookView.vue";
+import RegistryBookEntryLanding from "@/views/phdLibrary/RegistryBookEntryLanding.vue";
 
 
-const roles = { researcher: "RESEARCHER", admin: "ADMIN", institutionalEditor: "INSTITUTIONAL_EDITOR", commission: "COMMISSION", viceDeanForScience: "VICE_DEAN_FOR_SCIENCE", institutionalLibrarian: "INSTITUTIONAL_LIBRARIAN", headOfLibrary: "HEAD_OF_LIBRARY" };
+const roles = {
+    researcher: "RESEARCHER",
+    admin: "ADMIN",
+    institutionalEditor: "INSTITUTIONAL_EDITOR",
+    commission: "COMMISSION",
+    viceDeanForScience: "VICE_DEAN_FOR_SCIENCE",
+    institutionalLibrarian: "INSTITUTIONAL_LIBRARIAN",
+    headOfLibrary: "HEAD_OF_LIBRARY",
+    promotionRegistryAdministrator: "PROMOTION_REGISTRY_ADMINISTRATOR"
+};
 
 
 const router = createRouter({
@@ -144,7 +155,7 @@ const router = createRouter({
                     component: UserProfileView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.commission, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.promotionRegistryAdministrator],
                     },
                 },
                 {
@@ -253,7 +264,7 @@ const router = createRouter({
                             component: BookSeriesLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.promotionRegistryAdministrator],
                             },
                         },
                         {
@@ -418,7 +429,7 @@ const router = createRouter({
                             component: PublisherLandingView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary],
+                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.promotionRegistryAdministrator],
                             },
                         },
                         {
@@ -842,7 +853,7 @@ const router = createRouter({
                     component: NotificationsView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.commission],
+                        authorities: [roles.researcher, roles.institutionalEditor, roles.admin, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.commission, roles.promotionRegistryAdministrator],
                     },
                 },
                 {
@@ -1039,7 +1050,25 @@ const router = createRouter({
                     component: PromotionListView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin],
+                        authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                    },
+                },
+                {
+                    path: "registry-book",
+                    name: "registryBookList",
+                    component: RegistryBookView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                    },
+                },
+                {
+                    path: "registry-book/:id",
+                    name: "registryBookLandingPage",
+                    component: RegistryBookEntryLanding,
+                    meta: {
+                        authenticated: false,
+                        authorities: [roles.admin, roles.promotionRegistryAdministrator],
                     },
                 },
             ]

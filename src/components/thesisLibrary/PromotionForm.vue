@@ -22,8 +22,13 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetPromotion?.description, languageTags)"></multilingual-text-input>
+                    ref="descriptionRef"
+                    v-model="description"
+                    :rules="requiredFieldRules"
+                    :label="$t('descriptionLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetPromotion?.description, languageTags)"
+                    is-area>
+                </multilingual-text-input>
             </v-col>
         </v-row>
 

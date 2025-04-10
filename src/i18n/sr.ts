@@ -755,5 +755,8 @@ export default {
     diplomaNumberLabel: "Broj diplome",
     diplomaIssueDateLabel: "Datum izdavanja diplome",
     diplomaSupplementsNumberLabel: "Broj dodataka diplome",
-    diplomaSupplementsIssueDateLabel: "Datum izdavanja dodataka diplome"
+    diplomaSupplementsIssueDateLabel: "Datum izdavanja dodataka diplome",
+    weakPasswordError: "Unešena lozinka je preslaba.",
+    notPromotedLabel: "Nije promovisan",
+    registryBookLabel: "Matična knjiga"
 }

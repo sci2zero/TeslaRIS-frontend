@@ -44,8 +44,8 @@
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary) ? requiredSelectionRules : []"
-                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary"
+                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator) ? requiredSelectionRules : []"
+                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator"
                     :no-data-text="$t('noDataMessage')"
                     return-object
                     @update:search="searchOUs($event)"
@@ -145,7 +145,7 @@ export default defineComponent({
         const oldPassword = ref("");
         const newPassword = ref("");
 
-        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor} = useUserRole();
+        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor, isPromotionRegistryAdministrator} = useUserRole();
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
@@ -248,8 +248,8 @@ export default defineComponent({
                 email: email.value,
                 preferredLanguageId: selectedLanguage.value.value,
                 organisationUnitId: organisationUnitId,
-                oldPassword: oldPassword.value,
-                newPassword: newPassword.value,
+                oldPassword: changePassword.value ? oldPassword.value : "",
+                newPassword: changePassword.value ? newPassword.value : "",
                 notificationPeriod: selectedNotificationPeriod.value.value
             };
 
@@ -292,7 +292,8 @@ export default defineComponent({
             isFormValid, notificationPeriods, oldPassword, newPassword,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
-            isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary
+            isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary,
+            isPromotionRegistryAdministrator
         };
     }
 });

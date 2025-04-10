@@ -5,8 +5,8 @@
         <br />
         <promotion-table
             ref="tableRef"
-            :countries="countries"
-            :total-promotions="totalCountries"
+            :promotions="promotions"
+            :total-promotions="totalPromotions"
             @switch-page="switchPage">
         </promotion-table>
     </v-container>
@@ -26,9 +26,8 @@ export default defineComponent({
     name: "PromotionListView",
     components: { PromotionTable },
     setup() {
-        const searchParams = ref("tokens=");
-        const countries = ref<Promotion[]>([]);
-        const totalCountries = ref(0);
+        const promotions = ref<Promotion[]>([]);
+        const totalPromotions = ref(0);
         const page = ref(0);
         const size = ref(1);
         const sort = ref("");
@@ -42,16 +41,15 @@ export default defineComponent({
         });
 
         watch(i18n.locale, () => {
-            fetchPromotions(searchParams.value);
+            fetchPromotions();
         });
 
-        const fetchPromotions = (tokenParams: string) => {
-            searchParams.value = tokenParams;
+        const fetchPromotions = () => {
             PromotionService.getAllPromotions(
                 `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
             ).then((response) => {
-                countries.value = response.data.content;
-                totalCountries.value = response.data.totalElements;
+                promotions.value = response.data.content;
+                totalPromotions.value = response.data.totalElements;
             });
         };
 
@@ -60,12 +58,12 @@ export default defineComponent({
             size.value = pageSize;
             sort.value = sortField;
             direction.value = sortDir;
-            fetchPromotions(searchParams.value);
+            fetchPromotions();
         };
 
         return {
-            fetchPromotions, countries,
-            totalCountries,
+            fetchPromotions, promotions,
+            totalPromotions,
             switchPage, tableRef
         };
     }

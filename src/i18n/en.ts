@@ -729,5 +729,8 @@ export default {
     exportLabel: "Export",
     promotionListLabel: "Promotions",
     createNewPromotionLabel: "Create new promotion",
-    dateTimeLabel: "Date and time"
+    dateTimeLabel: "Date and time",
+    weakPasswordError: "Password you entered is too weak.",
+    notPromotedLabel: "Not promoted",
+    registryBookLabel: "Registry book"
 }

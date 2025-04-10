@@ -62,6 +62,7 @@ export enum AcademicTitle {
 export interface DissertationInformation {
     dissertationTitle: string;
     organisationUnitId: number;
+    institutionName?: MultilingualContent[];
     mentor: string;
     commission: string;
     grade: string;
@@ -110,6 +111,7 @@ export interface RegistryBookEntry {
     personalInformation: RegistryBookPersonalInformation;
     contactInformation: RegistryBookContactInformation;
     previousTitleInformation: PreviousTitleInformation;
+    inPromotion?: boolean;
 }
 
 export interface PhdThesisPrePopulatedData {

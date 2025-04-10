@@ -67,11 +67,13 @@
                                     {{ $t("restartPublicReviewLabel") }}
                                 </v-btn>
                                 <generic-crud-modal
+                                    v-if="canCreateRegistryBookEntry"
                                     :form-component="RegistryBookEntryForm"
                                     :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
                                     entity-name="RegistryBookEntry"
                                     :read-only="!canEdit || thesis?.isOnPublicReview"
                                     wide primary-color disable-submission
+                                    @create="createRegistryBookEntry"
                                 />
                                 <div>
                                     <v-btn
@@ -340,6 +342,8 @@ import PersistentQuestionDialog from '@/components/core/comparators/PersistentQu
 import { useUserRole } from '@/composables/useUserRole';
 import ThesisResearchOutputSection from '@/components/publication/ThesisResearchOutputSection.vue';
 import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
+import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
+import { type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 
 
 export default defineComponent({
@@ -371,6 +375,7 @@ export default defineComponent({
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
+        const canCreateRegistryBookEntry = ref(false);
 
         const documentClassifications = ref<EntityClassificationResponse[]>([]);
 
@@ -394,6 +399,10 @@ export default defineComponent({
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
+                });
+
+                RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canCreateRegistryBookEntry.value = response.data;
                 });
 
                 fetchClassifications();
@@ -653,6 +662,14 @@ export default defineComponent({
             }
         };
 
+        const createRegistryBookEntry = (registryEntry: RegistryBookEntry) => {
+            RegistryBookService.createRegistryBookEntry(registryEntry)
+            .then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
@@ -668,7 +685,7 @@ export default defineComponent({
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState,
-            RegistryBookEntryForm
+            RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry
         };
 }})
 

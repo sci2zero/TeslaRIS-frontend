@@ -21,7 +21,7 @@
     <v-data-table-server
         v-model="selectedPromotions"
         :sort-by="tableOptions.sortBy"
-        :items="countries"
+        :items="promotions"
         :headers="headers"
         :items-length="totalPromotions"
         :items-per-page-text="$t('itemsPerPageLabel')"
@@ -90,7 +90,7 @@ export default defineComponent({
     name: "PromotionTableComponent",
     components: { GenericCrudModal },
     props: {
-        countries: {
+        promotions: {
             type: Array<Promotion>,
             required: true
         }, 

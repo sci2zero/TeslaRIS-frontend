@@ -45,7 +45,7 @@
 </template>  
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import { ref } from 'vue';
 import { AcademicTitle, type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
@@ -63,6 +63,10 @@ export default defineComponent({
         thesisId: {
             type: Number,
             required: true
+        },
+        presetRegistryBookEntry: {
+            type: Object as PropType<RegistryBookEntry>,
+            default: undefined
         }
     },
     emits: ["create"],
@@ -125,22 +129,27 @@ export default defineComponent({
         );
 
         onMounted(() => {
-            RegistryBookService.getEntryPrePopulatedData(props.thesisId)
-            .then(response => {
-                registryEntry.value.personalInformation.authorName = response.data.personName;
-                registryEntry.value.personalInformation.localBirthDate = response.data.localBirthDate;
-                registryEntry.value.personalInformation.placeOfBrith = response.data.placeOfBirth;
-                registryEntry.value.contactInformation.place = returnCurrentLocaleContent(response.data.postalAddress.city) as string;
-                registryEntry.value.contactInformation.streetAndNumber = returnCurrentLocaleContent(response.data.postalAddress.streetAndNumber) as string;
-                registryEntry.value.contactInformation.residenceCountryId = response.data.postalAddress.countryId;
-                registryEntry.value.contactInformation.contact = response.data.contact;
-                registryEntry.value.dissertationInformation.commission = response.data.commission;
-                registryEntry.value.dissertationInformation.mentor = response.data.mentor;
-                registryEntry.value.dissertationInformation.defenceDate = response.data.defenceDate;
-                registryEntry.value.dissertationInformation.institutionPlace = response.data.place;
-                registryEntry.value.dissertationInformation.organisationUnitId = response.data.institutionId;
-                registryEntry.value.dissertationInformation.dissertationTitle = response.data.title;
-            });
+            if (!props.presetRegistryBookEntry) {
+                RegistryBookService.getEntryPrePopulatedData(props.thesisId)
+                .then(response => {
+                    registryEntry.value.personalInformation.authorName = response.data.personName;
+                    registryEntry.value.personalInformation.localBirthDate = response.data.localBirthDate;
+                    registryEntry.value.personalInformation.placeOfBrith = response.data.placeOfBirth;
+                    registryEntry.value.contactInformation.place = returnCurrentLocaleContent(response.data.postalAddress.city) as string;
+                    registryEntry.value.contactInformation.streetAndNumber = returnCurrentLocaleContent(response.data.postalAddress.streetAndNumber) as string;
+                    registryEntry.value.contactInformation.residenceCountryId = response.data.postalAddress.countryId;
+                    registryEntry.value.contactInformation.contact = response.data.contact;
+                    registryEntry.value.dissertationInformation.commission = response.data.commission;
+                    registryEntry.value.dissertationInformation.mentor = response.data.mentor;
+                    registryEntry.value.dissertationInformation.defenceDate = response.data.defenceDate;
+                    registryEntry.value.dissertationInformation.institutionPlace = response.data.place;
+                    registryEntry.value.dissertationInformation.organisationUnitId = response.data.institutionId;
+                    registryEntry.value.dissertationInformation.dissertationTitle = response.data.title;
+                });
+            } else {
+                registryEntry.value = props.presetRegistryBookEntry;
+                step.value = 4;
+            }
         });
 
         const prevStep = () => {
@@ -158,10 +167,7 @@ export default defineComponent({
         };
 
         const submit = () => {
-            RegistryBookService.createRegistryBookEntry(registryEntry.value)
-            .then(() => {
-                emit("create", registryEntry);
-            });
+            emit("create", registryEntry.value);
         };
 
         return {
