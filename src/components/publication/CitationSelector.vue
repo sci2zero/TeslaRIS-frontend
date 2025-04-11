@@ -26,13 +26,13 @@
     </div>
 </template>
 
-
 <script lang="ts">
 import { type CitationResponse } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { onMounted, ref } from "vue";
 import { defineComponent } from "vue";
 import CitationFormats from "./CitationFormats.vue";
+
 
 export default defineComponent({
     name: "CitationSelector",

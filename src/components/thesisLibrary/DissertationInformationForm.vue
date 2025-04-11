@@ -12,7 +12,8 @@
                 <organisation-unit-autocomplete-search
                     ref="ouAutocompleteRef"
                     v-model:model-value="selectedOrganisationUnit"
-                    :readonly="false"
+                    readonly
+                    disable-submission
                     required>
                 </organisation-unit-autocomplete-search>
             </v-col>
@@ -110,6 +111,10 @@ export default defineComponent({
             type: Boolean,
             required: true,
         },
+        isUpdate: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["update:modelValue", "update:valid"],
     setup(props, { emit }) {

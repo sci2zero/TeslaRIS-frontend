@@ -30,11 +30,12 @@
                     v-model="localForm.academicTitle"
                     :label="$t('academicTitleLabel') + '*'"
                     :items="academicTitleOptions"
+                    item-value="value"
                     :rules="requiredFieldRules"
                 />
             </v-col>
   
-            <v-col cols="12" md="6">
+            <v-col class="mb-2" cols="12" md="6">
                 <date-picker
                     v-model="localForm.graduationDate"
                     :label="$t('graduationDateLabel') + '*'"

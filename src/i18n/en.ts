@@ -90,7 +90,10 @@ export default {
         mService: "M-Service",
         thesisLibraryReporting: "Thesis Library Reporting",
         thesisLibrarySearch: "Thesis Library Search",
-        promotions: "Promotions"
+        promotions: "Promotions",
+        registryBookList: "Registry book",
+        registryBookLandingPage: "Registry book entry",
+        cancelAttendance: "Attendance cancellation"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -732,5 +735,16 @@ export default {
     dateTimeLabel: "Date and time",
     weakPasswordError: "Password you entered is too weak.",
     notPromotedLabel: "Not promoted",
-    registryBookLabel: "Registry book"
+    registryBookLabel: "Registry book",
+    promotionLabel: "Promotion",
+    nonPromotedLabel: "Non-promoted",
+    inPromotionLabel: "Ready for promotion",
+    createNewEntryLabel: "Add to promotion",
+    printListLabel: "Print list",
+    addressesLabel: "Addresses",
+    promoteAllLabel: "Promote all",
+    promotedSuccessfullyMessage: "Promoted successfully and registered into registry book.",
+    cancelAttendanceMessage: "Click the button below to confirm cancellation.",
+    cancelAttendanceLabel: "Cancel attendance",
+    cancellationCompleteMessage: "You have successfully cancelled your attendance. You will be notified about the new promotion date."
 }

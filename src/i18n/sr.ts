@@ -90,7 +90,10 @@ export default {
         mService: "M-Servis",
         thesisLibraryReporting: "Izveštavanje biblioteke završnih radova",
         thesisLibrarySearch: "Pretraga biblioteke završnih radova",
-        promotions: "Promocije"
+        promotions: "Promocije",
+        registryBookList: "Matična knjiga",
+        registryBookLandingPage: "Zapis u matičnoj knjizi",
+        cancelAttendance: "Otkazivanje prisustva"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -758,5 +761,16 @@ export default {
     diplomaSupplementsIssueDateLabel: "Datum izdavanja dodataka diplome",
     weakPasswordError: "Unešena lozinka je preslaba.",
     notPromotedLabel: "Nije promovisan",
-    registryBookLabel: "Matična knjiga"
+    registryBookLabel: "Matična knjiga",
+    promotionLabel: "Promocija",
+    nonPromotedLabel: "Nepromovisani",
+    inPromotionLabel: "Spremni za promociju",
+    createNewEntryLabel: "Dodaj u promociju",
+    printListLabel: "Štampaj listu",
+    addressesLabel: "Adrese",
+    promoteAllLabel: "Promoviši sve",
+    promotedSuccessfullyMessage: "Uspešno promovisano i upisano u matičnu knjigu.",
+    cancelAttendanceMessage: "Pritisnite dugme ispod kako bi potvrdili otkazivanje.",
+    cancelAttendanceLabel: "Otkaži prisustvo",
+    cancellationCompleteMessage: "Uspešno ste otkazali prisustvo. Bićete obavešteni o novom terminu promocija."
 }

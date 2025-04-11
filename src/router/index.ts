@@ -95,6 +95,7 @@ import ThesisLibrarySearchView from "@/views/phdLibrary/ThesisLibrarySearchView.
 import PromotionListView from "@/views/phdLibrary/PromotionListView.vue";
 import RegistryBookView from "@/views/phdLibrary/RegistryBookView.vue";
 import RegistryBookEntryLanding from "@/views/phdLibrary/RegistryBookEntryLanding.vue";
+import CancelAttendanceView from "@/views/phdLibrary/CancelAttendanceView.vue";
 
 
 const roles = {
@@ -1054,23 +1055,38 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "registry-book",
-                    name: "registryBookList",
-                    component: RegistryBookView,
+                    path: "cancel-attendance/:attendanceIdentifier",
+                    name: "cancelAttendance",
+                    component: CancelAttendanceView,
                     meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                        authenticated: false,
+                        authorities: [],
                     },
                 },
                 {
-                    path: "registry-book/:id",
-                    name: "registryBookLandingPage",
-                    component: RegistryBookEntryLanding,
-                    meta: {
-                        authenticated: false,
-                        authorities: [roles.admin, roles.promotionRegistryAdministrator],
-                    },
-                },
+                    path: "registry-book",
+                    name: "registryBookListParent",
+                    children: [
+                        {
+                            path: "",
+                            name: "registryBookList",
+                            component: RegistryBookView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "registryBookLandingPage",
+                            component: RegistryBookEntryLanding,
+                            meta: {
+                                authenticated: false,
+                                authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                            },
+                        },
+                    ]
+                }
             ]
         },
     ],

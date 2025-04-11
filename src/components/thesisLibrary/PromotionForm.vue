@@ -31,6 +31,16 @@
                 </multilingual-text-input>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <organisation-unit-autocomplete-search
+                    ref="ouAutocompleteRef"
+                    v-model:model-value="selectedOrganisationUnit"
+                    :readonly="false"
+                    required>
+                </organisation-unit-autocomplete-search>
+            </v-col>
+        </v-row>
 
         <v-row>
             <p class="required-fields-message">
@@ -41,20 +51,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { Promotion } from '@/models/ThesisLibraryModel';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import DatePicker from '../core/DatePicker.vue';
 import TimePicker from '../core/TimePicker.vue';
+import { useUserRole } from '@/composables/useUserRole';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "PromotionForm",
-    components: { MultilingualTextInput, DatePicker, TimePicker },
+    components: { MultilingualTextInput, DatePicker, TimePicker, OrganisationUnitAutocompleteSearch },
     props: {
         presetPromotion: {
             type: Object as PropType<Promotion | undefined>,
@@ -73,15 +86,26 @@ export default defineComponent({
         const promotionTime = ref(props.presetPromotion?.promotionTime);
         const description = ref<any>([]);
         const placeOrVenue = ref<string>(props.presetPromotion ? props.presetPromotion.placeOrVenue as string : "");
+        const selectedOrganisationUnit = ref<{title: string, value: number}>();
 
+        const { isAdmin, loggedInUser } = useUserRole();
         const { requiredFieldRules } = useValidationUtils();
+
+        onMounted(() => {
+            if (props.presetPromotion) {
+                OrganisationUnitService.readOU(props.presetPromotion.institutionId).then(response => {
+                    selectedOrganisationUnit.value = { title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id };
+                });
+            }
+        });
 
         const submit = () => {
             const promotion: Promotion = {
                 promotionDate: promotionDate.value as string,
                 promotionTime: promotionTime.value as string,
                 placeOrVenue: placeOrVenue.value,
-                description: description.value
+                description: description.value,
+                institutionId: isAdmin.value ? selectedOrganisationUnit.value?.value as number : loggedInUser.value?.organisationUnitId as number
             };
 
             emit("create", promotion);
@@ -92,7 +116,8 @@ export default defineComponent({
             description, descriptionRef,
             toMultilingualTextInput, submit,
             languageTags, requiredFieldRules,
-            placeOrVenue, promotionTime,
+            placeOrVenue, promotionTime, isAdmin,
+            selectedOrganisationUnit
         };
     }
 });

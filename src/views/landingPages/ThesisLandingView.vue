@@ -663,10 +663,14 @@ export default defineComponent({
         };
 
         const createRegistryBookEntry = (registryEntry: RegistryBookEntry) => {
-            RegistryBookService.createRegistryBookEntry(registryEntry)
-            .then(() => {
+            RegistryBookService.createRegistryBookEntry(registryEntry, parseInt(currentRoute.params.id as string))
+            .then((response) => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
+                canCreateRegistryBookEntry.value = false;
+                if (isAdmin.value) {
+                    router.push({name: "registryBookLandingPage", params: {id: response.data.id}});
+                }
             });
         };
 

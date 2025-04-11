@@ -49,6 +49,7 @@ export interface Promotion {
     promotionTime: string;
     placeOrVenue: string;
     description: MultilingualContent[];
+    institutionId: number;
 }
 
 export enum AcademicTitle {

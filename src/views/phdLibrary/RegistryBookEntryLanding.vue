@@ -8,7 +8,7 @@
                         {{ registryBookEntry?.personalInformation.authorName.firstname }} {{ registryBookEntry?.personalInformation.authorName.lastname }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ $t("registryBookEntryLabel") }}
+                        {{ $t("routeLabel.registryBookLandingPage") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
@@ -42,14 +42,14 @@
                             <v-col cols="6">
                                 <template v-if="registryBookEntry?.personalInformation">
                                     <div v-if="registryBookEntry.personalInformation.authorName.otherName">
-                                        {{ $t("otherNameLabel") }}:
+                                        {{ $t("middleNameLabel") }}:
                                         <div class="response">
                                             {{ registryBookEntry.personalInformation.authorName.otherName }}
                                         </div>
                                     </div>
 
                                     <div v-if="registryBookEntry.personalInformation.localBirthDate">
-                                        {{ $t("birthDateLabel") }}:
+                                        {{ $t("birthdateLabel") }}:
                                         <div class="response">
                                             {{ localiseDate(registryBookEntry.personalInformation.localBirthDate) }}
                                         </div>
@@ -171,7 +171,7 @@
 
                             <v-col cols="6">
                                 <div v-if="registryBookEntry?.dissertationInformation?.organisationUnitId">
-                                    {{ $t("organizationUnitLabel") }}:
+                                    {{ $t("institutionNameLabel") }}:
                                     <div class="response">
                                         <localized-link :to="'organisation-units/' + registryBookEntry.dissertationInformation.organisationUnitId">
                                             {{ returnCurrentLocaleContent(registryBookEntry.dissertationInformation.institutionName) }}
@@ -194,14 +194,14 @@
                                 </div>
 
                                 <div v-if="registryBookEntry?.dissertationInformation.diplomaSupplementsNumber">
-                                    {{ $t("diplomaSupplementNumberLabel") }}:
+                                    {{ $t("diplomaSupplementsNumberLabel") }}:
                                     <div class="response">
                                         {{ registryBookEntry?.dissertationInformation.diplomaSupplementsNumber }}
                                     </div>
                                 </div>
 
                                 <div v-if="registryBookEntry?.dissertationInformation.diplomaSupplementsIssueDate">
-                                    {{ $t("diplomaSupplementIssueDateLabel") }}:
+                                    {{ $t("diplomaSupplementsIssueDateLabel") }}:
                                     <div class="response">
                                         {{ localiseDate(registryBookEntry?.dissertationInformation.diplomaSupplementsIssueDate) }}
                                     </div>
@@ -217,14 +217,14 @@
                             <v-col cols="6">
                                 <template v-if="registryBookEntry?.previousTitleInformation">
                                     <div v-if="registryBookEntry.previousTitleInformation.institutionName">
-                                        {{ $t("previousInstitutionLabel") }}:
+                                        {{ $t("institutionNameLabel") }}:
                                         <div class="response">
                                             {{ registryBookEntry.previousTitleInformation.institutionName }}
                                         </div>
                                     </div>
 
                                     <div v-if="registryBookEntry.previousTitleInformation.institutionPlace">
-                                        {{ $t("previousInstitutionPlaceLabel") }}:
+                                        {{ $t("placeLabel") }}:
                                         <div class="response">
                                             {{ registryBookEntry.previousTitleInformation.institutionPlace }}
                                         </div>
@@ -296,6 +296,7 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 registryBookEntry.value = response.data;
+                console.log(response.data)
 
                 document.title = 
                     `${registryBookEntry.value?.personalInformation.authorName.firstname} ${registryBookEntry.value?.personalInformation.authorName.lastname}`;

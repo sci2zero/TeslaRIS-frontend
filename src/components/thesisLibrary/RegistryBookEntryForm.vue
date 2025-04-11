@@ -29,6 +29,7 @@
                 <dissertation-information-form
                     v-model="registryEntry.dissertationInformation"
                     v-model:valid="validSteps[3]"
+                    :is-update="presetRegistryBookEntry ? true : false"
                 />
             </v-stepper-window-item>
         </v-stepper-window>
@@ -57,7 +58,7 @@ import DissertationInformationForm from './DissertationInformationForm.vue';
 
 
 export default defineComponent({
-    name: "PromotionForm",
+    name: "RegistryBookEntryForm",
     components: { PersonalInformationForm, ContactInformationForm, PreviousTitleInformationForm, DissertationInformationForm },
     props: {
         thesisId: {
@@ -167,6 +168,7 @@ export default defineComponent({
         };
 
         const submit = () => {
+            console.log(registryEntry.value.previousTitleInformation)
             emit("create", registryEntry.value);
         };
 

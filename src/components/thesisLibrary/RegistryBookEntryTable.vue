@@ -29,8 +29,12 @@
                         {{ item.personalInformation.authorName.firstname }} {{ item.personalInformation.authorName.lastname }}
                     </localized-link>
                 </td>
-                <td>{{ item.dissertationInformation.organisationUnitId }}</td>
-                <td>{{ item.previousTitleInformation.academicTitle }}</td>
+                <td>
+                    <localized-link :to="'organisation-units/' + item.dissertationInformation.organisationUnitId">
+                        {{ returnCurrentLocaleContent(item.dissertationInformation.institutionName) }}
+                    </localized-link>
+                </td>
+                <td>{{ getAcademicTitleFromValueAutoLocale(item.previousTitleInformation.academicTitle) }}</td>
                 <td>{{ localiseDate(item.dissertationInformation.defenceDate) }}</td>
                 <td>{{ item.dissertationInformation.diplomaNumber }}</td>
                 <td>{{ displayTextOrPlaceholder(localiseDate(item.dissertationInformation.diplomaIssueDate)) }}</td>
@@ -44,9 +48,10 @@
                     </v-btn>
                     <generic-crud-modal
                         v-else
+                        class="mt-5"
                         :form-component="PromotionSelectorForm"
                         :form-props="{}"
-                        entity-name=""
+                        entity-name="Entry"
                         @create="addToPromotion($event, (item.id as number))"
                     />
                 </td>
@@ -65,6 +70,8 @@ import PromotionSelectorForm from './PromotionSelectorForm.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { getAcademicTitleFromValueAutoLocale } from '@/i18n/academicTitle';
   
 
 export default defineComponent({
@@ -93,7 +100,7 @@ export default defineComponent({
     
         const headers = computed<any>(() => [
             { title: i18n.t("fullNameLabel"), align: "start", key: "personalInformation.fullName" },
-            { title: i18n.t("institutionLabel"), align: "start", key: "dissertationInformation.institutionName" },
+            { title: i18n.t("institutionNameLabel"), align: "start", key: "dissertationInformation.institutionName" },
             { title: i18n.t("acquiredTitleLabel"), align: "start", key: "previousTitleInformation.acquiredTitle" },
             { title: i18n.t("defenceDateLabel"), align: "start", key: "dissertationInformation.defenceDate" },
             { title: i18n.t("diplomaNumberLabel"), align: "start", key: "dissertationInformation.diplomaNumber" },
@@ -133,7 +140,9 @@ export default defineComponent({
             notPromoted, localiseDate,
             displayTextOrPlaceholder,
             PromotionSelectorForm,
-            addToPromotion
+            addToPromotion,
+            returnCurrentLocaleContent,
+            getAcademicTitleFromValueAutoLocale
         };
         },
     });

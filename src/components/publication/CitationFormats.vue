@@ -25,6 +25,7 @@ import { type CitationResponse } from "@/models/PublicationModel";
 import { type PropType } from "vue";
 import { defineComponent } from "vue";
 
+
 export default defineComponent({
     name: "CitationFormats",
     props: {
@@ -46,7 +47,7 @@ export default defineComponent({
                 selection.removeAllRanges();
                 selection.addRange(range);
             }
-        }
+        };
 
         const copyToClipboard = (text: string) => {
             navigator.clipboard.writeText(text);

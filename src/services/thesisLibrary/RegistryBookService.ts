@@ -25,8 +25,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/pre-populate/${thesisId}`);
     }
 
-    async createRegistryBookEntry(body: RegistryBookEntry): Promise<AxiosResponse<RegistryBookEntry>> {
-        return super.sendRequest(axios.post, "registry-book", body, RegistryBookService.idempotencyKey);
+    async createRegistryBookEntry(body: RegistryBookEntry, thesisId: number): Promise<AxiosResponse<RegistryBookEntry>> {
+        return super.sendRequest(axios.post, `registry-book/${thesisId}`, body, RegistryBookService.idempotencyKey);
     }
 
     async updateRegistryBookEntry(body: RegistryBookEntry, entryId: number): Promise<AxiosResponse<RegistryBookEntry>> {
@@ -43,6 +43,22 @@ export class RegistryBookService extends BaseService {
 
     async canAddToRegistryBook(thesisId: number): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, `registry-book/can-add/${thesisId}`);
+    }
+
+    async getAddressList(promotionId: number): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, `registry-book/addresses/${promotionId}`);
+    }
+
+    async getPromoteesList(promotionId: number): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, `registry-book/promotees/${promotionId}`);
+    }
+
+    async promoteAll(promotionId: number): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.patch, `registry-book/promote-all/${promotionId}`);
+    }
+
+    async cancelAttendance(attendanceIdentifier: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/cancel-attendance/${attendanceIdentifier}`);
     }
 }
 

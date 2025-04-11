@@ -15,152 +15,201 @@
                 {{ $t("inPromotionLabel") }}
             </v-tab>
         </v-tabs>
-
+  
         <v-tabs-window v-model="currentTab">
             <v-window-item value="nonPromoted">
                 <registry-book-entry-table
                     ref="tableRef"
-                    :entries="nonPromotedEntries"
-                    :total-entries="totalNonPromotedEntries"
-                    @switch-non-promoted-page="switchNonPromotedPage"
-                    @entry-added-to-promotion="fetchRegistryBookEntrys(true)">
-                </registry-book-entry-table>
+                    :entries="tableStates.nonPromoted.entries"
+                    :total-entries="tableStates.nonPromoted.totalEntries"
+                    @switch-non-promoted-page="(args: any[]) => switchPage('nonPromoted', ...(args as [number, number, string, string]))"
+                    @entry-added-to-promotion="fetchAllTables"
+                />
             </v-window-item>
             <v-window-item value="forPromotion">
                 <v-select
                     v-model="selectedPromotion"
+                    class="promotion-select"
                     :items="promotions"
                     :label="$t('promotionLabel')"
-                    return-object>
-                </v-select>
+                    return-object
+                />
                 <registry-book-entry-table
                     ref="tableRef"
                     class="mt-5"
-                    :entries="inPromotionEntries"
-                    :total-entries="totalInPromotionEntries"
-                    @switch-non-promoted-page="switchInPromotionPage"
-                    @entry-not-promoted="fetchRegistryBookEntrys(false)">
-                </registry-book-entry-table>
+                    :entries="tableStates.forPromotion.entries"
+                    :total-entries="tableStates.forPromotion.totalEntries"
+                    @switch-non-promoted-page="(args: any[]) => switchPage('forPromotion', ...(args as [number, number, string, string]))"
+                    @entry-not-promoted="fetchAllTables"
+                />
+
+                <div class="d-flex flex-row justify-between mb-5">
+                    <promotion-printed-lists
+                        v-if="tableStates.forPromotion.totalEntries > 0"
+                        :promotion-id="selectedPromotion.value"
+                    />
+                    <v-btn
+                        class="ml-3"
+                        color="primary"
+                        @click="promoteAll">
+                        {{ $t("promoteAllLabel") }}
+                    </v-btn>
+                </div>
             </v-window-item>
         </v-tabs-window>
+
+        <toast v-model="snackbar" :message="message" />
     </v-container>
 </template>
-
+  
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
-import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
-import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
-import { ref } from 'vue';
-import type { RegistryBookEntry } from '@/models/ThesisLibraryModel';
+import { defineComponent, ref, reactive, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { onMounted } from 'vue';
+import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
+import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
+import PromotionPrintedLists from '@/components/thesisLibrary/PromotionPrintedLists.vue';
+import type { RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
+import Toast from '@/components/core/Toast.vue';
+  
 
+type TabKey = 'nonPromoted' | 'forPromotion';
 
+interface EntryTableState {
+    entries: RegistryBookEntry[];
+    totalEntries: number;
+    page: number;
+    size: number;
+    sort: string;
+    direction: string;
+    fetchFn: () => Promise<void>;
+}
+  
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast },
     setup() {
-        const currentTab = ref("nonPromoted");
+        const message = ref("");
+        const snackbar = ref(false);
 
-        const nonPromotedEntries = ref<RegistryBookEntry[]>([]);
-        const totalNonPromotedEntries = ref(0);
-        const nonPromotedPage = ref(0);
-        const nonPromotedSize = ref(1);
-        const nonPromotedSort = ref("");
-        const nonPromotedDirection = ref("");
-
-        const inPromotionEntries = ref<RegistryBookEntry[]>([]);
-        const totalInPromotionEntries = ref(0);
-        const inPromotionPage = ref(0);
-        const inPromotionSize = ref(1);
-        const inPromotionSort = ref("");
-        const inPromotionDirection = ref("");
-
-        const i18n = useI18n();
+        const currentTab = ref<TabKey>("nonPromoted");
         const tableRef = ref<typeof RegistryBookEntryTable>();
-
-        const promotions = ref<{title: string, value: number}[]>([]);
-        const selectedPromotion = ref<{title: string, value: number}>({title: "", value: -1});
-
-        onMounted(() => {
-            document.title = i18n.t("registryBookEntryListLabel");
-            fetchPromotions();
+    
+        const i18n = useI18n();
+    
+        const promotions = ref<{ title: string; value: number }[]>([]);
+        const selectedPromotion = ref<{ title: string; value: number }>({
+            title: "",
+            value: -1
         });
-
-        const fetchPromotions = () => {
-            PromotionService.getNonFinishedPromotions("")
-            .then(response => {
-                promotions.value.splice(0);
-                response.data.content.forEach(promotion => {
-                    promotions.value.push(
-                        {
-                            title: localiseDate(promotion.promotionDate) as string,
-                            value: promotion.id as number
-                        }
-                    );
-                });
-
-                if (promotions.value.length > 0) {
-                    selectedPromotion.value = promotions.value[0];
+    
+        const tableStates = reactive<Record<TabKey, EntryTableState>>({
+            nonPromoted: {
+                entries: [],
+                totalEntries: 0,
+                page: 0,
+                size: 1,
+                sort: "",
+                direction: "",
+                fetchFn: async () => {
+                    const query = `nonPromotedPage=${tableStates.nonPromoted.page}&nonPromotedSize=${tableStates.nonPromoted.size}&nonPromotedSort=${tableStates.nonPromoted.sort},${tableStates.nonPromoted.direction}`;
+                    const response = await RegistryBookService.getNonPromotedEntries(query);
+                    tableStates.nonPromoted.entries = response.data.content;
+                    tableStates.nonPromoted.totalEntries = response.data.totalElements;
                 }
-
-                fetchAllTables();
+            },
+            forPromotion: {
+                entries: [],
+                totalEntries: 0,
+                page: 0,
+                size: 1,
+                sort: "",
+                direction: "",
+                fetchFn: async () => {
+                    const query = `nonPromotedPage=${tableStates.forPromotion.page}&nonPromotedSize=${tableStates.forPromotion.size}&nonPromotedSort=${tableStates.forPromotion.sort},${tableStates.forPromotion.direction}`;
+                    const response = await RegistryBookService.getForPromotion(
+                        selectedPromotion.value.value,
+                        query
+                    );
+                    tableStates.forPromotion.entries = response.data.content;
+                    tableStates.forPromotion.totalEntries = response.data.totalElements;
+                }
+            }
+        });
+    
+        const fetchAllTables = () => {
+            Object.values(tableStates).forEach(state => state.fetchFn());
+        };
+    
+        const switchPage = (
+            tab: TabKey,
+            nextPage: number,
+            pageSize: number,
+            sortField: string,
+            sortDir: string
+        ) => {
+            const state = tableStates[tab];
+            state.page = nextPage;
+            state.size = pageSize;
+            state.sort = sortField;
+            state.direction = sortDir;
+            state.fetchFn();
+        };
+    
+        const fetchPromotions = () => {
+            PromotionService.getNonFinishedPromotions("").then(response => {
+            promotions.value.splice(0);
+            response.data.content.forEach(promotion => {
+                promotions.value.push({
+                title: localiseDate(promotion.promotionDate) as string,
+                value: promotion.id as number
+                });
+            });
+    
+            if (promotions.value.length > 0) {
+                selectedPromotion.value = promotions.value[0];
+            }
+    
+            fetchAllTables();
             });
         };
-
+    
         watch(i18n.locale, () => {
             fetchAllTables();
         });
+    
+        onMounted(() => {
+            document.title = i18n.t("registryBookLabel");
+            fetchPromotions();
+        });
 
-        const fetchAllTables = () => {
-            fetchRegistryBookEntrys(true);
-            fetchRegistryBookEntrys(false);
-        }
-
-        const fetchRegistryBookEntrys = (nonPromoted: boolean) => {
-            if (nonPromoted) {
-                RegistryBookService.getNonPromotedEntries(
-                    `nonPromotedPage=${nonPromotedPage.value}&nonPromotedSize=${nonPromotedSize.value}&nonPromotedSort=${nonPromotedSort.value},${nonPromotedDirection.value}`
-                ).then((response) => {
-                    nonPromotedEntries.value = response.data.content;
-                    totalNonPromotedEntries.value = response.data.totalElements;
-                });
-            } else {
-                RegistryBookService.getForPromotion(
-                    selectedPromotion.value.value,
-                    `nonPromotedPage=${nonPromotedPage.value}&nonPromotedSize=${nonPromotedSize.value}&nonPromotedSort=${nonPromotedSort.value},${nonPromotedDirection.value}`
-                ).then((response) => {
-                    inPromotionEntries.value = response.data.content;
-                    totalInPromotionEntries.value = response.data.totalElements;
-                });
-            }
+        const promoteAll = () => {
+            RegistryBookService.promoteAll(selectedPromotion.value.value)
+            .then(() => {
+                tableStates.forPromotion.fetchFn();
+                fetchPromotions();
+                message.value = i18n.t("promotedSuccessfullyMessage");
+                snackbar.value = true;
+            });
         };
-
-        const switchNonPromotedPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
-            nonPromotedPage.value = nextPage;
-            nonPromotedSize.value = pageSize;
-            nonPromotedSort.value = sortField;
-            nonPromotedDirection.value = sortDir;
-            fetchRegistryBookEntrys(true);
-        };
-
-        const switchInPromotionPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
-            inPromotionPage.value = nextPage;
-            inPromotionSize.value = pageSize;
-            inPromotionSort.value = sortField;
-            inPromotionDirection.value = sortDir;
-            fetchRegistryBookEntrys(false);
-        };
-
+    
         return {
-            fetchRegistryBookEntrys, nonPromotedEntries,
-            totalNonPromotedEntries, currentTab,
-            switchNonPromotedPage, tableRef, promotions,
-            inPromotionEntries, totalInPromotionEntries,
-            switchInPromotionPage, selectedPromotion
+            currentTab, tableRef,
+            tableStates, switchPage,
+            promotions, selectedPromotion,
+            fetchAllTables, promoteAll,
+            snackbar, message
         };
     }
 });
 </script>
+
+<style scoped>
+
+.promotion-select {
+    max-width: 200px;
+    margin-top: 10px;
+}
+
+</style>
