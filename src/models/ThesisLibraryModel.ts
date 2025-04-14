@@ -50,6 +50,7 @@ export interface Promotion {
     placeOrVenue: string;
     description: MultilingualContent[];
     institutionId: number;
+    finished?: boolean;
 }
 
 export enum AcademicTitle {
@@ -113,6 +114,7 @@ export interface RegistryBookEntry {
     contactInformation: RegistryBookContactInformation;
     previousTitleInformation: PreviousTitleInformation;
     inPromotion?: boolean;
+    promoted?: boolean;
 }
 
 export interface PhdThesisPrePopulatedData {
@@ -128,4 +130,14 @@ export interface PhdThesisPrePopulatedData {
     mentor: string;
     commission: string;
     defenceDate: string;
+}
+
+export interface PromotedCounts {
+    a: number;
+    b: number;
+}
+
+export interface InstitutionPromotionCountsReport {
+    institutionName: MultilingualContent[];
+    counts: PromotedCounts;
 }

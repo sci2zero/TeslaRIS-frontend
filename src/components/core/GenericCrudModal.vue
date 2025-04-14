@@ -5,6 +5,7 @@
                 <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
+                        :disabled="disabled"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         size="small" v-on="scope.isActive">
                         <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
@@ -12,12 +13,14 @@
                 </div>
                 <v-btn
                     v-if="!isSectionUpdate && !readOnly && isSubmission"
+                    :disabled="disabled"
                     color="primary" icon v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
                     <v-icon>mdi-pencil-plus-outline</v-icon>
                 </v-btn>
                 <v-btn
                     v-if="!isSectionUpdate && !readOnly && !isSubmission"
+                    :disabled="disabled"
                     :color="primaryColor ? 'primary' : ''"
                     :density="primaryColor ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
@@ -106,6 +109,10 @@ export default defineComponent({
             default: false
         },
         disableSubmission: {
+            type: Boolean,
+            default: false
+        },
+        disabled: {
             type: Boolean,
             default: false
         }

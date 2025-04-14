@@ -128,7 +128,7 @@ export default defineComponent({
 </script>
 
 
-<style>
+<style scoped>
 .v-overlay__content:has(> .v-date-picker) {
     min-width: auto!important;
 }

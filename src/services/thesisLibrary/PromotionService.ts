@@ -13,8 +13,8 @@ export class PromotionService extends BaseService {
         return super.sendRequest(axios.get, `promotion?${pageable}`);
     }
 
-    async getNonFinishedPromotions(pageable: string): Promise<AxiosResponse<Page<Promotion>>> {
-        return super.sendRequest(axios.get, `promotion?${pageable}`);
+    async getNonFinishedPromotions(): Promise<AxiosResponse<Promotion[]>> {
+        return super.sendRequest(axios.get, `promotion/non-finished`);
     }
 
     async createPromotion(body: Promotion): Promise<AxiosResponse<Promotion>> {

@@ -772,5 +772,14 @@ export default {
     promotedSuccessfullyMessage: "Uspešno promovisano i upisano u matičnu knjigu.",
     cancelAttendanceMessage: "Pritisnite dugme ispod kako bi potvrdili otkazivanje.",
     cancelAttendanceLabel: "Otkaži prisustvo",
-    cancellationCompleteMessage: "Uspešno ste otkazali prisustvo. Bićete obavešteni o novom terminu promocija."
+    cancellationCompleteMessage: "Uspešno ste otkazali prisustvo. Bićete obavešteni o novom terminu promocija.",
+    atLeastOneRequiredMessage: "Barem jedno od ovih polja je obavezno.",
+    institutionReportLabel: "Izveštaj po institucijama",
+    promotedDissertationsLabel: "Broj promovisanih - doktorske studije",
+    promotedMagistersLabel: "Broj promovisanih - po starom",
+    totalLabel: "Ukupno",
+    totalPromotedLabel: "Ukupno promovisano",
+    missingDiplomaMetadataMessage: "Nekim unosima nedostaju datum/broj diplome.",
+    isFinishedLabel: "Završeno",
+    librarianActionsLabel: "Akcije bibliotekara"
 }

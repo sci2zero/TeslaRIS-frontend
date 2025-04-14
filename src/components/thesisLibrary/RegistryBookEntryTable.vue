@@ -1,4 +1,9 @@
 <template>
+    <v-btn
+        density="compact" class="bottom-spacer" :disabled="selectedEntries.length === 0"
+        @click="deleteSelection">
+        {{ $t("deleteLabel") }}
+    </v-btn>
     <v-data-table-server
         v-model="selectedEntries"
         :sort-by="tableOptions.sortBy"
@@ -38,16 +43,16 @@
                 <td>{{ localiseDate(item.dissertationInformation.defenceDate) }}</td>
                 <td>{{ item.dissertationInformation.diplomaNumber }}</td>
                 <td>{{ displayTextOrPlaceholder(localiseDate(item.dissertationInformation.diplomaIssueDate)) }}</td>
-                <td>
+                <td v-if="!disableActions">
                     <v-btn
-                        v-if="item.inPromotion"
+                        v-if="item.inPromotion && !item.promoted"
                         density="compact"
                         color="error"
                         @click="notPromoted(item.id)">
                         {{ $t('notPromotedLabel') }}
                     </v-btn>
                     <generic-crud-modal
-                        v-else
+                        v-if="!item.inPromotion"
                         class="mt-5"
                         :form-component="PromotionSelectorForm"
                         :form-props="{}"
@@ -61,7 +66,7 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
@@ -78,35 +83,54 @@ export default defineComponent({
     name: "RegistryBookTableComponent",
     components: { GenericCrudModal, LocalizedLink },
     props: {
-      entries: {
-        type: Array as () => RegistryBookEntry[],
-        required: true,
-      },
-      totalEntries: {
-        type: Number,
-        required: true,
-      },
+        entries: {
+          type: Array as () => RegistryBookEntry[],
+          required: true,
+        },
+        totalEntries: {
+          type: Number,
+          required: true,
+        },
+        disableActions: {
+          type: Boolean,
+          default: false
+        }
     },
     emits: ["switchPage", "entryNotPromoted", "entryAddedToPromotion"],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
         const i18n = useI18n();
+
         const selectedEntries = ref<RegistryBookEntry[]>([]);
+        const notifications = ref<Map<string, string>>(new Map());
+
         const tableOptions = ref({
             initialCustomConfiguration: true,
             page: 1,
             itemsPerPage: 25,
             sortBy: [{ key: "dissertationInformation.defenceDate", order: "asc" }],
         });
-    
-        const headers = computed<any>(() => [
-            { title: i18n.t("fullNameLabel"), align: "start", key: "personalInformation.fullName" },
-            { title: i18n.t("institutionNameLabel"), align: "start", key: "dissertationInformation.institutionName" },
-            { title: i18n.t("acquiredTitleLabel"), align: "start", key: "previousTitleInformation.acquiredTitle" },
-            { title: i18n.t("defenceDateLabel"), align: "start", key: "dissertationInformation.defenceDate" },
-            { title: i18n.t("diplomaNumberLabel"), align: "start", key: "dissertationInformation.diplomaNumber" },
-            { title: i18n.t("diplomaIssueDateLabel"), align: "start", key: "dissertationInformation.diplomaIssueDate" },
-            { title: i18n.t("actionLabel"), align: "center" },
+
+        const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
+        const institutionNameLabel = computed(() => i18n.t("institutionNameLabel"));
+        const acquiredTitleLabel = computed(() => i18n.t("acquiredTitleLabel"));
+        const defenceDateLabel = computed(() => i18n.t("defenceDateLabel"));
+        const diplomaNumberLabel = computed(() => i18n.t("diplomaNumberLabel"));
+        const diplomaIssueDateLabel = computed(() => i18n.t("diplomaIssueDateLabel"));
+
+        const headers = ref<any[]>([
+            { title: fullNameLabel, align: "start", key: "personalInformation.fullName" },
+            { title: institutionNameLabel, align: "start", key: "dissertationInformation.institutionName" },
+            { title: acquiredTitleLabel, align: "start", key: "previousTitleInformation.acquiredTitle" },
+            { title: defenceDateLabel, align: "start", key: "dissertationInformation.defenceDate" },
+            { title: diplomaNumberLabel, align: "start", key: "dissertationInformation.diplomaNumber" },
+            { title: diplomaIssueDateLabel, align: "start", key: "dissertationInformation.diplomaIssueDate" }
         ]);
+
+        onMounted(() => {
+            if (!props.disableActions) {
+                headers.value.push({ title: i18n.t("actionLabel"), align: "center" });
+            }
+        });
     
         const refreshTable = (options: any) => {
             if (tableOptions.value.initialCustomConfiguration) {
@@ -133,6 +157,33 @@ export default defineComponent({
                 emit("entryAddedToPromotion", entryId);
             });
         };
+
+        const deleteSelection = () => {
+            Promise.all(selectedEntries.value.map((entry: RegistryBookEntry) => {
+                return RegistryBookService.deleteRegistryBookEntry(entry.id as number)
+                    .then(() => {
+                        addNotification(i18n.t("deleteSuccessNotification", { name: `${entry.personalInformation.authorName.firstname} ${entry.personalInformation.authorName.lastname}` }));
+                    })
+                    .catch(() => {
+                        addNotification(i18n.t("deleteFailedNotification", { name: `${entry.personalInformation.authorName.firstname} ${entry.personalInformation.authorName.lastname}` }));
+                        return entry;
+                    });
+            })).then((failedDeletions) => {
+                selectedEntries.value = selectedEntries.value.filter((entry) => failedDeletions.includes(entry));
+                refreshTable(tableOptions.value);
+            });
+        };
+
+        const addNotification = (message: string) => {
+            const notificationId = self.crypto.randomUUID();
+
+            notifications.value.set(notificationId, message);
+            setTimeout(() => removeNotification(notificationId), 2000);
+        };
+
+        const removeNotification = (notificationId: string) => {
+            notifications.value.delete(notificationId);
+        };
     
         return {
             selectedEntries, tableOptions,
@@ -140,7 +191,7 @@ export default defineComponent({
             notPromoted, localiseDate,
             displayTextOrPlaceholder,
             PromotionSelectorForm,
-            addToPromotion,
+            addToPromotion, deleteSelection,
             returnCurrentLocaleContent,
             getAcademicTitleFromValueAutoLocale
         };

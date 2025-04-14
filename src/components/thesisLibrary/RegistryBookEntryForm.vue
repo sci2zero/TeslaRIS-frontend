@@ -168,7 +168,6 @@ export default defineComponent({
         };
 
         const submit = () => {
-            console.log(registryEntry.value.previousTitleInformation)
             emit("create", registryEntry.value);
         };
 

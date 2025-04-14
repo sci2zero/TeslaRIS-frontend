@@ -746,5 +746,14 @@ export default {
     promotedSuccessfullyMessage: "Promoted successfully and registered into registry book.",
     cancelAttendanceMessage: "Click the button below to confirm cancellation.",
     cancelAttendanceLabel: "Cancel attendance",
-    cancellationCompleteMessage: "You have successfully cancelled your attendance. You will be notified about the new promotion date."
+    cancellationCompleteMessage: "You have successfully cancelled your attendance. You will be notified about the new promotion date.",
+    atLeastOneRequiredMessage: "At least one of these fields is required.",
+    institutionReportLabel: "Institution level report",
+    promotedDissertationsLabel: "Promoted count - doctoral studies",
+    promotedMagistersLabel: "Promoted count - old",
+    totalLabel: "Total",
+    totalPromotedLabel: "Total promoted",
+    missingDiplomaMetadataMessage: "Some entries are missing diploma date/number.",
+    isFinishedLabel: "Finished",
+    librarianActionsLabel: "Librarian actions"
 }

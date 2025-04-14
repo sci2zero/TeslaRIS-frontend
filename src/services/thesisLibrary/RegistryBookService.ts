@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { PhdThesisPrePopulatedData, RegistryBookEntry } from "@/models/ThesisLibraryModel";
+import type { InstitutionPromotionCountsReport, PhdThesisPrePopulatedData, RegistryBookEntry } from "@/models/ThesisLibraryModel";
 import { type Page } from "@/models/Common";
 
 
@@ -15,6 +15,14 @@ export class RegistryBookService extends BaseService {
 
     async getForPromotion(promotionId: number, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
         return super.sendRequest(axios.get, `registry-book/for-promotion/${promotionId}?${pageable}`);
+    }
+
+    async getPromoted(institutionId: number, from: string, to: string, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
+        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&${pageable}`);
+    }
+
+    async getPromotedCounts(from: string, to: string): Promise<AxiosResponse<InstitutionPromotionCountsReport[]>> {
+        return super.sendRequest(axios.get, `registry-book/count-report?from=${from}&to=${to}`);
     }
 
     async getNonPromotedEntries(pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
@@ -59,6 +67,10 @@ export class RegistryBookService extends BaseService {
 
     async cancelAttendance(attendanceIdentifier: string): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `registry-book/cancel-attendance/${attendanceIdentifier}`);
+    }
+
+    async deleteRegistryBookEntry(entryId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `registry-book/${entryId}`);
     }
 }
 

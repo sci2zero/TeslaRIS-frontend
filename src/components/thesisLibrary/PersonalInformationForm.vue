@@ -56,8 +56,10 @@
             </v-col>
             <v-col cols="12" sm="6">
                 <v-text-field
+                    ref="fatherNameRef"
                     v-model="formValue.fatherName"
-                    :label="$t('fatherNameLabel')"
+                    :label="$t('fatherNameLabel') + '*'"
+                    :rules="conditionalRule"
                 />
             </v-col>
             <v-col cols="12" sm="6">
@@ -68,8 +70,10 @@
             </v-col>
             <v-col cols="12" sm="6">
                 <v-text-field
+                    ref="motherNameRef"
                     v-model="formValue.motherName"
-                    :label="$t('motherNameLabel')"
+                    :label="$t('motherNameLabel') + '*'"
+                    :rules="conditionalRule"
                 />
             </v-col>
             <v-col cols="12" sm="6">
@@ -80,8 +84,10 @@
             </v-col>
             <v-col cols="12">
                 <v-text-field
+                    ref="guardianNameRef"
                     v-model="formValue.guardianNameAndSurname"
-                    :label="$t('guardianNameAndSurnameLabel')"
+                    :label="$t('guardianNameAndSurnameLabel') + '*'"
+                    :rules="conditionalRule"
                 />
             </v-col>
         </v-row>
@@ -98,6 +104,7 @@ import { type AxiosResponse } from "axios";
 import CountryService from "@/services/CountryService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import DatePicker from "../core/DatePicker.vue";
+import { VTextField } from "vuetify/lib/components/index.mjs";
 
 
 export default defineComponent({
@@ -115,12 +122,32 @@ export default defineComponent({
     },
     emits: ["update:modelValue", "update:valid"],
     setup(props, { emit }) {
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
-
         const localValid = ref(true);
         const formValue = computed({
             get: () => props.modelValue,
             set: (val) => emit("update:modelValue", val),
+        });
+
+        const { requiredFieldRules, requiredSelectionRules, atLeastOneRequiredRule } = useValidationUtils();
+        const conditionalRule = atLeastOneRequiredRule(formValue, [
+            "fatherName",
+            "motherName",
+            "guardianNameAndSurname"
+        ]);
+
+        const fatherNameRef = ref<typeof VTextField>();
+        const motherNameRef = ref<typeof VTextField>();
+        const guardianNameRef = ref<typeof VTextField>();
+        watch(
+        () => [
+            formValue.value.fatherName,
+            formValue.value.motherName,
+            formValue.value.guardianNameAndSurname,
+        ],
+        () => {
+            fatherNameRef.value?.validate?.();
+            motherNameRef.value?.validate?.();
+            guardianNameRef.value?.validate?.();
         });
 
         const countries = ref<{ title: string; value: number }[]>([]);
@@ -158,7 +185,9 @@ export default defineComponent({
             countries,
             requiredFieldRules,
             requiredSelectionRules,
-            localValid
+            localValid, conditionalRule,
+            fatherNameRef, motherNameRef,
+            guardianNameRef
         };
     },
 });

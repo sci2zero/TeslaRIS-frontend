@@ -30,19 +30,22 @@
             <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="formValue.municipality"
-                    :label="$t('municipalityLabel')"
+                    :label="$t('municipalityLabel') + '*'"
+                    :rules="requiredFieldRules"
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="formValue.postalCode"
-                    :label="$t('postalCodeLabel')"
+                    :label="$t('postalCodeLabel') + '*'"
+                    :rules="requiredFieldRules"
                 ></v-text-field>
             </v-col>
             <v-col cols="6">
                 <v-text-field
                     v-model="formValue.contact.contactEmail"
-                    :label="$t('emailLabel')"
+                    :label="$t('emailLabel') + '*'"
+                    :rules="requiredFieldRules"
                 ></v-text-field>
             </v-col>
             <v-col cols="6">
@@ -70,13 +73,13 @@ export default defineComponent({
     name: "ContactInformationForm",
     props: {
         modelValue: {
-        type: Object as PropType<RegistryBookContactInformation>,
-        required: true,
+            type: Object as PropType<RegistryBookContactInformation>,
+            required: true,
         },
         valid: {
-        type: Boolean,
-        required: true,
-        },
+            type: Boolean,
+            required: true,
+        }
     },
     emits: ["update:modelValue", "update:valid"],
     setup(props, { emit }) {
@@ -97,7 +100,9 @@ export default defineComponent({
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
                 countries.value = [{ title: "", value: -1}];
                 response.data.forEach(country => {
-                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                    countries.value.push(
+                        {title: returnCurrentLocaleContent(country.name) as string, value: country.id as number}
+                    );
                 });
             });
         };

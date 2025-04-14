@@ -46,12 +46,17 @@
                 <td>{{ row.item.placeOrVenue }}</td>
                 <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
                 <td>
+                    <v-icon v-if="row.item.finished" icon="mdi-check"></v-icon>
+                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                </td>
+                <td>
                     <generic-crud-modal
                         class="mt-5"
                         :form-component="PromotionForm"
                         :form-props="{ presetPromotion: row.item }"
                         entity-name=""
                         is-update
+                        :disabled="row.item.finished"
                         @update="updatePromotion(row.item.id as number, $event)"
                     />
                 </td>
@@ -113,6 +118,7 @@ export default defineComponent({
         const placeLabel = computed(() => i18n.t("placeLabel"));
         const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
+        const isFinishedLabel = computed(() => i18n.t("isFinishedLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "promotionDate", order: "asc"}]});
 
@@ -120,6 +126,7 @@ export default defineComponent({
           { title: dateTimeLabel, align: "start", sortable: true, key: "promotionDate"},
           { title: placeLabel, align: "start", sortable: true, key: "placeOrVenue"},
           { title: descriptionLabel, align: "start", sortable: false, key: "description.content"},
+          { title: isFinishedLabel, align: "start", sortable: true, key: "finished"},
           { title: actionLabel},
         ]);
 

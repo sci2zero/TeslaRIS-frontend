@@ -42,30 +42,6 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <v-btn
-                                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived"
-                                    class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(true, false)">
-                                    {{ $t("putOnPublicReviewLabel") }}
-                                </v-btn>
-                                <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview && !thesis?.isArchived"
-                                    class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(false, false)">
-                                    {{ $t("removeFromPublicReviewLabel") }}
-                                </v-btn>
-                                <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
-                                    class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(true, true)">
-                                    {{ $t("continuePublicReviewLabel") }}
-                                </v-btn>
-                                <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
-                                    class="mb-5 ml-2" color="primary" density="compact"
-                                    @click="changePublicReviewState(true, false)">
-                                    {{ $t("restartPublicReviewLabel") }}
-                                </v-btn>
                                 <generic-crud-modal
                                     v-if="canCreateRegistryBookEntry"
                                     :form-component="RegistryBookEntryForm"
@@ -75,20 +51,6 @@
                                     wide primary-color disable-submission
                                     @create="createRegistryBookEntry"
                                 />
-                                <div>
-                                    <v-btn
-                                        v-if="userCanPutOnPublicReview && !thesis?.isArchived"
-                                        class="mb-5" color="primary" density="compact"
-                                        @click="changeArchiveState(true)">
-                                        {{ $t("archiveLabel") }}
-                                    </v-btn>
-                                    <v-btn
-                                        v-if="(isAdmin || isHeadOfLibrary) && thesis?.isArchived"
-                                        class="mb-5" color="primary" density="compact"
-                                        @click="changeArchiveState(false)">
-                                        {{ $t("unarchiveLabel") }}
-                                    </v-btn>
-                                </div>
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="thesis?.thesisType">
                                     {{ $t("typeOfPublicationLabel") }}:
@@ -193,6 +155,56 @@
                 </v-card>
             </v-col>
         </v-row>
+
+        <div class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("librarianActionsLabel") }}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <v-btn
+                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, false)">
+                    {{ $t("putOnPublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview && !thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(false, false)">
+                    {{ $t("removeFromPublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, true)">
+                    {{ $t("continuePublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, false)">
+                    {{ $t("restartPublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="userCanPutOnPublicReview && !thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changeArchiveState(true)">
+                    {{ $t("archiveLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changeArchiveState(false)">
+                    {{ $t("unarchiveLabel") }}
+                </v-btn>
+            </div>
+        </div>
 
         <v-tabs
             v-model="currentTab"
@@ -708,5 +720,12 @@ export default defineComponent({
 
     .edit-pen-container {
         position:relative;
+    }
+
+    .actions-box {
+        border: 2px solid lightskyblue;
+        border-radius: 12px;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 </style>

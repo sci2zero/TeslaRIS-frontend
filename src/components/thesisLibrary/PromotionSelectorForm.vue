@@ -7,7 +7,8 @@
                     :items="promotions"
                     :label="$t('promotionLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
+                    return-object
+                    :no-data-text="$t('noDataInTableMessage')">
                 </v-select>
             </v-col>
         </v-row>
@@ -40,10 +41,10 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
 
         onMounted(() => {
-            PromotionService.getNonFinishedPromotions("")
+            PromotionService.getNonFinishedPromotions()
             .then(response => {
                 promotions.value.splice(0);
-                response.data.content.forEach(promotion => {
+                response.data.forEach(promotion => {
                     promotions.value.push(
                         {
                             title: localiseDate(promotion.promotionDate) as string,

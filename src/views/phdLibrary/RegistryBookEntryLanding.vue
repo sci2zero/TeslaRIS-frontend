@@ -296,7 +296,6 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 registryBookEntry.value = response.data;
-                console.log(response.data)
 
                 document.title = 
                     `${registryBookEntry.value?.personalInformation.authorName.firstname} ${registryBookEntry.value?.personalInformation.authorName.lastname}`;
