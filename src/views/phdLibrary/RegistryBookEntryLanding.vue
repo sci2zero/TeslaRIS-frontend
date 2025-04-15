@@ -29,7 +29,7 @@
                             :form-props="{ presetRegistryBookEntry: registryBookEntry }"
                             is-section-update
                             entity-name="RegistryBookEntry"
-                            :read-only="false"
+                            :read-only="!canEdit"
                             wide disable-submission
                             @create="updateBasicInfo"
                         />
@@ -206,6 +206,18 @@
                                         {{ localiseDate(registryBookEntry?.dissertationInformation.diplomaSupplementsIssueDate) }}
                                     </div>
                                 </div>
+                                <div v-if="registryBookEntry?.promotionSchoolYear">
+                                    {{ $t("schoolYearLabel") }}:
+                                    <div class="response">
+                                        {{ registryBookEntry?.promotionSchoolYear }}
+                                    </div>
+                                </div>
+                                <div v-if="registryBookEntry?.registryBookNumber">
+                                    {{ $t("registryBookNumberLabel") }}:
+                                    <div class="response">
+                                        {{ registryBookEntry?.registryBookNumber }}
+                                    </div>
+                                </div>
                             </v-col>
                         </v-row>
 
@@ -251,6 +263,22 @@
             </v-col>
         </v-row>
 
+        <div
+            v-if="isAdmin && !canEdit"
+            class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("adminActionsLabel") }}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <v-btn
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="allowSingleEdit()">
+                    {{ $t("allowSingleEditLabel") }}
+                </v-btn>
+            </div>
+        </div>
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
@@ -269,6 +297,7 @@ import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryF
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import Toast from '@/components/core/Toast.vue';
 import { type RegistryBookEntry } from '@/models/ThesisLibraryModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -279,9 +308,12 @@ export default defineComponent({
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
+        const canEdit = ref(false);
 
         const registryBookEntry = ref<RegistryBookEntry>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+
+        const { isAdmin } = useUserRole();
 
         const i18n = useI18n();
 
@@ -289,7 +321,16 @@ export default defineComponent({
 
         onMounted(() => {
             fetchRegistryBookEntry();
+            checkCanEdit();
         });
+
+        const checkCanEdit = () => {
+            RegistryBookService.canEdit(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                canEdit.value = response.data;
+            });
+        };
 
         const fetchRegistryBookEntry = () => {
             RegistryBookService.readRegistryBookEntry(
@@ -303,21 +344,32 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (entry: RegistryBookEntry) => {
-            RegistryBookService.updateRegistryBookEntry(entry, parseInt(currentRoute.params.id as string))
-            .then(() => {
+            RegistryBookService.updateRegistryBookEntry(
+                entry, parseInt(currentRoute.params.id as string)
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 fetchRegistryBookEntry();
+                checkCanEdit();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
             });
         };
 
+        const allowSingleEdit = () => {
+            RegistryBookService.allowSingleUpdate(
+                parseInt(currentRoute.params.id as string)
+            ).then(() => {
+                checkCanEdit();
+            });
+        };
+
         return {
             registryBookEntry, icon, returnCurrentLocaleContent,
             languageTagMap, localiseDate, snackbar, snackbarMessage,
-            RegistryBookEntryForm, updateBasicInfo
+            RegistryBookEntryForm, updateBasicInfo, canEdit,
+            allowSingleEdit, isAdmin
         };
 }})
 

@@ -28,7 +28,7 @@
                     class="mt-3"
                     :entries="tableStates.nonPromoted.entries"
                     :total-entries="tableStates.nonPromoted.totalEntries"
-                    @switch-non-promoted-page="(args: any[]) => switchPage('nonPromoted', ...(args as [number, number, string, string]))"
+                    @switch-page="(args: any[]) => switchPage('nonPromoted', ...(args as [number, number, string, string]))"
                     @entry-added-to-promotion="fetchAllTables"
                 />
             </v-window-item>
@@ -45,7 +45,8 @@
                     class="mt-5"
                     :entries="tableStates.forPromotion.entries"
                     :total-entries="tableStates.forPromotion.totalEntries"
-                    @switch-non-promoted-page="(args: any[]) => switchPage('forPromotion', ...(args as [number, number, string, string]))"
+                    disable-bulk-actions
+                    @switch-page="(args: any[]) => switchPage('forPromotion', ...(args as [number, number, string, string]))"
                     @entry-not-promoted="fetchAllTables"
                 />
 
@@ -64,7 +65,7 @@
                     </v-btn>
                 </div>
             </v-window-item>
-            <v-window-item value="promoted">
+            <v-window-item value="institutionReport">
                 <v-row class="justify-start mt-3">
                     <v-col cols="6" md="3" lg="1">
                         <date-picker
@@ -77,8 +78,27 @@
                     <v-col cols="6" md="3" lg="1">
                         <date-picker
                             v-model="toDate"
-                            style="max-width: 100px;"
                             :label="$t('toLabel') + '*'"
+                            color="primary"
+                        ></date-picker>
+                    </v-col>
+                </v-row>
+                <promotion-count-report class="mt-5" :report="reportCounts"></promotion-count-report>
+            </v-window-item>
+            <v-window-item value="promoted">
+                <v-row class="justify-start mt-3">
+                    <v-col cols="6" md="3" lg="1">
+                        <date-picker
+                            v-model="fromDate"
+                            class="input-component"
+                            :label="$t('fromLabel')"
+                            color="primary"
+                        ></date-picker>
+                    </v-col>
+                    <v-col cols="6" md="3" lg="1">
+                        <date-picker
+                            v-model="toDate"
+                            :label="$t('toLabel')"
                             color="primary"
                         ></date-picker>
                     </v-col>
@@ -95,30 +115,11 @@
                     :entries="tableStates.promoted.entries"
                     :total-entries="tableStates.promoted.totalEntries"
                     disable-actions
-                    @switch-non-promoted-page="(args: any[]) => switchPage('promoted', ...(args as [number, number, string, string]))"
+                    promoted-entries-view
+                    disable-bulk-actions
+                    @switch-page="(args: any[]) => switchPage('promoted', ...(args as [number, number, string, string]))"
                     @entry-added-to-promotion="fetchAllTables"
                 />
-            </v-window-item>
-            <v-window-item value="institutionReport">
-                <v-row class="justify-start mt-3">
-                    <v-col cols="6" md="3" lg="1">
-                        <date-picker
-                            v-model="fromDate"
-                            class="input-component"
-                            :label="$t('fromLabel') + '*'"
-                            color="primary"
-                        ></date-picker>
-                    </v-col>
-                    <v-col cols="6" md="3" lg="1">
-                        <date-picker
-                            v-model="toDate"
-                            style="max-width: 100px;"
-                            :label="$t('toLabel') + '*'"
-                            color="primary"
-                        ></date-picker>
-                    </v-col>
-                </v-row>
-                <promotion-count-report class="mt-5" :report="reportCounts"></promotion-count-report>
             </v-window-item>
         </v-tabs-window>
 
@@ -183,7 +184,7 @@ export default defineComponent({
         const reportCounts = ref<InstitutionPromotionCountsReport[]>([]);
 
         watch([fromDate, toDate, selectedInstitution], () => {
-            if (currentTab.value === "promoted" && fromDate.value && toDate.value && selectedInstitution.value.value > 0) {
+            if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
                 RegistryBookService.getPromotedCounts(
@@ -236,15 +237,15 @@ export default defineComponent({
                 sort: "",
                 direction: "",
                 fetchFn: async () => {
-                    if (!fromDate.value || !toDate.value || selectedInstitution.value.value <= 0) {
+                    if (selectedInstitution.value.value <= 0) {
                         return;
                     }
 
                     const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}`;
                     const response = await RegistryBookService.getPromoted(
                         selectedInstitution.value.value,
-                        fromDate.value.split("T")[0],
-                        toDate.value.split("T")[0],
+                        fromDate.value ? fromDate.value.split("T")[0] : "",
+                        toDate.value ? toDate.value.split("T")[0] : "",
                         query
                     );
                     tableStates.promoted.entries = response.data.content;

@@ -122,7 +122,7 @@ export default {
     firstNameLabel: "Name",
     surnameLabel: "Surname",
     noteLabel: "Note",
-    preferredLanguageLabel: "Preferred Language",
+    preferredLanguageLabel: "Preferred notification language",
     languageLabel: "Language",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
@@ -755,5 +755,11 @@ export default {
     totalPromotedLabel: "Total promoted",
     missingDiplomaMetadataMessage: "Some entries are missing diploma date/number.",
     isFinishedLabel: "Finished",
-    librarianActionsLabel: "Librarian actions"
+    librarianActionsLabel: "Librarian actions",
+    registryBookNumberLabel: "Registry book number",
+    examineRegistryBookEntryLabel: "Examine created record",
+    adminActionsLabel: "Administrator actions",
+    allowSingleEditLabel: "Allow single edit",
+    preferredReferenceLanguageLabel: "Preferred reference language",
+    isAlsoABoardMemberLabel: "Board member"
 }

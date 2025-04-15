@@ -33,7 +33,10 @@
             <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
                 <v-checkbox v-model="input.isBoardPresident" :label="$t('boardPresidentLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
-            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
+            <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR'">
+                <v-checkbox v-model="input.isAlsoABoardMember" :label="$t('isAlsoABoardMemberLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+            </v-col>
+            <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
                 <v-select
                     v-model="input.employmentTitle"
                     :items="employmentTitles"
@@ -41,7 +44,7 @@
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
-            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
+            <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
                 <v-select
                     v-model="input.personalTitle"
                     :items="personalTitles"
@@ -193,19 +196,28 @@ export default defineComponent({
                     });
                 }
 
-                returnObject.push({contributionDescription: input.contribution.description,
-                                    personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
-                                    displayAffiliationStatement: input.contribution.affiliationStatement,
-                                    orderNumber: index + 1,
-                                    personName: personName,
-                                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
-                                    isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
-                                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
-                                    isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
-                                    institutionIds: input.contribution.institutionIds,
-                                    employmentTitle: input.employmentTitle,
-                                    personalTitle: input.personalTitle
-                                });
+                const contributionObject = {
+                    contributionDescription: input.contribution.description,
+                    personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
+                    displayAffiliationStatement: input.contribution.affiliationStatement,
+                    orderNumber: index + 1,
+                    personName: personName,
+                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
+                    isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
+                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
+                    isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
+                    institutionIds: input.contribution.institutionIds,
+                    employmentTitle: input.employmentTitle,
+                    personalTitle: input.personalTitle
+                };
+
+                returnObject.push(contributionObject);
+
+                if (input.isAlsoABoardMember) {
+                    const boardMemberContribution = JSON.parse(JSON.stringify(contributionObject));
+                    boardMemberContribution.contributionType = DocumentContributionType.BOARD_MEMBER;
+                    returnObject.push(boardMemberContribution);
+                }
             });
             emit("setInput", returnObject);
         };

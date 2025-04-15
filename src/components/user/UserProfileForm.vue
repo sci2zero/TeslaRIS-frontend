@@ -23,20 +23,12 @@
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="6">
                 <v-text-field
                     v-model="email"
                     :label="$t('emailLabel')"
                     :rules="emailFieldRules"
                 ></v-text-field>
-            </v-col>
-            <v-col cols="6">
-                <v-select
-                    v-model="selectedLanguage"
-                    :label="$t('preferredLanguageLabel')"
-                    :items="languages"
-                    return-object
-                ></v-select>
             </v-col>
             <v-col v-if="!isAdmin" cols="6">
                 <v-autocomplete
@@ -50,6 +42,22 @@
                     return-object
                     @update:search="searchOUs($event)"
                 ></v-autocomplete>
+            </v-col>
+            <v-col cols="6">
+                <v-select
+                    v-model="selectedLanguage"
+                    :label="$t('preferredLanguageLabel')"
+                    :items="languages"
+                    return-object
+                ></v-select>
+            </v-col>
+            <v-col cols="6">
+                <v-select
+                    v-model="selectedReferenceLanguage"
+                    :label="$t('preferredReferenceLanguageLabel')"
+                    :items="languages"
+                    return-object
+                ></v-select>
             </v-col>
         </v-row>
         <v-row>
@@ -136,6 +144,7 @@ export default defineComponent({
         const email = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
+        const selectedReferenceLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const ouPlaceholder = {title: "", value: -1};
         const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
@@ -187,18 +196,21 @@ export default defineComponent({
 
                 researcherId.value = response.data.personId;
                 
-                populateLanguageData(response.data.preferredLanguage);
+                populateLanguageData(response.data.preferredLanguage, response.data.referenceLanguage);
             });
         };
 
-        const populateLanguageData = (preferredLanguage: string) => {
+        const populateLanguageData = (preferredLanguage: string, referenceLanguage: string) => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
                 response.data.forEach((language: LanguageResponse) => {
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
+                    
                     if (language.languageCode === preferredLanguage) {
                         selectedLanguage.value = { title: language.languageCode, value: language.id};
+                    } else if (language.languageCode === referenceLanguage) {
+                        selectedReferenceLanguage.value = { title: language.languageCode, value: language.id};
                     }
                 })
             })
@@ -247,6 +259,7 @@ export default defineComponent({
                 lastName: surname.value,
                 email: email.value,
                 preferredLanguageId: selectedLanguage.value.value,
+                preferredReferenceLanguageId: selectedReferenceLanguage.value.value,
                 organisationUnitId: organisationUnitId,
                 oldPassword: changePassword.value ? oldPassword.value : "",
                 newPassword: changePassword.value ? newPassword.value : "",
@@ -283,7 +296,7 @@ export default defineComponent({
         };
 
         return {
-            changePassword, name, surname,
+            changePassword, name, surname, selectedReferenceLanguage,
             organisationUnits, selectedOrganisationUnit, 
             email, showOldPassword, languages, selectedLanguage, 
             searchOUs, filterOUs, allowAccountTakeover, isInstitutionalEditor,

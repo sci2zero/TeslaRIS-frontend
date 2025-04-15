@@ -75,6 +75,7 @@ import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import { ExportableEndpointType } from '@/models/Common';
+import { isEqual } from 'lodash';
 
 
 export default defineComponent({
@@ -82,6 +83,8 @@ export default defineComponent({
     components: {SearchBarComponent, PublicationTableComponent},
     setup() {
         const searchParams = ref("tokens=");
+        const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
+
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref(0);
         const page = ref(0);
@@ -120,18 +123,27 @@ export default defineComponent({
         });
 
         const search = (tokenParams: string) => {
-            searchParams.value = tokenParams;
-
             if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
                 return;
+            }
+
+            const publicationTypes = selectedPublicationTypes.value.map(publicationType => publicationType.value);
+            const selectOnlyUnassessed = isCommission.value && returnOnlyUnassessedEntities.value;
+
+            if (searchParams.value === tokenParams && isEqual(previousFilterValues.value.publicationTypes, publicationTypes) && previousFilterValues.value.selectOnlyUnassessed === selectOnlyUnassessed) {
+                return;
+            } else {
+                searchParams.value = tokenParams;
+                previousFilterValues.value.publicationTypes = publicationTypes;
+                previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
             }
 
             DocumentPublicationService.searchDocumentPublications(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                isCommission.value && returnOnlyUnassessedEntities.value,
-                selectedPublicationTypes.value.map(publicationType => publicationType.value))
-            .then((response) => {
+                selectOnlyUnassessed,
+                publicationTypes
+            ).then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
             });

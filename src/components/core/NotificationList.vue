@@ -95,6 +95,8 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("events");
             } else if (action === NotificationAction.PERFORM_DOCUMENT_ASSESSMENT) {
                 decrementCounterAndNavigateToPage("scientificResults");
+            } else if (action === NotificationAction.PROMOTION_NOTIFICATION) {
+                decrementCounterAndNavigateToPage("registryBookList");
             }
         };
 

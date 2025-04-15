@@ -21,8 +21,9 @@
                 <v-btn
                     v-if="!isSectionUpdate && !readOnly && !isSubmission"
                     :disabled="disabled"
+                    :variant="outlined ? 'outlined' : 'elevated'"
                     :color="primaryColor ? 'primary' : ''"
-                    :density="primaryColor ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
+                    :density="primaryColor && !compact ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
                     {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
                 </v-btn>
@@ -113,6 +114,14 @@ export default defineComponent({
             default: false
         },
         disabled: {
+            type: Boolean,
+            default: false
+        },
+        outlined: {
+            type: Boolean,
+            default: false
+        },
+        compact: {
             type: Boolean,
             default: false
         }

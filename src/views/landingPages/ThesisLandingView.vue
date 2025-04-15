@@ -42,15 +42,6 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <generic-crud-modal
-                                    v-if="canCreateRegistryBookEntry"
-                                    :form-component="RegistryBookEntryForm"
-                                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
-                                    entity-name="RegistryBookEntry"
-                                    :read-only="!canEdit || thesis?.isOnPublicReview"
-                                    wide primary-color disable-submission
-                                    @create="createRegistryBookEntry"
-                                />
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="thesis?.thesisType">
                                     {{ $t("typeOfPublicationLabel") }}:
@@ -156,7 +147,7 @@
             </v-col>
         </v-row>
 
-        <div class="actions-box pa-4">
+        <div v-if="isAdmin || isHeadOfLibrary || userCanPutOnPublicReview" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
@@ -203,6 +194,25 @@
                     @click="changeArchiveState(false)">
                     {{ $t("unarchiveLabel") }}
                 </v-btn>
+                <v-btn
+                    v-if="registryBookEntryId > 0"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="examineRegistryBookEntry()">
+                    {{ $t("examineRegistryBookEntryLabel") }}
+                </v-btn>
+                <generic-crud-modal
+                    v-if="canCreateRegistryBookEntry"
+                    class="ml-2"
+                    :form-component="RegistryBookEntryForm"
+                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
+                    entity-name="RegistryBookEntry"
+                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                    primary-color compact
+                    disable-submission
+                    outlined wide
+                    @create="createRegistryBookEntry"
+                />
             </div>
         </div>
 
@@ -388,6 +398,7 @@ export default defineComponent({
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
         const canCreateRegistryBookEntry = ref(false);
+        const registryBookEntryId = ref(-1);
 
         const documentClassifications = ref<EntityClassificationResponse[]>([]);
 
@@ -414,7 +425,8 @@ export default defineComponent({
                 });
 
                 RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
-                    canCreateRegistryBookEntry.value = response.data;
+                    canCreateRegistryBookEntry.value = response.data ? false : true;
+                    registryBookEntryId.value = response.data;
                 });
 
                 fetchClassifications();
@@ -686,13 +698,19 @@ export default defineComponent({
             });
         };
 
+        const examineRegistryBookEntry = () => {
+            if (registryBookEntryId.value > 0) {
+                router.push({name: "registryBookLandingPage", params: {id: registryBookEntryId.value}});
+            }
+        };
+
         return {
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
             addAttachment, updateAttachment, deleteAttachment,
-            updateKeywords, updateDescription, localiseDate,
-            snackbar, snackbarMessage, updateContributions,
+            updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,
+            snackbar, snackbarMessage, updateContributions, registryBookEntryId,
             updateBasicInfo, organisationUnit, ThesisUpdateForm,
             researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
             handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
@@ -720,12 +738,5 @@ export default defineComponent({
 
     .edit-pen-container {
         position:relative;
-    }
-
-    .actions-box {
-        border: 2px solid lightskyblue;
-        border-radius: 12px;
-        margin-top: 20px;
-        margin-bottom: 20px;
     }
 </style>

@@ -8,6 +8,7 @@ export interface UserResponse {
     locked: boolean;
     canTakeRole: boolean;
     preferredLanguage: string;
+    referenceLanguage: string;
     organisationUnitId: number;
     personId: number;
     organisationUnitName: MultilingualContent[];
@@ -42,6 +43,7 @@ export interface UserUpdateRequest {
     firstname: string;
     lastName: string;
     preferredLanguageId: number;
+    preferredReferenceLanguageId: number;
     organisationUnitId?: number;
     notificationPeriod: UserNotificationPeriod;
 }

@@ -115,6 +115,8 @@ export interface RegistryBookEntry {
     previousTitleInformation: PreviousTitleInformation;
     inPromotion?: boolean;
     promoted?: boolean;
+    promotionSchoolYear?: string;
+    registryBookNumber?: number;
 }
 
 export interface PhdThesisPrePopulatedData {

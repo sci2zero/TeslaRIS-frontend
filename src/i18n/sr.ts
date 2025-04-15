@@ -122,7 +122,7 @@ export default {
     firstNameLabel: "Ime",
     surnameLabel: "Prezime",
     noteLabel: "Napomena",
-    preferredLanguageLabel: "Izabrani Jezik",
+    preferredLanguageLabel: "Izabrani jezik za obaveštenja",
     languageLabel: "Jezik",
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
@@ -781,5 +781,11 @@ export default {
     totalPromotedLabel: "Ukupno promovisano",
     missingDiplomaMetadataMessage: "Nekim unosima nedostaju datum/broj diplome.",
     isFinishedLabel: "Završeno",
-    librarianActionsLabel: "Akcije bibliotekara"
+    librarianActionsLabel: "Akcije bibliotekara",
+    registryBookNumberLabel: "Broj u matičnoj knjizi",
+    examineRegistryBookEntryLabel: "Pogledaj kreiran zapis",
+    adminActionsLabel: "Akcije administratora",
+    allowSingleEditLabel: "Dopusti jednu izmenu",
+    preferredReferenceLanguageLabel: "Izabrani jezik za unos referenci",
+    isAlsoABoardMemberLabel: "Član komisije"
 }

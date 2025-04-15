@@ -146,6 +146,12 @@ export default defineComponent({
             emit("update:valid", val);
         });
 
+        watch(() => formValue.value.diplomaIssueDate, () => {
+            if (formValue.value.diplomaIssueDate && !formValue.value.diplomaSupplementsIssueDate) {
+                formValue.value.diplomaSupplementsIssueDate = formValue.value.diplomaIssueDate;
+            }
+        });
+
         return {
             formValue,
             selectedOrganisationUnit,

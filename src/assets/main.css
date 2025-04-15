@@ -138,3 +138,12 @@ label {
 .statistics {
     padding: 10px;
 }
+
+/* Landing Pages */
+
+.actions-box {
+    border: 2px solid lightskyblue;
+    border-radius: 12px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

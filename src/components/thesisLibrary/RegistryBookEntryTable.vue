@@ -1,5 +1,6 @@
 <template>
     <v-btn
+        v-if="!disableBulkActions"
         density="compact" class="bottom-spacer" :disabled="selectedEntries.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
@@ -13,7 +14,7 @@
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
         :items-per-page="25"
-        show-select
+        :show-select="!disableBulkActions"
         return-object
         :no-data-text="$t('noDataInTableMessage')"
         :page="tableOptions.page"
@@ -21,7 +22,7 @@
     >
         <template #item="{ item }">
             <tr>
-                <td>
+                <td v-if="!disableBulkActions">
                     <v-checkbox
                         v-model="selectedEntries"
                         :value="item"
@@ -43,6 +44,12 @@
                 <td>{{ localiseDate(item.dissertationInformation.defenceDate) }}</td>
                 <td>{{ item.dissertationInformation.diplomaNumber }}</td>
                 <td>{{ displayTextOrPlaceholder(localiseDate(item.dissertationInformation.diplomaIssueDate)) }}</td>
+                <td v-if="promotedEntriesView">
+                    {{ item.promotionSchoolYear }}
+                </td>
+                <td v-if="promotedEntriesView">
+                    {{ item.registryBookNumber }}
+                </td>
                 <td v-if="!disableActions">
                     <v-btn
                         v-if="item.inPromotion && !item.promoted"
@@ -94,6 +101,14 @@ export default defineComponent({
         disableActions: {
           type: Boolean,
           default: false
+        },
+        disableBulkActions: {
+          type: Boolean,
+          default: false
+        },
+        promotedEntriesView: {
+          type: Boolean,
+          default: false
         }
     },
     emits: ["switchPage", "entryNotPromoted", "entryAddedToPromotion"],
@@ -127,8 +142,13 @@ export default defineComponent({
         ]);
 
         onMounted(() => {
+            if (props.promotedEntriesView) {
+                headers.value.push({ title: i18n.t("schoolYearLabel"), align: "start" });
+                headers.value.push({ title: i18n.t("registryBookNumberLabel"), align: "start" });
+            }
+            
             if (!props.disableActions) {
-                headers.value.push({ title: i18n.t("actionLabel"), align: "center" });
+                headers.value.push({ title: i18n.t("actionLabel"), align: "start" });
             }
         });
     
@@ -139,7 +159,7 @@ export default defineComponent({
             }
             tableOptions.value = options;
             const sort = options.sortBy?.[0] || {};
-            emit("switchPage", options.page - 1, options.itemsPerPage, sort.key, sort.order);
+            emit("switchPage", [options.page - 1, options.itemsPerPage, sort.key, sort.order]);
         };
     
         const notPromoted = (entryId?: number) => {

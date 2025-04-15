@@ -49,7 +49,7 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.patch, `registry-book/remove/${entryId}`, {});
     }
 
-    async canAddToRegistryBook(thesisId: number): Promise<AxiosResponse<boolean>> {
+    async canAddToRegistryBook(thesisId: number): Promise<AxiosResponse<number>> {
         return super.sendRequest(axios.get, `registry-book/can-add/${thesisId}`);
     }
 
@@ -69,8 +69,20 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.patch, `registry-book/cancel-attendance/${attendanceIdentifier}`);
     }
 
+    async isAttendanceCancellable(attendanceIdentifier: string): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `registry-book/is-attendance-cancellable/${attendanceIdentifier}`);
+    }
+
     async deleteRegistryBookEntry(entryId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.delete, `registry-book/${entryId}`);
+    }
+
+    async canEdit(entryId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `registry-book/can-edit/${entryId}`);
+    }
+
+    async allowSingleUpdate(entryId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/allow-single-update/${entryId}`);
     }
 }
 

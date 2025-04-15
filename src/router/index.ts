@@ -1082,7 +1082,7 @@ const router = createRouter({
                             component: RegistryBookEntryLanding,
                             meta: {
                                 authenticated: false,
-                                authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                                authorities: [roles.admin, roles.promotionRegistryAdministrator, roles.institutionalLibrarian],
                             },
                         },
                     ]
