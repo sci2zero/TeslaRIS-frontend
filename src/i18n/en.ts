@@ -89,7 +89,8 @@ export default {
         reporting: "Reporting",
         mService: "M-Service",
         thesisLibraryReporting: "Thesis Library Reporting",
-        thesisLibrarySearch: "Thesis Library Search"
+        thesisLibrarySearch: "Thesis Library Search",
+        healthCheck: "Service health check"
     },
     emailLabel: "Email",
     passwordLabel: "Password",

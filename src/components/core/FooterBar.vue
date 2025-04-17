@@ -18,7 +18,7 @@
                     </v-btn>
                 </div>
                 <div class="text-center" cols="12">
-                    {{ new Date().getFullYear() }} — <strong>TeslaRIS</strong>
+                    {{ new Date().getFullYear() }} — <strong>TeslaRIS</strong> <strong>{{ appVersion }}</strong>
                 </div>
             </v-row>
         </v-footer>
@@ -34,8 +34,8 @@ import { useI18n } from 'vue-i18n';
 export default defineComponent(
     {
         name: "FooterBar",
-        components: {  },
         setup() {
+            const appVersion = import.meta.env.VITE_APP_VERSION;
             const i18n = useI18n();
             const homeLabel = computed(() => i18n.t("homeLabel"));
 
@@ -56,7 +56,9 @@ export default defineComponent(
                 ]);
 
 
-            return {links};
+            return {
+                links, appVersion
+            };
         }
     });
 </script>

@@ -89,7 +89,8 @@ export default {
         reporting: "Izveštavanje",
         mService: "M-Servis",
         thesisLibraryReporting: "Izveštavanje biblioteke završnih radova",
-        thesisLibrarySearch: "Pretraga biblioteke završnih radova"
+        thesisLibrarySearch: "Pretraga biblioteke završnih radova",
+        healthCheck: "Status servisa"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
