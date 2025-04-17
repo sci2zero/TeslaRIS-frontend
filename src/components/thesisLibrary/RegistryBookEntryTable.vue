@@ -133,9 +133,9 @@ export default defineComponent({
         const diplomaIssueDateLabel = computed(() => i18n.t("diplomaIssueDateLabel"));
 
         const headers = ref<any[]>([
-            { title: fullNameLabel, align: "start", key: "personalInformation.fullName" },
-            { title: institutionNameLabel, align: "start", key: "dissertationInformation.institutionName" },
-            { title: acquiredTitleLabel, align: "start", key: "previousTitleInformation.acquiredTitle" },
+            { title: fullNameLabel, align: "start", sortable: false, key: "personalInformation.fullName" },
+            { title: institutionNameLabel, align: "start", sortable: false, key: "dissertationInformation.institutionName" },
+            { title: acquiredTitleLabel, align: "start", sortable: false, key: "previousTitleInformation.acquiredTitle" },
             { title: defenceDateLabel, align: "start", key: "dissertationInformation.defenceDate" },
             { title: diplomaNumberLabel, align: "start", key: "dissertationInformation.diplomaNumber" },
             { title: diplomaIssueDateLabel, align: "start", key: "dissertationInformation.diplomaIssueDate" }

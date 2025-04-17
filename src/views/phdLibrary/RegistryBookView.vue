@@ -14,11 +14,14 @@
             <v-tab value="forPromotion">
                 {{ $t("inPromotionLabel") }}
             </v-tab>
+            <v-tab value="promoted">
+                {{ $t("promotedLabel") }}
+            </v-tab>
+            <v-tab value="reports">
+                {{ $t("generatedRegistryBooksLabel") }}
+            </v-tab>
             <v-tab value="institutionReport">
                 {{ $t("institutionReportLabel") }}
-            </v-tab>
-            <v-tab value="promoted">
-                {{ $t("registryBookLabel") }}
             </v-tab>
         </v-tabs>
   
@@ -65,26 +68,6 @@
                     </v-btn>
                 </div>
             </v-window-item>
-            <v-window-item value="institutionReport">
-                <v-row class="justify-start mt-3">
-                    <v-col cols="6" md="3" lg="1">
-                        <date-picker
-                            v-model="fromDate"
-                            class="input-component"
-                            :label="$t('fromLabel') + '*'"
-                            color="primary"
-                        ></date-picker>
-                    </v-col>
-                    <v-col cols="6" md="3" lg="1">
-                        <date-picker
-                            v-model="toDate"
-                            :label="$t('toLabel') + '*'"
-                            color="primary"
-                        ></date-picker>
-                    </v-col>
-                </v-row>
-                <promotion-count-report class="mt-5" :report="reportCounts"></promotion-count-report>
-            </v-window-item>
             <v-window-item value="promoted">
                 <v-row class="justify-start mt-3">
                     <v-col cols="6" md="3" lg="1">
@@ -109,6 +92,24 @@
                             disable-submission
                         ></organisation-unit-autocomplete-search>
                     </v-col>
+                    <v-col
+                        v-if="tableStates.promoted.entries.length > 0" cols="6" md="3"
+                        lg="2">
+                        <v-select
+                            v-model="selectedLang"
+                            :items="langItems"
+                            :label="$t('languageLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
+                    <v-col v-if="tableStates.promoted.entries.length > 0">
+                        <v-btn
+                            density="compact" class="mt-3"
+                            @click="generateRegistryBookReport">
+                            {{ $t("generateRegistryBookLabel") }}
+                        </v-btn>
+                    </v-col>
                 </v-row>
                 <registry-book-entry-table
                     class="mt-10"
@@ -121,8 +122,35 @@
                     @entry-added-to-promotion="fetchAllTables"
                 />
             </v-window-item>
+            <v-window-item value="reports">
+                <v-row class="justify-start mt-3">
+                    <v-col cols="6">
+                        <registry-book-reports-list></registry-book-reports-list>
+                    </v-col>
+                </v-row>
+            </v-window-item>
+            <v-window-item value="institutionReport">
+                <v-row class="justify-start mt-3">
+                    <v-col cols="6" md="3" lg="1">
+                        <date-picker
+                            v-model="fromDate"
+                            class="input-component"
+                            :label="$t('fromLabel') + '*'"
+                            color="primary"
+                        ></date-picker>
+                    </v-col>
+                    <v-col cols="6" md="3" lg="1">
+                        <date-picker
+                            v-model="toDate"
+                            :label="$t('toLabel') + '*'"
+                            color="primary"
+                        ></date-picker>
+                    </v-col>
+                </v-row>
+                <promotion-count-report class="mt-5" :report="reportCounts"></promotion-count-report>
+            </v-window-item>
         </v-tabs-window>
-
+        
         <toast v-model="snackbar" :message="message" />
     </v-container>
 </template>
@@ -142,6 +170,10 @@ import DatePicker from '@/components/core/DatePicker.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import PromotionCountReport from '@/components/thesisLibrary/PromotionCountReport.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
+import RegistryBookReportService from '@/services/thesisLibrary/RegistryBookReportService';
+import RegistryBookReportsList from '@/components/thesisLibrary/RegistryBookReportsList.vue';
+import { getLangItems } from '@/i18n/languages';
+import { useValidationUtils } from '@/utils/ValidationUtils';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -158,12 +190,16 @@ interface EntryTableState {
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
 
         const currentTab = ref("nonPromoted");
+
+        const langItems = getLangItems();
+        const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
+        const { requiredSelectionRules } = useValidationUtils();
     
         const i18n = useI18n();
         const { loggedInUser } = useUserRole();
@@ -312,6 +348,21 @@ export default defineComponent({
                 snackbar.value = true;
             });
         };
+
+        const generateRegistryBookReport = () => {
+            const from = fromDate.value ? fromDate.value.split("T")[0] : "";
+            const to = toDate.value ? toDate.value.split("T")[0] : "";
+
+            RegistryBookReportService.scheduleReportGeneration(
+                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&lang=${selectedLang.value.value}`
+            ).then((response) => {
+                message.value = i18n.t("reportGenerationScheduledMessage", [response.data]);
+                snackbar.value = true;
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
+        };
     
         return {
             currentTab, fromDate, toDate,
@@ -319,7 +370,9 @@ export default defineComponent({
             promotions, selectedPromotion,
             fetchAllTables, promoteAll,
             snackbar, message, loggedInUser,
-            selectedInstitution, reportCounts
+            selectedInstitution, reportCounts,
+            generateRegistryBookReport, langItems,
+            selectedLang, requiredSelectionRules
         };
     }
 });

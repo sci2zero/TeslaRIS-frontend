@@ -748,7 +748,7 @@ export default {
     cancelAttendanceLabel: "Cancel attendance",
     cancellationCompleteMessage: "You have successfully cancelled your attendance. You will be notified about the new promotion date.",
     atLeastOneRequiredMessage: "At least one of these fields is required.",
-    institutionReportLabel: "Institution level report",
+    institutionReportLabel: "Institution level statistics",
     promotedDissertationsLabel: "Promoted count - doctoral studies",
     promotedMagistersLabel: "Promoted count - old",
     totalLabel: "Total",
@@ -761,5 +761,10 @@ export default {
     adminActionsLabel: "Administrator actions",
     allowSingleEditLabel: "Allow single edit",
     preferredReferenceLanguageLabel: "Preferred reference language",
-    isAlsoABoardMemberLabel: "Board member"
+    isAlsoABoardMemberLabel: "Board member",
+    reportGenerationScheduledMessage: "Report generation is scheduled for {0}. You will get a notification when the report will be ready for downloading.",
+    noGeneratedReportsLabel: "No generated reports yet.",
+    PromotedLabel: "Promoted",
+    generatedRegistryBooksLabel: "Generated registry books",
+    generateRegistryBookLabel: "Generate registry book"
 }

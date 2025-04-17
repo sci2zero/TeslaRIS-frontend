@@ -51,7 +51,8 @@
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="formValue.municipalityOfBrith"
-                    :label="$t('municipalityOfBirthLabel')"
+                    :label="$t('municipalityOfBirthLabel') + '*'"
+                    :rules="requiredFieldRules"
                 />
             </v-col>
             <v-col cols="12" sm="6">

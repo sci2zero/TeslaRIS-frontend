@@ -774,7 +774,7 @@ export default {
     cancelAttendanceLabel: "Otkaži prisustvo",
     cancellationCompleteMessage: "Uspešno ste otkazali prisustvo. Bićete obavešteni o novom terminu promocija.",
     atLeastOneRequiredMessage: "Barem jedno od ovih polja je obavezno.",
-    institutionReportLabel: "Izveštaj po institucijama",
+    institutionReportLabel: "Statistika po institucijama",
     promotedDissertationsLabel: "Broj promovisanih - doktorske studije",
     promotedMagistersLabel: "Broj promovisanih - po starom",
     totalLabel: "Ukupno",
@@ -787,5 +787,10 @@ export default {
     adminActionsLabel: "Akcije administratora",
     allowSingleEditLabel: "Dopusti jednu izmenu",
     preferredReferenceLanguageLabel: "Izabrani jezik za unos referenci",
-    isAlsoABoardMemberLabel: "Član komisije"
+    isAlsoABoardMemberLabel: "Član komisije",
+    reportGenerationScheduledMessage: "Generisanje izveštaja je uspešno zakazano za {0}. Dobićete obaveštenje kada isti bude spreman za preuzimanje.",
+    noGeneratedReportsLabel: "Još uvek nemate generisane izveštaje.",
+    promotedLabel: "Promovisani",
+    generatedRegistryBooksLabel: "Generisane matične knjige",
+    generateRegistryBookLabel: "Generiši matičnu knjigu"
 }
