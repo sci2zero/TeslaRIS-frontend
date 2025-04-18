@@ -40,7 +40,7 @@
                         {{ returnCurrentLocaleContent(item.dissertationInformation.institutionName) }}
                     </localized-link>
                 </td>
-                <td>{{ getAcademicTitleFromValueAutoLocale(item.previousTitleInformation.academicTitle) }}</td>
+                <td>{{ item.dissertationInformation.acquiredTitle }}</td>
                 <td>{{ localiseDate(item.dissertationInformation.defenceDate) }}</td>
                 <td>{{ item.dissertationInformation.diplomaNumber }}</td>
                 <td>{{ displayTextOrPlaceholder(localiseDate(item.dissertationInformation.diplomaIssueDate)) }}</td>
@@ -83,7 +83,6 @@ import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import { getAcademicTitleFromValueAutoLocale } from '@/i18n/academicTitle';
   
 
 export default defineComponent({
@@ -212,8 +211,7 @@ export default defineComponent({
             displayTextOrPlaceholder,
             PromotionSelectorForm,
             addToPromotion, deleteSelection,
-            returnCurrentLocaleContent,
-            getAcademicTitleFromValueAutoLocale
+            returnCurrentLocaleContent
         };
         },
     });

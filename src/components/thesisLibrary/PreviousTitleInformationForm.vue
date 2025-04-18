@@ -19,9 +19,10 @@
   
             <v-col cols="12" md="6">
                 <v-text-field
+                    ref="schoolYearRef"
                     v-model="localForm.schoolYear"
                     :label="$t('schoolYearLabel') + '*'"
-                    :rules="requiredFieldRules"
+                    :rules="conditionalRule"
                 />
             </v-col>
   
@@ -37,10 +38,10 @@
   
             <v-col class="mb-2" cols="12" md="6">
                 <date-picker
+                    ref="gradDateRef"
                     v-model="localForm.graduationDate"
                     :label="$t('graduationDateLabel') + '*'"
                     color="primary"
-                    required
                 ></date-picker>
             </v-col>
         </v-row>
@@ -54,6 +55,7 @@ import type { PreviousTitleInformation } from '@/models/ThesisLibraryModel'
 import DatePicker from '../core/DatePicker.vue'
 import { useValidationUtils } from '@/utils/ValidationUtils'
 import { getAcademicTitlesForGivenLocale } from '@/i18n/academicTitle'
+import { VTextField } from 'vuetify/lib/components/index.mjs'
 
 
 export default defineComponent({
@@ -77,7 +79,21 @@ export default defineComponent({
 
         const localForm = ref({ ...modelValue.value });
 
-        const { requiredFieldRules } = useValidationUtils();
+        const { requiredFieldRules, atLeastOneRequiredRule } = useValidationUtils();
+        const conditionalRule = atLeastOneRequiredRule(localForm, [
+            "graduationDate",
+            "schoolYear"
+        ]);
+        const schoolYearRef = ref<typeof VTextField>();
+        const gradDateRef = ref<typeof DatePicker>();
+        watch(
+        () => [
+            localForm.value.schoolYear,
+            localForm.value.graduationDate
+        ],
+        () => {
+            schoolYearRef.value?.validate?.();
+        });
 
         const academicTitleOptions = computed(() => getAcademicTitlesForGivenLocale());
 
@@ -94,6 +110,8 @@ export default defineComponent({
             internalValid,
             requiredFieldRules,
             academicTitleOptions,
+            conditionalRule,
+            schoolYearRef, gradDateRef
         };
     },
     })

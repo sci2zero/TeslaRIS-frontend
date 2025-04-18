@@ -135,7 +135,9 @@
                                     <div v-if="registryBookEntry.dissertationInformation.dissertationTitle">
                                         {{ $t("dissertationTitleLabel") }}:
                                         <div class="response">
-                                            {{ registryBookEntry.dissertationInformation.dissertationTitle }}
+                                            <localized-link :to="'scientific-results/thesis/' + registryBookEntry?.thesisId">
+                                                {{ registryBookEntry.dissertationInformation.dissertationTitle }}
+                                            </localized-link>
                                         </div>
                                     </div>
 

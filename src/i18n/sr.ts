@@ -792,5 +792,6 @@ export default {
     noGeneratedReportsLabel: "Još uvek nemate generisane izveštaje.",
     promotedLabel: "Promovisani",
     generatedRegistryBooksLabel: "Generisane matične knjige",
-    generateRegistryBookLabel: "Generiši matičnu knjigu"
+    generateRegistryBookLabel: "Generiši matičnu knjigu",
+    addRegistryBookAdminLabel: "Dodaj administratora matične knjige"
 }

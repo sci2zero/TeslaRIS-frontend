@@ -766,5 +766,6 @@ export default {
     noGeneratedReportsLabel: "No generated reports yet.",
     PromotedLabel: "Promoted",
     generatedRegistryBooksLabel: "Generated registry books",
-    generateRegistryBookLabel: "Generate registry book"
+    generateRegistryBookLabel: "Generate registry book",
+    addRegistryBookAdminLabel: "Add registry book administrator"
 }
