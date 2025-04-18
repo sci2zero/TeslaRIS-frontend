@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(dataset?.title) }}
+                        <rich-title-renderer :title="returnCurrentLocaleContent(dataset?.title)"></rich-title-renderer>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(dataset?.subTitle) }}
@@ -104,8 +104,8 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="classifications">
-                {{ $t("classificationsLabel") }}
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+                {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -134,7 +134,7 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item value="classifications">
+            <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="dataset?.id"
@@ -147,7 +147,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(dataset?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(dataset?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -155,7 +155,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -179,7 +179,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -190,11 +189,13 @@ import CitationSelector from '@/components/publication/CitationSelector.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -207,7 +208,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -360,7 +361,7 @@ export default defineComponent({
         };
 
         return {
-            dataset, icon, publisher, userRole, currentTab,
+            dataset, icon, publisher, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment, deleteAttachment,

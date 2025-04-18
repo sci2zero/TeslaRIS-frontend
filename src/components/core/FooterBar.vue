@@ -18,7 +18,7 @@
                     </v-btn>
                 </div>
                 <div class="text-center" cols="12">
-                    {{ new Date().getFullYear() }} — <strong>TeslaRIS</strong>
+                    {{ new Date().getFullYear() }} — <strong>TeslaRIS</strong> <strong>{{ appVersion }}</strong>
                 </div>
             </v-row>
         </v-footer>
@@ -34,15 +34,15 @@ import { useI18n } from 'vue-i18n';
 export default defineComponent(
     {
         name: "FooterBar",
-        components: {  },
         setup() {
+            const appVersion = import.meta.env.VITE_APP_VERSION;
             const i18n = useI18n();
             const homeLabel = computed(() => i18n.t("homeLabel"));
 
             const personListLabel = computed(() => i18n.t("personListLabel"));
             const ouListLabel = computed(() => i18n.t("ouListLabel"));
             const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-            const advancedSearchLabel = computed(() => i18n.t("advancedSearchLabel"));
+            const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
             const contactLabel = computed(() => i18n.t("contactLabel"));
 
 
@@ -51,12 +51,14 @@ export default defineComponent(
                     { title: personListLabel, path: "persons"},
                     { title: ouListLabel, path: "organisation-units"},
                     { title: scientificResultsListLabel, path: "scientific-results"},
-                    { title: advancedSearchLabel, path: "advanced-search"},
+                    { title: simpleSearchLabel, path: "advanced-search"},
                     { title: contactLabel, path: "contact"},
                 ]);
 
 
-            return {links};
+            return {
+                links, appVersion
+            };
         }
     });
 </script>

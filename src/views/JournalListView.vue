@@ -5,17 +5,32 @@
         <br />
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
-        <v-btn color="primary" @click="addJournal">
-            {{ $t("createNewJournalLabel") }}
-        </v-btn>
-        <br />
-        <br />
-        <journal-table-component ref="tableRef" :journals="journals" :total-journals="totalJournals" @switch-page="switchPage"></journal-table-component>
+        <span class="d-flex align-center">
+            <v-btn
+                v-if="isAdmin"
+                class="mb-5"
+                color="primary"
+                @click="addJournal">
+                {{ $t("createNewJournalLabel") }}
+            </v-btn>
+            <v-checkbox
+                v-if="isUserBoundToOU"
+                v-model="returnOnlyInstitutionRelatedEntities"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
+                class="ml-4"
+            ></v-checkbox>
+        </span>
+        <journal-table-component
+            ref="tableRef"
+            :journals="journals"
+            :total-journals="totalJournals"
+            @switch-page="switchPage">
+        </journal-table-component>
     </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import JournalService from '@/services/JournalService';
 import JournalTableComponent from '@/components/journal/JournalTableComponent.vue';
@@ -23,6 +38,7 @@ import { ref } from 'vue';
 import type { JournalIndex } from '@/models/JournalModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useUserRole } from '@/composables/useUserRole';
 
 export default defineComponent({
     name: "JournalListView",
@@ -40,8 +56,14 @@ export default defineComponent({
         const router = useRouter();
         const tableRef = ref<typeof JournalTableComponent>();
 
+        const { isAdmin, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+
         onMounted(() => {
             document.title = i18n.t("journalListLabel");
+        });
+
+        watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
+            search(searchParams.value);
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -54,7 +76,15 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            JournalService.searchJournals(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+
+            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                return;
+            }
+
+            JournalService.searchJournals(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+            .then((response) => {
                 journals.value = response.data.content;
                 totalJournals.value = response.data.totalElements;
             });
@@ -73,8 +103,10 @@ export default defineComponent({
         };
 
         return {
-            search, journals, totalJournals, switchPage, addJournal,
-            tableRef, clearSortAndPerformSearch
+            search, journals, totalJournals, isAdmin,
+            switchPage, addJournal, isUserBoundToOU,
+            tableRef, clearSortAndPerformSearch,
+            returnOnlyInstitutionRelatedEntities
         };
     }
 });

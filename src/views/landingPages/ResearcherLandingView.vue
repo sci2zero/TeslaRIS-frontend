@@ -218,7 +218,7 @@
                 </v-row>
 
                 <v-btn
-                    v-if="userRole === 'ADMIN'" 
+                    v-if="isAdmin" 
                     density="compact" class="mt-5" 
                     color="blue darken-1"
                     @click="migrateToUnmanaged">
@@ -226,17 +226,30 @@
                 </v-btn>
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
+                    :endpoint-token-parameters="[`${person?.id}`]"
+                    @switch-page="switchPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="personIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
+                    <statistics-view
+                        :entity-indicators="personIndicators"
+                        :statistics-type="StatisticsType.VIEW">
+                    </statistics-view>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <person-assessments-view :assessments="personAssessments" :is-loading="assessmentsLoading" @fetch="fetchAssessment"></person-assessments-view>
+                <person-assessments-view
+                    :assessments="personAssessments"
+                    :is-loading="assessmentsLoading"
+                    @fetch="fetchAssessment">
+                </person-assessments-view>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -247,7 +260,7 @@
 </template>
 
 <script lang="ts">
-import type { MultilingualContent, Country } from '@/models/Common';
+import { type MultilingualContent, type Country, ExportableEndpointType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
 import { computed, onMounted } from 'vue';
@@ -278,7 +291,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
-import UserService from '@/services/UserService';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
@@ -291,6 +303,7 @@ import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasur
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -320,7 +333,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
 
         const researcherName = ref("");
 
@@ -603,9 +616,10 @@ export default defineComponent({
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            currentTab, PersonUpdateForm, userRole, migrateToUnmanaged, performMigrationToUnmanaged,
+            currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
-            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading
+            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
+            ExportableEndpointType
         };
 }});
 </script>

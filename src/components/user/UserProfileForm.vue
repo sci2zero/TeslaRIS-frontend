@@ -44,8 +44,8 @@
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :rules="(isResearcher || isCommission || isViceDeanForScience) ? requiredSelectionRules : []"
-                    :readonly="isResearcher || isCommission || isViceDeanForScience"
+                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary) ? requiredSelectionRules : []"
+                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary"
                     :no-data-text="$t('noDataMessage')"
                     return-object
                     @update:search="searchOUs($event)"
@@ -114,6 +114,7 @@ import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from
 import { useRouter } from "vue-router";
 import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";
+import { useUserRole } from "@/composables/useUserRole";
 
 export default defineComponent({
     name: "UserProfileForm",
@@ -144,10 +145,7 @@ export default defineComponent({
         const oldPassword = ref("");
         const newPassword = ref("");
 
-        const isResearcher = computed(() => UserService.provideUserRole() === "RESEARCHER");
-        const isAdmin = computed(() => UserService.provideUserRole() === "ADMIN");
-        const isCommission = computed(() => UserService.provideUserRole() === "COMMISSION");
-        const isViceDeanForScience = computed(() => UserService.provideUserRole() === "VICE_DEAN_FOR_SCIENCE");
+        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor} = useUserRole();
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
@@ -214,7 +212,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params, null).then((response) => {
+                OrganisationUnitService.searchOUs(params, null, null).then((response) => {
                     const listOfOUs: { title: string, value: number }[] = [];
                     response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
                         if (i18n.locale.value === "sr") {
@@ -288,13 +286,13 @@ export default defineComponent({
             changePassword, name, surname,
             organisationUnits, selectedOrganisationUnit, 
             email, showOldPassword, languages, selectedLanguage, 
-            searchOUs, filterOUs, allowAccountTakeover,
+            searchOUs, filterOUs, allowAccountTakeover, isInstitutionalEditor,
             updateUser, setNewPassword, selectedNotificationPeriod,
             emailFieldRules, requiredFieldRules, requiredSelectionRules,
             isFormValid, notificationPeriods, oldPassword, newPassword,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
-            isViceDeanForScience
+            isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary
         };
     }
 });

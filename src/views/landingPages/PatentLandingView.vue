@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(patent?.title) }}
+                        <rich-title-renderer :title="returnCurrentLocaleContent(patent?.title)"></rich-title-renderer>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(patent?.subTitle) }}
@@ -147,7 +147,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(patent?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(patent?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -155,7 +155,7 @@
 
 <script lang="ts">
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -178,7 +178,6 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -189,10 +188,12 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer },
     setup() {
         const currentTab = ref("contributions");
 
@@ -206,7 +207,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -361,7 +362,7 @@ export default defineComponent({
         return {
             patent, icon, publisher, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, PatentUpdateForm, canClassify,
-            languageTagMap, searchKeyword, goToURL, canEdit, userRole,
+            languageTagMap, searchKeyword, goToURL, canEdit, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, citationRef, currentRoute,

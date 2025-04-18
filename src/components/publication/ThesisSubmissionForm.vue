@@ -3,16 +3,25 @@
         <v-row>
             <v-col cols="8">
                 <v-row>
-                    <v-col v-if="!enterExternalOU" cols="10">
-                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                    <v-col v-if="!enterExternalOU" cols="12">
+                        <organisation-unit-autocomplete-search
+                            ref="ouAutocompleteRef"
+                            v-model:model-value="selectedOrganisationUnit"
+                            :readonly="isInstitutionalLibrarian"
+                            required>
+                        </organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row v-if="enterExternalOU">
                     <v-col>
-                        <multilingual-text-input ref="externalOUNameRef" v-model="externalOUName" :rules="requiredFieldRules" :label="$t('externalOUNameLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="externalOUNameRef"
+                            v-model="externalOUName" :rules="requiredFieldRules"
+                            :label="$t('externalOUNameLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="!isInstitutionalLibrarian">
                     <v-col>
                         <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
                             {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
@@ -21,11 +30,14 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef" v-model="title"
+                            :rules="requiredFieldRules" :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-select
                             v-model="selectedThesisType"
                             :label="$t('thesisTypeLabel') + '*'"
@@ -36,16 +48,23 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-text-field
-                            v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules"></v-text-field>
+                            v-model="publicationYear" type="number" 
+                            :label="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
+                            :placeholder="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
+                            :rules="(canAddAsNonReference) ? [] : requiredFieldRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic limit-one @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            limit-one @set-input="contributions = $event">
+                        </person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -55,11 +74,47 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="6">
+                            <date-picker
+                                v-model="topicAcceptanceDate"
+                                :label="$t('topicAcceptanceDateLabel')"
+                                color="primary"
+                            ></date-picker>
+                        </v-col>
+                        <v-col cols="6">
+                            <date-picker
+                                v-model="thesisDefenceDate"
+                                :label="$t('defenceDateLabel')"
+                                color="primary"
+                            ></date-picker>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" md="6">
+                            <v-select
+                                v-model="selectedLanguage"
+                                :label="$t('languageLabel')"
+                                :items="languageList"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-select
+                                v-model="selectedWritingLanguage"
+                                :label="$t('writingLanguageLabel')"
+                                :items="languageTagsList"
+                            ></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
                             <v-select
                                 v-model="selectedResearchArea"
                                 :label="$t('researchAreaLabel')"
@@ -69,23 +124,36 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
-                            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="doi" label="DOI"
+                                placeholder="DOI" :rules="doiValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
-                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="numberOfPages" type="number"
+                                :label="$t('numberOfPagesLabel')"
+                                :placeholder="$t('numberOfPagesLabel')">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="descriptionRef" v-model="description"
+                                is-area :label="$t('abstractLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="keywordsRef" v-model="keywords"
+                                :label="$t('keywordsLabel')" is-area>
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -94,8 +162,11 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
-                            <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                        <v-col cols="12">
+                            <publisher-autocomplete-search
+                                ref="publisherAutocompleteRef"
+                                v-model="selectedPublisher">
+                            </publisher-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -112,7 +183,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -124,7 +195,7 @@ import type { Thesis, ThesisType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, LanguageTagResponse } from '@/models/Common';
+import type { ErrorResponse, LanguageResponse } from '@/models/Common';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
@@ -133,11 +204,14 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import Toast from '../core/Toast.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import { useUserRole } from '@/composables/useUserRole';
+import DatePicker from '../core/DatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -150,18 +224,20 @@ export default defineComponent({
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
         const router = useRouter();
+        const { isAdmin, isInstitutionalLibrarian, loggedInUser } = useUserRole();
+        const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { languageTagsList } = useLanguageTags();
         const languageList = ref<{title: string, value: number}[]>([]);
-        const selectedLanguages = ref<number[]>([]);
+        const selectedLanguage = ref<number>();
+        const selectedWritingLanguage = ref<number>();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageTags.value.push(languageTag);
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                    if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
-                        selectedLanguages.value.push(languageTag.id);
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
+                    if (i18n.locale.value.toUpperCase() === language.languageCode) {
+                        selectedLanguage.value = language.id;
                     }
                 })
             });
@@ -171,6 +247,19 @@ export default defineComponent({
                 populateSelectionData();
             });
         });
+
+        watch([loggedInUser, i18n], () => {
+            presetOU();
+        });
+
+        const presetOU = () => {
+            if (isInstitutionalLibrarian.value) {
+                selectedOrganisationUnit.value = {
+                    title: returnCurrentLocaleContent(loggedInUser.value?.organisationUnitName) as string,
+                    value: loggedInUser.value?.organisationUnitId as number
+                };
+            }
+        };
 
         const populateSelectionData = () => {
             researchAreasSelectable.value = [];
@@ -205,6 +294,8 @@ export default defineComponent({
         const doi = ref("");
         const numberOfPages = ref<number|null>();
         const uris = ref<string[]>([]);
+        const topicAcceptanceDate = ref("");
+        const thesisDefenceDate = ref("");
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
@@ -218,7 +309,8 @@ export default defineComponent({
             const newThesis: Thesis = {
                 title: title.value,
                 thesisType: selectedThesisType.value.value as ThesisType,
-                languageTagIds: selectedLanguages.value,
+                languageId: selectedLanguage.value as number,
+                writingLanguageTagId: selectedWritingLanguage.value as number,
                 numberOfPages: numberOfPages.value as number,
                 organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
                 externalOrganisationUnitName: externalOUName.value,
@@ -232,7 +324,9 @@ export default defineComponent({
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 researchAreaId: selectedResearchArea.value.value as number,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                topicAcceptanceDate: topicAcceptanceDate.value,
+                thesisDefenceDate: thesisDefenceDate.value
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
@@ -252,6 +346,8 @@ export default defineComponent({
                     selectedResearchArea.value = { title: "", value: null };
                     selectedOrganisationUnit.value = {title: "", value: -1};
                     contributionsRef.value?.clearInput();
+                    topicAcceptanceDate.value = "";
+                    thesisDefenceDate.value = "";
 
                     error.value = false;
                     snackbar.value = true;
@@ -272,21 +368,20 @@ export default defineComponent({
 
         return {
             isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
-            publicationYear, doi,
-            publisherAutocompleteRef,
-            selectedPublisher, numberOfPages,
+            additionalFields, snackbar, error, title, titleRef,
+            subtitle, subtitleRef, publicationYear, doi,
+            publisherAutocompleteRef, selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
-            keywords, keywordsRef, uris, urisRef,
-            contributions, contributionsRef,
+            keywords, keywordsRef, uris, urisRef, selectedLanguage,
+            contributions, contributionsRef, languageList,
             requiredFieldRules, submitThesis, errorMessage,
-            requiredSelectionRules, enterExternalOU,
+            requiredSelectionRules, enterExternalOU, languageTagsList,
             researchAreasSelectable, selectedResearchArea,
             selectedThesisType, thesisTypes, selectedOrganisationUnit,
-            externalOUName, externalOUNameRef, ouAutocompleteRef
+            externalOUName, externalOUNameRef, ouAutocompleteRef,
+            selectedWritingLanguage, canAddAsNonReference,
+            isInstitutionalLibrarian, topicAcceptanceDate,
+            thesisDefenceDate
         };
     }
 });

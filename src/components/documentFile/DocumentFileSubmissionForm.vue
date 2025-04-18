@@ -16,7 +16,7 @@
                             :label="$t('descriptionLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row v-if="!isProof">
+                <v-row v-if="!isProof && !disableResourceTypeSelection">
                     <v-col>
                         <v-select
                             v-model="selectedResourceType"
@@ -27,7 +27,7 @@
                         </v-select>
                     </v-col>
                 </v-row>
-                <!-- <v-row>
+                <v-row v-if="allowLicenceSelection">
                     <v-col>
                         <v-select
                             v-model="selectedLicense"
@@ -37,8 +37,8 @@
                             return-object>
                         </v-select>
                     </v-col>
-                </v-row> -->
-                <v-row>
+                </v-row>
+                <v-row v-else>
                     <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
                 </v-row>
             </v-col>
@@ -85,6 +85,14 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        allowLicenceSelection: {
+            type: Boolean,
+            default: false
+        },
+        disableResourceTypeSelection: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["create", "update"],
     setup(props, { emit }) {
@@ -128,7 +136,7 @@ export default defineComponent({
             { title: "Subscription-Based Access", value: License.SUBSCRIPTION_BASED_ACCESS },
         ];
 
-        const selectedLicense = ref({ title: "Open Access", value: License.OPEN_ACCESS });
+        const selectedLicense = ref({ title: "All Rights Reserved", value: License.ALL_RIGHTS_RESERVED });
         const isOpenAccess = ref<boolean>(true);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
@@ -138,8 +146,13 @@ export default defineComponent({
                 file: file.value as File,
                 description: description.value,
                 resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
-                // license: selectedLicense.value.value,
-                license: isOpenAccess.value ? License.OPEN_ACCESS : License.SUBSCRIPTION_BASED_ACCESS
+                license: License.ALL_RIGHTS_RESERVED
+            }
+
+            if (props.allowLicenceSelection) {
+                newDocumentFile.license = selectedLicense.value.value;
+            } else {
+                newDocumentFile.license = isOpenAccess.value ? License.OPEN_ACCESS : License.SUBSCRIPTION_BASED_ACCESS;
             }
 
             if(props.edit) {

@@ -26,9 +26,12 @@ export default defineComponent({
             const breadcrumbs = route.matched
             .filter((matchedRoute) => matchedRoute.name && matchedRoute.name !== "home")
             .map((matchedRoute) => {
+                let routeName = matchedRoute.name as string;
+                routeName = routeName.replace("Parent", "");
+
                 const isLastBreadcrumb = router.resolve(matchedRoute).fullPath === route.path;
                 return {
-                    title: matchedRoute.meta?.breadcrumb || i18n.t(`routeLabel.${matchedRoute.name as string}`),
+                    title: matchedRoute.meta?.breadcrumb || i18n.t(`routeLabel.${routeName}`),
                     disabled: isLastBreadcrumb,
                     to: !isLastBreadcrumb ? router.resolve(matchedRoute).fullPath : undefined,
                 }
