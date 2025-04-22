@@ -793,5 +793,9 @@ export default {
     promotedLabel: "Promovisani",
     generatedRegistryBooksLabel: "Generisane matične knjige",
     generateRegistryBookLabel: "Generiši matičnu knjigu",
-    addRegistryBookAdminLabel: "Dodaj administratora matične knjige"
+    addRegistryBookAdminLabel: "Dodaj administratora matične knjige",
+    weUseCookiesLabel: "Koristimo kolačiće 🍪",
+    cookiesExplanationMessage: "Koristimo kolačiće da bismo poboljšali vaše iskustvo evidentiranjem statistike pregledanja i preuzimanja. Možete prihvatiti sve kolačiće ili odbiti one za praćenje, čime ćete omogućiti samo one koji su potrebni za autentifikaciju.",
+    acceptAllLabel: "Prihvati sve",
+    acceptNecessaryLabel: "Prihvati samo neophodne"
 }

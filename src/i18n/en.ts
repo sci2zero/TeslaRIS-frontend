@@ -767,5 +767,9 @@ export default {
     PromotedLabel: "Promoted",
     generatedRegistryBooksLabel: "Generated registry books",
     generateRegistryBookLabel: "Generate registry book",
-    addRegistryBookAdminLabel: "Add registry book administrator"
+    addRegistryBookAdminLabel: "Add registry book administrator",
+    weUseCookiesLabel: "We use cookies 🍪",
+    cookiesExplanationMessage: "We use cookies to improve your experience by logging browsing and download statistics. You can accept all cookies or decline tracking ones, thus enabling only ones required for authentication.",
+    acceptAllLabel: "Accept all",
+    acceptNecessaryLabel: "Accept only necessary"
 }

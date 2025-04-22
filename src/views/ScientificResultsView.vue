@@ -3,7 +3,32 @@
         <h1>{{ $t("scientificResultsListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
+        <v-tabs
+            v-model="currentTab"
+            bg-color="blue-grey-lighten-5"
+            color="deep-purple-accent-4"
+            align-tabs="center"
+        >
+            <v-tab value="simpleSearch">
+                {{ $t("simpleSearchLabel") }}
+            </v-tab>
+            <v-tab value="advancedSearch">
+                {{ $t("advancedSearchLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window v-model="currentTab">
+            <v-tabs-window-item value="simpleSearch">
+                <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="advancedSearch">
+                <query-input-component
+                    :search-fields="searchFields"
+                    @search="clearSortAndPerformSearch($event)"
+                    @reset="resetFiltersAndSearch">
+                </query-input-component>
+            </v-tabs-window-item>
+        </v-tabs-window>
         <br />
         <span :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
             <v-menu v-if="canUserAddPublications" open-on-hover>
@@ -54,8 +79,9 @@
             :publications="publications"
             :total-publications="totalPublications"
             enable-export
-            :endpoint-type="ExportableEndpointType.DOCUMENT_SEARCH"
+            :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+            :endpoint-body-parameters="{allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value)}"
             @switch-page="switchPage">
         </publication-table-component>
     </v-container>
@@ -74,14 +100,17 @@ import { computed } from 'vue';
 import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import { ExportableEndpointType } from '@/models/Common';
+import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Common';
 import { isEqual } from 'lodash';
+import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 
 
 export default defineComponent({
     name: "ScientificResultsListView",
-    components: {SearchBarComponent, PublicationTableComponent},
+    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent },
     setup() {
+        const currentTab = ref("simpleSearch");
+
         const searchParams = ref("tokens=");
         const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
 
@@ -101,6 +130,8 @@ export default defineComponent({
 
         const { isCommission, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
 
+        const searchFields = ref<SearchFieldsResponse[]>([]);
+
         onMounted(() => {
             document.title = i18n.t("scientificResultsListLabel");
 
@@ -116,6 +147,10 @@ export default defineComponent({
             if (isInstitutionalLibrarian.value) {
                 submissionMenuItems.value = submissionMenuItems.value.filter(item => item.value === "submitThesis");
             }
+
+            DocumentPublicationService.getSearchFields(false).then(response => {
+                searchFields.value = response.data;
+            });
         });
 
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities, selectedPublicationTypes], () => {
@@ -130,7 +165,7 @@ export default defineComponent({
             const publicationTypes = selectedPublicationTypes.value.map(publicationType => publicationType.value);
             const selectOnlyUnassessed = isCommission.value && returnOnlyUnassessedEntities.value;
 
-            if (searchParams.value === tokenParams && isEqual(previousFilterValues.value.publicationTypes, publicationTypes) && previousFilterValues.value.selectOnlyUnassessed === selectOnlyUnassessed) {
+            if (loggedInUser.value && searchParams.value === tokenParams && isEqual(previousFilterValues.value.publicationTypes, publicationTypes) && previousFilterValues.value.selectOnlyUnassessed === selectOnlyUnassessed) {
                 return;
             } else {
                 searchParams.value = tokenParams;
@@ -138,18 +173,36 @@ export default defineComponent({
                 previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
             }
 
-            DocumentPublicationService.searchDocumentPublications(
-                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                selectOnlyUnassessed,
-                publicationTypes
-            ).then((response) => {
-                publications.value = response.data.content;
-                totalPublications.value = response.data.totalElements;
-            });
+            if (currentTab.value === "simpleSearch" || tokenParams === "tokens=*") {
+                DocumentPublicationService.searchDocumentPublications(
+                    `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                    returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
+                    selectOnlyUnassessed,
+                    publicationTypes
+                ).then((response) => {
+                    publications.value = response.data.content;
+                    totalPublications.value = response.data.totalElements;
+                });
+            } else {
+                DocumentPublicationService.performAdvancedSearch(
+                    `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                    returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
+                    selectOnlyUnassessed,
+                    publicationTypes
+                ).then((response) => {
+                    publications.value = response.data.content;
+                    totalPublications.value = response.data.totalElements;
+                });
+            }
         };
 
-        const clearSortAndPerformSearch = (tokenParams: string) => {
+        const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
+            if (typeof tokenParams !== "string") {
+                tokenParams = "tokens=" + tokenParams.join("&tokens=");
+            }
+
+            console.log(tokenParams);
+
             tableRef.value?.setSortAndPageOption([], 1);
             page.value = 0;
             sort.value = "";
@@ -190,15 +243,20 @@ export default defineComponent({
             { title: addThesisLabel, value: "submitThesis" },
         ]);
 
+        const resetFiltersAndSearch = () => {
+            clearSortAndPerformSearch("tokens=*");
+        };
+
         return {
             search, publications, totalPublications,
             switchPage, submissionMenuItems, navigateToPage,
-            tableRef, clearSortAndPerformSearch,
+            tableRef, clearSortAndPerformSearch, searchFields,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
-            ExportableEndpointType, searchParams
+            ExportableEndpointType, searchParams, currentTab,
+            resetFiltersAndSearch
         };
     }
 });

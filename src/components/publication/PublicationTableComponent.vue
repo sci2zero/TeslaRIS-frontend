@@ -25,7 +25,7 @@
     </v-btn>
     <table-export-modal
         v-if="enableExport && loggedInUser"
-        :export-entity="endpointBodyParameters ? ExportEntity.THESIS : ExportEntity.DOCUMENT"
+        :export-entity="exportEntity"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"
         :potential-max-amount-requested="selectedPublications.length >= tableOptions.itemsPerPage"
@@ -243,6 +243,10 @@ export default defineComponent({
         endpointBodyParameters: {
             type: Object as PropType<any>,
             default: undefined
+        },
+        exportEntity: {
+            type: Object as PropType<ExportEntity>,
+            default: ExportEntity.DOCUMENT
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],

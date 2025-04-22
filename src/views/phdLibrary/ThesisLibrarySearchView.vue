@@ -23,6 +23,7 @@
         </v-tabs-window-item>
         <v-tabs-window-item value="advancedSearch">
             <query-input-component
+                :search-fields="searchFields"
                 @search="clearSortAndPerformSearch($event)"
                 @reset="resetFiltersAndSearch">
             </query-input-component>
@@ -50,6 +51,7 @@
                     enable-export
                     :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.THESIS_SIMPLE_SEARCH : ExportableEndpointType.THESIS_ADVANCED_SEARCH"
                     :endpoint-body-parameters="lastSearchRequest"
+                    :export-entity="ExportEntity.THESIS"
                     @switch-page="switchPage">
                 </publication-table-component>
             </v-col>
@@ -71,7 +73,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import ThesisLibrarySearchService from '@/services/thesisLibrary/ThesisLibrarySearchService';
 import FilterBarComponent from '@/components/core/FilterBarComponent.vue';
 import ThesisFilters from '@/components/thesisLibrary/ThesisFilters.vue';
-import { ExportableEndpointType } from '@/models/Common';
+import { ExportableEndpointType, ExportEntity, type SearchFieldsResponse } from '@/models/Common';
 
 
 export default defineComponent({
@@ -104,8 +106,14 @@ export default defineComponent({
 
         const { requiredSelectionRules } = useValidationUtils();
 
+        const searchFields = ref<SearchFieldsResponse[]>([]);
+
         onMounted(() => {
             document.title = i18n.t("routeLabel.thesisLibrarySearch");
+
+            ThesisLibrarySearchService.getSearchFields(false).then(response => {
+                searchFields.value = response.data;
+            });
         });
 
         const search = (tokenParams: string[]) => {
@@ -190,9 +198,9 @@ export default defineComponent({
             switchPage, ThesisFilters,
             filtersRef, search, searchParams,
             ExportableEndpointType,
-            lastSearchRequest,
+            lastSearchRequest, ExportEntity,
             resetFiltersAndSearch,
-            sectionTableRef
+            sectionTableRef, searchFields
         };
     }
 });

@@ -256,10 +256,10 @@ export default defineComponent({
 
             switch(props.exportEntity) {
                 case ExportEntity.PERSON:
-                    TableExportService.exportPersonTable(exportRequest as DocumentCSVExportRequest);
+                    TableExportService.exportPersonTable(exportRequest as CSVExportRequest);
                     break;
                 case ExportEntity.ORGANISATION_UNIT:
-                    TableExportService.exportOrganisationUnitTable(exportRequest as DocumentCSVExportRequest);
+                    TableExportService.exportOrganisationUnitTable(exportRequest as CSVExportRequest);
                     break;
                 case ExportEntity.THESIS:
                     (exportRequest as ThesisCSVExportRequest).thesisSearchRequest = props.endpointBodyParameters;
@@ -277,6 +277,7 @@ export default defineComponent({
                     (exportRequest as DocumentCSVExportRequest).harvard = harvard.value;
                     (exportRequest as DocumentCSVExportRequest).chicago = chicago.value;
                     (exportRequest as DocumentCSVExportRequest).vancouver = vancouver.value;
+                    (exportRequest as DocumentCSVExportRequest).allowedTypes = props.endpointBodyParameters.allowedTypes;
 
                     TableExportService.exportDocumentTable(exportRequest as DocumentCSVExportRequest);
                     break;

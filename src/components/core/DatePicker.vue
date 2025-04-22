@@ -130,7 +130,6 @@ export default defineComponent({
     };
 
     const validate = () => {
-      console.log(fieldRef.value)
       fieldRef.value?.validate?.();
     };
 

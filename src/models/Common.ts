@@ -1,3 +1,5 @@
+import { PublicationType } from "./PublicationModel";
+
 export interface Page<Type> {
     content: Type[];
     totalElements: number;
@@ -166,6 +168,7 @@ export enum ExportEntity {
 export enum ExportableEndpointType {
     PERSON_SEARCH = "PERSON_SEARCH",
     DOCUMENT_SEARCH = "DOCUMENT_SEARCH",
+    DOCUMENT_ADVANCED_SEARCH = "DOCUMENT_ADVANCED_SEARCH",
     ORGANISATION_UNIT_SEARCH = "ORGANISATION_UNIT_SEARCH",
     PERSON_OUTPUTS = "PERSON_OUTPUTS",
     ORGANISATION_UNIT_OUTPUTS = "ORGANISATION_UNIT_OUTPUTS",
@@ -192,4 +195,5 @@ export interface DocumentCSVExportRequest extends CSVExportRequest {
     harvard: boolean;
     chicago: boolean;
     vancouver: boolean;
+    allowedTypes: PublicationType[];
 }
