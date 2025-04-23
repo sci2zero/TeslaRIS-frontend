@@ -19,8 +19,8 @@ class AuthenticationService extends BaseService {
     return super.sendRequest(axios.post, "user/register-researcher", registrationRequest, AuthenticationService.idempotencyKey);
   }
 
-  async registerEmployee(registrationRequest: EmployeeRegistrationRequest): Promise<AxiosResponse<UserResponse>> {
-    return super.sendRequest(axios.post, "user/register-institution-admin", registrationRequest, AuthenticationService.idempotencyKey);
+  async registerEmployee(registrationRequest: EmployeeRegistrationRequest, employmentPosition: string): Promise<AxiosResponse<UserResponse>> {
+    return super.sendRequest(axios.post, `user/register-employee/${employmentPosition}`, registrationRequest, AuthenticationService.idempotencyKey);
   }
 
   async registerCommission(registrationRequest: CommissionRegistrationRequest): Promise<AxiosResponse<UserResponse>> {

@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
+        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedEvent"
                 :readonly="readOnly"
@@ -15,8 +15,15 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission" cols="1" class="modal-spacer-top">
-            <conference-submission-modal :read-only="readOnly" @create="selectNewlyAddedEvent"></conference-submission-modal>
+        <v-col v-if="!disableSubmission" cols="1">
+            <generic-crud-modal
+                :form-component="ConferenceSubmissionForm"
+                :form-props="{readOnly: readOnly}"
+                entity-name="Conference"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedEvent"
+            />
         </v-col>
         <v-col v-if="allowManualClearing && hasSelection" cols="1">
             <v-btn icon @click="clearInput">
@@ -32,12 +39,14 @@ import lodash from "lodash";
 import EventService from '@/services/EventService';
 import type { Conference, EventIndex } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
-import ConferenceSubmissionModal from './ConferenceSubmissionModal.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import ConferenceSubmissionForm from './ConferenceSubmissionForm.vue';
+
 
 export default defineComponent({
     name: "EventAutocompleteSearch",
-    components: { ConferenceSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -95,7 +104,7 @@ export default defineComponent({
             if (!input || input.includes("|")) return;
             if (input.length >= 3) {
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
-                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false).then((response) => {
+                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
                         title: `${i18n.locale.value === "sr" ? conference.nameSr : conference.nameOther} | ${extractDate(conference.dateFromTo)}`,
                         value: conference.databaseId,
@@ -147,7 +156,8 @@ export default defineComponent({
         return {
             events, selectedEvent, searchEvents,
             requiredSelectionRules, sendContentToParent,
-            clearInput, selectNewlyAddedEvent, hasSelection
+            clearInput, selectNewlyAddedEvent, hasSelection,
+            ConferenceSubmissionForm
         };
     }
 });

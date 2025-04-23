@@ -73,16 +73,14 @@
 import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import type { MultilingualContent } from '@/models/Common';
 import type { ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/proceedingsPublicationType';
 import type { ProceedingsPublicationLoad } from '@/models/LoadModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -98,13 +96,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
-
-        onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-        });
+        const { languageTags } = useLanguageTags();
 
         const subtitle = ref([]);
         const description = ref([]);

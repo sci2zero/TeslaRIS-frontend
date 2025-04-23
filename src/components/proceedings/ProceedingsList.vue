@@ -3,18 +3,25 @@
         <v-col :cols="inComparator ? 4 : 2">
             <h2>{{ $t("proceedingsListLabel") }}</h2>  
         </v-col>
-        <v-col v-if="!readonly && userRole === 'ADMIN'" class="proceedings-submission" cols="3">
-            <proceedings-submission-modal :conference="convertToListEntry(presetEvent)" @create="refreshProceedingsList"></proceedings-submission-modal>
+        <v-col v-if="!readonly && isAdmin" cols="3">
+            <generic-crud-modal
+                :form-component="ProceedingsSubmissionForm"
+                :form-props="{conference: convertToListEntry(presetEvent)}"
+                entity-name="Proceedings"
+                is-submission
+                :read-only="false"
+                @create="refreshProceedingsList"
+            />
         </v-col>
     </v-row>
     <v-row v-if="proceedings?.length > 0">
         <v-btn
-            v-if="userRole === 'ADMIN'"
+            v-if="isAdmin"
             density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsPublicationComparison">
             {{ $t("comparePublicationsLabel") }}
         </v-btn>
         <v-btn
-            v-if="userRole === 'ADMIN'"
+            v-if="isAdmin"
             density="compact" class="compare-button" :disabled="selectedProceedings.length !== 2" @click="startProceedingsMetadataComparison">
             {{ $t("compareMetadataLabel") }}
         </v-btn>
@@ -33,7 +40,7 @@
                 :subtitle="item.documentDate ? item.documentDate : presetEvent?.dateTo.split('-')[0]"
                 @click="navigateToProceedings(item.id as number)"
             >
-                <template v-if="userRole === 'ADMIN'" #prepend>
+                <template v-if="isAdmin" #prepend>
                     <v-checkbox
                         v-model="selectedProceedings"
                         :value="item"
@@ -42,7 +49,7 @@
                         @click.stop
                     />
                 </template>
-                <template v-if="!readonly && userRole === 'ADMIN'" #append>
+                <template v-if="!readonly && isAdmin" #append>
                     <v-row>
                         <v-col cols="auto">
                             <v-icon @click.stop="deleteProceedings(item)">
@@ -64,7 +71,6 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, type PropType } from 'vue';
 import type { Conference } from "@/models/EventModel";
-import ProceedingsSubmissionModal from '@/components/proceedings/ProceedingsSubmissionModal.vue';
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { watch } from 'vue';
@@ -72,14 +78,15 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import router from '@/router';
 import { useI18n } from 'vue-i18n';
 import { VueDraggableNext } from 'vue-draggable-next'
-import { computed } from 'vue';
-import UserService from '@/services/UserService';
 import Toast from '../core/Toast.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import ProceedingsSubmissionForm from './ProceedingsSubmissionForm.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "ProceedingsList",
-    components: { ProceedingsSubmissionModal, draggable: VueDraggableNext, Toast },
+    components: { GenericCrudModal, draggable: VueDraggableNext, Toast },
     props: {
         presetEvent: {
             type: Object as PropType<Conference | undefined>,
@@ -162,25 +169,21 @@ export default defineComponent({
             }});
         };
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
 
         return {
             proceedings, returnCurrentLocaleContent,
             refreshProceedingsList, convertToListEntry,
             deleteProceedings, navigateToProceedings,
-            snackbar, message, onDropCallback, userRole,
+            snackbar, message, onDropCallback, isAdmin,
             selectedProceedings, startProceedingsPublicationComparison,
-            startProceedingsMetadataComparison
+            startProceedingsMetadataComparison, ProceedingsSubmissionForm
         };
     },
   });
 </script>
 
 <style scoped>
-
-.proceedings-submission {
-    margin-top: 10px;
-}
 
 .no-proceedings-message {
     margin-bottom: 10px;

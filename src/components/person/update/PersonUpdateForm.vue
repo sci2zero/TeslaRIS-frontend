@@ -77,12 +77,12 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="cityRef" v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageList)" :label="$t('cityLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="cityRef" v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageTags)" :label="$t('cityLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageList)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageTags)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -93,14 +93,15 @@
             </v-col>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
 import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
-import type { Country, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { Country, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PersonalInfo, PersonResponse, Sex } from '@/models/PersonModel';
@@ -111,29 +112,34 @@ import DatePicker from '@/components/core/DatePicker.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import UriInput from '@/components/core/UriInput.vue';
 import { useI18n } from 'vue-i18n';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import PersonService from '@/services/PersonService';
+import Toast from '@/components/core/Toast.vue';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
     name: "PersonUpdateForm",
-    components: { MultilingualTextInput, DatePicker, UriInput },
+    components: { MultilingualTextInput, DatePicker, UriInput, Toast },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
-        const languageList = ref<LanguageTagResponse[]>([]);
+        const { languageTags } = useLanguageTags();
 
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
-            });
-
             fetchCountries();
         });
 
@@ -198,23 +204,49 @@ export default defineComponent({
         const { apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const { duplicateFound } = await checkIdentifiers(
+                    [
+                        { value: eNaukaId.value as string, error: "eNaukaIdExistsError" },
+                        { value: scopus.value as string, error: "scopusIdExistsError" },
+                        { value: apvnt.value as string, error: "apvntExistsError" },
+                        { value: eCrisId.value as string, error: "eCrisIdExistsError" },
+                        { value: orcid.value as string, error: "orcidIdExistsError" }
+                    ],
+                    props.presetPerson?.id as number,
+                    (id, docId) => PersonService.checkIdentifierUsage(id, docId)
+                );
+
+                if (duplicateFound) {
+                    return;
+                }
+            }
+
             const updatedPerson: PersonalInfo = {
-                contact: {phoneNumber: phoneNumber.value as string, contactEmail: email.value},
-                localBirthDate: birthdate.value ? birthdate.value : "",
+                contact: {
+                    phoneNumber: phoneNumber.value as string,
+                    contactEmail: email.value
+                },
+                localBirthDate: birthdate.value || "",
                 sex: selectedSex.value.value as Sex,
                 apvnt: apvnt.value,
                 eCrisId: eCrisId.value,
                 eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 placeOfBirth: placeOfBirth.value,
-                postalAddress: {city: city.value, countryId: selectedCountry.value?.value as number, streetAndNumber: streetAndNumber.value},
+                postalAddress: {
+                    city: city.value,
+                    countryId: selectedCountry.value?.value as number,
+                    streetAndNumber: streetAndNumber.value
+                },
                 scopusAuthorId: scopus.value,
                 uris: uris.value
             };
 
             emit("update", updatedPerson);
         };
+
 
         const refreshForm = () => {
             cityRef.value?.clearInput();
@@ -239,14 +271,14 @@ export default defineComponent({
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
             urisRef.value?.refreshModelValue(uris.value);
 
-            cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageList.value));
-            streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageList.value));
+            cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
+            streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageTags.value));
         };
 
         return {
-            isFormValid, email, phoneNumber, birthdate,
+            isFormValid, email, phoneNumber, birthdate, snackbar,
             orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
-            toMultilingualTextInput, languageList, submit,
+            toMultilingualTextInput, languageTags, submit, message,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,

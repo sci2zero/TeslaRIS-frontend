@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1>{{ $t("advancedSearchLabel") }}</h1>
+        <h1>{{ $t("simpleSearchLabel") }}</h1>
         <br />
         <br />
         <search-bar-component :preset-search-input="searchParams" @search="search"></search-bar-component>
@@ -91,39 +91,51 @@ export default defineComponent({
 
         onMounted(() => {
             currentTab.value = route.query.tab as string;
-            document.title = i18n.t("advancedSearchLabel");
+            document.title = i18n.t("simpleSearchLabel");
         });
     
         const search = (tokenParams: string) => {
-            if (!tokenParams) {
+            if (!tokenParams || !tokenParams.includes("tokens")) {
                 return;
             }
 
-            searchParams.value = tokenParams;
-            
             if (!currentTab.value) {
                 currentTab.value = "persons";
             }
             
             if(tokenParams) {
-                router.push({name:"advancedSearch", query: { searchQuery: tokenParams.split("=")[1], tab: currentTab.value }});
+                searchParams.value = tokenParams;
+                router.replace({name:"advancedSearch", query: { searchQuery: tokenParams.replaceAll("&", "").split("tokens=").filter(el => el).join(" "), tab: currentTab.value }});
             }
             
             switch(currentTab.value) {
                 case "persons":
-                    PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`, false).then((response) => {
+                    PersonService.searchResearchers(
+                        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPerson.value},${direction.value}`,
+                        false,
+                        null
+                    ).then((response) => {
                         persons.value = response.data.content;
                         totalPersons.value = response.data.totalElements;
                     });
                     break;
                 case "organisationUnits":
-                    OrganisationUnitService.searchOUs(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`).then((response) => {
+                    OrganisationUnitService.searchOUs(
+                        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortOU.value},${direction.value}`,
+                        null,
+                        null
+                    ).then((response) => {
                         organisationUnits.value = response.data.content;
                         totalOUs.value = response.data.totalElements;
                     });
                     break;
                 case "publications":
-                    DocumentPublicationService.searchDocumentPublications(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`).then((response) => {
+                    DocumentPublicationService.searchDocumentPublications(
+                        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sortPublication.value},${direction.value}`,
+                        null,
+                        false,
+                        []
+                    ).then((response) => {
                         publications.value = response.data.content;
                         totalPublications.value = response.data.totalElements;
                     });
@@ -147,7 +159,7 @@ export default defineComponent({
                     break;
             }
             search(searchParams.value as string);
-        }
+        };
 
         return {currentTab, persons, organisationUnits, publications, totalPersons, totalOUs, totalPublications, search, switchPage, searchParams};
     }

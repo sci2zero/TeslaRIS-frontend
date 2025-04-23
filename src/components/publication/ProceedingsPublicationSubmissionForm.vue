@@ -19,7 +19,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && userRole === 'RESEARCHER'">
+                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && isResearcher">
                     <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -33,8 +33,15 @@
                             return-object
                         ></v-select>
                     </v-col>
-                    <v-col class="proceedings-submission">
-                        <proceedings-submission-modal :conference="selectedEvent ? selectedEvent : searchPlaceholder" @create="selectNewlyAddedProceedings"></proceedings-submission-modal>
+                    <v-col>
+                        <generic-crud-modal
+                            :form-component="ProceedingsSubmissionForm"
+                            :form-props="{conference: selectedEvent ? selectedEvent : searchPlaceholder}"
+                            entity-name="Proceedings"
+                            is-submission
+                            :read-only="false"
+                            @create="selectNewlyAddedProceedings"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -139,7 +146,6 @@ import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { ProceedingsPublication } from "@/models/PublicationModel";
 import ProceedingsService from '@/services/ProceedingsService';
-import ProceedingsSubmissionModal from '../proceedings/ProceedingsSubmissionModal.vue';
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
@@ -147,12 +153,14 @@ import type { ErrorResponse } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import Toast from '../core/Toast.vue';
-import UserService from '@/services/UserService';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, ProceedingsSubmissionModal, Toast},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -238,11 +246,11 @@ export default defineComponent({
             });
         };
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
 
         watch(selectedEvent, (newValue) => {
             if (newValue) {
-                if (userRole.value === "RESEARCHER") {
+                if (isResearcher.value) {
                     listPublications(newValue);
                 }
                 availableProceedings.value = [];
@@ -334,20 +342,11 @@ export default defineComponent({
             myPublications, doiValidationRules, selectNewlyAddedProceedings,
             selectedEvent, eventAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType, errorMessage,
-            contributions, contributionsRef, scopusIdValidationRules, userRole,
+            contributions, contributionsRef, scopusIdValidationRules, isResearcher,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
-            searchPlaceholder
+            searchPlaceholder, ProceedingsSubmissionForm
         };
     }
 });
 </script>
-
-
-<style scoped>
-
-.proceedings-submission {
-    margin-top: 15px;
-}
-
-</style>

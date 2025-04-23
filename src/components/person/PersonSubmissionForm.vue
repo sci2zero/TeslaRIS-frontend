@@ -1,122 +1,179 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 8">
-                <v-row>
-                    <v-col>
-                        <v-text-field v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"></v-text-field>
-                    </v-col>
-                    <v-col>
-                        <v-text-field v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"></v-text-field>
-                    </v-col>
-                </v-row>
+        <v-container>
+            <v-row>
+                <v-col cols="12" :sm="inModal ? 12 : 8">
+                    <v-row>
+                        <v-col cols="12" md="6">
+                            <v-text-field
+                                v-model="firstName"
+                                :label="$t('firstNameLabel') + '*'"
+                                :placeholder="$t('firstNameLabel')"
+                                :rules="requiredFieldRules"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field
+                                v-model="lastName"
+                                :label="$t('surnameLabel') + '*'"
+                                :placeholder="$t('surnameLabel')"
+                                :rules="requiredFieldRules"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
 
-                <v-row>
-                    <person-deduplication-table ref="deduplicationTableRef" :person-first-name="firstName" :person-last-name="lastName"></person-deduplication-table>
-                </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <person-deduplication-table
+                                ref="deduplicationTableRef"
+                                :person-first-name="firstName"
+                                :person-last-name="lastName"
+                            ></person-deduplication-table>
+                        </v-col>
+                    </v-row>
 
-                <v-row>
-                    <v-col cols="12">
-                        <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit"></organisation-unit-autocomplete-search>
-                    </v-col>
-                </v-row>
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
                     <v-row>
-                        <v-col>
-                            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')"></v-text-field>
+                        <v-col cols="12">
+                            <organisation-unit-autocomplete-search
+                                ref="ouAutocompleteRef"
+                                v-model:model-value="selectedOrganisationUnit"
+                                :top-level-institution-id="role === 'INSTITUTIONAL_EDITOR' ? loggedInUser?.organisationUnitId : undefined"
+                            ></organisation-unit-autocomplete-search>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-select
-                                v-model="selectedEmploymentPosition"
-                                :items="employmentPositions"
-                                :label="$t('employmentPositionLabel')"
-                                return-object>
-                            </v-select>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-select
-                                v-model="selectedSex"
-                                :items="sexes"
-                                :label="$t('sexLabel')"
-                                return-object>
-                            </v-select>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <date-picker
-                                v-model="birthdate"
-                                :label="$t('birthdateLabel')"
-                                color="primary"
-                            ></date-picker>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="orcid" label="ORCID" placeholder="ORCID" :rules="orcidValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="eCrisId" label="eCRIS-ID" placeholder="eCRIS-ID" :rules="eCrisIdValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="eNaukaId" label="enaukaID" placeholder="enaukaID" :rules="eNaukaIdValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT" :rules="apvntValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID" :rules="scopusAuthorIdValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+                    <v-row class="d-flex align-center justify-space-between">
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
+                            {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+                        </v-btn>
+                    </v-row>
+
+                    <v-container v-if="additionalFields">
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="middleName"
+                                    :label="$t('middleNameLabel')"
+                                    :placeholder="$t('middleNameLabel')"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    v-model="selectedEmploymentPosition"
+                                    :items="employmentPositions"
+                                    :label="$t('employmentPositionLabel')"
+                                    return-object
+                                ></v-select>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    v-model="selectedSex"
+                                    :items="sexes"
+                                    :label="$t('sexLabel')"
+                                    return-object
+                                ></v-select>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="email"
+                                    :label="$t('emailLabel')"
+                                    :placeholder="$t('emailLabel')"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="phoneNumber"
+                                    :label="$t('phoneNumberLabel')"
+                                    :placeholder="$t('phoneNumberLabel')"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <date-picker
+                                    v-model="birthdate"
+                                    :label="$t('birthdateLabel')"
+                                    color="primary"
+                                ></date-picker>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="orcid"
+                                    label="ORCID"
+                                    placeholder="ORCID"
+                                    :rules="orcidValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="eCrisId"
+                                    label="eCRIS-ID"
+                                    placeholder="eCRIS-ID"
+                                    :rules="eCrisIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="eNaukaId"
+                                    label="enaukaID"
+                                    placeholder="enaukaID"
+                                    :rules="eNaukaIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="apvnt"
+                                    label="APVNT"
+                                    placeholder="APVNT"
+                                    :rules="apvntValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="scopus"
+                                    label="Scopus Author ID"
+                                    placeholder="Scopus Author ID"
+                                    :rules="scopusAuthorIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col cols="12">
+                    <p class="required-fields-message">
+                        {{ $t("requiredFieldsMessage") }}
+                    </p>
+                </v-col>
+            </v-row>
+        </v-container>
     </v-form>
-    
+
     <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import PersonService from "@/services/PersonService";
-import type { LanguageTagResponse } from '@/models/Common';
 import { useRouter } from 'vue-router';
-import { onMounted } from 'vue';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import type { BasicPerson } from "@/models/PersonModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from '@/utils/ValidationUtils';
@@ -127,6 +184,8 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
 import PersonDeduplicationTable from './PersonDeduplicationTable.vue';
 import Toast from '../core/Toast.vue';
+import UserService from '@/services/UserService';
+import { type UserResponse } from '@/models/UserModel';
 
 
 export default defineComponent({
@@ -148,15 +207,16 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const router = useRouter();
-
-        const languageList = ref<LanguageTagResponse[]>();
+        const role = computed(() => UserService.provideUserRole());
+        const loggedInUser = ref<UserResponse>();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageList.value = response.data;
+            UserService.getLoggedInUser().then(response => {
+                loggedInUser.value = response.data;
             });
-        })
+        });
+
+        const router = useRouter();
 
         const firstName = ref("");
         const middleName = ref("");
@@ -187,7 +247,7 @@ export default defineComponent({
 
         const deduplicationTableRef = ref<typeof PersonDeduplicationTable>();
 
-        const submitPerson = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
             const newPerson: BasicPerson = {
                 personName: {firstname: firstName.value, otherName: middleName.value, lastname: lastName.value, dateFrom: birthdate.value, dateTo: null},
                 contactEmail: email.value,
@@ -238,12 +298,12 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, additionalFields, snackbar, message, deduplicationTableRef,
+            isFormValid, additionalFields, snackbar, message, deduplicationTableRef, role,
             firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
-            sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submitPerson,
+            sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules
+            scopusAuthorIdValidationRules, loggedInUser
         };
     }
 });

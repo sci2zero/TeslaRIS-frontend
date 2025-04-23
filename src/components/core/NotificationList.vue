@@ -26,7 +26,7 @@
                                 <v-icon v-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
                                     mdi-content-duplicate
                                 </v-icon>
-                                <v-icon v-if="notificationAction.toString() === 'BROWSE_CLAIMABLE_DOCUMENTS'">
+                                <v-icon v-else>
                                     mdi-eye-outline
                                 </v-icon>
                             </v-btn>
@@ -91,6 +91,10 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("deduplication");
             } else if (action === NotificationAction.BROWSE_CLAIMABLE_DOCUMENTS) {
                 decrementCounterAndNavigateToPage("documentClaim");
+            } else if (action === NotificationAction.PERFORM_EVENT_CLASSIFICATION) {
+                decrementCounterAndNavigateToPage("events");
+            } else if (action === NotificationAction.PERFORM_DOCUMENT_ASSESSMENT) {
+                decrementCounterAndNavigateToPage("scientificResults");
             }
         };
 

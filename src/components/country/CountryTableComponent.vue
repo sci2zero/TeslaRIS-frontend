@@ -51,7 +51,7 @@
                         :form-props="{ presetCountry: row.item }"
                         entity-name="Country"
                         is-update
-                        @update="updateCountry(row.item.id, $event)"
+                        @update="updateCountry(row.item.id as number, $event)"
                     />
                 </td>
             </tr>
@@ -113,11 +113,11 @@ export default defineComponent({
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name.content", order: "asc"}]});
 
-        const headers = [
+        const headers = ref<any>([
           { title: nameLabel, align: "start", sortable: true, key: "name.content"},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: actionLabel},
-        ];
+        ]);
 
         const refreshTable = (event: any) => {
             if (tableOptions.value.initialCustomConfiguration) {

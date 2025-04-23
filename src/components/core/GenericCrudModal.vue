@@ -11,7 +11,13 @@
                     </v-btn>
                 </div>
                 <v-btn
-                    v-if="!isSectionUpdate && !readOnly"
+                    v-if="!isSectionUpdate && !readOnly && isSubmission"
+                    color="primary" icon v-bind="scope.props" class="bottom-spacer"
+                    v-on="scope.isActive">
+                    <v-icon>mdi-pencil-plus-outline</v-icon>
+                </v-btn>
+                <v-btn
+                    v-if="!isSectionUpdate && !readOnly && !isSubmission"
                     :color="primaryColor ? 'primary' : ''"
                     :density="primaryColor ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
@@ -31,6 +37,7 @@
                             in-modal
                             @create="emitToParent"
                             @update="emitToParent"
+                            @update-persist="emitToParentAndPersist"
                         />
                     </v-container>
                 </v-card-text>
@@ -64,6 +71,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        isSubmission: {
+            type: Boolean,
+            default: false
+        },
         readOnly: {
             type: Boolean,
             default: false
@@ -89,7 +100,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ["create", "update"],
+    emits: ["create", "update", "updatePersist"],
     setup(props, { emit }) {
         const dialog = ref(false);
         const formRef = ref<InstanceType<typeof props.formComponent>>();
@@ -104,7 +115,14 @@ export default defineComponent({
             dialog.value = false;
         }
 
-        return { dialog, formRef, emitToParent };
+        const emitToParentAndPersist = (formData: any) => {
+            emit("updatePersist", formData);
+        }
+
+        return { 
+            dialog, formRef, emitToParent,
+            emitToParentAndPersist
+        };
     }
 });
 </script>

@@ -30,6 +30,10 @@ export class ProceedingsService extends BaseService {
   async forceDeleteProceedings(proceedingsId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `proceedings/force/${proceedingsId}`);
   }
+
+  async checkProceedingsIdentifierUsage(identifier: string, proceedingsId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `proceedings/identifier-usage/${proceedingsId}?identifier=${encodeURIComponent(identifier)}`);
+  }
 }
 
 export default new ProceedingsService();

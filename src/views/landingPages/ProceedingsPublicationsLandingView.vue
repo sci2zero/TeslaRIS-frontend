@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(proceedingsPublication?.title) }}
+                        <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)"></rich-title-renderer>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(proceedingsPublication?.subTitle) }}
@@ -176,7 +176,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -212,7 +212,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -223,11 +222,13 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import CitationSelector from '@/components/publication/CitationSelector.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer },
     setup() {
         const currentTab = ref("contributions");
 
@@ -237,7 +238,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -409,7 +410,7 @@ export default defineComponent({
 
         return {
             proceedingsPublication, icon, publications, event,
-            totalPublications, returnCurrentLocaleContent, userRole,
+            totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
             addAttachment, deleteAttachment, updateAttachment, publicationTypes,

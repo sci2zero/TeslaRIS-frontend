@@ -51,7 +51,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewResearcherLabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("addPersonLabel") }}
+                {{ $t("createNewPersonLabel") }}
             </v-btn>
         </h3>
 
@@ -139,7 +139,11 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
-            PersonService.searchResearchers(`tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`, true).then(response => {
+            PersonService.searchResearchers(
+                `tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`,
+                true,
+                null)
+            .then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
                 if (totalPersons.value === 0) {

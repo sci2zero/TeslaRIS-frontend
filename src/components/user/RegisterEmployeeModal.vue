@@ -1,16 +1,16 @@
 <template>
-    <v-col align-self="start" cols="2" class="ml-3">
+    <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
-                <v-btn
-                    color="primary" dark v-bind="scope.props" class="bottom-spacer"
-                    v-on="scope.isActive">
-                    {{ isCommission ? $t("addCommissionLabel") : $t("addInstitutionEditorLabel") }}
-                </v-btn>
+                <v-list-item dark v-bind="scope.props" class="inline-action" v-on="scope.isActive">
+                    <v-list-item-title>
+                        {{ getTitleLabel() }}
+                    </v-list-item-title>
+                </v-list-item>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ isCommission ? $t("addCommissionLabel") : $t("addInstitutionEditorLabel") }}</span>
+                    <span class="text-h5">{{ getTitleLabel() }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -19,11 +19,11 @@
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="name"
-                                        :label="(isCommission ? $t('nameLabel') : $t('firstNameLabel')) + '*'"
+                                        :label="(registeringCommission ? $t('nameLabel') : $t('firstNameLabel')) + '*'"
                                         :rules="requiredFieldRules"
                                     ></v-text-field>
                                 </v-col>
-                                <v-col v-if="!isCommission" cols="12">
+                                <v-col v-if="!registeringCommission" cols="12">
                                     <v-text-field
                                         v-model="surname"
                                         :label="$t('surnameLabel') + '*'"
@@ -48,7 +48,7 @@
                                 <v-col cols="12">
                                     <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
                                 </v-col>
-                                <v-col v-if="isCommission" cols="12">
+                                <v-col v-if="registeringCommission" cols="12">
                                     <commission-autocomplete-search ref="commissionAutocompleteRef" v-model="selectedCommission" required></commission-autocomplete-search>
                                 </v-col>
                                 <v-col cols="12">
@@ -78,11 +78,11 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, type PropType, ref } from "vue";
 import { defineComponent } from "vue";
 import LanguageService from "@/services/LanguageService";
 import AuthenticationService from "@/services/AuthenticationService";
@@ -94,23 +94,26 @@ import OrganisationUnitAutocompleteSearch from "../organisationUnit/Organisation
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import CommissionAutocompleteSearch from "../assessment/commission/CommissionAutocompleteSearch.vue";
 import { useI18n } from "vue-i18n";
+import { UserRole } from "@/models/UserModel";
 
 
 export default defineComponent({
     name: "RegisterEmployeeModal",
     components: { OrganisationUnitAutocompleteSearch, CommissionAutocompleteSearch },
     props: {
-        isCommission: {
-            type: Boolean,
-            default: false
+        employeeRole: {
+            type: Object as PropType<UserRole>,
+            required: true
         }
     },
     emits: ["success", "failure"],
     setup(props, {emit}) {
         const dialog = ref(false);
         const isFormValid = ref(false);
-
+        
         const i18n = useI18n();
+
+        const registeringCommission = computed(() => props.employeeRole === UserRole.COMMISSION);
 
         const name = ref("");
         const surname = ref("");
@@ -159,7 +162,7 @@ export default defineComponent({
                 organisationUnitId: selectedOrganisationUnit.value.value
             };
 
-            if (props.isCommission) {
+            if (registeringCommission.value) {
                 const newCommission = {
                     ...newEmployee,
                     commissionId: selectedCommission.value.value,
@@ -169,7 +172,7 @@ export default defineComponent({
                     .then(() => handleSuccess(stayOnPage))
                     .catch(handleError);
             } else {
-                AuthenticationService.registerEmployee(newEmployee)
+                AuthenticationService.registerEmployee(newEmployee, getEmploeeEndpointPath())
                     .then(() => handleSuccess(stayOnPage))
                     .catch(handleError);
             }
@@ -188,6 +191,36 @@ export default defineComponent({
             });
         });
 
+        const getTitleLabel = () => {
+            switch (props.employeeRole) {
+                case UserRole.INSTITUTIONAL_EDITOR:
+                    return i18n.t("addInstitutionEditorLabel");
+                case UserRole.COMMISSION:
+                    return i18n.t("addCommissionLabel");
+                case UserRole.VICE_DEAN_FOR_SCIENCE:
+                    return i18n.t("addViceDeanForScienceLabel");
+                case UserRole.INSTITUTIONAL_LIBRARIAN:
+                    return i18n.t("addInstitutionLibrarianLabel");
+                case UserRole.HEAD_OF_LIBRARY:
+                    return i18n.t("addHeadOfLibraryLabel");
+            }
+        };
+
+        const getEmploeeEndpointPath = (): string => {
+            switch (props.employeeRole) {
+                case UserRole.INSTITUTIONAL_EDITOR:
+                    return "institution-admin";
+                case UserRole.VICE_DEAN_FOR_SCIENCE:
+                    return "vice-dean-for-science";
+                case UserRole.INSTITUTIONAL_LIBRARIAN:
+                    return "institution-librarian";
+                case UserRole.HEAD_OF_LIBRARY:
+                    return "head-of-library";
+            }
+
+            return ""; // should never happen
+        };
+
         return {
             dialog, name, surname, 
             ouAutocompleteRef, 
@@ -196,8 +229,8 @@ export default defineComponent({
             languages, selectedLanguage, 
             registerEmployee, isFormValid,
             emailFieldRules, requiredFieldRules,
-            requiredSelectionRules,
-            commissionAutocompleteRef
+            requiredSelectionRules, getTitleLabel,
+            commissionAutocompleteRef, registeringCommission
         };
     }
 });

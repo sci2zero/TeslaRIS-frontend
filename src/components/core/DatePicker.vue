@@ -58,7 +58,7 @@ export default defineComponent({
     modelValue: {
       type: Object as PropType<string | undefined>,
       required: true,
-    },
+    }
   },
   emits: ["update:modelValue"],
   setup(props, { emit }) {

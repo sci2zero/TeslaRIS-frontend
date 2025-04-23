@@ -236,7 +236,7 @@ export default defineComponent({
             setPublicationYear(newValue.date);
         });
 
-        const submitProceedings = (stayOnPage: boolean) => {
+        const submit = (stayOnPage: boolean) => {
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
                 publicationSeriesId = undefined;
@@ -310,7 +310,7 @@ export default defineComponent({
             publisherAutocompleteRef, selectedPublisher,
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, submitProceedings,
+            publicationSeriesExternalValidation, submit,
             scopusIdValidationRules
         };
     }

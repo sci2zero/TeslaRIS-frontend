@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <journal-publication-update-form ref="updateLeftRef" :preset-journal-publication="leftJournalPublication" in-comparator @update="updateLeft"></journal-publication-update-form>
+                <journal-publication-update-form
+                    ref="updateLeftRef" :preset-journal-publication="leftJournalPublication" in-comparator :in-modal="false"
+                    @update="updateLeft"></journal-publication-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <journal-publication-update-form ref="updateRightRef" :preset-journal-publication="rightJournalPublication" in-comparator @update="updateRight"></journal-publication-update-form>
+                <journal-publication-update-form
+                    ref="updateRightRef" :preset-journal-publication="rightJournalPublication" in-comparator :in-modal="false"
+                    @update="updateRight"></journal-publication-update-form>
 
                 <br />
 

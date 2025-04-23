@@ -78,35 +78,43 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { MonographPublication, MonographPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import MonographService from '@/services/DocumentPublicationService';
 import type { Monograph } from '@/models/PublicationModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getMonographPublicationTypesForGivenLocale } from '@/i18n/monographPublicationType';
 import MonographAutocompleteSearch from '../MonographAutocompleteSearch.vue';
 import { watch } from 'vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import Toast from '@/components/core/Toast.vue';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
+import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
     name: "MonographPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, MonographAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, MonographAutocompleteSearch, Toast},
     props: {
         presetMonographPublication: {
             type: Object as PropType<MonographPublication | undefined>,
             required: true
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
@@ -116,13 +124,11 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const event = ref<Conference>();
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
+        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
+
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-
             fetchDetails();
         });
 
@@ -167,7 +173,22 @@ export default defineComponent({
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
 
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const { duplicateFound } = await checkIdentifiers(
+                    [
+                        { value: doi.value as string, error: "doiExistsError" },
+                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                    ],
+                    props.presetMonographPublication?.id as number,
+                    (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
+                );
+
+                if (duplicateFound) {
+                    return;
+                }
+            }
+
             const updatedMonographPublication: MonographPublication = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
@@ -218,8 +239,8 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
+            isFormValid, snackbar,
+            title, subtitle, message,
             publicationYear, doi, scopus,
             selectedMonograph, articleNumber,
             uris, numberOfPages, doiValidationRules,

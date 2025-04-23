@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Page } from "@/models/Common";
+import type { Page, SearchFieldsResponse } from "@/models/Common";
 import type { OrganisationUnitRequest, OrganisationUnitIndex, OrganisationUnitResponse, OrganisationUnitRelationResponse, OrganisationUnitRelationRequest } from "@/models/OrganisationUnitModel";
 
 export class OrganisationUnitService extends BaseService {
@@ -32,8 +32,8 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
 
-  async searchOUs(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
-    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}`);
+  async searchOUs(tokens: string, forPersonId: number | null, topLevelInstitutionId: number | null): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}`);
   }
 
   async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
@@ -73,6 +73,14 @@ export class OrganisationUnitService extends BaseService {
 
   async deleteOURelation(relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `organisation-unit-relation/${relationId}`);
+  }
+
+  async checkIdentifierUsage(identifier: string, organisationUnitId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `organisation-unit/identifier-usage/${organisationUnitId}?identifier=${encodeURIComponent(identifier)}`);
+  }
+
+  async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
+    return super.sendRequest(axios.get, `organisation-unit/fields?export=${onlyExportFields}`);
   }
 }
 

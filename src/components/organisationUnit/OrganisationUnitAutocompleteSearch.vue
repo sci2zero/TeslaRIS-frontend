@@ -3,19 +3,27 @@
         <v-col :cols="calculateAutocompleteWidth()">
             <v-autocomplete
                 v-model="selectedOrganisationUnit"
-                :label="(multiple ? $t('ouListLabel') : $t('organisationUnitLabel')) + (required ? '*' : '')"
+                :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
                 :items="organisationUnits"
                 :custom-filter="((): boolean => true)"
-                :rules="required ? requiredSelectionRules : []"
+                :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
                 :no-data-text="$t('noDataMessage')"
                 :multiple="multiple"
                 return-object
+                :class="comfortable ? 'comfortable' : ''"
+                :readonly="readonly"
                 @update:search="searchOUs($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission && userRole === 'ADMIN'" cols="1" class="modal-spacer-top">
-            <organisation-unit-submission-modal @create="selectNewlyAddedOU"></organisation-unit-submission-modal>
+        <v-col v-if="!disableSubmission && isAdmin" cols="1">
+            <generic-crud-modal
+                :form-component="OrganisationUnitSubmissionForm"
+                entity-name="OU"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedOU"
+            />
         </v-col>
         <v-col v-if="allowManualClearing && hasSelection" cols="1">
             <v-btn icon @click="clearInput">
@@ -32,14 +40,15 @@ import lodash from "lodash";
 import { useI18n } from 'vue-i18n';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitIndex, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import OrganisationUnitSubmissionModal from './OrganisationUnitSubmissionModal.vue';
-import UserService from '@/services/UserService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import OrganisationUnitSubmissionForm from './OrganisationUnitSubmissionForm.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "OrganisationUnitAutocompleteSearch",
-    components: { OrganisationUnitSubmissionModal },
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -53,6 +62,14 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        comfortable: {
+            type: Boolean,
+            default: false,
+        },
+        label: {
+            type: String,
+            default: "",
+        },
         modelValue: {
             type: [Object, Array] as PropType<
                 { title: string; value: number } | { title: string; value: number }[] | undefined
@@ -62,12 +79,24 @@ export default defineComponent({
         disableSubmission: {
             type: Boolean,
             default: false
+        },
+        forPersonId: {
+            type: Number,
+            default: null
+        },
+        topLevelInstitutionId: {
+            type: Number,
+            default: null
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
         const i18n = useI18n();
-        const { requiredSelectionRules } = useValidationUtils();
+        const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
         
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const searchPlaceholder = props.multiple ? [] : { title: '', value: -1 };
@@ -76,7 +105,7 @@ export default defineComponent({
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
         
         const hasSelection = computed(() =>
             props.multiple ? (selectedOrganisationUnit.value as any[]).length > 0 : (selectedOrganisationUnit.value as { title: '', value: -1 }).value !== -1
@@ -102,7 +131,7 @@ export default defineComponent({
                     params += `tokens=${token}&`;
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params).then((response) => {
+                OrganisationUnitService.searchOUs(params, props.forPersonId, props.topLevelInstitutionId).then((response) => {
                     organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
                         title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
                         value: organisationUnit.databaseId,
@@ -122,7 +151,7 @@ export default defineComponent({
 
         const calculateAutocompleteWidth = () => {
             let numberOfColumns = props.allowManualClearing && hasSelection.value ? 10 : 11;
-            if (userRole.value !== "ADMIN") {
+            if (props.disableSubmission || !isAdmin.value) {
                 numberOfColumns += 1;
             }
             return numberOfColumns;
@@ -147,8 +176,8 @@ export default defineComponent({
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth,
-            sendContentToParent, clearInput, userRole,
-            selectNewlyAddedOU, hasSelection
+            sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
+            selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules
         };
     }
 });

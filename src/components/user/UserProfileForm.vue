@@ -44,8 +44,8 @@
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :rules="(isResearcher || isCommission) ? requiredSelectionRules : []"
-                    :readonly="isResearcher || isCommission"
+                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary) ? requiredSelectionRules : []"
+                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary"
                     :no-data-text="$t('noDataMessage')"
                     return-object
                     @update:search="searchOUs($event)"
@@ -114,6 +114,7 @@ import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from
 import { useRouter } from "vue-router";
 import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";
+import { useUserRole } from "@/composables/useUserRole";
 
 export default defineComponent({
     name: "UserProfileForm",
@@ -144,9 +145,7 @@ export default defineComponent({
         const oldPassword = ref("");
         const newPassword = ref("");
 
-        const isResearcher = ref(false);
-        const isAdmin = ref(false);
-        const isCommission = ref(false);
+        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor} = useUserRole();
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
@@ -157,17 +156,6 @@ export default defineComponent({
 
         const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
-        const fetchUserRole = () => {
-            const userRole = UserService.provideUserRole();
-            if (userRole === 'RESEARCHER') {
-                isResearcher.value = true;
-            } else if (userRole === 'ADMIN') {
-                isAdmin.value = true;
-            } else if (userRole === "COMMISSION") {
-                isCommission.value = true;
-            }
-        };
-
         const populateUserData = () => {
             UserService.getLoggedInUser().then((response) => {
                 name.value = response.data.firstname;
@@ -175,8 +163,6 @@ export default defineComponent({
                 email.value = response.data.email;
                 allowAccountTakeover.value = response.data.canTakeRole;
                 selectedNotificationPeriod.value = {title: getTitleFromValueAutoLocale(response.data.notificationPeriod) as string, value: response.data.notificationPeriod};
-
-                fetchUserRole();
                 
                 let ouNameSr = "";
                 let ouNameOther = "";
@@ -226,7 +212,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params).then((response) => {
+                OrganisationUnitService.searchOUs(params, null, null).then((response) => {
                     const listOfOUs: { title: string, value: number }[] = [];
                     response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
                         if (i18n.locale.value === "sr") {
@@ -300,12 +286,13 @@ export default defineComponent({
             changePassword, name, surname,
             organisationUnits, selectedOrganisationUnit, 
             email, showOldPassword, languages, selectedLanguage, 
-            searchOUs, filterOUs, allowAccountTakeover,
+            searchOUs, filterOUs, allowAccountTakeover, isInstitutionalEditor,
             updateUser, setNewPassword, selectedNotificationPeriod,
             emailFieldRules, requiredFieldRules, requiredSelectionRules,
             isFormValid, notificationPeriods, oldPassword, newPassword,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
-            navigateToResearcherPage, isAdmin, isResearcher, isCommission
+            navigateToResearcherPage, isAdmin, isResearcher, isCommission,
+            isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary
         };
     }
 });

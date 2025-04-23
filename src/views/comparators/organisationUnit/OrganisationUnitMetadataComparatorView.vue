@@ -7,7 +7,7 @@
                 </h2>
                 <br />
 
-                <organisation-unit-update-form ref="updateLeftRef" :preset-o-u="leftOrganisationUnit" @update="updateLeft"></organisation-unit-update-form>
+                <organisation-unit-update-form ref="updateLeftRef" :preset-o-u="leftOrganisationUnit" :in-modal="false" @update="updateLeft"></organisation-unit-update-form>
 
                 <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftOrganisationUnit?.keyword as MultilingualContent[])" @update="updateLeftKeywords"></keyword-update-form>
 
@@ -48,7 +48,7 @@
 
                 <br />
 
-                <organisation-unit-update-form ref="updateRightRef" :preset-o-u="rightOrganisationUnit" @update="updateRight"></organisation-unit-update-form>
+                <organisation-unit-update-form ref="updateRightRef" :preset-o-u="rightOrganisationUnit" :in-modal="false" @update="updateRight"></organisation-unit-update-form>
 
                 <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightOrganisationUnit?.keyword as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
 

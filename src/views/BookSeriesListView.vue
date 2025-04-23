@@ -6,7 +6,7 @@
         <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <v-btn color="primary" @click="addBookSeries">
-            {{ $t("addBookSeriesLabel") }}
+            {{ $t("createNewBookSeriesLabel") }}
         </v-btn>
         <br />
         <br />

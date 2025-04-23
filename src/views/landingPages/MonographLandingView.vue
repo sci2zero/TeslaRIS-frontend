@@ -5,7 +5,7 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(monograph?.title) }}
+                        <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)"></rich-title-renderer>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(monograph?.subTitle) }}
@@ -153,8 +153,8 @@
             <v-tab v-if="documentIndicators?.length > 0 || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="classifications">
-                {{ $t("classificationsLabel") }}
+            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+                {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -204,11 +204,11 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item value="classifications">
+            <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="monograph?.id"
-                    :can-edit="canClassify && monograph?.documentDate !== ''"
+                    :can-edit="((canClassify && monograph?.documentDate) as boolean)"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
                     @create="createClassification"
@@ -217,7 +217,7 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && userRole === 'RESEARCHER'" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -225,7 +225,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -257,7 +257,6 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
-import UserService from '@/services/UserService';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse, type EntityClassificationResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -268,11 +267,13 @@ import { useLoginStore } from '@/stores/loginStore';
 import CitationSelector from '@/components/publication/CitationSelector.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector, EntityClassificationView },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector, EntityClassificationView, RichTitleRenderer },
     setup() {
         const currentTab = ref("contributions");
 
@@ -285,7 +286,7 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isResearcher } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -516,7 +517,7 @@ export default defineComponent({
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,
             MonographUpdateForm, deleteAttachment,
-            handleResearcherUnbind, userRole,
+            handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType,
             currentTab, updateResearchAreas,
             ApplicableEntityType, currentRoute,

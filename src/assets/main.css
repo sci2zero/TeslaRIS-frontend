@@ -26,6 +26,10 @@ a,
     }
 }
 
+.comfortable {
+    height: 90px;
+}
+
 /* Forms */
 .semi-transparent {
     opacity: 0.9;
@@ -93,10 +97,6 @@ label {
     background: white;
 }
 
-.modal-spacer-top {
-    margin-top: 20px;
-}
-
 /* Tables */
 
 .table-checkbox {
@@ -120,6 +120,10 @@ label {
     display: grid;
     grid-gap: 0.5em;
     z-index: 99;
+}
+
+.table-header-actions {
+    margin-bottom: -50px;
 }
 
 /* Comparators */

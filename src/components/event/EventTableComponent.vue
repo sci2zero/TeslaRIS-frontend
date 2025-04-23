@@ -1,16 +1,16 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedEvents.length === 0"
+        v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedEvents.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'"
+        v-if="isAdmin"
         density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startProceedingsComparison">
         {{ $t("compareProceedingsLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'"
+        v-if="isAdmin"
         density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -21,7 +21,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalEvents"
-        :show-select="userRole === 'ADMIN'"
+        :show-select="isAdmin"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -30,7 +30,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="userRole === 'ADMIN'">
+                <td v-if="isAdmin">
                     <v-checkbox
                         v-model="selectedEvents"
                         :value="row.item"
@@ -61,6 +61,18 @@
                     <v-icon v-if="row.item.serialEvent" icon="mdi-check"></v-icon>
                     <v-icon v-else icon="mdi-cancel"></v-icon>
                 </td>
+                <td>
+                    <entity-classification-modal-content
+                        :entity-id="row.item.databaseId"
+                        :entity-type="ApplicableEntityType.EVENT"
+                        @classified="eventClassified(row.item)"
+                        @update="refreshTable(tableOptions)">
+                    </entity-classification-modal-content>
+                </td>
+                <td v-if="isCommission">
+                    <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
+                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -78,19 +90,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import UserService from '@/services/UserService';
 import {EventType, type EventIndex} from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
+import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
+import { useUserRole } from '@/composables/useUserRole';
+import { ApplicableEntityType } from '@/models/Common';
+
 
 export default defineComponent({
     name: "EventTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, EntityClassificationModalContent },
     props: {
         events: {
             type: Array<EventIndex>,
@@ -113,27 +128,39 @@ export default defineComponent({
         const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
         const serialEventLabel = computed(() => i18n.t("serialEventLabel"));
+        const actionLabel = computed(() => i18n.t("actionLabel"));
+        const classifiedByMeLabel = computed(() => i18n.t("classifiedByMeLabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin, isCommission, loggedInUser } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
-        const headers = [
+        const headers = ref<any[]>([
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
           { title: stateLabel, align: "start", sortable: true, key: stateColumn},
-          { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"},
-        ];
+          { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"}
+        ]);
+
+        onMounted(() => {
+            if (isAdmin.value || isCommission.value) {
+                headers.value.push({ title: actionLabel, align: "start", sortable: false, key: "action"});
+            }
+
+            if (isCommission.value) {
+                headers.value.push({ title: classifiedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
+            }
+        });
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["nameSr", "name_sr_sortable"],
             ["nameOther", "name_other_sortable"],
             ["dateFromTo", "date_sortable"],
             ["stateSr", "state_sr_sortable"],
-            ["stateOther", "state_other_sortable"],
+            ["stateOther", "state_other_sortable"]
         ]);
 
         const refreshTable = (event: any) => {
@@ -236,12 +263,29 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
+        const eventClassified = (event: EventIndex) => {
+            if (event.serialEvent) {
+                refreshTable(tableOptions.value);
+                return;
+            }
+
+            const commissionId = loggedInUser.value?.commissionId as number;
+            if (event.classifiedBy) {
+                if (!event.classifiedBy.includes(commissionId)) {
+                    event.classifiedBy.push(commissionId);
+                }
+            } else {
+                event.classifiedBy = [commissionId];
+            }
+        };
+
         return {
             selectedEvents, headers, notifications,
-            refreshTable, userRole, deleteSelection,
+            refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startProceedingsComparison, startMetadataComparison,
-            setSortAndPageOption
+            setSortAndPageOption, loggedInUser, isCommission,
+            eventClassified, ApplicableEntityType
         };
     }
 });

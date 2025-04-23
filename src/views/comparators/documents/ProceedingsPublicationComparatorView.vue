@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <proceedings-publication-update-form ref="updateLeftRef" :preset-proceedings-publication="leftProceedingsPublication" in-comparator @update="updateLeft"></proceedings-publication-update-form>
+                <proceedings-publication-update-form
+                    ref="updateLeftRef" :preset-proceedings-publication="leftProceedingsPublication" in-comparator :in-modal="false"
+                    @update="updateLeft"></proceedings-publication-update-form>
 
                 <br />
 
@@ -47,7 +49,9 @@
 
                 <br />
 
-                <proceedings-publication-update-form ref="updateRightRef" :preset-proceedings-publication="rightProceedingsPublication" in-comparator @update="updateRight"></proceedings-publication-update-form>
+                <proceedings-publication-update-form
+                    ref="updateRightRef" :preset-proceedings-publication="rightProceedingsPublication" in-comparator :in-modal="false"
+                    @update="updateRight"></proceedings-publication-update-form>
 
                 <br />
 

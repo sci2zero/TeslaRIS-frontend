@@ -13,9 +13,9 @@
                 <v-card flat class="pa-4 header-card">
                     <v-card-title class="text-center">
                         <v-container>
-                            <h2>CRIS UNS</h2>
+                            <h2>{{ returnCurrentLocaleContent(title) }}</h2>
                             <p class="text-wrap">
-                                {{ $t("homePageMessage") }}
+                                {{ returnCurrentLocaleContent(description) }}
                             </p>
                         </v-container>
                     </v-card-title>
@@ -55,12 +55,16 @@ import PersonService from "@/services/PersonService";
 import { onMounted } from "vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import BrandingService from "@/services/BrandingService";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
 export default defineComponent({
     name: "HomeView",
     components: { SearchBarComponent },
     setup() {
+        const title = ref();
+        const description = ref();
 
         const router = useRouter();
         const i18n = useI18n();
@@ -74,6 +78,11 @@ export default defineComponent({
         const publicationCount = ref(0);
 
         onMounted(() => {
+            BrandingService.fetchBrandingInfo().then((response) => {
+                title.value = response.data.title;
+                description.value = response.data.description;
+            });
+
             PersonService.getResearcherCount().then((response) => researcherCount.value = response.data);
             OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data);
             DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data);
@@ -103,11 +112,10 @@ export default defineComponent({
         }
 
         return {
-        search,
-        cardsData
+            search, cardsData,
+            title, description,
+            returnCurrentLocaleContent
         };
-
-        
     },
 });
 </script>

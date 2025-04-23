@@ -3,7 +3,7 @@
         {{ $t("scheduleTasksLabel") }}
     </h1>
     <v-row class="d-flex flex-row justify-center mt-10">
-        <v-col cols="2">
+        <v-col cols="12" sm="3" md="2">
             <v-select
                 v-model="selectedScheduledTaskType"
                 :items="scheduledTaskTypes"
@@ -14,7 +14,7 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment" cols="2">
+            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -25,7 +25,17 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="taskReindexing" cols="4">
+            <v-col v-if="reportGeneration" cols="12" sm="3" md="2">
+                <v-select
+                    v-model="selectedReportType"
+                    :items="reportTypes"
+                    :label="$t('reportTypeLabel') + '*'"
+                    :class="isSummaryReport() ? 'comfortable' : ''"
+                    :rules="requiredSelectionRules"
+                    :readonly="false">
+                </v-select>
+            </v-col>
+            <v-col v-if="taskReindexing" cols="12" md="4">
                 <v-select
                     v-model="selectedEntityTypes"
                     :items="entityTypes"
@@ -34,7 +44,7 @@
                     multiple>
                 </v-select>
             </v-col>
-            <v-col v-if="taskIndicatorLoad" cols="2">
+            <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedIndicatorSource"
                     :items="indicatorSources"
@@ -54,40 +64,50 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
                     :only-classification-commissions="taskClassificationComputation"
                     :comfortable="taskClassificationComputation || journalPublicationsAssessment || proceedingsPublicationsAssessment"
-                    :required="taskClassificationComputation || taskClassificationLoad">
+                    :required="taskClassificationComputation || taskClassificationLoad || reportGeneration">
                 </commission-autocomplete-search>
             </v-col>
-            <v-col v-if="taskClassificationComputation || taskIF5Computation" cols="2">
+            <v-col v-if="reportGeneration && isSummaryReport()" cols="12" sm="3" md="2">
+                <commission-autocomplete-search 
+                    v-model="selectedCommissions" 
+                    only-load-commissions
+                    required
+                    multiple>
+                </commission-autocomplete-search>
+            </v-col>
+            <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedYears"
                     :items="years"
-                    :label="$t('yearsLabel') + '*'"
+                    :label="(reportGeneration ? $t('reportYearLabel') : $t('yearsLabel')) + '*'"
                     :rules="requiredMultiSelectionRules"
-                    :class="taskClassificationComputation ? 'comfortable' : ''"
-                    multiple>
+                    :class="(taskClassificationComputation || isSummaryReport()) ? 'comfortable' : ''"
+                    :multiple="!reportGeneration">
                 </v-select>
             </v-col>
-            <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="3">
+            <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="12" md="3">
                 <journal-autocomplete-search v-model="selectedJournals" multiple disable-submission></journal-autocomplete-search>
             </v-col>
-            <v-col v-if="proceedingsPublicationsAssessment" cols="3">
+            <v-col v-if="proceedingsPublicationsAssessment" cols="12" md="3">
                 <event-autocomplete-search v-model="selectedEvents" multiple disable-submission></event-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" md="3">
                 <person-autocomplete-search v-model="selectedPersons" multiple disable-submission></person-autocomplete-search>
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="3">
-                <organisation-unit-autocomplete-search v-model="selectedOUs" multiple disable-submission></organisation-unit-autocomplete-search>
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || isTopLevelReport()" cols="12" md="3">
+                <organisation-unit-autocomplete-search
+                    v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
+                    :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="2">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" sm="3" md="2">
                 <date-picker
                     v-model="startDate"
                     :label="$t('startDateLabel') + '*'"
@@ -95,7 +115,7 @@
                     required
                 />
             </v-col>
-            <v-col cols="2">
+            <v-col cols="12" sm="3" md="2">
                 <date-picker
                     v-model="scheduleDate"
                     :label="$t('dateLabel') + '*'"
@@ -104,10 +124,10 @@
                     in-future
                 />
             </v-col>
-            <v-col cols="1">
+            <v-col cols="12" sm="3" md="1">
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
-            <v-col cols="1">
+            <v-col cols="12" sm="3" md="1">
                 <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
                     {{ $t("scheduleLabel") }}
                 </v-btn>
@@ -129,7 +149,7 @@ import { ApplicableEntityType, ScheduledTaskType, type ScheduledTaskResponse } f
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getApplicableEntityTypesForGivenLocale, getApplicableEntityTypeTitleFromValueAutoLocale } from "@/i18n/applicableEntityType";
 import { useI18n } from "vue-i18n";
-import { EntityClassificationSource, EntityIndicatorSource } from "@/models/AssessmentModel";
+import { EntityClassificationSource, EntityIndicatorSource, ReportType } from "@/models/AssessmentModel";
 import { getIndicatorSourceForGivenLocale, getIndicatorSourceTitleFromValueAutoLocale } from "@/i18n/entityIndicatorSource";
 import { getErrorMessageForErrorKey } from "@/i18n";
 import Toast from "@/components/core/Toast.vue";
@@ -145,6 +165,7 @@ import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSear
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import EventAutocompleteSearch from "@/components/event/EventAutocompleteSearch.vue";
 import { PublicationType } from "@/models/PublicationModel";
+import { getReportTypesForGivenLocale } from "@/i18n/reportType";
 
 
 export default defineComponent({
@@ -173,8 +194,11 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const scheduledTaskTypes = getScheduledTaskTypeForGivenLocale();
+        const scheduledTaskTypes = ref(getScheduledTaskTypeForGivenLocale());
         const selectedScheduledTaskType = ref<ScheduledTaskType>(ScheduledTaskType.INDICATOR_LOAD);
+
+        const reportTypes = ref(getReportTypesForGivenLocale());
+        const selectedReportType = ref<ReportType>(ReportType.TABLE_63);
 
         const taskReindexing = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REINDEXING);
         const taskIndicatorLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.INDICATOR_LOAD);
@@ -183,6 +207,7 @@ export default defineComponent({
         const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
         const proceedingsPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT);
+        const reportGeneration = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REPORT_GENERATION);
 
         const years = ref<number[]>([]);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
@@ -192,13 +217,14 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedCommission = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const entityTypes = getEntityTypeForGivenLocale();
-        const selectedEntityTypes = ref<{ title: string, value: EntityType }[]>([...entityTypes]);
+        const entityTypes = ref<{ title: string; value: EntityType; }[]>(getEntityTypeForGivenLocale() as { title: string; value: EntityType; }[]);
+        const selectedEntityTypes = ref<{ title: string, value: EntityType }[]>([...entityTypes.value]);
 
         const selectedJournals = ref<{title: string, value: number}[]>([]);
         const selectedEvents = ref<{title: string, value: number}[]>([]);
         const selectedPersons = ref<{title: string, value: number}[]>([]);
-        const selectedOUs = ref<{title: string, value: number}[]>([]);
+        const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
+        const selectedCommissions = ref<{title: string, value: number}[]>([]);
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -212,6 +238,8 @@ export default defineComponent({
             for(let i = 1999; i <= now.getFullYear(); i++) {
                 years.value.push(i);
             }
+
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.scheduledTasks")}}`;
 
             setTimeout(() => {
                 fetchScheduledTasks();
@@ -237,6 +265,9 @@ export default defineComponent({
         };
 
         const populateSelectionData = () => {
+            scheduledTaskTypes.value = getScheduledTaskTypeForGivenLocale();
+            reportTypes.value = getReportTypesForGivenLocale();
+            entityTypes.value = getEntityTypeForGivenLocale() as { title: string; value: EntityType; }[];
             applicableTypes.value = (getApplicableEntityTypesForGivenLocale() as { title: string, value: ApplicableEntityType }[]).filter(item => item.value === ApplicableEntityType.PUBLICATION_SERIES);
             indicatorSources.value = (getIndicatorSourceForGivenLocale() as { title: string, value: EntityIndicatorSource }[]).filter(item => item.value !== EntityIndicatorSource.MANUAL);
         };
@@ -307,7 +338,7 @@ export default defineComponent({
                             {
                                 commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
                                 authorIds: selectedPersons.value.map(person => person.value),
-                                organisationUnitIds: selectedOUs.value.map(ou => ou.value),
+                                organisationUnitIds: (selectedOUs.value as {title: string, value: number}[]).map(ou => ou.value),
                                 publishedInIds: selectedJournals.value.map(journal => journal.value)
                             },
                             PublicationType.JOURNAL_PUBLICATION
@@ -322,10 +353,20 @@ export default defineComponent({
                             {
                                 commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
                                 authorIds: selectedPersons.value.map(person => person.value),
-                                organisationUnitIds: selectedOUs.value.map(ou => ou.value),
+                                organisationUnitIds: (selectedOUs.value as {title: string, value: number}[]).map(ou => ou.value),
                                 publishedInIds: selectedEvents.value.map(journal => journal.value)
                             },
                             PublicationType.PROCEEDINGS_PUBLICATION
+                        )
+                    );
+                    break;
+
+                case ScheduledTaskType.REPORT_GENERATION:
+                    scheduleTask(() => 
+                        TaskManagerService.scheduleReportGeneration(
+                            timestamp, selectedReportType.value,
+                            selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? selectedCommissions.value.map(commission => commission.value) : [selectedCommission.value.value],
+                            selectedYears.value, (selectedOUs.value as {title: string, value: number}).value, "sr"
                         )
                     );
                     break;
@@ -354,38 +395,53 @@ export default defineComponent({
             return `${localDate}T${localTime}`;
         };
 
+        const isTopLevelReport = () => {
+            if (reportGeneration.value && 
+                (
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION || 
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED || 
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY
+                )
+            ) {
+                return true;
+            }
+
+            return false;
+        };
+
+        const isSummaryReport = () => {
+            if (reportGeneration.value && selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY) {
+                return true;
+            }
+
+            return false;
+        };
+
         return {
             scheduleDate, scheduledTasks,
             applicableTypes, selectedApplicableEntityType,
             selectedIndicatorSource, requiredSelectionRules,
             scheduleTaskForComputation, scheduledTime,
-            isFormValid, snackbar, message,
+            isFormValid, snackbar, message, years,
             deleteScheduledLoadTask, selectedOUs,
             scheduledTaskTypes, indicatorSources,
-            selectedScheduledTaskType,
-            ScheduledTaskType, years,
+            selectedScheduledTaskType, ScheduledTaskType,
             selectedYears, selectedCommission,
             entityTypes, selectedEntityTypes,
             requiredMultiSelectionRules,
-            classificationSources,
+            classificationSources, startDate,
             selectedClassificationSource,
             taskReindexing, taskIndicatorLoad,
-            taskIF5Computation, startDate,
+            taskIF5Computation, reportTypes,
             taskClassificationComputation,
-            taskClassificationLoad,
+            taskClassificationLoad, reportGeneration,
             journalPublicationsAssessment,
             selectedJournals, selectedPersons,
             proceedingsPublicationsAssessment,
-            selectedEvents
+            selectedEvents, selectedReportType,
+            isTopLevelReport, isSummaryReport,
+            selectedCommissions
         };
     },
 });
 </script>
-
-<style scoped>
-
-.comfortable {
-    height: 90px;
-}
-
-</style>

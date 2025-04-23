@@ -2,7 +2,8 @@
     <v-app>
         <v-main>
             <navbar />
-            <router-view :key="$route.params.id" />
+            <breadcrumbs />
+            <router-view :key="$route.fullPath" />
         </v-main>
         <footerbar />
     </v-app>
@@ -19,11 +20,12 @@ import { jwtDecode } from "jwt-decode";
 import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
 import footerbar from "./components/core/FooterBar.vue";
+import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 
 
 export default defineComponent({
     name: "App",
-    components: {navbar, footerbar},
+    components: {navbar, footerbar, Breadcrumbs},
     beforeMount() {
         const route = useRoute();
         const router = useRouter();
@@ -71,7 +73,11 @@ export default defineComponent({
                 }
             } else {
                 if (to.name === "login") {
-                    routeStore.setRouteAndParams(from.name, from.params);
+                    if (loginStore.explicitlyLoggedOut) {
+                        loginStore.reachedLoginPage();
+                    } else {
+                        routeStore.setRouteAndParams(from.name, from.params);
+                    }
                 }
                 next();
             }

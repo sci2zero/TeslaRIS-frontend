@@ -92,6 +92,8 @@
             </p>
         </v-row>
     </v-form>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -117,11 +119,13 @@ import BookSeriesService from '@/services/BookSeriesService';
 import EventService from '@/services/EventService';
 import PublisherService from '@/services/PublisherService';
 import { watch } from 'vue';
+import ProceedingsService from '@/services/ProceedingsService';
+import Toast from '@/components/core/Toast.vue';
 
 
 export default defineComponent({
     name: "ProceedingsUpdateForm",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch},
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast},
     props: {
         presetProceedings: {
             type: Object as PropType<Proceedings | undefined>,
@@ -130,13 +134,20 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        inModal: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
+        const snackbar = ref(false);
+        const message = ref("");
         const i18n = useI18n();
+
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
 
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -221,7 +232,33 @@ export default defineComponent({
             validatePublicationSeriesSelection();
         });
         
-        const submit = () => {
+        const submit = async () => {
+            if (props.inModal) {
+                const proceedingsId = props.presetProceedings?.id as number;
+                const identifiers = [
+                    { value: eIsbn.value, error: "eisbnExistsError" },
+                    { value: printIsbn.value, error: "printIsbnExistsError" },
+                    { value: doi.value, error: "doiExistsError" },
+                    { value: scopus.value, error: "scopusIdExistsError" }
+                ].filter(id => id.value);
+
+                const results = await Promise.all(
+                    identifiers.map(id => ProceedingsService.checkProceedingsIdentifierUsage(id.value as string, proceedingsId))
+                );
+
+                const firstDuplicate = identifiers.find((_, index) => results[index].data);
+                if (firstDuplicate) {
+                    message.value = i18n.t(firstDuplicate.error);
+                    snackbar.value = true;
+                    return;
+                }
+
+                let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
+                if (publicationSeriesId === -1) {
+                    publicationSeriesId = undefined;
+                }
+            }
+
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
                 publicationSeriesId = undefined;
@@ -285,7 +322,7 @@ export default defineComponent({
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
             selectedPublisher, selectedBookSeries, doiValidationRules,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, submit,
+            publicationSeriesExternalValidation, submit, snackbar, message,
             scopusIdValidationRules, refreshForm, titleRef, subtitleRef
         };
     }

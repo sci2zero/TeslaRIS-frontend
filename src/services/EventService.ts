@@ -8,8 +8,8 @@ export class EventService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean): Promise<AxiosResponse<Page<EventIndex>>> {
-    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}`);
+  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean): Promise<AxiosResponse<Page<EventIndex>>> {
+    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}`);
   }
 
   async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {
@@ -62,6 +62,10 @@ export class EventService extends BaseService {
 
   async deleteEventsRelation(relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `events-relation/${relationId}`);
+  }
+
+  async checkIdentifierUsage(identifier: string, conferenceId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `conference/identifier-usage/${conferenceId}?identifier=${encodeURIComponent(identifier)}`);
   }
 }
 

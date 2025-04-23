@@ -1,17 +1,17 @@
 <template>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="bottom-spacer" :disabled="selectedPublishers.length === 0"
+        v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedPublishers.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button"
+        v-if="isAdmin" density="compact" class="compare-button"
         :disabled="selectedPublishers.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-btn
-        v-if="userRole === 'ADMIN'" density="compact" class="compare-button"
+        v-if="isAdmin" density="compact" class="compare-button"
         :disabled="selectedPublishers.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
@@ -23,7 +23,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalPublishers"
-        :show-select="userRole === 'ADMIN'"
+        :show-select="isAdmin"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -32,7 +32,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="userRole === 'ADMIN'">
+                <td v-if="isAdmin">
                     <v-checkbox
                         v-model="selectedPublishers"
                         :value="row.item"
@@ -82,12 +82,12 @@
 import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import UserService from '@/services/UserService';
 import type { PublisherIndex } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -115,7 +115,7 @@ export default defineComponent({
         const placeLabel = computed(() => i18n.t("placeLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
 
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const placeColumn = computed(() => i18n.t("placeColumn"));
@@ -212,7 +212,7 @@ export default defineComponent({
 
         return {
             selectedPublishers, headers, notifications,
-            refreshTable, userRole, deleteSelection,
+            refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             setSortAndPageOption, startMetadataComparison,
             startPublicationComparison

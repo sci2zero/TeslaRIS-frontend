@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col :cols="allowManualClearing && hasSelection ? 10 : 11">
+        <v-col :cols="allowManualClearing && hasSelection ? 11 : 12">
             <v-autocomplete
                 v-model="selectedCommission"
                 :readonly="readOnly"
@@ -176,11 +176,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped>
-
-.comfortable {
-    height: 90px;
-}
-
-</style>

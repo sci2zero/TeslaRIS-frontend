@@ -1,6 +1,6 @@
 <template>
     <generic-crud-modal
-        class="mt-5 ml-5"
+        class="mt-5"
         :form-component="EntityClassificationForm"
         :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
         :entity-name="containingEntityType === ApplicableEntityType.DOCUMENT ? 'EntityAssessment' : 'EntityClassification'"
@@ -9,11 +9,11 @@
     />
     <v-row>
         <v-col>
-            <h2 v-if="entityClassifications?.length > 0" class="mt-5">
+            <h2 class="mt-5">
                 {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("classificationsLabel") : $t("assessmentsLabel") }}
             </h2>
         
-            <v-expansion-panels v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
+            <v-expansion-panels v-if="entityClassifications?.length > 0" v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
                 <v-expansion-panel
                     v-for="(classification, index) in entityClassifications"
                     :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
@@ -22,7 +22,7 @@
                             <p>{{ contents[index] }}</p>
                         </v-row>
                         <v-row v-if="classification.manual">
-                            <div v-if="classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN'">
+                            <div v-if="classification.commissionId === loggedInUser?.commissionId || isAdmin">
                                 <generic-crud-modal
                                     :form-component="EntityClassificationForm"
                                     :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
@@ -32,8 +32,8 @@
                                     @update="updateClassification($event, classification.id)"
                                 />
                             </div>
-                            <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || userRole === 'ADMIN')" class="ml-5">
-                                <v-btn density="compact" @click.prevent="deleteCLassification(classification.id)">
+                            <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || isAdmin)" class="ml-5">
+                                <v-btn density="compact" @click.prevent="deleteClassification(classification.id)">
                                     {{ $t("deleteLabel") }}
                                 </v-btn>
                             </div>
@@ -41,12 +41,15 @@
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
+            <h3 v-else>
+                {{ $t("noClassificationsLabel") }}
+            </h3>
         </v-col>
     </v-row>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
+import { defineComponent, onMounted, type PropType, watch } from 'vue';
 import { ref } from 'vue';
 import type { EntityClassificationResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -55,8 +58,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationForm from './EntityClassificationForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
-import UserService from '@/services/UserService';
-import type { UserResponse } from '@/models/UserModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -93,14 +95,10 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const loggedInUser = ref<UserResponse>();
-        const userRole = computed(() => UserService.provideUserRole());
+        const { isAdmin, loggedInUser } = useUserRole();
         
         onMounted(() => {
             setClassifications();
-            UserService.getLoggedInUser().then(response => {
-                loggedInUser.value = response.data;
-            });
         });
 
         watch(() => props.entityClassifications, () => {
@@ -123,7 +121,11 @@ export default defineComponent({
         };
 
         const buildDisplayData = (entityClassification: EntityClassificationResponse) => {
-            const displayValue = returnCurrentLocaleContent(entityClassification.classificationTitle);
+            let displayValue = returnCurrentLocaleContent(entityClassification.classificationTitle);
+
+            if (entityClassification.assessmentReason.length > 0) {
+                displayValue += " " + returnCurrentLocaleContent(entityClassification.assessmentReason);
+            }
 
             const title = buildDisplayTitle(entityClassification);
 
@@ -160,7 +162,7 @@ export default defineComponent({
             emit("update");
         };
 
-        const deleteCLassification = async (entityClassificationId: number) => {
+        const deleteClassification = async (entityClassificationId: number) => {
             openedPanel.value = null;
             await EntityClassificationService.deleteEntityClassification(entityClassificationId);
             const index = props.entityClassifications.findIndex(classification => classification.id === entityClassificationId);
@@ -177,10 +179,10 @@ export default defineComponent({
         return {
             titles, contents,
             ApplicableEntityType,
-            openedPanel, userRole,
+            openedPanel, isAdmin,
             EntityClassificationForm,
             updateClassification,
-            deleteCLassification,
+            deleteClassification,
             createClassification,
             loggedInUser
         };

@@ -6,8 +6,8 @@
         <search-bar-component :preset-search-input="presetSearchParams" @search="clearSortAndPerformSearch"></search-bar-component>
         <br />
         <span class="d-flex align-center">
-            <v-btn color="primary" @click="addConference">
-                {{ $t("addConferenceLabel") }}
+            <v-btn v-if="isAdmin" color="primary" @click="addConference">
+                {{ $t("createNewConferenceLabel") }}
             </v-btn>
             <v-checkbox
                 v-model="returnSerialEvents"
@@ -15,9 +15,15 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
             <v-checkbox
-                v-if="userRole === 'COMMISSION'"
-                v-model="returnOnlyInstitutionBoundEvents"
-                :label="$t('showEventsForMyInstitutionLabel')"
+                v-if="isUserBoundToOU"
+                v-model="returnOnlyInstitutionRelatedEntities"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+            <v-checkbox
+                v-if="isCommission"
+                v-model="returnOnlyUnclassifiedEntities"
+                :label="$t('showUnclassifiedLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
@@ -26,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import EventService from '@/services/EventService';
 import EventTableComponent from '@/components/event/EventTableComponent.vue';
@@ -35,7 +41,7 @@ import type { EventIndex } from '@/models/EventModel';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
-import UserService from '@/services/UserService';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -56,16 +62,16 @@ export default defineComponent({
         const direction = ref("");
 
         const returnSerialEvents = ref(true);
+        const returnOnlyUnclassifiedEntities = ref(true);
         const tableRef = ref<typeof EventTableComponent>();
 
-        const userRole = computed(() => UserService.provideUserRole());
-        const returnOnlyInstitutionBoundEvents = ref(userRole.value === 'COMMISSION' ? true : false);
+        const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
         });
 
-        watch([returnSerialEvents, returnOnlyInstitutionBoundEvents], () => {
+        watch([returnSerialEvents, returnOnlyInstitutionRelatedEntities, returnOnlyUnclassifiedEntities], () => {
             search(searchParams.value);
         });
 
@@ -79,7 +85,18 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            EventService.searchConferences(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, !returnSerialEvents.value, false, returnOnlyInstitutionBoundEvents.value).then((response) => {
+
+            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                return;
+            }
+
+            EventService.searchConferences(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                !returnSerialEvents.value,
+                false,
+                returnOnlyInstitutionRelatedEntities.value as boolean,
+                isCommission.value && returnOnlyUnclassifiedEntities.value)
+            .then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
             });
@@ -98,10 +115,11 @@ export default defineComponent({
         };
 
         return {
-            search, events, totalEvents, switchPage,
+            search, events, totalEvents, switchPage, isAdmin,
             addConference, presetSearchParams, returnSerialEvents,
-            tableRef, clearSortAndPerformSearch, userRole,
-            returnOnlyInstitutionBoundEvents
+            tableRef, clearSortAndPerformSearch, isUserBoundToOU,
+            returnOnlyInstitutionRelatedEntities, isCommission,
+            returnOnlyUnclassifiedEntities
         };
     }
 });

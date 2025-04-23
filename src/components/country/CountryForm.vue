@@ -25,13 +25,10 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
-import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
-import type { AxiosResponse } from 'axios';
 import type { Country } from '@/models/Common';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -47,13 +44,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
-
-        onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-        });
+        const { languageTags } = useLanguageTags();
 
         const nameRef = ref<typeof MultilingualTextInput>();
 

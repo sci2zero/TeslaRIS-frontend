@@ -33,6 +33,7 @@ export interface DocumentPublicationIndex {
     monographId: number | null;
     databaseId: number | null;
     doi: string;
+    assessedBy?: number[];
 }
 
 export enum PublicationType {
@@ -52,7 +53,9 @@ export enum ThesisType {
     MR = "MR",
     PHD = "PHD",
     PHD_ART_PROJECT = "PHD_ART_PROJECT",
-    MASTER = "MASTER"
+    MASTER = "MASTER",
+    BACHELOR_WITH_HONORS = "BACHELOR_WITH_HONORS",
+    UNDERGRADUATE_THESIS = "UNDERGRADUATE_THESIS"
 }
   
 export enum JournalPublicationType {
@@ -97,6 +100,7 @@ export interface PersonDocumentContribution extends PersonContribution {
     contributionType: DocumentContributionType;
     isMainContributor: boolean;
     isCorrespondingContributor: boolean;
+    isBoardPresident: boolean;
 }
 
 export enum DocumentContributionType {
@@ -213,10 +217,21 @@ export interface Thesis extends Document {
     externalOrganisationUnitName?: MultilingualContent[];
     thesisType: ThesisType;
     numberOfPages?: number;
-    languageTagIds: number[];
+    languageId?: number;
+    writingLanguageTagId?: number;
     researchAreaId?: number;
     publisherId?: number;
-    languageTagNames?: string[];
+    languageCode?: string;
+    preliminaryFiles?: DocumentFileResponse[];
+    preliminarySupplements?: DocumentFileResponse[];
+    commissionReports?: DocumentFileResponse[];
+    isOnPublicReview?: boolean;
+    publicReviewDates?: string[];
+    publicReviewEnd?: string;
+    isOnPublicReviewPause?: boolean;
+    topicAcceptanceDate: string;
+    thesisDefenceDate: string;
+    isArchived: boolean;
 }
 
 export interface CitationResponse {
@@ -225,4 +240,20 @@ export interface CitationResponse {
     chicago: string;
     harvard: string;
     vancouver: string;
+}
+
+export interface DocumentAffiliationRequest {
+    documentIds: number[];
+    deleteOthers: boolean;
+}
+
+export enum MServiceApplicableTypes {
+    JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
+    PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION"
+}
+
+export interface ThesisLibraryFormatsResponse {
+    etdMs: string;
+    dublinCore: string;
+    marc21: string;
 }

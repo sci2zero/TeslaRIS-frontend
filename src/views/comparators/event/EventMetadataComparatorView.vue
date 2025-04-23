@@ -7,7 +7,9 @@
                 </h2>
                 <br />
 
-                <event-update-form ref="updateLeftRef" :preset-event="leftConference" in-comparator @update="updateLeft"></event-update-form>
+                <event-update-form
+                    ref="updateLeftRef" :preset-event="leftConference" in-comparator :in-modal="false"
+                    @update="updateLeft"></event-update-form>
 
                 <br />
 
@@ -45,7 +47,9 @@
 
                 <br />
 
-                <event-update-form ref="updateRightRef" :preset-event="rightConference" in-comparator @update="updateRight"></event-update-form>
+                <event-update-form
+                    ref="updateRightRef" :preset-event="rightConference" in-comparator :in-modal="false"
+                    @update="updateRight"></event-update-form>
 
                 <br />
 

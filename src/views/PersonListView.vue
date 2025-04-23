@@ -5,25 +5,41 @@
         <br />
         <search-bar-component @search="clearSortAndPerformSearch($event)"></search-bar-component>
         <br />
-        <v-btn v-if="userRole === 'ADMIN' || userRole === 'INSTITUTIONAL_EDITOR'" color="primary" @click="addPerson">
-            {{ $t("addPersonLabel") }}
-        </v-btn>
-        <br />
-        <br />
-        <person-table-component ref="tableRef" :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+        <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">
+            <v-btn v-if="isAdmin || isInstitutionalEditor" color="primary" @click="addPerson">
+                {{ $t("createNewPersonLabel") }}
+            </v-btn>
+            <v-checkbox
+                v-if="isUserBoundToOU"
+                v-model="returnOnlyInstitutionRelatedEntities"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+        </span>
+        <person-table-component
+            ref="tableRef"
+            :persons="persons"
+            :total-persons="totalPersons"
+            enable-export
+            :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
+            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+            @switch-page="switchPage">
+        </person-table-component>
     </v-container>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PersonService from '@/services/PersonService';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import { ref } from 'vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import { useRouter } from 'vue-router';
-import UserService from '@/services/UserService';
 import { useI18n } from 'vue-i18n';
+import { useUserRole } from '@/composables/useUserRole';
+import { ExportableEndpointType } from '@/models/Common';
+
 
 export default defineComponent({
     name: "PersonListView",
@@ -40,16 +56,30 @@ export default defineComponent({
         const i18n = useI18n();
         const router = useRouter();
 
-        const userRole = computed(() => UserService.provideUserRole());
         const tableRef = ref<typeof PersonTableComponent>();
+
+        const { isAdmin, isInstitutionalEditor, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("personListLabel");
         });
 
+        watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
+            search(searchParams.value);
+        });
+
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            PersonService.searchResearchers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false).then((response) => {
+
+            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                return;
+            }
+
+            PersonService.searchResearchers(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                false,
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+            .then((response) => {
                 persons.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
             });
@@ -77,8 +107,11 @@ export default defineComponent({
 
         return {
             search, persons, totalPersons,
-            switchPage, addPerson, userRole,
-            tableRef, clearSortAndPerformSearch
+            switchPage, addPerson, isAdmin,
+            tableRef, clearSortAndPerformSearch,
+            isInstitutionalEditor, isUserBoundToOU,
+            returnOnlyInstitutionRelatedEntities,
+            ExportableEndpointType, searchParams
         };
     }
 });
