@@ -196,4 +196,6 @@ export interface DocumentCSVExportRequest extends CSVExportRequest {
     chicago: boolean;
     vancouver: boolean;
     allowedTypes: PublicationType[];
+    institutionId: number;
+    commissionId: number;
 }

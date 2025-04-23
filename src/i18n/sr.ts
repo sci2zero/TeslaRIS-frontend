@@ -290,6 +290,7 @@ export default {
     fileLabel: "Fajl",
     resourceTypeLabel: "Tip resursa",
     licenseLabel: "Licenca",
+    ccLicenseLabel: "CC Licenca",
     noFilesUploadedMessage: "Nisu priloženi dokumenti.",
     proofsLabel: "Dokazi",
     fileItemsLabel: "Dokumenti",
@@ -797,5 +798,21 @@ export default {
     weUseCookiesLabel: "Koristimo kolačiće 🍪",
     cookiesExplanationMessage: "Koristimo kolačiće da bismo poboljšali vaše iskustvo evidentiranjem statistike pregledanja i preuzimanja. Možete prihvatiti sve kolačiće ili odbiti one za praćenje, čime ćete omogućiti samo one koji su potrebni za autentifikaciju.",
     acceptAllLabel: "Prihvati sve",
-    acceptNecessaryLabel: "Prihvati samo neophodne"
+    acceptNecessaryLabel: "Prihvati samo neophodne",
+    promotionPreviewLabel: "Pregled promocije",
+    registryBookHeaders: {
+        index: "Укуп. бр.\n---------\nРед. бр.\nу школ. год.",
+        name: "Име и презиме",
+        birthPlace: "Датум, место, општина рођења и држава",
+        parents: "Презиме и име оба родитеља (или старатеља)",
+        studyInfo: "Назив завршене високошколске установе и седиште",
+        previousTitle: "Стручни или академски и скраћени назив после завршених дипломских или специјалистичких академских студија",
+        faculty: "Назив организационе јединице Универзитета на којој је одбрањена дисертација",
+        dissertation: "Назив докторске дисертације или докторски уметнички пројекат",
+        commission: "Комисија за одбрану и ментор за израду докторске дисертације",
+        defendedOn: "Оцена дисертације и датум одбране дисертације",
+        newTitle: "Научни назив који је кандидат стекао",
+        diploma: "Број и датум издавања дипломе и додатака дипломе",
+        promotionDate: "Датум промоције"
+    }
 }

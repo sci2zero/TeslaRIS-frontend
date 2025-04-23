@@ -81,7 +81,12 @@
             enable-export
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
-            :endpoint-body-parameters="{allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value)}"
+            :endpoint-body-parameters="
+                {
+                    allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
+                    institutionId: returnOnlyInstitutionRelatedEntities ? loggedInUser?.organisationUnitId as number : null,
+                    commissionId: isCommission && returnOnlyUnassessedEntities ? loggedInUser?.commissionId as number : null
+                }"
             @switch-page="switchPage">
         </publication-table-component>
     </v-container>
@@ -256,7 +261,7 @@ export default defineComponent({
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
-            resetFiltersAndSearch
+            resetFiltersAndSearch, loggedInUser
         };
     }
 });

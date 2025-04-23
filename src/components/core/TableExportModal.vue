@@ -278,6 +278,8 @@ export default defineComponent({
                     (exportRequest as DocumentCSVExportRequest).chicago = chicago.value;
                     (exportRequest as DocumentCSVExportRequest).vancouver = vancouver.value;
                     (exportRequest as DocumentCSVExportRequest).allowedTypes = props.endpointBodyParameters.allowedTypes;
+                    (exportRequest as DocumentCSVExportRequest).institutionId = props.endpointBodyParameters.institutionId;
+                    (exportRequest as DocumentCSVExportRequest).commissionId = props.endpointBodyParameters.commissionId;
 
                     TableExportService.exportDocumentTable(exportRequest as DocumentCSVExportRequest);
                     break;

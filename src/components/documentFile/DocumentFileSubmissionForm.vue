@@ -41,6 +41,17 @@
                 <v-row v-else>
                     <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
                 </v-row>
+                <v-row v-if="isOpenAccess && (selectedResourceType.value == ResourceType.OFFICIAL_PUBLICATION || selectedResourceType.value == 'OFFICIAL_PUBLICATION')">
+                    <v-col>
+                        <v-select
+                            v-model="selectedCCLicense"
+                            :items="cclicenseTypes"
+                            :label="$t('ccLicenseLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
 
@@ -61,7 +72,7 @@ import { computed } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileModel';
 import { resourceTypeSr, resourceTypeEn } from "@/i18n/resourceType";
-import { License, ResourceType } from "@/models/DocumentFileModel";
+import { CCLicense, License, ResourceType } from "@/models/DocumentFileModel";
 import type { PropType } from 'vue';
 import { onMounted } from 'vue';
 import { getNameFromOrdinal } from '@/utils/EnumUtil';
@@ -136,7 +147,18 @@ export default defineComponent({
             { title: "Subscription-Based Access", value: License.SUBSCRIPTION_BASED_ACCESS },
         ];
 
+        const cclicenseTypes = [
+            { title: "CC BY", value: CCLicense.BY },
+            { title: "CC BY-SA", value: CCLicense.BY_SA },
+            { title: "CC BY-NC", value: CCLicense.BY_NC },
+            { title: "CC BY-NC-SA", value: CCLicense.BY_NC_SA },
+            { title: "CC BY-ND", value: CCLicense.BY_ND },
+            { title: "CC BY-NC-ND", value: CCLicense.BY_NC_ND },
+            { title: "CC Zero (Public Domain)", value: CCLicense.CC0 }
+        ];
+
         const selectedLicense = ref({ title: "All Rights Reserved", value: License.ALL_RIGHTS_RESERVED });
+        const selectedCCLicense = ref({ title: "NC BY", value: CCLicense.BY });
         const isOpenAccess = ref<boolean>(true);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
@@ -146,7 +168,8 @@ export default defineComponent({
                 file: file.value as File,
                 description: description.value,
                 resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
-                license: License.ALL_RIGHTS_RESERVED
+                license: License.ALL_RIGHTS_RESERVED,
+                ccLicense: selectedCCLicense.value.value
             }
 
             if (props.allowLicenceSelection) {
@@ -163,12 +186,14 @@ export default defineComponent({
             
         };
 
-        return {isFormValid, file,
+        return {
+            isFormValid, file, ResourceType, cclicenseTypes,
             description, descriptionRef, isOpenAccess,
             requiredFieldRules, licenses, resourceTypes,
             selectedLicense, selectedResourceType,
             addDocumentFile, requiredSelectionRules, 
-            languageTags, toMultilingualTextInput
+            languageTags, toMultilingualTextInput,
+            selectedCCLicense
         };
     }
 });

@@ -43,7 +43,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            :show-select="isAdmin || allowSelection"
+            :show-select="isAdmin || allowSelection || enableExport"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -64,7 +64,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in properties.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || allowSelection">
+                        <td v-if="isAdmin || allowSelection || enableExport">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"

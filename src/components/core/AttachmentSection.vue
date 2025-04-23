@@ -4,7 +4,7 @@
             <h2>{{ $t("preliminaryFilesLabel") }}</h2>
             <attachment-list
                 :attachments="preliminaryFiles" :can-edit="canEditThesisAttachments" :in-comparator="inComparator"
-                allow-licence-selection disable-updates
+                disable-updates
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"></attachment-list>
@@ -15,7 +15,7 @@
             <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
             <attachment-list
                 :attachments="preliminarySupplements" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
-                allow-licence-selection disable-updates 
+                disable-updates 
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"></attachment-list>
@@ -26,7 +26,7 @@
             <h2>{{ $t("commissionReportsLabel") }}</h2>
             <attachment-list
                 :attachments="commissionReports" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
-                allow-licence-selection disable-updates 
+                disable-updates 
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"></attachment-list>

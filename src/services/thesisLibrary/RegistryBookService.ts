@@ -3,6 +3,7 @@ import { BaseService } from "../BaseService";
 import axios from "axios";
 import type { InstitutionPromotionCountsReport, PhdThesisPrePopulatedData, RegistryBookEntry } from "@/models/ThesisLibraryModel";
 import { type Page } from "@/models/Common";
+import i18n from "@/i18n";
 
 
 export class RegistryBookService extends BaseService {
@@ -17,8 +18,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/for-promotion/${promotionId}?${pageable}`);
     }
 
-    async getPromoted(institutionId: number, from: string, to: string, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
-        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&${pageable}`);
+    async getPromoted(institutionId: number, from: string, to: string, authorName: string, authorTitle: string, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
+        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&authorName=${authorName}&authorTitle=${authorTitle}&${pageable}`);
     }
 
     async getPromotedCounts(from: string, to: string): Promise<AxiosResponse<InstitutionPromotionCountsReport[]>> {
@@ -61,7 +62,11 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/promotees/${promotionId}`);
     }
 
-    async promoteAll(promotionId: number): Promise<AxiosResponse<string[]>> {
+    async previewPromoteAll(promotionId: number): Promise<AxiosResponse<string[][]>> {
+        return super.sendRequest(axios.patch, `registry-book/preview-promote-all/${promotionId}?lang=${i18n.vueI18n.global.locale}`);
+    }
+
+    async promoteAll(promotionId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `registry-book/promote-all/${promotionId}`);
     }
 

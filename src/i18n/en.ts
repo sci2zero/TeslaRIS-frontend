@@ -290,6 +290,7 @@ export default {
     fileLabel: "File",
     resourceTypeLabel: "Resource Type",
     licenseLabel: "License",
+    ccLicenseLabel: "CC License",
     noFilesUploadedMessage: "No Files Provided.",
     proofsLabel: "Proofs",
     fileItemsLabel: "File Items",
@@ -764,12 +765,28 @@ export default {
     isAlsoABoardMemberLabel: "Board member",
     reportGenerationScheduledMessage: "Report generation is scheduled for {0}. You will get a notification when the report will be ready for downloading.",
     noGeneratedReportsLabel: "No generated reports yet.",
-    PromotedLabel: "Promoted",
+    promotedLabel: "Promoted",
     generatedRegistryBooksLabel: "Generated registry books",
     generateRegistryBookLabel: "Generate registry book",
     addRegistryBookAdminLabel: "Add registry book administrator",
     weUseCookiesLabel: "We use cookies 🍪",
     cookiesExplanationMessage: "We use cookies to improve your experience by logging browsing and download statistics. You can accept all cookies or decline tracking ones, thus enabling only ones required for authentication.",
     acceptAllLabel: "Accept all",
-    acceptNecessaryLabel: "Accept only necessary"
+    acceptNecessaryLabel: "Accept only necessary",
+    promotionPreviewLabel: "Promotion preview",
+    registryBookHeaders: {
+        index: "Total No.\n---------\nSerial No.\nin\nAcademic\nYear",
+        name: "Full Name",
+        birthPlace: "Date, Place, Municipality of Birth, and Country",
+        parents: "Full Names of Both Parents (or Guardian)",
+        studyInfo: "Name and Location of the Graduated Higher Education Institution",
+        previousTitle: "Professional or Academic Title and Abbreviation after Completion of Undergraduate or Specialist Academic Studies",
+        faculty: "Name of the University Organizational Unit Where the Dissertation Was Defended",
+        dissertation: "Title of the Doctoral Dissertation or Artistic Doctoral Project",
+        commission: "Defense Committee and Mentor for the Doctoral Dissertation",
+        defendedOn: "Dissertation Grade and Date of Defense",
+        newTitle: "Academic Title Acquired by the Candidate",
+        diploma: "Number and Date of Issuance of Diploma and Diploma Supplements",
+        promotionDate: "Date of Promotion"
+    }    
 }

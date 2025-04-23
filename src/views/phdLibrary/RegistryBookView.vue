@@ -59,11 +59,17 @@
                     <promotion-printed-lists
                         :promotion-id="selectedPromotion.value"
                     />
+                    <persistent-table-dialog
+                        ref="promotionPreviewRef"
+                        :title="$t('promotionPreviewLabel')"
+                        :row-data="promotionPreview"
+                        :headers="headers"
+                        @continue="promoteAll">
+                    </persistent-table-dialog>
                     <v-btn
-
                         class="ml-3"
                         color="primary"
-                        @click="promoteAll">
+                        @click="previewPromotion">
                         {{ $t("promoteAllLabel") }}
                     </v-btn>
                 </div>
@@ -92,6 +98,22 @@
                             disable-submission
                         ></organisation-unit-autocomplete-search>
                     </v-col>
+                    <v-col cols="12" sm="6" lg="3">
+                        <v-text-field
+                            v-model="authorFullName"
+                            :label="$t('fullNameLabel')"
+                            :placeholder="$t('fullNameLabel')">
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" lg="3">
+                        <v-text-field
+                            v-model="authorAcquiredTitle"
+                            :label="$t('acquiredTitleLabel')"
+                            :placeholder="$t('acquiredTitleLabel')">
+                        </v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row class="justify-start">
                     <v-col
                         v-if="tableStates.promoted.entries.length > 0" cols="6" md="3"
                         lg="2">
@@ -174,6 +196,8 @@ import RegistryBookReportService from '@/services/thesisLibrary/RegistryBookRepo
 import RegistryBookReportsList from '@/components/thesisLibrary/RegistryBookReportsList.vue';
 import { getLangItems } from '@/i18n/languages';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import PersistentTableDialog from './PersistentTableDialog.vue';
+import lodash, { type DebouncedFunc } from 'lodash';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -185,12 +209,12 @@ interface EntryTableState {
     size: number;
     sort: string;
     direction: string;
-    fetchFn: () => Promise<void>;
+    fetchFn: (() => Promise<void>) | (DebouncedFunc<() => Promise<void>>);
 }
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
@@ -216,10 +240,11 @@ export default defineComponent({
             title: "",
             value: -1
         });
-
+        const authorFullName = ref("");
+        const authorAcquiredTitle = ref("");
         const reportCounts = ref<InstitutionPromotionCountsReport[]>([]);
 
-        watch([fromDate, toDate, selectedInstitution], () => {
+        watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
@@ -272,7 +297,7 @@ export default defineComponent({
                 size: 1,
                 sort: "",
                 direction: "",
-                fetchFn: async () => {
+                fetchFn: lodash.debounce(async () => {
                     if (selectedInstitution.value.value <= 0) {
                         return;
                     }
@@ -282,11 +307,12 @@ export default defineComponent({
                         selectedInstitution.value.value,
                         fromDate.value ? fromDate.value.split("T")[0] : "",
                         toDate.value ? toDate.value.split("T")[0] : "",
+                        authorFullName.value, authorAcquiredTitle.value,
                         query
                     );
                     tableStates.promoted.entries = response.data.content;
                     tableStates.promoted.totalEntries = response.data.totalElements;
-                }
+                }, 300)
             }
         });
     
@@ -336,6 +362,30 @@ export default defineComponent({
             fetchPromotions();
         });
 
+        const promotionPreviewRef = ref<typeof PersistentTableDialog>();
+        const promotionPreview = ref<string[][]>([]);
+        const headers = [
+            "registryBookHeaders.index",
+            "registryBookHeaders.name",
+            "registryBookHeaders.birthPlace",
+            "registryBookHeaders.parents",
+            "registryBookHeaders.studyInfo",
+            "registryBookHeaders.previousTitle",
+            "registryBookHeaders.faculty",
+            "registryBookHeaders.dissertation",
+            "registryBookHeaders.commission",
+            "registryBookHeaders.defendedOn",
+            "registryBookHeaders.newTitle",
+            "registryBookHeaders.diploma",
+            "registryBookHeaders.promotionDate"
+        ];
+        const previewPromotion = () => {
+            RegistryBookService.previewPromoteAll(selectedPromotion.value.value).then(response => {
+                promotionPreview.value = response.data;
+                promotionPreviewRef.value?.toggle();
+            });
+        };
+
         const promoteAll = () => {
             RegistryBookService.promoteAll(selectedPromotion.value.value)
             .then(() => {
@@ -366,13 +416,16 @@ export default defineComponent({
     
         return {
             currentTab, fromDate, toDate,
-            tableStates, switchPage,
+            tableStates, switchPage, headers,
             promotions, selectedPromotion,
             fetchAllTables, promoteAll,
             snackbar, message, loggedInUser,
             selectedInstitution, reportCounts,
             generateRegistryBookReport, langItems,
-            selectedLang, requiredSelectionRules
+            selectedLang, requiredSelectionRules,
+            promotionPreview, previewPromotion,
+            promotionPreviewRef, authorFullName,
+            authorAcquiredTitle
         };
     }
 });
