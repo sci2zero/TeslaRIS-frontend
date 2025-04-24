@@ -788,5 +788,35 @@ export default {
         newTitle: "Academic Title Acquired by the Candidate",
         diploma: "Number and Date of Issuance of Diploma and Diploma Supplements",
         promotionDate: "Date of Promotion"
-    }    
+    },
+    "licenses": {
+        "by": {
+            "title": "CC BY",
+            "description": "You must give appropriate credit."
+        },
+        "by_sa": {
+            "title": "CC BY-SA",
+            "description": "You must give appropriate credit and share any derivative works under the same license."
+        },
+        "by_nd": {
+            "title": "CC BY-ND",
+            "description": "You must give appropriate credit, and you may not distribute modified material."
+        },
+        "by_nc": {
+            "title": "CC BY-NC",
+            "description": "You must give appropriate credit and may not use the material for commercial purposes."
+        },
+        "by_nc_sa": {
+            "title": "CC BY-NC-SA",
+            "description": "You must give appropriate credit, may not use the material for commercial purposes, and must share any derivatives under the same license."
+        },
+        "by_nc_nd": {
+            "title": "CC BY-NC-ND",
+            "description": "You must give appropriate credit, may not use the material for commercial purposes, and may not distribute modified material."
+        },
+        "cc0": {
+            "title": "CC0 (Public Domain)",
+            "description": "No rights reserved. You can copy, modify, and distribute without asking permission."
+        }
+    }
 }

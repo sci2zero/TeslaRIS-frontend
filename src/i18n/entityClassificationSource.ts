@@ -12,12 +12,12 @@ export const classificationSourceEn = [
 export const getClassificationSourceTitleFromValueAutoLocale = (value: EntityClassificationSource) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = classificationSourceEn;
+    let classificationSourceArray = classificationSourceEn;
     if (locale == "sr") {
-        resourceTypeArray = classificationSourceSr;
+        classificationSourceArray = classificationSourceSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (classificationSourceArray.find(item => item.value === value) || {}).title;
 };
 
 export const getClassificationSourcesForGivenLocale = () => {

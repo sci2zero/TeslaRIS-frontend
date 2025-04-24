@@ -29,12 +29,12 @@ const employmentTitlesSr = [
 export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = employmentTitlesEn;
+    let employmentTitleArray = employmentTitlesEn;
     if (locale == "sr") {
-        resourceTypeArray = employmentTitlesSr;
+        employmentTitleArray = employmentTitlesSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (employmentTitleArray.find(item => item.value === value) || {}).title;
 };
 
 export const getEmploymentTitlesForGivenLocale = () => {

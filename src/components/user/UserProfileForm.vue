@@ -118,7 +118,7 @@ import { computed } from "vue";
 import UserService from "@/services/UserService";
 import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
-import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriods";
+import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriod";
 import { useRouter } from "vue-router";
 import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";

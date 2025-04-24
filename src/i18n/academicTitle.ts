@@ -22,12 +22,12 @@ const academicTitlesSr = [
 export const getAcademicTitleFromValueAutoLocale = (value: AcademicTitle) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = academicTitlesEn;
+    let academicTitleArray = academicTitlesEn;
     if (locale == "sr") {
-        resourceTypeArray = academicTitlesSr;
+        academicTitleArray = academicTitlesSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (academicTitleArray.find(item => item.value === value) || {}).title;
 };
 
 export const getAcademicTitlesForGivenLocale = () => {

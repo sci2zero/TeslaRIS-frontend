@@ -21,12 +21,12 @@ const personalTitlesSr = [
 export const getPersonalTitleFromValueAutoLocale = (value: PersonalTitle) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = personalTitlesEn;
+    let personalTitleArray = personalTitlesEn;
     if (locale == "sr") {
-        resourceTypeArray = personalTitlesSr;
+        personalTitleArray = personalTitlesSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (personalTitleArray.find(item => item.value === value) || {}).title;
 };
 
 export const getPersonalTitlesForGivenLocale = () => {

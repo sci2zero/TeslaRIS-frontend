@@ -4,6 +4,7 @@ export enum ResourceType {
     PREPRINT,
     OFFICIAL_PUBLICATION,
     SUPPLEMENT,
+    STATEMENT
 }
 
 export enum License {
@@ -32,6 +33,7 @@ export interface DocumentFileResponse {
     description: MultilingualContent[];
     resourceType: ResourceType;
     license: License;
+    ccLicense: CCLicense;
     sizeInMb: number;
 }
 

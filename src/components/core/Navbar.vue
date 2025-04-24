@@ -129,7 +129,7 @@ import type { Component } from 'vue';
 import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';

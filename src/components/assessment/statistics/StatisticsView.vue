@@ -73,7 +73,8 @@ export default defineComponent({
         };
 
         const buildDisplayData = () => {
-            content.value = [];
+            content.value.splice(0);
+            statisticsEntityIndicators.value.sort((a, b) => -a.fromDate!.localeCompare(b.fromDate as string));
             statisticsEntityIndicators.value.forEach(statisticsEntityIndicator => {
                 if (statisticsEntityIndicator.indicatorResponse.code === getIndicatorForTotalCount()) {
                     title.value = `${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.title)}: ${statisticsEntityIndicator.numericValue}`;

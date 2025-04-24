@@ -82,7 +82,7 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';

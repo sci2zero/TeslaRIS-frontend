@@ -166,10 +166,10 @@ export default defineComponent({
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
                 countries.value = [{ title: "", value: -1 }];
                 response.data.forEach((country) => {
-                countries.value.push({
-                    title: returnCurrentLocaleContent(country.name) as string,
-                    value: country.id as number,
-                });
+                    countries.value.push({
+                        title: returnCurrentLocaleContent(country.name) as string,
+                        value: country.id as number,
+                    });
                 });
             });
         };

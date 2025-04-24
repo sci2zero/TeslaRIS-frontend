@@ -41,7 +41,7 @@
                 <v-row v-else>
                     <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
                 </v-row>
-                <v-row v-if="isOpenAccess && (selectedResourceType.value == ResourceType.OFFICIAL_PUBLICATION || selectedResourceType.value == 'OFFICIAL_PUBLICATION')">
+                <v-row v-if="isOpenAccess">
                     <v-col>
                         <v-select
                             v-model="selectedCCLicense"
@@ -121,8 +121,10 @@ export default defineComponent({
                     file.value = new File([], props.presetDocumentFile.fileName);
                     selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.license };
 
-                    if (props.presetDocumentFile.license.toString() !== "OPEN_ACCESS") {
-                        isOpenAccess.value = false;
+                    if (props.presetDocumentFile.license.toString() === "OPEN_ACCESS") {
+                        isOpenAccess.value = true;
+                        console.log("AAAAAAAAAAAAAAAAAA", cclicenseTypes.find(ccLicense => props.presetDocumentFile?.ccLicense == ccLicense.value)?.title)
+                        selectedCCLicense.value = { title: cclicenseTypes.find(ccLicense => props.presetDocumentFile?.ccLicense == ccLicense.value)?.title as string, value: props.presetDocumentFile.ccLicense };
                     }
 
                     selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
@@ -159,7 +161,7 @@ export default defineComponent({
 
         const selectedLicense = ref({ title: "All Rights Reserved", value: License.ALL_RIGHTS_RESERVED });
         const selectedCCLicense = ref({ title: "NC BY", value: CCLicense.BY });
-        const isOpenAccess = ref<boolean>(true);
+        const isOpenAccess = ref<boolean>(false);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 

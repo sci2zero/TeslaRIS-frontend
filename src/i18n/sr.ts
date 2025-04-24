@@ -814,5 +814,35 @@ export default {
         newTitle: "Научни назив који је кандидат стекао",
         diploma: "Број и датум издавања дипломе и додатака дипломе",
         promotionDate: "Датум промоције"
+    },
+    "licenses": {
+        "by": {
+            "title": "CC BY",
+            "description": "Mora se navesti autorstvo."
+        },
+        "by_sa": {
+            "title": "CC BY-SA",
+            "description": "Mora se navesti autorstvo i deljeni radovi moraju biti pod istom licencom."
+        },
+        "by_nd": {
+            "title": "CC BY-ND",
+            "description": "Mora se navesti autorstvo, a izmenjeni materijal se ne sme distribuirati."
+        },
+        "by_nc": {
+            "title": "CC BY-NC",
+            "description": "Mora se navesti autorstvo i materijal se ne sme koristiti u komercijalne svrhe."
+        },
+        "by_nc_sa": {
+            "title": "CC BY-NC-SA",
+            "description": "Mora se navesti autorstvo, ne sme se koristiti u komercijalne svrhe i radovi moraju biti deljeni pod istim uslovima."
+        },
+        "by_nc_nd": {
+            "title": "CC BY-NC-ND",
+            "description": "Mora se navesti autorstvo, materijal se ne sme koristiti u komercijalne svrhe niti menjati ili distribuirati izmenjen."
+        },
+        "cc0": {
+            "title": "CC0 (Public Domain)",
+            "description": "Autor se odrekao svih prava. Možete slobodno kopirati, menjati i distribuirati bez dozvole."
+        }
     }
 }

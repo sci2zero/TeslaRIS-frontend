@@ -20,19 +20,19 @@ export const monographPublicationTypeSr = [
     { title: "Naučna kritika", value: MonographPublicationType.SCIENTIFIC_CRITIC },
 ];
 
-export const getTitleFromValue = (value: MonographPublicationType, resourceTypeArray: {title: string, value: MonographPublicationType}[]) => {
-    return (resourceTypeArray.find(item => item.value === value.toString()) || {}).title;
+export const getTitleFromValue = (value: MonographPublicationType, monographPublicationTypeArray: {title: string, value: MonographPublicationType}[]) => {
+    return (monographPublicationTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: MonographPublicationType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = monographPublicationTypeEn;
+    let monographPublicationTypeArray = monographPublicationTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = monographPublicationTypeSr;
+        monographPublicationTypeArray = monographPublicationTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (monographPublicationTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getMonographPublicationTypesForGivenLocale = () => {

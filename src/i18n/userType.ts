@@ -26,12 +26,12 @@ export const userTypesEn = [
 export const getTitleFromValueAutoLocale = (value: UserRole | string) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = userTypesEn;
+    let userTypeArray = userTypesEn;
     if (locale == "sr") {
-        resourceTypeArray = userTypesSr;
+        userTypeArray = userTypesSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (userTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getUserTypeForGivenLocale = () => {

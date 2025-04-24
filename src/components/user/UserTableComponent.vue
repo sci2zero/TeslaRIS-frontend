@@ -71,7 +71,7 @@ import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import Toast from '../core/Toast.vue';
 
 

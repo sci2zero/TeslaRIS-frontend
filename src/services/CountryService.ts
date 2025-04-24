@@ -34,10 +34,26 @@ export class CountryService extends BaseService {
 
   async readAllCountries(): Promise<AxiosResponse<Country[]>> {
     if (this.cachedCountries) {
-      return Promise.resolve(this.cachedCountries);
+      return Promise.resolve({
+        ...this.cachedCountries,
+        data: this.sortCountriesByLocale(this.cachedCountries.data)
+      });
     }
-
-    return super.sendRequest(axios.get, "country");
+  
+    const response = await super.sendRequest(axios.get, "country");
+    response.data = this.sortCountriesByLocale(response.data);
+    this.cachedCountries = response;
+    return response;
+  }
+  
+  private sortCountriesByLocale(countries: Country[]): Country[] {
+    const locale = i18n.vueI18n.global.locale;
+  
+    return [...countries].sort((a, b) => {
+      const aName = a.name.find(n => n.languageTag.toLowerCase() === locale)?.content || "";
+      const bName = b.name.find(n => n.languageTag.toLowerCase() === locale)?.content || "";
+      return aName.localeCompare(bName);
+    });
   }
 
   invalidateCaches(): void {

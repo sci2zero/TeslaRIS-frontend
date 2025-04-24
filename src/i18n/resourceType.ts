@@ -6,12 +6,14 @@ export const resourceTypeSr = [
     { title: "Preprint", value: ResourceType.PREPRINT },
     { title: "Oficijalna Publikacija", value: ResourceType.OFFICIAL_PUBLICATION },
     { title: "Dodatak", value: ResourceType.SUPPLEMENT },
+    { title: "Izjava", value: ResourceType.STATEMENT },
 ];
 
 export const resourceTypeEn = [
     { title: "Preprint", value: ResourceType.PREPRINT },
     { title: "Official Publication", value: ResourceType.OFFICIAL_PUBLICATION },
     { title: "Supplement", value: ResourceType.SUPPLEMENT },
+    { title: "Statement", value: ResourceType.STATEMENT },
 ];
 
 export const getResourceTypeTitleFromValueAutoLocale = (value: ResourceType) => {
