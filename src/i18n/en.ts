@@ -1,6 +1,6 @@
 export default {
     routeLabel: {
-        baseLocale: "Home",
+        baseLocale: "Home Page",
         login: "Login",
         register: "Register",
         userProfile: "User Profile",
@@ -94,7 +94,9 @@ export default {
         registryBookList: "Registry book",
         registryBookLandingPage: "Registry book entry",
         cancelAttendance: "Attendance cancellation",
-        healthCheck: "Service health check"
+        healthCheck: "Service health check",
+        thesisLibraryBackup: "Thesis Library Backup",
+        documentBackup: "Document Backup"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -819,5 +821,13 @@ export default {
             "title": "CC0 (Public Domain)",
             "description": "No rights reserved. You can copy, modify, and distribute without asking permission."
         }
-    }
+    },
+    backupLabel: "Backup",
+    fileSectionsLabel: "File sections",
+    backupGenerationScheduledMessage: "Backup generation is scheduled for {0}. You will get a notification when the report will be ready for downloading.",
+    dateRangeIssueMessage: "'From' date cannot be later than 'to' date.",
+    backupGenerationLabel: "Generate backup",
+    backupListLabel: "Backup list",
+    nogeneratedBackupsLabel: "No downloadable backups.",
+    backupDownloadWarning: "The backup will be automatically deleted after download to free up disk space. Please make sure to save it securely."
 }

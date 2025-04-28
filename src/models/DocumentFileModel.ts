@@ -51,3 +51,8 @@ export enum ThesisAttachmentType {
     SUPPLEMENT = "SUPPLEMENT",
     COMMISSION_REPORT = "COMMISSION_REPORT"
 }
+
+export enum DocumentFileSection {
+    PROOFS = "PROOFS",
+    FILE_ITEMS = "FILE_ITEMS"
+}

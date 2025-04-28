@@ -236,11 +236,28 @@ export const useValidationUtils = () => {
         return [
             (value: any) => {
                 const isAnyFilled = fields.some((field) => {
-                const fieldValue = formRef.value[field]
+                    const fieldValue = formRef.value[field]
                     return fieldValue !== null && fieldValue !== undefined && fieldValue !== "";
-                })
+                });
         
                 if (isAnyFilled || (value !== null && value !== undefined && value !== "")) {
+                    return true;
+                }
+        
+                return atLeastOneRequiredMessage.value;
+            },
+        ];
+    };
+
+    const atLeastOneTrueRule = <T extends Record<string, any>>(formRef: Ref<T>, fields: (keyof T)[]) => {
+        return [
+            (value: any) => {
+                const isAnyTrue = fields.some((field) => {
+                    const fieldValue = formRef.value[field]
+                    return fieldValue !== null && fieldValue !== undefined && fieldValue !== "" && fieldValue === true;
+                });
+        
+                if (isAnyTrue || (value !== null && value !== undefined && value !== "" && value === true)) {
                     return true;
                 }
         
@@ -257,6 +274,6 @@ export const useValidationUtils = () => {
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
         dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
         requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules,
-        atLeastOneRequiredRule
+        atLeastOneRequiredRule, atLeastOneTrueRule
     };
 };

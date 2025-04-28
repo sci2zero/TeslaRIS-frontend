@@ -30,7 +30,7 @@
 
                                     <v-list>
                                         <v-list-item
-                                            v-for="(subItem, index) in item.subItems"
+                                            v-for="(subItem, index) in item.subItems?.filter(subItem => subItem.condition != false)"
                                             :key="index" class="ps-5 pe-5" :value="item.title"
                                             :to="subItem.pathName !== undefined ? '/' + $i18n.locale + '/' + subItem.pathName : undefined"
                                             link
@@ -200,6 +200,7 @@ export default defineComponent(
             const promotionListLabel = computed(() => i18n.t("promotionListLabel"));
             const registryBookLabel = computed(() => i18n.t("registryBookLabel"));
             const healthCheckLabel = computed(() => i18n.t("routeLabel.healthCheck"));
+            const backupLabel = computed(() => i18n.t("backupLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -261,10 +262,11 @@ export default defineComponent(
                 }
             });
 
-            const personsAndOU = ref<MenuItem[]>([
+            const resourcesMenu = ref<MenuItem[]>([
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
                 { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' },
+                { title: backupLabel, type:'icon-link', pathName: 'document-backup', condition: computed(() => (isAdmin.value || isInstitutionalEditor.value)) }
             ]);
 
             const manageMenu = ref<MenuItem[]>([
@@ -291,12 +293,13 @@ export default defineComponent(
                 { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value)) },
                 { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' },
                 { title: promotionListLabel, type:'icon-link', pathName: 'promotions', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
-                { title: registryBookLabel, type:'icon-link', pathName: 'registry-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) }
+                { title: registryBookLabel, type:'icon-link', pathName: 'registry-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
+                { title: backupLabel, type:'icon-link', pathName: 'thesis-library-backup', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
-                { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
+                { title: resourcesLabel, type: 'menu', subItems: resourcesMenu },
                 { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
@@ -305,7 +308,7 @@ export default defineComponent(
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isHeadOfLibrary.value || isResearcher.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value || isPromotionRegistryAdministrator.value)) },
+                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },

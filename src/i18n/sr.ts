@@ -1,6 +1,6 @@
 export default {
     routeLabel: {
-        baseLocale: "Početna",
+        baseLocale: "Početna strana",
         login: "Login",
         register: "Registracija",
         userProfile: "Profil korisnika",
@@ -94,7 +94,9 @@ export default {
         registryBookList: "Matična knjiga",
         registryBookLandingPage: "Zapis u matičnoj knjizi",
         cancelAttendance: "Otkazivanje prisustva",
-        healthCheck: "Status servisa"
+        healthCheck: "Status servisa",
+        thesisLibraryBackup: "Bekap biblioteke završnih radova",
+        documentBackup: "Bekap dokumenata"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -845,5 +847,13 @@ export default {
             "title": "CC0 (Public Domain)",
             "description": "Autor se odrekao svih prava. Možete slobodno kopirati, menjati i distribuirati bez dozvole."
         }
-    }
+    },
+    backupLabel: "Bekap",
+    fileSectionsLabel: "Sekcije fajlova",
+    backupGenerationScheduledMessage: "Generisanje bekapa je uspešno zakazano za {0}. Dobićete obaveštenje kada isti bude spreman za preuzimanje.",
+    dateRangeIssueMessage: "'Od' datum ne može biti nakon 'do' datuma.",
+    backupGenerationLabel: "Generiši bekap",
+    backupListLabel: "Lista bekapa",
+    nogeneratedBackupsLabel: "Nema bekapa za preuzimanje.",
+    backupDownloadWarning: "Bekap će biti automatski obrisan nakon preuzimanja radi oslobađanja prostora na disku. Molimo vas da ga preuzmete i sačuvate na sigurnom mestu."
 }

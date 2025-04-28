@@ -73,6 +73,7 @@ import { useRouteStore } from "@/stores/routeStore";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import Toast from "@/components/core/Toast.vue";
 import UserService from "@/services/UserService";
+import { useInterval } from "@/composables/useInterval";
 
 
 export default defineComponent(
@@ -117,7 +118,7 @@ export default defineComponent(
                     cooldown.value = false;
                 }, totalTime);
 
-                setInterval(() => {
+                useInterval(() => {
                     elapsedTime.value += interval;
 
                     if (elapsedTime.value >= totalTime) {

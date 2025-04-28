@@ -1,13 +1,13 @@
 <template>
-    <v-tooltip location="top" width="500px">
+    <v-tooltip class="license-tooltip" location="top" width="500px">
         <template #activator="{ props }">
             <v-img
                 v-bind="props"
                 :src="`/src/assets/creativeCommonsLicenses/${license.toLowerCase()}.svg`"
                 :alt="`CC License - ${license}`"
                 width="90"
-                height="90"
-                class="ml-2"
+                height="40"
+                class="ml-2 cc-badge"
             />
         </template>
         <div>
@@ -37,11 +37,15 @@ export default defineComponent({
 });
 </script>
   
-<style scoped>
+<style>
 
-    .v-tooltip {
+    .license-tooltip {
         max-width: 250px;
         white-space: normal;
+    }
+
+    .cc-badge img {
+        object-fit: cover !important;
     }
 
 </style>

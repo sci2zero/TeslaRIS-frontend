@@ -145,3 +145,11 @@ export interface InstitutionPromotionCountsReport {
     institutionName: MultilingualContent[];
     counts: PromotedCounts;
 }
+
+export enum ThesisFileSection {
+    PROOFS = "PROOFS",
+    FILE_ITEMS = "FILE_ITEMS",
+    PRELIMINARY_FILES = "PRELIMINARY_FILES",
+    PRELIMINARY_SUPPLEMENTS = "PRELIMINARY_SUPPLEMENTS",
+    COMMISSION_REPORTS = "COMMISSION_REPORTS"
+}

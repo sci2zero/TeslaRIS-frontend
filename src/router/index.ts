@@ -90,13 +90,15 @@ import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
 import MServiceView from "@/views/MServiceView.vue";
-import ThesisLibraryReportView from "@/views/phdLibrary/ThesisLibraryReportView.vue";
-import ThesisLibrarySearchView from "@/views/phdLibrary/ThesisLibrarySearchView.vue";
-import PromotionListView from "@/views/phdLibrary/PromotionListView.vue";
-import RegistryBookView from "@/views/phdLibrary/RegistryBookView.vue";
-import RegistryBookEntryLanding from "@/views/phdLibrary/RegistryBookEntryLanding.vue";
-import CancelAttendanceView from "@/views/phdLibrary/CancelAttendanceView.vue";
+import ThesisLibraryReportView from "@/views/thesisLibrary/ThesisLibraryReportView.vue";
+import ThesisLibrarySearchView from "@/views/thesisLibrary/ThesisLibrarySearchView.vue";
+import PromotionListView from "@/views/thesisLibrary/PromotionListView.vue";
+import RegistryBookView from "@/views/thesisLibrary/RegistryBookView.vue";
+import RegistryBookEntryLanding from "@/views/thesisLibrary/RegistryBookEntryLanding.vue";
+import CancelAttendanceView from "@/views/thesisLibrary/CancelAttendanceView.vue";
 import HealthStatus from "@/views/HealthStatus.vue";
+import ThesisLibraryBackupView from "@/views/thesisLibrary/ThesisLibraryBackupView.vue";
+import DocumentBackupView from "@/views/DocumentBackupView.vue";
 
 
 const roles = {
@@ -1042,8 +1044,26 @@ const router = createRouter({
                     name: "thesisLibrarySearch",
                     component: ThesisLibrarySearchView,
                     meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "thesis-library-backup",
+                    name: "thesisLibraryBackup",
+                    component: ThesisLibraryBackupView,
+                    meta: {
                         authenticated: true,
-                        authorities: [roles.headOfLibrary, roles.admin, roles.institutionalLibrarian, roles.institutionalEditor, roles.researcher],
+                        authorities: [roles.admin, roles.institutionalLibrarian, roles.headOfLibrary],
+                    },
+                },
+                {
+                    path: "document-backup",
+                    name: "documentBackup",
+                    component: DocumentBackupView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor],
                     },
                 },
                 {

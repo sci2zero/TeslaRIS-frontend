@@ -48,7 +48,7 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { defineComponent, onMounted, onUnmounted, reactive, ref } from "vue";
 import HealthCheckService from "@/services/HealthCheckService";
 import type { AxiosResponse } from "axios";
 
@@ -75,11 +75,16 @@ setup() {
         });
     };
 
+    let intervalId: number;
     onMounted(() => {
         loading.value = true;
         fetchHealthStatus();
 
-        setInterval(() => fetchHealthStatus(), 10000);
+        intervalId = setInterval(() => fetchHealthStatus(), 10000);
+    });
+
+    onUnmounted(() => {
+        clearInterval(intervalId);
     });
 
     return {
