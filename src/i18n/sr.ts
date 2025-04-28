@@ -93,7 +93,8 @@ export default {
         promotions: "Promocije",
         registryBookList: "Matična knjiga",
         registryBookLandingPage: "Zapis u matičnoj knjizi",
-        cancelAttendance: "Otkazivanje prisustva"
+        cancelAttendance: "Otkazivanje prisustva",
+        healthCheck: "Status servisa"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",

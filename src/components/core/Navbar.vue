@@ -199,6 +199,7 @@ export default defineComponent(
             const thesisLibraryLabel = computed(() => i18n.t("thesisLibraryLabel"));
             const promotionListLabel = computed(() => i18n.t("promotionListLabel"));
             const registryBookLabel = computed(() => i18n.t("registryBookLabel"));
+            const healthCheckLabel = computed(() => i18n.t("routeLabel.healthCheck"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -275,7 +276,8 @@ export default defineComponent(
                 { title: countryListLabel, type:'icon-link', pathName: "countries"},
                 { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},
                 { title: brandingLabel, type:'icon-link', pathName: "branding"},
-                { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"}
+                { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"},
+                { title: healthCheckLabel, type:'icon-link', pathName: "health-check"}
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([

@@ -93,7 +93,8 @@ export default {
         promotions: "Promotions",
         registryBookList: "Registry book",
         registryBookLandingPage: "Registry book entry",
-        cancelAttendance: "Attendance cancellation"
+        cancelAttendance: "Attendance cancellation",
+        healthCheck: "Service health check"
     },
     emailLabel: "Email",
     passwordLabel: "Password",

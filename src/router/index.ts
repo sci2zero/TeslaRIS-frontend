@@ -96,6 +96,7 @@ import PromotionListView from "@/views/phdLibrary/PromotionListView.vue";
 import RegistryBookView from "@/views/phdLibrary/RegistryBookView.vue";
 import RegistryBookEntryLanding from "@/views/phdLibrary/RegistryBookEntryLanding.vue";
 import CancelAttendanceView from "@/views/phdLibrary/CancelAttendanceView.vue";
+import HealthStatus from "@/views/HealthStatus.vue";
 
 
 const roles = {
@@ -1086,6 +1087,15 @@ const router = createRouter({
                             },
                         },
                     ]
+                },
+                {
+                    path: "health-check",
+                    name: "healthCheck",
+                    component: HealthStatus,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
                 }
             ]
         },
