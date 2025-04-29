@@ -37,8 +37,11 @@
                                 {{ returnCurrentLocaleContent(attachment.description) }}
                             </v-list-item-subtitle>
 
-
                             <template #append>
+                                <c-c-license-badge
+                                    v-if="attachment.license.toString() === 'OPEN_ACCESS' && attachment.ccLicense"
+                                    :license="attachment.ccLicense.toLowerCase()"
+                                />
                                 <v-row v-if="canEdit">
                                     <v-col v-if="!disableUpdates || isAdmin || isHeadOfLibrary">
                                         <v-btn
@@ -71,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileModel';
+import { License, type DocumentFile, type DocumentFileResponse } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
 import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
@@ -82,11 +85,13 @@ import { VueDraggableNext } from 'vue-draggable-next';
 import { getResourceTypeTitleFromValueAutoLocale } from '@/i18n/resourceType';
 import Toast from './Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { getNameFromOrdinal } from '@/utils/EnumUtil';
+import CCLicenseBadge from './CCLicenseBadge.vue';
 
 
 export default defineComponent({
     name: "AttachmentList",
-    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext, Toast },
+    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext, Toast, CCLicenseBadge },
     props: {
         attachments: {
             type: Object as PropType<DocumentFileResponse[]>,
@@ -154,7 +159,7 @@ export default defineComponent({
             download, sendDataToParent, sendDeleteRequestToParent, 
             sendUpdateRequestToParent, returnCurrentLocaleContent, isAdmin,
             errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale,
-            isHeadOfLibrary
+            isHeadOfLibrary, License, getNameFromOrdinal
         };
     }
 });

@@ -19,12 +19,12 @@ export const eventsRelationTypesEn = [
 export const getEventsRelationTitleFromValueAutoLocale = (value: EventsRelationType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = eventsRelationTypesEn;
+    let eventsRelationArray = eventsRelationTypesEn;
     if (locale == "sr") {
-        resourceTypeArray = eventsRelationTypesSr;
+        eventsRelationArray = eventsRelationTypesSr;
     }
     
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (eventsRelationArray.find(item => item.value === value) || {}).title;
 };
 
 export const getEventsRelationTypeForGivenLocale = () => {

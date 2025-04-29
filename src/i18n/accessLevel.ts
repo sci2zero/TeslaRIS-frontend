@@ -16,12 +16,12 @@ export const accessLevelEn = [
 export const getTitleFromValueAutoLocale = (value: AccessLevel) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = accessLevelEn;
+    let accessLevelArray = accessLevelEn;
     if (locale == "sr") {
-        resourceTypeArray = accessLevelSr;
+        accessLevelArray = accessLevelSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (accessLevelArray.find(item => item.value === value) || {}).title;
 };
 
 export const getAccessLevelForGivenLocale = () => {

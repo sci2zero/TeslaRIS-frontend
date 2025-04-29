@@ -15,19 +15,19 @@ const monographTypeSr = [
     { title: "Prevod", value: MonographType.TRANSLATION }
 ];
 
-export const getTitleFromValue = (value: MonographType, resourceTypeArray: {title: string, value: MonographType}[]) => {
-    return (resourceTypeArray.find(item => item.value === value.toString()) || {}).title;
+export const getTitleFromValue = (value: MonographType, monographTypeArray: {title: string, value: MonographType}[]) => {
+    return (monographTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
 export const getMonographTypeTitleFromValueAutoLocale = (value: MonographType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = monographTypeEn;
+    let monographTypeArray = monographTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = monographTypeSr;
+        monographTypeArray = monographTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (monographTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getMonographTypesForGivenLocale = () => {

@@ -27,6 +27,15 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}`);
   }
 
+  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    let allowedTypesParam= "";
+    allowedTypes.forEach(allowedType => {
+      allowedTypesParam += `&allowedTypes=${allowedType}`;
+    });
+    
+    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}`);
+  }
+
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {
     return super.sendRequest(axios.get, `journal-publication/${journalPublicationId}`);
   }

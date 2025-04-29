@@ -1,5 +1,5 @@
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
+import { computed, type Ref } from 'vue';
 
 export const useValidationUtils = () => {
     const i18n = useI18n();
@@ -20,6 +20,7 @@ export const useValidationUtils = () => {
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
     const requiredFutureDateMessage = computed(() => i18n.t("requiredFutureDateMessage"));
     const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
+    const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
 
     
     const requiredFieldRules = [
@@ -231,6 +232,40 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const atLeastOneRequiredRule = <T extends Record<string, any>>(formRef: Ref<T>, fields: (keyof T)[]) => {
+        return [
+            (value: any) => {
+                const isAnyFilled = fields.some((field) => {
+                    const fieldValue = formRef.value[field]
+                    return fieldValue !== null && fieldValue !== undefined && fieldValue !== "";
+                });
+        
+                if (isAnyFilled || (value !== null && value !== undefined && value !== "")) {
+                    return true;
+                }
+        
+                return atLeastOneRequiredMessage.value;
+            },
+        ];
+    };
+
+    const atLeastOneTrueRule = <T extends Record<string, any>>(formRef: Ref<T>, fields: (keyof T)[]) => {
+        return [
+            (value: any) => {
+                const isAnyTrue = fields.some((field) => {
+                    const fieldValue = formRef.value[field]
+                    return fieldValue !== null && fieldValue !== undefined && fieldValue !== "" && fieldValue === true;
+                });
+        
+                if (isAnyTrue || (value !== null && value !== undefined && value !== "" && value === true)) {
+                    return true;
+                }
+        
+                return atLeastOneRequiredMessage.value;
+            },
+        ];
+    };
+
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
@@ -238,6 +273,7 @@ export const useValidationUtils = () => {
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
         dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
-        requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules
+        requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules,
+        atLeastOneRequiredRule, atLeastOneTrueRule
     };
 };

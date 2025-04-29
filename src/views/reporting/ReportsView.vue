@@ -118,6 +118,7 @@ import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
 import Toast from '@/components/core/Toast.vue';
 import { AxiosError } from 'axios';
 import { ReportType } from '@/models/AssessmentModel';
+import { useInterval } from '@/composables/useInterval';
 
 
 export default defineComponent({
@@ -162,12 +163,12 @@ export default defineComponent({
 
             setTimeout(() => {
                 fetchScheduledTasks();
-                setInterval(fetchScheduledTasks, 1000 * 60);
+                useInterval(fetchScheduledTasks, 1000 * 60);
             }, millisecondsUntilNextMinute);
 
             setTimeout(() => {
                 fetchAllGeneratedReports();
-                setInterval(fetchScheduledTasks, 1000 * 60);
+                useInterval(fetchScheduledTasks, 1000 * 60);
             }, millisecondsUntilNextMinute);
         });
 

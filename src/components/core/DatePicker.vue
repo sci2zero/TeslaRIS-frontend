@@ -2,6 +2,7 @@
     <v-menu v-model="isMenuOpen" :close-on-content-click="false" :persistent="persistent">
         <template #activator="{ props }">
             <v-text-field
+                ref="fieldRef"
                 :label="label"
                 :model-value="formattedDate"
                 :rules="applyRules()"
@@ -31,6 +32,7 @@
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import type { PropType } from "vue";
 import { ref, computed, watch, defineComponent } from "vue";
+import { VTextField } from "vuetify/lib/components/index.mjs";
 
 export default defineComponent({
   name: "DatePicker",
@@ -58,6 +60,10 @@ export default defineComponent({
     modelValue: {
       type: Object as PropType<string | undefined>,
       required: true,
+    },
+    additionalRules: {
+      type: Array as PropType<Array<(value: string) => string | true>>,
+      default: () => []
     }
   },
   emits: ["update:modelValue"],
@@ -66,6 +72,8 @@ export default defineComponent({
     const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
 
     const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
+
+    const fieldRef = ref<typeof VTextField>();
 
     const toIsoString = (date: Date) => {
       const pad = function(num : number) {
@@ -114,25 +122,34 @@ export default defineComponent({
         rules.push(dateTodayOrFutureRules[0]);
       }
 
+      if (props.additionalRules.length > 0) {
+        rules.push(...props.additionalRules);
+      }
+
       return rules;
+    };
+
+    const validate = () => {
+      fieldRef.value?.validate?.();
     };
 
     return {
       isMenuOpen,
       selectedDate,
       formattedDate,
-      clearDate, applyRules
+      clearDate, applyRules,
+      fieldRef, validate
     };
   },
 });
 </script>
 
 
-<style>
+<style scoped>
 .v-overlay__content:has(> .v-date-picker) {
     min-width: auto!important;
 }
 .v-picker-title {
     padding: 0 !important;
 }
-</style>`
+</style>

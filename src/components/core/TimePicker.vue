@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { useValidationUtils } from "@/utils/ValidationUtils";
-import { defineComponent, ref, computed, watch, type PropType } from "vue";
+import { defineComponent, ref, computed, watch, type PropType, onMounted } from "vue";
 import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
 export default defineComponent({
@@ -58,7 +58,16 @@ export default defineComponent({
     emits: ["update:modelValue"],
     setup(props, {emit}) {
         const isTimeMenuOpen = ref(false);
-        const selectedTime = ref(null);
+        const selectedTime = ref<string | null>(null);
+
+        onMounted(() => {
+            if (props.modelValue) {
+                const [hours, minutes] = props.modelValue.split(":");
+                if (hours !== undefined && minutes !== undefined) {
+                    selectedTime.value = `${hours}:${minutes}`;
+                }
+            }
+        });
 
         const formattedTime = computed(() =>
             selectedTime.value ? selectedTime.value : ""

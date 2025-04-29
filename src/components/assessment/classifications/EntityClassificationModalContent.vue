@@ -42,7 +42,7 @@
 import type { DocumentAssessmentClassification, EntityAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification } from '@/models/AssessmentModel';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
-import { defineComponent, onMounted, type PropType, ref } from 'vue';
+import { defineComponent, type PropType, ref, watch } from 'vue';
 import EntityClassificationView from './EntityClassificationView.vue';
 import { useI18n } from 'vue-i18n';
 
@@ -71,8 +71,10 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        onMounted(() => {
-            fetchClassifications();
+        watch(dialog, () => {
+            if (dialog.value) {
+                fetchClassifications();
+            }
         });
 
         const fetchClassifications = () => {

@@ -24,22 +24,22 @@ const journalPublicationTypeSr = [
     { title: "Naučna kritika", value: JournalPublicationType.SCIENTIFIC_CRITIC },
 ];
 
-export const getTitleFromValue = (value: JournalPublicationType, resourceTypeArray: {title: string, value: JournalPublicationType}[]) => {
-    return (resourceTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value.toString()) || {}).title;
+export const getTitleFromValue = (value: JournalPublicationType, journalPublicationTypeArray: {title: string, value: JournalPublicationType}[]) => {
+    return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: JournalPublicationType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = journalPublicationTypeEn;
+    let journalPublicationTypeArray = journalPublicationTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = journalPublicationTypeSr;
+        journalPublicationTypeArray = journalPublicationTypeSr;
     }
 
     if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+        return (journalPublicationTypeArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value) || {}).title;
+        return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value) || {}).title;
     }
 };
 

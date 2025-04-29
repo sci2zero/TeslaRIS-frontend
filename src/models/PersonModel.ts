@@ -41,13 +41,13 @@ export interface PersonName {
     dateTo?: string | null;
 }
   
-interface PostalAddress {
+export interface PostalAddress {
     countryId: number;
     streetAndNumber: MultilingualContent[];
     city: MultilingualContent[];
 }
   
-interface Contact {
+export interface Contact {
     contactEmail?: string;
     phoneNumber: string;
 }

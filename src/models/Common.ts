@@ -1,3 +1,5 @@
+import { PublicationType } from "./PublicationModel";
+
 export interface Page<Type> {
     content: Type[];
     totalElements: number;
@@ -62,7 +64,8 @@ export enum NotificationAction {
     PERFORM_DEDUPLICATION = "PERFORM_DEDUPLICATION",
     BROWSE_CLAIMABLE_DOCUMENTS = "BROWSE_CLAIMABLE_DOCUMENTS",
     PERFORM_EVENT_CLASSIFICATION = "PERFORM_EVENT_CLASSIFICATION",
-    PERFORM_DOCUMENT_ASSESSMENT = "PERFORM_DOCUMENT_ASSESSMENT"
+    PERFORM_DOCUMENT_ASSESSMENT = "PERFORM_DOCUMENT_ASSESSMENT",
+    PROMOTION_NOTIFICATION = "PROMOTION_NOTIFICATION"
 }
 
 export interface Notification {
@@ -165,6 +168,7 @@ export enum ExportEntity {
 export enum ExportableEndpointType {
     PERSON_SEARCH = "PERSON_SEARCH",
     DOCUMENT_SEARCH = "DOCUMENT_SEARCH",
+    DOCUMENT_ADVANCED_SEARCH = "DOCUMENT_ADVANCED_SEARCH",
     ORGANISATION_UNIT_SEARCH = "ORGANISATION_UNIT_SEARCH",
     PERSON_OUTPUTS = "PERSON_OUTPUTS",
     ORGANISATION_UNIT_OUTPUTS = "ORGANISATION_UNIT_OUTPUTS",
@@ -191,4 +195,7 @@ export interface DocumentCSVExportRequest extends CSVExportRequest {
     harvard: boolean;
     chicago: boolean;
     vancouver: boolean;
+    allowedTypes: PublicationType[];
+    institutionId: number;
+    commissionId: number;
 }

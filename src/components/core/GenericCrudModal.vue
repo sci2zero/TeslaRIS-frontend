@@ -5,6 +5,7 @@
                 <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
+                        :disabled="disabled"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         size="small" v-on="scope.isActive">
                         <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
@@ -12,14 +13,17 @@
                 </div>
                 <v-btn
                     v-if="!isSectionUpdate && !readOnly && isSubmission"
+                    :disabled="disabled"
                     color="primary" icon v-bind="scope.props" class="bottom-spacer"
                     v-on="scope.isActive">
                     <v-icon>mdi-pencil-plus-outline</v-icon>
                 </v-btn>
                 <v-btn
                     v-if="!isSectionUpdate && !readOnly && !isSubmission"
+                    :disabled="disabled"
+                    :variant="outlined ? 'outlined' : 'elevated'"
                     :color="primaryColor ? 'primary' : ''"
-                    :density="primaryColor ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
+                    :density="primaryColor && !compact ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
                     v-on="scope.isActive">
                     {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
                 </v-btn>
@@ -43,10 +47,16 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" @click="dialog = false">
+                    <v-btn
+                        color="blue darken-1"
+                        @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" @click="formRef?.submit(true)">
+                    <v-btn
+                        v-if="!disableSubmission"
+                        color="blue darken-1"
+                        :disabled="!formRef?.isFormValid"
+                        @click="formRef?.submit(true)">
                         {{ $t("saveLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -96,6 +106,22 @@ export default defineComponent({
             default: false
         },
         primaryColor: {
+            type: Boolean,
+            default: false
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
+        },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
+        outlined: {
+            type: Boolean,
+            default: false
+        },
+        compact: {
             type: Boolean,
             default: false
         }

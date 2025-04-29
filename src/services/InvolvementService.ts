@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Education, Employment, Membership } from "@/models/InvolvementModel";
+import type { Education, Employment, EmploymentTitle, Membership } from "@/models/InvolvementModel";
 
 export class InvolvementService extends BaseService {
 
@@ -54,6 +54,10 @@ export class InvolvementService extends BaseService {
   async terminateEmployment(personId: number, institutionId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `involvement/employment/${institutionId}/${personId}`);
   }
+
+  async getEmploymentTitle(personId: boolean): Promise<AxiosResponse<EmploymentTitle>> {
+    return super.sendRequest(axios.get, `involvement/employment-title/${personId}`);
+}
 }
 
 export default new InvolvementService();

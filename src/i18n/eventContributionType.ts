@@ -26,22 +26,22 @@ export const contributionTypesSr = [
     { title: "Demonstrator", value: EventContributionType.DEMONSTRATOR },
 ];
 
-export const getTitleFromValue = (value: EventContributionType, resourceTypeArray: {title: string, value: EventContributionType}[]) => {
-    return (resourceTypeArray.find(item => getNameFromOrdinal(EventContributionType, item.value) === value.toString()) || {}).title;
+export const getTitleFromValue = (value: EventContributionType, contributionTypeArray: {title: string, value: EventContributionType}[]) => {
+    return (contributionTypeArray.find(item => getNameFromOrdinal(EventContributionType, item.value) === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: EventContributionType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = contributionTypesEn;
+    let contributionTypeArray = contributionTypesEn;
     if (locale == "sr") {
-        resourceTypeArray = contributionTypesSr;
+        contributionTypeArray = contributionTypesSr;
     }
 
     if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+        return (contributionTypeArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(EventContributionType, item.value) === value) || {}).title;
+        return (contributionTypeArray.find(item => getNameFromOrdinal(EventContributionType, item.value) === value) || {}).title;
     }
 };
 

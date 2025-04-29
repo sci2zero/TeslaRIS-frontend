@@ -21,19 +21,19 @@ const involvementTypeSr = [
     { title: "Kandidat", value: InvolvementType.CANDIDATE },
 ];
 
-export const getTitleFromValue = (value: InvolvementType, resourceTypeArray: {title: string, value: InvolvementType}[]) => {
-    return (resourceTypeArray.find(item => item.value === value.toString()) || {}).title;
+export const getTitleFromValue = (value: InvolvementType, involvementTypeArray: {title: string, value: InvolvementType}[]) => {
+    return (involvementTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
 export const getInvolvementTypeTitleFromValueAutoLocale = (value: InvolvementType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = involvementTypeEn;
+    let involvementTypeArray = involvementTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = involvementTypeSr;
+        involvementTypeArray = involvementTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (involvementTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getInvolvementTypesForGivenLocale = () => {
@@ -46,27 +46,27 @@ export const getInvolvementTypesForGivenLocale = () => {
 }
 
 export const getSimilarInvolvementTypes = (type: InvolvementType) => {
-    let resourceTypeArray;
+    let involvementTypeArray;
     switch(i18n.vueI18n.global.locale) {
         case "sr":
-            resourceTypeArray = involvementTypeSr;
+            involvementTypeArray = involvementTypeSr;
             break;
         case "en":
-            resourceTypeArray = involvementTypeEn;
+            involvementTypeArray = involvementTypeEn;
             break;
     }
 
     if(type == InvolvementType.MEMBER_OF) {
-        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.MEMBER_OF);
+        return involvementTypeArray?.filter(involvementType => involvementType.value === InvolvementType.MEMBER_OF);
     } 
     else if(type == InvolvementType.HIRED_BY ||
             type == InvolvementType.EMPLOYED_AT ||
             type == InvolvementType.CANDIDATE) {
-        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.HIRED_BY || involvementType.value === InvolvementType.EMPLOYED_AT || involvementType.value === InvolvementType.CANDIDATE);
+        return involvementTypeArray?.filter(involvementType => involvementType.value === InvolvementType.HIRED_BY || involvementType.value === InvolvementType.EMPLOYED_AT || involvementType.value === InvolvementType.CANDIDATE);
     } 
     else if(type == InvolvementType.STUDIED_AT ||
             type == InvolvementType.POSTDOC_AT ||
             type == InvolvementType.COMPLETED_COURSE_AT) {
-        return resourceTypeArray?.filter(involvementType => involvementType.value === InvolvementType.STUDIED_AT || involvementType.value === InvolvementType.POSTDOC_AT || involvementType.value === InvolvementType.COMPLETED_COURSE_AT);
+        return involvementTypeArray?.filter(involvementType => involvementType.value === InvolvementType.STUDIED_AT || involvementType.value === InvolvementType.POSTDOC_AT || involvementType.value === InvolvementType.COMPLETED_COURSE_AT);
     }
 }

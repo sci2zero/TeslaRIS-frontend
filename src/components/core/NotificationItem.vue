@@ -28,6 +28,7 @@ import NotificationService from '@/services/NotificationService';
 import { defineComponent, onMounted } from 'vue';  
 import NotificationList from './NotificationList.vue';
 import { useNotificationCountStore } from '@/stores/notificationCountStore';
+import { useInterval } from '@/composables/useInterval';
 
 
 export default defineComponent({
@@ -40,7 +41,7 @@ export default defineComponent({
             fetchCount();
 
             // Fetch notification count every 5 minutes
-            setInterval(fetchCount, 1000 * 60 * 5);
+            useInterval(fetchCount, 1000 * 60 * 5);
         });
 
         const fetchCount = () => {

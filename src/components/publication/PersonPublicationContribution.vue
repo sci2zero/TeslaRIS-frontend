@@ -33,6 +33,25 @@
             <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
                 <v-checkbox v-model="input.isBoardPresident" :label="$t('boardPresidentLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
+            <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR'">
+                <v-checkbox v-model="input.isAlsoABoardMember" :label="$t('isAlsoABoardMemberLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+            </v-col>
+            <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
+                <v-select
+                    v-model="input.employmentTitle"
+                    :items="employmentTitles"
+                    :label="$t('employmentPositionLabel')"
+                    @update:model-value="sendContentToParent">
+                </v-select>
+            </v-col>
+            <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
+                <v-select
+                    v-model="input.personalTitle"
+                    :items="personalTitles"
+                    :label="$t('academicTitleLabel')"
+                    @update:model-value="sendContentToParent">
+                </v-select>
+            </v-col>
         </v-row>
     </v-container>
 </template>
@@ -46,6 +65,11 @@ import { DocumentContributionType, type PersonDocumentContribution } from "@/mod
 import type { PropType } from "vue";
 import { onMounted } from "vue";
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from "@/i18n/documentContributionType";
+import { getEmploymentTitlesForGivenLocale } from "@/i18n/employmentTitle";
+import { getPersonalTitlesForGivenLocale } from "@/i18n/personalTitle";
+import { EmploymentTitle, PersonalTitle } from "@/models/InvolvementModel";
+import InvolvementService from "@/services/InvolvementService";
+
 
 export default defineComponent({
     name: "PersonPublicationContribution",
@@ -73,6 +97,9 @@ export default defineComponent({
         const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR), value: DocumentContributionType.AUTHOR}, isMainContributor: false, isCorrespondingContributor: false}]);
         const baseContributionRef = ref<any>([]);
 
+        const employmentTitles = computed(() => getEmploymentTitlesForGivenLocale());
+        const personalTitles = computed(() => getPersonalTitlesForGivenLocale());
+
         onMounted(() => {
             if(props.presetContributions && props.presetContributions.length > 0) {
                 inputs.value.splice(0);
@@ -93,6 +120,8 @@ export default defineComponent({
                     isMainContributor: contribution.isMainContributor, 
                     isCorrespondingContributor: contribution.isCorrespondingContributor,
                     isBoardPresident: contribution.isBoardPresident,
+                    employmentTitle: contribution.employmentTitle,
+                    personalTitle: contribution.personalTitle,
                     id: contribution.id});
                 });
             }
@@ -116,7 +145,8 @@ export default defineComponent({
                 }, 
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
-                isBoardPresident: false
+                isBoardPresident: false,
+                personalTitle: PersonalTitle.DR
             });
         };
 
@@ -158,17 +188,36 @@ export default defineComponent({
                                   dateTo: input.contribution.selectedOtherName[4]}
                 }
                 
-                returnObject.push({contributionDescription: input.contribution.description,
-                                    personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
-                                    displayAffiliationStatement: input.contribution.affiliationStatement,
-                                    orderNumber: index + 1,
-                                    personName: personName,
-                                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
-                                    isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
-                                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
-                                    isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
-                                    institutionIds: input.contribution.institutionIds
-                                });
+                if (input.contributionType.value === DocumentContributionType.BOARD_MEMBER && !input.employmentTitle && input.contribution.personId !== -1) {
+                    InvolvementService.getEmploymentTitle(input.contribution.personId)
+                    .then(response => {
+                        input.employmentTitle = response.data ? response.data : EmploymentTitle.ASSOCIATE_PROFESSOR;
+                        sendContentToParent();
+                    });
+                }
+
+                const contributionObject = {
+                    contributionDescription: input.contribution.description,
+                    personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
+                    displayAffiliationStatement: input.contribution.affiliationStatement,
+                    orderNumber: index + 1,
+                    personName: personName,
+                    contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
+                    isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
+                    isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
+                    isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
+                    institutionIds: input.contribution.institutionIds,
+                    employmentTitle: input.employmentTitle,
+                    personalTitle: input.personalTitle
+                };
+
+                returnObject.push(contributionObject);
+
+                if (input.isAlsoABoardMember) {
+                    const boardMemberContribution = JSON.parse(JSON.stringify(contributionObject));
+                    boardMemberContribution.contributionType = DocumentContributionType.BOARD_MEMBER;
+                    returnObject.push(boardMemberContribution);
+                }
             });
             emit("setInput", returnObject);
         };
@@ -176,7 +225,8 @@ export default defineComponent({
         return {
             inputs, addInput, removeInput,
             contributionTypes, sendContentToParent,
-            baseContributionRef, clearInput
+            baseContributionRef, clearInput,
+            employmentTitles, personalTitles
         }
     }
 });

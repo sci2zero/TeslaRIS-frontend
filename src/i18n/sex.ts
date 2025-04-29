@@ -15,15 +15,15 @@ export const sexEn = [
 export const getTitleFromValueAutoLocale = (value: Sex) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = sexEn;
+    let sexArray = sexEn;
     if (locale == "sr") {
-        resourceTypeArray = sexSr;
+        sexArray = sexSr;
     }
 
     if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+        return (sexArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(Sex, item.value) === value) || {}).title;
+        return (sexArray.find(item => getNameFromOrdinal(Sex, item.value) === value) || {}).title;
     }
 };
 

@@ -25,19 +25,19 @@ const publicationTypeSr = [
     { title: "Završni rad", value: PublicationType.THESIS }
 ];
 
-export const getTitleFromValue = (value: PublicationType, resourceTypeArray: {title: string, value: PublicationType}[]) => {
-    return (resourceTypeArray.find(item => item.value === value.toString()) || {}).title;
+export const getTitleFromValue = (value: PublicationType, publicationTypeArray: {title: string, value: PublicationType}[]) => {
+    return (publicationTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
 export const getPublicationTypeTitleFromValueAutoLocale = (value: PublicationType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = publicationTypeEn;
+    let publicationTypeArray = publicationTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = publicationTypeSr;
+        publicationTypeArray = publicationTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (publicationTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getPublicationTypesForGivenLocale = () => {

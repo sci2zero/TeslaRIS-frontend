@@ -76,7 +76,7 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import type { LanguageTag, LanguageTagResponse } from '@/models/Common';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LanguageTagForm from './LanguageTagForm.vue';

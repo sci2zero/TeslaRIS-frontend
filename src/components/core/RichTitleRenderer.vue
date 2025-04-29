@@ -21,6 +21,37 @@ export default defineComponent({
     },
     setup(props) {
         const latexRegex = /\$\$(.*?)\$\$|\$(.*?)\$/g;
+
+        const splitByLatexSections = (input: string): string[] => {
+            const result: string[] = [];
+            let buffer = "";
+            let inLatex = false;
+
+            for (let i = 0; i < input.length; i++) {
+                const char = input[i];
+
+                if (char === "$") {
+                    if (!inLatex) {
+                        if (buffer) result.push(buffer);
+                        buffer = "$";
+                        inLatex = true;
+                    } else {
+                        buffer += "$";
+                        result.push(buffer);
+                        buffer = "";
+                        inLatex = false;
+                    }
+                } else {
+                    buffer += char;
+                }
+            }
+
+            if (buffer) {
+                result.push(buffer);
+            }
+
+            return result;
+        };
     
         const safeRenderedTitle = computed(() => {
             if (!props.title) {
@@ -28,15 +59,17 @@ export default defineComponent({
             }
 
             if (latexRegex.test(props.title)) {
-                const parts = props.title.split("$")
-                const processedParts = parts.map((part, index) => {
+                const parts = splitByLatexSections(props.title);
+
+                const processedParts = parts.map((part) => {
                     if (!part) {
                         return "";
                     }
 
-                    const isPartAnExpression = latexRegex.test(`$${part}$`);
+                    const isPartAnExpression = part.startsWith("$") && part.endsWith("$");
+                    part = part.replaceAll("$", "");
 
-                    if (index > 0 && index < parts.length - 1 && isPartAnExpression) {
+                    if (isPartAnExpression) {
                         try {
                             const renderedMath = katex.renderToString(part.replace(/\$/g, ""), {
                                 throwOnError: false,

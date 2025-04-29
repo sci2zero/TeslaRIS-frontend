@@ -25,7 +25,7 @@
     </v-btn>
     <table-export-modal
         v-if="enableExport && loggedInUser"
-        :export-entity="endpointBodyParameters ? ExportEntity.THESIS : ExportEntity.DOCUMENT"
+        :export-entity="exportEntity"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"
         :potential-max-amount-requested="selectedPublications.length >= tableOptions.itemsPerPage"
@@ -43,7 +43,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            :show-select="isAdmin || allowSelection"
+            :show-select="isAdmin || allowSelection || enableExport"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -64,7 +64,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in properties.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || allowSelection">
+                        <td v-if="isAdmin || allowSelection || enableExport">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -243,6 +243,10 @@ export default defineComponent({
         endpointBodyParameters: {
             type: Object as PropType<any>,
             default: undefined
+        },
+        exportEntity: {
+            type: Object as PropType<ExportEntity>,
+            default: ExportEntity.DOCUMENT
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],

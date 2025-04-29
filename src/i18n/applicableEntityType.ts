@@ -24,12 +24,12 @@ export const applicableEntityTypeEn = [
 export const getApplicableEntityTypeTitleFromValueAutoLocale = (value: ApplicableEntityType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = applicableEntityTypeEn;
+    let applicableEntityTypeArray = applicableEntityTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = applicableEntityTypeSr;
+        applicableEntityTypeArray = applicableEntityTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (applicableEntityTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getApplicableEntityTypesForGivenLocale = () => {

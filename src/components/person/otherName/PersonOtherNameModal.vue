@@ -3,7 +3,11 @@
         <v-dialog v-model="dialog" persistent max-width="850px">
             <template #activator="scope">
                 <v-btn
-                    color="primary" dark v-bind="scope.props" :class="readOnly ? 'bottom-spacer' : ''"
+                    color="primary" dark
+                    density="compact"
+                    variant="outlined"
+                    v-bind="scope.props"
+                    :class="readOnly ? 'bottom-spacer' : ''"
                     v-on="scope.isActive">
                     {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>

@@ -16,12 +16,12 @@ export const notificationPeriodEn = [
 export const getTitleFromValueAutoLocale = (value: UserNotificationPeriod) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = notificationPeriodEn;
+    let notificationPeriodArray = notificationPeriodEn;
     if (locale == "sr") {
-        resourceTypeArray = notificationPeriodSr;
+        notificationPeriodArray = notificationPeriodSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (notificationPeriodArray.find(item => item.value === value) || {}).title;
 };
 
 export const getNotificationPeriodForGivenLocale = () => {

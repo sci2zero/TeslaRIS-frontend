@@ -14,12 +14,12 @@ export const mServiceApplicableTypesEn = [
 export const getMServiceApplicableTypeTitleFromValueAutoLocale = (value: MServiceApplicableTypes) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = mServiceApplicableTypesEn;
+    let mServiceApplicableTypeArray = mServiceApplicableTypesEn;
     if (locale == "sr") {
-        resourceTypeArray = mServiceApplicableTypesSr;
+        mServiceApplicableTypeArray = mServiceApplicableTypesSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (mServiceApplicableTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getMServiceApplicableTypesForGivenLocale = () => {

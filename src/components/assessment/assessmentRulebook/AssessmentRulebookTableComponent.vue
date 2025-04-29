@@ -79,7 +79,7 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import type { AssessmentRulebook, AssessmentRulebookResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';

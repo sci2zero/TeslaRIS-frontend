@@ -8,6 +8,7 @@ export interface UserResponse {
     locked: boolean;
     canTakeRole: boolean;
     preferredLanguage: string;
+    referenceLanguage: string;
     organisationUnitId: number;
     personId: number;
     organisationUnitName: MultilingualContent[];
@@ -42,6 +43,7 @@ export interface UserUpdateRequest {
     firstname: string;
     lastName: string;
     preferredLanguageId: number;
+    preferredReferenceLanguageId: number;
     organisationUnitId?: number;
     notificationPeriod: UserNotificationPeriod;
 }
@@ -53,7 +55,8 @@ export enum UserRole {
     COMMISSION = "COMMISSION",
     VICE_DEAN_FOR_SCIENCE = "VICE_DEAN_FOR_SCIENCE",
     INSTITUTIONAL_LIBRARIAN = "INSTITUTIONAL_LIBRARIAN",
-    HEAD_OF_LIBRARY = "HEAD_OF_LIBRARY"
+    HEAD_OF_LIBRARY = "HEAD_OF_LIBRARY",
+    PROMOTION_REGISTRY_ADMINISTRATOR = "PROMOTION_REGISTRY_ADMINISTRATOR"
 }
 
 export enum UserNotificationPeriod {

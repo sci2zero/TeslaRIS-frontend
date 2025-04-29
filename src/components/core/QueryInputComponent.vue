@@ -62,7 +62,6 @@
 
 <script lang="ts">
 import { ref, onMounted, defineComponent, watch } from "vue";
-import ThesisLibrarySearchService from "@/services/thesisLibrary/ThesisLibrarySearchService";
 import DatePicker from "../core/DatePicker.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { type SearchFieldsResponse } from "@/models/Common";
@@ -79,8 +78,14 @@ interface QueryClause {
 export default defineComponent({
     name: "QueryInputComponent",
     components: { DatePicker },
+    props: {
+        searchFields: {
+            type: Array<SearchFieldsResponse>,
+            required: true
+        }
+    },
     emits: ["search", "reset"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const operations = ref(["AND", "OR", "NOT"]);
         const fieldData = ref<SearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
@@ -91,18 +96,24 @@ export default defineComponent({
             { id: self.crypto.randomUUID(), operation: "AND", field: "", value: "" }
         ]);
 
-        const fetchFields = async () => {
-            ThesisLibrarySearchService.getSearchFields(false).then(response => {
-                fieldData.value = response.data;
-                populateFieldData();
-            });
-        };
-
-        onMounted(fetchFields);
+        onMounted(() => {
+            handleSearchFieldsChanged();
+        });
 
         watch(i18n.locale, () => {
             populateFieldData();
         });
+
+        watch(() => props.searchFields, () => {
+            handleSearchFieldsChanged();
+        });
+
+        const handleSearchFieldsChanged = () => {
+            if (props.searchFields) {
+                fieldData.value = props.searchFields;
+                populateFieldData();
+            }
+        };
 
         const populateFieldData = () => {
             fields.value.splice(0);

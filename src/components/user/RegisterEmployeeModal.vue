@@ -203,6 +203,8 @@ export default defineComponent({
                     return i18n.t("addInstitutionLibrarianLabel");
                 case UserRole.HEAD_OF_LIBRARY:
                     return i18n.t("addHeadOfLibraryLabel");
+                case UserRole.PROMOTION_REGISTRY_ADMINISTRATOR:
+                    return i18n.t("addRegistryBookAdminLabel");
             }
         };
 
@@ -216,6 +218,8 @@ export default defineComponent({
                     return "institution-librarian";
                 case UserRole.HEAD_OF_LIBRARY:
                     return "head-of-library";
+                case UserRole.PROMOTION_REGISTRY_ADMINISTRATOR:
+                    return "promotion-registry-administrator";
             }
 
             return ""; // should never happen

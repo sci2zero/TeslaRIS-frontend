@@ -24,12 +24,12 @@ export const thesisTypeEn = [
 export const getThesisTitleFromValueAutoLocale = (value: ThesisType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = thesisTypeEn;
+    let thesisTypeArray = thesisTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = thesisTypeSr;
+        thesisTypeArray = thesisTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (thesisTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getThesisTypesForGivenLocale = () => {

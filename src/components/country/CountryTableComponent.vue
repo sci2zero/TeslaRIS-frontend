@@ -2,7 +2,7 @@
     <v-row class="align-center">
         <v-col cols="auto">
             <v-btn
-                density="compact" class="bottom-spacer" :disabled="selectedCountrys.length === 0"
+                density="compact" class="bottom-spacer" :disabled="selectedCountries.length === 0"
                 @click="deleteSelection">
                 {{ $t("deleteLabel") }}
             </v-btn>
@@ -19,7 +19,7 @@
     </v-row>
 
     <v-data-table-server
-        v-model="selectedCountrys"
+        v-model="selectedCountries"
         :sort-by="tableOptions.sortBy"
         :items="countries"
         :headers="headers"
@@ -36,7 +36,7 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedCountrys"
+                        v-model="selectedCountries"
                         :value="row.item"
                         class="table-checkbox"
                         hide-details
@@ -76,7 +76,7 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import type { Country } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import CountryService from '@/services/CountryService';
@@ -98,7 +98,7 @@ export default defineComponent({
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedCountrys = ref<Country[]>([]);
+        const selectedCountries = ref<Country[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
         const i18n = useI18n();
@@ -135,7 +135,7 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedCountrys.value.map((country: Country) => {
+            Promise.all(selectedCountries.value.map((country: Country) => {
                 return CountryService.deleteCountry(country.id as number)
                     .then(() => {
                         addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(country.name) }));
@@ -145,7 +145,7 @@ export default defineComponent({
                         return country;
                     });
             })).then((failedDeletions) => {
-                selectedCountrys.value = selectedCountrys.value.filter((country) => failedDeletions.includes(country));
+                selectedCountries.value = selectedCountries.value.filter((country) => failedDeletions.includes(country));
                 CountryService.invalidateCaches();
                 refreshTable(tableOptions.value);
             });
@@ -196,10 +196,11 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedCountrys, notifications, createNewCountry,
+            selectedCountries, notifications, createNewCountry,
             updateCountry, setSortAndPageOption, CountryForm
         };
     }

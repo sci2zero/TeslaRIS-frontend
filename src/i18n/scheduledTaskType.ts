@@ -26,12 +26,12 @@ export const scheduledTaskTypeEn = [
 export const getScheduledTaskTypeTitleFromValueAutoLocale = (value: ScheduledTaskType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = scheduledTaskTypeEn;
+    let scheduledtaskTypeArray = scheduledTaskTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = scheduledTaskTypeSr;
+        scheduledtaskTypeArray = scheduledTaskTypeSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (scheduledtaskTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getScheduledTaskTypeForGivenLocale = () => {

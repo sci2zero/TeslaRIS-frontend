@@ -79,6 +79,7 @@ import ImportService from "@/services/ImportService";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import Toast from "@/components/core/Toast.vue";
+import { useInterval } from "@/composables/useInterval";
 
 
 export default defineComponent({
@@ -109,7 +110,7 @@ export default defineComponent({
             });
 
             // Fetch number of imported documents 10 seconds
-            setInterval(fetchNumberOfHarvestedDocuments, 1000 * 10);
+            useInterval(fetchNumberOfHarvestedDocuments, 1000 * 10);
         });
 
         const fetchNumberOfHarvestedDocuments = () => {

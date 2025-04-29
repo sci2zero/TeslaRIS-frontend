@@ -21,12 +21,12 @@ export const contributionTypesSr = [
 export const getTitleFromValueAutoLocale = (value: DocumentContributionType) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = contributionTypesEn;
+    let documentContributionTypeArray = contributionTypesEn;
     if (locale == "sr") {
-        resourceTypeArray = contributionTypesSr;
+        documentContributionTypeArray = contributionTypesSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (documentContributionTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getTypesForGivenLocale = () => {

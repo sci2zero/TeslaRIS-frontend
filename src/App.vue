@@ -4,6 +4,7 @@
             <navbar />
             <breadcrumbs />
             <router-view :key="$route.fullPath" />
+            <cookie-consent />
         </v-main>
         <footerbar />
     </v-app>
@@ -21,11 +22,12 @@ import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
 import footerbar from "./components/core/FooterBar.vue";
 import Breadcrumbs from "./components/core/Breadcrumbs.vue";
+import CookieConsent from "./components/core/CookieConsent.vue";
 
 
 export default defineComponent({
     name: "App",
-    components: {navbar, footerbar, Breadcrumbs},
+    components: { navbar, footerbar, Breadcrumbs, CookieConsent },
     beforeMount() {
         const route = useRoute();
         const router = useRouter();

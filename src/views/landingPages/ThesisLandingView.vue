@@ -42,44 +42,6 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <v-btn
-                                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived"
-                                    class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(true, false)">
-                                    {{ $t("putOnPublicReviewLabel") }}
-                                </v-btn>
-                                <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview && !thesis?.isArchived"
-                                    class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(false, false)">
-                                    {{ $t("removeFromPublicReviewLabel") }}
-                                </v-btn>
-                                <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
-                                    class="mb-5" color="primary" density="compact"
-                                    @click="changePublicReviewState(true, true)">
-                                    {{ $t("continuePublicReviewLabel") }}
-                                </v-btn>
-                                <v-btn
-                                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
-                                    class="mb-5 ml-2" color="primary" density="compact"
-                                    @click="changePublicReviewState(true, false)">
-                                    {{ $t("restartPublicReviewLabel") }}
-                                </v-btn>
-                                <div>
-                                    <v-btn
-                                        v-if="userCanPutOnPublicReview && !thesis?.isArchived"
-                                        class="mb-5" color="primary" density="compact"
-                                        @click="changeArchiveState(true)">
-                                        {{ $t("archiveLabel") }}
-                                    </v-btn>
-                                    <v-btn
-                                        v-if="(isAdmin || isHeadOfLibrary) && thesis?.isArchived"
-                                        class="mb-5" color="primary" density="compact"
-                                        @click="changeArchiveState(false)">
-                                        {{ $t("unarchiveLabel") }}
-                                    </v-btn>
-                                </div>
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="thesis?.thesisType">
                                     {{ $t("typeOfPublicationLabel") }}:
@@ -184,6 +146,75 @@
                 </v-card>
             </v-col>
         </v-row>
+
+        <div v-if="isAdmin || isHeadOfLibrary || userCanPutOnPublicReview" class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("librarianActionsLabel") }}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <v-btn
+                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, false)">
+                    {{ $t("putOnPublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview && !thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(false, false)">
+                    {{ $t("removeFromPublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, true)">
+                    {{ $t("continuePublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReviewPause"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, false)">
+                    {{ $t("restartPublicReviewLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="userCanPutOnPublicReview && !thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changeArchiveState(true)">
+                    {{ $t("archiveLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="(isAdmin || isHeadOfLibrary) && thesis?.isArchived"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changeArchiveState(false)">
+                    {{ $t("unarchiveLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="registryBookEntryId > 0"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="examineRegistryBookEntry()">
+                    {{ $t("examineRegistryBookEntryLabel") }}
+                </v-btn>
+                <generic-crud-modal
+                    v-if="canCreateRegistryBookEntry"
+                    class="ml-2"
+                    :form-component="RegistryBookEntryForm"
+                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
+                    entity-name="RegistryBookEntry"
+                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                    primary-color compact
+                    disable-submission
+                    outlined wide
+                    @create="createRegistryBookEntry"
+                />
+            </div>
+        </div>
 
         <v-tabs
             v-model="currentTab"
@@ -332,6 +363,9 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import ThesisResearchOutputSection from '@/components/publication/ThesisResearchOutputSection.vue';
+import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
+import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
+import { type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 
 
 export default defineComponent({
@@ -363,6 +397,8 @@ export default defineComponent({
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
+        const canCreateRegistryBookEntry = ref(false);
+        const registryBookEntryId = ref(-1);
 
         const documentClassifications = ref<EntityClassificationResponse[]>([]);
 
@@ -386,6 +422,11 @@ export default defineComponent({
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
+                });
+
+                RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canCreateRegistryBookEntry.value = response.data ? false : true;
+                    registryBookEntryId.value = response.data;
                 });
 
                 fetchClassifications();
@@ -645,13 +686,31 @@ export default defineComponent({
             }
         };
 
+        const createRegistryBookEntry = (registryEntry: RegistryBookEntry) => {
+            RegistryBookService.createRegistryBookEntry(registryEntry, parseInt(currentRoute.params.id as string))
+            .then((response) => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+                canCreateRegistryBookEntry.value = false;
+                if (isAdmin.value) {
+                    router.push({name: "registryBookLandingPage", params: {id: response.data.id}});
+                }
+            });
+        };
+
+        const examineRegistryBookEntry = () => {
+            if (registryBookEntryId.value > 0) {
+                router.push({name: "registryBookLandingPage", params: {id: registryBookEntryId.value}});
+            }
+        };
+
         return {
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
             addAttachment, updateAttachment, deleteAttachment,
-            updateKeywords, updateDescription, localiseDate,
-            snackbar, snackbarMessage, updateContributions,
+            updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,
+            snackbar, snackbarMessage, updateContributions, registryBookEntryId,
             updateBasicInfo, organisationUnit, ThesisUpdateForm,
             researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
             handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
@@ -659,7 +718,8 @@ export default defineComponent({
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
-            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState
+            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState,
+            RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry
         };
 }})
 

@@ -73,15 +73,15 @@ const employmentPositionsSr = [
 export const getEmploymentPositionTitleFromValueAutoLocale = (value: EmploymentPosition) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = employmentPositionsEn;
+    let employmentPositionArray = employmentPositionsEn;
     if (locale == "sr") {
-        resourceTypeArray = employmentPositionsSr;
+        employmentPositionArray = employmentPositionsSr;
     }
 
     if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+        return (employmentPositionArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(EmploymentPosition, item.value) === value) || {}).title;
+        return (employmentPositionArray.find(item => getNameFromOrdinal(EmploymentPosition, item.value) === value) || {}).title;
     }
 };
 
