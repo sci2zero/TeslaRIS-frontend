@@ -299,6 +299,7 @@ export default {
     fileItemsLabel: "Dokumenti",
     unauthorizedPublicationEditAttemptMessage: "Ne možete dodati/izmeniti publikaciju u kojoj niste u listi autora.",
     loginToViewDocumentMessage: "Dokument nije javno dostupan, morate se ulogovati kako biste ga videli.",
+    loginToViewCCDocumentMessage: "Dokument je pod CC licencom i nije završni rad, morate se ulogovati kako biste ga videli.",
     updateKeywordsLabel: "Ažuriraj ključne reči",
     updateAbstractLabel: "Ažuriraj opis",
     updateBiographyLabel: "Ažuriraj biografiju",
@@ -855,5 +856,7 @@ export default {
     backupGenerationLabel: "Generiši bekap",
     backupListLabel: "Lista bekapa",
     nogeneratedBackupsLabel: "Nema bekapa za preuzimanje.",
-    backupDownloadWarning: "Bekap će biti automatski obrisan nakon preuzimanja radi oslobađanja prostora na disku. Molimo vas da ga preuzmete i sačuvate na sigurnom mestu."
+    backupDownloadWarning: "Bekap će biti automatski obrisan nakon preuzimanja radi oslobađanja prostora na disku. Molimo vas da ga preuzmete i sačuvate na sigurnom mestu.",
+    additionalActionsLabel: "Dodatne akcije",
+    publicationsNotForInstitutionLabel: "Vaše publikacije koje nisu u ovoj instituciji:"
 }

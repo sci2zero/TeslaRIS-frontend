@@ -70,8 +70,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.patch, `registry-book/promote-all/${promotionId}`);
     }
 
-    async cancelAttendance(attendanceIdentifier: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `registry-book/cancel-attendance/${attendanceIdentifier}`);
+    async cancelAttendance(attendanceIdentifier: string, captchaToken: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/cancel-attendance/${attendanceIdentifier}?token=${captchaToken}`);
     }
 
     async isAttendanceCancellable(attendanceIdentifier: string): Promise<AxiosResponse<boolean>> {

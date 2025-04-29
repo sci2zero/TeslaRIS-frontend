@@ -299,6 +299,7 @@ export default {
     fileItemsLabel: "File Items",
     unauthorizedPublicationEditAttemptMessage: "You can't submit or edit publications where you are not a contributor.",
     loginToViewDocumentMessage: "Document is not publicly available, please login to be able to view it.",
+    loginToViewCCDocumentMessage: "Document is under CC license and is not a thesis, please login to be able to view it.",
     updateKeywordsLabel: "Update Keywords",
     updateAbstractLabel: "Update Description",
     updateBiographyLabel: "Update Biography",
@@ -829,5 +830,7 @@ export default {
     backupGenerationLabel: "Generate backup",
     backupListLabel: "Backup list",
     nogeneratedBackupsLabel: "No downloadable backups.",
-    backupDownloadWarning: "The backup will be automatically deleted after download to free up disk space. Please make sure to save it securely."
+    backupDownloadWarning: "The backup will be automatically deleted after download to free up disk space. Please make sure to save it securely.",
+    additionalActionsLabel: "Additional actions",
+    publicationsNotForInstitutionLabel: "Your publications that are not tied to this institution:"
 }

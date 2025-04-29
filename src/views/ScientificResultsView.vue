@@ -30,24 +30,10 @@
             </v-tabs-window-item>
         </v-tabs-window>
         <br />
-        <span :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-            <v-menu v-if="canUserAddPublications" open-on-hover>
-                <template #activator="{ props }">
-                    <v-btn color="primary" v-bind="props">
-                        {{ $t("addNewEntityLabel") }}
-                    </v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item
-                        v-for="(item, index) in submissionMenuItems"
-                        :key="index"
-                        @click="navigateToPage(item.value)"
-                    >
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+        <span
+            v-if="canUserAddPublications"
+            :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
+            <add-publication-menu></add-publication-menu>
         </span>
 
         <v-select
@@ -99,7 +85,6 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { ref } from 'vue';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
-import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { onMounted } from 'vue';
@@ -108,11 +93,12 @@ import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAuto
 import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Common';
 import { isEqual } from 'lodash';
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
+import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 
 
 export default defineComponent({
     name: "ScientificResultsListView",
-    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent },
+    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu },
     setup() {
         const currentTab = ref("simpleSearch");
 
@@ -126,7 +112,7 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
-        const router = useRouter();
+        const i18n = useI18n();
         const tableRef = ref<typeof PublicationTableComponent>();
         
         const returnOnlyUnassessedEntities = ref(true);
@@ -147,10 +133,6 @@ export default defineComponent({
                 publicationTypes.value?.forEach(publicationType => {
                     selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
                 });
-            }
-
-            if (isInstitutionalLibrarian.value) {
-                submissionMenuItems.value = submissionMenuItems.value.filter(item => item.value === "submitThesis");
             }
 
             DocumentPublicationService.getSearchFields(false).then(response => {
@@ -223,38 +205,13 @@ export default defineComponent({
             search(searchParams.value);
         };
 
-        const navigateToPage = (name: string) => {
-            router.push({name: name});
-        };
-
-        const i18n = useI18n();
-        const addJournalPublicationLabel = computed(() => i18n.t("addJournalPublicationLabel"));
-        const addProceedingsPublicationLabel = computed(() => i18n.t("addProceedingsPublicationLabel"));
-        const addPatentLabel = computed(() => i18n.t("addPatentLabel"));
-        const addSoftwareLabel = computed(() => i18n.t("addSoftwareLabel"));
-        const addDatasetLabel = computed(() => i18n.t("addDatasetLabel"));
-        const createNewMonographLabel = computed(() => i18n.t("createNewMonographLabel"));
-        const addMonographPublicationLabel = computed(() => i18n.t("addMonographPublicationLabel"));
-        const addThesisLabel = computed(() => i18n.t("addThesisLabel"));
-
-        const submissionMenuItems = ref([
-            { title: addJournalPublicationLabel, value: "submitJournalPublication" },
-            { title: addProceedingsPublicationLabel, value: "submitProceedingsPublication" },
-            { title: addPatentLabel, value: "submitPatent" },
-            { title: addSoftwareLabel, value: "submitSoftware" },
-            { title: addDatasetLabel, value: "submitDataset" },
-            { title: createNewMonographLabel, value: "submitMonograph" },
-            { title: addMonographPublicationLabel, value: "submitMonographPublication" },
-            { title: addThesisLabel, value: "submitThesis" },
-        ]);
-
         const resetFiltersAndSearch = () => {
             clearSortAndPerformSearch("tokens=*");
         };
 
         return {
             search, publications, totalPublications,
-            switchPage, submissionMenuItems, navigateToPage,
+            switchPage,
             tableRef, clearSortAndPerformSearch, searchFields,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,

@@ -12,7 +12,9 @@
         </div>
     </div>
 
-    <div class="d-flex flex-row flex-grow-1 justify-center">
+    <div
+        v-if="selectedOU?.value && selectedOU?.value > 0"
+        class="d-flex flex-row flex-grow-1 justify-center">
         <div>
             <v-btn
                 density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
@@ -27,13 +29,22 @@
         </div>
     </div>
 
-    <v-row class="d-flex flex-row justify-center mt-5">
-        <v-col cols="12" lg="10">
-            <publication-table-component
-                :publications="publications" :total-publications="totalPublications" allow-selection @switch-page="switchPage"
-                @selection-updated="updateSelection"></publication-table-component>
-        </v-col>
-    </v-row>
+    <div v-if="selectedOU?.value && selectedOU?.value > 0">
+        <v-row class="d-flex flex-row justify-center mt-10">
+            <v-col cols="12" lg="10">
+                <h2>
+                    {{ $t("publicationsNotForInstitutionLabel") }}
+                </h2>
+            </v-col>
+        </v-row>
+        <v-row class="d-flex flex-row justify-center mt-5">
+            <v-col cols="12" lg="10">
+                <publication-table-component
+                    :publications="publications" :total-publications="totalPublications" allow-selection @switch-page="switchPage"
+                    @selection-updated="updateSelection"></publication-table-component>
+            </v-col>
+        </v-row>
+    </div>
 
     <toast v-model="snackbar" :message="message" />
 </template>
