@@ -3,18 +3,22 @@ name: TeslaRIS Frontend Deploy
 on:
   workflow_dispatch:
     inputs:
-      skip_tests:
-        description: 'Skip running tests'
-        default: false
-        type: boolean
       api_url:
         description: 'Backend API URL (https://testcris.uns.ac.rs/api/)'
+        default: ''
+        required: false
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
         default: ''
         required: false
       environment:
         description: 'Deploy environment'
         type: environment
         required: false
+      skip_tests:
+        description: 'Skip running tests'
+        default: false
+        type: boolean
       without_deploy:
         description: 'Only build (without deploy)'
         default: false
@@ -22,17 +26,29 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*' # Trigger on version tags (e.g., v1.0.0)
+  
 
 env:
   VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
   VITE_RECAPTCHA_SITE_KEY: ${{ inputs.site_key || vars.SITE_KEY  }}
+  VITE_APP_VERSION: ${{ inputs.version }}
 
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
+    env:
+      REPO_URL: ${{ github.server_url }}/${{ github.repository }}
     steps:
     
       - uses: actions/checkout@v4
+
+      - name: Set custom environment variables (commit SHA and ref)
+        run: |
+          echo "VITE_FRONTEND_GIT_COMMIT_HASH=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "VITE_FRONTEND_GIT_TAG=${GITHUB_REF}" >> $GITHUB_ENV
+          echo "VITE_FRONTEND_GITHUB_REPO=${REPO_URL}" >> $GITHUB_ENV
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
