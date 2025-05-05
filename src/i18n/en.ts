@@ -832,5 +832,14 @@ export default {
     nogeneratedBackupsLabel: "No downloadable backups.",
     backupDownloadWarning: "The backup will be automatically deleted after download to free up disk space. Please make sure to save it securely.",
     additionalActionsLabel: "Additional actions",
-    publicationsNotForInstitutionLabel: "Your publications that are not tied to this institution:"
+    publicationsNotForInstitutionLabel: "Your publications that are not tied to this institution:",
+    generateNewPasswordLabel: "Generate New Password",
+    migrateDataLabel: "Migrate Data",
+    passwordResetSuccessMessage: "A new password has been successfully sent to the user.",
+    functionalityNotAvailableMessage: "This functionality is currently unavailable. Please check the service availability.",
+    userHasAssignedIndicatorsMessage: "The user has assigned indicators. You must migrate them to another user before deletion.",
+    feedbackLabel: "Feedback",
+    userLabel: "User",
+    migrateLabel: "Migrate",
+    migratedDataToMessage: "Successfully migrated data to: {0}"
 }

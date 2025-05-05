@@ -44,14 +44,50 @@
                     </td>
                     <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
                     <td>
-                        <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
-                            {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
-                        </v-btn>
-                        <v-btn
-                            color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
-                            @click="takeRoleOfUser(row.item.email)">
-                            {{ $t("takeRoleLabel") }}
-                        </v-btn>
+                        <div class="d-flex flex-row justify-start">
+                            <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
+                                {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
+                            </v-btn>
+                            <v-btn
+                                color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
+                                @click="takeRoleOfUser(row.item.email)">
+                                {{ $t("takeRoleLabel") }}
+                            </v-btn>
+                            <v-menu
+                                :close-on-content-click="true"
+                                location="bottom"
+                            >
+                                <template #activator="{ props }">
+                                    <div
+                                        class="inline-action">
+                                        <v-btn
+                                            v-bind="props"
+                                            compact dark
+                                            color="blue">
+                                            ...
+                                        </v-btn>
+                                    </div>
+                                </template>
+
+                                <v-list min-width="150">
+                                    <v-list-item
+                                        @click="generateNewPassword(row.item.databaseId)">
+                                        <v-list-item-title>{{ $t("generateNewPasswordLabel") }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item
+                                        v-if="row.item.userRole != 'ADMIN'"
+                                        @click="deleteUser(row.item.databaseId, row.item.fullName)">
+                                        <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
+                                    </v-list-item>
+                                    <user-migration-selection-modal
+                                        v-if="row.item.userRole === 'COMMISSION' || row.item.userRole === 'RESEARCHER'"
+                                        :migrate-from-id="row.item.databaseId"
+                                        :allowed-roles="[row.item.userRole]"
+                                        @migrate="notifyUserAboutMigration">
+                                    </user-migration-selection-modal>
+                                </v-list>
+                            </v-menu>
+                        </div>
                     </td>
                 </tr>
             </template>
@@ -73,11 +109,13 @@ import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import Toast from '../core/Toast.vue';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import UserMigrationSelectionModal from './UserMigrationSelectionModal.vue';
 
 
 export default defineComponent({
     name: "UserTableComponent",
-    components: { RegisterEmployeeModal, Toast },
+    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal },
     props: {
         users: {
             type: Array<UserAccountIndex>,
@@ -194,12 +232,43 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
+        const generateNewPassword = (userId: number) => {
+            UserService.generateNewUserPassword(userId).then(response => {
+                if (response.data) {
+                    snackbarText.value = i18n.t("passwordResetSuccessMessage");
+                } else {
+                    snackbarText.value = i18n.t("functionalityNotAvailableMessage");
+                }
+                snackbar.value = true;
+            }).catch((error) => {
+                snackbarText.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
+        };
+
+        const deleteUser = (userId: number, personName: string) => {
+            UserService.deleteUser(userId).then(() => {
+                snackbarText.value = i18n.t("deleteSuccessNotification", { name: personName });
+                snackbar.value = true;
+                refreshTable(tableOptions.value);
+            }).catch((error) => {
+                snackbarText.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
+        };
+
+        const notifyUserAboutMigration = (migratedToName: string) => {
+            snackbarText.value = i18n.t("migratedDataToMessage", [migratedToName]);
+            snackbar.value = true;
+        };
+
         return {
             headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, changeActivationStatus, takeRoleOfUser,
             displayFormNotification, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, setSortAndPageOption,
-            accountsThatAllowedRoleTaking, UserRole
+            accountsThatAllowedRoleTaking, UserRole, deleteUser,
+            generateNewPassword, notifyUserAboutMigration
         };
     }
 });

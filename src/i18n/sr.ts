@@ -1,6 +1,6 @@
 export default {
     routeLabel: {
-        baseLocale: "Početna strana",
+        baseLocale: "Početna stranica",
         login: "Login",
         register: "Registracija",
         userProfile: "Profil korisnika",
@@ -858,5 +858,14 @@ export default {
     nogeneratedBackupsLabel: "Nema bekapa za preuzimanje.",
     backupDownloadWarning: "Bekap će biti automatski obrisan nakon preuzimanja radi oslobađanja prostora na disku. Molimo vas da ga preuzmete i sačuvate na sigurnom mestu.",
     additionalActionsLabel: "Dodatne akcije",
-    publicationsNotForInstitutionLabel: "Vaše publikacije koje nisu u ovoj instituciji:"
+    publicationsNotForInstitutionLabel: "Vaše publikacije koje nisu u ovoj instituciji:",
+    generateNewPasswordLabel: "Generiši novu lozinku",
+    migrateDataLabel: "Migriraj podatke",
+    passwordResetSuccessMessage: "Korisniku je uspešno poslata nova lozinka.",
+    functionalityNotAvailableMessage: "Funkcionalnost je trenutno nedostupna, proverite dostupnost servisa.",
+    userHasAssignedIndicatorsMessage: "Korisnik ima unešene indikatore, morate ih migrirati na drugog korisnika pre nego ga obrišete.",
+    feedbackLabel: "Povratne informacije",
+    userLabel: "Korisnik",
+    migrateLabel: "Migriraj",
+    migratedDataToMessage: "Uspešno migrirao podatke na: {0}"
 }
