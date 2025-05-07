@@ -244,7 +244,7 @@ export default defineComponent({
         const authorAcquiredTitle = ref("");
         const reportCounts = ref<InstitutionPromotionCountsReport[]>([]);
 
-        watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle], () => {
+        watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle, selectedPromotion], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
@@ -255,6 +255,8 @@ export default defineComponent({
                     reportCounts.value.splice(0);
                     reportCounts.value = response.data;
                 });
+            } else if (currentTab.value === "forPromotion" && selectedPromotion.value.value > 0) {
+                tableStates.forPromotion.fetchFn();
             }
         });
     
@@ -404,7 +406,7 @@ export default defineComponent({
             const to = toDate.value ? toDate.value.split("T")[0] : "";
 
             RegistryBookReportService.scheduleReportGeneration(
-                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&lang=${selectedLang.value.value}`
+                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&authorName=${authorFullName.value}&authorTitle=${authorAcquiredTitle.value}&lang=${selectedLang.value.value}`
             ).then((response) => {
                 message.value = i18n.t("reportGenerationScheduledMessage", [response.data]);
                 snackbar.value = true;

@@ -96,7 +96,9 @@ export default {
         cancelAttendance: "Attendance cancellation",
         healthCheck: "Service health check",
         thesisLibraryBackup: "Thesis Library Backup",
-        documentBackup: "Document Backup"
+        documentBackup: "Document Backup",
+        legacyFileRedirect: "Redirecting",
+        notFound: "Not Found"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -841,5 +843,8 @@ export default {
     feedbackLabel: "Feedback",
     userLabel: "User",
     migrateLabel: "Migrate",
-    migratedDataToMessage: "Successfully migrated data to: {0}"
+    migratedDataToMessage: "Successfully migrated data to: {0}",
+    redirectingToResourceMessage: "Redirecting you to a requested resource...",
+    notFoundMessage: "It looks like the page you are looking for is no longer here.",
+    redirectionFinishedMessage: "Redirection successfull, you may close this page now."
 }

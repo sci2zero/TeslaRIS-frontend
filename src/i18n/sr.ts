@@ -96,7 +96,9 @@ export default {
         cancelAttendance: "Otkazivanje prisustva",
         healthCheck: "Status servisa",
         thesisLibraryBackup: "Bekap biblioteke završnih radova",
-        documentBackup: "Bekap dokumenata"
+        documentBackup: "Bekap dokumenata",
+        legacyFileRedirect: "Preusmeravanje",
+        notFound: "Nije pronađeno"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -867,5 +869,8 @@ export default {
     feedbackLabel: "Povratne informacije",
     userLabel: "Korisnik",
     migrateLabel: "Migriraj",
-    migratedDataToMessage: "Uspešno migrirao podatke na: {0}"
+    migratedDataToMessage: "Uspešno migrirao podatke na: {0}",
+    redirectingToResourceMessage: "Preusmeravamo vas na traženi resurs...",
+    notFoundMessage: "Izgleda da stranica koju tražite više nije dostupna.",
+    redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu."
 }

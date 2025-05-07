@@ -38,6 +38,10 @@ export default defineComponent({
         router.beforeEach((to: any, from: any, next: any) => {
             const newLocale: string = to.params.locale;
             const prevLocale: string = from.params.locale;
+            if (newLocale === undefined) {
+                next();
+                return;
+            }
 
             if (!supportedLocales.includes(newLocale)) {
                 next({ name: to.name, params: { ...to.params, locale: fallbackLocale } });
