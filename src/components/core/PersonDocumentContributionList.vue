@@ -7,10 +7,13 @@
             <h4 v-else>
                 <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong>
             </h4>
+            <strong v-if="contribution.employmentTitle">{{ getEmploymentTitleFromValueAutoLocale(contribution.employmentTitle) }}</strong>
+            <v-icon v-if="contribution.employmentTitle && contribution.personalTitle" icon="mdi-circle-small" />
+            <strong v-if="contribution.personalTitle">{{ getPersonalTitleFromValueAutoLocale(contribution.personalTitle) }}</strong>
+            <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
             <h5 v-if="loginStore.userLoggedIn && contribution.contact?.contactEmail">
                 <strong>{{ `${$t("emailLabel")}: ${contribution.contact?.contactEmail}` }}</strong>
             </h5>
-            <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
         </div>
     </draggable>
 </template>
@@ -23,6 +26,8 @@ import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import { VueDraggableNext } from 'vue-draggable-next'
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useLoginStore } from '@/stores/loginStore';
+import { getEmploymentTitleFromValueAutoLocale } from '@/i18n/employmentTitle';
+import { getPersonalTitleFromValueAutoLocale } from '@/i18n/personalTitle';
 
 
 export default defineComponent({
@@ -48,7 +53,10 @@ export default defineComponent({
         };
 
         return { 
-            getTitleFromValueAutoLocale, reorderContributors, loginStore
+            getTitleFromValueAutoLocale,
+            reorderContributors, loginStore,
+            getEmploymentTitleFromValueAutoLocale,
+            getPersonalTitleFromValueAutoLocale
         };
     },
 });
