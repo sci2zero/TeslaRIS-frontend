@@ -846,5 +846,7 @@ export default {
     migratedDataToMessage: "Successfully migrated data to: {0}",
     redirectingToResourceMessage: "Redirecting you to a requested resource...",
     notFoundMessage: "It looks like the page you are looking for is no longer here.",
-    redirectionFinishedMessage: "Redirection successfull, you may close this page now."
+    redirectionFinishedMessage: "Redirection successfull, you may close this page now.",
+    displayTitle: "Display title",
+    chooseFromListLabel: "Choose from list"
 }

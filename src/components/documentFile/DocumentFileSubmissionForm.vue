@@ -123,7 +123,6 @@ export default defineComponent({
 
                     if (props.presetDocumentFile.license.toString() === "OPEN_ACCESS") {
                         isOpenAccess.value = true;
-                        console.log("AAAAAAAAAAAAAAAAAA", cclicenseTypes.find(ccLicense => props.presetDocumentFile?.ccLicense == ccLicense.value)?.title)
                         selectedCCLicense.value = { title: cclicenseTypes.find(ccLicense => props.presetDocumentFile?.ccLicense == ccLicense.value)?.title as string, value: props.presetDocumentFile.ccLicense };
                     }
 

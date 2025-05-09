@@ -234,7 +234,7 @@ export interface Thesis extends Document {
     isOnPublicReviewPause?: boolean;
     topicAcceptanceDate: string;
     thesisDefenceDate: string;
-    isArchived: boolean;
+    isArchived?: boolean;
 }
 
 export interface CitationResponse {

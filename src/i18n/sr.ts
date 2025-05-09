@@ -872,5 +872,7 @@ export default {
     migratedDataToMessage: "Uspešno migrirao podatke na: {0}",
     redirectingToResourceMessage: "Preusmeravamo vas na traženi resurs...",
     notFoundMessage: "Izgleda da stranica koju tražite više nije dostupna.",
-    redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu."
+    redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu.",
+    displayTitle: "Titula za prikazivanje",
+    chooseFromListLabel: "Izaberi iz liste"
 }

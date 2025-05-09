@@ -2,7 +2,12 @@
     <v-container v-for="(input, index) in inputs" :key="input.key" class="bottom-spacer">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base
+                    :ref="(el) => (baseContributionRef[index] = el)"
+                    :basic="basic"
+                    :preset-contribution-value="input.contribution"
+                    :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
+                    @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -90,6 +95,10 @@ export default defineComponent({
         limitOne: {
             type: Boolean,
             default: false
+        },
+        allowExternalAssociate: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["setInput"],
@@ -196,6 +205,8 @@ export default defineComponent({
                     });
                 }
 
+                const advisorOrBoardMember = input.contributionType.value === DocumentContributionType.BOARD_MEMBER || input.contributionType.value === DocumentContributionType.ADVISOR;
+
                 const contributionObject = {
                     contributionDescription: input.contribution.description,
                     personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
@@ -207,8 +218,8 @@ export default defineComponent({
                     isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
                     isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
                     institutionIds: input.contribution.institutionIds,
-                    employmentTitle: input.employmentTitle,
-                    personalTitle: input.personalTitle
+                    employmentTitle: advisorOrBoardMember ? input.employmentTitle : undefined,
+                    personalTitle: advisorOrBoardMember ? input.personalTitle : undefined
                 };
 
                 returnObject.push(contributionObject);

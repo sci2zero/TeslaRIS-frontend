@@ -23,10 +23,10 @@
             />
         </v-col>
     </v-row>
-    <v-btn color="primary" class="text-body-2 mb-2" @click="toggleExternalSelection">
+    <v-btn v-if="allowExternalAssociate" color="primary" class="text-body-2 mb-2" @click="toggleExternalSelection">
         {{ selectExternalAssociate ? $t("selectAssociateFromSystemLabel") : $t("addExternalAssociateLabel") }}
     </v-btn>
-    <v-row v-if="personOtherNames.length > 0">
+    <v-row v-show="personOtherNames.length > 0 && !enterExternalOU">
         <v-col cols="10">
             <v-select
                 v-if="!selectExternalAssociate"
@@ -40,6 +40,30 @@
             ></v-select>
         </v-col>
     </v-row>
+    <v-row v-show="personOtherNames.length > 0 && enterExternalOU">
+        <v-col>
+            <multilingual-text-input
+                ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row>
+    <v-row v-if="personOtherNames.length > 0">
+        <v-col>
+            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU">
+                {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
+            </v-btn>
+        </v-col>
+    </v-row>
+    <!-- <v-row>
+        <v-col>
+            <multilingual-text-input
+                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
+                is-area
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row> -->
     <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
         <v-col v-if="!customNameInput && !selectExternalAssociate" cols="10">
             <v-select
@@ -69,23 +93,6 @@
             <v-btn color="primary" class="text-body-2" @click="customNameInput = !customNameInput">
                 {{ !customNameInput ? $t("addCustomLabel") : $t("selectFromListLabel") }}
             </v-btn>
-        </v-col>
-    </v-row>
-    <!-- <v-row>
-        <v-col>
-            <multilingual-text-input
-                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
-                is-area
-                @update:model-value="sendContentToParent"></multilingual-text-input>
-        </v-col>
-    </v-row> -->
-    <v-row>
-        <v-col>
-            <multilingual-text-input
-                v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
-                @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
     </v-row>
 </template>
@@ -129,12 +136,18 @@ export default defineComponent({
                 affiliationStatement: [],
                 selectedOtherName: []
             })
+        },
+        allowExternalAssociate: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
+
+        const enterExternalOU = ref(true);
 
         const customNameInput = ref(false);
         const firstName = ref("");
@@ -205,6 +218,10 @@ export default defineComponent({
             if(props.presetContributionValue && !valueSet.value) {
                 valueSet.value = true;
 
+                if (props.presetContributionValue.affiliationStatement?.length === 0) {
+                    enterExternalOU.value = false;
+                }
+
                 const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
                 presetAffiliations.value = props.presetContributionValue.institutionIds;
 
@@ -273,12 +290,13 @@ export default defineComponent({
                 otherName = [firstName.value, middleName.value, lastName.value, null, null]
             }
             
+            console.log(selectedAffiliations.value.map(affiliation => affiliation.value), enterExternalOU)
             const returnObject = {
                 personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
                 description: contributionDescription.value,
-                affiliationStatement: affiliationStatement.value,
+                affiliationStatement: enterExternalOU.value ? affiliationStatement.value : [],
                 selectedOtherName: otherName,
-                institutionIds: selectedAffiliations.value.map(affiliation => affiliation.value)
+                institutionIds: enterExternalOU.value ? [] : selectedAffiliations.value.map(affiliation => affiliation.value)
             };
             
             emit("setInput", returnObject);
@@ -356,7 +374,7 @@ export default defineComponent({
                 personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput,
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
-                PersonSubmissionForm
+                PersonSubmissionForm, enterExternalOU
             };
     }
 });

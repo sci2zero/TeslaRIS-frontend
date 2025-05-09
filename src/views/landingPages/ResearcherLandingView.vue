@@ -8,7 +8,7 @@
                         {{ researcherName }}
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ $t("researcherLabel") }}
+                        {{ person?.personalInfo.displayTitle && person.personalInfo.displayTitle.length > 0 ? returnCurrentLocaleContent(person?.personalInfo.displayTitle) as string : $t("researcherLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>

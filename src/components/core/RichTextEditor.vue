@@ -62,7 +62,7 @@ export default defineComponent({
             () => editor.value?.getHTML(),
             (newValue) => {
                 if (newValue !== props.modelValue) {
-                    newValue = newValue.replace(/\s/g, "\u00a0");
+                    newValue = newValue.replace(/\s/g, "\u0020");
                     emit('update:modelValue', newValue);
                     emit("input");
                 }

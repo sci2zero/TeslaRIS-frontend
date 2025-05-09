@@ -63,7 +63,8 @@
                         <person-publication-contribution
                             ref="contributionsRef"
                             basic
-                            limit-one @set-input="contributions = $event">
+                            limit-one :allow-external-associate="false"
+                            @set-input="contributions = $event">
                         </person-publication-contribution>
                     </v-col>
                 </v-row>

@@ -188,8 +188,6 @@ export default defineComponent({
                 tokenParams = "tokens=" + tokenParams.join("&tokens=");
             }
 
-            console.log(tokenParams);
-
             tableRef.value?.setSortAndPageOption([], 1);
             page.value = 0;
             sort.value = "";

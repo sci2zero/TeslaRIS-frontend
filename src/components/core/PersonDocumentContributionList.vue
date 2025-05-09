@@ -10,10 +10,20 @@
             <strong v-if="contribution.employmentTitle">{{ getEmploymentTitleFromValueAutoLocale(contribution.employmentTitle) }}</strong>
             <v-icon v-if="contribution.employmentTitle && contribution.personalTitle" icon="mdi-circle-small" />
             <strong v-if="contribution.personalTitle">{{ getPersonalTitleFromValueAutoLocale(contribution.personalTitle) }}</strong>
-            <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
+            <div v-if="contribution.institutionIds?.length === 0">
+                <em>
+                    {{ returnCurrentLocaleContent(contribution.displayAffiliationStatement) }}
+                </em>
+            </div>
+            <div v-for="(mc, idx) in contribution.displayInstitutionNames" v-else :key="idx">
+                <em>
+                    {{ returnCurrentLocaleContent(mc) }}
+                </em>
+            </div>
             <h5 v-if="loginStore.userLoggedIn && contribution.contact?.contactEmail">
                 <strong>{{ `${$t("emailLabel")}: ${contribution.contact?.contactEmail}` }}</strong>
             </h5>
+            <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
         </div>
     </draggable>
 </template>
@@ -28,6 +38,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useLoginStore } from '@/stores/loginStore';
 import { getEmploymentTitleFromValueAutoLocale } from '@/i18n/employmentTitle';
 import { getPersonalTitleFromValueAutoLocale } from '@/i18n/personalTitle';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -56,7 +67,8 @@ export default defineComponent({
             getTitleFromValueAutoLocale,
             reorderContributors, loginStore,
             getEmploymentTitleFromValueAutoLocale,
-            getPersonalTitleFromValueAutoLocale
+            getPersonalTitleFromValueAutoLocale,
+            returnCurrentLocaleContent
         };
     },
 });
