@@ -764,6 +764,7 @@ export default {
     isFinishedLabel: "Finished",
     librarianActionsLabel: "Librarian actions",
     registryBookNumberLabel: "Registry book number",
+    schoolYearNumberLabel: "School year book number",
     examineRegistryBookEntryLabel: "Examine created record",
     adminActionsLabel: "Administrator actions",
     allowSingleEditLabel: "Allow single edit",
@@ -847,6 +848,6 @@ export default {
     redirectingToResourceMessage: "Redirecting you to a requested resource...",
     notFoundMessage: "It looks like the page you are looking for is no longer here.",
     redirectionFinishedMessage: "Redirection successfull, you may close this page now.",
-    displayTitle: "Display title",
+    displayTitleLabel: "Display title",
     chooseFromListLabel: "Choose from list"
 }

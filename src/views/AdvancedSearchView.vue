@@ -95,6 +95,8 @@ export default defineComponent({
         });
     
         const search = (tokenParams: string) => {
+            tokenParams = decodeURIComponent(tokenParams);
+
             if (!tokenParams || !tokenParams.includes("tokens")) {
                 return;
             }

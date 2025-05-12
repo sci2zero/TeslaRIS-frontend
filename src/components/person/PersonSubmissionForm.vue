@@ -156,7 +156,7 @@
                                 <multilingual-text-input
                                     v-model="displayTitle"
                                     :rules="requiredFieldRules"
-                                    :label="$t('displayTitle') + '*'">
+                                    :label="$t('displayTitleLabel') + '*'">
                                 </multilingual-text-input>
                             </v-col>
                         </v-row>

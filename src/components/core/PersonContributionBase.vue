@@ -290,7 +290,6 @@ export default defineComponent({
                 otherName = [firstName.value, middleName.value, lastName.value, null, null]
             }
             
-            console.log(selectedAffiliations.value.map(affiliation => affiliation.value), enterExternalOU)
             const returnObject = {
                 personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
                 description: contributionDescription.value,

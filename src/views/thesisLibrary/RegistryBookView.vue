@@ -269,7 +269,7 @@ export default defineComponent({
                 sort: "",
                 direction: "",
                 fetchFn: async () => {
-                    const query = `page=${tableStates.nonPromoted.page}&size=${tableStates.nonPromoted.size}&sort=${tableStates.nonPromoted.sort},${tableStates.nonPromoted.direction}`;
+                    const query = `page=${tableStates.nonPromoted.page}&size=${tableStates.nonPromoted.size}${tableStates.nonPromoted.sort ? `&sort=${tableStates.nonPromoted.sort},${tableStates.nonPromoted.direction}` : ""}`;
                     const response = await RegistryBookService.getNonPromotedEntries(query);
                     tableStates.nonPromoted.entries = response.data.content;
                     tableStates.nonPromoted.totalEntries = response.data.totalElements;
@@ -283,7 +283,7 @@ export default defineComponent({
                 sort: "",
                 direction: "",
                 fetchFn: async () => {
-                    const query = `page=${tableStates.forPromotion.page}&size=${tableStates.forPromotion.size}&sort=${tableStates.forPromotion.sort},${tableStates.forPromotion.direction}`;
+                    const query = `page=${tableStates.forPromotion.page}&size=${tableStates.forPromotion.size}${tableStates.forPromotion.sort ? `&sort=${tableStates.forPromotion.sort},${tableStates.forPromotion.direction}` : ""}`;
                     const response = await RegistryBookService.getForPromotion(
                         selectedPromotion.value.value,
                         query
@@ -304,7 +304,7 @@ export default defineComponent({
                         return;
                     }
 
-                    const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}`;
+                    const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}${tableStates.promoted.sort ? `&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}` : ""}`;
                     const response = await RegistryBookService.getPromoted(
                         selectedInstitution.value.value,
                         fromDate.value ? fromDate.value.split("T")[0] : "",

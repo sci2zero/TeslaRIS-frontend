@@ -790,6 +790,7 @@ export default {
     isFinishedLabel: "Završeno",
     librarianActionsLabel: "Akcije bibliotekara",
     registryBookNumberLabel: "Broj u matičnoj knjizi",
+    schoolYearNumberLabel: "Broj u školskoj godini",
     examineRegistryBookEntryLabel: "Pogledaj kreiran zapis",
     adminActionsLabel: "Akcije administratora",
     allowSingleEditLabel: "Dopusti jednu izmenu",
@@ -873,6 +874,6 @@ export default {
     redirectingToResourceMessage: "Preusmeravamo vas na traženi resurs...",
     notFoundMessage: "Izgleda da stranica koju tražite više nije dostupna.",
     redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu.",
-    displayTitle: "Titula za prikazivanje",
+    displayTitleLabel: "Titula za prikazivanje",
     chooseFromListLabel: "Izaberi iz liste"
 }
