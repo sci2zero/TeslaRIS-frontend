@@ -120,7 +120,12 @@
                 <attachment-section :document="dataset" :can-edit="canEdit" :proofs="dataset?.proofs" :file-items="dataset?.fileItems"></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="dataset?.id" :contribution-list="dataset?.contributions ? dataset?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <person-document-contribution-tabs
+                    :document-id="dataset?.id"
+                    :contribution-list="dataset?.contributions ? dataset?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

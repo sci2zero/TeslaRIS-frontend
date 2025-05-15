@@ -3,7 +3,11 @@
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
-                    <event-contribution-update-modal :read-only="readOnly" :preset-event-contributions="contributionList" @update="sendToParent"></event-contribution-update-modal>
+                    <event-contribution-update-modal
+                        :read-only="readOnly"
+                        :preset-event-contributions="localContributions"
+                        @update="sendToParent">
+                    </event-contribution-update-modal>
 
                     <div v-if="contributionList?.length === 0">
                         <b>{{ $t("contributionsLabel") }}</b>
@@ -46,31 +50,67 @@
                         
                     <v-window v-model="currentTab">
                         <v-window-item value="orgBoardChair">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="orgBoardChairList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="orgBoardChairList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="orgBoardMembers">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="orgBoardMemberList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="orgBoardMemberList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="reviewerList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="reviewerList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="progBoardMembers">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="progBoardMemberList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="progBoardMemberList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="speakers">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="speakerList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="speakerList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="panelists">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="panelistList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="panelistList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="chair">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="chairList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="chairList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="audience">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="audienceList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="audienceList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="demonstrators">
-                            <person-event-contribution-list :event-id="eventId" :contribution-list="demonstratorList"></person-event-contribution-list>
+                            <person-event-contribution-list
+                                :event-id="eventId"
+                                :contribution-list="demonstratorList"
+                                @positions-changed="updateOrderInParentList">
+                            </person-event-contribution-list>
                         </v-window-item>
                     </v-window>
                 </v-card-text>
@@ -110,6 +150,8 @@ export default defineComponent({
     setup(props, { emit }) {
         const currentTab = ref("progBoardMembers");
 
+        const localContributions = ref<PersonEventContribution[]>([]);
+
         const orgBoardChairList = ref<PersonEventContribution[]>([]);
         const orgBoardMemberList = ref<PersonEventContribution[]>([]);
         const reviewerList = ref<PersonEventContribution[]>([]);
@@ -121,27 +163,58 @@ export default defineComponent({
         const demonstratorList = ref<PersonEventContribution[]>([]);
 
         watch(() => props.contributionList, () => {
-            orgBoardChairList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_CHAIR]);
-            orgBoardMemberList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_MEMBER]);
-            reviewerList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.REVIEWER]);
-            progBoardMemberList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PROGRAMME_BOARD_MEMBER]);
-            speakerList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.SPEAKER]);
-            panelistList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PANELISTS]);
-            chairList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.CHAIR]);
-            audienceList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.AUDIENCE]);
-            demonstratorList.value = props.contributionList.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.DEMONSTRATOR]);
+            localContributions.value = props.contributionList;
+
+            orgBoardChairList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_CHAIR]);
+            orgBoardMemberList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_MEMBER]);
+            reviewerList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.REVIEWER]);
+            progBoardMemberList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PROGRAMME_BOARD_MEMBER]);
+            speakerList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.SPEAKER]);
+            panelistList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PANELISTS]);
+            chairList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.CHAIR]);
+            audienceList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.AUDIENCE]);
+            demonstratorList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.DEMONSTRATOR]);
         });
         
         const sendToParent = (contributions: any[]) => {
             emit("update", contributions);
         };
 
-        return {sendToParent,
-            getTitleFromValueAutoLocale,
-            currentTab, orgBoardChairList, reviewerList,
+        const updateOrderInParentList = () => {
+            const indexes: number[] = [];
+            orgBoardChairList.value.forEach(contribution => indexes.push(contribution.id as number));
+            reviewerList.value.forEach(contribution => indexes.push(contribution.id as number));
+            progBoardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
+            speakerList.value.forEach(contribution => indexes.push(contribution.id as number));
+            panelistList.value.forEach(contribution => indexes.push(contribution.id as number));
+            chairList.value.forEach(contribution => indexes.push(contribution.id as number));
+            audienceList.value.forEach(contribution => indexes.push(contribution.id as number));
+            demonstratorList.value.forEach(contribution => indexes.push(contribution.id as number));
+
+            updateContributionPositions(indexes);
+        };
+
+        const updateContributionPositions = (indexes: number[]) => {
+            if (!localContributions.value) return;
+
+            const contributionMap = new Map<number, any>(
+                localContributions.value.map(contribution => [contribution.id as number, contribution])
+            );
+
+            localContributions.value = indexes
+                .map(id => contributionMap.get(id))
+                .filter((c): c is NonNullable<typeof c> => !!c);
+        };
+
+        return {
+            sendToParent, updateOrderInParentList,
+            getTitleFromValueAutoLocale, currentTab,
+            orgBoardChairList, reviewerList,
             orgBoardMemberList, progBoardMemberList,
             speakerList, panelistList, chairList,
-            audienceList, demonstratorList };
+            audienceList, demonstratorList,
+            localContributions
+        };
     },
 });
 </script>

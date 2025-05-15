@@ -23,47 +23,13 @@
             />
         </v-col>
     </v-row>
-    <v-btn v-if="allowExternalAssociate" color="primary" class="text-body-2 mb-2" @click="toggleExternalSelection">
-        {{ selectExternalAssociate ? $t("selectAssociateFromSystemLabel") : $t("addExternalAssociateLabel") }}
+    <v-btn
+        v-if="allowExternalAssociate && !selectExternalAssociate"
+        color="primary"
+        class="text-body-2 mb-2"
+        @click="toggleExternalSelection">
+        {{ $t("addExternalAssociateLabel") }}
     </v-btn>
-    <v-row v-show="personOtherNames.length > 0 && !enterExternalOU">
-        <v-col cols="10">
-            <v-select
-                v-if="!selectExternalAssociate"
-                v-model="selectedAffiliations"
-                :label="$t('personAffiliationsLabel')"
-                :items="personAffiliations"
-                :no-data-text="$t('noAffiliationsMessage')"
-                return-object
-                multiple
-                @update:model-value="sendContentToParent"
-            ></v-select>
-        </v-col>
-    </v-row>
-    <v-row v-show="personOtherNames.length > 0 && enterExternalOU">
-        <v-col>
-            <multilingual-text-input
-                ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
-                @update:model-value="sendContentToParent"></multilingual-text-input>
-        </v-col>
-    </v-row>
-    <v-row v-if="personOtherNames.length > 0">
-        <v-col>
-            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU">
-                {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-    <!-- <v-row>
-        <v-col>
-            <multilingual-text-input
-                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
-                is-area
-                @update:model-value="sendContentToParent"></multilingual-text-input>
-        </v-col>
-    </v-row> -->
     <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
         <v-col v-if="!customNameInput && !selectExternalAssociate" cols="10">
             <v-select
@@ -95,6 +61,51 @@
             </v-btn>
         </v-col>
     </v-row>
+    <v-btn
+        v-if="allowExternalAssociate && selectExternalAssociate"
+        color="primary"
+        class="text-body-2 mb-2"
+        @click="toggleExternalSelection">
+        {{ $t("selectAssociateFromSystemLabel") }}
+    </v-btn>
+    <v-row v-show="personOtherNames.length > 0 && !enterExternalOU">
+        <v-col cols="10">
+            <v-select
+                v-if="!selectExternalAssociate"
+                v-model="selectedAffiliations"
+                :label="$t('personAffiliationsLabel')"
+                :items="personAffiliations"
+                :no-data-text="$t('noAffiliationsMessage')"
+                return-object
+                multiple
+                @update:model-value="sendContentToParent"
+            ></v-select>
+        </v-col>
+    </v-row>
+    <v-row v-show="(personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate">
+        <v-col>
+            <multilingual-text-input
+                ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row>
+    <v-row v-if="personOtherNames.length > 0 && !selectExternalAssociate">
+        <v-col>
+            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU">
+                {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
+            </v-btn>
+        </v-col>
+    </v-row>
+    <!-- <v-row>
+        <v-col>
+            <multilingual-text-input
+                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
+                is-area
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row> -->
 </template>
 
 <script lang="ts">
@@ -267,7 +278,7 @@ export default defineComponent({
                     selectExternalAssociate.value = true;
                 }
             }
-        });
+        }, { deep: true });
 
         const onPersonSelect = (selection: {title: string, value: number}) => {
             PersonService.readPerson(selection.value).then((response) => {
@@ -282,10 +293,18 @@ export default defineComponent({
 
         const sendContentToParent = () => {
             let otherName = ["", "", "", null, null];
+            
             if (selectedOtherName.value && selectedOtherName.value?.value !== -1) {
                 const personOtherName = selectedOtherName.value?.value as PersonName;
-                otherName = [personOtherName.firstname, personOtherName.otherName, personOtherName.lastname, personOtherName.dateFrom as string, personOtherName.dateTo as string];
+                otherName = [
+                    personOtherName.firstname,
+                    personOtherName.otherName,
+                    personOtherName.lastname,
+                    personOtherName.dateFrom as string,
+                    personOtherName.dateTo as string
+                ];
             }
+
             if (customNameInput.value) {
                 otherName = [firstName.value, middleName.value, lastName.value, null, null]
             }
@@ -293,7 +312,7 @@ export default defineComponent({
             const returnObject = {
                 personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
                 description: contributionDescription.value,
-                affiliationStatement: enterExternalOU.value ? affiliationStatement.value : [],
+                affiliationStatement: (selectExternalAssociate.value || enterExternalOU.value) ? affiliationStatement.value : [],
                 selectedOtherName: otherName,
                 institutionIds: enterExternalOU.value ? [] : selectedAffiliations.value.map(affiliation => affiliation.value)
             };
@@ -326,6 +345,8 @@ export default defineComponent({
                     if (selectedAffiliations.value.length === 0) {
                         selectLatestAffiliation();
                     }
+
+                    sendContentToParent();
                 }
             });
         });
@@ -358,7 +379,10 @@ export default defineComponent({
 
         const toggleExternalSelection = () => {
             selectExternalAssociate.value = !selectExternalAssociate.value;
+
             customNameInput.value = selectExternalAssociate.value;
+            enterExternalOU.value = selectExternalAssociate.value;
+            
             sendContentToParent();
         };
 

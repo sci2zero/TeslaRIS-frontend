@@ -1,5 +1,5 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="input.key" class="bottom-spacer">
+    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
         <v-row>
             <v-col cols="10">
                 <person-contribution-base
@@ -110,31 +110,40 @@ export default defineComponent({
         const personalTitles = computed(() => getPersonalTitlesForGivenLocale());
 
         onMounted(() => {
+            populateFormData();
+        });
+
+        const populateFormData = () => {
             if(props.presetContributions && props.presetContributions.length > 0) {
                 inputs.value.splice(0);
                 props.presetContributions.forEach(contribution => {
-                    inputs.value.push({contribution: 
-                        {
-                            personId: contribution.personId, 
-                            description: contribution.contributionDescription, 
-                            affiliationStatement: contribution.displayAffiliationStatement, 
-                            selectedOtherName: [
-                                        contribution.personName?.firstname, 
-                                        contribution.personName?.otherName, 
-                                        contribution.personName?.lastname
-                                    ],
-                            institutionIds: contribution.institutionIds
+                    inputs.value.push({
+                        contribution: 
+                            {
+                                personId: contribution.personId, 
+                                description: contribution.contributionDescription, 
+                                affiliationStatement: contribution.displayAffiliationStatement, 
+                                selectedOtherName: [
+                                            contribution.personName?.firstname, 
+                                            contribution.personName?.otherName, 
+                                            contribution.personName?.lastname
+                                        ],
+                                institutionIds: contribution.institutionIds
+                            }, 
+                        contributionType: {
+                            title: getTitleFromValueAutoLocale(contribution.contributionType),
+                            value: contribution.contributionType
                         }, 
-                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType}, 
-                    isMainContributor: contribution.isMainContributor, 
-                    isCorrespondingContributor: contribution.isCorrespondingContributor,
-                    isBoardPresident: contribution.isBoardPresident,
-                    employmentTitle: contribution.employmentTitle,
-                    personalTitle: contribution.personalTitle,
-                    id: contribution.id});
+                        isMainContributor: contribution.isMainContributor, 
+                        isCorrespondingContributor: contribution.isCorrespondingContributor,
+                        isBoardPresident: contribution.isBoardPresident,
+                        employmentTitle: contribution.employmentTitle,
+                        personalTitle: contribution.personalTitle,
+                        id: contribution.id
+                    });
                 });
             }
-        });
+        };
 
         const contributionTypes = computed(() => {
             const types = getTypesForGivenLocale();
@@ -237,7 +246,8 @@ export default defineComponent({
             inputs, addInput, removeInput,
             contributionTypes, sendContentToParent,
             baseContributionRef, clearInput,
-            employmentTitles, personalTitles
+            employmentTitles, personalTitles,
+            populateFormData
         }
     }
 });

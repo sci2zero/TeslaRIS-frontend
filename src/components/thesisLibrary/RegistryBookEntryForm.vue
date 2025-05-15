@@ -55,7 +55,7 @@
 </template>  
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType } from 'vue';
+import { defineComponent, nextTick, onMounted, type PropType } from 'vue';
 import { ref } from 'vue';
 import { AcademicTitle, type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
@@ -163,19 +163,23 @@ export default defineComponent({
                 loading.value = true;
                 registryEntry.value = props.presetRegistryBookEntry;
                 step.value = 1;
-                setTimeout(() => {
-                    loadAll.value = true;
-                    setTimeout(() => {
+                nextTick()
+                    .then(() => {
+                        loadAll.value = true;
+                        return nextTick();
+                    })
+                    .then(() => nextTick())
+                    .then(() => nextTick())
+                    .then(() => nextTick())
+                    .then(() => {
                         const firstInvalidStep = validSteps.value.findIndex(val => !val) + 1;
                         if (firstInvalidStep > 0) {
                             step.value = firstInvalidStep;
                         } else if (step.value !== 4) {
                             step.value = 4;
                         }
-                        loadAll.value = false;
                         loading.value = false;
-                    }, 500);
-                }, 200);
+                    });
             }
         });
 

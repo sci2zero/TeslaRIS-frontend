@@ -96,7 +96,11 @@
                 <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+                <person-publication-series-contribution-tabs
+                    :contribution-list="journal?.contributions ? journal.contributions : []"
+                    :publication-series-id="journal?.id"
+                    :read-only="!canEdit" @update="updateContributions">
+                </person-publication-series-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -158,7 +162,7 @@ export default defineComponent({
     name: "JournalLandingPage",
     components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView },
     setup() {
-        const currentTab = ref("");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");

@@ -22,7 +22,7 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-publication-series-contribution-list :contribution-list="leftJournal?.contributions ? leftJournal.contributions : []" in-comparator></person-publication-series-contribution-list>
+                        <person-publication-series-contribution-list :publication-series-id="leftJournal?.id" :contribution-list="leftJournal?.contributions ? leftJournal.contributions : []" in-comparator></person-publication-series-contribution-list>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -58,7 +58,7 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-publication-series-contribution-list :contribution-list="rightJournal?.contributions ? rightJournal.contributions : []" in-comparator></person-publication-series-contribution-list>
+                        <person-publication-series-contribution-list :publication-series-id="rightJournal?.id" :contribution-list="rightJournal?.contributions ? rightJournal.contributions : []" in-comparator></person-publication-series-contribution-list>
                     </v-card-text>
                 </v-card>
             </v-col>
