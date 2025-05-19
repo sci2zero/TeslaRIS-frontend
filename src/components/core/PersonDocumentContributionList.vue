@@ -1,5 +1,10 @@
 <template>
-    <draggable :list="contributionList" group="documentContributions" item-key="id" @change="reorderContributors">
+    <draggable
+        :list="contributionList"
+        group="documentContributions"
+        item-key="id"
+        :disabled="!canReorder"
+        @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" :to="'persons/' + contribution.personId">
                 <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}` }}</strong></h4>
@@ -52,6 +57,10 @@ export default defineComponent({
         documentId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        canReorder: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["positionsChanged"],

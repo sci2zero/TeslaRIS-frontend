@@ -2,6 +2,7 @@
     <draggable 
         :list="contributionList" item-key="id"
         group="publicationContributions"
+        :disabled="!canReorder"
         @change="reorderContributors"
     >
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
@@ -44,6 +45,10 @@ export default defineComponent({
         publicationSeriesId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        canReorder: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["positionsChanged"],

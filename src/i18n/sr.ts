@@ -342,7 +342,7 @@ export default {
     academicTitleLabel: "Akademsko zvanje",
     abbreviationTitleLabel: "Skraćenica zvanja",
     otherNamesLabel: "Svi oblici imena",
-    viewAllPersonNamesLabel: "Vidi sve oblike imena",
+    viewAllPersonNamesLabel: "Prikaz oblika imena",
     noOtherNamesMessage: "Nema alternativnih oblika imena.",
     recentNotificationsLabel: "Nedavna obaveštenja",
     dateOfAcquisitionLabel: "Datum sticanja",

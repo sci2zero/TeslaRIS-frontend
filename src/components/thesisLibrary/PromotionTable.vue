@@ -89,6 +89,7 @@ import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PromotionForm from './PromotionForm.vue';
 import type { Promotion } from '@/models/ThesisLibraryModel';
 import { localiseDate, localiseTime } from '@/i18n/dateLocalisation';
+import { isEqual } from 'lodash';
 
 
 export default defineComponent({
@@ -195,6 +196,16 @@ export default defineComponent({
         };
 
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            if (
+                (
+                    isEqual([{key: "promotionDate", order: "asc"}], tableOptions.value.sortBy) ||
+                    tableOptions.value.sortBy.length === 0
+                ) &&
+                page == tableOptions.value.page
+            ) {
+                return
+            }
+
             tableOptions.value.initialCustomConfiguration = true;
             if (sortBy.length === 0) {
                 tableOptions.value.sortBy.splice(0);

@@ -1,5 +1,9 @@
 <template>
-    <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+    <v-card
+        class="pa-3"
+        variant="flat"
+        color="grey-lighten-5"
+        v-if="canEdit || (expertiseOrSkills && expertiseOrSkills?.length > 0)">
         <v-card-text class="edit-pen-container">
             <expertise-or-skill-modal :read-only="!canEdit" @create="createExpertiseOrSkill"></expertise-or-skill-modal>
             <div><b>{{ $t("expertisesAndSkillsLabel") }}</b></div>

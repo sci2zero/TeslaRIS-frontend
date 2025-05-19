@@ -38,28 +38,32 @@
                             <person-publication-series-contribution-list
                                 :contribution-list="editorList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                         <v-window-item value="associateEditors">
                             <person-publication-series-contribution-list
                                 :contribution-list="associateEditorList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-publication-series-contribution-list
                                 :contribution-list="reviewerList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                         <v-window-item value="scientificBoardMembers">
                             <person-publication-series-contribution-list
                                 :contribution-list="scientificBoardMemberList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                     </v-window>

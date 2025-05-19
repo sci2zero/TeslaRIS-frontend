@@ -139,11 +139,11 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab value="additionalInfo">
-                {{ $t("additionalInfoLabel") }}
-            </v-tab>
             <v-tab v-if="canEdit || (journalPublication?.contributions && journalPublication?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}

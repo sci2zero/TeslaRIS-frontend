@@ -342,7 +342,7 @@ export default {
     academicTitleLabel: "Academic Title",
     abbreviationTitleLabel: "Title Abbreviation",
     otherNamesLabel: "All Person Names",
-    viewAllPersonNamesLabel: "View All Person Names",
+    viewAllPersonNamesLabel: "All Person Names",
     noOtherNamesMessage: "There are no alternative names specified.",
     recentNotificationsLabel: "Recent Notifications",
     dateOfAcquisitionLabel: "Date of Acquisition",

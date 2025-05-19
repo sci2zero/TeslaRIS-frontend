@@ -42,35 +42,40 @@
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="authorList"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="editors">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="editorList"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="reviewerList"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="advisors">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="advisorList"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="boardMembers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="boardMemberList"
-                                @positions-changed="updateOrderInParentList">
+                                @positions-changed="updateOrderInParentList"
+                                :can-reorder="!readOnly">
                             </person-document-contribution-list>
                         </v-window-item>
                     </v-window>

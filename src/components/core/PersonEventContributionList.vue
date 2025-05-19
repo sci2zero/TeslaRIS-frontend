@@ -2,6 +2,7 @@
     <draggable
         :list="contributionList" item-key="id"
         group="eventContributions"
+        :disabled="!canReorder"
         @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" elementk :to="'persons/' + contribution.personId">
@@ -36,6 +37,10 @@ export default defineComponent({
         eventId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        canReorder: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["positionsChanged"],

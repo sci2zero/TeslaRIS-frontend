@@ -22,7 +22,12 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-publication-series-contribution-list :publication-series-id="leftBookSeries?.id" :contribution-list="leftBookSeries?.contributions ? leftBookSeries.contributions : []" in-comparator></person-publication-series-contribution-list>
+                        <person-publication-series-contribution-list
+                            :publication-series-id="leftBookSeries?.id"
+                            :contribution-list="leftBookSeries?.contributions ? leftBookSeries.contributions : []"
+                            in-comparator
+                            :can-reorder="true">
+                        </person-publication-series-contribution-list>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -58,7 +63,12 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-publication-series-contribution-list :publication-series-id="rightBookSeries?.id" :contribution-list="rightBookSeries?.contributions ? rightBookSeries.contributions : []" in-comparator></person-publication-series-contribution-list>
+                        <person-publication-series-contribution-list
+                            :publication-series-id="rightBookSeries?.id"
+                            :contribution-list="rightBookSeries?.contributions ? rightBookSeries.contributions : []"
+                            in-comparator
+                            :can-reorder="true">
+                        </person-publication-series-contribution-list>
                     </v-card-text>
                 </v-card>
             </v-col>

@@ -91,7 +91,6 @@ import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Common';
-import { isEqual } from 'lodash';
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 
@@ -152,13 +151,9 @@ export default defineComponent({
             const publicationTypes = selectedPublicationTypes.value.map(publicationType => publicationType.value);
             const selectOnlyUnassessed = isCommission.value && returnOnlyUnassessedEntities.value;
 
-            if (loggedInUser.value && searchParams.value === tokenParams && isEqual(previousFilterValues.value.publicationTypes, publicationTypes) && previousFilterValues.value.selectOnlyUnassessed === selectOnlyUnassessed) {
-                return;
-            } else {
-                searchParams.value = tokenParams;
-                previousFilterValues.value.publicationTypes = publicationTypes;
-                previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
-            }
+            searchParams.value = tokenParams;
+            previousFilterValues.value.publicationTypes = publicationTypes;
+            previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
 
             if (currentTab.value === "simpleSearch" || tokenParams === "tokens=*") {
                 DocumentPublicationService.searchDocumentPublications(

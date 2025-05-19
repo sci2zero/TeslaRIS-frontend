@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []" :document-id="leftPatent?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []"
+                            :document-id="leftPatent?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []" :document-id="rightPatent?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []"
+                            :document-id="rightPatent?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
