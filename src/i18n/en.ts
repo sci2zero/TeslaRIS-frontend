@@ -849,5 +849,7 @@ export default {
     notFoundMessage: "It looks like the page you are looking for is no longer here.",
     redirectionFinishedMessage: "Redirection successfull, you may close this page now.",
     displayTitleLabel: "Display title",
-    chooseFromListLabel: "Choose from list"
+    chooseFromListLabel: "Choose from list",
+    selectColorLabel: "Select color",
+    selectBackgroundColorLabel: "Select background color"
 }

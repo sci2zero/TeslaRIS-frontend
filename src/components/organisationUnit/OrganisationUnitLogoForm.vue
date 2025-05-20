@@ -13,10 +13,13 @@
                 :box-style="{
                     width: '100%',
                     height: '100%',
-                    backgroundColor: '#f8f8f8',
+                    backgroundColor: backgroundColor,
                     margin: 'auto',
                 }"
-                :img="imageSrc ? imageSrc : ''"
+                :img="imageSrc || ''"
+                :autoCrop="true"
+                :autoCropWidth="150"
+                :autoCropHeight="150"
                 :options="{
                     viewMode: 1,
                     dragMode: 'crop',
@@ -24,7 +27,13 @@
                 }"
             />
         </v-row>
-        <v-row v-if="originalFileName" class="mt-10">
+        <v-row class="mt-10">
+            <color-picker
+                v-model="backgroundColor"
+                :label="$t('selectBackgroundColorLabel')"
+            />
+        </v-row>
+        <v-row v-if="originalFileName" class="mt-5">
             <v-btn density="compact" class="bottom-spacer" @click="removeProfileImage">
                 {{ $t("removeProfileImageLabel") }}
             </v-btn>
@@ -33,34 +42,40 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
-import PersonService from '@/services/PersonService';
-import type { PersonProfileImageRequest } from '@/models/PersonModel';
+import type { InstitutionLogoRequest } from '@/models/OrganisationUnitModel';
 import VuePictureCropper, { cropper } from 'vue-picture-cropper'
 import BaseService from '@/services/BaseService';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import ColorPicker from '../core/ColorPicker.vue';
 
 
 export default defineComponent({
-    name: "PersonProfileImageForm",
-    components: { VuePictureCropper },
+    name: "OrganisationUnitLogoForm",
+    components: { VuePictureCropper, ColorPicker },
     props: {
         originalFileName: {
             type: String,
             default: undefined
         },
-        personId: {
+        orgUnitId: {
             type: Number,
             required: true
+        },
+        backgroundColorHex: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
         const languageTags = ref<LanguageTagResponse[]>([]);
+        const backgroundColor = ref(props.backgroundColorHex ? props.backgroundColorHex : "#a8b2bd");
 
         onMounted(async () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -71,16 +86,20 @@ export default defineComponent({
                 file.value = (new File([], props.originalFileName));
             }
 
-            if (props.personId) {
-                imageSrc.value = (await BaseService.fetchImageForDisplay(props.personId, true))[0] as string;
+            if (props.orgUnitId) {
+                imageSrc.value = (await BaseService.fetchLogoForDisplay(props.orgUnitId, true))[0] as string;
             }
+        });
+
+        watch(() => props.backgroundColorHex, () => {
+            backgroundColor.value = props.backgroundColorHex;
         });
 
         const file = ref<File>();
         const imageSrc = ref<string | undefined>(undefined);
 
         const submit = async () => {
-            if (!cropper || !file.value) return
+            if (!cropper || !file.value) return;
 
             const canvasData = cropper.getCanvasData();
             const imageData = cropper.getImageData();
@@ -89,21 +108,23 @@ export default defineComponent({
             const scaleX = imageData.naturalWidth / imageData.width;
             const scaleY = imageData.naturalHeight / imageData.height;
 
-            const newProfileImage: PersonProfileImageRequest = {
+            const newlogo: InstitutionLogoRequest = {
                 file: await urlToFile(imageSrc.value as string, file.value.name),
                 top: Math.round((cropBoxData.top - canvasData.top) * scaleY),
                 left: Math.round((cropBoxData.left - canvasData.left) * scaleX),
                 height: Math.round(cropBoxData.height * scaleY),
-                width: Math.round(cropBoxData.width * scaleX)
+                width: Math.round(cropBoxData.width * scaleX),
+                backgroundHex: backgroundColor.value
             };
 
-            PersonService.updatePersonProfileImage(newProfileImage, props.personId).then(() => {
+            OrganisationUnitService.updateOrganisationUnitLogo(newlogo, props.orgUnitId).then(() => {
                 emit("update");
             });
         };
 
+
         const removeProfileImage = () => {
-            PersonService.removePersonProfileImage(props.personId).then(() => {
+            OrganisationUnitService.removeOrganisationUnitLogo(props.orgUnitId).then(() => {
                 emit("update");
             });
         };
@@ -113,39 +134,37 @@ export default defineComponent({
 
             cropper.clear();
 
-            if (file.value) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
 
-                        canvas.width = img.width;
-                        canvas.height = img.height;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
 
-                        ctx?.drawImage(img, 0, 0, img.width, img.height);
+                    ctx?.drawImage(img, 0, 0, img.width, img.height);
 
-                        imageSrc.value = canvas.toDataURL('image/jpeg');
+                    const base64 = canvas.toDataURL('image/png');
+                    imageSrc.value = base64;
 
-                        cropper?.setCropBoxData({
-                            width: img.width / 2,
-                            height: img.height / 2,
-                            top: img.height / 4,
-                            left: img.width / 4
-                        });
-                    };
-
-                    img.src = e.target?.result as string;
+                    cropper?.setCropBoxData({
+                        width: img.width / 2,
+                        height: img.height / 2,
+                        top: img.height / 4,
+                        left: img.width / 4
+                    });
                 };
-                reader.readAsDataURL(file.value);
-            }
+                img.src = e.target?.result as string;
+            };
+            reader.readAsDataURL(file.value);
         };
 
         const urlToFile = async (url: string, fileName: string): Promise<File> => {
             if (url.startsWith('data:')) {
                 const [metadata, base64] = url.split(',');
-                const mime = metadata.match(/:(.*?);/)?.[1] || 'image/jpeg';
+                const mime = metadata.match(/:(.*?);/)?.[1] || 'image/png';
                 const binary = atob(base64);
                 const array = new Uint8Array(binary.length);
                 for (let i = 0; i < binary.length; i++) {
@@ -155,18 +174,17 @@ export default defineComponent({
             } else if (url.startsWith('blob:')) {
                 const response = await fetch(url);
                 const blob = await response.blob();
-                const mime = blob.type || 'image/jpeg';
+                const mime = blob.type || 'image/png';
                 return new File([blob], fileName, { type: mime });
             } else {
                 throw new Error('Unsupported URL format');
             }
         };
 
-
         return {
             isFormValid, file, submit,
             removeProfileImage, imageSrc,
-            handleFileChange
+            handleFileChange, backgroundColor
         };
     }
 });

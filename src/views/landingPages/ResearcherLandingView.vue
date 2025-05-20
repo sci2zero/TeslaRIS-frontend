@@ -17,7 +17,11 @@
         <!-- Researcher Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <person-profile-image :filename="person?.imageServerFilename" :person-id="person?.id" :can-edit="canEdit"></person-profile-image>
+                <person-profile-image
+                    :filename="person?.imageServerFilename"
+                    :person-id="person?.id"
+                    :can-edit="canEdit">
+                </person-profile-image>
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">

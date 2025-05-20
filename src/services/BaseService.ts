@@ -49,6 +49,29 @@ export class BaseService {
     }
   }
 
+  async fetchLogoForDisplay(organisationUnitId: number, fullSize: boolean): Promise<[string | null, string | null]> {
+    try {
+      const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/logo/${organisationUnitId}?fullSize=${fullSize}`, {
+        responseType: 'blob',
+      });
+
+      if (response.status === 204) {
+        return [null, null];
+      }
+
+      let imageName = null;
+      if (response.headers["content-disposition"]) {
+        imageName = response.headers["content-disposition"].split("=")[1].replaceAll('"', '');
+      }
+  
+      const imageUrl = URL.createObjectURL(response.data);
+      return [imageUrl, imageName];
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return [null, null];
+    }
+  }
+
   async sendRequest(
     restMethod: any = axios.get,
     path: string = "",

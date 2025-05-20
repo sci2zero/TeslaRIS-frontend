@@ -875,5 +875,7 @@ export default {
     notFoundMessage: "Izgleda da stranica koju tražite više nije dostupna.",
     redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu.",
     displayTitleLabel: "Titula za prikazivanje",
-    chooseFromListLabel: "Izaberi iz liste"
+    chooseFromListLabel: "Izaberi iz liste",
+    selectColorLabel: "Izaberi boju",
+    selectBackgroundColorLabel: "Izaberi boju pozadine"
 }
