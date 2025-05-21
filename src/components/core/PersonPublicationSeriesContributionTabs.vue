@@ -10,7 +10,7 @@
                     </publication-series-contribution-update-modal>
 
                     <div v-if="contributionList?.length === 0">
-                        <b>{{ $t("contributionsLabel") }}</b>
+                        <b>{{ showsBoardAndReviewers ? $t("boardAndReviewersLabel") : $t("contributionsLabel") }}</b>
                     </div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <v-tabs
@@ -38,32 +38,32 @@
                             <person-publication-series-contribution-list
                                 :contribution-list="editorList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                         <v-window-item value="associateEditors">
                             <person-publication-series-contribution-list
                                 :contribution-list="associateEditorList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-publication-series-contribution-list
                                 :contribution-list="reviewerList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                         <v-window-item value="scientificBoardMembers">
                             <person-publication-series-contribution-list
                                 :contribution-list="scientificBoardMemberList"
                                 :publication-series-id="publicationSeriesId"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-publication-series-contribution-list>
                         </v-window-item>
                     </v-window>
@@ -98,6 +98,10 @@ export default defineComponent({
         publicationSeriesId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        showsBoardAndReviewers: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],

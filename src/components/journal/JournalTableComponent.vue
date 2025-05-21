@@ -94,7 +94,8 @@ export default defineComponent({
         totalJournals: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedJournals = ref<JournalIndex[]>([]);

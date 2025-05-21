@@ -44,7 +44,7 @@
                             <v-col cols="6">
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
-                                    {{ $t("typeOfPublicationLabel") }}:
+                                    {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType" class="response">
                                     {{ getTitleFromValue(proceedingsPublication.proceedingsPublicationType, publicationTypes) }}

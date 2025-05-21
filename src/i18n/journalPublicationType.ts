@@ -28,7 +28,7 @@ export const getTitleFromValue = (value: JournalPublicationType, journalPublicat
     return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value.toString()) || {}).title;
 };
 
-export const getTitleFromValueAutoLocale = (value: JournalPublicationType) => {
+export const getTitleFromValueAutoLocale = (value: JournalPublicationType | string) => {
     const locale = i18n.vueI18n.global.locale;
 
     let journalPublicationTypeArray = journalPublicationTypeEn;

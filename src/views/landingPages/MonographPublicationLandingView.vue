@@ -45,7 +45,7 @@
                             <v-col cols="6">
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="monographPublication?.monographPublicationType">
-                                    {{ $t("typeOfPublicationLabel") }}:
+                                    {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
                                 <div v-if="monographPublication?.monographPublicationType" class="response">
                                     {{ getTitleFromValueAutoLocale(monographPublication.monographPublicationType) }}

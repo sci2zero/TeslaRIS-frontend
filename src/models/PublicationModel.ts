@@ -35,6 +35,7 @@ export interface DocumentPublicationIndex {
     databaseId: number | null;
     doi: string;
     assessedBy?: number[];
+    publicationType: string;
 }
 
 export enum PublicationType {

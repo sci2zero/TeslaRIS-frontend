@@ -17,9 +17,9 @@
                     margin: 'auto',
                 }"
                 :img="imageSrc || ''"
-                :autoCrop="true"
-                :autoCropWidth="150"
-                :autoCropHeight="150"
+                :auto-crop="true"
+                :auto-crop-width="150"
+                :auto-crop-height="150"
                 :options="{
                     viewMode: 1,
                     dragMode: 'crop',

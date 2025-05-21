@@ -8,8 +8,8 @@
                     variant="outlined"
                     v-bind="scope.props"
                     :class="readOnly ? 'bottom-spacer' : ''"
-                    v-on="scope.isActive"
-                    :disabled="readOnly && otherNames.length === 0">
+                    :disabled="readOnly && otherNames.length === 0"
+                    v-on="scope.isActive">
                     {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>
             </template>

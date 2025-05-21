@@ -1,9 +1,9 @@
 <template>
     <v-card
+        v-if="canEdit || (prizes && prizes?.length > 0)"
         class="pa-3"
         variant="flat"
-        color="grey-lighten-5"
-        v-if="canEdit || (prizes && prizes?.length > 0)">
+        color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
             <prize-modal :read-only="!canEdit" @create="createPrize"></prize-modal>
             <div><b>{{ $t("prizesLabel") }}</b></div>

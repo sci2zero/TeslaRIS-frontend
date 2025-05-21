@@ -285,7 +285,7 @@ export default {
     thesisTitleLabel: "Thesis Title",
     prizesLabel: "Prizes",
     basicInfoLabel: "Basic Info",
-    relationsLabel: "Relations",
+    relationsLabel: "Organisation structure",
     isSerialEventMessage: "This is a serial event.",
     isOneTimeEventMessage: "This is a one time event.",
     journalPublicationLabel: "Journal Publication",
@@ -851,5 +851,8 @@ export default {
     displayTitleLabel: "Display title",
     chooseFromListLabel: "Choose from list",
     selectColorLabel: "Select color",
-    selectBackgroundColorLabel: "Select background color"
+    selectBackgroundColorLabel: "Select background color",
+    papersLabel: "Papers",
+    concretePublicationTypeLabel: "Concrete publication type",
+    boardAndReviewersLabel: "Board and reviewers"
 }

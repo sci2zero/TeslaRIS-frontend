@@ -79,7 +79,7 @@
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
+                {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="canClassify || journalIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -93,13 +93,21 @@
             <v-tabs-window-item value="publications">
                 <!-- Publications Table -->
                 <h2>{{ $t("journalPublicationsLabel") }}</h2>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    in-comparator
+                    show-publication-concrete-type
+                    @switch-page="switchPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs
                     :contribution-list="journal?.contributions ? journal.contributions : []"
                     :publication-series-id="journal?.id"
-                    :read-only="!canEdit" @update="updateContributions">
+                    :read-only="!canEdit"
+                    shows-board-and-reviewers
+                    @update="updateContributions">
                 </person-publication-series-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">

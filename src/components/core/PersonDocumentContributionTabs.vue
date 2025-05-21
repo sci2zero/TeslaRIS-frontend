@@ -11,7 +11,7 @@
                     </publication-contribution-update-modal>
 
                     <div v-if="contributionList?.length === 0">
-                        <b>{{ $t("contributionsLabel") }}</b>
+                        <b>{{ showsBoardAndReviewers ? $t("boardAndReviewersLabel") : $t("contributionsLabel") }}</b>
                     </div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <v-tabs
@@ -42,40 +42,40 @@
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="authorList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="editors">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="editorList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="reviewerList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="advisors">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="advisorList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-document-contribution-list>
                         </v-window-item>
                         <v-window-item value="boardMembers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="boardMemberList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-document-contribution-list>
                         </v-window-item>
                     </v-window>
@@ -112,6 +112,10 @@ export default defineComponent({
             default: false
         },
         boardMembersAllowed: {
+            type: Boolean,
+            default: false
+        },
+        showsBoardAndReviewers: {
             type: Boolean,
             default: false
         }

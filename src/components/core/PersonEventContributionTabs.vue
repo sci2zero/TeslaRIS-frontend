@@ -53,72 +53,72 @@
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="orgBoardChairList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="orgBoardMembers">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="orgBoardMemberList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="reviewerList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="progBoardMembers">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="progBoardMemberList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="speakers">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="speakerList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="panelists">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="panelistList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="chair">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="chairList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="audience">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="audienceList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                         <v-window-item value="demonstrators">
                             <person-event-contribution-list
                                 :event-id="eventId"
                                 :contribution-list="demonstratorList"
-                                @positions-changed="updateOrderInParentList"
-                                :can-reorder="!readOnly">
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
                             </person-event-contribution-list>
                         </v-window-item>
                     </v-window>

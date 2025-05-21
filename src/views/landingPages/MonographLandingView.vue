@@ -145,7 +145,7 @@
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-if="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
+                {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="researchAreaHierarchy || canEdit" value="researchArea">
                 {{ $t("researchAreaLabel") }}
@@ -170,14 +170,25 @@
                 <v-row>
                     <v-col cols="12">
                         <h2>{{ $t("monographPublicationsLabel") }}</h2>
-                        <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                        <publication-table-component
+                            :publications="publications"
+                            :total-publications="totalPublications"
+                            in-comparator
+                            show-publication-concrete-type
+                            @switch-page="switchPage">
+                        </publication-table-component>
                     </v-col>
                 </v-row>
 
                 <attachment-section :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <person-document-contribution-tabs
+                    :document-id="monograph?.id"
+                    :contribution-list="monograph?.contributions ? monograph?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>

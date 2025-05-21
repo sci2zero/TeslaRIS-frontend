@@ -237,8 +237,8 @@
 
                 <v-row>
                     <v-col
-                        cols="6"
-                        v-if="displayExpertiseAndPrizePanel()">
+                        v-if="displayExpertiseAndPrizePanel()"
+                        cols="6">
                         <!-- Expertises and Skills -->
                         <expertise-or-skill-list
                             :expertise-or-skills="person?.expertisesOrSkills"
@@ -459,7 +459,7 @@ export default defineComponent({
 
                 if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
                     researcherName.value =
-                        `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`;
+                        `${response.data.personName.firstname} (${response.data.personName.otherName}) ${response.data.personName.lastname}`;
                 } else {
                     researcherName.value =
                         `${response.data.personName.firstname} ${response.data.personName.lastname}`;

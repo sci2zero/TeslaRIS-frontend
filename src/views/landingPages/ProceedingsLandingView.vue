@@ -42,7 +42,10 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
+                                <!-- <citation-selector
+                                    ref="citationRef"
+                                    :document-id="parseInt(currentRoute.params.id as string)">
+                                </citation-selector> -->
                                 <div v-if="proceedings?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>
@@ -151,7 +154,7 @@
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-if="canEdit || (proceedings?.contributions && proceedings?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
+                {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -161,7 +164,13 @@
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="publications">
                 <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    in-comparator
+                    show-publication-concrete-type
+                    @switch-page="switchPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -175,7 +184,13 @@
                 <attachment-section :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="proceedings?.id" :contribution-list="proceedings?.contributions ? proceedings?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <person-document-contribution-tabs
+                    :document-id="proceedings?.id"
+                    :contribution-list="proceedings?.contributions ? proceedings?.contributions : []"
+                    :read-only="!canEdit"
+                    shows-board-and-reviewers
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">
@@ -231,13 +246,12 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import CitationSelector from '@/components/publication/CitationSelector.vue';
 import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, CitationSelector },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
     setup() {
         const currentTab = ref("");
 
@@ -273,8 +287,6 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore= useLoginStore();
-
-        const citationRef = ref<typeof CitationSelector>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -324,7 +336,6 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-            citationRef.value?.fetchCitations();
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -456,7 +467,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
-            documentIndicators, StatisticsType, currentRoute, citationRef
+            documentIndicators, StatisticsType, currentRoute
         };
 }})
 
