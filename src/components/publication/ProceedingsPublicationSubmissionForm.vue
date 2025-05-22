@@ -39,7 +39,7 @@
                             :form-props="{conference: selectedEvent ? selectedEvent : searchPlaceholder}"
                             entity-name="Proceedings"
                             is-submission
-                            :read-only="false"
+                            :read-only="selectedEvent.value === -1"
                             @create="selectNewlyAddedProceedings"
                         />
                     </v-col>

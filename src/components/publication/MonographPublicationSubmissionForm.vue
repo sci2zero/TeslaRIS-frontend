@@ -4,7 +4,12 @@
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
                     <v-col cols="11">
-                        <monograph-autocomplete-search ref="eventAutocompleteRef" v-model="selectedMonograph" required></monograph-autocomplete-search>
+                        <monograph-autocomplete-search
+                            ref="eventAutocompleteRef"
+                            v-model="selectedMonograph"
+                            required
+                            only-books>
+                        </monograph-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length > 0">

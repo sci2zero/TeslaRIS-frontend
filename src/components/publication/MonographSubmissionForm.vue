@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
-                    <v-col>
+                    <v-col cols="12">
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
                 </v-row>
@@ -19,16 +19,6 @@
                             :label="$t('monographTypeLabel') + '*'"
                             :items="monographTypes"
                             :rules="requiredSelectionRules"
-                            return-object
-                        ></v-select>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-select
-                            v-model="selectedResearchArea"
-                            :label="$t('researchAreaLabel')"
-                            :items="researchAreasSelectable"
                             return-object
                         ></v-select>
                     </v-col>
@@ -81,6 +71,17 @@
                     <v-row>
                         <v-col>
                             <v-select
+                                v-model="selectedResearchArea"
+                                :label="$t('researchAreaLabel')"
+                                :placeholder="$t('researchAreaLabel')"
+                                :items="researchAreasSelectable"
+                                return-object
+                            ></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-select
                                 v-model="selectedLanguages"
                                 :label="$t('languageLabel')"
                                 :items="languageList"
@@ -116,11 +117,11 @@
                             <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <!-- <v-row>
                         <v-col cols="12">
                             <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
                         </v-col>
-                    </v-row>
+                    </v-row> -->
                 </v-container>
             </v-col>
         </v-row>
@@ -147,7 +148,6 @@ import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import UriInput from '../core/UriInput.vue';
-import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
 import type { MonographType, Monograph } from "@/models/PublicationModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
@@ -166,7 +166,7 @@ import Toast from '../core/Toast.vue';
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast},
     props: {
         inModal: {
             type: Boolean,
@@ -184,6 +184,7 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
+        const noDataMessage = computed(() => i18n.t("noDataMessage"));
 
         const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -204,6 +205,8 @@ export default defineComponent({
                 allResearchAreas.value = response.data;
                 populateSelectionData();
             });
+
+            selectedResearchArea.value.title = noDataMessage.value;
         });
 
         const populateSelectionData = () => {
@@ -220,7 +223,6 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
 
-        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
         const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
 
@@ -234,6 +236,7 @@ export default defineComponent({
 
         const allResearchAreas = ref<ResearchArea[]>([]);
         const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
+
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
         const title = ref([]);
@@ -324,7 +327,6 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
-                    eventAutocompleteRef.value?.clearInput();
                     doi.value = "";
                     scopus.value = "";
                     numberOfPages.value = null;
@@ -350,7 +352,7 @@ export default defineComponent({
             isFormValid, additionalFields,
             snackbar, message, researchAreasSelectable,
             title, titleRef, subtitle, subtitleRef,
-            eventAutocompleteRef, selectedEvent, doiValidationRules,
+            selectedEvent, doiValidationRules,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
             description, descriptionRef, requiredSelectionRules,

@@ -1,6 +1,6 @@
 <template>
     <v-row v-if="!selectExternalAssociate">
-        <v-col cols="11">
+        <v-col :cols="canUserAddPersons ? 11 : 12">
             <v-autocomplete
                 v-model="selectedPerson"
                 :label="$t('personLabel') + '*'"
@@ -13,7 +13,7 @@
                 @update:model-value="onPersonSelect($event)"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1">
+        <v-col v-if="canUserAddPersons" cols="1">
             <generic-crud-modal
                 :form-component="PersonSubmissionForm"
                 entity-name="Person"
@@ -129,6 +129,7 @@ import { localiseDate } from "@/i18n/dateLocalisation";
 import { removeTrailingPipeRegex } from "@/utils/StringUtil";
 import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -155,6 +156,8 @@ export default defineComponent({
     },
     emits: ["setInput"],
     setup(props, {emit}) {
+        const { canUserAddPersons } = useUserRole();
+
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
 
@@ -327,7 +330,12 @@ export default defineComponent({
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
                 personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
-                    personAffiliations.value.push({title: returnCurrentLocaleContent(employment.organisationUnitName) as string, value: employment.organisationUnitId as number});
+                    personAffiliations.value.push(
+                        {
+                            title: returnCurrentLocaleContent(employment.organisationUnitName) as string,
+                            value: employment.organisationUnitId as number
+                        }
+                    );
                 });
 
                 selectedAffiliations.value.splice(0);
@@ -397,7 +405,7 @@ export default defineComponent({
                 personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput,
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
-                PersonSubmissionForm, enterExternalOU
+                PersonSubmissionForm, enterExternalOU, canUserAddPersons
             };
     }
 });

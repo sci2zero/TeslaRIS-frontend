@@ -156,6 +156,7 @@ export enum MonographType {
     BOOK = "BOOK",
     BIBLIOGRAPHY = "BIBLIOGRAPHY",
     TRANSLATION = "TRANSLATION",
+    STUDY = "STUDY"
 }
 
 export interface Monograph extends Document {

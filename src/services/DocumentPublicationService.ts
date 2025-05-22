@@ -164,8 +164,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.patch, `document/${publicationId}/reorder-contribution/${contributionId}`, {oldContributionOrderNumber: oldOrderNumber, newContributionOrderNumber: newOrderNumber});
   }
 
-  async searchMonographs(tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `monograph/simple-search?${tokens}`);
+  async searchMonographs(tokens: string, onlyBooks: boolean = false): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `monograph/simple-search?${tokens}&onlyBooks=${onlyBooks}`);
   }
 
   async findMyPublicationsInMonograph(monographId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {

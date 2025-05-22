@@ -158,7 +158,12 @@
                 {{ $t("additionalActionsLabel") }}
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
+                <person-other-name-modal
+                    :preset-person="person"
+                    :read-only="!canEdit"
+                    @update="updateNames"
+                    @select-primary="selectPrimaryName"
+                />
                 <generic-crud-modal
                     class="ml-2" 
                     :form-component="AssessmentResearchAreaForm"
