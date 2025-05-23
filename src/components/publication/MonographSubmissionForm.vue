@@ -4,12 +4,22 @@
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="publicationYear"
+                            :rules="requiredFieldRules"
+                            :label="$t('yearOfPublicationLabel') + '*'"
+                            :placeholder="$t('yearOfPublicationLabel')">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -19,28 +29,49 @@
                             :label="$t('monographTypeLabel') + '*'"
                             :items="monographTypes"
                             :rules="requiredSelectionRules"
+                            :disabled="inModal"
                             return-object
                         ></v-select>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="doi"
+                            label="DOI"
+                            placeholder="DOI"
+                            :rules="doiValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="eIsbn"
+                            label="E-ISBN"
+                            placeholder="E-ISBN"
+                            :rules="isbnValidationRules">
+                        </v-text-field>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="printIsbn"
+                            label="Print ISBN"
+                            placeholder="Print ISBN"
+                            :rules="isbnValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
 
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            :required="false"
+                            @set-input="contributions = $event">
+                        </person-publication-contribution>
                     </v-col>
                 </v-row>
                 
@@ -50,17 +81,31 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="descriptionRef"
+                                v-model="description"
+                                is-area
+                                :label="$t('abstractLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="keywordsRef"
+                                v-model="keywords"
+                                :label="$t('keywordsLabel')"
+                                is-area>
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -91,35 +136,66 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                            <v-text-field
+                                v-model="numberOfPages"
+                                type="number"
+                                :label="$t('numberOfPagesLabel')"
+                                :placeholder="$t('numberOfPagesLabel')">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
+                            <journal-autocomplete-search
+                                ref="journalAutocompleteRef"
+                                v-model="selectedJournal"
+                                allow-manual-clearing
+                                :external-validation="publicationSeriesExternalValidation">
+                            </journal-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
+                            <book-series-autocomplete-search
+                                ref="bookSeriesAutocompleteRef"
+                                v-model="selectedBookSeries"
+                                allow-manual-clearing
+                                :external-validation="publicationSeriesExternalValidation">
+                            </book-series-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="6">
-                            <v-text-field v-model="number" :label="$t('numberLabel')" :placeholder="$t('numberLabel')"></v-text-field>
+                            <v-text-field
+                                v-model="number"
+                                :label="$t('numberLabel')"
+                                :placeholder="$t('numberLabel')">
+                            </v-text-field>
                         </v-col>
                         <v-col cols="6">
-                            <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                            <v-text-field
+                                v-model="volume"
+                                :label="$t('volumeLabel')"
+                                :placeholder="$t('volumeLabel')">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <!-- <v-row>
                         <v-col cols="12">
-                            <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
+                            <event-autocomplete-search
+                                ref="eventAutocompleteRef"
+                                v-model="selectedEvent">
+                            </event-autocomplete-search>
                         </v-col>
                     </v-row> -->
                 </v-container>
@@ -149,7 +225,7 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import UriInput from '../core/UriInput.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import type { MonographType, Monograph } from "@/models/PublicationModel";
+import { MonographType, type Monograph } from "@/models/PublicationModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
@@ -162,6 +238,7 @@ import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
+import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 
 
 export default defineComponent({
@@ -207,6 +284,13 @@ export default defineComponent({
             });
 
             selectedResearchArea.value.title = noDataMessage.value;
+
+            if (props.inModal) {
+                selectedMonographType.value = {
+                    title: getMonographTypeTitleFromValueAutoLocale(MonographType.BOOK) as string,
+                    value: MonographType.BOOK
+                };
+            }
         });
 
         const populateSelectionData = () => {

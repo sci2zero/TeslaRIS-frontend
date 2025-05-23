@@ -5,6 +5,7 @@
                 <person-contribution-base
                     :ref="(el) => (baseContributionRef[index] = el)"
                     :basic="basic"
+                    :required="required"
                     :preset-contribution-value="input.contribution"
                     :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
                     @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
@@ -97,6 +98,10 @@ export default defineComponent({
             default: false
         },
         allowExternalAssociate: {
+            type: Boolean,
+            default: true
+        },
+        required: {
             type: Boolean,
             default: true
         }

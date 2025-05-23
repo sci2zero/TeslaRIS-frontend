@@ -86,14 +86,14 @@
                             <span v-if="item.authorNames.trim() === ''">
                                 {{ displayTextOrPlaceholder(item.authorNames) }}
                             </span>
-                            <span v-for="(employment, index) in item.authorNames.split('; ')" v-else :key="index">
+                            <span v-for="(employment, index) in item.authorNames.split(';')" v-else :key="index">
                                 <localized-link
                                     v-if="item.authorIds[index] !== -1"
                                     :to="'persons/' + item.authorIds[index]"
                                 >
-                                    {{ `${employment}; ` }}
+                                    {{ `${employment}👤;` }}
                                 </localized-link>
-                                <span v-else>{{ `${employment}; ` }}</span>
+                                <span v-else>{{ `${employment};` }}</span>
                             </span>
                         </td>
                         <td>
@@ -125,8 +125,12 @@
                                 </template>
 
                                 <v-list min-width="150">
-                                    <publication-reference-formats :document-id="(item.databaseId as number)"></publication-reference-formats>
-                                    <publication-file-download-modal :document-id="(item.databaseId as number)"></publication-file-download-modal>
+                                    <publication-reference-formats
+                                        :document-id="(item.databaseId as number)"
+                                    />
+                                    <publication-file-download-modal
+                                        :document-id="(item.databaseId as number)"
+                                    />
                                 </v-list>
                             </v-menu>
                             <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">

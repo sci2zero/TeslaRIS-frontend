@@ -3,10 +3,10 @@
         <v-col :cols="canUserAddPersons ? 11 : 12">
             <v-autocomplete
                 v-model="selectedPerson"
-                :label="$t('personLabel') + '*'"
+                :label="$t('personLabel') + (required ? '*' : '')"
                 :items="persons"
                 :custom-filter="filterPersons"
-                :rules="requiredSelectionRules"
+                :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchPersons($event)"
@@ -150,6 +150,10 @@ export default defineComponent({
             })
         },
         allowExternalAssociate: {
+            type: Boolean,
+            default: true
+        },
+        required: {
             type: Boolean,
             default: true
         }
