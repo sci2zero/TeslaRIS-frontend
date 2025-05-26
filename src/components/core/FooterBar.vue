@@ -19,7 +19,6 @@
                 </div>
                 <div class="text-center" cols="12">
                     <version-link></version-link>
-                
                 </div>
             </v-row>
         </v-footer>
