@@ -883,5 +883,8 @@ export default {
     boardAndReviewersLabel: "Odbor i recenzenti",
     conferenceAbbreviationLabel: "Skraćeni naziv konferencije",
     dateRangeFormatError: "Krajnji datum ne može biti pre početnog",
-    unauthorisedToViewDocumentMessage: "Nemate ovlašćenje da pristupite ovom dokumentu."
+    unauthorisedToViewDocumentMessage: "Nemate ovlašćenje da pristupite ovom dokumentu.",
+    tableLabel: "Tabela",
+    wordcloudLabel: "Oblak reči",
+    resultRepresentationLabel: "Prikaz rezultata"
 }

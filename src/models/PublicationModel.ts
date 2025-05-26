@@ -262,3 +262,8 @@ export interface ThesisLibraryFormatsResponse {
     dublinCore: string;
     marc21: string;
 }
+
+export interface TermFrequency {
+    a: string;
+    b: number;
+}

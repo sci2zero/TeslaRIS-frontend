@@ -857,5 +857,8 @@ export default {
     boardAndReviewersLabel: "Board and reviewers",
     conferenceAbbreviationLabel: "Conference name abbreviation",
     dateRangeFormatError: "End date cannot be before start date",
-    unauthorisedToViewDocumentMessage: "You do not have the authorization to access this document."
+    unauthorisedToViewDocumentMessage: "You do not have the authorization to access this document.",
+    tableLabel: "Table",
+    wordcloudLabel: "Word cloud",
+    resultRepresentationLabel: "Result representation"
 }

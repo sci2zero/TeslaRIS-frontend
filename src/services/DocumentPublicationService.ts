@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import type { CitationResponse, Dataset, Document, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import type { CitationResponse, Dataset, Document, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, TermFrequency, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -258,6 +258,10 @@ export class DocumentPublicationService extends BaseService {
 
   async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
     return super.sendRequest(axios.get, `document/fields?export=${onlyExportFields}`);
+  }
+
+  async getWordcloudForSingleDocument(documentId: number): Promise<AxiosResponse<TermFrequency[]>> {
+    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?foreignLanguage=${i18n.vueI18n.global.locale !== 'sr'}`);
   }
 }
 

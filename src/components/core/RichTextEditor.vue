@@ -24,9 +24,10 @@
 <script lang="ts">
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { computed, defineComponent, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import Placeholder from '@tiptap/extension-placeholder'
 import { useI18n } from 'vue-i18n';
+import lodash from "lodash";
 
 
 export default defineComponent({
@@ -47,6 +48,12 @@ export default defineComponent({
         const i18n = useI18n();
         const placeholder = computed(() => i18n.t("writeSomethingPlaceholder"));
 
+        const lastKeyCode = ref("");
+        document.addEventListener('keypress', function (e){
+            const nowKeyCode = e.key;
+            lastKeyCode.value = nowKeyCode;
+        });
+
         const editor = useEditor({
             content: props.modelValue,
             extensions: [
@@ -60,13 +67,25 @@ export default defineComponent({
 
         watch(
             () => editor.value?.getHTML(),
-            (newValue) => {
-                if (newValue !== props.modelValue) {
-                    newValue = newValue.replace(/\s/g, "\u0020");
-                    emit('update:modelValue', newValue);
-                    emit("input");
+            lodash.debounce((newVal) => {
+                const editorInstance = editor.value;
+                if (!editorInstance) return;
+
+                if (lastKeyCode.value === " ") return;
+
+                if (!props.editable) {
+                    editorInstance.commands.setContent(newVal);
+                } else {
+                    const { state } = editorInstance;
+                    const { from, to } = state.selection;
+
+                    editorInstance.commands.setContent(newVal);
+                    editorInstance.commands.setTextSelection({ from, to });
                 }
-            }
+
+                emit('update:modelValue', newVal);
+                emit("input");
+            }, 500)
         );
 
         watch(() => props.modelValue, () => {

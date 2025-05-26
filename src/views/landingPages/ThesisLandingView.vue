@@ -19,9 +19,10 @@
         <!-- Thesis Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-thesis-icon">
+                <v-icon v-if="!thesis" size="x-large" class="large-thesis-icon">
                     {{ icon }}
                 </v-icon>
+                <wordcloud v-else :for-document-id="thesis?.id" compact-icon />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -367,11 +368,12 @@ import ThesisResearchOutputSection from '@/components/publication/ThesisResearch
 import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import { type RegistryBookEntry } from '@/models/ThesisLibraryModel';
+import Wordcloud from '@/components/core/Wordcloud.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud },
     setup() {
         const currentTab = ref("contributions");
 
