@@ -145,7 +145,7 @@ export default defineComponent({
             { title: "Public Domain", value: AccessRights.PUBLIC_DOMAIN },
             { title: "Open Access", value: AccessRights.OPEN_ACCESS },
             { title: "All Rights Reserved", value: AccessRights.ALL_RIGHTS_RESERVED },
-            { title: "Subscription-Based Access", value: AccessRights.SUBSCRIPTION_BASED_ACCESS },
+            { title: "Restricted Access", value: AccessRights.RESTRICTED_ACCESS },
         ];
 
         const cclicenseTypes = [
@@ -176,7 +176,7 @@ export default defineComponent({
             if (props.allowLicenceSelection) {
                 newDocumentFile.accessRights = selectedLicense.value.value;
             } else {
-                newDocumentFile.accessRights = isOpenAccess.value ? AccessRights.OPEN_ACCESS : AccessRights.SUBSCRIPTION_BASED_ACCESS;
+                newDocumentFile.accessRights = isOpenAccess.value ? AccessRights.OPEN_ACCESS : AccessRights.RESTRICTED_ACCESS;
             }
 
             if(props.edit) {

@@ -125,7 +125,7 @@ export default {
     firstNameLabel: "Ime",
     surnameLabel: "Prezime",
     noteLabel: "Napomena",
-    preferredLanguageLabel: "Izabrani jezik za obaveštenja",
+    preferredLanguageLabel: "Izabrani jezik interfejsa",
     languageLabel: "Jezik",
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
@@ -858,5 +858,6 @@ export default {
     nogeneratedBackupsLabel: "Nema bekapa za preuzimanje.",
     backupDownloadWarning: "Bekap će biti automatski obrisan nakon preuzimanja radi oslobađanja prostora na disku. Molimo vas da ga preuzmete i sačuvate na sigurnom mestu.",
     additionalActionsLabel: "Dodatne akcije",
-    publicationsNotForInstitutionLabel: "Vaše publikacije koje nisu u ovoj instituciji:"
+    publicationsNotForInstitutionLabel: "Vaše publikacije koje nisu u ovoj instituciji:",
+    metadataFormatLabel: "Format metapodataka"
 }

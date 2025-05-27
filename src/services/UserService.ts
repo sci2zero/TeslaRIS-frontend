@@ -20,6 +20,11 @@ export class UserService extends BaseService {
     return decoded.role;
   }
 
+  provideUserPreferredUILanguage(): string {
+    const decoded = this.getDecodedJwt();
+    return decoded.uiLang;
+  }
+
   invalidateCaches(): void {
     this.cachedUser = null;
   }

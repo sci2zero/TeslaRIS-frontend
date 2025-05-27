@@ -125,7 +125,7 @@ export default {
     firstNameLabel: "Name",
     surnameLabel: "Surname",
     noteLabel: "Note",
-    preferredLanguageLabel: "Preferred notification language",
+    preferredLanguageLabel: "Preferred interface language",
     languageLabel: "Language",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
@@ -832,5 +832,6 @@ export default {
     nogeneratedBackupsLabel: "No downloadable backups.",
     backupDownloadWarning: "The backup will be automatically deleted after download to free up disk space. Please make sure to save it securely.",
     additionalActionsLabel: "Additional actions",
-    publicationsNotForInstitutionLabel: "Your publications that are not tied to this institution:"
+    publicationsNotForInstitutionLabel: "Your publications that are not tied to this institution:",
+    metadataFormatLabel: "Metadata format"
 }

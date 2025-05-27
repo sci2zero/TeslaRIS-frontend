@@ -209,7 +209,9 @@ export default defineComponent({
                     
                     if (language.languageCode === preferredUILanguage) {
                         selectedLanguage.value = { title: language.languageCode, value: language.id};
-                    } else if (language.languageCode === preferredReferenceCataloguingLanguage) {
+                    }
+                    
+                    if (language.languageCode === preferredReferenceCataloguingLanguage) {
                         selectedReferenceLanguage.value = { title: language.languageCode, value: language.id};
                     }
                 })

@@ -13,7 +13,7 @@ export enum AccessRights {
     EMBARGOED_ACCESS,
     OPEN_ACCESS,
     PUBLIC_DOMAIN,
-    SUBSCRIPTION_BASED_ACCESS
+    RESTRICTED_ACCESS
 }
 
 export enum License {
