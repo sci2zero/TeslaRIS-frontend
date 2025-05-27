@@ -91,7 +91,7 @@
                                     v-if="item.authorIds[index] !== -1"
                                     :to="'persons/' + item.authorIds[index]"
                                 >
-                                    {{ `${employment}👤;` }}
+                                    {{ `👤${employment};` }}
                                 </localized-link>
                                 <span v-else>{{ `${employment};` }}</span>
                             </span>

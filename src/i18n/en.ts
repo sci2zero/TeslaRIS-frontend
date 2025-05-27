@@ -860,5 +860,6 @@ export default {
     unauthorisedToViewDocumentMessage: "You do not have the authorization to access this document.",
     tableLabel: "Table",
     wordcloudLabel: "Word cloud",
-    resultRepresentationLabel: "Result representation"
+    resultRepresentationLabel: "Result representation",
+    updateProceedingsPublicationLabel: "Update proceedings publication"
 }

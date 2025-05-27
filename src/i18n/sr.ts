@@ -886,5 +886,6 @@ export default {
     unauthorisedToViewDocumentMessage: "Nemate ovlašćenje da pristupite ovom dokumentu.",
     tableLabel: "Tabela",
     wordcloudLabel: "Oblak reči",
-    resultRepresentationLabel: "Prikaz rezultata"
+    resultRepresentationLabel: "Prikaz rezultata",
+    updateProceedingsPublicationLabel: "Ažuriraj rad sa konferencije"
 }

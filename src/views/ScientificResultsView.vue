@@ -60,7 +60,15 @@
                 class="ml-4 mt-3"
             ></v-checkbox>
         </span>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="3"
+            layout="table"
+        />
         <publication-table-component
+            v-else
             ref="tableRef"
             :publications="publications"
             :total-publications="totalPublications"
@@ -93,13 +101,15 @@ import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAuto
 import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Common';
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ScientificResultsListView",
-    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu },
+    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu, TabContentLoader },
     setup() {
         const currentTab = ref("simpleSearch");
+        const loading = ref(false);
 
         const searchParams = ref("tokens=");
         const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
@@ -123,6 +133,7 @@ export default defineComponent({
         const searchFields = ref<SearchFieldsResponse[]>([]);
 
         onMounted(() => {
+            loading.value = true;
             document.title = i18n.t("scientificResultsListLabel");
 
             selectedPublicationTypes.value.splice(0);
@@ -164,6 +175,7 @@ export default defineComponent({
                 ).then((response) => {
                     publications.value = response.data.content;
                     totalPublications.value = response.data.totalElements;
+                    loading.value = false;
                 });
             } else {
                 DocumentPublicationService.performAdvancedSearch(
@@ -174,6 +186,7 @@ export default defineComponent({
                 ).then((response) => {
                     publications.value = response.data.content;
                     totalPublications.value = response.data.totalElements;
+                    loading.value = false;
                 });
             }
         };
@@ -211,7 +224,7 @@ export default defineComponent({
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
-            resetFiltersAndSearch, loggedInUser
+            resetFiltersAndSearch, loggedInUser, loading
         };
     }
 });
