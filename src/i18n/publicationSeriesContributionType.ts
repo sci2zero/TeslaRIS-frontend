@@ -16,22 +16,22 @@ export const contributionTypesSr = [
     { title: "Član naučnog odbora", value: PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER },
 ];
 
-export const getTitleFromValue = (value: PublicationSeriesContributionType, resourceTypeArray: {title: string, value: PublicationSeriesContributionType}[]) => {
-    return (resourceTypeArray.find(item => getNameFromOrdinal(PublicationSeriesContributionType, item.value) === value.toString()) || {}).title;
+export const getTitleFromValue = (value: PublicationSeriesContributionType, contributionTypeArray: {title: string, value: PublicationSeriesContributionType}[]) => {
+    return (contributionTypeArray.find(item => getNameFromOrdinal(PublicationSeriesContributionType, item.value) === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: PublicationSeriesContributionType) => {
     const locale = i18n.vueI18n.global.locale;
     
-    let resourceTypeArray = contributionTypesEn;
+    let contributionTypeArray = contributionTypesEn;
     if (locale == "sr") {
-        resourceTypeArray = contributionTypesSr;
+        contributionTypeArray = contributionTypesSr;
     }
 
     if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+        return (contributionTypeArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(PublicationSeriesContributionType, item.value) === value) || {}).title;
+        return (contributionTypeArray.find(item => getNameFromOrdinal(PublicationSeriesContributionType, item.value) === value) || {}).title;
     }
 };
 

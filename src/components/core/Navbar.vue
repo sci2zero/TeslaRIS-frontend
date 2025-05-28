@@ -30,7 +30,7 @@
 
                                     <v-list>
                                         <v-list-item
-                                            v-for="(subItem, index) in item.subItems"
+                                            v-for="(subItem, index) in item.subItems?.filter(subItem => subItem.condition != false)"
                                             :key="index" class="ps-5 pe-5" :value="item.title"
                                             :to="subItem.pathName !== undefined ? '/' + $i18n.locale + '/' + subItem.pathName : undefined"
                                             link
@@ -129,7 +129,7 @@ import type { Component } from 'vue';
 import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
@@ -183,7 +183,6 @@ export default defineComponent(
             const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
             const countryListLabel = computed(() => i18n.t("countryListLabel"));
             const researchAreaListLabel = computed(() => i18n.t("researchAreaListLabel"));
-            const documentClaimLabel = computed(() => i18n.t("documentClaimLabel"));
             const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
             const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
@@ -193,18 +192,20 @@ export default defineComponent(
             const reportingLabel = computed(() => i18n.t("reportingLabel"));
             const mServiceLabel = computed(() => i18n.t("mServiceLabel"));
             const brandingLabel = computed(() => i18n.t("brandingLabel"));
-            const massInstitutionAssignmentLabel = computed(() => i18n.t("massInstitutionAssignmentLabel"));
             const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
             const institutionProfileLabel = computed(() => i18n.t("institutionProfileLabel"));
             const thesisLibraryLabel = computed(() => i18n.t("thesisLibraryLabel"));
+            const promotionListLabel = computed(() => i18n.t("promotionListLabel"));
+            const registryBookLabel = computed(() => i18n.t("registryBookLabel"));
             const healthCheckLabel = computed(() => i18n.t("routeLabel.healthCheck"));
+            const backupLabel = computed(() => i18n.t("backupLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
             
             const appTitle = ref();
             const sidebar = ref(false);
-            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian } = useUserRole();
+            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 
             const loginStore = useLoginStore();
             const userName = ref("");
@@ -259,10 +260,11 @@ export default defineComponent(
                 }
             });
 
-            const personsAndOU = ref<MenuItem[]>([
+            const resourcesMenu = ref<MenuItem[]>([
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
                 { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' },
+                { title: backupLabel, type:'icon-link', pathName: 'document-backup', condition: computed(() => (isAdmin.value || isInstitutionalEditor.value)) }
             ]);
 
             const manageMenu = ref<MenuItem[]>([
@@ -287,28 +289,29 @@ export default defineComponent(
 
             const thesisLibraryMenu = ref<MenuItem[]>([
                 { title: reportingLabel, type:'icon-link', pathName: 'thesis-library-reporting', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value)) },
-                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' }
+                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' },
+                { title: promotionListLabel, type:'icon-link', pathName: 'promotions', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
+                { title: registryBookLabel, type:'icon-link', pathName: 'registry-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
+                { title: backupLabel, type:'icon-link', pathName: 'thesis-library-backup', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([
                 { title: homeLabel, type: 'icon-link', pathName:"" },
-                { title: resourcesLabel, type: 'menu', subItems: personsAndOU },
+                { title: resourcesLabel, type: 'menu', subItems: resourcesMenu },
                 { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
                 { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
                 { title: institutionProfileLabel, type: 'dynamic', pathName: `organisation-units`, dynamicValue: computed(() => institutionId.value), condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-                { title: documentClaimLabel, type: 'icon-link', pathName: 'document-claim', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isHeadOfLibrary.value || isResearcher.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)) },
+                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isViceDeanForScience.value)) },
-                { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: true },
-                { title: massInstitutionAssignmentLabel, type:'icon-link', pathName: 'mass-institution-assignment', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
+                { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: true }
             ]);
 
             const menuItems = ref<MenuItem[]>([

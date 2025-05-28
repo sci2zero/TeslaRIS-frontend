@@ -20,12 +20,12 @@ export const indicatorSourceEn = [
 export const getIndicatorSourceTitleFromValueAutoLocale = (value: EntityIndicatorSource) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = indicatorSourceEn;
+    let entityIndicatorSourceArray = indicatorSourceEn;
     if (locale == "sr") {
-        resourceTypeArray = indicatorSourceSr;
+        entityIndicatorSourceArray = indicatorSourceSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (entityIndicatorSourceArray.find(item => item.value === value) || {}).title;
 };
 
 export const getIndicatorSourceForGivenLocale = () => {

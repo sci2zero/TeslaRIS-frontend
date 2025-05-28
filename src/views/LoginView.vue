@@ -73,6 +73,7 @@ import { useRouteStore } from "@/stores/routeStore";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import Toast from "@/components/core/Toast.vue";
 import UserService from "@/services/UserService";
+import { useInterval } from "@/composables/useInterval";
 
 
 export default defineComponent(
@@ -117,7 +118,7 @@ export default defineComponent(
                     cooldown.value = false;
                 }, totalTime);
 
-                setInterval(() => {
+                useInterval(() => {
                     elapsedTime.value += interval;
 
                     if (elapsedTime.value >= totalTime) {
@@ -143,21 +144,23 @@ export default defineComponent(
                     localStorage.setItem("refreshToken", response.data.refreshToken);
 
                     loginStore.emitLoginSuccess();
+                    const preferredUILanguage = UserService.provideUserPreferredUILanguage();
+
                     if (routeStore.nextRoute != null) {
                         const routeName = routeStore.fetchAndClearRoute();
                         const routeParams = routeStore.fetchAndClearParams();
                         
-                        router.push({ name: routeName, params: routeParams });
+                        router.push({ name: routeName, params: {...routeParams, locale: preferredUILanguage } });
                         return;
                     }
 
                     const userRole = UserService.provideUserRole();
                     if (userRole === "INSTITUTIONAL_LIBRARIAN" || userRole === "HEAD_OF_LIBRARY") {
-                        router.push({ name: "scientificResults" });
+                        router.push({ name: "scientificResults", params: { locale: preferredUILanguage } });
                         return;
                     }
 
-                    router.push({ name: "home" });
+                    router.push({ name: "home", params: { locale: preferredUILanguage } });
                 }).catch(() => {
                     snackbar.value = true;
                 });

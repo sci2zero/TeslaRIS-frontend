@@ -166,6 +166,7 @@ import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/Or
 import EventAutocompleteSearch from "@/components/event/EventAutocompleteSearch.vue";
 import { PublicationType } from "@/models/PublicationModel";
 import { getReportTypesForGivenLocale } from "@/i18n/reportType";
+import { useInterval } from "@/composables/useInterval";
 
 
 export default defineComponent({
@@ -243,7 +244,7 @@ export default defineComponent({
 
             setTimeout(() => {
                 fetchScheduledTasks();
-                setInterval(fetchScheduledTasks, 1000 * 60);
+                useInterval(fetchScheduledTasks, 1000 * 60);
             }, millisecondsUntilNextMinute);
         });
 

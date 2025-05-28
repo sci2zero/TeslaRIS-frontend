@@ -16,6 +16,7 @@
                 <register-employee-modal :employee-role="UserRole.COMMISSION" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
                 <register-employee-modal :employee-role="UserRole.INSTITUTIONAL_LIBRARIAN" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
                 <register-employee-modal :employee-role="UserRole.HEAD_OF_LIBRARY" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
             </v-list>
         </v-menu>
     </v-row>
@@ -70,7 +71,7 @@ import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/stores/loginStore';
 import RegisterEmployeeModal from '@/components/user/RegisterEmployeeModal.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getTitleFromValueAutoLocale } from '@/i18n/userTypes';
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import Toast from '../core/Toast.vue';
 
 

@@ -24,22 +24,22 @@ export const proceedingsPublicationTypeSr = [
     { title: "Naučna kritika", value: ProceedingsPublicationType.SCIENTIFIC_CRITIC },
 ];
 
-export const getTitleFromValue = (value: ProceedingsPublicationType, resourceTypeArray: {title: string, value: ProceedingsPublicationType}[]) => {
-    return (resourceTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value.toString()) || {}).title;
+export const getTitleFromValue = (value: ProceedingsPublicationType, proceedingsPublicationTypeArray: {title: string, value: ProceedingsPublicationType}[]) => {
+    return (proceedingsPublicationTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = proceedingsPublicationTypeEn;
+    let proceedingsPublicationTypeArray = proceedingsPublicationTypeEn;
     if (locale == "sr") {
-        resourceTypeArray = proceedingsPublicationTypeSr;
+        proceedingsPublicationTypeArray = proceedingsPublicationTypeSr;
     }
 
     if (typeof value === "number") {
-        return (resourceTypeArray.find(item => item.value === value) || {}).title;
+        return (proceedingsPublicationTypeArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
-        return (resourceTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value) || {}).title;
+        return (proceedingsPublicationTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value) || {}).title;
     }
 };
 

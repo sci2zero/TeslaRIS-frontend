@@ -23,12 +23,25 @@
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="6">
                 <v-text-field
                     v-model="email"
                     :label="$t('emailLabel')"
                     :rules="emailFieldRules"
                 ></v-text-field>
+            </v-col>
+            <v-col v-if="!isAdmin" cols="6">
+                <v-autocomplete
+                    v-model="selectedOrganisationUnit"
+                    :label="$t('organisationUnitLabel')"
+                    :items="organisationUnits"
+                    :custom-filter="filterOUs"
+                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator) ? requiredSelectionRules : []"
+                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator"
+                    :no-data-text="$t('noDataMessage')"
+                    return-object
+                    @update:search="searchOUs($event)"
+                ></v-autocomplete>
             </v-col>
             <v-col cols="6">
                 <v-select
@@ -38,18 +51,13 @@
                     return-object
                 ></v-select>
             </v-col>
-            <v-col v-if="!isAdmin" cols="6">
-                <v-autocomplete
-                    v-model="selectedOrganisationUnit"
-                    :label="$t('organisationUnitLabel')"
-                    :items="organisationUnits"
-                    :custom-filter="filterOUs"
-                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary) ? requiredSelectionRules : []"
-                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary"
-                    :no-data-text="$t('noDataMessage')"
+            <v-col cols="6">
+                <v-select
+                    v-model="selectedReferenceLanguage"
+                    :label="$t('preferredReferenceLanguageLabel')"
+                    :items="languages"
                     return-object
-                    @update:search="searchOUs($event)"
-                ></v-autocomplete>
+                ></v-select>
             </v-col>
         </v-row>
         <v-row>
@@ -110,7 +118,7 @@ import { computed } from "vue";
 import UserService from "@/services/UserService";
 import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
-import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriods";
+import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriod";
 import { useRouter } from "vue-router";
 import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";
@@ -136,6 +144,7 @@ export default defineComponent({
         const email = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
+        const selectedReferenceLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const ouPlaceholder = {title: "", value: -1};
         const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
@@ -145,7 +154,7 @@ export default defineComponent({
         const oldPassword = ref("");
         const newPassword = ref("");
 
-        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor} = useUserRole();
+        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor, isPromotionRegistryAdministrator} = useUserRole();
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
@@ -187,18 +196,23 @@ export default defineComponent({
 
                 researcherId.value = response.data.personId;
                 
-                populateLanguageData(response.data.preferredLanguage);
+                populateLanguageData(response.data.preferredUILanguage, response.data.preferredReferenceCataloguingLanguage);
             });
         };
 
-        const populateLanguageData = (preferredLanguage: string) => {
+        const populateLanguageData = (preferredUILanguage: string, preferredReferenceCataloguingLanguage: string) => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
                 response.data.forEach((language: LanguageResponse) => {
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
-                    if (language.languageCode === preferredLanguage) {
+                    
+                    if (language.languageCode === preferredUILanguage) {
                         selectedLanguage.value = { title: language.languageCode, value: language.id};
+                    }
+                    
+                    if (language.languageCode === preferredReferenceCataloguingLanguage) {
+                        selectedReferenceLanguage.value = { title: language.languageCode, value: language.id};
                     }
                 })
             })
@@ -246,10 +260,11 @@ export default defineComponent({
                 firstname: name.value,
                 lastName: surname.value,
                 email: email.value,
-                preferredLanguageId: selectedLanguage.value.value,
+                preferredUILanguageId: selectedLanguage.value.value,
+                preferredReferenceCataloguingLanguageId: selectedReferenceLanguage.value.value,
                 organisationUnitId: organisationUnitId,
-                oldPassword: oldPassword.value,
-                newPassword: newPassword.value,
+                oldPassword: changePassword.value ? oldPassword.value : "",
+                newPassword: changePassword.value ? newPassword.value : "",
                 notificationPeriod: selectedNotificationPeriod.value.value
             };
 
@@ -283,7 +298,7 @@ export default defineComponent({
         };
 
         return {
-            changePassword, name, surname,
+            changePassword, name, surname, selectedReferenceLanguage,
             organisationUnits, selectedOrganisationUnit, 
             email, showOldPassword, languages, selectedLanguage, 
             searchOUs, filterOUs, allowAccountTakeover, isInstitutionalEditor,
@@ -292,7 +307,8 @@ export default defineComponent({
             isFormValid, notificationPeriods, oldPassword, newPassword,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
-            isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary
+            isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary,
+            isPromotionRegistryAdministrator
         };
     }
 });

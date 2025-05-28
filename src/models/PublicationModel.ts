@@ -1,5 +1,6 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
 import type { PersonContribution } from "./PersonModel";
 
@@ -101,6 +102,8 @@ export interface PersonDocumentContribution extends PersonContribution {
     isMainContributor: boolean;
     isCorrespondingContributor: boolean;
     isBoardPresident: boolean;
+    employmentTitle: EmploymentTitle;
+    personalTitle: PersonalTitle;
 }
 
 export enum DocumentContributionType {

@@ -14,12 +14,12 @@ export const resultCalculationMethodsEn = [
 export const getResultCalculationMethodTitleFromValueAutoLocale = (value: ResultCalculationMethod) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let resourceTypeArray = resultCalculationMethodsEn;
+    let resultCalculationMethodArray = resultCalculationMethodsEn;
     if (locale == "sr") {
-        resourceTypeArray = resultCalculationMethodsSr;
+        resultCalculationMethodArray = resultCalculationMethodsSr;
     }
 
-    return (resourceTypeArray.find(item => item.value === value) || {}).title;
+    return (resultCalculationMethodArray.find(item => item.value === value) || {}).title;
 };
 
 export const getResultCalculationMethodsForGivenLocale = () => {

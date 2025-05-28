@@ -217,7 +217,7 @@ import { useResearchAreas } from '@/composables/useResearchAreas';
 import { JournalPublicationType, MServiceApplicableTypes, ProceedingsPublicationType } from '@/models/PublicationModel';
 import { getNameFromOrdinal } from '@/utils/EnumUtil';
 import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
-import { getMServiceApplicableTypesForGivenLocale, getMServiceApplicableTypeTitleFromValueAutoLocale } from '@/i18n/mServiceApplicableTypes';
+import { getMServiceApplicableTypesForGivenLocale, getMServiceApplicableTypeTitleFromValueAutoLocale } from '@/i18n/mServiceApplicableType';
 import { getTypesForGivenLocale as getJournalPublicationTypes, getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@/i18n/journalPublicationType';
 import { getTypesForGivenLocale as getProceedingsPublicationTypes, getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
 import VueRecaptcha from 'vue3-recaptcha2';

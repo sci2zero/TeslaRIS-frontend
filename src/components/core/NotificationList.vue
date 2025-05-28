@@ -49,6 +49,7 @@
 </template>
   
 <script lang="ts">
+import { useInterval } from '@/composables/useInterval';
 import { NotificationAction } from '@/models/Common';
 import type { Notification } from '@/models/Common';
 import NotificationService from '@/services/NotificationService';
@@ -68,7 +69,7 @@ export default defineComponent({
             fetchNotificationsAndCounts();
 
             // Fetch notifications and counts every 5 minutes
-            setInterval(fetchNotificationsAndCounts, 1000 * 60 * 5);
+            useInterval(fetchNotificationsAndCounts, 1000 * 60 * 5);
         });
 
         const fetchNotificationsAndCounts = () => {
@@ -95,6 +96,8 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("events");
             } else if (action === NotificationAction.PERFORM_DOCUMENT_ASSESSMENT) {
                 decrementCounterAndNavigateToPage("scientificResults");
+            } else if (action === NotificationAction.PROMOTION_NOTIFICATION) {
+                decrementCounterAndNavigateToPage("registryBookList");
             }
         };
 

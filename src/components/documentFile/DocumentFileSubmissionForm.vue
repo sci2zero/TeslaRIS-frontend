@@ -41,6 +41,17 @@
                 <v-row v-else>
                     <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
                 </v-row>
+                <v-row v-if="isOpenAccess">
+                    <v-col>
+                        <v-select
+                            v-model="selectedCCLicense"
+                            :items="cclicenseTypes"
+                            :label="$t('ccLicenseLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
 
@@ -61,7 +72,7 @@ import { computed } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileModel';
 import { resourceTypeSr, resourceTypeEn } from "@/i18n/resourceType";
-import { License, ResourceType } from "@/models/DocumentFileModel";
+import { AccessRights, License, ResourceType } from "@/models/DocumentFileModel";
 import type { PropType } from 'vue';
 import { onMounted } from 'vue';
 import { getNameFromOrdinal } from '@/utils/EnumUtil';
@@ -108,10 +119,11 @@ export default defineComponent({
             
             if(props.edit && props.presetDocumentFile) {
                     file.value = new File([], props.presetDocumentFile.fileName);
-                    selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.license };
+                    selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.accessRights };
 
-                    if (props.presetDocumentFile.license.toString() !== "OPEN_ACCESS") {
-                        isOpenAccess.value = false;
+                    if (props.presetDocumentFile.license.toString() === "OPEN_ACCESS") {
+                        isOpenAccess.value = true;
+                        selectedCCLicense.value = { title: cclicenseTypes.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
                     }
 
                     selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
@@ -128,16 +140,27 @@ export default defineComponent({
         const selectedResourceType = ref(selectionPlaceholder);
 
         const licenses = [
-            { title: "Creative Commons", value: License.CREATIVE_COMMONS },
-            { title: "Embargoed Access", value: License.EMBARGOED_ACCESS },
-            { title: "Public Domain", value: License.PUBLIC_DOMAIN },
-            { title: "Open Access", value: License.OPEN_ACCESS },
-            { title: "All Rights Reserved", value: License.ALL_RIGHTS_RESERVED },
-            { title: "Subscription-Based Access", value: License.SUBSCRIPTION_BASED_ACCESS },
+            { title: "Creative Commons", value: AccessRights.CREATIVE_COMMONS },
+            { title: "Embargoed Access", value: AccessRights.EMBARGOED_ACCESS },
+            { title: "Public Domain", value: AccessRights.PUBLIC_DOMAIN },
+            { title: "Open Access", value: AccessRights.OPEN_ACCESS },
+            { title: "All Rights Reserved", value: AccessRights.ALL_RIGHTS_RESERVED },
+            { title: "Restricted Access", value: AccessRights.RESTRICTED_ACCESS },
         ];
 
-        const selectedLicense = ref({ title: "All Rights Reserved", value: License.ALL_RIGHTS_RESERVED });
-        const isOpenAccess = ref<boolean>(true);
+        const cclicenseTypes = [
+            { title: "CC BY", value: License.BY },
+            { title: "CC BY-SA", value: License.BY_SA },
+            { title: "CC BY-NC", value: License.BY_NC },
+            { title: "CC BY-NC-SA", value: License.BY_NC_SA },
+            { title: "CC BY-ND", value: License.BY_ND },
+            { title: "CC BY-NC-ND", value: License.BY_NC_ND },
+            { title: "CC Zero (Public Domain)", value: License.CC0 }
+        ];
+
+        const selectedLicense = ref({ title: "All Rights Reserved", value: AccessRights.ALL_RIGHTS_RESERVED });
+        const selectedCCLicense = ref({ title: "NC BY", value: License.BY });
+        const isOpenAccess = ref<boolean>(false);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
@@ -146,13 +169,14 @@ export default defineComponent({
                 file: file.value as File,
                 description: description.value,
                 resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
-                license: License.ALL_RIGHTS_RESERVED
+                accessRights: AccessRights.ALL_RIGHTS_RESERVED,
+                license: selectedCCLicense.value.value
             }
 
             if (props.allowLicenceSelection) {
-                newDocumentFile.license = selectedLicense.value.value;
+                newDocumentFile.accessRights = selectedLicense.value.value;
             } else {
-                newDocumentFile.license = isOpenAccess.value ? License.OPEN_ACCESS : License.SUBSCRIPTION_BASED_ACCESS;
+                newDocumentFile.accessRights = isOpenAccess.value ? AccessRights.OPEN_ACCESS : AccessRights.RESTRICTED_ACCESS;
             }
 
             if(props.edit) {
@@ -163,12 +187,14 @@ export default defineComponent({
             
         };
 
-        return {isFormValid, file,
+        return {
+            isFormValid, file, ResourceType, cclicenseTypes,
             description, descriptionRef, isOpenAccess,
             requiredFieldRules, licenses, resourceTypes,
             selectedLicense, selectedResourceType,
             addDocumentFile, requiredSelectionRules, 
-            languageTags, toMultilingualTextInput
+            languageTags, toMultilingualTextInput,
+            selectedCCLicense
         };
     }
 });

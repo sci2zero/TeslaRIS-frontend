@@ -38,20 +38,6 @@
                         </div>
                         <v-row>
                             <v-col cols="6">
-                                <div class="response">
-                                    <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
-                                </div>
-                                <div v-if="canEdit" class="response">
-                                    <generic-crud-modal
-                                        :form-component="AssessmentResearchAreaForm"
-                                        :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
-                                        entity-name="ResearchArea"
-                                        is-update
-                                        primary-color
-                                        :read-only="!canEdit"
-                                        @update="fetchAssessmentResearchArea"
-                                    />
-                                </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
                                 </div>
@@ -150,7 +136,39 @@
             </v-col>
         </v-row>
     
-        <br />
+        <div class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("additionalActionsLabel") }}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <person-other-name-modal :preset-person="person" :read-only="!canEdit" @update="updateNames" @select-primary="selectPrimaryName"></person-other-name-modal>
+                <generic-crud-modal
+                    class="ml-2" 
+                    :form-component="AssessmentResearchAreaForm"
+                    :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
+                    entity-name="ResearchArea"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="fetchAssessmentResearchArea"
+                />
+                <v-btn
+                    v-if="isResearcher && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('documentClaim')">
+                    {{ $t("documentClaimLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="isResearcher && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('massInstitutionAssignment')">
+                    {{ $t("massInstitutionAssignmentLabel") }}
+                </v-btn>
+            </div>
+        </div>
+
         <v-tabs
             v-model="currentTab"
             color="deep-purple-accent-4"
@@ -226,7 +244,18 @@
                 </v-btn>
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <h1>{{ $t("publicationsLabel") }}</h1>
+                <h1 class="mt-5">
+                    {{ $t("publicationsLabel") }}
+                </h1>
+                <div class="mb-5 mt-5">
+                    <add-publication-menu compact />
+                    <v-btn
+                        v-if="isResearcher && canEdit"
+                        class="ml-2" color="primary" density="compact"
+                        @click="performNavigation('importer')">
+                        {{ $t("importerLabel") }}
+                    </v-btn>
+                </div>
                 <publication-table-component
                     :publications="publications"
                     :total-publications="totalPublications"
@@ -304,11 +333,12 @@ import AssessmentResearchAreaService from '@/services/assessment/AssessmentResea
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -333,7 +363,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isResearcher } = useUserRole();
 
         const researcherName = ref("");
 
@@ -609,6 +639,10 @@ export default defineComponent({
             });
         };
 
+        const performNavigation = (pageName: string) => {
+            router.push({name: pageName});
+        };
+
         return {
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword,
@@ -619,7 +653,7 @@ export default defineComponent({
             currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
-            ExportableEndpointType
+            ExportableEndpointType, isResearcher, performNavigation
         };
 }});
 </script>

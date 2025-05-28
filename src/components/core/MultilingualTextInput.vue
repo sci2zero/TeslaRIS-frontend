@@ -93,7 +93,7 @@ export default defineComponent({
 
         const setInitialState = () => {
             UserService.getLoggedInUser().then((response: AxiosResponse<UserResponse>) => {
-                userPreferredLanguage.value.tag = response.data.preferredLanguage;
+                userPreferredLanguage.value.tag = response.data.preferredReferenceCataloguingLanguage;
                 LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                     const languages = response.data;
                     languages.forEach((language: LanguageTagResponse) => {

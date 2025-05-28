@@ -1,6 +1,6 @@
 export default {
     routeLabel: {
-        baseLocale: "Home",
+        baseLocale: "Home Page",
         login: "Login",
         register: "Register",
         userProfile: "User Profile",
@@ -90,7 +90,13 @@ export default {
         mService: "M-Service",
         thesisLibraryReporting: "Thesis Library Reporting",
         thesisLibrarySearch: "Thesis Library Search",
-        healthCheck: "Service health check"
+        promotions: "Promotions",
+        registryBookList: "Registry book",
+        registryBookLandingPage: "Registry book entry",
+        cancelAttendance: "Attendance cancellation",
+        healthCheck: "Service health check",
+        thesisLibraryBackup: "Thesis Library Backup",
+        documentBackup: "Document Backup"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -119,7 +125,7 @@ export default {
     firstNameLabel: "Name",
     surnameLabel: "Surname",
     noteLabel: "Note",
-    preferredLanguageLabel: "Preferred Language",
+    preferredLanguageLabel: "Preferred interface language",
     languageLabel: "Language",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
@@ -287,11 +293,13 @@ export default {
     fileLabel: "File",
     resourceTypeLabel: "Resource Type",
     licenseLabel: "License",
+    ccLicenseLabel: "CC License",
     noFilesUploadedMessage: "No Files Provided.",
     proofsLabel: "Proofs",
     fileItemsLabel: "File Items",
     unauthorizedPublicationEditAttemptMessage: "You can't submit or edit publications where you are not a contributor.",
     loginToViewDocumentMessage: "Document is not publicly available, please login to be able to view it.",
+    loginToViewCCDocumentMessage: "Document is under CC license and is not a thesis, please login to be able to view it.",
     updateKeywordsLabel: "Update Keywords",
     updateAbstractLabel: "Update Description",
     updateBiographyLabel: "Update Biography",
@@ -726,5 +734,104 @@ export default {
     exportAllLabel: "Export all",
     exportColumnsLabel: "Export columns",
     pageLabel: "Page Number (export is performed in batches of {0} records)",
-    exportLabel: "Export"
+    exportLabel: "Export",
+    promotionListLabel: "Promotions",
+    createNewPromotionLabel: "Create new promotion",
+    dateTimeLabel: "Date and time",
+    weakPasswordError: "Password you entered is too weak.",
+    notPromotedLabel: "Not promoted",
+    registryBookLabel: "Registry book",
+    promotionLabel: "Promotion",
+    nonPromotedLabel: "Non-promoted",
+    inPromotionLabel: "Ready for promotion",
+    createNewEntryLabel: "Add to promotion",
+    printListLabel: "Print list",
+    addressesLabel: "Addresses",
+    promoteAllLabel: "Promote all",
+    promotedSuccessfullyMessage: "Promoted successfully and registered into registry book.",
+    cancelAttendanceMessage: "Click the button below to confirm cancellation.",
+    cancelAttendanceLabel: "Cancel attendance",
+    cancellationCompleteMessage: "You have successfully cancelled your attendance. You will be notified about the new promotion date.",
+    atLeastOneRequiredMessage: "At least one of these fields is required.",
+    institutionReportLabel: "Institution level statistics",
+    promotedDissertationsLabel: "Promoted count - doctoral studies",
+    promotedMagistersLabel: "Promoted count - old",
+    totalLabel: "Total",
+    totalPromotedLabel: "Total promoted",
+    missingDiplomaMetadataMessage: "Some entries are missing diploma date/number.",
+    isFinishedLabel: "Finished",
+    librarianActionsLabel: "Librarian actions",
+    registryBookNumberLabel: "Registry book number",
+    examineRegistryBookEntryLabel: "Examine created record",
+    adminActionsLabel: "Administrator actions",
+    allowSingleEditLabel: "Allow single edit",
+    preferredReferenceLanguageLabel: "Preferred reference language",
+    isAlsoABoardMemberLabel: "Board member",
+    reportGenerationScheduledMessage: "Report generation is scheduled for {0}. You will get a notification when the report will be ready for downloading.",
+    noGeneratedReportsLabel: "No generated reports yet.",
+    promotedLabel: "Promoted",
+    generatedRegistryBooksLabel: "Generated registry books",
+    generateRegistryBookLabel: "Generate registry book",
+    addRegistryBookAdminLabel: "Add registry book administrator",
+    weUseCookiesLabel: "We use cookies 🍪",
+    cookiesExplanationMessage: "We use cookies to improve your experience by logging browsing and download statistics. You can accept all cookies or decline tracking ones, thus enabling only ones required for authentication.",
+    acceptAllLabel: "Accept all",
+    acceptNecessaryLabel: "Accept only necessary",
+    promotionPreviewLabel: "Promotion preview",
+    registryBookHeaders: {
+        index: "Total No.\n---------\nSerial No.\nin\nAcademic\nYear",
+        name: "Full Name",
+        birthPlace: "Date, Place, Municipality of Birth, and Country",
+        parents: "Full Names of Both Parents (or Guardian)",
+        studyInfo: "Name and Location of the Graduated Higher Education Institution",
+        previousTitle: "Professional or Academic Title and Abbreviation after Completion of Undergraduate or Specialist Academic Studies",
+        faculty: "Name of the University Organizational Unit Where the Dissertation Was Defended",
+        dissertation: "Title of the Doctoral Dissertation or Artistic Doctoral Project",
+        commission: "Defense Committee and Mentor for the Doctoral Dissertation",
+        defendedOn: "Dissertation Grade and Date of Defense",
+        newTitle: "Academic Title Acquired by the Candidate",
+        diploma: "Number and Date of Issuance of Diploma and Diploma Supplements",
+        promotionDate: "Date of Promotion"
+    },
+    "licenses": {
+        "by": {
+            "title": "CC BY",
+            "description": "You must give appropriate credit."
+        },
+        "by_sa": {
+            "title": "CC BY-SA",
+            "description": "You must give appropriate credit and share any derivative works under the same license."
+        },
+        "by_nd": {
+            "title": "CC BY-ND",
+            "description": "You must give appropriate credit, and you may not distribute modified material."
+        },
+        "by_nc": {
+            "title": "CC BY-NC",
+            "description": "You must give appropriate credit and may not use the material for commercial purposes."
+        },
+        "by_nc_sa": {
+            "title": "CC BY-NC-SA",
+            "description": "You must give appropriate credit, may not use the material for commercial purposes, and must share any derivatives under the same license."
+        },
+        "by_nc_nd": {
+            "title": "CC BY-NC-ND",
+            "description": "You must give appropriate credit, may not use the material for commercial purposes, and may not distribute modified material."
+        },
+        "cc0": {
+            "title": "CC0 (Public Domain)",
+            "description": "No rights reserved. You can copy, modify, and distribute without asking permission."
+        }
+    },
+    backupLabel: "Backup",
+    fileSectionsLabel: "File sections",
+    backupGenerationScheduledMessage: "Backup generation is scheduled for {0}. You will get a notification when the report will be ready for downloading.",
+    dateRangeIssueMessage: "'From' date cannot be later than 'to' date.",
+    backupGenerationLabel: "Generate backup",
+    backupListLabel: "Backup list",
+    nogeneratedBackupsLabel: "No downloadable backups.",
+    backupDownloadWarning: "The backup will be automatically deleted after download to free up disk space. Please make sure to save it securely.",
+    additionalActionsLabel: "Additional actions",
+    publicationsNotForInstitutionLabel: "Your publications that are not tied to this institution:",
+    metadataFormatLabel: "Metadata format"
 }
