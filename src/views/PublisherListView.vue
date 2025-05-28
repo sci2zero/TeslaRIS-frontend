@@ -10,7 +10,20 @@
         </v-btn>
         <br />
         <br />
-        <publisher-table-component ref="tableRef" :publishers="publishers" :total-publishers="totalPublishers" @switch-page="switchPage"></publisher-table-component>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="3"
+            layout="table"
+        />
+        <publisher-table-component
+            v-else
+            ref="tableRef"
+            :publishers="publishers"
+            :total-publishers="totalPublishers"
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 
@@ -24,11 +37,15 @@ import type { PublisherIndex } from '@/models/PublisherModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+
 
 export default defineComponent({
     name: "PublisherListView",
-    components: {SearchBarComponent, PublisherTableComponent},
+    components: { SearchBarComponent, PublisherTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const publishers = ref<PublisherIndex[]>([]);
         const totalPublishers = ref(0);
@@ -43,6 +60,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("publisherListLabel");
+            loading.value = true;
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -55,9 +73,13 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            PublisherService.searchPublishers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            PublisherService.searchPublishers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response) => {
                 publishers.value = response.data.content;
                 totalPublishers.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -76,7 +98,7 @@ export default defineComponent({
         return {
             search, publishers, totalPublishers, 
             switchPage, addPublisher, tableRef,
-            clearSortAndPerformSearch
+            clearSortAndPerformSearch, loading
         };
     }
 });

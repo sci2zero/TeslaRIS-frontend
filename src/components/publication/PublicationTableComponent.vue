@@ -86,21 +86,21 @@
                             <span v-if="item.authorNames.trim() === ''">
                                 {{ displayTextOrPlaceholder(item.authorNames) }}
                             </span>
-                            <span v-for="(employment, index) in item.authorNames.split('; ')" v-else :key="index">
+                            <span v-for="(employment, index) in item.authorNames.split(';')" v-else :key="index">
                                 <localized-link
                                     v-if="item.authorIds[index] !== -1"
                                     :to="'persons/' + item.authorIds[index]"
                                 >
-                                    {{ `${employment}; ` }}
+                                    {{ `👤${employment};` }}
                                 </localized-link>
-                                <span v-else>{{ `${employment}; ` }}</span>
+                                <span v-else>{{ `${employment};` }}</span>
                             </span>
                         </td>
                         <td>
                             {{ item.year !== -1 ? item.year : "-" }}
                         </td>
                         <td>
-                            {{ getPublicationTypeTitleFromValueAutoLocale(item.type) }}
+                            {{ showPublicationConcreteType ? getConcretePublicationType(item.publicationType) : getPublicationTypeTitleFromValueAutoLocale(item.type) }}
                         </td>
                         <td v-if="item.doi">
                             <identifier-link :identifier="item.doi"></identifier-link>
@@ -125,8 +125,12 @@
                                 </template>
 
                                 <v-list min-width="150">
-                                    <publication-reference-formats :document-id="(item.databaseId as number)"></publication-reference-formats>
-                                    <publication-file-download-modal :document-id="(item.databaseId as number)"></publication-file-download-modal>
+                                    <publication-reference-formats
+                                        :document-id="(item.databaseId as number)"
+                                    />
+                                    <publication-file-download-modal
+                                        :document-id="(item.databaseId as number)"
+                                    />
                                 </v-list>
                             </v-menu>
                             <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
@@ -190,6 +194,10 @@ import { ApplicableEntityType, ExportableEndpointType, ExportEntity } from '@/mo
 import PublicationReferenceFormats from './PublicationReferenceFormats.vue';
 import PublicationFileDownloadModal from './PublicationFileDownloadModal.vue';
 import TableExportModal from '../core/TableExportModal.vue';
+import { isEqual } from 'lodash';
+import { getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@/i18n/journalPublicationType';
+import { getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
+import { getTitleFromValueAutoLocale as getMonographPublicationTypeTitle } from '@/i18n/monographPublicationType';
 
 
 export default defineComponent({
@@ -247,6 +255,10 @@ export default defineComponent({
         exportEntity: {
             type: Object as PropType<ExportEntity>,
             default: ExportEntity.DOCUMENT
+        },
+        showPublicationConcreteType: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -292,6 +304,7 @@ export default defineComponent({
         const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
+        const concretePublicationTypeLabel = computed(() => i18n.t("concretePublicationTypeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
 
@@ -302,11 +315,16 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
         const headers = ref<any>([
-          { title: titleLabel, align: "start", sortable: true, key: titleColumn},
-          { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
-          { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
-          { title: typeOfPublicationLabel, align: "start", sortable: true, key: "type"},
-          { title: "DOI", align: "start", sortable: true, key: "doi"},
+            { title: titleLabel, align: "start", sortable: true, key: titleColumn},
+            { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
+            { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
+            { title:
+                    props.showPublicationConcreteType ? concretePublicationTypeLabel : typeOfPublicationLabel,
+                align: "start",
+                sortable: true, 
+                key: "type"
+            },
+            { title: "DOI", align: "start", sortable: true, key: "doi"},
         ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -404,6 +422,16 @@ export default defineComponent({
         };
 
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            if (
+                (
+                    isEqual([{key: titleColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+                    tableOptions.value.sortBy.length === 0
+                ) &&
+                page == tableOptions.value.page
+            ) {
+                return
+            }
+
             tableOptions.value.initialCustomConfiguration = true;
             if (sortBy.length === 0) {
                 tableOptions.value.sortBy.splice(0);
@@ -437,6 +465,16 @@ export default defineComponent({
             emit("removeResearchOutputs", selectedPublications.value.map(selectedPublication => selectedPublication.databaseId));
         };
 
+        const getConcretePublicationType = (publicationType: string) => {
+            const possibleValues = [
+                getJournalPublicationTypeTitle(publicationType),
+                getProceedingsPublicationTypeTitle(publicationType),
+                getMonographPublicationTypeTitle(publicationType)
+            ];
+            
+            return possibleValues.find(publicationType => publicationType);
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -445,7 +483,8 @@ export default defineComponent({
             startMetadataComparison, getDocumentLandingPageBasePath,
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
-            ApplicableEntityType, removeResearchOutputs, ExportEntity
+            ApplicableEntityType, removeResearchOutputs, ExportEntity,
+            getConcretePublicationType
         };
     }
 });

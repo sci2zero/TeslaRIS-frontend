@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftMonographPublication?.contributions ? leftMonographPublication.contributions : []" :document-id="leftMonographPublication?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftMonographPublication?.contributions ? leftMonographPublication.contributions : []"
+                            :document-id="leftMonographPublication?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 

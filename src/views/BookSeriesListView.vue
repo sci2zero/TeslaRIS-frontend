@@ -10,7 +10,20 @@
         </v-btn>
         <br />
         <br />
-        <book-series-table-component ref="tableRef" :book-series="bookSeries" :total-book-series="totalBookSeries" @switch-page="switchPage"></book-series-table-component>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
+        <book-series-table-component
+            v-else
+            ref="tableRef"
+            :book-series="bookSeries"
+            :total-book-series="totalBookSeries"
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 
@@ -24,11 +37,15 @@ import BookSeriesTableComponent from "@/components/bookSeries/BookSeriesTableCom
 import type { BookSeriesIndex } from '@/models/BookSeriesModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+
 
 export default defineComponent({
     name: "BookSeriesListView",
-    components: {SearchBarComponent, BookSeriesTableComponent},
+    components: { SearchBarComponent, BookSeriesTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const bookSeries = ref<BookSeriesIndex[]>([]);
         const totalBookSeries = ref(0);
@@ -43,6 +60,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("bookSeriesListLabel");
+            loading.value = true;
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -55,9 +73,13 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            BookSeriesService.searchBookSeries(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            BookSeriesService.searchBookSeries(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response) => {
                 bookSeries.value = response.data.content;
                 totalBookSeries.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -76,7 +98,7 @@ export default defineComponent({
         return {
             search, bookSeries, totalBookSeries,
             switchPage, addBookSeries, tableRef,
-            clearSortAndPerformSearch
+            clearSortAndPerformSearch, loading
         };
     }
 });

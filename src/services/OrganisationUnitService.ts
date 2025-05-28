@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import type { OrganisationUnitRequest, OrganisationUnitIndex, OrganisationUnitResponse, OrganisationUnitRelationResponse, OrganisationUnitRelationRequest } from "@/models/OrganisationUnitModel";
+import type { OrganisationUnitRequest, OrganisationUnitIndex, OrganisationUnitResponse, OrganisationUnitRelationResponse, OrganisationUnitRelationRequest, InstitutionLogoRequest } from "@/models/OrganisationUnitModel";
 
 export class OrganisationUnitService extends BaseService {
 
@@ -81,6 +81,14 @@ export class OrganisationUnitService extends BaseService {
 
   async getSearchFields(onlyExportFields: boolean): Promise<AxiosResponse<SearchFieldsResponse[]>> {
     return super.sendRequest(axios.get, `organisation-unit/fields?export=${onlyExportFields}`);
+  }
+
+  async updateOrganisationUnitLogo(imageFile: InstitutionLogoRequest, orgUnitId: number): Promise<AxiosResponse<string>> {
+    return super.sendMultipartFormDataRequest(axios.patch, `organisation-unit/logo/${orgUnitId}`, imageFile, OrganisationUnitService.idempotencyKey);
+  }
+
+  async removeOrganisationUnitLogo(orgUnitId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `organisation-unit/logo/${orgUnitId}`);
   }
 }
 

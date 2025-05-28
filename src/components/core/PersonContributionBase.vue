@@ -1,19 +1,19 @@
 <template>
     <v-row v-if="!selectExternalAssociate">
-        <v-col cols="11">
+        <v-col :cols="canUserAddPersons ? 11 : 12">
             <v-autocomplete
                 v-model="selectedPerson"
-                :label="$t('personLabel') + '*'"
+                :label="$t('personLabel') + (required ? '*' : '')"
                 :items="persons"
                 :custom-filter="filterPersons"
-                :rules="requiredSelectionRules"
+                :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1">
+        <v-col v-if="canUserAddPersons" cols="1">
             <generic-crud-modal
                 :form-component="PersonSubmissionForm"
                 entity-name="Person"
@@ -23,23 +23,13 @@
             />
         </v-col>
     </v-row>
-    <v-btn color="primary" class="text-body-2 mb-2" @click="toggleExternalSelection">
-        {{ selectExternalAssociate ? $t("selectAssociateFromSystemLabel") : $t("addExternalAssociateLabel") }}
+    <v-btn
+        v-if="allowExternalAssociate && !selectExternalAssociate"
+        color="primary"
+        class="text-body-2 mb-2"
+        @click="toggleExternalSelection">
+        {{ $t("addExternalAssociateLabel") }}
     </v-btn>
-    <v-row v-if="personOtherNames.length > 0">
-        <v-col cols="10">
-            <v-select
-                v-if="!selectExternalAssociate"
-                v-model="selectedAffiliations"
-                :label="$t('personAffiliationsLabel')"
-                :items="personAffiliations"
-                :no-data-text="$t('noAffiliationsMessage')"
-                return-object
-                multiple
-                @update:model-value="sendContentToParent"
-            ></v-select>
-        </v-col>
-    </v-row>
     <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
         <v-col v-if="!customNameInput && !selectExternalAssociate" cols="10">
             <v-select
@@ -71,6 +61,42 @@
             </v-btn>
         </v-col>
     </v-row>
+    <v-btn
+        v-if="allowExternalAssociate && selectExternalAssociate"
+        color="primary"
+        class="text-body-2 mb-2"
+        @click="toggleExternalSelection">
+        {{ $t("selectAssociateFromSystemLabel") }}
+    </v-btn>
+    <v-row v-show="personOtherNames.length > 0 && !enterExternalOU">
+        <v-col cols="10">
+            <v-select
+                v-if="!selectExternalAssociate"
+                v-model="selectedAffiliations"
+                :label="$t('personAffiliationsLabel')"
+                :items="personAffiliations"
+                :no-data-text="$t('noAffiliationsMessage')"
+                return-object
+                multiple
+                @update:model-value="sendContentToParent"
+            ></v-select>
+        </v-col>
+    </v-row>
+    <v-row v-show="(personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate">
+        <v-col>
+            <multilingual-text-input
+                ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
+                @update:model-value="sendContentToParent"></multilingual-text-input>
+        </v-col>
+    </v-row>
+    <v-row v-if="personOtherNames.length > 0 && !selectExternalAssociate">
+        <v-col>
+            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU">
+                {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
+            </v-btn>
+        </v-col>
+    </v-row>
     <!-- <v-row>
         <v-col>
             <multilingual-text-input
@@ -80,14 +106,6 @@
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
     </v-row> -->
-    <v-row>
-        <v-col>
-            <multilingual-text-input
-                v-if="!basic" ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
-                @update:model-value="sendContentToParent"></multilingual-text-input>
-        </v-col>
-    </v-row>
 </template>
 
 <script lang="ts">
@@ -111,6 +129,7 @@ import { localiseDate } from "@/i18n/dateLocalisation";
 import { removeTrailingPipeRegex } from "@/utils/StringUtil";
 import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -129,12 +148,24 @@ export default defineComponent({
                 affiliationStatement: [],
                 selectedOtherName: []
             })
+        },
+        allowExternalAssociate: {
+            type: Boolean,
+            default: true
+        },
+        required: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
+        const { canUserAddPersons } = useUserRole();
+
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
+
+        const enterExternalOU = ref(true);
 
         const customNameInput = ref(false);
         const firstName = ref("");
@@ -205,6 +236,10 @@ export default defineComponent({
             if(props.presetContributionValue && !valueSet.value) {
                 valueSet.value = true;
 
+                if (props.presetContributionValue.affiliationStatement?.length === 0) {
+                    enterExternalOU.value = false;
+                }
+
                 const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
                 presetAffiliations.value = props.presetContributionValue.institutionIds;
 
@@ -250,7 +285,7 @@ export default defineComponent({
                     selectExternalAssociate.value = true;
                 }
             }
-        });
+        }, { deep: true });
 
         const onPersonSelect = (selection: {title: string, value: number}) => {
             PersonService.readPerson(selection.value).then((response) => {
@@ -265,10 +300,18 @@ export default defineComponent({
 
         const sendContentToParent = () => {
             let otherName = ["", "", "", null, null];
+            
             if (selectedOtherName.value && selectedOtherName.value?.value !== -1) {
                 const personOtherName = selectedOtherName.value?.value as PersonName;
-                otherName = [personOtherName.firstname, personOtherName.otherName, personOtherName.lastname, personOtherName.dateFrom as string, personOtherName.dateTo as string];
+                otherName = [
+                    personOtherName.firstname,
+                    personOtherName.otherName,
+                    personOtherName.lastname,
+                    personOtherName.dateFrom as string,
+                    personOtherName.dateTo as string
+                ];
             }
+
             if (customNameInput.value) {
                 otherName = [firstName.value, middleName.value, lastName.value, null, null]
             }
@@ -276,9 +319,9 @@ export default defineComponent({
             const returnObject = {
                 personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
                 description: contributionDescription.value,
-                affiliationStatement: affiliationStatement.value,
+                affiliationStatement: (selectExternalAssociate.value || enterExternalOU.value) ? affiliationStatement.value : [],
                 selectedOtherName: otherName,
-                institutionIds: selectedAffiliations.value.map(affiliation => affiliation.value)
+                institutionIds: enterExternalOU.value ? [] : selectedAffiliations.value.map(affiliation => affiliation.value)
             };
             
             emit("setInput", returnObject);
@@ -291,7 +334,12 @@ export default defineComponent({
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
                 personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
-                    personAffiliations.value.push({title: returnCurrentLocaleContent(employment.organisationUnitName) as string, value: employment.organisationUnitId as number});
+                    personAffiliations.value.push(
+                        {
+                            title: returnCurrentLocaleContent(employment.organisationUnitName) as string,
+                            value: employment.organisationUnitId as number
+                        }
+                    );
                 });
 
                 selectedAffiliations.value.splice(0);
@@ -309,6 +357,8 @@ export default defineComponent({
                     if (selectedAffiliations.value.length === 0) {
                         selectLatestAffiliation();
                     }
+
+                    sendContentToParent();
                 }
             });
         });
@@ -341,7 +391,10 @@ export default defineComponent({
 
         const toggleExternalSelection = () => {
             selectExternalAssociate.value = !selectExternalAssociate.value;
+
             customNameInput.value = selectExternalAssociate.value;
+            enterExternalOU.value = selectExternalAssociate.value;
+            
             sendContentToParent();
         };
 
@@ -356,7 +409,7 @@ export default defineComponent({
                 personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput,
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
-                PersonSubmissionForm
+                PersonSubmissionForm, enterExternalOU, canUserAddPersons
             };
     }
 });

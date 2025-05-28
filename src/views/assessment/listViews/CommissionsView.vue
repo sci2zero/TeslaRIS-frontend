@@ -4,6 +4,12 @@
         <br />
         <br />
         <br />
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="1"
+            layout="table"
+        />
         <commission-table-component :commissions="commissions" :total-commissions="totalCommissions" @switch-page="switchPage"></commission-table-component>
     </v-container>
 </template>
@@ -19,12 +25,15 @@ import CommissionTableComponent from '@/components/assessment/commission/Commiss
 import type { Page } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
 import { watch } from 'vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "CommissionListView",
-    components: { CommissionTableComponent },
+    components: { CommissionTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const commissions = ref<CommissionResponse[]>([]);
         const totalCommissions = ref(0);
         const page = ref(0);
@@ -36,6 +45,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("commissionListLabel");
+            loading.value = true;
         });
 
         watch(i18n.locale, () => {
@@ -43,9 +53,13 @@ export default defineComponent({
         });
 
         const search = () => {
-            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false, false).then((response: AxiosResponse<Page<CommissionResponse>>) => {
+            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false, false)
+            .then((response: AxiosResponse<Page<CommissionResponse>>) => {
                 commissions.value = response.data.content;
                 totalCommissions.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -55,9 +69,13 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search();
-        }
+        };
 
-        return {search, commissions, totalCommissions, switchPage};
+        return {
+            search, commissions,
+            totalCommissions, switchPage,
+            loading
+        };
     }
 });
 </script>

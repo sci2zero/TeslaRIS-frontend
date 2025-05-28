@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(commission?.description) }}
+                        <v-skeleton-loader
+                            :loading="!commission"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(commission?.description) }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("commissionLabel") }}
@@ -37,7 +46,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!commission" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div v-if="commission?.assessmentDateFrom">
                                     {{ $t("startDateLabel") }}:
@@ -72,7 +82,9 @@
             </v-col>
         </v-row>
 
+        <tab-content-loader v-if="!commission" :tab-number="2" layout="sections" />
         <v-tabs
+            v-show="commission"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -85,7 +97,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="commission"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="relations">
                 <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations"></commission-relations-view>
             </v-tabs-window-item>
@@ -117,11 +132,13 @@ import CommissionRelationService from '@/services/assessment/CommissionRelationS
 import CommissionRelationsView from '@/components/assessment/commission/CommissionRelationsView.vue';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 import CommissionResearchersView from '@/components/assessment/commission/CommissionResearchersView.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "CommissionLandingPage",
-    components: { GenericCrudModal, Toast, CommissionRelationsView, CommissionResearchersView },
+    components: { GenericCrudModal, Toast, CommissionRelationsView, CommissionResearchersView, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("relations");
 

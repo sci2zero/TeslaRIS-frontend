@@ -50,6 +50,9 @@
                 <td v-if="promotedEntriesView">
                     {{ item.registryBookNumber }}
                 </td>
+                <td v-if="promotedEntriesView">
+                    {{ item.schoolYearOrdinalNumber }}
+                </td>
                 <td v-if="!disableActions">
                     <v-btn
                         v-if="item.inPromotion && !item.promoted"
@@ -142,8 +145,9 @@ export default defineComponent({
 
         onMounted(() => {
             if (props.promotedEntriesView) {
-                headers.value.push({ title: i18n.t("schoolYearLabel"), align: "start" });
+                headers.value.push({ title: i18n.t("schoolYearLabel"), sortable: true, align: "start", key: "promotionSchoolYear" });
                 headers.value.push({ title: i18n.t("registryBookNumberLabel"), align: "start" });
+                headers.value.push({ title: i18n.t("schoolYearNumberLabel"), align: "start" });
             }
             
             if (!props.disableActions) {

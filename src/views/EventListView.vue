@@ -27,7 +27,20 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
-        <event-table-component ref="tableRef" :events="events" :total-events="totalEvents" @switch-page="switchPage"></event-table-component>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
+        <event-table-component
+            v-else
+            ref="tableRef"
+            :events="events"
+            :total-events="totalEvents"
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 
@@ -42,12 +55,14 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "EventListView",
-    components: {SearchBarComponent, EventTableComponent},
+    components: { SearchBarComponent, EventTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
         const i18n = useI18n();
         const router = useRouter();
         const route = useRoute();
@@ -69,6 +84,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
+            loading.value = true;
         });
 
         watch([returnSerialEvents, returnOnlyInstitutionRelatedEntities, returnOnlyUnclassifiedEntities], () => {
@@ -99,6 +115,9 @@ export default defineComponent({
             .then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -119,7 +138,7 @@ export default defineComponent({
             addConference, presetSearchParams, returnSerialEvents,
             tableRef, clearSortAndPerformSearch, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities, isCommission,
-            returnOnlyUnclassifiedEntities
+            returnOnlyUnclassifiedEntities, loading
         };
     }
 });

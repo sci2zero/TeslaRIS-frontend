@@ -15,11 +15,11 @@ export class MergeService extends BaseService {
     }
 
     async switchAllIndicatorsToOtherJournal(sourceJournalId: number, targetJournalId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/journal-indicator/source/${sourceJournalId}/target/${targetJournalId}`);
+        return super.sendRequest(axios.patch, `assessment-merge/journal-indicator/source/${sourceJournalId}/target/${targetJournalId}`);
     }
 
     async switchAllClassificationsToOtherJournal(sourceJournalId: number, targetJournalId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/journal-classification/source/${sourceJournalId}/target/${targetJournalId}`);
+        return super.sendRequest(axios.patch, `assessment-merge/journal-classification/source/${sourceJournalId}/target/${targetJournalId}`);
     }
 
     async switchPublisherPublicationToOtherPublisher(sourcePublisherId: number, publicationId: number): Promise<AxiosResponse<void>> {
@@ -75,11 +75,11 @@ export class MergeService extends BaseService {
     }
 
     async switchAllIndicatorsToOtherConference(sourceConferenceId: number, targetConferenceId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/conference-indicator/source/${sourceConferenceId}/target/${targetConferenceId}`);
+        return super.sendRequest(axios.patch, `assessment-merge/conference-indicator/source/${sourceConferenceId}/target/${targetConferenceId}`);
     }
 
     async switchAllClassificationsToOtherConference(sourceConferenceId: number, targetConferenceId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/conference-classification/source/${sourceConferenceId}/target/${targetConferenceId}`);
+        return super.sendRequest(axios.patch, `assessment-merge/conference-classification/source/${sourceConferenceId}/target/${targetConferenceId}`);
     }
 
     async switchProceedingsPublicationToOtherProceedings(targetProceedingsId: number, publicationId: number): Promise<AxiosResponse<void>> {

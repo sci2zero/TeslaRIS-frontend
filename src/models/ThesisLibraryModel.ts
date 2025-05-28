@@ -117,7 +117,7 @@ export interface RegistryBookEntry {
     promoted?: boolean;
     promotionSchoolYear?: string;
     registryBookNumber?: number;
-    promotionOrdinalNumber?: number;
+    schoolYearOrdinalNumber?: number;
     thesisId?: number;
 }
 

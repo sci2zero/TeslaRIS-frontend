@@ -4,8 +4,15 @@
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)"></rich-title-renderer>
+                    <v-card-title class="text-h5">
+                        <v-skeleton-loader
+                            :loading="!proceedingsPublication"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="text-center"
+                        >
+                            <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)"></rich-title-renderer>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(proceedingsPublication?.subTitle) }}
@@ -19,9 +26,10 @@
         <!-- ProceedingsPublication Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-proceedingsPublication-icon">
+                <v-icon v-if="!proceedingsPublication" size="x-large" class="large-proceedingsPublication-icon">
                     {{ icon }}
                 </v-icon>
+                <wordcloud v-else :for-document-id="proceedingsPublication?.id" compact-icon />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -40,11 +48,12 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!proceedingsPublication" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
-                                    {{ $t("typeOfPublicationLabel") }}:
+                                    {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType" class="response">
                                     {{ getTitleFromValue(proceedingsPublication.proceedingsPublicationType, publicationTypes) }}
@@ -122,7 +131,9 @@
             </v-col>
         </v-row>
 
+        <tab-content-loader v-if="!proceedingsPublication" layout="list" />
         <v-tabs
+            v-if="proceedingsPublication"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -141,7 +152,9 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-if="proceedingsPublication"
+            v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -176,7 +189,11 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(proceedingsPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(proceedingsPublication?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -224,11 +241,14 @@ import AssessmentClassificationService from '@/services/assessment/AssessmentCla
 import CitationSelector from '@/components/publication/CitationSelector.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import Wordcloud from '@/components/core/Wordcloud.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("contributions");
 

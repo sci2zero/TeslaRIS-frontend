@@ -60,7 +60,7 @@
                         <v-select
                             v-model="selectedpublicationType"
                             :items="publicationTypes"
-                            :label="$t('typeOfPublicationLabel')"
+                            :label="$t('concretePublicationTypeLabel')"
                             return-object>
                         </v-select>
                     </v-col>
@@ -133,7 +133,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import type { DocumentPublicationIndex, JournalPublication, JournalPublicationType } from "@/models/PublicationModel";
+import { type DocumentPublicationIndex, type JournalPublication, JournalPublicationType } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
@@ -141,14 +141,14 @@ import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
-import { getTypesForGivenLocale } from '@/i18n/journalPublicationType';
+import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast },
     props: {
         inModal: {
             type: Boolean,
@@ -200,7 +200,7 @@ export default defineComponent({
         const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: "", value: null});
+        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: getTitleFromValueAutoLocale(JournalPublicationType.RESEARCH_ARTICLE) as string, value: JournalPublicationType.RESEARCH_ARTICLE});
 
         const listPublications = (journal: { title: string, value: number }) => {
             if (journal.value > 0) {

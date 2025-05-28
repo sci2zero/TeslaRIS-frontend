@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
+        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + ((disableSubmission || readOnly) ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedEvent"
                 :readonly="readOnly"
@@ -15,7 +15,7 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
+        <v-col v-if="!disableSubmission && !readOnly" cols="1">
             <generic-crud-modal
                 :form-component="ConferenceSubmissionForm"
                 :form-props="{readOnly: readOnly}"
@@ -42,6 +42,7 @@ import { useI18n } from 'vue-i18n';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ConferenceSubmissionForm from './ConferenceSubmissionForm.vue';
+import { localiseDate } from '@/i18n/dateLocalisation';
 
 
 export default defineComponent({
@@ -106,7 +107,7 @@ export default defineComponent({
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
-                        title: `${i18n.locale.value === "sr" ? conference.nameSr : conference.nameOther} | ${extractDate(conference.dateFromTo)}`,
+                        title: `${i18n.locale.value === "sr" ? conference.nameSr : conference.nameOther} | ${conference.dateFromTo}`,
                         value: conference.databaseId,
                         date: conference.dateFromTo
                     }));
@@ -136,8 +137,12 @@ export default defineComponent({
         const selectNewlyAddedEvent = (event: Conference) => {
             let title = event.name.find(m => m.languageTag === i18n.locale.value.toUpperCase())?.content || event.name[0].content;
             const abbreviation = event.nameAbbreviation.find(m => m.languageTag === i18n.locale.value.toUpperCase())?.content || event.nameAbbreviation[0]?.content;
-            if (abbreviation) title += ` ${abbreviation}`;
-            const toSelect = { title: `${title} | ${extractDate(event.dateFrom)}`, value: event.id as number };
+            
+            if (abbreviation) {
+                title += ` ${abbreviation}`;
+            }
+
+            const toSelect = { title: `${title} | ${extractDate(event)}`, value: event.id as number };
             events.value.push(toSelect);
             
             if (props.multiple) {
@@ -148,9 +153,22 @@ export default defineComponent({
             sendContentToParent();
         };
 
-        const extractDate = (text: string): string => {
-            const match = text?.match(/\d{2}\.\d{2}\.\d{4}\./);
-            return match ? match[0].split(".")[2] : i18n.t("serialEventLabel");
+        const extractDate = (event: Conference): string => {
+            if (event.serialEvent) {
+                return i18n.t("serialEventLabel");
+            }
+
+            const dateFrom = new Date(Date.parse(event.dateFrom));
+            const dateTo = new Date(Date.parse(event.dateTo));
+            if (monthDiff(dateFrom, dateTo) > 2) {
+                return `${dateFrom.getFullYear()}`;
+            }
+
+            return `${localiseDate(event.dateFrom)} - ${localiseDate(event.dateTo)}`
+        };
+
+        const monthDiff = (dateFrom: Date, dateTo: Date) => {
+            return dateTo.getMonth() - dateFrom.getMonth() + (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
         };
 
         return {

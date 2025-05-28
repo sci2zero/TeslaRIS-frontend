@@ -7,7 +7,7 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel') + '*'"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -22,22 +22,22 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-select
-                    v-model="selectedResearchArea"
-                    :label="$t('researchAreaLabel')"
-                    :items="researchAreasSelectable"
-                    return-object
-                ></v-select>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
                 <multilingual-text-input v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetMonograph?.subTitle, languageTags)"></multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <uri-input ref="urisRef" v-model="uris"></uri-input>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedResearchArea"
+                    :label="$t('researchAreaLabel')"
+                    :items="researchAreasSelectable"
+                    return-object
+                ></v-select>
             </v-col>
         </v-row>
         <v-row>
@@ -89,11 +89,11 @@
                 <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
             </v-col>
         </v-row>
-        <v-row>
+        <!-- <v-row>
             <v-col cols="12">
                 <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
             </v-col>
-        </v-row>
+        </v-row> -->
 
         <v-row>
             <p class="required-fields-message">
@@ -124,7 +124,6 @@ import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import BookSeriesAutocompleteSearch from '@/components/bookSeries/BookSeriesAutocompleteSearch.vue';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 import { watch } from 'vue';
 import EventService from '@/services/EventService';
 import JournalService from '@/services/JournalService';
@@ -136,7 +135,7 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 export default defineComponent({
     name: "MonographUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, EventAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast},
     props: {
         presetMonograph: {
             type: Object as PropType<Monograph | undefined>,
@@ -158,6 +157,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
+        const noDataMessage = computed(() => i18n.t("noDataMessage"));
 
         const selectedLanguages = ref<number[]>([]);
 
@@ -186,6 +186,8 @@ export default defineComponent({
                     ResearchAreaService.readResearchAreaHierarchy(props.presetMonograph.researchAreaId).then((response) => {
                         selectedResearchArea.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
                     });
+                } else {
+                    selectedResearchArea.value.title = noDataMessage.value;
                 }
 
                 if (props.presetMonograph.eventId) {

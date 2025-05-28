@@ -38,7 +38,7 @@
             </v-col>
         </v-row>
     </v-container>
-    <div v-if="loading" class="d-flex flex-row justify-center loader">
+    <div v-if="loading" class="d-flex flex-row justify-center loader mt-10">
         <v-progress-circular
             color="primary"
             indeterminate
@@ -104,6 +104,7 @@ h1 {
 
 loader {
     height: 100vh;
+    min-height: 200px;
 }
 
 </style>

@@ -30,6 +30,7 @@ export interface BasicPerson {
     scopusAuthorId?: string | null;
     organisationUnitId?: number;
     employmentPosition?: EmploymentPosition;
+    displayTitle: MultilingualContent[];
   }
 
 export interface PersonName {
@@ -62,6 +63,7 @@ export interface PersonContribution {
     personName?: PersonName;
     postalAddress?: PostalAddress;
     contact?: Contact;
+    displayInstitutionNames?: MultilingualContent[][];
 }
 
 export enum EmploymentPosition {
@@ -130,6 +132,7 @@ export interface PersonalInfo {
     orcid?: string;
     scopusAuthorId?: string;
     uris: string[];
+    displayTitle: MultilingualContent[];
 }
 
 export interface ExpertiseOrSkillResponse {

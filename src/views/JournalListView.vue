@@ -20,12 +20,20 @@
                 class="ml-4"
             ></v-checkbox>
         </span>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
         <journal-table-component
+            v-else
             ref="tableRef"
             :journals="journals"
             :total-journals="totalJournals"
-            @switch-page="switchPage">
-        </journal-table-component>
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 
@@ -39,11 +47,15 @@ import type { JournalIndex } from '@/models/JournalModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserRole } from '@/composables/useUserRole';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+
 
 export default defineComponent({
     name: "JournalListView",
-    components: {SearchBarComponent, JournalTableComponent},
+    components: { SearchBarComponent, JournalTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const journals = ref<JournalIndex[]>([]);
         const totalJournals = ref(0);
@@ -64,6 +76,7 @@ export default defineComponent({
 
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
             search(searchParams.value);
+            loading.value = true;
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -87,6 +100,9 @@ export default defineComponent({
             .then((response) => {
                 journals.value = response.data.content;
                 totalJournals.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -106,7 +122,8 @@ export default defineComponent({
             search, journals, totalJournals, isAdmin,
             switchPage, addJournal, isUserBoundToOU,
             tableRef, clearSortAndPerformSearch,
-            returnOnlyInstitutionRelatedEntities
+            returnOnlyInstitutionRelatedEntities,
+            loading
         };
     }
 });

@@ -4,6 +4,12 @@
         <br />
         <br />
         <br />
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="1"
+            layout="table"
+        />
         <indicator-table-component :indicators="indicators" :total-indicators="totalIndicators" @switch-page="switchPage"></indicator-table-component>
     </v-container>
 </template>
@@ -18,12 +24,15 @@ import { onMounted } from 'vue';
 import IndicatorTableComponent from '@/components/assessment/indicators/IndicatorTableComponent.vue';
 import type { Page } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "IndicatorListView",
-    components: { IndicatorTableComponent },
+    components: { IndicatorTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+        
         const indicators = ref<IndicatorResponse[]>([]);
         const totalIndicators = ref(0);
         const page = ref(0);
@@ -35,6 +44,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("indicatorListLabel");
+            loading.value = true;
         });
 
         watch(i18n.locale, () => {
@@ -42,10 +52,14 @@ export default defineComponent({
         });
 
         const search = () => {
-            IndicatorService.fetchAllIndicators(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response: AxiosResponse<Page<IndicatorResponse>>) => {
+            IndicatorService.fetchAllIndicators(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response: AxiosResponse<Page<IndicatorResponse>>) => {
                 indicators.value = response.data.content;
                 totalIndicators.value = response.data.totalElements;
-            });
+            })
+            .finally(() => {
+                loading.value = false;
+            })
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -54,9 +68,13 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search();
-        }
+        };
 
-        return {search, indicators, totalIndicators, switchPage};
+        return {
+            search, indicators,
+            totalIndicators, switchPage,
+            loading
+        };
     }
 });
 </script>

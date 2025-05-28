@@ -81,6 +81,7 @@ import type { LanguageTag, LanguageTagResponse } from '@/models/Common';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LanguageTagForm from './LanguageTagForm.vue';
 import LanguageService from '@/services/LanguageService';
+import { isEqual } from 'lodash';
 
 
 export default defineComponent({
@@ -186,6 +187,16 @@ export default defineComponent({
         };
 
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            if (
+                (
+                    isEqual([{key: "display", order: "asc"}], tableOptions.value.sortBy) ||
+                    tableOptions.value.sortBy.length === 0
+                ) &&
+                page == tableOptions.value.page
+            ) {
+                return
+            }
+
             tableOptions.value.initialCustomConfiguration = true;
             if (sortBy.length === 0) {
                 tableOptions.value.sortBy.splice(0);

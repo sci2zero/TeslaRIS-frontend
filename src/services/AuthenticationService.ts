@@ -39,11 +39,17 @@ class AuthenticationService extends BaseService {
     return !!localStorage.getItem("jwt");
   }
 
-  logoutUser(): void {
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("refreshToken");
-    UserService.cachedUser = null;
-  }
+  async logoutUser() {
+    try {
+      await super.sendRequest(axios.patch, "user/logout", {});
+    } catch {
+      // server is down, noo need to invalidate
+    } finally {
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("refreshToken");
+      UserService.cachedUser = null;
+    }
+  }  
 }
 
 export default new AuthenticationService();

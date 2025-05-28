@@ -42,7 +42,12 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="publicationYear" type="number" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                <v-text-field
+                    v-model="publicationYear" type="number" 
+                    :label="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
+                    :placeholder="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
+                    :rules="(canAddAsNonReference) ? [] : requiredFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -171,7 +176,8 @@ export default defineComponent({
         const publisher = ref<Publisher>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
-        const { isInstitutionalLibrarian } = useUserRole();
+        const { isAdmin, isInstitutionalLibrarian } = useUserRole();
+        const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
         const { languageTags, languageTagsList } = useLanguageTags();
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -337,7 +343,7 @@ export default defineComponent({
             selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
-            topicAcceptanceDate, thesisDefenceDate
+            topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference
         };
     }
 });

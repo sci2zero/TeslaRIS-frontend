@@ -99,6 +99,8 @@ import CancelAttendanceView from "@/views/thesisLibrary/CancelAttendanceView.vue
 import HealthStatus from "@/views/HealthStatus.vue";
 import ThesisLibraryBackupView from "@/views/thesisLibrary/ThesisLibraryBackupView.vue";
 import DocumentBackupView from "@/views/DocumentBackupView.vue";
+import LegacyRedirectView from "@/views/LegacyRedirectView.vue";
+import NotFound from "@/views/NotFound.vue";
 
 
 const roles = {
@@ -122,6 +124,24 @@ const router = createRouter({
             redirect: { name: 'home', params: { locale: defaultLocale } },
         },
         {
+            path: "/record.jsf",
+            name: "legacyEntityRedirect",
+            component: LegacyRedirectView,
+            meta: {
+                authenticated: false,
+                authorities: [],
+            },
+        },
+        {
+            path: "/DownloadFileServlet/:fileName",
+            name: "legacyFileRedirect",
+            component: LegacyRedirectView,
+            meta: {
+                authenticated: false,
+                authorities: [],
+            },
+        },
+        {
             path: "/:locale",
             name: "baseLocale",
             children: [
@@ -129,6 +149,15 @@ const router = createRouter({
                     path: "",
                     name: "home",
                     component: HomeView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "not-found",
+                    name: "notFound",
+                    component: NotFound,
                     meta: {
                         authenticated: false,
                         authorities: [],

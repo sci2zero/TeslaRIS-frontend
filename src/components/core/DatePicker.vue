@@ -9,7 +9,7 @@
                 readonly
                 v-bind="props"
                 variant="solo"
-                hide-details
+                :hide-details="additionalRules.length == 0"
             ></v-text-field>
         </template>
         <v-date-picker

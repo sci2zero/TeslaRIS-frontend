@@ -1,9 +1,9 @@
 <template>
     <draggable 
         :list="contributionList" item-key="id"
-        group="publicationContributions" 
-        :disabled="!inComparator"
-        @change="onDropCallback"
+        group="publicationContributions"
+        :disabled="!canReorder"
+        @change="reorderContributors"
     >
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" :to="'persons/' + contribution.personId">
@@ -27,6 +27,7 @@ import type { PersonPublicationSeriesContribution } from '@/models/PublicationSe
 import { getTitleFromValueAutoLocale } from '@/i18n/publicationSeriesContributionType';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { VueDraggableNext } from 'vue-draggable-next'
+import PublicationSeriesService from '@/services/PublicationSeriesService';
 
 
 export default defineComponent({
@@ -40,16 +41,35 @@ export default defineComponent({
         inComparator: {
             type: Boolean,
             default: false
+        },
+        publicationSeriesId: {
+            type: Object as PropType<number | undefined>,
+            required: true
+        },
+        canReorder: {
+            type: Boolean,
+            default: false
         }
     },
-    emits: ["dragged"],
-    setup(_, {emit}) {
-        const onDropCallback = (event: any) => {
-            emit("dragged", event);
+    emits: ["positionsChanged"],
+    setup(props, {emit}) {
+        const reorderContributors = (event: any) => {
+            if(event.moved.newIndex !== event.moved.oldIndex) {
+                PublicationSeriesService.reorderContribution(
+                    props.publicationSeriesId as number,
+                    props.contributionList[event.moved.newIndex].id as number,
+                    event.moved.oldIndex + 1,
+                    event.moved.newIndex + 1
+                ).then(() => {
+                    emit("positionsChanged")
+                });
+            }
         };
 
-        return { getTitleFromValueAutoLocale,
-            localiseDate, onDropCallback };
+        return {
+            getTitleFromValueAutoLocale,
+            localiseDate, reorderContributors
+        };
     },
 });
 </script>

@@ -199,3 +199,13 @@ export interface DocumentCSVExportRequest extends CSVExportRequest {
     institutionId: number;
     commissionId: number;
 }
+
+export interface EntityNavigationDetails {
+    entityType: string;
+    databaseId: number;
+}
+
+export interface DocumentFileNavigationDetails {
+    serverFilename: string;
+    filename: string;
+}

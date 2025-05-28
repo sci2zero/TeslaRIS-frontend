@@ -90,6 +90,11 @@
                         <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input ref="displayTitleRef" v-model="displayTitle" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.displayTitle, languageTags)" :label="$t('displayTitleLabel')"></multilingual-text-input>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
     </v-form>
@@ -197,6 +202,7 @@ export default defineComponent({
         const city = ref<any>([]);
         const streetAndNumber = ref<any>([]);
         const uris = ref<string[]>(props.presetPerson?.personalInfo.uris as string[]);
+        const displayTitle = ref<any>([]);
 
         const sexes = getSexForGivenLocale();
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
@@ -241,7 +247,8 @@ export default defineComponent({
                     streetAndNumber: streetAndNumber.value
                 },
                 scopusAuthorId: scopus.value,
-                uris: uris.value
+                uris: uris.value,
+                displayTitle: displayTitle.value
             };
 
             emit("update", updatedPerson);
@@ -282,7 +289,7 @@ export default defineComponent({
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
-            streetAndNumberRef, refreshForm, uris, urisRef
+            streetAndNumberRef, refreshForm, uris, urisRef, displayTitle
         };
     }
 });

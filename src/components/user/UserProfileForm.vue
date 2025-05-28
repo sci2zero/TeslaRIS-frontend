@@ -23,14 +23,14 @@
             {{ $t("updateResearcherLabel") }}
         </v-btn>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-text-field
                     v-model="email"
                     :label="$t('emailLabel')"
                     :rules="emailFieldRules"
                 ></v-text-field>
             </v-col>
-            <v-col v-if="!isAdmin" cols="6">
+            <v-col v-if="!isAdmin && !isResearcher" cols="12" md="6">
                 <v-autocomplete
                     v-model="selectedOrganisationUnit"
                     :label="$t('organisationUnitLabel')"
@@ -43,7 +43,8 @@
                     @update:search="searchOUs($event)"
                 ></v-autocomplete>
             </v-col>
-            <v-col cols="6">
+            <v-col v-else cols="0" md="6" />
+            <v-col cols="12" md="6">
                 <v-select
                     v-model="selectedLanguage"
                     :label="$t('preferredLanguageLabel')"
@@ -51,7 +52,7 @@
                     return-object
                 ></v-select>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" md="6">
                 <v-select
                     v-model="selectedReferenceLanguage"
                     :label="$t('preferredReferenceLanguageLabel')"
@@ -73,28 +74,39 @@
         <v-btn color="blue darken-1" @click="changePassword = !changePassword">
             {{ $t("changePasswordLabel") }} {{ changePassword ? "▲" : "▼" }}
         </v-btn>
-        <v-container v-if="changePassword">
-            <v-row>
-                <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
-                    <v-text-field
-                        v-model="oldPassword"
-                        :label="$t('oldPasswordLabel')"
-                        :rules="requiredSelectionRules"
-                        validate-on-blur
-                        :append-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                        :type="showOldPassword ? 'text' : 'password'"
-                        @click:append="showOldPassword = !showOldPassword"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
-                    <password-input-with-meter :label="$t('newPasswordLabel')" repeat-password @password-change="setNewPassword($event)"></password-input-with-meter>
-                </v-col>
-            </v-row>
-        </v-container>
-        <v-row justify="center">
-            <v-btn color="blue darken-1" :disabled="!isFormValid" class="submission-action" @click="updateUser">
+
+        <transition name="fade-slide">
+            <v-container v-if="changePassword">
+                <v-row>
+                    <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
+                        <v-text-field
+                            v-model="oldPassword"
+                            :label="$t('oldPasswordLabel')"
+                            :rules="requiredSelectionRules"
+                            validate-on-blur
+                            :append-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                            :type="showOldPassword ? 'text' : 'password'"
+                            @click:append="showOldPassword = !showOldPassword"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
+                        <password-input-with-meter
+                            :label="$t('newPasswordLabel')"
+                            repeat-password
+                            @password-change="setNewPassword($event)">
+                        </password-input-with-meter>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </transition>
+        <v-row justify="center" class="mt-5">
+            <v-btn
+                color="blue darken-1"
+                :disabled="!isFormValid"
+                class="submission-action"
+                @click="updateUser">
                 {{ $t("saveLabel") }}
             </v-btn>
         </v-row>
@@ -124,9 +136,10 @@ import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUserRole } from "@/composables/useUserRole";
 
+
 export default defineComponent({
     name: "UserProfileForm",
-    components: {PasswordInputWithMeter, Toast},
+    components: { PasswordInputWithMeter, Toast },
     setup() {
         const snackbar = ref(false);
         const snackbarText = ref("");
@@ -144,7 +157,7 @@ export default defineComponent({
         const email = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
-        const selectedReferenceLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
+        const selectedReferenceLanguage = ref<{ title: string, value: number }>({title: "EN", value: -1});
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const ouPlaceholder = {title: "", value: -1};
         const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
@@ -319,6 +332,17 @@ export default defineComponent({
 .update-researcher {
     margin-top: -15px;
     margin-bottom: 20px;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 </style>

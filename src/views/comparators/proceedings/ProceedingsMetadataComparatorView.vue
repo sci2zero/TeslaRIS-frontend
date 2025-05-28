@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftProceedings?.contributions ? leftProceedings.contributions : []" :document-id="leftProceedings?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftProceedings?.contributions ? leftProceedings.contributions : []"
+                            :document-id="leftProceedings?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightProceedings?.contributions ? rightProceedings.contributions : []" :document-id="rightProceedings?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightProceedings?.contributions ? rightProceedings.contributions : []"
+                            :document-id="rightProceedings?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 

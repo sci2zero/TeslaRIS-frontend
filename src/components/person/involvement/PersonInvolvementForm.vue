@@ -3,8 +3,29 @@
         <v-row>
             <v-col cols="12">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col
+                        v-if="!enterExternalOU"
+                        cols="12">
                         <organisation-unit-autocomplete-search ref="orgUnitAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                    </v-col>
+                </v-row>
+                <v-row
+                    v-if="enterExternalOU"
+                    cols="12">
+                    <v-col>
+                        <multilingual-text-input
+                            ref="externalOUNameRef"
+                            v-model="externalOUName" :rules="requiredFieldRules"
+                            :initial-value="toMultilingualTextInput(presetInvolvement && presetInvolvement.affiliationStatement ? presetInvolvement.affiliationStatement : [], languageTags)"
+                            :label="$t('externalOUNameLabel') + '*'">
+                        </multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
+                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                        </v-btn>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -44,17 +65,29 @@
             <v-col>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="title" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).title : [], languageTags)" :label="$t('academicTitleLabel') + '*'" :rules="requiredFieldRules"></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="title"
+                            :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).title : [], languageTags)"
+                            :label="$t('academicTitleLabel') + '*'" :rules="requiredFieldRules">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="abbreviationTitle" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).abbreviationTitle : [], languageTags)" :label="$t('abbreviationTitleLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="abbreviationTitle"
+                            :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).abbreviationTitle : [], languageTags)"
+                            :label="$t('abbreviationTitleLabel')">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="thesisTitle" :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).thesisTitle : [], languageTags)" :label="$t('thesisTitleLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="thesisTitle"
+                            :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).thesisTitle : [], languageTags)"
+                            :label="$t('thesisTitleLabel')">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -64,12 +97,20 @@
             <v-col>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="contributionDescription" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageTags)" :label="$t('contributionabstractLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="contributionDescription"
+                            :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).contributionDescription : [], languageTags)"
+                            :label="$t('contributionabstractLabel')" is-area>
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="role" :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).role : [], languageTags)" :label="$t('roleLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="role"
+                            :initial-value="toMultilingualTextInput((presetInvolvement as Membership) ? (presetInvolvement as Membership).role : [], languageTags)"
+                            :label="$t('roleLabel')">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
             </v-col>
@@ -141,6 +182,8 @@ export default defineComponent({
         const isFormValid = ref(false);
         const { languageTags } = useLanguageTags();
 
+        const enterExternalOU = ref(false);
+
         onMounted(() => {
             if(props.presetInvolvement?.organisationUnitId) {
                 selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(props.presetInvolvement.organisationUnitName) as string, value: props.presetInvolvement?.organisationUnitId as number};
@@ -160,6 +203,7 @@ export default defineComponent({
         const title = ref([]);
         const abbreviationTitle = ref([]);
         const thesisTitle = ref([]);
+        const externalOUName = ref([]);
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: null };
 
@@ -178,8 +222,8 @@ export default defineComponent({
                 dateFrom: dateFrom.value as string,
                 dateTo: dateTo.value as string,
                 involvementType: selectedInvolvementType.value?.value as InvolvementType,
-                affiliationStatement: [],
-                organisationUnitId: selectedOrganisationUnit.value.value
+                affiliationStatement: externalOUName.value,
+                organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined
             };
 
             if(involvement.involvementType == InvolvementType.MEMBER_OF) {
@@ -211,11 +255,11 @@ export default defineComponent({
 
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
-            dateFrom, dateTo, saveInvolvement,
+            dateFrom, dateTo, saveInvolvement, enterExternalOU,
             languageTags, selectedInvolvementType, requiredSelectionRules,
             ouAutocompleteRef, selectedOrganisationUnit, contributionDescription,
             role, title, abbreviationTitle, thesisTitle, employmentPositions,
-            selectedEmploymentPosition, requiredFieldRules
+            selectedEmploymentPosition, requiredFieldRules, externalOUName
         };
     }
 });

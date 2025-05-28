@@ -84,6 +84,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ResearchAreaForm from './ResearchAreaForm.vue';
+import { isEqual } from 'lodash';
 
 
 export default defineComponent({
@@ -187,6 +188,16 @@ export default defineComponent({
         };
 
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            if (
+                (
+                    isEqual([{key: "name", order: "asc"}], tableOptions.value.sortBy) ||
+                    tableOptions.value.sortBy.length === 0
+                ) &&
+                page == tableOptions.value.page
+            ) {
+                return
+            }
+
             tableOptions.value.initialCustomConfiguration = true;
             if (sortBy.length === 0) {
                 tableOptions.value.sortBy.splice(0);

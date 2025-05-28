@@ -4,7 +4,8 @@ export enum ResourceType {
     PREPRINT,
     OFFICIAL_PUBLICATION,
     SUPPLEMENT,
-    STATEMENT
+    STATEMENT,
+    ADVISOR_CONFLICT_OF_INTEREST
 }
 
 export enum AccessRights {

@@ -219,7 +219,8 @@ export default defineComponent({
             clearInput,
             updatedLanguage,
             forceRefreshModelValue,
-            richEditorRef
+            richEditorRef,
+            setInitialModelValue
         };
     }
 });

@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                        <v-skeleton-loader
+                            :loading="!journal"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("journalLabel") }}
@@ -38,7 +47,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!journal" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div>eISSN:</div>
                                 <div class="response">
@@ -70,7 +80,9 @@
         </v-row>
 
         <br />
+        <tab-content-loader v-if="!journal" :tab-number="3" layout="list" />
         <v-tabs
+            v-show="journal"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -79,7 +91,7 @@
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
+                {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="canClassify || journalIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -89,14 +101,29 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="journal"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="publications">
                 <!-- Publications Table -->
                 <h2>{{ $t("journalPublicationsLabel") }}</h2>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    in-comparator
+                    show-publication-concrete-type
+                    @switch-page="switchPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-publication-series-contribution-tabs :contribution-list="journal?.contributions ? journal.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+                <person-publication-series-contribution-tabs
+                    :contribution-list="journal?.contributions ? journal.contributions : []"
+                    :publication-series-id="journal?.id"
+                    :read-only="!canEdit"
+                    shows-board-and-reviewers
+                    @update="updateContributions">
+                </person-publication-series-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -152,13 +179,15 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
     setup() {
-        const currentTab = ref("");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");

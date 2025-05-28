@@ -5,7 +5,14 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        <rich-title-renderer :title="returnCurrentLocaleContent(software?.title)"></rich-title-renderer>
+                        <v-skeleton-loader
+                            :loading="!software"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="text-center"
+                        >
+                            <rich-title-renderer :title="returnCurrentLocaleContent(software?.title)"></rich-title-renderer>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(software?.subTitle) }}
@@ -19,9 +26,10 @@
         <!-- Software Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-software-icon">
+                <v-icon v-if="!software" size="x-large" class="large-software-icon">
                     {{ icon }}
                 </v-icon>
+                <wordcloud v-else :for-document-id="software?.id" compact-icon />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -40,7 +48,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!software" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="software?.internalNumber">
@@ -90,7 +99,9 @@
             </v-col>
         </v-row>
 
+        <tab-content-loader v-if="!software" layout="sections" />
         <v-tabs
+            v-show="software"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -109,7 +120,9 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="software"
+            v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -188,11 +201,14 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import Wordcloud from '@/components/core/Wordcloud.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("contributions");
 

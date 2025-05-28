@@ -66,7 +66,11 @@ export default defineComponent({
             if (props.repeatPassword) {
                 rules.value.push((value: string) => {
                     if (!value) return requiredFieldMessage.value;
-                    if (password.value !== repeatNewPassword.value) return passwordsDontMatchMessage.value;
+                    if (
+                        password.value &&
+                        repeatNewPassword.value &&
+                        password.value !== repeatNewPassword.value
+                    ) return passwordsDontMatchMessage.value;
 
                     return true;
                 });

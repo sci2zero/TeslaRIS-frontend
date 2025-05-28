@@ -59,6 +59,10 @@ export default defineComponent({
         returnOnlyNonSerialMonographs: {
             type: Boolean,
             default: true
+        },
+        onlyBooks: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -89,7 +93,7 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params = params.slice(0, -1);
-                DocumentPublicationService.searchMonographs(params).then((response) => {
+                DocumentPublicationService.searchMonographs(params, props.onlyBooks).then((response) => {
                     const listOfMonographs: { title: string, value: number }[] = [];
                     response.data.content.forEach((monograph: DocumentPublicationIndex) => {
                         if (i18n.locale.value === "sr") {

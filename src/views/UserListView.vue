@@ -7,7 +7,19 @@
         <br />
         <br />
         <br />
-        <user-table-component ref="tableRef" :users="users" :total-users="totalUsers" @switch-page="switchPage"></user-table-component>
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
+        <user-table-component
+            v-else
+            ref="tableRef"
+            :users="users"
+            :total-users="totalUsers"
+            @switch-page="switchPage">
+        </user-table-component>
     </v-container>
 </template>
 
@@ -20,11 +32,15 @@ import { ref } from 'vue';
 import type { UserAccountIndex } from '@/models/UserModel';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+
 
 export default defineComponent({
     name: "UserListView",
-    components: {SearchBarComponent, UserTableComponent},
+    components: { SearchBarComponent, UserTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const users = ref<UserAccountIndex[]>([]);
         const totalUsers = ref(0);
@@ -38,6 +54,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("userListLabel");
+            loading.value = true;
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -50,9 +67,13 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            UserService.searchUsers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            UserService.searchUsers(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, [])
+            .then((response) => {
                 users.value = response.data.content;
                 totalUsers.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -66,7 +87,8 @@ export default defineComponent({
 
         return {
             search, users, totalUsers, switchPage,
-            clearSortAndPerformSearch, tableRef
+            clearSortAndPerformSearch, tableRef,
+            loading
         };
     }
 });

@@ -151,6 +151,15 @@
                                 ></v-text-field>
                             </v-col>
                         </v-row>
+                        <v-row>
+                            <v-col cols="12">
+                                <multilingual-text-input
+                                    v-model="displayTitle"
+                                    :rules="requiredFieldRules"
+                                    :label="$t('displayTitleLabel') + '*'">
+                                </multilingual-text-input>
+                            </v-col>
+                        </v-row>
                     </v-container>
                 </v-col>
             </v-row>
@@ -186,11 +195,12 @@ import PersonDeduplicationTable from './PersonDeduplicationTable.vue';
 import Toast from '../core/Toast.vue';
 import UserService from '@/services/UserService';
 import { type UserResponse } from '@/models/UserModel';
+import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput },
     props: {
         inModal: {
             type: Boolean,
@@ -233,6 +243,7 @@ export default defineComponent({
         const eNaukaId = ref("");
         const apvnt = ref("");
         const scopus = ref("");
+        const displayTitle = ref([]);
 
         const { requiredFieldRules, requiredSelectionRules, apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
@@ -260,7 +271,8 @@ export default defineComponent({
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
-                employmentPosition: selectedEmploymentPosition.value.value
+                employmentPosition: selectedEmploymentPosition.value.value,
+                displayTitle: displayTitle.value
             };
 
             PersonService.createPerson(newPerson).then((response) => {
@@ -303,7 +315,7 @@ export default defineComponent({
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules, loggedInUser
+            scopusAuthorIdValidationRules, loggedInUser, displayTitle
         };
     }
 });

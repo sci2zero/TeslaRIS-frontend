@@ -28,7 +28,7 @@ export const getTitleFromValue = (value: ProceedingsPublicationType, proceedings
     return (proceedingsPublicationTypeArray.find(item => getNameFromOrdinal(ProceedingsPublicationType, item.value) === value.toString()) || {}).title;
 };
 
-export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType) => {
+export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType | string) => {
     const locale = i18n.vueI18n.global.locale;
 
     let proceedingsPublicationTypeArray = proceedingsPublicationTypeEn;

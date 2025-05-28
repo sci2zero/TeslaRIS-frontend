@@ -4,6 +4,12 @@
         <br />
         <br />
         <br />
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="1"
+            layout="table"
+        />
         <AssessmentCLassificationTableComponent :classifications="classifications" :total-classifications="totalClassifications" @switch-page="switchPage"></AssessmentCLassificationTableComponent>
     </v-container>
 </template>
@@ -18,12 +24,15 @@ import { onMounted } from 'vue';
 import AssessmentCLassificationTableComponent from '@/components/assessment/classifications/AssessmentCLassificationTableComponent.vue';
 import type { Page } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ClassificationListView",
-    components: { AssessmentCLassificationTableComponent },
+    components: { AssessmentCLassificationTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const classifications = ref<AssessmentClassification[]>([]);
         const totalClassifications = ref(0);
         const page = ref(0);
@@ -35,6 +44,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("classificationsLabel");
+            loading.value = true;
         });
 
         watch(i18n.locale, () => {
@@ -42,9 +52,13 @@ export default defineComponent({
         });
 
         const search = () => {
-            AssessmentClassificationService.fetchAllAssessmentClassifications(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response: AxiosResponse<Page<AssessmentClassification>>) => {
+            AssessmentClassificationService.fetchAllAssessmentClassifications(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response: AxiosResponse<Page<AssessmentClassification>>) => {
                 classifications.value = response.data.content;
                 totalClassifications.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -54,9 +68,13 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search();
-        }
+        };
 
-        return {search, classifications, totalClassifications, switchPage};
+        return {
+            search, classifications,
+            totalClassifications, switchPage,
+            loading
+        };
     }
 });
 </script>

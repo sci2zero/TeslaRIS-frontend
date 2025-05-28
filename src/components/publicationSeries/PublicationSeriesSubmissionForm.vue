@@ -12,18 +12,18 @@
                         <multilingual-text-input ref="abbreviationsRef" v-model="nameAbbreviations" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col cols="6">
-                            <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
                     <v-row>
                         <v-col>
                             <v-select

@@ -1,7 +1,9 @@
 <template>
     <div v-for="uri in uris" :key="uri" class="uri">
         <v-btn
-            variant="plain" class="no-uppercase m-0 p-0 h-auto semi-transparent" :href="uri"
+            variant="plain"
+            class="no-uppercase m-0 p-0 h-auto semi-transparent text-h6"
+            :href="uri"
             target="_blank">
             {{ uri }}
         </v-btn>
