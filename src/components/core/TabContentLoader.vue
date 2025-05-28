@@ -1,13 +1,15 @@
 <template>
     <div>
-        <v-skeleton-loader v-if="true" :type="`${buttonHeader ? 'button' : 'chip'}@${tabNumber}`" />
+        <v-skeleton-loader
+            v-if="tabNumberByRole ? isUserLoggedIn : true"
+            :type="`${buttonHeader ? 'button' : 'chip'}@${tabNumberByRole ? (deduceTabNumberByRole()) : tabNumber}`" />
     </div>
     <div>
         <template v-if="layout === 'table'">
             <v-skeleton-loader type="table" color="grey-lighten-5" />
         </template>
   
-        <template v-else-if="layout === 'articles'">
+        <template v-else-if="layout === 'sections'">
             <v-row v-for="index in 3" :key="index">
                 <v-col
                     :key="'paragraph-' + index"
@@ -44,17 +46,18 @@
     </div>
 </template>
   
-  <script lang="ts">
-  import { defineComponent } from 'vue';
+<script lang="ts">
+import { useUserRole } from '@/composables/useUserRole';
+import { defineComponent } from 'vue';
   
-  export default defineComponent({
+export default defineComponent({
     name: 'TabContentLoader',
     props: {
       layout: {
         type: String,
         default: 'list',
         validator: (value: string) => {
-          return ['table', 'articles', 'list'].includes(value);
+          return ['table', 'sections', 'list'].includes(value);
         }
       },
       tabNumber: {
@@ -64,7 +67,29 @@
       buttonHeader: {
         type: Boolean,
         default: false
+      },
+      tabNumberByRole: {
+        type: Boolean,
+        default: false
       }
+    },
+    setup() {
+        const { isAdmin, isUserLoggedIn } = useUserRole();
+
+        const deduceTabNumberByRole = () => {
+            if (isAdmin.value) {
+                return 3;
+            } else if (isUserLoggedIn) {
+                return 1
+            }
+
+            return 1;
+        };
+
+        return {
+            deduceTabNumberByRole,
+            isUserLoggedIn
+        };
     }
   });
   </script>

@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(proceedings?.title) }}
+                        <v-skeleton-loader
+                            :loading="!proceedings"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(proceedings?.title) }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(proceedings?.subTitle) }}
@@ -40,7 +49,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!proceedings" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <!-- <citation-selector
                                     ref="citationRef"
@@ -142,7 +152,9 @@
         </v-row>
 
         <br />
+        <tab-content-loader v-if="!proceedings" :tab-number="3" layout="list" />
         <v-tabs
+            v-show="proceedings"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -161,7 +173,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="proceedings"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="publications">
                 <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
                 <publication-table-component
@@ -247,11 +262,13 @@ import { StatisticsType, type EntityIndicatorResponse } from '@/models/Assessmen
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import { useUserRole } from '@/composables/useUserRole';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("");
 

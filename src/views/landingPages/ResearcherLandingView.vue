@@ -4,8 +4,17 @@
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        {{ researcherName }}
+                    <v-card-title>
+                        <v-skeleton-loader
+                            :loading="!person"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ researcherName }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ person?.personalInfo.displayTitle && person.personalInfo.displayTitle.length > 0 ? returnCurrentLocaleContent(person?.personalInfo.displayTitle) as string : $t("researcherLabel") }}
@@ -40,7 +49,8 @@
                         <div class="mb-5">
                             <b>{{ $t("personalInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!person" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
                                     {{ $t("birthdateLabel") }}:
@@ -191,7 +201,9 @@
             </div>
         </div>
 
+        <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
         <v-tabs
+            v-if="person"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -210,7 +222,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-if="person"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="publications">
                 <h1 class="mt-5">
                     {{ $t("publicationsLabel") }}
@@ -372,11 +387,13 @@ import { useUserRole } from '@/composables/useUserRole';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("additionalInfo");
 

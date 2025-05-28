@@ -16,7 +16,15 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
         <organisation-unit-table-component
+            v-else
             ref="tableRef"
             :organisation-units="organisationUnits"
             :total-o-us="totalOUs"
@@ -39,12 +47,15 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType } from '@/models/Common';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitListView",
-    components: {SearchBarComponent, OrganisationUnitTableComponent},
+    components: { SearchBarComponent, OrganisationUnitTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const organisationUnits = ref<OrganisationUnitIndex[]>([]);
         const totalOUs = ref(0);
@@ -61,6 +72,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("ouListLabel");
+            loading.value = true;
         });
 
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
@@ -88,6 +100,9 @@ export default defineComponent({
             .then((response) => {
                 organisationUnits.value = response.data.content;
                 totalOUs.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -108,7 +123,8 @@ export default defineComponent({
             switchPage, addOU, isAdmin, searchParams,
             clearSortAndPerformSearch, tableRef,
             returnOnlyInstitutionRelatedEntities,
-            isUserBoundToOU, ExportableEndpointType
+            isUserBoundToOU, ExportableEndpointType,
+            loading
         };
     }
 });

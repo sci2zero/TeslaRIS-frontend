@@ -5,7 +5,14 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="primary">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${organisationUnit?.nameAbbreviation})` : "" }}
+                        <v-skeleton-loader
+                            :loading="!organisationUnit"
+                            type="heading"
+                            color="primary"
+                            class="d-flex justify-center align-center"
+                        >
+                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${organisationUnit?.nameAbbreviation})` : "" }}
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("organisationUnitLabel") }}
@@ -42,7 +49,13 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader
+                            v-if="!organisationUnit"
+                            color="grey-lighten-5"
+                            :citation-button="false"
+                            show-map
+                        />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div>
                                     {{ $t("addressLabel") }}:
@@ -98,7 +111,9 @@
         <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <br />
+        <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
+            v-if="organisationUnit"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -120,7 +135,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-if="organisationUnit"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
@@ -240,11 +258,13 @@ import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitLogo from '@/components/organisationUnit/OrganisationUnitLogo.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("");
 

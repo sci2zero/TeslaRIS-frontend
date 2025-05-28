@@ -55,7 +55,14 @@
             v-if="!showWordcloud"
             class="d-flex flex-row justify-center mt-15">
             <v-col cols="12" sm="10">
+                <tab-content-loader
+                    v-if="loading"
+                    button-header
+                    :tab-number="2"
+                    layout="table"
+                />
                 <publication-table-component
+                    v-else
                     id="resultsTable"
                     ref="tableRef"
                     class="mt-15"
@@ -96,12 +103,14 @@ import FilterBarComponent from '@/components/core/FilterBarComponent.vue';
 import ThesisFilters from '@/components/thesisLibrary/ThesisFilters.vue';
 import { ExportableEndpointType, ExportEntity, type SearchFieldsResponse } from '@/models/Common';
 import Wordcloud from '@/components/core/Wordcloud.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ThesisLibrarySearchView",
-    components: { SearchBarComponent, QueryInputComponent, PublicationTableComponent, FilterBarComponent, Wordcloud },
+    components: { SearchBarComponent, QueryInputComponent, PublicationTableComponent, FilterBarComponent, Wordcloud, TabContentLoader },
     setup() {
+        const loading = ref(false);
         const currentTab = ref("simpleSearch");
         const filtersRef = ref<typeof FilterBarComponent>();
 
@@ -140,6 +149,8 @@ export default defineComponent({
             ThesisLibrarySearchService.getSearchFields(false).then(response => {
                 searchFields.value = response.data;
             });
+
+            loading.value = true;
         });
 
         const search = (tokenParams: string[]) => {
@@ -165,23 +176,24 @@ export default defineComponent({
 
             lastSearchRequest.value = searchRequest;
 
-            if (currentTab.value === "simpleSearch") {
-                ThesisLibrarySearchService.performSimpleSearch(
-                    searchRequest,
-                    `&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
-                .then((response) => {
-                    theses.value = response.data.content;
-                    totalTheses.value = response.data.totalElements;
-                });
-            }   else {
-                ThesisLibrarySearchService.performAdvancedSearch(
-                    searchRequest,
-                    `&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
-                .then((response) => {
-                    theses.value = response.data.content;
-                    totalTheses.value = response.data.totalElements;
-                });
-            }
+            const isSimpleSearch = currentTab.value === "simpleSearch";
+            const serviceMethod = isSimpleSearch
+                ? (searchRequest: ThesisSearchRequest, tokens: string) =>
+                    ThesisLibrarySearchService.performSimpleSearch(searchRequest, tokens)
+                : (searchRequest: ThesisSearchRequest, tokens: string) =>
+                    ThesisLibrarySearchService.performAdvancedSearch(searchRequest, tokens);
+
+            serviceMethod(
+                searchRequest,
+                `&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+            )
+            .then((response) => {
+                theses.value = response.data.content;
+                totalTheses.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
+            });
 
             ThesisLibrarySearchService.performWordCloudSearch(
                 searchRequest,
@@ -236,7 +248,7 @@ export default defineComponent({
             resetFiltersAndSearch,
             sectionTableRef, searchFields,
             wordcloudFrequencies,
-            showWordcloud
+            showWordcloud, loading
         };
     }
 });

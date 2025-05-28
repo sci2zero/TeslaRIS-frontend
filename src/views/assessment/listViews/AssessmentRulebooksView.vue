@@ -4,6 +4,12 @@
         <br />
         <br />
         <br />
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="1"
+            layout="table"
+        />
         <assessment-rulebook-table-component :assessment-rulebooks="assessmentRulebooks" :total-assessment-rulebooks="totalAssessmentRulebooks" @switch-page="switchPage"></assessment-rulebook-table-component>
     </v-container>
 </template>
@@ -18,12 +24,15 @@ import { onMounted } from 'vue';
 import AssessmentRulebookTableComponent from '@/components/assessment/assessmentRulebook/AssessmentRulebookTableComponent.vue';
 import type { Page } from '@/models/Common';
 import type { AxiosResponse } from 'axios';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "AssessmentRulebookListView",
-    components: { AssessmentRulebookTableComponent },
+    components: { AssessmentRulebookTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const assessmentRulebooks = ref<AssessmentRulebookResponse[]>([]);
         const totalAssessmentRulebooks = ref(0);
         const page = ref(0);
@@ -35,6 +44,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("assessmentRulebookPageLabel");
+            loading.value = true;
         });
 
         watch(i18n.locale, () => {
@@ -42,9 +52,13 @@ export default defineComponent({
         });
 
         const search = () => {
-            AssessmentRulebookService.fetchAllAssessmentRulebooks(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response: AxiosResponse<Page<AssessmentRulebookResponse>>) => {
+            AssessmentRulebookService.fetchAllAssessmentRulebooks(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response: AxiosResponse<Page<AssessmentRulebookResponse>>) => {
                 assessmentRulebooks.value = response.data.content;
                 totalAssessmentRulebooks.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -54,9 +68,13 @@ export default defineComponent({
             sort.value = sortField;
             direction.value = sortDir;
             search();
-        }
+        };
 
-        return {search, assessmentRulebooks, totalAssessmentRulebooks, switchPage};
+        return {
+            search, assessmentRulebooks,
+            totalAssessmentRulebooks, switchPage,
+            loading
+        };
     }
 });
 </script>

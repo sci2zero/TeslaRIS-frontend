@@ -4,11 +4,12 @@
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
+                    <v-card-title class="text-h5">
                         <v-skeleton-loader
                             :loading="!proceedingsPublication"
                             type="heading"
                             color="blue-lighten-3"
+                            class="text-center"
                         >
                             <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)"></rich-title-renderer>
                         </v-skeleton-loader>

@@ -7,7 +7,19 @@
         <br />
         <br />
         <br />
-        <country-table-component ref="tableRef" :countries="countries" :total-countrys="totalCountries" @switch-page="switchPage"></country-table-component>
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="2"
+            layout="table"
+        />
+        <country-table-component
+            v-else
+            ref="tableRef"
+            :countries="countries"
+            :total-countrys="totalCountries"
+            @switch-page="switchPage">
+        </country-table-component>
     </v-container>
 </template>
 
@@ -20,12 +32,15 @@ import { ref } from 'vue';
 import type { Country } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "CountryListView",
-    components: {SearchBarComponent, CountryTableComponent},
+    components: { SearchBarComponent, CountryTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const countries = ref<Country[]>([]);
         const totalCountries = ref(0);
@@ -39,6 +54,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("countryListLabel");
+            loading.value = true;
         });
 
         watch(i18n.locale, () => {
@@ -55,9 +71,13 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            CountryService.searchCountries(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            CountryService.searchCountries(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response) => {
                 countries.value = response.data.content;
                 totalCountries.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -71,7 +91,7 @@ export default defineComponent({
 
         return {
             search, countries, totalCountries, switchPage,
-            clearSortAndPerformSearch, tableRef
+            clearSortAndPerformSearch, tableRef, loading
         };
     }
 });

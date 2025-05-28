@@ -64,7 +64,7 @@
         <tab-content-loader
             v-if="loading"
             button-header
-            :tab-number="3"
+            tab-number-by-role
             layout="table"
         />
         <publication-table-component
@@ -166,29 +166,28 @@ export default defineComponent({
             previousFilterValues.value.publicationTypes = publicationTypes;
             previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
 
-            if (currentTab.value === "simpleSearch" || tokenParams === "tokens=*") {
-                DocumentPublicationService.searchDocumentPublications(
-                    `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-                    returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                    selectOnlyUnassessed,
-                    publicationTypes
-                ).then((response) => {
-                    publications.value = response.data.content;
-                    totalPublications.value = response.data.totalElements;
-                    loading.value = false;
-                });
-            } else {
-                DocumentPublicationService.performAdvancedSearch(
-                    `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-                    returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                    selectOnlyUnassessed,
-                    publicationTypes
-                ).then((response) => {
-                    publications.value = response.data.content;
-                    totalPublications.value = response.data.totalElements;
-                    loading.value = false;
-                });
-            }
+            const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
+            const serviceMethod = isSimpleSearch
+                ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes)
+                : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
+                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes);
+
+            const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
+                ? (loggedInUser.value?.organisationUnitId as number)
+                : null;
+
+            serviceMethod(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                organisationUnitId,
+                selectOnlyUnassessed,
+                publicationTypes
+            ).then((response) => {
+                publications.value = response.data.content;
+                totalPublications.value = response.data.totalElements;
+            }).finally(() => {
+                loading.value = false;
+            });
         };
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {

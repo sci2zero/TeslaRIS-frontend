@@ -27,7 +27,10 @@
                 }"
             />
         </v-row>
-        <v-row class="mt-10">
+        <v-row
+            v-if="imageSrc"
+            class="mt-10"
+        >
             <color-picker
                 v-model="backgroundColor"
                 :label="$t('selectBackgroundColorLabel')"
