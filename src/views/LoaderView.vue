@@ -315,7 +315,15 @@ export default defineComponent({
 
         const submitNewPublication = () => {
             const contributions: PersonDocumentContribution[] = [];
+            
             currentLoadRecord.value?.contributions.forEach((contribution, index) => {
+
+                const affiliatedInstitutionIds = 
+                    importAuthorsRef.value[index].importAffiliationsRef.map(
+                        (importAffiliationRef: any) => 
+                            importAffiliationRef.selectedAffiliation.databaseId
+                    );
+                
                 contributions.push({
                     contributionDescription: contribution.contributionDescription,
                     contributionType: contribution.contributionType,
@@ -328,7 +336,11 @@ export default defineComponent({
                         firstname: contribution.person.firstName,
                         lastname: contribution.person.lastName,
                         otherName: "",
-                    }
+                    },
+                    isBoardPresident: false,
+                    employmentTitle: undefined,
+                    personalTitle: undefined,
+                    institutionIds: affiliatedInstitutionIds
                 });
             });
 

@@ -15,8 +15,8 @@ export class ImportService extends BaseService {
       return super.sendRequest(axios.get, "import-common/can-perform");
     }
   
-    async startHarvest(dateFrom: string, dateTo: string): Promise<AxiosResponse<number>> {
-      return super.sendRequest(axios.get, `import-common/documents-by-author?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}`);
+    async startHarvest(dateFrom: string, dateTo: string, institutionId: number = 0): Promise<AxiosResponse<number>> {
+      return super.sendRequest(axios.get, `import-common/documents-by-author?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}`);
     }
 
     async getHarvestedDocumentsCount(): Promise<AxiosResponse<number>> {

@@ -823,7 +823,7 @@ const router = createRouter({
                     component: HarvesterView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher],
+                        authorities: [roles.researcher, roles.admin, roles.institutionalEditor],
                     },
                 },
                 {

@@ -6,6 +6,18 @@
             </h1>
             <br />
             <div v-if="canPerformHarvest">
+                <v-row
+                    v-if="isAdmin"
+                    class="d-flex flex-row justify-center"
+                >
+                    <v-col cols="8">
+                        <organisation-unit-autocomplete-search
+                            v-model:model-value="selectedOrganisationUnit"
+                            required
+                            disable-submission
+                        ></organisation-unit-autocomplete-search>
+                    </v-col>
+                </v-row>
                 <v-row class="d-flex flex-row justify-center">
                     <v-col cols="4">
                         <date-picker
@@ -80,11 +92,13 @@ import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import Toast from "@/components/core/Toast.vue";
 import { useInterval } from "@/composables/useInterval";
+import { useUserRole } from "@/composables/useUserRole";
+import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: {DatePicker, Toast},
+    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
@@ -99,6 +113,9 @@ export default defineComponent({
         const harvestComplete = ref(false);
         const numberOfHarvestedDocuments = ref(0);
         const newDocumentsHarvested = ref(0);
+
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
+        const { isAdmin } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -122,7 +139,7 @@ export default defineComponent({
         const startHarvest = () => {
             loading.value = true;
             harvestComplete.value = false;
-            ImportService.startHarvest(startDate.value, endDate.value).then(response => {
+            ImportService.startHarvest(startDate.value, endDate.value, selectedOrganisationUnit.value.value).then(response => {
                 loading.value = false;
                 harvestComplete.value = true;
                 newDocumentsHarvested.value = response.data;
@@ -143,9 +160,10 @@ export default defineComponent({
             loading, startHarvest,
             numberOfHarvestedDocuments,
             newDocumentsHarvested,
-            harvestComplete,
+            harvestComplete, isAdmin,
             isFormValid, snackbar,
-            errorMessage, canPerformHarvest
+            errorMessage, canPerformHarvest,
+            selectedOrganisationUnit
         };
     },
 });
