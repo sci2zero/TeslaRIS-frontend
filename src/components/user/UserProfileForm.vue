@@ -209,20 +209,22 @@ export default defineComponent({
 
                 researcherId.value = response.data.personId;
                 
-                populateLanguageData(response.data.preferredLanguage, response.data.referenceLanguage);
+                populateLanguageData(response.data.preferredUILanguage, response.data.preferredReferenceCataloguingLanguage);
             });
         };
 
-        const populateLanguageData = (preferredLanguage: string, referenceLanguage: string) => {
+        const populateLanguageData = (preferredUILanguage: string, preferredReferenceCataloguingLanguage: string) => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
                 response.data.forEach((language: LanguageResponse) => {
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
                     
-                    if (language.languageCode === preferredLanguage) {
+                    if (language.languageCode === preferredUILanguage) {
                         selectedLanguage.value = { title: language.languageCode, value: language.id};
-                    } else if (language.languageCode === referenceLanguage) {
+                    }
+                    
+                    if (language.languageCode === preferredReferenceCataloguingLanguage) {
                         selectedReferenceLanguage.value = { title: language.languageCode, value: language.id};
                     }
                 })
@@ -271,8 +273,8 @@ export default defineComponent({
                 firstname: name.value,
                 lastName: surname.value,
                 email: email.value,
-                preferredLanguageId: selectedLanguage.value.value,
-                preferredReferenceLanguageId: selectedReferenceLanguage.value.value,
+                preferredUILanguageId: selectedLanguage.value.value,
+                preferredReferenceCataloguingLanguageId: selectedReferenceLanguage.value.value,
                 organisationUnitId: organisationUnitId,
                 oldPassword: changePassword.value ? oldPassword.value : "",
                 newPassword: changePassword.value ? newPassword.value : "",

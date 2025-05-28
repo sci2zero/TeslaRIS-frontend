@@ -127,7 +127,7 @@ export default {
     firstNameLabel: "Ime",
     surnameLabel: "Prezime",
     noteLabel: "Napomena",
-    preferredLanguageLabel: "Izabrani jezik za obaveštenja",
+    preferredLanguageLabel: "Izabrani jezik interfejsa",
     languageLabel: "Jezik",
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
@@ -887,5 +887,6 @@ export default {
     tableLabel: "Tabela",
     wordcloudLabel: "Oblak reči",
     resultRepresentationLabel: "Prikaz rezultata",
-    updateProceedingsPublicationLabel: "Ažuriraj rad sa konferencije"
+    updateProceedingsPublicationLabel: "Ažuriraj rad sa konferencije",
+    metadataFormatLabel: "Format metapodataka"
 }

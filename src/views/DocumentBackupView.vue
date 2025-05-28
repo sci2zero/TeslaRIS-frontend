@@ -52,11 +52,20 @@
                     </v-col>    
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" sm="6" md="2">
                         <v-select
                             v-model="selectedLang"
                             :items="langItems"
                             :label="$t('languageLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="2">
+                        <v-select
+                            v-model="selectedExportFileFormat"
+                            :items="exportFileFormats"
+                            :label="$t('metadataFormatLabel') + '*'"
                             :rules="requiredSelectionRules"
                             return-object>
                         </v-select>
@@ -113,6 +122,7 @@ import BackupList from '@/components/core/BackupList.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import { DocumentFileSection } from '@/models/DocumentFileModel';
 import { getDocumentFileSectionsForGivenLocale } from '@/i18n/documentFileSection';
+import { ExportFileFormat } from '@/models/Common';
 
 
 export default defineComponent({
@@ -136,6 +146,8 @@ export default defineComponent({
                 
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
+        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLS]);
+        const selectedExportFileFormat = ref<ExportFileFormat>(ExportFileFormat.CSV);
 
         const { requiredSelectionRules } = useValidationUtils();
         const years = ref<number[]>([]);
@@ -169,6 +181,8 @@ export default defineComponent({
             selectedFileSections.value.forEach(section => {
                 params += `&sections=${section.value}`
             });
+
+            params += `&metadataFormat=${selectedExportFileFormat.value}`;
             
             DocumentBackupService.scheduleGeneration(params)
             .then(response => {
@@ -188,7 +202,8 @@ export default defineComponent({
             endYear, generateBackupRequest,
             fileSections, langItems, selectedLang,
             snackbar, message, loggedInUser,
-            selectedFileSections, isAdmin, currentTab
+            selectedFileSections, isAdmin, currentTab,
+            exportFileFormats, selectedExportFileFormat
         };
     }
 });

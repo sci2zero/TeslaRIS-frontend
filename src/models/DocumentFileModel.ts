@@ -8,16 +8,16 @@ export enum ResourceType {
     ADVISOR_CONFLICT_OF_INTEREST
 }
 
-export enum License {
+export enum AccessRights {
     ALL_RIGHTS_RESERVED,
     CREATIVE_COMMONS,
     EMBARGOED_ACCESS,
     OPEN_ACCESS,
     PUBLIC_DOMAIN,
-    SUBSCRIPTION_BASED_ACCESS
+    RESTRICTED_ACCESS
 }
 
-export enum CCLicense {
+export enum License {
     BY = "BY",
     BY_SA = "BY_SA",
     BY_NC = "BY_NC",
@@ -33,8 +33,8 @@ export interface DocumentFileResponse {
     serverFilename: string;
     description: MultilingualContent[];
     resourceType: ResourceType;
+    accessRights: AccessRights;
     license: License;
-    ccLicense: CCLicense;
     sizeInMb: number;
 }
 
@@ -43,8 +43,8 @@ export interface DocumentFile {
     file: File;
     description: MultilingualContent[];
     resourceType: ResourceType;
+    accessRights: AccessRights;
     license: License;
-    ccLicense: CCLicense;
 }
 
 export enum ThesisAttachmentType {

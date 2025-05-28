@@ -127,7 +127,7 @@ export default {
     firstNameLabel: "Name",
     surnameLabel: "Surname",
     noteLabel: "Note",
-    preferredLanguageLabel: "Preferred notification language",
+    preferredLanguageLabel: "Preferred interface language",
     languageLabel: "Language",
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
@@ -861,5 +861,6 @@ export default {
     tableLabel: "Table",
     wordcloudLabel: "Word cloud",
     resultRepresentationLabel: "Result representation",
-    updateProceedingsPublicationLabel: "Update proceedings publication"
+    updateProceedingsPublicationLabel: "Update proceedings publication",
+    metadataFormatLabel: "Metadata format"
 }
