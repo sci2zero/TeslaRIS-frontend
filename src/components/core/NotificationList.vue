@@ -20,10 +20,10 @@
                                 <v-icon v-if="notificationAction.toString() === 'APPROVE'">
                                     mdi-check
                                 </v-icon>
-                                <v-icon v-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION'">
+                                <v-icon v-else-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION'">
                                     mdi-file-remove-outline
                                 </v-icon>
-                                <v-icon v-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
+                                <v-icon v-else-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
                                     mdi-content-duplicate
                                 </v-icon>
                                 <v-icon v-else>

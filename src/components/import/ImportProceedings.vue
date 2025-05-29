@@ -98,12 +98,14 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
 
         const eventBinded = ref(false);
         const proceedingsBinded = ref(false);
         const automaticProcessCompleted = ref(false);
+        const waitingOnUserInput = ref(false);
 
         const selectedEvent = ref<EventIndex>();
         const selectedProceedings = ref<ProceedingsResponse>();
@@ -137,6 +139,7 @@ export default defineComponent({
             proceedingsBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -158,6 +161,8 @@ export default defineComponent({
                     } else {
                         potentialMatches.value = response.data.content;
                         showTable.value = true;
+                        automaticProcessCompleted.value = true;
+                        waitingOnUserInput.value = true;
                     }   
                 }
             });
@@ -312,6 +317,12 @@ export default defineComponent({
                         selectedPublicationSeries.value = bookSeriesResponse.data;
                     });
                 });
+            }
+        });
+
+        watch(proceedingsBinded, () => {
+            if (proceedingsBinded.value && waitingOnUserInput.value) {
+                emit("userActionComplete");
             }
         });
 

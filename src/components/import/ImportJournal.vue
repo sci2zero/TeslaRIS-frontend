@@ -81,11 +81,13 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
         const journalBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedJournal = ref<JournalIndex>();
+        const waitingOnUserInput = ref(false);
 
         const showTable = ref(false);
         const potentialMatches = ref<JournalIndex[]>([]);
@@ -126,6 +128,7 @@ export default defineComponent({
             journalBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -136,6 +139,7 @@ export default defineComponent({
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
+                    waitingOnUserInput.value = true;
                 }
             });
         };
@@ -240,6 +244,12 @@ export default defineComponent({
             );
         };
         const idempotencyKey = generateIdempotencyKey();
+
+        watch(journalBinded, () => {
+            if (journalBinded.value && waitingOnUserInput.value) {
+                emit("userActionComplete");
+            }
+        });
 
         return {
             potentialMatches, switchPage, 

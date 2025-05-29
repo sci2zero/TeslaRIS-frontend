@@ -93,12 +93,14 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
 
         const affiliationBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedAffiliation = ref<OrganisationUnitIndex>();
+        const waitingOnUserInput = ref(false);
 
         const showTable = ref(false);
         const potentialMatches = ref<OrganisationUnitIndex[]>([]);
@@ -139,6 +141,7 @@ export default defineComponent({
             affiliationBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -150,6 +153,7 @@ export default defineComponent({
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
+                    waitingOnUserInput.value = true;
                 }
             });
         };
@@ -283,6 +287,12 @@ export default defineComponent({
             );
         };
         const idempotencyKey = generateIdempotencyKey();
+
+        watch(affiliationBinded, () => {
+            if (affiliationBinded.value && waitingOnUserInput.value) {
+                emit("userActionComplete");
+            }
+        });
 
         return {
             potentialMatches, switchPage, 

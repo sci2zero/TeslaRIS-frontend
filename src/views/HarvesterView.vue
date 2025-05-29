@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { defineComponent } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import ImportService from "@/services/ImportService";
@@ -131,8 +131,14 @@ export default defineComponent({
             useInterval(fetchNumberOfHarvestedDocuments, 1000 * 10);
         });
 
+        watch(selectedOrganisationUnit, () => {
+            fetchNumberOfHarvestedDocuments();
+        })
+
         const fetchNumberOfHarvestedDocuments = () => {
-            ImportService.getHarvestedDocumentsCount().then(response => {
+            ImportService.getHarvestedDocumentsCount(
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+            ).then(response => {
                 numberOfHarvestedDocuments.value = response.data;
             });
         };

@@ -19,8 +19,8 @@ export class ImportService extends BaseService {
       return super.sendRequest(axios.get, `import-common/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}`);
     }
 
-    async getHarvestedDocumentsCount(): Promise<AxiosResponse<number>> {
-      return super.sendRequest(axios.get, "load/load-wizard/count-remaining");
+    async getHarvestedDocumentsCount(institutionId: number | null = null): Promise<AxiosResponse<number>> {
+      return super.sendRequest(axios.get, `load/load-wizard/count-remaining${institutionId ? "?institutionId=" + institutionId : ""}`);
     }
 
     async getNextFromWizard(): Promise<AxiosResponse<JournalPublicationLoad | ProceedingsPublicationLoad>> {

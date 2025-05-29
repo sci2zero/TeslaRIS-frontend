@@ -55,7 +55,13 @@
             </v-btn>
         </h3>
 
-        <import-affiliation v-for="(institution, index) in institutionsForLoading" :ref="(el) => (importAffiliationsRef[index] = el)" :key="institution.scopusAfid" :ou-for-loading="institution"></import-affiliation>
+        <import-affiliation
+            v-for="(institution, index) in institutionsForLoading"
+            :ref="(el) => (importAffiliationsRef[index] = el)"
+            :key="institution.scopusAfid"
+            :ou-for-loading="institution"
+            @user-action-complete="notifyParentIfAllHandled">
+        </import-affiliation>
     </v-container>
 </template>
 
@@ -89,10 +95,12 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
         const importAffiliationsRef = ref<any[]>([]);
         const automaticProcessCompleted = ref(false);
+        const waitingOnUserInput = ref(false);
 
         const researcherBinded = ref(false);
         const selectedResearcher = ref<PersonIndex>();
@@ -136,6 +144,7 @@ export default defineComponent({
             researcherBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -150,6 +159,7 @@ export default defineComponent({
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
+                    waitingOnUserInput.value = true;
                 }
             });
         };
@@ -297,6 +307,16 @@ export default defineComponent({
             idempotencyKey.value = generateIdempotencyKey();
         };
 
+        watch(researcherBinded, () => {
+            notifyParentIfAllHandled();
+        });
+
+        const notifyParentIfAllHandled = () => {
+            if (isHandled() && waitingOnUserInput.value) {
+                emit("userActionComplete");
+            }
+        };
+
         return {
             potentialMatches, switchPage, 
             tableOptions, headers, refreshTable,
@@ -304,7 +324,8 @@ export default defineComponent({
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
             hadToBeCreated, importAffiliationsRef,
-            isHandled, isReady, resetIdempotencyKey
+            isHandled, isReady, resetIdempotencyKey,
+            notifyParentIfAllHandled
         };
     },
 });

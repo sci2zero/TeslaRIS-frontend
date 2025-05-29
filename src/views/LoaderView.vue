@@ -6,22 +6,63 @@
         <deduplicator :publication-for-loading="currentLoadRecord" @deduplicate="deduplicate"></deduplicator>
 
         <br />
+        
+        <v-btn class="load-action mb-5" :disabled="stepperValue === steps.length" @click="toggleSmartLoading">
+            {{ smartLoading ? $t('turnOffSmartImportLabel') : $t('turnOnSmartImportLabel') }}
+        </v-btn>
+        <v-btn icon variant="plain">
+            <v-icon>mdi-information-variant</v-icon>
+            <v-tooltip
+                activator="parent"
+                location="bottom"
+            >
+                {{ $t('smartImportTooltip') }}
+            </v-tooltip>
+        </v-btn>
+
         <v-stepper
             v-model="stepperValue" :items="steps"
             :next-text="$t('nextLabel')"
             :prev-text="$t('previousLabel')">
             <template v-for="(contribution, index) in currentLoadRecord?.contributions" :key="contribution.key" #[`item.${index+1}`]>
-                <import-author :ref="(el) => (importAuthorsRef[index] = el)" :person-for-loading="contribution.person" :institutions-for-loading="contribution.institutions"></import-author>
+                <import-author
+                    :ref="(el) => (importAuthorsRef[index] = el)"
+                    :person-for-loading="contribution.person"
+                    :institutions-for-loading="contribution.institutions"
+                    @user-action-complete="resumeImport">
+                </import-author>
             </template>
 
             <template #[`item.${steps.length-1}`]>
-                <import-journal v-if="loadingJournalPublication" ref="journalImportRef" :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"></import-journal>
-                <import-proceedings v-if="loadingProceedingsPublication" ref="proceedingsImportRef" :publication-for-loading="(currentLoadRecord as ProceedingsPublicationLoad)"></import-proceedings>
+                <import-journal
+                    v-if="loadingJournalPublication"
+                    ref="journalImportRef"
+                    :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"
+                    @user-action-complete="resumeImport">
+                </import-journal>
+                
+                <import-proceedings
+                    v-if="loadingProceedingsPublication"
+                    ref="proceedingsImportRef"
+                    :publication-for-loading="(currentLoadRecord as ProceedingsPublicationLoad)"
+                    @user-action-complete="resumeImport">
+                </import-proceedings>
             </template>
 
             <template #[`item.${steps.length}`]>
-                <import-journal-publication-details v-if="loadingJournalPublication" ref="journalPublicationDetailsRef" :preset-metadata="(currentLoadRecord as JournalPublicationLoad)" @update="updateRecord"></import-journal-publication-details>
-                <import-proceedings-publication-details v-if="loadingProceedingsPublication" ref="proceedingsPublicationDetailsRef" :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)" @update="updateRecord"></import-proceedings-publication-details>
+                <import-journal-publication-details
+                    v-if="loadingJournalPublication"
+                    ref="journalPublicationDetailsRef"
+                    :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
+                    @update="updateRecord">
+                </import-journal-publication-details>
+                
+                <import-proceedings-publication-details
+                    v-if="loadingProceedingsPublication"
+                    ref="proceedingsPublicationDetailsRef"
+                    :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
+                    @update="updateRecord">
+                </import-proceedings-publication-details>
             </template>
 
             <template #actions>
@@ -40,24 +81,16 @@
             {{ $t('skipDocumentLabel') }}
         </v-btn>
 
-        
-        <v-btn class="load-action same-line" :disabled="stepperValue === steps.length" @click="smartSkip">
-            {{ $t('smartImportLabel') }}
-        </v-btn>
-
-        <v-btn icon variant="plain">
-            <v-icon>mdi-information-variant</v-icon>
-            <v-tooltip
-                activator="parent"
-                location="bottom"
-            >
-                {{ $t('smartImportTooltip') }}
-            </v-tooltip>
-        </v-btn>
-
         <v-btn class="load-action same-line" :disabled="stepperValue !== steps.length" @click="finishLoad">
             {{ $t('finishLoadLabel') }}
         </v-btn>
+
+        <v-progress-circular
+            v-if="loading"
+            color="primary"
+            class="load-action ml-2"
+            indeterminate
+        ></v-progress-circular>
 
         <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
@@ -102,6 +135,7 @@ export default defineComponent({
         const contributionsLength = ref(0);
 
         const isFormValid = ref(false);
+        const loading = ref(false);
         
         const snackbar = ref(false);
         const errorMessage = ref("");
@@ -115,6 +149,9 @@ export default defineComponent({
         const loadingProceedingsPublication = ref(false);
 
         const noRecordsRemaining = ref(false);
+
+        const smartLoading = ref(false);
+        const currentSmartSkipRunId = ref('');
         
         const nextStep = () => {
             stepperValue.value += 1;
@@ -161,10 +198,16 @@ export default defineComponent({
                 }
 
                 steps.value.push(i18n.t("otherDetailsLabel"));
+                if (smartLoading.value) {
+                    smartSkip();
+                }
             });
         };
 
         const skipDocument = () => {
+            smartLoading.value = false;
+            currentSmartSkipRunId.value = crypto.randomUUID();
+
             ImportService.skipWizard().then(() => {
                 stepperValue.value = 1;
                 importAuthorsRef.value.forEach(contribution => {
@@ -175,6 +218,7 @@ export default defineComponent({
                 importAuthorsRef.value = [];
                 importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();
+                smartLoading.value = true;
             });
         };
 
@@ -214,12 +258,24 @@ export default defineComponent({
         };
 
         const smartSkip = async () => {
+            const runId = crypto.randomUUID();
+            currentSmartSkipRunId.value = runId;
+            smartLoading.value = true;
+
             let shouldStep = true;
             while (shouldStep) {
+                if (!smartLoading.value || currentSmartSkipRunId.value !== runId) {
+                    break;
+                }
+
                 nextStep();
                 await new Promise(r => setTimeout(r, 1000));
+
+                if (!smartLoading.value || currentSmartSkipRunId.value !== runId) break;
+
                 if (stepperValue.value <= currentLoadRecord.value!.contributions.length) {
                     await waitForImportAuthor(stepperValue.value - 1);
+                    if (!smartLoading.value || currentSmartSkipRunId.value !== runId) break;
                     shouldStep = importAuthorsRef.value[stepperValue.value - 1].isHandled();
                 } else if (stepperValue.value === currentLoadRecord.value!.contributions.length + 1) {
                     if (loadingJournalPublication.value) {
@@ -236,6 +292,7 @@ export default defineComponent({
                 }
             }
         };
+
 
         const updateRecord = (updatedRecord: JournalPublicationLoad | ProceedingsPublicationLoad) => {
             currentLoadRecord.value!.subTitle = updatedRecord.subTitle;
@@ -262,9 +319,12 @@ export default defineComponent({
         };
 
         const finishLoad = () => {
+            loading.value = true;
+
             if (contributionsLength.value !== currentLoadRecord.value?.contributions.length) {
                 errorMessage.value = i18n.t("authorBindNotFinishedMessage");
                 snackbar.value = true;
+                loading.value = false;
                 return;
             }
 
@@ -278,6 +338,7 @@ export default defineComponent({
             if (unbindedAuthors.length !== 0) {
                 errorMessage.value = i18n.t("authorsNotBindedMessage", unbindedAuthors);
                 snackbar.value = true;
+                loading.value = false;
                 return;
             }
             
@@ -285,12 +346,14 @@ export default defineComponent({
                 if (!journalImportRef.value?.journalBinded) {
                     errorMessage.value = i18n.t("journalNotBindedMessage");
                     snackbar.value = true;
+                    loading.value = false;
                     return;
                 }
 
                 if (!journalPublicationDetailsRef.value) {
                     errorMessage.value = i18n.t("detailsNotReviewedMessage");
                     snackbar.value = true;
+                    loading.value = false;
                     return;
                 }
                 
@@ -300,12 +363,14 @@ export default defineComponent({
                 if (!proceedingsImportRef.value?.eventBinded) {
                     errorMessage.value = i18n.t("eventNotBindedMessage");
                     snackbar.value = true;
+                    loading.value = false;
                     return;
                 }
 
                 if (!proceedingsImportRef.value?.proceedingsBinded) {
                     errorMessage.value = i18n.t("proceedingsNotBindedMessage");
                     snackbar.value = true;
+                    loading.value = false;
                     return;
                 }
 
@@ -319,7 +384,11 @@ export default defineComponent({
             currentLoadRecord.value?.contributions.forEach((contribution, index) => {
 
                 const affiliatedInstitutionIds = 
-                    importAuthorsRef.value[index].importAffiliationsRef.map(
+                    importAuthorsRef.value[index].importAffiliationsRef
+                    .filter(
+                        (importAffiliationRef: any) => importAffiliationRef.selectedAffiliation
+                    )
+                    .map(
                         (importAffiliationRef: any) => 
                             importAffiliationRef.selectedAffiliation.databaseId
                     );
@@ -370,6 +439,7 @@ export default defineComponent({
 
                 DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
                     markAsLoadedAndFetchNext();
+                    loading.value = false;
                 });
             } else if (loadingProceedingsPublication.value) {
                 const newProceedingsPublication: ProceedingsPublication = {
@@ -395,6 +465,7 @@ export default defineComponent({
 
                 DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then(() => {
                     markAsLoadedAndFetchNext();
+                    loading.value = false;
                 });
             }
         };
@@ -414,6 +485,19 @@ export default defineComponent({
             });
         };
 
+        const toggleSmartLoading = () => {
+            smartLoading.value = !smartLoading.value;
+            if (smartLoading.value) {
+                smartSkip();
+            }
+        };
+
+        const resumeImport = () => {
+            if (smartLoading.value) {
+                smartSkip();
+            }
+        };
+
         return {
             isFormValid, snackbar,
             errorMessage, currentLoadRecord,
@@ -426,7 +510,8 @@ export default defineComponent({
             journalImportRef, journalPublicationDetailsRef,
             deduplicate, proceedingsImportRef,
             proceedingsPublicationDetailsRef,
-            noRecordsRemaining
+            noRecordsRemaining, toggleSmartLoading,
+            smartLoading, resumeImport, loading
         };
     },
 });
