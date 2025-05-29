@@ -244,7 +244,7 @@ export default defineComponent({
         const authorAcquiredTitle = ref("");
         const reportCounts = ref<InstitutionPromotionCountsReport[]>([]);
 
-        watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle], () => {
+        watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle, selectedPromotion], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
@@ -255,6 +255,8 @@ export default defineComponent({
                     reportCounts.value.splice(0);
                     reportCounts.value = response.data;
                 });
+            } else if (currentTab.value === "forPromotion" && selectedPromotion.value.value > 0) {
+                tableStates.forPromotion.fetchFn();
             }
         });
     
@@ -267,7 +269,7 @@ export default defineComponent({
                 sort: "",
                 direction: "",
                 fetchFn: async () => {
-                    const query = `page=${tableStates.nonPromoted.page}&size=${tableStates.nonPromoted.size}&sort=${tableStates.nonPromoted.sort},${tableStates.nonPromoted.direction}`;
+                    const query = `page=${tableStates.nonPromoted.page}&size=${tableStates.nonPromoted.size}${tableStates.nonPromoted.sort ? `&sort=${tableStates.nonPromoted.sort},${tableStates.nonPromoted.direction}` : ""}`;
                     const response = await RegistryBookService.getNonPromotedEntries(query);
                     tableStates.nonPromoted.entries = response.data.content;
                     tableStates.nonPromoted.totalEntries = response.data.totalElements;
@@ -281,7 +283,7 @@ export default defineComponent({
                 sort: "",
                 direction: "",
                 fetchFn: async () => {
-                    const query = `page=${tableStates.forPromotion.page}&size=${tableStates.forPromotion.size}&sort=${tableStates.forPromotion.sort},${tableStates.forPromotion.direction}`;
+                    const query = `page=${tableStates.forPromotion.page}&size=${tableStates.forPromotion.size}${tableStates.forPromotion.sort ? `&sort=${tableStates.forPromotion.sort},${tableStates.forPromotion.direction}` : ""}`;
                     const response = await RegistryBookService.getForPromotion(
                         selectedPromotion.value.value,
                         query
@@ -302,7 +304,7 @@ export default defineComponent({
                         return;
                     }
 
-                    const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}`;
+                    const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}${tableStates.promoted.sort ? `&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}` : ""}`;
                     const response = await RegistryBookService.getPromoted(
                         selectedInstitution.value.value,
                         fromDate.value ? fromDate.value.split("T")[0] : "",
@@ -404,7 +406,7 @@ export default defineComponent({
             const to = toDate.value ? toDate.value.split("T")[0] : "";
 
             RegistryBookReportService.scheduleReportGeneration(
-                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&lang=${selectedLang.value.value}`
+                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&authorName=${authorFullName.value}&authorTitle=${authorAcquiredTitle.value}&lang=${selectedLang.value.value}`
             ).then((response) => {
                 message.value = i18n.t("reportGenerationScheduledMessage", [response.data]);
                 snackbar.value = true;

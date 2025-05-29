@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []" :document-id="leftSoftware?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []"
+                            :document-id="leftSoftware?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []" :document-id="rightSoftware?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []"
+                            :document-id="rightSoftware?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 

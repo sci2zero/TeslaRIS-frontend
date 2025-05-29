@@ -2,17 +2,19 @@ import { MonographType } from "@/models/PublicationModel";
 import i18n from ".";
 
 const monographTypeEn = [
-    { title: "Bibliography", value: MonographType.BIBLIOGRAPHY },
-    { title: "Book", value: MonographType.BOOK },
     { title: "Research Monograph", value: MonographType.RESEARCH_MONOGRAPH },
-    { title: "Translation", value: MonographType.TRANSLATION }
+    { title: "Study", value: MonographType.STUDY },
+    { title: "Book", value: MonographType.BOOK },
+    { title: "Translation", value: MonographType.TRANSLATION },
+    { title: "Bibliography", value: MonographType.BIBLIOGRAPHY },
 ];
 
 const monographTypeSr = [
-    { title: "Bibliografija", value: MonographType.BIBLIOGRAPHY },
-    { title: "Knjiga", value: MonographType.BOOK },
     { title: "Istraživačka monografija", value: MonographType.RESEARCH_MONOGRAPH },
-    { title: "Prevod", value: MonographType.TRANSLATION }
+    { title: "Studija", value: MonographType.STUDY },
+    { title: "Knjiga", value: MonographType.BOOK },
+    { title: "Prevod", value: MonographType.TRANSLATION },
+    { title: "Bibliografija", value: MonographType.BIBLIOGRAPHY },
 ];
 
 export const getTitleFromValue = (value: MonographType, monographTypeArray: {title: string, value: MonographType}[]) => {

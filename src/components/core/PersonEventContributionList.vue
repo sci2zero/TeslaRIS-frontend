@@ -1,5 +1,9 @@
 <template>
-    <draggable :list="contributionList" item-key="id" group="eventContributions" @change="reorderContributors">
+    <draggable
+        :list="contributionList" item-key="id"
+        group="eventContributions"
+        :disabled="!canReorder"
+        @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" elementk :to="'persons/' + contribution.personId">
                 <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
@@ -33,12 +37,24 @@ export default defineComponent({
         eventId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        canReorder: {
+            type: Boolean,
+            default: false
         }
     },
-    setup(props) {
+    emits: ["positionsChanged"],
+    setup(props, {emit}) {
         const reorderContributors = (event: any) => {
             if(event.moved.newIndex !== event.moved.oldIndex) {
-                EventService.reorderContribution(props.eventId as number, props.contributionList[event.moved.newIndex].id as number, event.moved.oldIndex + 1, event.moved.newIndex + 1);
+                EventService.reorderContribution(
+                    props.eventId as number,
+                    props.contributionList[event.moved.newIndex].id as number,
+                    event.moved.oldIndex + 1,
+                    event.moved.newIndex + 1
+                ).then(() => {
+                    emit("positionsChanged")
+                });
             }
         };
 

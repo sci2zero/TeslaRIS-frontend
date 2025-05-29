@@ -130,6 +130,7 @@ import { useRouter } from 'vue-router';
 import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
+import { isEqual } from 'lodash';
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
@@ -260,6 +261,16 @@ export default defineComponent({
         };
 
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            if (
+                (
+                    isEqual([{key: nameColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+                    tableOptions.value.sortBy.length === 0
+                ) &&
+                page == tableOptions.value.page
+            ) {
+                return
+            }
+
             tableOptions.value.initialCustomConfiguration = true;
             if (sortBy.length === 0) {
                 tableOptions.value.sortBy.splice(0);

@@ -45,7 +45,7 @@
                 <v-select
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
-                    :label="$t('typeOfPublicationLabel') + '*'"
+                    :label="$t('concretePublicationTypeLabel') + '*'"
                     return-object
                     :rules="requiredSelectionRules">
                 </v-select>

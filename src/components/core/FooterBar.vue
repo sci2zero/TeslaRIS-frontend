@@ -12,7 +12,8 @@
                         variant="text"
                         class="mx-2"
                         rounded="xl"
-                        :to="link.path !== undefined ? '/' + $i18n.locale + '/' + link.path : undefined"
+                        :to="(link.path !== undefined && !link.path.startsWith('mailto')) ? '/' + $i18n.locale + '/' + link.path : undefined"
+                        :href="link.path.startsWith('mailto') ? link.path : undefined"
                     >
                         {{ link.title }}
                     </v-btn>
@@ -48,6 +49,7 @@ export default defineComponent(
             const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
             const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
             const contactLabel = computed(() => i18n.t("contactLabel"));
+            const feedbackLabel = computed(() => i18n.t("feedbackLabel"));
 
 
             const links = ref([
@@ -56,7 +58,8 @@ export default defineComponent(
                     { title: ouListLabel, path: "organisation-units"},
                     { title: scientificResultsListLabel, path: "scientific-results"},
                     { title: simpleSearchLabel, path: "advanced-search"},
-                    { title: contactLabel, path: "contact"},
+                    { title: contactLabel, path: "mailto:chenejac@uns.ac.rs"},
+                    { title: feedbackLabel, path: "contact"},
                 ]);
 
 

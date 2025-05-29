@@ -5,7 +5,14 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)"></rich-title-renderer>
+                        <v-skeleton-loader
+                            :loading="!monograph"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="text-center"
+                        >
+                            <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)"></rich-title-renderer>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(monograph?.subTitle) }}
@@ -19,9 +26,10 @@
         <!-- Monograph Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-monograph-icon">
+                <v-icon v-if="!monograph" size="x-large" class="large-monograph-icon">
                     {{ icon }}
                 </v-icon>
+                <wordcloud v-else :for-document-id="monograph?.id" compact-icon />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -40,7 +48,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!monograph" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="monograph?.monographType">
@@ -136,7 +145,9 @@
             </v-col>
         </v-row>
 
+        <tab-content-loader v-if="!monograph" layout="sections" />
         <v-tabs
+            v-show="monograph"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -145,7 +156,7 @@
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-if="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
+                {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="researchAreaHierarchy || canEdit" value="researchArea">
                 {{ $t("researchAreaLabel") }}
@@ -158,7 +169,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="monograph"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -170,14 +184,25 @@
                 <v-row>
                     <v-col cols="12">
                         <h2>{{ $t("monographPublicationsLabel") }}</h2>
-                        <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                        <publication-table-component
+                            :publications="publications"
+                            :total-publications="totalPublications"
+                            in-comparator
+                            show-publication-concrete-type
+                            @switch-page="switchPage">
+                        </publication-table-component>
                     </v-col>
                 </v-row>
 
                 <attachment-section :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="monograph?.id" :contribution-list="monograph?.contributions ? monograph?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <person-document-contribution-tabs
+                    :document-id="monograph?.id"
+                    :contribution-list="monograph?.contributions ? monograph?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>
@@ -269,11 +294,14 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import Wordcloud from '@/components/core/Wordcloud.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector, EntityClassificationView, RichTitleRenderer },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("contributions");
 

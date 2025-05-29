@@ -1,8 +1,14 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="input.key" class="bottom-spacer">
+    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="basic" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base
+                    :ref="(el) => (baseContributionRef[index] = el)"
+                    :basic="basic"
+                    :required="required"
+                    :preset-contribution-value="input.contribution"
+                    :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
+                    @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -90,6 +96,14 @@ export default defineComponent({
         limitOne: {
             type: Boolean,
             default: false
+        },
+        allowExternalAssociate: {
+            type: Boolean,
+            default: true
+        },
+        required: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["setInput"],
@@ -101,31 +115,40 @@ export default defineComponent({
         const personalTitles = computed(() => getPersonalTitlesForGivenLocale());
 
         onMounted(() => {
+            populateFormData();
+        });
+
+        const populateFormData = () => {
             if(props.presetContributions && props.presetContributions.length > 0) {
                 inputs.value.splice(0);
                 props.presetContributions.forEach(contribution => {
-                    inputs.value.push({contribution: 
-                        {
-                            personId: contribution.personId, 
-                            description: contribution.contributionDescription, 
-                            affiliationStatement: contribution.displayAffiliationStatement, 
-                            selectedOtherName: [
-                                        contribution.personName?.firstname, 
-                                        contribution.personName?.otherName, 
-                                        contribution.personName?.lastname
-                                    ],
-                            institutionIds: contribution.institutionIds
+                    inputs.value.push({
+                        contribution: 
+                            {
+                                personId: contribution.personId, 
+                                description: contribution.contributionDescription, 
+                                affiliationStatement: contribution.displayAffiliationStatement, 
+                                selectedOtherName: [
+                                            contribution.personName?.firstname, 
+                                            contribution.personName?.otherName, 
+                                            contribution.personName?.lastname
+                                        ],
+                                institutionIds: contribution.institutionIds
+                            }, 
+                        contributionType: {
+                            title: getTitleFromValueAutoLocale(contribution.contributionType),
+                            value: contribution.contributionType
                         }, 
-                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType}, 
-                    isMainContributor: contribution.isMainContributor, 
-                    isCorrespondingContributor: contribution.isCorrespondingContributor,
-                    isBoardPresident: contribution.isBoardPresident,
-                    employmentTitle: contribution.employmentTitle,
-                    personalTitle: contribution.personalTitle,
-                    id: contribution.id});
+                        isMainContributor: contribution.isMainContributor, 
+                        isCorrespondingContributor: contribution.isCorrespondingContributor,
+                        isBoardPresident: contribution.isBoardPresident,
+                        employmentTitle: contribution.employmentTitle,
+                        personalTitle: contribution.personalTitle,
+                        id: contribution.id
+                    });
                 });
             }
-        });
+        };
 
         const contributionTypes = computed(() => {
             const types = getTypesForGivenLocale();
@@ -196,6 +219,8 @@ export default defineComponent({
                     });
                 }
 
+                const advisorOrBoardMember = input.contributionType.value === DocumentContributionType.BOARD_MEMBER || input.contributionType.value === DocumentContributionType.ADVISOR;
+
                 const contributionObject = {
                     contributionDescription: input.contribution.description,
                     personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
@@ -207,8 +232,8 @@ export default defineComponent({
                     isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
                     isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
                     institutionIds: input.contribution.institutionIds,
-                    employmentTitle: input.employmentTitle,
-                    personalTitle: input.personalTitle
+                    employmentTitle: advisorOrBoardMember ? input.employmentTitle : undefined,
+                    personalTitle: advisorOrBoardMember ? input.personalTitle : undefined
                 };
 
                 returnObject.push(contributionObject);
@@ -226,7 +251,8 @@ export default defineComponent({
             inputs, addInput, removeInput,
             contributionTypes, sendContentToParent,
             baseContributionRef, clearInput,
-            employmentTitles, personalTitles
+            employmentTitles, personalTitles,
+            populateFormData
         }
     }
 });

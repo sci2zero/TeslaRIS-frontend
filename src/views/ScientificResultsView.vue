@@ -60,7 +60,15 @@
                 class="ml-4 mt-3"
             ></v-checkbox>
         </span>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
         <publication-table-component
+            v-else
             ref="tableRef"
             :publications="publications"
             :total-publications="totalPublications"
@@ -91,16 +99,17 @@ import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Common';
-import { isEqual } from 'lodash';
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ScientificResultsListView",
-    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu },
+    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu, TabContentLoader },
     setup() {
         const currentTab = ref("simpleSearch");
+        const loading = ref(false);
 
         const searchParams = ref("tokens=");
         const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
@@ -124,6 +133,7 @@ export default defineComponent({
         const searchFields = ref<SearchFieldsResponse[]>([]);
 
         onMounted(() => {
+            loading.value = true;
             document.title = i18n.t("scientificResultsListLabel");
 
             selectedPublicationTypes.value.splice(0);
@@ -152,43 +162,38 @@ export default defineComponent({
             const publicationTypes = selectedPublicationTypes.value.map(publicationType => publicationType.value);
             const selectOnlyUnassessed = isCommission.value && returnOnlyUnassessedEntities.value;
 
-            if (loggedInUser.value && searchParams.value === tokenParams && isEqual(previousFilterValues.value.publicationTypes, publicationTypes) && previousFilterValues.value.selectOnlyUnassessed === selectOnlyUnassessed) {
-                return;
-            } else {
-                searchParams.value = tokenParams;
-                previousFilterValues.value.publicationTypes = publicationTypes;
-                previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
-            }
+            searchParams.value = tokenParams;
+            previousFilterValues.value.publicationTypes = publicationTypes;
+            previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
 
-            if (currentTab.value === "simpleSearch" || tokenParams === "tokens=*") {
-                DocumentPublicationService.searchDocumentPublications(
-                    `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-                    returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                    selectOnlyUnassessed,
-                    publicationTypes
-                ).then((response) => {
-                    publications.value = response.data.content;
-                    totalPublications.value = response.data.totalElements;
-                });
-            } else {
-                DocumentPublicationService.performAdvancedSearch(
-                    `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-                    returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
-                    selectOnlyUnassessed,
-                    publicationTypes
-                ).then((response) => {
-                    publications.value = response.data.content;
-                    totalPublications.value = response.data.totalElements;
-                });
-            }
+            const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
+            const serviceMethod = isSimpleSearch
+                ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes)
+                : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
+                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes);
+
+            const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
+                ? (loggedInUser.value?.organisationUnitId as number)
+                : null;
+
+            serviceMethod(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                organisationUnitId,
+                selectOnlyUnassessed,
+                publicationTypes
+            ).then((response) => {
+                publications.value = response.data.content;
+                totalPublications.value = response.data.totalElements;
+            }).finally(() => {
+                loading.value = false;
+            });
         };
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams !== "string") {
                 tokenParams = "tokens=" + tokenParams.join("&tokens=");
             }
-
-            console.log(tokenParams);
 
             tableRef.value?.setSortAndPageOption([], 1);
             page.value = 0;
@@ -218,7 +223,7 @@ export default defineComponent({
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
-            resetFiltersAndSearch, loggedInUser
+            resetFiltersAndSearch, loggedInUser, loading
         };
     }
 });

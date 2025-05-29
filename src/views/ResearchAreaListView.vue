@@ -7,7 +7,19 @@
         <br />
         <br />
         <br />
-        <research-area-table-component ref="tableRef" :research-areas="researchAreas" :total-research-areas="totalCountries" @switch-page="switchPage"></research-area-table-component>
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            :tab-number="2"
+            layout="table"
+        />
+        <research-area-table-component
+            v-else
+            ref="tableRef"
+            :research-areas="researchAreas"
+            :total-research-areas="totalCountries"
+            @switch-page="switchPage">
+        </research-area-table-component>
     </v-container>
 </template>
 
@@ -20,12 +32,15 @@ import { ref } from 'vue';
 import type { ResearchAreaResponse } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "ResearchAreaListView",
-    components: {SearchBarComponent, ResearchAreaTableComponent},
+    components: { SearchBarComponent, ResearchAreaTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const researchAreas = ref<ResearchAreaResponse[]>([]);
         const totalCountries = ref(0);
@@ -39,6 +54,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("researchAreaListLabel");
+            loading.value = true;
         });
 
         watch(i18n.locale, () => {
@@ -55,9 +71,13 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            ResearchAreaService.searchResearchAreas(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            ResearchAreaService.searchResearchAreas(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            .then((response) => {
                 researchAreas.value = response.data.content;
                 totalCountries.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -71,7 +91,7 @@ export default defineComponent({
 
         return {
             search, researchAreas, totalCountries, switchPage,
-            clearSortAndPerformSearch, tableRef
+            clearSortAndPerformSearch, tableRef, loading
         };
     }
 });

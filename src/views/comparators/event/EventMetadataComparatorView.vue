@@ -26,7 +26,12 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-event-contribution-list :contribution-list="leftConference?.contributions ? leftConference.contributions : []" :event-id="leftConference?.id" in-comparator></person-event-contribution-list>
+                        <person-event-contribution-list
+                            :contribution-list="leftConference?.contributions ? leftConference.contributions : []"
+                            :event-id="leftConference?.id"
+                            in-comparator
+                            :can-reorder="true">
+                        </person-event-contribution-list>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -66,7 +71,12 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-event-contribution-list :contribution-list="rightConference?.contributions ? rightConference.contributions : []" :event-id="rightConference?.id" in-comparator></person-event-contribution-list>
+                        <person-event-contribution-list
+                            :contribution-list="rightConference?.contributions ? rightConference.contributions : []"
+                            :event-id="rightConference?.id"
+                            in-comparator
+                            :can-reorder="true">
+                        </person-event-contribution-list>
                     </v-card-text>
                 </v-card>
             </v-col>

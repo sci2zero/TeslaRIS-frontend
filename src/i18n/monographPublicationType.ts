@@ -24,7 +24,7 @@ export const getTitleFromValue = (value: MonographPublicationType, monographPubl
     return (monographPublicationTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
-export const getTitleFromValueAutoLocale = (value: MonographPublicationType) => {
+export const getTitleFromValueAutoLocale = (value: MonographPublicationType | string) => {
     const locale = i18n.vueI18n.global.locale;
 
     let monographPublicationTypeArray = monographPublicationTypeEn;

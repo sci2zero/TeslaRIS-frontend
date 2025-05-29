@@ -1,11 +1,18 @@
 <template>
-    <v-container id="researcher">
+    <v-container id="institution">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="primary">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${organisationUnit?.nameAbbreviation})` : "" }}
+                        <v-skeleton-loader
+                            :loading="!organisationUnit"
+                            type="heading"
+                            color="primary"
+                            class="d-flex justify-center align-center"
+                        >
+                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${organisationUnit?.nameAbbreviation})` : "" }}
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("organisationUnitLabel") }}
@@ -17,11 +24,12 @@
         <!-- Account Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-card class="pa-3 h-100" variant="flat" color="secondary">
-                    <v-icon size="x-large" class="large-researcher-icon">
-                        {{ ouIcon }}
-                    </v-icon>
-                </v-card>
+                <organisation-unit-logo
+                    :filename="organisationUnit?.logoServerFilename"
+                    :background-color-hex="organisationUnit?.logoBackgroundHex"
+                    :org-unit-id="organisationUnit?.id"
+                    :can-edit="canEdit">
+                </organisation-unit-logo>
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -41,7 +49,13 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader
+                            v-if="!organisationUnit"
+                            color="grey-lighten-5"
+                            :citation-button="false"
+                            show-map
+                        />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div>
                                     {{ $t("addressLabel") }}:
@@ -97,7 +111,9 @@
         <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
         <br />
+        <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
+            v-if="organisationUnit"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -119,7 +135,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-if="organisationUnit"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
@@ -238,11 +257,14 @@ import { type EntityIndicatorResponse, StatisticsType } from '@/models/Assessmen
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import OrganisationUnitLogo from '@/components/organisationUnit/OrganisationUnitLogo.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("");
 
@@ -256,8 +278,6 @@ export default defineComponent({
 
         const graphRef = ref<typeof RelationsGraph>();
         const relationChain = ref();
-
-        const ouIcon = ref('mdi-city');
         
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -526,7 +546,7 @@ export default defineComponent({
         };
 
         return {
-            organisationUnit, ouIcon, currentTab,
+            organisationUnit, currentTab,
             publications, totalPublications,
             employees, totalEmployees,
             switchPublicationsPage,
@@ -547,11 +567,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    #researcher .large-researcher-icon {
+    #institution .large-institution-icon {
         font-size: 10em;
     }
 
-    #researcher .response {
+    #institution .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

@@ -48,8 +48,11 @@ export class UserService extends BaseService {
     return response;
   }
 
-  async searchUsers(tokens: string): Promise<AxiosResponse<Page<UserAccountIndex>>> {
-    return super.sendRequest(axios.get, `user/search?${tokens}`);
+  async searchUsers(tokens: string, allowedRoles: string[]): Promise<AxiosResponse<Page<UserAccountIndex>>> {
+    let allowedRolesParams = "";
+    allowedRoles.forEach(role => allowedRolesParams += `&allowedRoles=${role}`);
+
+    return super.sendRequest(axios.get, `user/search?${tokens}${allowedRolesParams}`);
   }
 
   async updateAccountActivationStatus(userId: number): Promise<AxiosResponse<void>> {
@@ -78,6 +81,18 @@ export class UserService extends BaseService {
 
   async getUserObjectByPersonId(personId: number): Promise<AxiosResponse> {
     return super.sendRequest(axios.get, `user/person/${personId}`);
+  }
+
+  async generateNewUserPassword(employeeUserId: number): Promise<AxiosResponse> {
+    return super.sendRequest(axios.patch, `user/reset-user-password/${employeeUserId}`);
+  }
+
+  async deleteUser(userId: number): Promise<AxiosResponse> {
+    return super.sendRequest(axios.delete, `user/${userId}`);
+  }
+
+  async migrateUserData(newUserId: number, oldUserId: number): Promise<AxiosResponse> {
+    return super.sendRequest(axios.delete, `user/migrate/${oldUserId}/${newUserId}`);
   }
 }
 

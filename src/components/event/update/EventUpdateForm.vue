@@ -11,7 +11,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetEvent?.nameAbbreviation, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('conferenceAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetEvent?.nameAbbreviation, languageTags)"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <h3 v-if="!serialEvent">
@@ -23,6 +23,8 @@
                             v-model="dateFrom"
                             :label="$t('fromLabel') + '*'"
                             color="primary"
+                            required
+                            :additional-rules="dateRangeRule"
                         ></date-picker>
                     </v-col>
                     <v-col v-if="timePeriodInput" cols="3">
@@ -30,6 +32,8 @@
                             v-model="dateTo"
                             :label="$t('toLabel') + '*'"
                             color="primary"
+                            required
+                            :additional-rules="dateRangeRule"
                         ></date-picker>
                     </v-col>
                     <v-col v-if="!timePeriodInput" cols="6">
@@ -100,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { Country, ExternalValidation, MultilingualContent } from '@/models/Common';
@@ -206,6 +210,16 @@ export default defineComponent({
 
         const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
 
+        const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
+        const dateRangeRule = [
+            (value: string) => {
+                if (!dateFrom.value || !dateTo.value || !value) return true;
+                if (dateFrom.value > dateTo.value) return dateRangeFormatError.value;
+
+                return true;
+            }
+        ];
+
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
         const submit = async () => {
@@ -276,7 +290,7 @@ export default defineComponent({
             isFormValid,
             name, nameAbbreviation, urisRef, refreshForm, uris, message, snackbar,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
-            requiredFieldRules, publicationSeriesExternalValidation, submit,
+            requiredFieldRules, publicationSeriesExternalValidation, submit, dateRangeRule,
             dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
             eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId
         };
