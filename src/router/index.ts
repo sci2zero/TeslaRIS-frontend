@@ -861,7 +861,7 @@ const router = createRouter({
                     component: LoaderView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.researcher],
+                        authorities: [roles.researcher, roles.admin, roles.institutionalEditor],
                     },
                 },
                 {

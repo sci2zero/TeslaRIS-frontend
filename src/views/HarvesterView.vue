@@ -15,6 +15,7 @@
                             v-model:model-value="selectedOrganisationUnit"
                             required
                             disable-submission
+                            only-harvestable-institutions
                         ></organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>

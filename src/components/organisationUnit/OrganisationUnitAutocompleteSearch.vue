@@ -91,6 +91,10 @@ export default defineComponent({
         readonly: {
             type: Boolean,
             default: false
+        },
+        onlyHarvestableInstitutions: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -131,12 +135,18 @@ export default defineComponent({
                     params += `tokens=${token}&`;
                 });
                 params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params, props.forPersonId, props.topLevelInstitutionId).then((response) => {
-                    organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
-                        title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
-                        value: organisationUnit.databaseId,
-                    }));
-                });
+                OrganisationUnitService.searchOUs(
+                        params,
+                        props.forPersonId,
+                        props.topLevelInstitutionId,
+                        props.onlyHarvestableInstitutions
+                    ).then((response) => {
+                        organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
+                            title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
+                            value: organisationUnit.databaseId,
+                        }));
+                    }
+                );
             }
         }, 300);
 
