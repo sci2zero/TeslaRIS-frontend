@@ -81,7 +81,7 @@ import { watch } from "vue";
 import type { OrganisationUnitLoad } from "@/models/LoadModel";
 import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
@@ -90,6 +90,10 @@ export default defineComponent({
     props: {
         ouForLoading: {
             type: Object as PropType<OrganisationUnitLoad>,
+            required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
             required: true
         }
     },
@@ -227,7 +231,11 @@ export default defineComponent({
 
             await new Promise(r => setTimeout(r, Math.floor(Math.random() * (500 - 10 + 1)) + 10));
 
-            ImportService.createNewInstitution(props.ouForLoading.scopusAfid, idempotencyKey).then((response) => {
+            ImportService.createNewInstitution(
+                props.ouForLoading.scopusAfid,
+                idempotencyKey,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then((response) => {
                 selectedAffiliation.value = {
                     nameSr: response.data.name[0].content,
                     nameOther: response.data.name[0].content,

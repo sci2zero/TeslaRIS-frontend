@@ -863,5 +863,7 @@ export default {
     wordcloudLabel: "Word cloud",
     resultRepresentationLabel: "Result representation",
     updateProceedingsPublicationLabel: "Update proceedings publication",
-    metadataFormatLabel: "Metadata format"
+    metadataFormatLabel: "Metadata format",
+    smartLoadingByDefaultLabel: "Smart import by default",
+    loadedEntitiesAreUnamangedLabel: "Unbinded entities are external associates"
 }

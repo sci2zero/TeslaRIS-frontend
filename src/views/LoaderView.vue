@@ -1,4 +1,17 @@
 <template>
+    <v-row
+        v-if="isAdmin"
+        class="d-flex flex-row justify-center"
+    >
+        <v-col cols="8">
+            <organisation-unit-autocomplete-search
+                v-model:model-value="selectedOrganisationUnit"
+                required
+                disable-submission
+                only-harvestable-institutions
+            ></organisation-unit-autocomplete-search>
+        </v-col>
+    </v-row>
     <v-container v-if="!noRecordsRemaining">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
@@ -7,9 +20,13 @@
 
         <br />
         
-        <v-btn class="load-action mb-5" :disabled="stepperValue === steps.length" @click="toggleSmartLoading">
+        <v-btn class="load-action mb-5" @click="skipDocument">
+            {{ $t('skipDocumentLabel') }}
+        </v-btn>
+        <v-btn class="load-action mb-5 same-line" :disabled="stepperValue === steps.length" @click="toggleSmartLoading">
             {{ smartLoading ? $t('turnOffSmartImportLabel') : $t('turnOnSmartImportLabel') }}
         </v-btn>
+        
         <v-btn icon variant="plain">
             <v-icon>mdi-information-variant</v-icon>
             <v-tooltip
@@ -29,6 +46,7 @@
                     :ref="(el) => (importAuthorsRef[index] = el)"
                     :person-for-loading="contribution.person"
                     :institutions-for-loading="contribution.institutions"
+                    :top-level-institution-id="selectedOrganisationUnit.value"
                     @user-action-complete="resumeImport">
                 </import-author>
             </template>
@@ -38,6 +56,7 @@
                     v-if="loadingJournalPublication"
                     ref="journalImportRef"
                     :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"
+                    :top-level-institution-id="selectedOrganisationUnit.value"
                     @user-action-complete="resumeImport">
                 </import-journal>
                 
@@ -45,6 +64,7 @@
                     v-if="loadingProceedingsPublication"
                     ref="proceedingsImportRef"
                     :publication-for-loading="(currentLoadRecord as ProceedingsPublicationLoad)"
+                    :top-level-institution-id="selectedOrganisationUnit.value"
                     @user-action-complete="resumeImport">
                 </import-proceedings>
             </template>
@@ -77,11 +97,7 @@
             </template>
         </v-stepper>
 
-        <v-btn class="load-action" @click="skipDocument">
-            {{ $t('skipDocumentLabel') }}
-        </v-btn>
-
-        <v-btn class="load-action same-line" :disabled="stepperValue !== steps.length" @click="finishLoad">
+        <v-btn class="load-action" :disabled="stepperValue !== steps.length" @click="finishLoad">
             {{ $t('finishLoadLabel') }}
         </v-btn>
 
@@ -105,8 +121,8 @@
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { localiseDate } from "@/i18n/dateLocalisation";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
-import ImportService from "@/services/ImportService";
-import { ref } from "vue";
+import ImportService from "@/services/importer/ImportService";
+import { ref, watch } from "vue";
 import { onMounted } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
@@ -119,12 +135,18 @@ import DocumentPublicationService from "@/services/DocumentPublicationService";
 import Deduplicator from "@/components/import/Deduplicator.vue";
 import ImportProceedings from "@/components/import/ImportProceedings.vue";
 import Toast from "@/components/core/Toast.vue";
+import { useUserRole } from "@/composables/useUserRole";
+import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: {ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings, Toast},
+    components: { ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings, Toast, OrganisationUnitAutocompleteSearch },
     setup() {
+        const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
+        const { isAdmin, isResearcher } = useUserRole();
+
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();
         const journalPublicationDetailsRef = ref<typeof ImportJournalPublicationDetails>();
@@ -166,6 +188,22 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
 
+            LoadingConfigurationService.fetchLoadingConfiguration()
+            .then(response => {
+                if (isResearcher.value) {
+                    smartLoading.value = response.data.smartLoadingByDefault;
+                }
+                
+                fetchNextRecordForLoading();
+            });
+        });
+
+        watch(selectedOrganisationUnit, () => {
+            smartLoading.value = false;
+            currentSmartSkipRunId.value = crypto.randomUUID();
+            noRecordsRemaining.value = false;
+            stepperValue.value = 1;
+
             fetchNextRecordForLoading();
         });
 
@@ -175,7 +213,9 @@ export default defineComponent({
             loadingJournalPublication.value = false;
             loadingProceedingsPublication.value = false;
 
-            ImportService.getNextFromWizard().then(response => {
+            ImportService.getNextFromWizard(
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+            ).then(response => {
                 if(!response.data) {
                     noRecordsRemaining.value = true;
                     return;
@@ -205,10 +245,13 @@ export default defineComponent({
         };
 
         const skipDocument = () => {
+            const shouldToggleSmartLoading = smartLoading.value;
             smartLoading.value = false;
             currentSmartSkipRunId.value = crypto.randomUUID();
 
-            ImportService.skipWizard().then(() => {
+            ImportService.skipWizard(
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+            ).then(() => {
                 stepperValue.value = 1;
                 importAuthorsRef.value.forEach(contribution => {
                     if (contribution) {
@@ -218,7 +261,7 @@ export default defineComponent({
                 importAuthorsRef.value = [];
                 importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();
-                smartLoading.value = true;
+                smartLoading.value = shouldToggleSmartLoading;
             });
         };
 
@@ -382,11 +425,10 @@ export default defineComponent({
             const contributions: PersonDocumentContribution[] = [];
             
             currentLoadRecord.value?.contributions.forEach((contribution, index) => {
-
                 const affiliatedInstitutionIds = 
                     importAuthorsRef.value[index].importAffiliationsRef
                     .filter(
-                        (importAffiliationRef: any) => importAffiliationRef.selectedAffiliation
+                        (importAffiliationRef: any) => importAffiliationRef && importAffiliationRef.selectedAffiliation
                     )
                     .map(
                         (importAffiliationRef: any) => 
@@ -477,7 +519,9 @@ export default defineComponent({
         const markAsLoadedAndFetchNext = () => {
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
-            ImportService.markCurrentAsLoaded().then(() => {
+            ImportService.markCurrentAsLoaded(
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+            ).then(() => {
                 stepperValue.value = 1;
                 fetchNextRecordForLoading();
                 errorMessage.value = i18n.t("loadSuccessMessage");
@@ -499,7 +543,7 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, snackbar,
+            isFormValid, snackbar, isAdmin,
             errorMessage, currentLoadRecord,
             returnCurrentLocaleContent,
             localiseDate, stepperValue, steps,
@@ -511,7 +555,8 @@ export default defineComponent({
             deduplicate, proceedingsImportRef,
             proceedingsPublicationDetailsRef,
             noRecordsRemaining, toggleSmartLoading,
-            smartLoading, resumeImport, loading
+            smartLoading, resumeImport, loading,
+            selectedOrganisationUnit
         };
     },
 });
@@ -524,7 +569,7 @@ export default defineComponent({
 }
 
 .same-line {
-    margin-left: 30px;
+    margin-left: 20px;
 }
 
 </style>

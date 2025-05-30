@@ -19,6 +19,10 @@
                         ></organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
+                <loading-configuration-form
+                    v-if="isInstitutionalEditor || (isAdmin && selectedOrganisationUnit.value > 0)"
+                    :top-level-institution-id="selectedOrganisationUnit.value"
+                />
                 <v-row class="d-flex flex-row justify-center">
                     <v-col cols="4">
                         <date-picker
@@ -88,18 +92,19 @@
 import { ref, watch } from "vue";
 import { defineComponent } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import Toast from "@/components/core/Toast.vue";
 import { useInterval } from "@/composables/useInterval";
 import { useUserRole } from "@/composables/useUserRole";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import LoadingConfigurationForm from "@/components/import/LoadingConfigurationForm.vue";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch },
+    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
@@ -116,7 +121,7 @@ export default defineComponent({
         const newDocumentsHarvested = ref(0);
 
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isInstitutionalEditor } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -170,7 +175,8 @@ export default defineComponent({
             harvestComplete, isAdmin,
             isFormValid, snackbar,
             errorMessage, canPerformHarvest,
-            selectedOrganisationUnit
+            selectedOrganisationUnit,
+            isInstitutionalEditor
         };
     },
 });

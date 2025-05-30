@@ -82,7 +82,7 @@ import type { ProceedingsPublicationLoad } from "@/models/LoadModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { EventType, type EventIndex } from "@/models/EventModel";
 import EventService from "@/services/EventService";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 import ProceedingsService from "@/services/ProceedingsService";
 import JournalService from "@/services/JournalService";
@@ -95,6 +95,10 @@ export default defineComponent({
     props: {
         publicationForLoading: {
             type: Object as PropType<ProceedingsPublicationLoad>,
+            required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
             required: true
         }
     },
@@ -228,7 +232,10 @@ export default defineComponent({
 
             creationInProgress.value = true;
 
-            ImportService.createNewProceedings(idempotencyKey).then((response) => {
+            ImportService.createNewProceedings(
+                idempotencyKey,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then((response) => {
                 selectedEvent.value = {
                     nameSr: returnCurrentLocaleContent(response.data.eventName) as string,
                     nameOther: returnCurrentLocaleContent(response.data.eventName) as string,

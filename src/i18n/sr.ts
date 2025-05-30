@@ -385,8 +385,8 @@ export default {
     canNotAutoFindJournalMessage: "Nije moguće automatski pronaći časopis u sistemu, molimo vas, selektujte iz liste časopisa:",
     canCreateNewJournalLabel: "Ukoliko časopis nije u listi možete kreirati novi:",
     authorAffiliationsLabel: "Afilijacije autora",
-    turnOnSmartImportLabel: "Uključi pametan import",
-    turnOffSmartImportLabel: "Isključi pametan import",
+    turnOnSmartImportLabel: "Uključi pametan uvoz",
+    turnOffSmartImportLabel: "Isključi pametan uvoz",
     smartImportTooltip: "Kada pokrenete proces automatskog učitavanja, sistem će pokušati automatski da poveže svaki uvezeni resurs sa odgovarajućim resursom u našem sistemu. Ovo se zasniva na unapred definisanim kriterijumima i algoritmima za usklađivanje. Ako sistem pronađe podudaranje, resurs se automatski povezuje i označava kao uspešno obrađen. Za resurse koji ne mogu biti automatski povezani, potreban je unos korisnika za ručno povezivanje tih resursa. Sistem će vam omogućiti da pregledate i ručno povežete ove nepovezane resurse. Nakon rešavanja nepovezanih resursa, možete nastaviti proces automatskog učitavanja. Sistem će zatim nastaviti automatsko povezivanje za preostale resurse, ponavljajući proces dok svi resursi ne budu automatski povezani ili dok ne bude potreban dalji unos korisnika.",
     noPublicationsForResearcherMessage: "Nema podataka za ovog istraživača.",
     authorBindNotFinishedMessage: "Niste povezali sve autore na ovoj publikaciji.",
@@ -889,5 +889,7 @@ export default {
     wordcloudLabel: "Oblak reči",
     resultRepresentationLabel: "Prikaz rezultata",
     updateProceedingsPublicationLabel: "Ažuriraj rad sa konferencije",
-    metadataFormatLabel: "Format metapodataka"
+    metadataFormatLabel: "Format metapodataka",
+    smartLoadingByDefaultLabel: "Pametan uvoz podrazumevan",
+    loadedEntitiesAreUnamangedLabel: "Nespojeni entitieti su spoljni saradnici"
 }

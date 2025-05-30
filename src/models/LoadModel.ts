@@ -70,3 +70,8 @@ export interface OrganisationUnitLoad {
     nameAbbreviation: string;
     scopusAfid: string;
 }
+
+export interface LoadingConfiguration {
+    smartLoadingByDefault: boolean;
+    loadedEntitiesAreUnmanaged: boolean;
+}

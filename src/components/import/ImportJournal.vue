@@ -35,7 +35,7 @@
                         {{ row.item.titleOther }}
                     </td>
                     <td>
-                        {{ displayTextOrPlaceholder(row.item.eISSN) }}
+                        {{ displayTextOrPlaceholder(row.item.eissn) }}
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(row.item.printISSN) }}
@@ -70,7 +70,7 @@ import type { JournalPublicationLoad } from "@/models/LoadModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import type { JournalIndex } from "@/models/JournalModel";
 import JournalService from "@/services/JournalService";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 
 
 export default defineComponent({
@@ -78,6 +78,10 @@ export default defineComponent({
     props: {
         publicationForLoading: {
             type: Object as PropType<JournalPublicationLoad>,
+            required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
             required: true
         }
     },
@@ -201,7 +205,12 @@ export default defineComponent({
 
             creationInProgress.value = true;
 
-            ImportService.createNewJournal(props.publicationForLoading.journalEIssn, props.publicationForLoading.journalPrintIssn, idempotencyKey).then((response) => {
+            ImportService.createNewJournal(
+                props.publicationForLoading.journalEIssn,
+                props.publicationForLoading.journalPrintIssn,
+                idempotencyKey,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then((response) => {
                 selectedJournal.value = {
                     titleSr: returnCurrentLocaleContent(response.data.title) as string,
                     titleOther: returnCurrentLocaleContent(response.data.title) as string,

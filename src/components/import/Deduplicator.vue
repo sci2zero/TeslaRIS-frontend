@@ -29,7 +29,7 @@ import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/model
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { watch } from "vue";
 import { ref } from "vue";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 
 

@@ -60,6 +60,7 @@
             :ref="(el) => (importAffiliationsRef[index] = el)"
             :key="institution.scopusAfid"
             :ou-for-loading="institution"
+            :top-level-institution-id="topLevelInstitutionId"
             @user-action-complete="notifyParentIfAllHandled">
         </import-affiliation>
     </v-container>
@@ -79,7 +80,7 @@ import { useI18n } from "vue-i18n";
 import PublicationsDialog from "@/components/core/PublicationsDialog.vue"
 import { watch } from "vue";
 import ImportAffiliation from "./ImportAffiliation.vue";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 
 
 export default defineComponent({
@@ -92,6 +93,10 @@ export default defineComponent({
         },
         institutionsForLoading: {
             type: Object as PropType<OrganisationUnitLoad[]>,
+            required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
             required: true
         }
     },
@@ -240,7 +245,11 @@ export default defineComponent({
             creationInProgress.value = true;
             await waitForImportAffiliations();
 
-            ImportService.createNewPerson(props.personForLoading.scopusAuthorId, idempotencyKey.value).then(response => {
+            ImportService.createNewPerson(
+                props.personForLoading.scopusAuthorId,
+                idempotencyKey.value,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then(response => {
                 selectedResearcher.value = {
                     name: `${props.personForLoading.firstName} ${props.personForLoading.lastName}`,
                     birthdate: "",
