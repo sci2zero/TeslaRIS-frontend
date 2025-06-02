@@ -336,20 +336,25 @@ export default defineComponent({
             rightMonograph.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftMonograph.value?.id as number : rightMonograph.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftMonograph.value?.title : rightMonograph.value?.title;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightMonograph.value?.id : leftMonograph.value?.id;
 
-            const deleteAction = isForceDelete 
-                ? DocumentPublicationService.forceDeleteMonograph(id)
-                : DocumentPublicationService.deleteMonograph(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? DocumentPublicationService.forceDeleteMonograph(id)
+                    : DocumentPublicationService.deleteMonograph(id);
 
-            deleteAction.then(() => {
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

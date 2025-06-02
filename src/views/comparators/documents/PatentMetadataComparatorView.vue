@@ -308,14 +308,21 @@ export default defineComponent({
             rightPatent.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftPatent.value?.id as number : rightPatent.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide) => {
+            const id = side === ComparisonSide.LEFT ? leftPatent.value?.id : rightPatent.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightPatent.value?.id : leftPatent.value?.id;
+
+            try {
+                await DocumentPublicationService.deleteDocumentPublication(id as number);
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 const name = side === ComparisonSide.LEFT ? leftPatent.value?.title : rightPatent.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

@@ -93,6 +93,9 @@
             <v-tab v-if="canEdit || (bookSeries?.contributions && bookSeries?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab v-if="bookSeriesIndicators.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -111,6 +114,16 @@
                     :read-only="!canEdit" @update="updateContributions">
                 </person-publication-series-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="bookSeriesIndicators" 
+                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]" 
+                    :entity-id="bookSeries?.id"
+                    :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
+                    :can-edit="false"
+                    show-statistics
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -118,7 +131,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -140,11 +153,15 @@ import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import StatisticsService from '@/services/StatisticsService';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -171,19 +188,30 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
+        const bookSeriesIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
+
+                StatisticsService.registerPublicationSeriesView(parseInt(currentRoute.params.id as string));
             }
 
             fetchBookSeries(true);
+            fetchIndicators();
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchPublicationSeriesIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                bookSeriesIndicators.value = response.data;
+            });
+        };
 
         const fetchBookSeries = (uponStartup: boolean) => {
             BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -275,7 +303,9 @@ export default defineComponent({
             languageTagMap, canEdit,
             updateBasicInfo, snackbar,
             snackbarMessage, updateContributions,
-            PublicationSeriesUpdateForm
+            PublicationSeriesUpdateForm,
+            ApplicableEntityType,
+            bookSeriesIndicators
         };
 }})
 

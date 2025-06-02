@@ -161,6 +161,7 @@
                     :entity-id="conference?.id" 
                     :entity-type="ApplicableEntityType.EVENT" 
                     :can-edit="canClassify"
+                    show-statistics
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -214,6 +215,7 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -258,6 +260,8 @@ export default defineComponent({
                     canClassify.value = response.data;
                 });
                 fetchClassifications();
+
+                StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
             fetchConference();

@@ -424,20 +424,26 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftPerson.value?.id as number : rightPerson.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftPerson.value?.personName.firstname : rightPerson.value?.personName.firstname;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightPerson.value?.id : leftPerson.value?.id;
 
-            const deleteAction = isForceDelete 
-                ? PersonService.forceDeleteResearcher(id)
-                : PersonService.forceDeleteResearcher(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? PersonService.forceDeleteResearcher(id)
+                    : PersonService.forceDeleteResearcher(id);
 
-            deleteAction.then(() => {
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherPerson(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "persons" } });
-            }).catch(() => {
-                snackbarMessage.value = isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
+            } catch (error) {
+                snackbarMessage.value =
+                    isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

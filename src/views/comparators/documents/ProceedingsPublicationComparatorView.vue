@@ -321,14 +321,21 @@ export default defineComponent({
             rightProceedingsPublication.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.id as number : rightProceedingsPublication.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide) => {
+            const id = side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.id : rightProceedingsPublication.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightProceedingsPublication.value?.id : leftProceedingsPublication.value?.id;
+
+            try {
+                await DocumentPublicationService.deleteDocumentPublication(id as number);
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 const name = side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.title : rightProceedingsPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {
