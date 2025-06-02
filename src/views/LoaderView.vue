@@ -138,6 +138,8 @@ import Toast from "@/components/core/Toast.vue";
 import { useUserRole } from "@/composables/useUserRole";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
+import LanguageService from "@/services/LanguageService";
+import { type LanguageTagResponse } from "@/models/Common";
 
 
 export default defineComponent({
@@ -163,7 +165,7 @@ export default defineComponent({
         const errorMessage = ref("");
         const i18n = useI18n();
 
-        const stepperValue = ref(1);
+        const stepperValue = ref(0);
         const canAdvance = ref(true);
         const steps = ref<string[]>([]);
 
@@ -174,6 +176,8 @@ export default defineComponent({
 
         const smartLoading = ref(false);
         const currentSmartSkipRunId = ref('');
+
+        const languageTags = ref<LanguageTagResponse[]>([]);
         
         const nextStep = () => {
             stepperValue.value += 1;
@@ -196,13 +200,17 @@ export default defineComponent({
                 
                 fetchNextRecordForLoading();
             });
+
+            LanguageService.getAllLanguageTags().then(response => {
+                languageTags.value = response.data;
+            });
         });
 
         watch(selectedOrganisationUnit, () => {
             smartLoading.value = false;
             currentSmartSkipRunId.value = crypto.randomUUID();
             noRecordsRemaining.value = false;
-            stepperValue.value = 1;
+            stepperValue.value = 0;
 
             fetchNextRecordForLoading();
         });
@@ -252,7 +260,7 @@ export default defineComponent({
             ImportService.skipWizard(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
             ).then(() => {
-                stepperValue.value = 1;
+                stepperValue.value = 0;
                 importAuthorsRef.value.forEach(contribution => {
                     if (contribution) {
                         contribution.resetIdempotencyKey();
@@ -428,17 +436,41 @@ export default defineComponent({
                 const affiliatedInstitutionIds = 
                     importAuthorsRef.value[index].importAffiliationsRef
                     .filter(
-                        (importAffiliationRef: any) => importAffiliationRef && importAffiliationRef.selectedAffiliation
+                        (importAffiliationRef: any) =>
+                            importAffiliationRef &&
+                            importAffiliationRef.selectedAffiliation &&
+                            importAffiliationRef.selectedAffiliation.databaseId
                     )
                     .map(
                         (importAffiliationRef: any) => 
                             importAffiliationRef.selectedAffiliation.databaseId
                     );
+
+                let affiliationStatement = [];
+                const isUnmanagedPerson = !importAuthorsRef.value[index].selectedResearcher.databaseId;
+                if (affiliatedInstitutionIds.length === 0 || isUnmanagedPerson) {
+                    affiliationStatement = importAuthorsRef.value[index].importAffiliationsRef
+                        .filter(
+                            (importAffiliationRef: any) =>
+                                importAffiliationRef &&
+                                importAffiliationRef.selectedAffiliation
+                        )
+                        .map(
+                            (importAffiliationRef: any) => {
+                                return {
+                                    languageTagId: languageTags.value.find(tag => tag.languageCode === "EN")?.id,
+                                    languageTag: "EN",
+                                    content: importAffiliationRef.selectedAffiliation.nameOther,
+                                    priority: 1
+                                };
+                            }
+                        );
+                }
                 
                 contributions.push({
                     contributionDescription: contribution.contributionDescription,
                     contributionType: contribution.contributionType,
-                    displayAffiliationStatement: [],
+                    displayAffiliationStatement: affiliationStatement,
                     isCorrespondingContributor: contribution.isCorrespondingContributor ? true : false,
                     isMainContributor: contribution.isMainContributor ? true : false,
                     orderNumber: contribution.orderNumber as number,
@@ -522,7 +554,7 @@ export default defineComponent({
             ImportService.markCurrentAsLoaded(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
             ).then(() => {
-                stepperValue.value = 1;
+                stepperValue.value = 0;
                 fetchNextRecordForLoading();
                 errorMessage.value = i18n.t("loadSuccessMessage");
                 snackbar.value = true;
