@@ -41,7 +41,9 @@ export interface OrganisationUnitResponse {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
-    uris: string[]
+    uris: string[];
+    logoServerFilename?: string;
+    logoBackgroundHex: string;
 }
 
 export enum OrganisationUnitsRelationType {
@@ -95,4 +97,13 @@ interface GeoLocation {
     longitude: number;
     latitude: number;
     address?: string;
+}
+
+export interface InstitutionLogoRequest {
+    file: File
+    top: number;
+    left: number;
+    height: number;
+    width: number;
+    backgroundHex: string;
 }

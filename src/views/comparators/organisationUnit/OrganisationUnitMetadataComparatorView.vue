@@ -331,20 +331,28 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.id as number : rightOrganisationUnit.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftOrganisationUnit.value?.name : rightOrganisationUnit.value?.name;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightOrganisationUnit.value?.id : leftOrganisationUnit.value?.id;
 
-            const deleteAction = isForceDelete 
-                ? OrganisationUnitService.forceDeleteOrganisationUnit(id)
-                : OrganisationUnitService.deleteOrganisationUnit(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? OrganisationUnitService.forceDeleteOrganisationUnit(id)
+                    : OrganisationUnitService.deleteOrganisationUnit(id);
 
-            deleteAction.then(() => {
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherOrganisationUnit(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "organisationUnits" } });
-            }).catch(() => {
-                snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
+            } catch (error) {
+                snackbarMessage.value = i18n.t(
+                    "deleteFailedNotification",
+                    { name: returnCurrentLocaleContent(name) }
+                );
                 snackbar.value = true;
-            });
+            }
         };
 
         const updateRelations = async (newRelations: OrganisationUnitRelationRequest[], toDelete: number[], left: boolean) => {

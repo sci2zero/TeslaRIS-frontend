@@ -7,6 +7,7 @@ export const resourceTypeSr = [
     { title: "Oficijalna Publikacija", value: ResourceType.OFFICIAL_PUBLICATION },
     { title: "Dodatak", value: ResourceType.SUPPLEMENT },
     { title: "Izjava", value: ResourceType.STATEMENT },
+    { title: "Savetnik - Sukob interesa", value: ResourceType.ADVISOR_CONFLICT_OF_INTEREST },
 ];
 
 export const resourceTypeEn = [
@@ -14,6 +15,7 @@ export const resourceTypeEn = [
     { title: "Official Publication", value: ResourceType.OFFICIAL_PUBLICATION },
     { title: "Supplement", value: ResourceType.SUPPLEMENT },
     { title: "Statement", value: ResourceType.STATEMENT },
+    { title: "Advisor - Conflict of Interest", value: ResourceType.ADVISOR_CONFLICT_OF_INTEREST },
 ];
 
 export const getResourceTypeTitleFromValueAutoLocale = (value: ResourceType) => {

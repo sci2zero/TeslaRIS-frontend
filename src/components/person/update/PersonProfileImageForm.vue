@@ -82,12 +82,19 @@ export default defineComponent({
         const submit = async () => {
             if (!cropper || !file.value) return
 
+            const canvasData = cropper.getCanvasData();
+            const imageData = cropper.getImageData();
+            const cropBoxData = cropper.getCropBoxData();
+
+            const scaleX = imageData.naturalWidth / imageData.width;
+            const scaleY = imageData.naturalHeight / imageData.height;
+
             const newProfileImage: PersonProfileImageRequest = {
                 file: await urlToFile(imageSrc.value as string, file.value.name),
-                top: Math.round(cropper.getCropBoxData().top),
-                left: Math.round(cropper.getCropBoxData().left) - 60,
-                height: Math.round(cropper.getCropBoxData().height),
-                width: Math.round(cropper.getCropBoxData().width)
+                top: Math.round((cropBoxData.top - canvasData.top) * scaleY),
+                left: Math.round((cropBoxData.left - canvasData.left) * scaleX),
+                height: Math.round(cropBoxData.height * scaleY),
+                width: Math.round(cropBoxData.width * scaleX)
             };
 
             PersonService.updatePersonProfileImage(newProfileImage, props.personId).then(() => {
@@ -113,13 +120,20 @@ export default defineComponent({
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        
-                        canvas.width = 450;
-                        canvas.height = 600;
 
-                        ctx?.drawImage(img, 0, 0, 450, 600);
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        ctx?.drawImage(img, 0, 0, img.width, img.height);
 
                         imageSrc.value = canvas.toDataURL('image/jpeg');
+
+                        cropper?.setCropBoxData({
+                            width: img.width / 2,
+                            height: img.height / 2,
+                            top: img.height / 4,
+                            left: img.width / 4
+                        });
                     };
 
                     img.src = e.target?.result as string;

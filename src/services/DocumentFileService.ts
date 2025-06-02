@@ -7,11 +7,17 @@ export class DocumentFileService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async downloadDocumentFile(serverFilename: string, fileName: string, extension: string): Promise<void> {
-        const response = await super.sendRequest(axios.get, `file/${serverFilename}`, {
-            responseType: 'blob',
-        });
-        this.initialzeDownload(response, fileName, extension);
+    async downloadDocumentFile(serverFilename: string, fileName: string, extension: string, inline: boolean = false): Promise<void> {
+        if (inline) {
+            const imagePath = this.basePath + `file/${serverFilename}?inline=true`;
+            window.open(imagePath, '_blank');
+        } else {
+            const response = await super.sendRequest(axios.get, `file/${serverFilename}`, {
+                responseType: "blob",
+            });
+
+            this.initialzeDownload(response, fileName, extension);
+        }
     }
 
     async addInvolvementProof(proof: any, involvementId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {

@@ -9,7 +9,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('conferenceAbbreviationLabel')"></multilingual-text-input>
                     </v-col>
                 </v-row>
                 <div v-if="!serialEvent" class="mt-3">
@@ -21,6 +21,7 @@
                                 :label="$t('fromLabel') + '*'"
                                 color="primary"
                                 required
+                                :additional-rules="dateRangeRule"
                             ></date-picker>
                         </v-col>
                         <v-col v-if="timePeriodInput" cols="3">
@@ -29,6 +30,7 @@
                                 :label="$t('toLabel') + '*'"
                                 color="primary"
                                 required
+                                :additional-rules="dateRangeRule"
                             ></date-picker>
                         </v-col>
                         <v-col v-if="!timePeriodInput" cols="6">
@@ -43,7 +45,7 @@
                         </v-col>
                     </v-row>
                 </div>
-                <v-row class="serial-event">
+                <v-row v-if="canAddSerialEvents" class="serial-event">
                     <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                 </v-row>
                 <v-row>
@@ -82,18 +84,18 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="5">
+                        <v-col cols="10">
                             <v-text-field
                                 v-model="conferenceNumber"
                                 :label="$t('conferenceNumberLabel')"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="5">
+                        <!-- <v-col cols="5">
                             <v-text-field
                                 v-model="entryFee"
                                 :label="$t('entryFeeLabel')"
                             ></v-text-field>
-                        </v-col>
+                        </v-col> -->
                     </v-row>
                     <v-row>
                         <v-col>
@@ -115,7 +117,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import { ref } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { useI18n } from 'vue-i18n';
@@ -131,6 +133,7 @@ import CountryService from '@/services/CountryService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import UriInput from '../core/UriInput.vue';
 import Toast from '../core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -153,6 +156,8 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
+
+        const { canAddSerialEvents } = useUserRole();
 
         onMounted(() => {
             fetchCountries();
@@ -196,6 +201,16 @@ export default defineComponent({
         const urisRef = ref<typeof MultilingualTextInput>();
 
         const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
+
+        const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
+        const dateRangeRule = [
+            (value: string) => {
+                if (!dateFrom.value || !dateTo.value || !value) return true;
+                if (dateFrom.value > dateTo.value) return dateRangeFormatError.value;
+
+                return true;
+            }
+        ];
 
         const submit = (stayOnPage: boolean) => {
             if (!timePeriodInput.value) {
@@ -259,9 +274,9 @@ export default defineComponent({
             name, nameAbbreviation, description, keywords,
             dateFrom, dateTo, eventYear, countries, selectedCountry,
             place, conferenceNumber, entryFee, serialEvent,
-            requiredFieldRules, submit, timePeriodInput,
+            requiredFieldRules, submit, timePeriodInput, dateRangeRule,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
-            confIdValidationRules, confId, uris, urisRef
+            confIdValidationRules, confId, uris, urisRef, canAddSerialEvents
         };
     }
 });

@@ -80,6 +80,7 @@ import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import router from '@/router';
 import { useUserRole } from '@/composables/useUserRole';
+import { isEqual } from 'lodash';
 
 
 export default defineComponent({
@@ -93,7 +94,8 @@ export default defineComponent({
         totalJournals: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedJournals = ref<JournalIndex[]>([]);
@@ -186,6 +188,16 @@ export default defineComponent({
         };
 
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
+            if (
+                (
+                    isEqual([{key: titleColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+                    tableOptions.value.sortBy.length === 0
+                ) &&
+                page == tableOptions.value.page
+            ) {
+                return
+            }
+
             tableOptions.value.initialCustomConfiguration = true;
             if (sortBy.length === 0) {
                 tableOptions.value.sortBy.splice(0);

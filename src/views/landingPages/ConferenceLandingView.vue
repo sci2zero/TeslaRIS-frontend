@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(conference?.name) + (conference?.nameAbbreviation && conference.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(conference?.nameAbbreviation) + ")" : "") }}
+                        <v-skeleton-loader
+                            :loading="!conference"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(conference?.name) + (conference?.nameAbbreviation && conference.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(conference?.nameAbbreviation) + ")" : "") }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("conferenceLabel") }}
@@ -38,6 +47,7 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
+                        <basic-info-loader v-if="!conference" :citation-button="false" />
                         <v-row>
                             <v-col cols="6">
                                 <div v-if="!conference?.serialEvent">
@@ -96,7 +106,9 @@
             </v-col>
         </v-row>
 
+        <tab-content-loader v-if="!conference" layout="sections" />
         <v-tabs
+            v-show="conference"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -115,7 +127,10 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="conference"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
                 <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
@@ -146,6 +161,7 @@
                     :entity-id="conference?.id" 
                     :entity-type="ApplicableEntityType.EVENT" 
                     :can-edit="canClassify"
+                    show-statistics
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -197,11 +213,14 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("contributions");
 
@@ -241,6 +260,8 @@ export default defineComponent({
                     canClassify.value = response.data;
                 });
                 fetchClassifications();
+
+                StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
             fetchConference();

@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftJournalPublication?.contributions ? leftJournalPublication.contributions : []" :document-id="leftJournalPublication?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftJournalPublication?.contributions ? leftJournalPublication.contributions : []"
+                            :document-id="leftJournalPublication?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightJournalPublication?.contributions ? rightJournalPublication.contributions : []" :document-id="rightJournalPublication?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightJournalPublication?.contributions ? rightJournalPublication.contributions : []"
+                            :document-id="rightJournalPublication?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -88,7 +96,6 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import JournalService from '@/services/JournalService';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
@@ -323,14 +330,21 @@ export default defineComponent({
             rightJournalPublication.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            JournalService.deleteJournal(side === ComparisonSide.LEFT ? leftJournalPublication.value?.id as number : rightJournalPublication.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide) => {
+            const id = side === ComparisonSide.LEFT ? leftJournalPublication.value?.id : rightJournalPublication.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightJournalPublication.value?.id : leftJournalPublication.value?.id;
+
+            try {
+                await DocumentPublicationService.deleteDocumentPublication(id as number);
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 const name = side === ComparisonSide.LEFT ? leftJournalPublication.value?.title : rightJournalPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftThesis?.contributions ? leftThesis.contributions : []" :document-id="leftThesis?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftThesis?.contributions ? leftThesis.contributions : []"
+                            :document-id="leftThesis?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightThesis?.contributions ? rightThesis.contributions : []" :document-id="rightThesis?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightThesis?.contributions ? rightThesis.contributions : []"
+                            :document-id="rightThesis?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -322,14 +330,21 @@ export default defineComponent({
             rightThesis.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftThesis.value?.id as number : rightThesis.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide) => {
+            const id = side === ComparisonSide.LEFT ? leftThesis.value?.id : rightThesis.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightThesis.value?.id : leftThesis.value?.id;
+
+            try {
+                await DocumentPublicationService.deleteDocumentPublication(id as number);
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 const name = side === ComparisonSide.LEFT ? leftThesis.value?.title : rightThesis.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

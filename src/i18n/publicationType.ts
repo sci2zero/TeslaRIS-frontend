@@ -3,7 +3,7 @@ import i18n from ".";
 
 const publicationTypeEn = [
     { title: "Journal Publication", value: PublicationType.JOURNAL_PUBLICATION },
-    { title: "Proceedings Publication", value: PublicationType.PROCEEDINGS_PUBLICATION },
+    { title: "Conference Publication", value: PublicationType.PROCEEDINGS_PUBLICATION },
     { title: "Patent", value: PublicationType.PATENT },
     { title: "Proceedings", value: PublicationType.PROCEEDINGS },
     { title: "Dataset", value: PublicationType.DATASET },
@@ -15,7 +15,7 @@ const publicationTypeEn = [
 
 const publicationTypeSr = [
     { title: "Rad u časopisu", value: PublicationType.JOURNAL_PUBLICATION },
-    { title: "Rad u zborniku radova", value: PublicationType.PROCEEDINGS_PUBLICATION },
+    { title: "Rad sa konferencije", value: PublicationType.PROCEEDINGS_PUBLICATION },
     { title: "Patent", value: PublicationType.PATENT },
     { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
     { title: "Skup podataka", value: PublicationType.DATASET },

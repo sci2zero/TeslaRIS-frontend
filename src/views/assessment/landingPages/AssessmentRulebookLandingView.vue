@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(assessmentRulebook?.name) }}
+                        <v-skeleton-loader
+                            :loading="!assessmentRulebook"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(assessmentRulebook?.name) }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("assessmentRulebookLabel") }}
@@ -37,7 +46,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!assessmentRulebook" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div v-if="assessmentRulebook?.isDefault" class="response">
                                     {{ $t("defaultLabel") }}
@@ -76,6 +86,7 @@
 
         <!-- Assessment Measures -->
         <br />
+        <tab-content-loader v-if="!assessmentRulebook" :button-header="false" layout="table" />
         <assessment-measure-table-component
             :assessment-measures="assessmentMeasures" :total-assessment-measures="totalAssessmentMeasures" @switch-page="switchPage" @create="addAssessmentMeasure"
             @update="updateAssessmentMeasure"></assessment-measure-table-component>
@@ -116,11 +127,13 @@ import AssessmentMeasureTableComponent from '@/components/assessment/assessmentM
 import type { AxiosResponse } from 'axios';
 import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
 import Toast from '@/components/core/Toast.vue';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "AssessmentRulebookLandingPage",
-    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericCrudModal, AssessmentMeasureTableComponent, Toast },
+    components: { AttachmentList, DescriptionSection, LocalizedLink, GenericCrudModal, AssessmentMeasureTableComponent, Toast, BasicInfoLoader, TabContentLoader },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

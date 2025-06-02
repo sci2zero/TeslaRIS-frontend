@@ -29,9 +29,12 @@
                 </v-list>
             </v-menu>
             <h4>
-                <localized-link :to="'organisation-units/' + involvement.organisationUnitId">
+                <localized-link
+                    v-if="involvement.organisationUnitId"
+                    :to="'organisation-units/' + involvement.organisationUnitId">
                     <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
                 </localized-link>
+                <strong v-else>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
                 <v-icon icon="mdi-circle-small">
                 </v-icon>
                 <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>

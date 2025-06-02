@@ -35,6 +35,7 @@ export interface DocumentPublicationIndex {
     databaseId: number | null;
     doi: string;
     assessedBy?: number[];
+    publicationType: string;
 }
 
 export enum PublicationType {
@@ -155,6 +156,7 @@ export enum MonographType {
     BOOK = "BOOK",
     BIBLIOGRAPHY = "BIBLIOGRAPHY",
     TRANSLATION = "TRANSLATION",
+    STUDY = "STUDY"
 }
 
 export interface Monograph extends Document {
@@ -234,7 +236,7 @@ export interface Thesis extends Document {
     isOnPublicReviewPause?: boolean;
     topicAcceptanceDate: string;
     thesisDefenceDate: string;
-    isArchived: boolean;
+    isArchived?: boolean;
 }
 
 export interface CitationResponse {
@@ -259,4 +261,9 @@ export interface ThesisLibraryFormatsResponse {
     etdMs: string;
     dublinCore: string;
     marc21: string;
+}
+
+export interface TermFrequency {
+    a: string;
+    b: number;
 }

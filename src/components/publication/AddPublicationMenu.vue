@@ -63,12 +63,12 @@ export default defineComponent({
         const submissionMenuItems = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
             { title: addProceedingsPublicationLabel, value: "submitProceedingsPublication" },
-            { title: addPatentLabel, value: "submitPatent" },
-            { title: addSoftwareLabel, value: "submitSoftware" },
-            { title: addDatasetLabel, value: "submitDataset" },
             { title: createNewMonographLabel, value: "submitMonograph" },
             { title: addMonographPublicationLabel, value: "submitMonographPublication" },
             { title: addThesisLabel, value: "submitThesis" },
+            { title: addPatentLabel, value: "submitPatent" },
+            { title: addSoftwareLabel, value: "submitSoftware" },
+            { title: addDatasetLabel, value: "submitDataset" },
         ]);
 
         return {

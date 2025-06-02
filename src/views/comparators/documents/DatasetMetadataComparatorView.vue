@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftDataset?.contributions ? leftDataset.contributions : []" :document-id="leftDataset?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftDataset?.contributions ? leftDataset.contributions : []"
+                            :document-id="leftDataset?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightDataset?.contributions ? rightDataset.contributions : []" :document-id="rightDataset?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightDataset?.contributions ? rightDataset.contributions : []"
+                            :document-id="rightDataset?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -300,14 +308,21 @@ export default defineComponent({
             rightDataset.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftDataset.value?.id as number : rightDataset.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide) => {
+            const id = side === ComparisonSide.LEFT ? leftDataset.value?.id : rightDataset.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightDataset.value?.id : leftDataset.value?.id;
+
+            try {
+                await DocumentPublicationService.deleteDocumentPublication(id as number);
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 const name = side === ComparisonSide.LEFT ? leftDataset.value?.title : rightDataset.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

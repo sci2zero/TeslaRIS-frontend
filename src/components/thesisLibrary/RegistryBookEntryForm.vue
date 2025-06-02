@@ -1,5 +1,7 @@
 <template>
-    <v-stepper v-model="step">
+    <v-stepper
+        v-show="!loading"
+        v-model="step">
         <v-stepper-header>
             <v-stepper-item v-for="(label, index) in steps" :key="index" :value="index + 1">
                 {{ $t(label) }}
@@ -7,25 +9,25 @@
         </v-stepper-header>
   
         <v-stepper-window>
-            <v-stepper-window-item :value="1">
+            <v-stepper-window-item :value="1" :eager="loadAll">
                 <personal-information-form
                     v-model="registryEntry.personalInformation"
                     v-model:valid="validSteps[0]"
                 />
             </v-stepper-window-item>
-            <v-stepper-window-item :value="2">
+            <v-stepper-window-item :value="2" :eager="loadAll">
                 <contact-information-form
                     v-model="registryEntry.contactInformation"
                     v-model:valid="validSteps[1]"
                 />
             </v-stepper-window-item>
-            <v-stepper-window-item :value="3">
+            <v-stepper-window-item :value="3" :eager="loadAll">
                 <previous-title-information-form
                     v-model="registryEntry.previousTitleInformation"
                     v-model:valid="validSteps[2]"
                 />
             </v-stepper-window-item>
-            <v-stepper-window-item :value="4">
+            <v-stepper-window-item :value="4" :eager="loadAll">
                 <dissertation-information-form
                     v-model="registryEntry.dissertationInformation"
                     v-model:valid="validSteps[3]"
@@ -43,10 +45,17 @@
             </v-btn>
         </template>
     </v-stepper>
+
+    <v-progress-circular
+        v-if="loading"
+        color="primary"
+        class="d-flex flex-row justify-center align-center"
+        indeterminate
+    ></v-progress-circular>
 </template>  
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType } from 'vue';
+import { defineComponent, nextTick, onMounted, type PropType } from 'vue';
 import { ref } from 'vue';
 import { AcademicTitle, type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
@@ -74,7 +83,10 @@ export default defineComponent({
     setup(props, { emit }) {
         const step = ref(1);
         const steps = ["authorInfoLabel", "authorContactLabel", "previousTitleInfoLabel", "dissertationInfoLabel"];
-        const validSteps = ref([false, false, false, false]);
+        const validSteps = ref<boolean[]>([false, false, false, false]);
+        
+        const loadAll = ref(false);
+        const loading = ref(false);
 
         const registryEntry = ref<RegistryBookEntry>(
             {
@@ -148,8 +160,26 @@ export default defineComponent({
                     registryEntry.value.dissertationInformation.dissertationTitle = response.data.title;
                 });
             } else {
+                loading.value = true;
                 registryEntry.value = props.presetRegistryBookEntry;
-                step.value = 4;
+                step.value = 1;
+                nextTick()
+                    .then(() => {
+                        loadAll.value = true;
+                        return nextTick();
+                    })
+                    .then(() => nextTick())
+                    .then(() => nextTick())
+                    .then(() => nextTick())
+                    .then(() => {
+                        const firstInvalidStep = validSteps.value.findIndex(val => !val) + 1;
+                        if (firstInvalidStep > 0) {
+                            step.value = firstInvalidStep;
+                        } else if (step.value !== 4) {
+                            step.value = 4;
+                        }
+                        loading.value = false;
+                    });
             }
         });
 
@@ -174,7 +204,8 @@ export default defineComponent({
         return {
             step, steps, validSteps,
             prevStep, nextStep,
-            registryEntry, submit
+            registryEntry, submit,
+            loadAll, loading
         };
     }
 });

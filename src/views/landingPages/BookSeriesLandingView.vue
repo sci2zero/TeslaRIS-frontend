@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation && bookSeries.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
+                        <v-skeleton-loader
+                            :loading="!bookSeries"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation && bookSeries.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("bookSeriesLabel") }}
@@ -38,7 +47,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!bookSeries" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div>eISSN:</div>
                                 <div class="response">
@@ -70,7 +80,9 @@
         </v-row>
 
         <br />
+        <tab-content-loader v-if="!bookSeries" :tab-number="3" layout="list" />
         <v-tabs
+            v-show="bookSeries"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -81,16 +93,36 @@
             <v-tab v-if="canEdit || (bookSeries?.contributions && bookSeries?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab v-if="bookSeriesIndicators.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
         </v-tabs>
 
-        <v-tabs-window v-model="currentTab">
+        <v-tabs-window
+            v-show="bookSeries"
+            v-model="currentTab"
+        >
             <v-tabs-window-item value="publications">
                 <!-- Publications Table -->
                 <h2>{{ $t("journalPublicationsLabel") }}</h2>
                 <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-publication-series-contribution-tabs :contribution-list="bookSeries?.contributions ? bookSeries.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-publication-series-contribution-tabs>
+                <person-publication-series-contribution-tabs
+                    :contribution-list="bookSeries?.contributions ? bookSeries.contributions : []"
+                    :publication-series-id="bookSeries?.id"
+                    :read-only="!canEdit" @update="updateContributions">
+                </person-publication-series-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="bookSeriesIndicators" 
+                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]" 
+                    :entity-id="bookSeries?.id"
+                    :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
+                    :can-edit="false"
+                    show-statistics
+                />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -99,7 +131,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -119,13 +151,19 @@ import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/P
 import UriList from '@/components/core/UriList.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import StatisticsService from '@/services/StatisticsService';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection },
     setup() {
-        const currentTab = ref("");
+        const currentTab = ref("contributions");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -150,19 +188,30 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
+        const bookSeriesIndicators = ref<EntityIndicatorResponse[]>([]);
+
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
+
+                StatisticsService.registerPublicationSeriesView(parseInt(currentRoute.params.id as string));
             }
 
             fetchBookSeries(true);
+            fetchIndicators();
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchPublicationSeriesIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                bookSeriesIndicators.value = response.data;
+            });
+        };
 
         const fetchBookSeries = (uponStartup: boolean) => {
             BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -254,7 +303,9 @@ export default defineComponent({
             languageTagMap, canEdit,
             updateBasicInfo, snackbar,
             snackbarMessage, updateContributions,
-            PublicationSeriesUpdateForm
+            PublicationSeriesUpdateForm,
+            ApplicableEntityType,
+            bookSeriesIndicators
         };
 }})
 

@@ -39,7 +39,7 @@
                             :form-props="{conference: selectedEvent ? selectedEvent : searchPlaceholder}"
                             entity-name="Proceedings"
                             is-submission
-                            :read-only="false"
+                            :read-only="selectedEvent.value === -1"
                             @create="selectNewlyAddedProceedings"
                         />
                     </v-col>
@@ -67,7 +67,7 @@
                         <v-select
                             v-model="selectedpublicationType"
                             :items="publicationTypes"
-                            :label="$t('typeOfPublicationLabel') + '*'"
+                            :label="$t('concretePublicationTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
                             return-object>
                         </v-select>

@@ -16,7 +16,15 @@
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
+
+        <tab-content-loader
+            v-if="loading"
+            button-header
+            tab-number-by-role
+            layout="table"
+        />
         <person-table-component
+            v-else
             ref="tableRef"
             :persons="persons"
             :total-persons="totalPersons"
@@ -39,12 +47,15 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType } from '@/models/Common';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "PersonListView",
-    components: {SearchBarComponent, PersonTableComponent},
+    components: { SearchBarComponent, PersonTableComponent, TabContentLoader },
     setup() {
+        const loading = ref(false);
+
         const searchParams = ref("tokens=");
         const persons = ref<PersonIndex[]>([]);
         const totalPersons = ref(0);
@@ -62,6 +73,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("personListLabel");
+            loading.value = true;
         });
 
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
@@ -82,6 +94,9 @@ export default defineComponent({
             .then((response) => {
                 persons.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
+            })
+            .finally(() => {
+                loading.value = false;
             });
         };
 
@@ -111,7 +126,8 @@ export default defineComponent({
             tableRef, clearSortAndPerformSearch,
             isInstitutionalEditor, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
-            ExportableEndpointType, searchParams
+            ExportableEndpointType, searchParams,
+            loading
         };
     }
 });

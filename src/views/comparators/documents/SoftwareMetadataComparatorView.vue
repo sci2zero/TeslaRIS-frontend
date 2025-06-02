@@ -26,7 +26,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []" :document-id="leftSoftware?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []"
+                            :document-id="leftSoftware?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -68,7 +72,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []" :document-id="rightSoftware?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []"
+                            :document-id="rightSoftware?.id"
+                            :can-reorder="true">
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -300,14 +308,21 @@ export default defineComponent({
             rightSoftware.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide) => {
-            DocumentPublicationService.deleteDocumentPublication(side === ComparisonSide.LEFT ? leftSoftware.value?.id as number : rightSoftware.value?.id as number).then(() => {
+        const deleteSide = async (side: ComparisonSide) => {
+            const id = side === ComparisonSide.LEFT ? leftSoftware.value?.id : rightSoftware.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightSoftware.value?.id : leftSoftware.value?.id;
+
+            try {
+                await DocumentPublicationService.deleteDocumentPublication(id as number);
+
+                await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "documents" } });
-            }).catch(() => {
+            } catch {
                 const name = side === ComparisonSide.LEFT ? leftSoftware.value?.title : rightSoftware.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

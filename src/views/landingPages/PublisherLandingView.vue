@@ -5,7 +5,16 @@
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
-                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                        <v-skeleton-loader
+                            :loading="!publisher"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
+                        >
+                            <p class="text-h5">
+                                {{ returnCurrentLocaleContent(publisher?.name) }}
+                            </p>
+                        </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ $t("publisherLabel") }}
@@ -38,7 +47,8 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <v-row>
+                        <basic-info-loader v-if="!publisher" :citation-button="false" />
+                        <v-row v-else>
                             <v-col cols="6">
                                 <div v-if="publisher?.countryId">
                                     {{ $t("stateLabel") }}:
@@ -63,7 +73,8 @@
 
         <!-- Publication Table -->
         <br />
-        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <tab-content-loader v-if="!publisher" :button-header="false" layout="table" />
+        <publication-table-component v-else :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
         
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -89,11 +100,13 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast },
+    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
