@@ -891,5 +891,9 @@ export default {
     updateProceedingsPublicationLabel: "Ažuriraj rad sa konferencije",
     metadataFormatLabel: "Format metapodataka",
     smartLoadingByDefaultLabel: "Pametan uvoz podrazumevan",
-    loadedEntitiesAreUnamangedLabel: "Nespojeni entitieti su spoljni saradnici"
+    loadedEntitiesAreUnamangedLabel: "Nespojeni entitieti su spoljni saradnici",
+    addExternalOULabel: "Dodaj kao spoljnu afilijaciju",
+    bindedUnmanagedEntityLabel: "Dodao {0} kao eksterni entitet.",
+    selectInstitutionMessage: "Morate selektovati instituciju kako biste započeli uvoz podataka.",
+    institutionLabel: "Institucija"
 }

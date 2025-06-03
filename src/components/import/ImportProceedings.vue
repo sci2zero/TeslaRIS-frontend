@@ -345,3 +345,22 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="css" scoped>
+
+h1 {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+
+h2 {
+    color: #555;
+    font-weight: 500;
+    font-size: 1em;
+    line-height: 1em;
+    margin-bottom: 1em;
+}
+
+</style>

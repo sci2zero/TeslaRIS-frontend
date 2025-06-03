@@ -92,7 +92,7 @@
     </v-row>
     <v-row v-if="personOtherNames.length > 0 && !selectExternalAssociate">
         <v-col>
-            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU">
+            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU; sendContentToParent();">
                 {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
             </v-btn>
         </v-col>
@@ -315,13 +315,15 @@ export default defineComponent({
             if (customNameInput.value) {
                 otherName = [firstName.value, middleName.value, lastName.value, null, null]
             }
+
+            const unmangedAffiliations = (selectExternalAssociate.value || enterExternalOU.value);
             
             const returnObject = {
                 personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
                 description: contributionDescription.value,
-                affiliationStatement: (selectExternalAssociate.value || enterExternalOU.value) ? affiliationStatement.value : [],
+                affiliationStatement: unmangedAffiliations ? affiliationStatement.value : [],
                 selectedOtherName: otherName,
-                institutionIds: enterExternalOU.value ? [] : selectedAffiliations.value.map(affiliation => affiliation.value)
+                institutionIds: unmangedAffiliations ? [] : selectedAffiliations.value.map(affiliation => affiliation.value)
             };
             
             emit("setInput", returnObject);
@@ -364,7 +366,7 @@ export default defineComponent({
         });
 
         const selectLatestAffiliation = () => {
-            if (selectedPerson.value.value && selectedPerson.value.value > 0) {
+            if (selectedPerson.value.value && selectedPerson.value.value > 0 && props.presetContributionValue.personId <= 0) {
                 PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
                     if(latestAffiliationResponse.data) {
                         selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});

@@ -865,5 +865,9 @@ export default {
     updateProceedingsPublicationLabel: "Update proceedings publication",
     metadataFormatLabel: "Metadata format",
     smartLoadingByDefaultLabel: "Smart import by default",
-    loadedEntitiesAreUnamangedLabel: "Unbinded entities are external associates"
+    loadedEntitiesAreUnamangedLabel: "Unbinded entities are external associates",
+    addExternalOULabel: "Added as external affiliation",
+    bindedUnmanagedEntityLabel: "Added {0} as external entity.",
+    selectInstitutionMessage: "Zou have to select an institution in order to start importing data.",
+    institutionLabel: "Institution"
 }

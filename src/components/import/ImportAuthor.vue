@@ -7,7 +7,7 @@
         </h2>
 
         <h2 v-if="researcherBinded && hadToBeCreated">
-            {{ $t("createdNewEntityLabel", [selectedResearcher?.name as string]) }}
+            {{ $t(importAsUnmanaged ? "bindedUnmanagedEntityLabel" : "createdNewEntityLabel", [selectedResearcher?.name as string]) }}
         </h2>
 
         <h2 v-if="showTable" class="can-not-find-message">
@@ -40,7 +40,12 @@
                     <td>{{ displayTextOrPlaceholder(row.item.birthdate) }}</td>
                     <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
                     <td>
-                        <publications-dialog :button-text="$t('viewPublicationsLabel')" :id-for-fetching="row.item.databaseId" icon="mdi-note" :title="$t('publicationsLabel')"></publications-dialog>
+                        <publications-dialog
+                            :button-text="$t('viewPublicationsLabel')"
+                            :id-for-fetching="row.item.databaseId"
+                            icon="mdi-note"
+                            :title="$t('publicationsLabel')">
+                        </publications-dialog>
                         <v-btn size="small" color="primary" @click="selectManually(row.item)">
                             {{ $t("selectLabel") }}
                         </v-btn>
@@ -50,8 +55,9 @@
         </v-data-table-server>
 
         <h3 v-if="showTable">
-            {{ $t("canCreateNewResearcherLabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("createNewPersonLabel") }}
+            {{ $t("canCreateNewResearcherLabel") }} 
+            <v-btn size="small" color="primary" @click="addNew">
+                {{ importAsUnmanaged ? $t("addExternalAssociateLabel") : $t("createNewPersonLabel") }}
             </v-btn>
         </h3>
 
@@ -61,6 +67,7 @@
             :key="institution.scopusAfid"
             :ou-for-loading="institution"
             :top-level-institution-id="topLevelInstitutionId"
+            :import-as-unmanaged="importAsUnmanaged"
             @user-action-complete="notifyParentIfAllHandled">
         </import-affiliation>
     </v-container>
@@ -97,6 +104,10 @@ export default defineComponent({
         },
         topLevelInstitutionId: {
             type: Number,
+            required: true
+        },
+        importAsUnmanaged: {
+            type: Boolean,
             required: true
         }
     },
@@ -339,3 +350,20 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="css" scoped>
+
+h1 {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+
+h2 {
+    color: #555;
+    font-weight: 500;
+    font-size: 1em;
+    line-height: 1em;
+}
+</style>

@@ -133,22 +133,24 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
+import { useBrandingStore } from '@/stores/brandingStore';
 
 
 interface MenuItem {
-  title?: ComputedRef<string> | string | undefined;
-  pathName?: string;
-  click?: () => void;
-  icon?: string;
-  type: string;
-  condition?: Ref<boolean> | boolean;
-  badge?: Ref<number> | number;
-  variant?: 'text' | 'outlined' | 'flat' | 'elevated' | 'tonal' | 'plain';
-  color?: string;
-  subItems?: MenuItem[] | Ref<MenuItem[]>;
-  component?: Component;
-  dynamicValue?: ComputedRef;
+    title?: ComputedRef<string> | string | undefined;
+    pathName?: string;
+    click?: () => void;
+    icon?: string;
+    type: string;
+    condition?: Ref<boolean> | boolean;
+    badge?: Ref<number> | number;
+    variant?: 'text' | 'outlined' | 'flat' | 'elevated' | 'tonal' | 'plain';
+    color?: string;
+    subItems?: MenuItem[] | Ref<MenuItem[]>;
+    component?: Component;
+    dynamicValue?: ComputedRef;
 }
+
 
 export default defineComponent(
     {
@@ -207,6 +209,7 @@ export default defineComponent(
             const sidebar = ref(false);
             const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 
+            const brandingStore = useBrandingStore();
             const loginStore = useLoginStore();
             const userName = ref("");
             const router = useRouter();
@@ -233,9 +236,15 @@ export default defineComponent(
             const logout = () => {
                 AuthenticationService.logoutUser();
                 loginStore.explicitlyLogout();
-                loginStore
                 router.push({ name: "login" });
             };
+
+            watch(() => brandingStore.rebranded, () => {
+                if (brandingStore.rebranded) {
+                    appTitle.value = brandingStore.newTitle;
+                    brandingStore.rebrandingHandled();
+                }
+            });
 
             watch(() => loginStore.userLoggedIn, () => {
                 if (loginStore.userLoggedIn) {
@@ -270,8 +279,8 @@ export default defineComponent(
             const manageMenu = ref<MenuItem[]>([
                 { title: userPageLabel, type:'icon-link', pathName: 'users' },
                 { title: eventListLabel, type:'icon-link', pathName: 'events' },
-                { title: journalListLabel, type:'icon-link', pathName: 'journals' },
-                { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
+                { title: journalListLabel, type:'icon-link', pathName: 'journals'},
+                { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series'},
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
                 { title: countryListLabel, type:'icon-link', pathName: "countries"},
                 { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},

@@ -7,7 +7,7 @@
         </h2>
 
         <h2 v-if="affiliationBinded && hadToBeCreated">
-            {{ $t("createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
+            {{ $t(importAsUnmanaged ? "bindedUnmanagedEntityLabel" : "createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
         </h2>
 
         <h2 v-if="showTable" class="can-not-find-message">
@@ -63,7 +63,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewOULabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("createNewOULabel") }}
+                {{ importAsUnmanaged ? $t("addExternalOULabel") : $t("createNewOULabel") }}
             </v-btn>
         </h3>
     </v-container>
@@ -94,6 +94,10 @@ export default defineComponent({
         },
         topLevelInstitutionId: {
             type: Number,
+            required: true
+        },
+        importAsUnmanaged: {
+            type: Boolean,
             required: true
         }
     },
@@ -313,3 +317,22 @@ export default defineComponent({
     },
 });
 </script>
+
+
+<style lang="css" scoped>
+
+h1 {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+
+h2 {
+    color: #555;
+    font-weight: 500;
+    font-size: 1em;
+    line-height: 1em;
+}
+
+</style>

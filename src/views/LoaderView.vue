@@ -9,10 +9,11 @@
                 required
                 disable-submission
                 only-harvestable-institutions
+                :label="$t('institutionLabel')"
             ></organisation-unit-autocomplete-search>
         </v-col>
     </v-row>
-    <v-container v-if="!noRecordsRemaining">
+    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && selectedOrganisationUnit.value > 0)">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
@@ -47,6 +48,7 @@
                     :person-for-loading="contribution.person"
                     :institutions-for-loading="contribution.institutions"
                     :top-level-institution-id="selectedOrganisationUnit.value"
+                    :import-as-unmanaged="unmanagedImport"
                     @user-action-complete="resumeImport">
                 </import-author>
             </template>
@@ -70,23 +72,41 @@
             </template>
 
             <template #[`item.${steps.length}`]>
-                <import-journal-publication-details
-                    v-if="loadingJournalPublication"
-                    ref="journalPublicationDetailsRef"
-                    :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
-                    @update="updateRecord">
-                </import-journal-publication-details>
-                
-                <import-proceedings-publication-details
-                    v-if="loadingProceedingsPublication"
-                    ref="proceedingsPublicationDetailsRef"
-                    :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
-                    @update="updateRecord">
-                </import-proceedings-publication-details>
+                <div class="metadata-import">
+                    <import-journal-publication-details
+                        v-if="loadingJournalPublication"
+                        ref="journalPublicationDetailsRef"
+                        :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
+                        @update="updateRecord">
+                    </import-journal-publication-details>
+                    
+                    <import-proceedings-publication-details
+                        v-if="loadingProceedingsPublication"
+                        ref="proceedingsPublicationDetailsRef"
+                        :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
+                        @update="updateRecord">
+                    </import-proceedings-publication-details>
+
+                    <div class="d-flex flex-row justify-center">
+                        <v-btn
+                            class="finish-load-action"
+                            :disabled="stepperValue !== steps.length"
+                            color="primary"
+                            @click="finishLoad">
+                            {{ $t('finishLoadLabel') }}
+                        </v-btn>
+                        <v-progress-circular
+                            v-if="loading"
+                            color="primary"
+                            class="mt-4 ml-2"
+                            indeterminate
+                        ></v-progress-circular>
+                    </div>
+                </div>
             </template>
 
             <template #actions>
-                <div class="d-flex flex-row justify-between">
+                <div class="d-flex">
                     <v-btn :disabled="stepperValue === 1" @click="previousStep">
                         {{ $t('previousLabel') }}
                     </v-btn>
@@ -97,18 +117,12 @@
             </template>
         </v-stepper>
 
-        <v-btn class="load-action" :disabled="stepperValue !== steps.length" @click="finishLoad">
-            {{ $t('finishLoadLabel') }}
-        </v-btn>
-
-        <v-progress-circular
-            v-if="loading"
-            color="primary"
-            class="load-action ml-2"
-            indeterminate
-        ></v-progress-circular>
-
         <toast v-model="snackbar" :message="errorMessage" />
+    </v-container>
+    <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0">
+        <h1 class="d-flex flex-row justify-center">
+            {{ $t("selectInstitutionMessage") }}
+        </h1>
     </v-container>
     <v-container v-else>
         <h1 class="d-flex flex-row justify-center">
@@ -176,6 +190,7 @@ export default defineComponent({
 
         const smartLoading = ref(false);
         const currentSmartSkipRunId = ref('');
+        const unmanagedImport = ref(false);
 
         const languageTags = ref<LanguageTagResponse[]>([]);
         
@@ -192,27 +207,38 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
 
-            LoadingConfigurationService.fetchLoadingConfiguration()
-            .then(response => {
-                if (isResearcher.value) {
-                    smartLoading.value = response.data.smartLoadingByDefault;
-                }
-                
-                fetchNextRecordForLoading();
-            });
+            startLoadingProcess();
 
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
             });
         });
 
+        const startLoadingProcess = () => {
+            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0) {
+                return;
+            }
+
+            LoadingConfigurationService.fetchLoadingConfiguration(
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+            )
+            .then(response => {
+                if (isResearcher.value) {
+                    smartLoading.value = response.data.smartLoadingByDefault;
+                }
+
+                unmanagedImport.value = response.data.loadedEntitiesAreUnmanaged;
+                fetchNextRecordForLoading();
+            });
+        };
+
         watch(selectedOrganisationUnit, () => {
             smartLoading.value = false;
             currentSmartSkipRunId.value = crypto.randomUUID();
             noRecordsRemaining.value = false;
-            stepperValue.value = 0;
+            stepperValue.value = 1;
 
-            fetchNextRecordForLoading();
+            startLoadingProcess();
         });
 
         const fetchNextRecordForLoading = () => {
@@ -260,7 +286,7 @@ export default defineComponent({
             ImportService.skipWizard(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
             ).then(() => {
-                stepperValue.value = 0;
+                stepperValue.value = shouldToggleSmartLoading ? 0 : 1;
                 importAuthorsRef.value.forEach(contribution => {
                     if (contribution) {
                         contribution.resetIdempotencyKey();
@@ -554,7 +580,7 @@ export default defineComponent({
             ImportService.markCurrentAsLoaded(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
             ).then(() => {
-                stepperValue.value = 0;
+                stepperValue.value = smartLoading.value ? 0 : 1;
                 fetchNextRecordForLoading();
                 errorMessage.value = i18n.t("loadSuccessMessage");
                 snackbar.value = true;
@@ -588,7 +614,7 @@ export default defineComponent({
             proceedingsPublicationDetailsRef,
             noRecordsRemaining, toggleSmartLoading,
             smartLoading, resumeImport, loading,
-            selectedOrganisationUnit
+            selectedOrganisationUnit, unmanagedImport
         };
     },
 });
@@ -600,8 +626,20 @@ export default defineComponent({
     margin-top: 30px;
 }
 
+.finish-load-action {
+    display: flex;
+    justify-content: right;
+    padding: 2em 2.5em;
+    font-size: 1em;
+}
+
 .same-line {
     margin-left: 20px;
+}
+
+.metadata-import {
+    max-width: 1200px;
+    margin: auto;
 }
 
 </style>
