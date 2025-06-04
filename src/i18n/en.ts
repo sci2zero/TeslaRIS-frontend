@@ -869,5 +869,9 @@ export default {
     addExternalOULabel: "Added as external affiliation",
     bindedUnmanagedEntityLabel: "Added {0} as external entity.",
     selectInstitutionMessage: "Zou have to select an institution in order to start importing data.",
-    institutionLabel: "Institution"
+    institutionLabel: "Institution",
+    turnOffAutoSubmissionLabel: "Turn off automatic submission",
+    turnOnAutoSubmissionLabel: "Turn on automatic submission",
+    saveOldPublicationLabel: "Save old publication",
+    overwriteOldPublicationLabel: "Overwrite with new publication"
 }

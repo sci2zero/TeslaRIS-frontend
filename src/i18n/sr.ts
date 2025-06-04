@@ -369,7 +369,7 @@ export default {
     harvestFailedMessage: "Server trenutno ne može skenirati izvore. Kontaktirajte sistem administratora.",
     nextLabel: "Sledeće",
     previousLabel: "Prethodno",
-    researcherProfileLabel: "Profil istraživača",
+    researcherProfileLabel: "Moj profil",
     commissionProfileLabel: "Profil komisije",
     otherDetailsLabel: "Ostali detalji",
     currentlyLoadingLabel: "Trenutno se učitava",
@@ -895,5 +895,9 @@ export default {
     addExternalOULabel: "Dodaj kao spoljnu afilijaciju",
     bindedUnmanagedEntityLabel: "Dodao {0} kao eksterni entitet.",
     selectInstitutionMessage: "Morate selektovati instituciju kako biste započeli uvoz podataka.",
-    institutionLabel: "Institucija"
+    institutionLabel: "Institucija",
+    turnOffAutoSubmissionLabel: "Isključi automatsku potvrdu",
+    turnOnAutoSubmissionLabel: "Uključi automatsku potvrdu",
+    saveOldPublicationLabel: "Sačuvaj stari rad",
+    overwriteOldPublicationLabel: "Zameni rad novim"
 }

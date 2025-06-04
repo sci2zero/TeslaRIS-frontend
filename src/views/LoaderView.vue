@@ -17,14 +17,24 @@
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
-        <deduplicator :publication-for-loading="currentLoadRecord" @deduplicate="deduplicate"></deduplicator>
+        <deduplicator
+            ref="deduplicatorRef"
+            :publication-for-loading="currentLoadRecord"
+            :can-perform-overwrite="stepperValue === steps.length"
+            @deduplicate="deduplicate">
+        </deduplicator>
 
         <br />
         
-        <v-btn class="load-action mb-5" @click="skipDocument">
+        <v-btn
+            class="load-action mb-5"
+            @click="skipDocument">
             {{ $t('skipDocumentLabel') }}
         </v-btn>
-        <v-btn class="load-action mb-5 same-line" :disabled="stepperValue === steps.length" @click="toggleSmartLoading">
+        <v-btn
+            class="load-action mb-5 same-line"
+            :disabled="stepperValue === steps.length"
+            @click="toggleSmartLoading">
             {{ smartLoading ? $t('turnOffSmartImportLabel') : $t('turnOnSmartImportLabel') }}
         </v-btn>
         
@@ -36,6 +46,13 @@
             >
                 {{ $t('smartImportTooltip') }}
             </v-tooltip>
+        </v-btn>
+
+        <v-btn
+            class="load-action mb-5 same-line"
+            :disabled="stepperValue === steps.length"
+            @click="toggleAutomaticSubmission">
+            {{ automaticSubmission ? $t('turnOffAutoSubmissionLabel') : $t('turnOnAutoSubmissionLabel') }}
         </v-btn>
 
         <v-stepper
@@ -191,6 +208,8 @@ export default defineComponent({
         const smartLoading = ref(false);
         const currentSmartSkipRunId = ref('');
         const unmanagedImport = ref(false);
+        const automaticSubmission = ref(false);
+        const deduplicatorRef = ref<typeof Deduplicator>();
 
         const languageTags = ref<LanguageTagResponse[]>([]);
         
@@ -203,6 +222,8 @@ export default defineComponent({
         };
 
         const currentLoadRecord = ref<JournalPublicationLoad|ProceedingsPublicationLoad>();
+
+        const documentIdToDelete = ref<number | null>(null);
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -366,10 +387,13 @@ export default defineComponent({
                     }
                 } else {
                     shouldStep = false;
+                    const detectedDuplicates = deduplicatorRef.value?.foundDuplicates;
+                    if (automaticSubmission.value && !detectedDuplicates) {
+                        finishLoad();
+                    }
                 }
             }
         };
-
 
         const updateRecord = (updatedRecord: JournalPublicationLoad | ProceedingsPublicationLoad) => {
             currentLoadRecord.value!.subTitle = updatedRecord.subTitle;
@@ -538,8 +562,7 @@ export default defineComponent({
                 };
 
                 DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
-                    markAsLoadedAndFetchNext();
-                    loading.value = false;
+                    fetchNextAfterLoading();
                 });
             } else if (loadingProceedingsPublication.value) {
                 const newProceedingsPublication: ProceedingsPublication = {
@@ -564,21 +587,33 @@ export default defineComponent({
                 };
 
                 DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then(() => {
-                    markAsLoadedAndFetchNext();
-                    loading.value = false;
+                    fetchNextAfterLoading();
                 });
             }
         };
 
-        const deduplicate = () => {
-            markAsLoadedAndFetchNext();
+        const fetchNextAfterLoading = () => {
+            markAsLoadedAndFetchNext(documentIdToDelete.value, documentIdToDelete.value !== null);
+            loading.value = false;
+            documentIdToDelete.value = null;
         };
 
-        const markAsLoadedAndFetchNext = () => {
+        const deduplicate = (oldDocumentId: number, deleteOldDocument: boolean) => {
+            if (deleteOldDocument) {
+                documentIdToDelete.value = oldDocumentId;
+                finishLoad();
+            } else {
+                markAsLoadedAndFetchNext(oldDocumentId, deleteOldDocument);
+            }
+        };
+
+        const markAsLoadedAndFetchNext = (oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
             ImportService.markCurrentAsLoaded(
-                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
+                oldDocumentId,
+                deleteOldDocument
             ).then(() => {
                 stepperValue.value = smartLoading.value ? 0 : 1;
                 fetchNextRecordForLoading();
@@ -600,6 +635,10 @@ export default defineComponent({
             }
         };
 
+        const toggleAutomaticSubmission = () => {
+            automaticSubmission.value = !automaticSubmission.value;
+        };
+
         return {
             isFormValid, snackbar, isAdmin,
             errorMessage, currentLoadRecord,
@@ -611,10 +650,11 @@ export default defineComponent({
             loadingProceedingsPublication, finishLoad,
             journalImportRef, journalPublicationDetailsRef,
             deduplicate, proceedingsImportRef,
-            proceedingsPublicationDetailsRef,
+            proceedingsPublicationDetailsRef, deduplicatorRef,
             noRecordsRemaining, toggleSmartLoading,
             smartLoading, resumeImport, loading,
-            selectedOrganisationUnit, unmanagedImport
+            selectedOrganisationUnit, unmanagedImport,
+            automaticSubmission, toggleAutomaticSubmission
         };
     },
 });

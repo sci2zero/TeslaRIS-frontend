@@ -47,6 +47,10 @@ export default defineComponent({
         presetContributions: {
             type: Array as PropType<PersonEventContribution[]>,
             default: () => []
+        },
+        isUpdate: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],

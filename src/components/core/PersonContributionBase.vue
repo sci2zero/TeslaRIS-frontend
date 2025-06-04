@@ -156,6 +156,10 @@ export default defineComponent({
         required: {
             type: Boolean,
             default: true
+        },
+        isUpdate: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],
@@ -366,10 +370,14 @@ export default defineComponent({
         });
 
         const selectLatestAffiliation = () => {
-            if (selectedPerson.value.value && selectedPerson.value.value > 0 && props.presetContributionValue.personId <= 0) {
+            if (selectedPerson.value.value && selectedPerson.value.value > 0 && !props.isUpdate) {
                 PersonService.getLatestAffiliation(selectedPerson.value.value).then((latestAffiliationResponse) => {
                     if(latestAffiliationResponse.data) {
-                        selectedAffiliations.value.push({title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number});
+                        selectedAffiliations.value.push(
+                            {
+                                title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number
+                            }
+                        );
                     }
                 });
             }

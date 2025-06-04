@@ -32,8 +32,28 @@ export class ImportService extends BaseService {
           return super.sendRequest(axios.patch, `load/skip${institutionId ? "?institutionId=" + institutionId : ""}`);
     }
 
-    async markCurrentAsLoaded(institutionId: number | null = null): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `load/mark-as-loaded${institutionId ? "?institutionId=" + institutionId : ""}`);
+    async markCurrentAsLoaded(
+        institutionId: number | null = null,
+        oldDocumentId: number | null = null,
+        deleteOldDocument: boolean | null = null
+    ): Promise<AxiosResponse<void>> {
+        const queryParams: string[] = [];
+
+        if (institutionId !== null) {
+            queryParams.push(`institutionId=${institutionId}`);
+        }
+
+        if (oldDocumentId !== null) {
+            queryParams.push(`oldDocumentId=${oldDocumentId}`);
+        }
+
+        if (deleteOldDocument !== null) {
+            queryParams.push(`deleteOldDocument=${deleteOldDocument}`);
+        }
+
+        const queryString = queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
+
+        return super.sendRequest(axios.patch, `load/mark-as-loaded${queryString}`);
     }
 
     async createNewInstitution(scopusAfid: string, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<OrganisationUnitResponse>> {
