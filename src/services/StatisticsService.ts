@@ -19,6 +19,14 @@ export class StatisticsService extends BaseService {
       return super.sendRequest(axios.post, `statistics/document/${documentId}`, {}, StatisticsService.idempotencyKey);
     }
 
+    async registerPublicationSeriesView(publicationSeriesId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.post, `statistics/publication-series/${publicationSeriesId}`, {}, StatisticsService.idempotencyKey);
+    }
+
+    async registerEventView(eventId: number): Promise<AxiosResponse<void>> {
+      return super.sendRequest(axios.post, `statistics/event/${eventId}`, {}, StatisticsService.idempotencyKey);
+    }
+
     async fetchStatisticsTypeIndicators(statisticsType: StatisticsType | string): Promise<AxiosResponse<string[]>> {
       return super.sendRequest(axios.get, `statistics/${statisticsType}`);
     }

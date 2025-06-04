@@ -239,7 +239,7 @@
             <v-tab v-if="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="thesis?.contributions![0].personId" value="researchOutput">
+            <v-tab v-if="thesis?.contributions && thesis.contributions.length > 0 && thesis?.contributions![0].personId" value="researchOutput">
                 {{ $t("researchOutputLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">

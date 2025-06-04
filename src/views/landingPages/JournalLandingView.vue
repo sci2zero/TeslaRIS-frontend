@@ -132,6 +132,7 @@
                     :entity-id="journal?.id"
                     :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
                     :can-edit="false"
+                    show-statistics
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="classifications">
@@ -181,6 +182,7 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import StatisticsService from '@/services/StatisticsService';
 
 
 export default defineComponent({
@@ -225,6 +227,8 @@ export default defineComponent({
                     canClassify.value = response.data;
                 });
                 fetchClassifications();
+            
+                StatisticsService.registerPublicationSeriesView(parseInt(currentRoute.params.id as string));
             }
 
             fetchJournal(true);

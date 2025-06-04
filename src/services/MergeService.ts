@@ -18,6 +18,10 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `assessment-merge/journal-indicator/source/${sourceJournalId}/target/${targetJournalId}`);
     }
 
+    async switchAllIndicatorsToOtherBookSeries(sourceBookSeriesId: number, targetBookSeriesId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/book-series-indicator/source/${sourceBookSeriesId}/target/${targetBookSeriesId}`);
+    }
+
     async switchAllClassificationsToOtherJournal(sourceJournalId: number, targetJournalId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `assessment-merge/journal-classification/source/${sourceJournalId}/target/${targetJournalId}`);
     }
@@ -56,6 +60,10 @@ export class MergeService extends BaseService {
 
     async switchSkillsToOtherPerson(skillIds: number[], sourcePersonId: number, targetPersonId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/person/skills/source/${sourcePersonId}/target/${targetPersonId}`, {entityIds: skillIds});
+    }
+
+    async switchAllIndicatorsToOtherPerson(sourcePersonId: number, targetPersonId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/person-indicator/source/${sourcePersonId}/target/${targetPersonId}`);
     }
 
     async switchEmployemntToOtherOU(sourceOUId: number, targetOUId: number, personId: number): Promise<AxiosResponse<void>> {
@@ -110,6 +118,10 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/organisation-unit/metadata/${leftOUId}/${rightOUId}`, body);
     }
 
+    async switchAllIndicatorsToOtherOrganisationUnit(sourceOUId: number, targetOUId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/organisation-unit-indicator/source/${sourceOUId}/target/${targetOUId}`);
+    }
+
     async saveMergedConferencesMetadata(leftConferenceId: number, rightConferenceId: number, body: MergedConferences): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/conference/metadata/${leftConferenceId}/${rightConferenceId}`, body);
     }
@@ -152,6 +164,10 @@ export class MergeService extends BaseService {
 
     async saveMergedMonographPublicationsMetadata(leftMonographPublicationId: number, rightMonographPublicationId: number, body: MergedMonographPublications): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/monograph-publication/metadata/${leftMonographPublicationId}/${rightMonographPublicationId}`, body);
+    }
+
+    async switchAllIndicatorsToOtherDocument(sourceDocumentId: number, targetDocumentId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/document-indicator/source/${sourceDocumentId}/target/${targetDocumentId}`);
     }
 
     async saveMergedPublishersMetadata(leftPublisherId: number, rightPublisherId: number, body: MergedPublishers): Promise<AxiosResponse<void>> {

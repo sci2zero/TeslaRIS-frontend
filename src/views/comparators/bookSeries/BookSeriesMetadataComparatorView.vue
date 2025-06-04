@@ -260,20 +260,25 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftBookSeries.value?.id as number : rightBookSeries.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftBookSeries.value?.title : rightBookSeries.value?.title;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightBookSeries.value?.id : leftBookSeries.value?.id;
 
-            const deleteAction = isForceDelete 
-                ? BookSeriesService.forceDeleteBookSeries(id)
-                : BookSeriesService.deleteBookSeries(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? BookSeriesService.forceDeleteBookSeries(id)
+                    : BookSeriesService.deleteBookSeries(id);
 
-            deleteAction.then(() => {
+                await deleteAction;
+
+                await MergeService.switchAllIndicatorsToOtherBookSeries(id as number, transferTargetId as number);
+
                 router.push({ name: "deduplication", query: { tab: "bookSeries" } });
-            }).catch(() => {
+            } catch {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {
