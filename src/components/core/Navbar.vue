@@ -160,7 +160,7 @@
                                 @click="drawer = false"
                             >
                                 <v-icon start icon="mdi-close" />
-                                Close
+                                {{ $t("closeLabel") }}
                             </v-btn>
                         </div>
                     </v-navigation-drawer>
