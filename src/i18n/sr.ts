@@ -899,5 +899,6 @@ export default {
     turnOffAutoSubmissionLabel: "Isključi automatsku potvrdu",
     turnOnAutoSubmissionLabel: "Uključi automatsku potvrdu",
     saveOldPublicationLabel: "Sačuvaj stari rad",
-    overwriteOldPublicationLabel: "Zameni rad novim"
+    overwriteOldPublicationLabel: "Zameni rad novim",
+    dismissAllLabel: "Odbaci sve"
 }

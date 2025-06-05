@@ -3,14 +3,16 @@
         <v-toolbar app height="auto">
             <div class="wide-container flex-wrap toolbar-container">
                 <div class="d-flex">
-                    <v-toolbar-title>
+                    <v-toolbar-title :class="isLargeScreen ? '' : 'lowered'">
                         <router-link to="/" class="logo-link app-title">
                             {{ returnCurrentLocaleContent(appTitle) }}
                         </router-link>
                     </v-toolbar-title>
 
                     <!-- Menu -->
-                    <div class="d-flex ps-5 flex-wrap">
+                    <div 
+                        v-if="isLargeScreen" 
+                        class="d-flex ps-5 flex-wrap">
                         <div v-for="item in leftMenuItems" :key="item.title" class="text-center">
                             <template v-if="item.type == 'menu'">
                                 <v-menu v-if="item.condition == undefined || item.condition" open-on-hover open-delay="0">
@@ -69,11 +71,104 @@
                             </template>
                         </div>
                     </div>
+                    <v-app-bar-nav-icon
+                        v-if="!isLargeScreen"
+                        @click="drawer = !drawer"
+                    />
+                    <v-navigation-drawer
+                        v-if="!isLargeScreen"
+                        v-model="drawer"
+                        temporary
+                        location="left"
+                    >
+                        <v-list class="align-start">
+                            <template v-for="item in leftMenuItems" :key="item.title">
+                                <!-- menu type -->
+                                <v-list-item
+                                    v-if="item.type === 'menu' && (item.condition === undefined || item.condition)"
+                                    class="text-left"
+                                >
+                                    <v-menu open-on-hover location="end bottom" open-delay="0">
+                                        <template #activator="{ props }">
+                                            <v-btn size="small" v-bind="props" class="no-uppercase">
+                                                {{ item.title }}
+                                                <v-icon icon="mdi-chevron-down" />
+                                            </v-btn>
+                                        </template>
+                                        <v-list>
+                                            <v-list-item
+                                                v-for="(subItem, index) in item.subItems?.filter(subItem => subItem.condition !== false)"
+                                                :key="index"
+                                                class="ps-5 pe-5"
+                                                :to="subItem.pathName !== undefined ? '/' + $i18n.locale + '/' + subItem.pathName : undefined"
+                                                link
+                                            >
+                                                <v-list-item-title>{{ subItem.title }}</v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-list-item>
+
+                                <!-- dynamic type -->
+                                <v-list-item
+                                    v-else-if="item.type === 'dynamic' && item.condition"
+                                    class="text-left"
+                                >
+                                    <v-btn
+                                        size="small"
+                                        :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName + '/' + item.dynamicValue : undefined"
+                                        :variant="item.variant"
+                                        :color="item.color"
+                                        class="no-uppercase nav-items"
+                                        @click="item.click"
+                                    >
+                                        {{ item.title }}
+                                    </v-btn>
+                                </v-list-item>
+
+                                <!-- default type -->
+                                <v-list-item
+                                    v-else-if="item.condition === undefined || item.condition"
+                                    class="text-left"
+                                >
+                                    <v-btn
+                                        size="small"
+                                        :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                                        :variant="item.variant"
+                                        :color="item.color"
+                                        class="no-uppercase"
+                                        :icon="item.type === 'icon'"
+                                        exact
+                                    >
+                                        <v-icon v-if="item.icon" left dark>
+                                            {{ item.icon }}
+                                        </v-icon>
+                                        <template v-if="item.type !== 'icon'">
+                                            {{ item.title }}
+                                        </template>
+                                    </v-btn>
+                                </v-list-item>
+                            </template>
+                        </v-list>
+                        <v-divider class="my-2" />
+
+                        <div class="text-center pa-2">
+                            <v-btn
+                                color="primary"
+                                variant="text"
+                                class="no-uppercase"
+                                @click="drawer = false"
+                            >
+                                <v-icon start icon="mdi-close" />
+                                Close
+                            </v-btn>
+                        </div>
+                    </v-navigation-drawer>
                 </div>
 
                 <v-spacer></v-spacer>
 
-                <div class="d-none d-xl-flex">
+                <div class="d-flex">
                     <template v-for="(item, index) in menuItems">
                         <template v-if="item.type == 'divider'">
                             <v-divider
@@ -102,68 +197,13 @@
                                         {{ item.icon }}
                                     </v-icon>
                                 </v-badge>
-                                <template v-if="item.type != 'icon'">
+                                <span v-if="item.type != 'icon'" class="d-none d-md-flex">
                                     {{ item.title }}
-                                </template>
+                                </span>
                             </v-btn>
                         </template>
                     </template>
                 </div>
-
-                <v-app-bar-nav-icon
-                    class="d-xl-none"
-                    @click="drawer = !drawer"
-                />
-                <v-navigation-drawer
-                    v-model="drawer"
-                    temporary
-                    :class="'d-xl-none' + (drawer ? ' wide' : '')"
-                    location="right"
-                >
-                    <v-list>
-                        <template v-for="(item, index) in menuItems">
-                            <template v-if="item.type === 'divider'">
-                                <v-divider :key="index" class="my-2"></v-divider>
-                            </template>
-
-                            <template v-else-if="item.type === 'lang_component' || item.type === 'notification_component'">
-                                <component :is="item.component" :key="index" />
-                            </template>
-
-                            <template v-else-if="item.type === 'icon'">
-                                <v-btn
-                                    v-if="item.condition"
-                                    :key="item.title"
-                                    :color="item.color" :class="'no-uppercase nav-items' + (item.title ? ' mt-1' : '')"
-                                    :icon="item.type == 'icon'"
-                                    @click="item.click"
-                                >
-                                    <v-badge :content="item.badge" :model-value="false">
-                                        <v-icon left dark>
-                                            {{ item.icon }}
-                                        </v-icon>
-                                    </v-badge>
-                                </v-btn>
-                            </template>
-
-                            <template v-else>
-                                <v-list-item
-                                    v-if="item.condition"
-                                    :key="item.title"
-                                    :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
-                                    @click="drawer = false"
-                                >
-                                    <v-list-item-title>
-                                        <v-icon v-if="item.icon" start>
-                                            {{ item.icon }}
-                                        </v-icon>
-                                        {{ item.title }}
-                                    </v-list-item-title>
-                                </v-list-item>
-                            </template>
-                        </template>
-                    </v-list>
-                </v-navigation-drawer>
             </div>
         </v-toolbar>
     </div>
@@ -188,6 +228,7 @@ import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { useBrandingStore } from '@/stores/brandingStore';
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 
 
 interface MenuItem {
@@ -211,7 +252,9 @@ export default defineComponent(
         name: "NavbarHeader",
         components: { LangChangeItem, NotificationItem },
         setup() {
-            const drawer = ref(false)
+            const drawer = ref(false);
+            const { width } = useDisplay();
+            const isLargeScreen = computed(() => width.value > 1500);
 
             const langChangeItem = shallowRef(LangChangeItem);
             const notificationItem = shallowRef(NotificationItem);
@@ -344,7 +387,8 @@ export default defineComponent(
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: brandingLabel, type:'icon-link', pathName: "branding"},
                 { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"},
-                { title: healthCheckLabel, type:'icon-link', pathName: "health-check"}
+                { title: healthCheckLabel, type:'icon-link', pathName: "health-check"},
+                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) }
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
@@ -374,7 +418,6 @@ export default defineComponent(
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu },
-                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
@@ -388,13 +431,14 @@ export default defineComponent(
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color:'primary' },
                 { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
-                { title: undefined, type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) },
+                { title: undefined, type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }
             ]);
 
             return { 
                 userName, userRole, logout, appTitle,
                 sidebar, menuItems, leftMenuItems, loginStore,
-                returnCurrentLocaleContent, drawer
+                returnCurrentLocaleContent, drawer,
+                isLargeScreen
             };
         }
     });
@@ -424,8 +468,8 @@ export default defineComponent(
     min-height: 64px;
 }
 
-.wide {
-    min-width: 350px;
+.lowered {
+    margin-top: 10px;
 }
 
 </style>

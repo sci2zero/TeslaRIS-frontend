@@ -873,5 +873,6 @@ export default {
     turnOffAutoSubmissionLabel: "Turn off automatic submission",
     turnOnAutoSubmissionLabel: "Turn on automatic submission",
     saveOldPublicationLabel: "Save old publication",
-    overwriteOldPublicationLabel: "Overwrite with new publication"
+    overwriteOldPublicationLabel: "Overwrite with new publication",
+    dismissAllLabel: "Dismiss all"
 }

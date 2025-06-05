@@ -10,7 +10,10 @@
                     v-bind="props"
                     icon="mdi-translate"
                 >
-                    <v-badge :content="notificationCountStore.notificationCount" :model-value="notificationCountStore.notificationCount > 0">
+                    <v-badge
+                        style="z-index: 5;"
+                        :content="notificationCountStore.notificationCount"
+                        :model-value="notificationCountStore.notificationCount > 0">
                         <v-icon left dark>
                             mdi-bell
                         </v-icon>
