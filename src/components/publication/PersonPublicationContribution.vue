@@ -8,7 +8,8 @@
                     :required="required"
                     :preset-contribution-value="input.contribution"
                     :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
-                    @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                    :is-update="isUpdate"
+                    @set-input="input.contribution = $event; sendContentToParent();" />
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -104,6 +105,10 @@ export default defineComponent({
         required: {
             type: Boolean,
             default: true
+        },
+        isUpdate: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],

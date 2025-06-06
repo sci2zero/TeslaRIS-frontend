@@ -86,14 +86,14 @@
                             <span v-if="item.authorNames.trim() === ''">
                                 {{ displayTextOrPlaceholder(item.authorNames) }}
                             </span>
-                            <span v-for="(employment, index) in item.authorNames.split(';')" v-else :key="index">
+                            <span v-for="(author, index) in item.authorNames.split(';')" v-else :key="index">
                                 <localized-link
                                     v-if="item.authorIds[index] !== -1"
                                     :to="'persons/' + item.authorIds[index]"
                                 >
-                                    {{ `👤${employment};` }}
+                                    {{ `👤${author.trim()};` }}
                                 </localized-link>
-                                <span v-else>{{ `${employment};` }}</span>
+                                <span v-else>{{ `${author.trim()};` }}</span>
                             </span>
                         </td>
                         <td>

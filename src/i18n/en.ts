@@ -386,7 +386,8 @@ export default {
     canNotAutoFindJournalMessage: "Can't automatically find a journal in the system, please, select journal from the list:",
     canCreateNewJournalLabel: "If the journal is not in the list you can create a new one:",
     authorAffiliationsLabel: "Author affiliations",
-    smartImportLabel: "Smart import",
+    turnOnSmartImportLabel: "Turn on mart import",
+    turnOffSmartImportLabel: "Turn off smart import",
     smartImportTooltip: "When you initiate the auto load process, the system will attempt to automatically bind each imported resource to a corresponding resource in our system. This is based on predefined criteria and matching algorithms. If the system finds a match, the resource is automatically bound and marked as successfully processed. For resources that cannot be automatically matched, user input is required to manually bind these resources. The system will prompt you to review and bind these unmatched resources manually. After addressing the unmatched resources, you can continue the auto load process. The system will then resume automatic binding for any remaining resources, repeating the process until all resources are either automatically bound or require further user input.",
     noPublicationsForResearcherMessage: "There are no publications for this researcher yet.",
     authorBindNotFinishedMessage: "You did not finish the binding process of all authors on this publication.",
@@ -862,5 +863,16 @@ export default {
     wordcloudLabel: "Word cloud",
     resultRepresentationLabel: "Result representation",
     updateProceedingsPublicationLabel: "Update proceedings publication",
-    metadataFormatLabel: "Metadata format"
+    metadataFormatLabel: "Metadata format",
+    smartLoadingByDefaultLabel: "Smart import by default",
+    loadedEntitiesAreUnamangedLabel: "Unbinded entities are external associates",
+    addExternalOULabel: "Added as external affiliation",
+    bindedUnmanagedEntityLabel: "Added {0} as external entity.",
+    selectInstitutionMessage: "Zou have to select an institution in order to start importing data.",
+    institutionLabel: "Institution",
+    turnOffAutoSubmissionLabel: "Turn off automatic submission",
+    turnOnAutoSubmissionLabel: "Turn on automatic submission",
+    saveOldPublicationLabel: "Save old publication",
+    overwriteOldPublicationLabel: "Overwrite with new publication",
+    dismissAllLabel: "Dismiss all"
 }

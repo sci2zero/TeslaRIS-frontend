@@ -20,6 +20,10 @@ export class LanguageService extends BaseService {
   async dismissNotification(notificationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `notification/${notificationId}/dismiss`);
   }
+
+  async dismissAllNotifications(): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `notification/dismiss-all`);
+  }
 }
 
 export default new LanguageService();

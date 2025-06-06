@@ -39,6 +39,7 @@ import type { PropType } from "vue";
 import { onMounted } from "vue";
 import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/eventContributionType";
 
+
 export default defineComponent({
     name: "PersonEventContributionForm",
     components: {PersonContributionBase},
@@ -46,6 +47,10 @@ export default defineComponent({
         presetContributions: {
             type: Array as PropType<PersonEventContribution[]>,
             default: () => []
+        },
+        isUpdate: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],

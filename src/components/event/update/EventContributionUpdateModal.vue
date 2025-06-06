@@ -18,7 +18,12 @@
                 <v-card-text>
                     <v-form v-model="isFormValid" @submit.prevent>
                         <v-container>
-                            <person-event-contribution-form ref="updateFormRef" :preset-contributions="presetEventContributions" @set-input="contributions = $event"></person-event-contribution-form>
+                            <person-event-contribution-form
+                                ref="updateFormRef"
+                                :preset-contributions="presetEventContributions"
+                                is-update
+                                @set-input="contributions = $event"
+                            />
                         </v-container>
                     </v-form>
                 </v-card-text>

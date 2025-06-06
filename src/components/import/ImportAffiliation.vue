@@ -7,7 +7,7 @@
         </h2>
 
         <h2 v-if="affiliationBinded && hadToBeCreated">
-            {{ $t("createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
+            {{ $t(importAsUnmanaged ? "bindedUnmanagedEntityLabel" : "createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
         </h2>
 
         <h2 v-if="showTable" class="can-not-find-message">
@@ -63,7 +63,7 @@
 
         <h3 v-if="showTable">
             {{ $t("canCreateNewOULabel") }} <v-btn size="small" color="primary" @click="addNew">
-                {{ $t("createNewOULabel") }}
+                {{ importAsUnmanaged ? $t("addExternalOULabel") : $t("createNewOULabel") }}
             </v-btn>
         </h3>
     </v-container>
@@ -81,7 +81,7 @@ import { watch } from "vue";
 import type { OrganisationUnitLoad } from "@/models/LoadModel";
 import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
@@ -91,14 +91,24 @@ export default defineComponent({
         ouForLoading: {
             type: Object as PropType<OrganisationUnitLoad>,
             required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
+            required: true
+        },
+        importAsUnmanaged: {
+            type: Boolean,
+            required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
 
         const affiliationBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedAffiliation = ref<OrganisationUnitIndex>();
+        const waitingOnUserInput = ref(false);
 
         const showTable = ref(false);
         const potentialMatches = ref<OrganisationUnitIndex[]>([]);
@@ -139,6 +149,7 @@ export default defineComponent({
             affiliationBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -150,6 +161,7 @@ export default defineComponent({
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
+                    waitingOnUserInput.value = true;
                 }
             });
         };
@@ -223,7 +235,11 @@ export default defineComponent({
 
             await new Promise(r => setTimeout(r, Math.floor(Math.random() * (500 - 10 + 1)) + 10));
 
-            ImportService.createNewInstitution(props.ouForLoading.scopusAfid, idempotencyKey).then((response) => {
+            ImportService.createNewInstitution(
+                props.ouForLoading.scopusAfid,
+                idempotencyKey,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then((response) => {
                 selectedAffiliation.value = {
                     nameSr: response.data.name[0].content,
                     nameOther: response.data.name[0].content,
@@ -284,6 +300,12 @@ export default defineComponent({
         };
         const idempotencyKey = generateIdempotencyKey();
 
+        watch(affiliationBinded, () => {
+            if (affiliationBinded.value && waitingOnUserInput.value) {
+                emit("userActionComplete");
+            }
+        });
+
         return {
             potentialMatches, switchPage, 
             tableOptions, headers, refreshTable,
@@ -295,3 +317,22 @@ export default defineComponent({
     },
 });
 </script>
+
+
+<style lang="css" scoped>
+
+h1 {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+
+h2 {
+    color: #555;
+    font-weight: 500;
+    font-size: 1em;
+    line-height: 1em;
+}
+
+</style>

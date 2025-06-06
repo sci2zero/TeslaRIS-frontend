@@ -5,7 +5,7 @@
             show-progress
             :words="localWordcloudFrequencies"
             :color="([, weight]: [string, number]) => weight > 10 ? 'DeepPink' : weight > 5 ? 'RoyalBlue' : 'Indigo'"
-            font-family="Anton"
+            font-family="sans-serif"
             animation-overlap="20%"
             font-size-ratio="20%"
             animation-easing="ease"
@@ -81,7 +81,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 
 .wordcloud {
     width: 100%;
