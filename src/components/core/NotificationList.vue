@@ -1,8 +1,8 @@
 <template>
     <v-card min-width="150">
         <v-list v-if="notifications.length > 0">
-            <v-list-subheader>
-                <div class="d-flex flex-row justify-space-between">
+            <v-list-subheader class="w-100">
+                <div class="d-flex flex-row justify-space-between w-100">
                     <strong>{{ $t("recentNotificationsLabel") }}</strong>
                     <v-spacer></v-spacer>
                     <v-btn
@@ -56,7 +56,7 @@
         </v-list>
 
         <v-list v-else-if="loading">
-            <v-list-item v-for="i in 5" :key="i" class="wide">
+            <v-list-item v-for="i in 5" :key="i" class="wide-skeleton">
                 <v-skeleton-loader
                     type="text@2"
                 />
@@ -164,10 +164,14 @@ export default defineComponent({
 }});
 </script>
 
-<style scoped>
+<style>
 
-.wide {
+.wide-skeleton {
     min-width: 400px;
+}
+
+.w-100 > div.v-list-subheader > div {
+    width: 100%;
 }
 
 </style>
