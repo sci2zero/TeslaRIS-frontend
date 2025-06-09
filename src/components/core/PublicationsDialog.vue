@@ -8,11 +8,13 @@
         width="auto"
     >
         <v-card
-            max-width="400"
+            max-width="1800"
             :prepend-icon="icon"
-            :text="text"
             :title="title"
         >
+            <v-card-text>
+                <pre class="publications-as-text">{{ text }}</pre>
+            </v-card-text>
             <template #actions>
                 <v-btn
                     class="ms-auto"
@@ -29,6 +31,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 
 export default defineComponent({
     name: "TextDialog",
@@ -82,3 +85,13 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.publications-as-text {
+    max-height: 300px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+</style>

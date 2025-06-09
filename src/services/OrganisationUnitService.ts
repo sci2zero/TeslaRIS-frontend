@@ -24,8 +24,8 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/sub-units/${organisationUnitId}?${pageable}`);
   }
 
-  async findOUByScopusAfid(scopusAfid: string): Promise<AxiosResponse<OrganisationUnitIndex>> {
-    return super.sendRequest(axios.get, `organisation-unit/scopus-afid/${scopusAfid}`);
+  async findOUByImportId(importId: string): Promise<AxiosResponse<OrganisationUnitIndex>> {
+    return super.sendRequest(axios.get, `organisation-unit/import-identifier/${importId}`);
   }
 
   async readOURelationsGraph(organisationUnitLeafId: number): Promise<AxiosResponse<any>> {

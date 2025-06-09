@@ -88,6 +88,7 @@ import PublicationsDialog from "@/components/core/PublicationsDialog.vue"
 import { watch } from "vue";
 import ImportAffiliation from "./ImportAffiliation.vue";
 import ImportService from "@/services/importer/ImportService";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -126,10 +127,11 @@ export default defineComponent({
         const hadToBeCreated = ref(false);
 
         const i18n = useI18n();
+        const { loggedResearcherId } = useUserRole();
 
         const totalPersons = ref(0);
         const page = ref(0);
-        const size = ref(1);
+        const size = ref(5);
         const sort = ref("");
         const direction = ref("");
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
@@ -144,16 +146,22 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            PersonService.findResearcherByScopusAuthorId(props.personForLoading.scopusAuthorId).then(response => {
-                if(response.data) {
-                    selectedResearcher.value = response.data;
-                    researcherBinded.value = true;
-                    automaticProcessCompleted.value = true;
-                } else {
-                    showTable.value = true;
-                    searchPotentialMatches();
-                }
-            });
+            if (props.personForLoading.scopusAuthorId) {
+                PersonService.findResearcherByImportIdentifier(props.personForLoading.importId)
+                .then(response => {
+                    if(response.data) {
+                        selectedResearcher.value = response.data;
+                        researcherBinded.value = true;
+                        automaticProcessCompleted.value = true;
+                    } else {
+                        showTable.value = true;
+                        searchPotentialMatches();
+                    }
+                });
+            } else {
+                showTable.value = true;
+                searchPotentialMatches();
+            }
         };
 
         const setFlagsToDefault = () => {
@@ -161,21 +169,38 @@ export default defineComponent({
             showTable.value = false;
             hadToBeCreated.value = false;
             waitingOnUserInput.value = false;
+            automaticProcessCompleted.value = false;
         };
 
         const searchPotentialMatches = () => {
             PersonService.searchResearchers(
-                `tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=0&size=10`,
-                true,
+                `tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                false,
                 null)
             .then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
-                if (totalPersons.value === 0) {
-                    addNew();
-                } else {
-                    automaticProcessCompleted.value = true;
-                    waitingOnUserInput.value = true;
+                if (page.value === 0 && !automaticProcessCompleted.value) {
+                    if (loggedResearcherId.value > 0) {
+                        const currentResearcherContribution =
+                            potentialMatches.value.find(
+                                person => person.databaseId === loggedResearcherId.value
+                            );
+                        if (currentResearcherContribution) {
+                            selectedResearcher.value = currentResearcherContribution;
+                            researcherBinded.value = true;
+                            automaticProcessCompleted.value = true;
+                            showTable.value = false;
+                            return;
+                        }
+                    }
+
+                    if (totalPersons.value === 0) {
+                        addNew();
+                    } else {
+                        automaticProcessCompleted.value = true;
+                        waitingOnUserInput.value = true;
+                    }
                 }
             });
         };
@@ -257,7 +282,7 @@ export default defineComponent({
             await waitForImportAffiliations();
 
             ImportService.createNewPerson(
-                props.personForLoading.scopusAuthorId,
+                props.personForLoading.importId,
                 idempotencyKey.value,
                 props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
             ).then(response => {

@@ -63,6 +63,7 @@ export interface PersonLoad {
     eNaukaId: string;
     orcid: string;
     scopusAuthorId: string;
+    importId: string;
 }
 
 export interface OrganisationUnitLoad {

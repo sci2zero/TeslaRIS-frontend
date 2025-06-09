@@ -134,6 +134,13 @@
             </template>
         </v-stepper>
 
+        <authorship-selection-modal
+            ref="authorshipSelectionRef"
+            :contributions="deducedContributions"
+            :submission="submissionDTO"
+            @select="fetchNextAfterLoading"
+        />
+
         <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
     <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0">
@@ -171,11 +178,12 @@ import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/Or
 import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
 import LanguageService from "@/services/LanguageService";
 import { type LanguageTagResponse } from "@/models/Common";
+import AuthorshipSelectionModal from "@/components/import/AuthorshipSelectionModal.vue";
 
 
 export default defineComponent({
     name: "LoaderView",
-    components: { ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings, Toast, OrganisationUnitAutocompleteSearch },
+    components: { ImportAuthor, ImportJournal, ImportJournalPublicationDetails, ImportProceedingsPublicationDetails, Deduplicator, ImportProceedings, Toast, OrganisationUnitAutocompleteSearch, AuthorshipSelectionModal },
     setup() {
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const { isAdmin, isResearcher } = useUserRole();
@@ -479,8 +487,12 @@ export default defineComponent({
             }
         };
 
+        const deducedContributions = ref<PersonDocumentContribution[]>([]);
+        const authorshipSelectionRef = ref<typeof AuthorshipSelectionModal>();
+        const submissionDTO = ref<JournalPublication | ProceedingsPublication>();
+
         const submitNewPublication = () => {
-            const contributions: PersonDocumentContribution[] = [];
+            deducedContributions.value.splice(0);
             
             currentLoadRecord.value?.contributions.forEach((contribution, index) => {
                 const affiliatedInstitutionIds = 
@@ -517,7 +529,7 @@ export default defineComponent({
                         );
                 }
                 
-                contributions.push({
+                deducedContributions.value.push({
                     contributionDescription: contribution.contributionDescription,
                     contributionType: contribution.contributionType,
                     displayAffiliationStatement: affiliationStatement,
@@ -552,7 +564,7 @@ export default defineComponent({
                     numberOfPages: currentLoadRecord.value!.numberOfPages as number,
                     subTitle: currentLoadRecord.value!.subTitle,
                     uris: currentLoadRecord.value!.uris,
-                    contributions: contributions,
+                    contributions: deducedContributions.value,
                     documentDate: currentLoadRecord.value!.documentDate,
                     scopusId: currentLoadRecord.value!.scopusId,
                     doi: currentLoadRecord.value!.doi,
@@ -561,8 +573,17 @@ export default defineComponent({
                     proofs: []
                 };
 
-                DocumentPublicationService.createJournalPublication(newJournalPublication).then(() => {
+                DocumentPublicationService.createJournalPublication(
+                    newJournalPublication,
+                    self.crypto.randomUUID()
+                ).then(() => {
                     fetchNextAfterLoading();
+                })
+                .catch((error) => {
+                    if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
+                        submissionDTO.value = newJournalPublication;
+                        authorshipSelectionRef.value!.show();
+                    }
                 });
             } else if (loadingProceedingsPublication.value) {
                 const newProceedingsPublication: ProceedingsPublication = {
@@ -576,7 +597,7 @@ export default defineComponent({
                     numberOfPages: currentLoadRecord.value!.numberOfPages as number,
                     subTitle: currentLoadRecord.value!.subTitle,
                     uris: currentLoadRecord.value!.uris,
-                    contributions: contributions,
+                    contributions: deducedContributions.value,
                     documentDate: currentLoadRecord.value!.documentDate,
                     scopusId: currentLoadRecord.value!.scopusId,
                     doi: currentLoadRecord.value!.doi,
@@ -586,8 +607,16 @@ export default defineComponent({
                     proofs: []
                 };
 
-                DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then(() => {
+                DocumentPublicationService.createProceedingsPublication(
+                    newProceedingsPublication, self.crypto.randomUUID()
+                ).then(() => {
                     fetchNextAfterLoading();
+                })
+                .catch((error) => {
+                    if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
+                        submissionDTO.value = newProceedingsPublication;
+                        authorshipSelectionRef.value!.show();
+                    }
                 });
             }
         };
@@ -654,7 +683,9 @@ export default defineComponent({
             noRecordsRemaining, toggleSmartLoading,
             smartLoading, resumeImport, loading,
             selectedOrganisationUnit, unmanagedImport,
-            automaticSubmission, toggleAutomaticSubmission
+            automaticSubmission, toggleAutomaticSubmission,
+            deducedContributions, authorshipSelectionRef,
+            submissionDTO, fetchNextAfterLoading
         };
     },
 });

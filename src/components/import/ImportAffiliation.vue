@@ -118,7 +118,7 @@ export default defineComponent({
 
         const totalOUs = ref(0);
         const page = ref(0);
-        const size = ref(1);
+        const size = ref(5);
         const sort = ref("");
         const direction = ref("");
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
@@ -133,7 +133,7 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            OrganisationUnitService.findOUByScopusAfid(props.ouForLoading.scopusAfid).then(response => {
+            OrganisationUnitService.findOUByImportId(props.ouForLoading.scopusAfid).then(response => {
                 if(response.data) {
                     selectedAffiliation.value = response.data;
                     affiliationBinded.value = true;
@@ -150,18 +150,25 @@ export default defineComponent({
             showTable.value = false;
             hadToBeCreated.value = false;
             waitingOnUserInput.value = false;
+            automaticProcessCompleted.value = false;
         };
 
         const searchPotentialMatches = () => {
-            OrganisationUnitService.searchOUs(`tokens=${props.ouForLoading.name[0].content}&tokens=${props.ouForLoading.nameAbbreviation}&page=0&size=10`, null, null).then(response => {
+            OrganisationUnitService.searchOUs(
+                `tokens=${props.ouForLoading.name[0].content}&tokens=${props.ouForLoading.nameAbbreviation}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                null, null
+            )
+            .then(response => {
                 potentialMatches.value = response.data.content;
                 totalOUs.value = response.data.totalElements;
-                if (totalOUs.value === 0) {
-                    showTable.value = false;
-                    addNew();
-                } else {
-                    automaticProcessCompleted.value = true;
-                    waitingOnUserInput.value = true;
+                if (page.value === 0 && !automaticProcessCompleted.value) {
+                    if (totalOUs.value === 0) {
+                        showTable.value = false;
+                        addNew();
+                    } else {
+                        automaticProcessCompleted.value = true;
+                        waitingOnUserInput.value = true;
+                    }
                 }
             });
         };
@@ -266,7 +273,7 @@ export default defineComponent({
                 showTable.value = false;
                 creationInProgress.value = false;
             }).catch(() => {
-                OrganisationUnitService.findOUByScopusAfid(props.ouForLoading.scopusAfid).then(response => {
+                OrganisationUnitService.findOUByImportId(props.ouForLoading.scopusAfid).then(response => {
                     selectedAffiliation.value = response.data;
                     hadToBeCreated.value = true;
                     affiliationBinded.value = true;
