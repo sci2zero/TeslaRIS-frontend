@@ -900,5 +900,6 @@ export default {
     turnOnAutoSubmissionLabel: "Uključi automatsku potvrdu",
     saveOldPublicationLabel: "Sačuvaj stari rad",
     overwriteOldPublicationLabel: "Zameni rad novim",
-    dismissAllLabel: "Odbaci sve"
+    dismissAllLabel: "Odbaci sve",
+    selectYourselfLabel: "Koji od ovih autora ste vi?"
 }

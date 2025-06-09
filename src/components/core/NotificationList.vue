@@ -92,8 +92,8 @@ export default defineComponent({
             loading.value = true;
             fetchNotificationsAndCounts();
 
-            // Fetch notifications and counts every 5 minutes
-            useInterval(fetchNotificationsAndCounts, 1000 * 60 * 5);
+            // Fetch notifications and counts every 30 seconds
+            useInterval(fetchNotificationsAndCounts, 1000 * 30);
         });
 
         const fetchNotificationsAndCounts = () => {

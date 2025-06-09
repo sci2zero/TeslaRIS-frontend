@@ -57,6 +57,11 @@
                     <td v-else>
                         {{ displayTextOrPlaceholder(row.item.stateOther) }}
                     </td>
+                    <td>
+                        <v-btn size="small" color="primary" @click="selectManually(row.item)">
+                            {{ $t("selectLabel") }}
+                        </v-btn>
+                    </td>
                 </tr>
             </template>
         </v-data-table-server>
@@ -155,12 +160,7 @@ export default defineComponent({
 
             EventService.searchConferencesForImport(parameters).then(response => {
                 if(response.data) {
-                    if (response.data.totalElements === 1) {
-                        selectedEvent.value = response.data.content[0];
-                        eventBinded.value = true;
-                        selectProceedingsFromConference();
-                        automaticProcessCompleted.value = true;
-                    } else if (response.data.totalElements === 0) {
+                    if (response.data.totalElements === 0) {
                         addNew();
                     } else {
                         potentialMatches.value = response.data.content;

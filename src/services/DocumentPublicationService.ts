@@ -80,12 +80,12 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/for-organisation-unit/${organisationUnitId}?${pageable}`);
   }
 
-  async createJournalPublication(body: JournalPublication): Promise<AxiosResponse<JournalPublication>> {
-    return super.sendRequest(axios.post, "journal-publication", body, DocumentPublicationService.idempotencyKey);
+  async createJournalPublication(body: JournalPublication, idempotencyKey: string | null = null): Promise<AxiosResponse<JournalPublication>> {
+    return super.sendRequest(axios.post, "journal-publication", body, idempotencyKey ? idempotencyKey : DocumentPublicationService.idempotencyKey);
   }
 
-  async createProceedingsPublication(body: ProceedingsPublication): Promise<AxiosResponse<ProceedingsPublication>> {
-    return super.sendRequest(axios.post, "proceedings-publication", body, DocumentPublicationService.idempotencyKey);
+  async createProceedingsPublication(body: ProceedingsPublication, idempotencyKey: string | null = null): Promise<AxiosResponse<ProceedingsPublication>> {
+    return super.sendRequest(axios.post, "proceedings-publication", body, idempotencyKey ? idempotencyKey : DocumentPublicationService.idempotencyKey);
   }
 
   async createPatent(body: Patent): Promise<AxiosResponse<Patent>> {

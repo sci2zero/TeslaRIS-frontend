@@ -2,6 +2,7 @@ import { computed, ref, onMounted, watch } from "vue";
 import UserService from "@/services/UserService";
 import { type UserResponse } from "@/models/UserModel";
 import { useLoginStore } from "@/stores/loginStore";
+import PersonService from "@/services/PersonService";
 
 
 export function useUserRole() {
@@ -24,6 +25,8 @@ export function useUserRole() {
     const returnOnlyInstitutionRelatedEntities = ref(isUserBoundToOU.value);
     const loggedInUser = ref<UserResponse | null>(null);
     const isUserLoggedIn = computed(() => loggedInUser.value !== null);
+
+    const loggedResearcherId = ref<number>(-1);
     
     const loginStore = useLoginStore();
 
@@ -32,6 +35,12 @@ export function useUserRole() {
             UserService.getLoggedInUser().then(response => {
                 loggedInUser.value = response.data;
             });
+
+            if (isResearcher.value) {
+                PersonService.getPersonId().then(response => {
+                    loggedResearcherId.value = response.data;
+                });
+            }
         }
     });
 
@@ -48,6 +57,6 @@ export function useUserRole() {
         isInstitutionalLibrarian, isHeadOfLibrary,
         isPromotionRegistryAdministrator,
         canUserAddPersons, canAddSerialEvents,
-        isUserLoggedIn
+        isUserLoggedIn, loggedResearcherId
     };
 }
