@@ -23,37 +23,79 @@
                     v-if="isInstitutionalEditor || (isAdmin && selectedOrganisationUnit.value > 0)"
                     :top-level-institution-id="selectedOrganisationUnit.value"
                 />
-                <v-row class="d-flex flex-row justify-center">
-                    <v-col cols="4">
-                        <date-picker
-                            v-model="startDate"
-                            :label="$t('startDateLabel')"
-                            color="primary"
-                            required
-                        ></date-picker>
-                    </v-col>
-                    <v-col cols="4">
-                        <date-picker
-                            v-model="endDate"
-                            :label="$t('endDateLabel')"
-                            color="primary"
-                            required
-                        ></date-picker>
-                    </v-col>
-                </v-row>
-                <v-row class="d-flex flex-row justify-center">
-                    <v-col cols="auto">
-                        <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
-                            {{ $t("scanSourcesLabel") }}
-                        </v-btn>
-                    </v-col>
-                </v-row>
+
+                <v-tabs
+                    v-model="currentTab"
+                    color="deep-purple-accent-4"
+                    align-tabs="center">
+                    <v-tab value="externalSources">
+                        {{ $t("externalSourcesLabel") }}
+                    </v-tab>
+                    <v-tab v-if="isResearcher" value="files">
+                        {{ $t("blibliographisFormatFilesLabel") }}
+                    </v-tab>
+                </v-tabs>
+
+                <v-window
+                    v-model="currentTab"
+                    class="mt-10">
+                    <v-window-item value="externalSources">
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="4">
+                                <date-picker
+                                    v-model="startDate"
+                                    :label="$t('startDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker>
+                            </v-col>
+                            <v-col cols="4">
+                                <date-picker
+                                    v-model="endDate"
+                                    :label="$t('endDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker>
+                            </v-col>
+                        </v-row>
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="auto">
+                                <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
+                                    {{ $t("scanSourcesLabel") }}
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-window-item>
+                    <v-window-item value="files">
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="auto">
+                                <v-file-upload
+                                    v-model="files"
+                                    clearable
+                                    density="default"
+                                    :title="$t('dragDropFilesLabel')"
+                                    :browse-text="$t('browseFilesLabel')"
+                                    :divider-text="$t('orChooseLocalLabel')"
+                                    accept=".ris, .csv, .bib, .enw"
+                                    multiple>
+                                </v-file-upload>
+                            </v-col>
+                        </v-row>
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="auto">
+                                <v-btn color="primary" :disabled="files.length === 0" @click="uploadBibliographicFiles">
+                                    {{ $t("uploadLabel") }}
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-window-item>
+                </v-window>
             </div>
             <h2 v-else class="d-flex flex-row justify-center">
                 {{ $t("setupIdentifiersMessage") }}
             </h2>
 
-            <v-container class="d-flex flex-row justify-center">
+            <v-container class="d-flex flex-row justify-center mt-10">
                 <h2>{{ $t("documentsReadyForImportLabel") }}: {{ numberOfHarvestedDocuments }}</h2>
             </v-container>
             <v-row v-if="loading" class="d-flex flex-row justify-center submission-action">
@@ -108,10 +150,13 @@ export default defineComponent({
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
-        
+        const currentTab = ref("externalSources");
+
         const snackbar = ref(false);
         const errorMessage = ref("");
         const i18n = useI18n();
+
+        const files = ref<File[]>([]);
 
         const startDate = ref();
         const endDate = ref();
@@ -121,7 +166,7 @@ export default defineComponent({
         const newDocumentsHarvested = ref(0);
 
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
-        const { isAdmin, isInstitutionalEditor } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isResearcher } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -132,8 +177,7 @@ export default defineComponent({
                 canPerformHarvest.value = response.data;
             });
 
-            // Fetch number of imported documents 10 seconds
-            useInterval(fetchNumberOfHarvestedDocuments, 1000 * 10);
+            startInterval();
         });
 
         watch(selectedOrganisationUnit, () => {
@@ -148,23 +192,50 @@ export default defineComponent({
             });
         };
 
+        // Fetch number of imported documents 10 seconds
+        const { startInterval } = useInterval(fetchNumberOfHarvestedDocuments, 1000 * 10);
+
         const startHarvest = () => {
+            startLoading();
+
+            ImportService.startHarvest(startDate.value, endDate.value, selectedOrganisationUnit.value.value).then(response => {
+                finishLoading(response.data);
+            }).catch((error) => {
+                handleError(error.response.status);
+            });
+        };
+
+        const uploadBibliographicFiles = () => {
+            startLoading();
+
+            ImportService.uploadBibiographicFiles(files.value).then(response => {
+                files.value.splice(0);
+                finishLoading(response.data);
+            }).catch((error) => {
+                handleError(error.response.status);
+            });
+        };
+
+        const startLoading = () => {
             loading.value = true;
             harvestComplete.value = false;
-            ImportService.startHarvest(startDate.value, endDate.value, selectedOrganisationUnit.value.value).then(response => {
-                loading.value = false;
-                harvestComplete.value = true;
-                newDocumentsHarvested.value = response.data;
-                fetchNumberOfHarvestedDocuments();
-            }).catch((error) => {
-                if(error.response.status === 500) {
-                    errorMessage.value = i18n.t("harvestFailedMessage");
-                } else {
-                    errorMessage.value = i18n.t("genericErrorMessage");
-                }
-                snackbar.value = true;
-                loading.value = false;
-            });
+        };
+
+        const finishLoading = (numberOfNewlyHarvestedDocuments: number) => {
+            loading.value = false;
+            harvestComplete.value = true;
+            newDocumentsHarvested.value = numberOfNewlyHarvestedDocuments;
+            fetchNumberOfHarvestedDocuments();
+        };
+
+        const handleError = (errorStatus: number) => {
+            if(errorStatus === 500) {
+                errorMessage.value = i18n.t("harvestFailedMessage");
+            } else {
+                errorMessage.value = i18n.t("genericErrorMessage");
+            }
+            snackbar.value = true;
+            loading.value = false;
         };
 
         return {
@@ -173,10 +244,12 @@ export default defineComponent({
             numberOfHarvestedDocuments,
             newDocumentsHarvested,
             harvestComplete, isAdmin,
-            isFormValid, snackbar,
+            isFormValid, snackbar, files,
             errorMessage, canPerformHarvest,
             selectedOrganisationUnit,
-            isInstitutionalEditor
+            isInstitutionalEditor,
+            isResearcher, currentTab,
+            uploadBibliographicFiles
         };
     },
 });

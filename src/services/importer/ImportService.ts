@@ -11,6 +11,8 @@ import type { PersonResponse } from "@/models/PersonModel";
 
 
 export class ImportService extends BaseService {
+
+    private static idempotencyKey: string = super.generateIdempotencyKey();
   
     async canPerformHarvest(): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, "import-common/can-perform");
@@ -19,6 +21,22 @@ export class ImportService extends BaseService {
     async startHarvest(dateFrom: string, dateTo: string, institutionId: number = 0): Promise<AxiosResponse<number>> {
         return super.sendRequest(axios.get, `import-common/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}`);
     }
+
+    async uploadBibiographicFiles(files: File[]): Promise<AxiosResponse<number>> {
+        const formData = new FormData();
+        files.forEach(file => formData.append("files", file));
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Idempotency-Key": ImportService.idempotencyKey,
+            },
+            withCredentials: true,
+        };
+
+        return axios.post(`${this.basePath}import-common/documents-from-file`, formData, config);
+    }
+
 
     async getHarvestedDocumentsCount(institutionId: number | null = null): Promise<AxiosResponse<number>> {
         return super.sendRequest(axios.get, `load/load-wizard/count-remaining${institutionId ? "?institutionId=" + institutionId : ""}`);

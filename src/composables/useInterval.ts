@@ -1,16 +1,21 @@
-import { onMounted, onUnmounted } from 'vue';
+import { onUnmounted } from 'vue';
 
-export function useInterval(callback: () => void, interval: number): void {
-    let intervalId: ReturnType<typeof setInterval> | undefined;
+export function useInterval(callback: () => void, interval: number) {
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    onMounted(() => {
-            callback(); // call it immediately
+    const startInterval = () => {
+        if (intervalId === null) {
+            callback();
             intervalId = setInterval(callback, interval);
-    });
+        }
+    };
 
     onUnmounted(() => {
-        if (intervalId !== undefined) {
+        if (intervalId !== null) {
             clearInterval(intervalId);
+            intervalId = null;
         }
     });
+
+    return { startInterval };
 }

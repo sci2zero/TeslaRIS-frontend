@@ -108,7 +108,7 @@ export default defineComponent(
             });
 
             const startCooldown = () => {
-                const interval = 1000; // 1 second
+                
                 elapsedTime.value = 0;
                 progress.value = 0;
                 
@@ -118,7 +118,11 @@ export default defineComponent(
                     cooldown.value = false;
                 }, totalTime);
 
-                useInterval(() => {
+                startInterval();
+            };
+
+            const interval = 1000; // 1 second
+            const { startInterval } = useInterval(() => {
                     elapsedTime.value += interval;
 
                     if (elapsedTime.value >= totalTime) {
@@ -127,7 +131,6 @@ export default defineComponent(
 
                     progress.value = (elapsedTime.value / totalTime) * 100;
                 }, interval);
-            };
 
             const { emailFieldRules } = useValidationUtils();
 

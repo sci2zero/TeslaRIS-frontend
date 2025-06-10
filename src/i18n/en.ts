@@ -359,7 +359,9 @@ export default {
     unknownDateMessage: "Unknown date",
     importerLabel: "Data import",
     scanSourcesLabel: "Scan data sources",
-    harvestDataLabel: "Harvest data from external sources",
+    harvestDataLabel: "Harvest data",
+    externalSourcesLabel: "External sources",
+    blibliographisFormatFilesLabel: "Bibliographic files",
     documentsReadyForImportLabel: "Documents ready to be imported",
     newlyImportedDocumentsCountLabel: "Number of newly found documents",
     noNewDocumentsMessage: "No new imports found.",
@@ -607,6 +609,7 @@ export default {
     createNewCommissionRelationLabel: "Add new relation group",
     classificationRuleLabel: "Classification Rule",
     dragDropFilesLabel: "Drag and drop files here",
+    browseFilesLabel: "Browse files",
     assessPublicationLabel: "Assess publication",
     createNewEntityAssessmentLabel: "Enter assessment",
     createNewAssessmentResearcherLabel: "Add researcher",
@@ -875,5 +878,7 @@ export default {
     saveOldPublicationLabel: "Save old publication",
     overwriteOldPublicationLabel: "Overwrite with new publication",
     dismissAllLabel: "Dismiss all",
-    selectYourselfLabel: "Who of these authors are you?"
+    selectYourselfLabel: "Who of these authors are you?",
+    orChooseLocalLabel: "or choose locally",
+    uploadLabel: "Upload"
 }

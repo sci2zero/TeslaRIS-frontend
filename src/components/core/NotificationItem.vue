@@ -42,9 +42,7 @@ export default defineComponent({
 
         onMounted(() => {
             fetchCount();
-
-            // Fetch notification count every 5 minutes
-            useInterval(fetchCount, 1000 * 60 * 5);
+            startInterval();
         });
 
         const fetchCount = () => {
@@ -52,6 +50,9 @@ export default defineComponent({
                 notificationCountStore.setNotificationCount(response.data);
             });
         };
+
+        // Fetch notification count every 30 seconds
+        const { startInterval } = useInterval(fetchCount, 1000 * 30);
 
         return {
             notificationCountStore
