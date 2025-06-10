@@ -2,19 +2,17 @@
     <div id="navbar">
         <v-toolbar app height="auto">
             <div class="wide-container flex-wrap toolbar-container">
-                <span class="hidden-sm-and-up">
-                    <v-toolbar-side-icon @click="sidebar = !sidebar">
-                    </v-toolbar-side-icon>
-                </span>
                 <div class="d-flex">
-                    <v-toolbar-title>
+                    <v-toolbar-title :class="isLargeScreen ? '' : 'lowered'">
                         <router-link to="/" class="logo-link app-title">
                             {{ returnCurrentLocaleContent(appTitle) }}
                         </router-link>
                     </v-toolbar-title>
 
                     <!-- Menu -->
-                    <div class="d-flex ps-5 flex-wrap">
+                    <div 
+                        v-if="isLargeScreen" 
+                        class="d-flex ps-5 flex-wrap">
                         <div v-for="item in leftMenuItems" :key="item.title" class="text-center">
                             <template v-if="item.type == 'menu'">
                                 <v-menu v-if="item.condition == undefined || item.condition" open-on-hover open-delay="0">
@@ -73,43 +71,139 @@
                             </template>
                         </div>
                     </div>
+                    <v-app-bar-nav-icon
+                        v-if="!isLargeScreen"
+                        @click="drawer = !drawer"
+                    />
+                    <v-navigation-drawer
+                        v-if="!isLargeScreen"
+                        v-model="drawer"
+                        temporary
+                        location="left"
+                    >
+                        <v-list class="align-start">
+                            <template v-for="item in leftMenuItems" :key="item.title">
+                                <!-- menu type -->
+                                <v-list-item
+                                    v-if="item.type === 'menu' && (item.condition === undefined || item.condition)"
+                                    class="text-left"
+                                >
+                                    <v-menu open-on-hover location="end bottom" open-delay="0">
+                                        <template #activator="{ props }">
+                                            <v-btn size="small" v-bind="props" class="no-uppercase">
+                                                {{ item.title }}
+                                                <v-icon icon="mdi-chevron-down" />
+                                            </v-btn>
+                                        </template>
+                                        <v-list>
+                                            <v-list-item
+                                                v-for="(subItem, index) in item.subItems?.filter(subItem => subItem.condition !== false)"
+                                                :key="index"
+                                                class="ps-5 pe-5"
+                                                :to="subItem.pathName !== undefined ? '/' + $i18n.locale + '/' + subItem.pathName : undefined"
+                                                link
+                                            >
+                                                <v-list-item-title>{{ subItem.title }}</v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-list-item>
+
+                                <!-- dynamic type -->
+                                <v-list-item
+                                    v-else-if="item.type === 'dynamic' && item.condition"
+                                    class="text-left"
+                                >
+                                    <v-btn
+                                        size="small"
+                                        :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName + '/' + item.dynamicValue : undefined"
+                                        :variant="item.variant"
+                                        :color="item.color"
+                                        class="no-uppercase nav-items"
+                                        @click="item.click"
+                                    >
+                                        {{ item.title }}
+                                    </v-btn>
+                                </v-list-item>
+
+                                <!-- default type -->
+                                <v-list-item
+                                    v-else-if="item.condition === undefined || item.condition"
+                                    class="text-left"
+                                >
+                                    <v-btn
+                                        size="small"
+                                        :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                                        :variant="item.variant"
+                                        :color="item.color"
+                                        class="no-uppercase"
+                                        :icon="item.type === 'icon'"
+                                        exact
+                                    >
+                                        <v-icon v-if="item.icon" left dark>
+                                            {{ item.icon }}
+                                        </v-icon>
+                                        <template v-if="item.type !== 'icon'">
+                                            {{ item.title }}
+                                        </template>
+                                    </v-btn>
+                                </v-list-item>
+                            </template>
+                        </v-list>
+                        <v-divider class="my-2" />
+
+                        <div class="text-center pa-2">
+                            <v-btn
+                                color="primary"
+                                variant="text"
+                                class="no-uppercase"
+                                @click="drawer = false"
+                            >
+                                <v-icon start icon="mdi-close" />
+                                {{ $t("closeLabel") }}
+                            </v-btn>
+                        </div>
+                    </v-navigation-drawer>
                 </div>
 
                 <v-spacer></v-spacer>
 
-                <template v-for="(item, index) in menuItems">
-                    <template v-if="item.type == 'divider'">
-                        <v-divider
-                            :key="index"
-                            inset
-                            class="ms-2 me-2"
-                            vertical></v-divider>
+                <div class="d-flex">
+                    <template v-for="(item, index) in menuItems">
+                        <template v-if="item.type == 'divider'">
+                            <v-divider
+                                :key="index"
+                                inset
+                                class="ms-2 me-2"
+                                vertical></v-divider>
+                        </template>
+                        <template v-else-if="item.type == 'lang_component'">
+                            <component :is="item.component" :key="index"></component>
+                        </template>
+                        <template v-else-if="item.type == 'notification_component' && item.condition">
+                            <component :is="item.component" :key="index"></component>
+                        </template>
+                        <template v-else>
+                            <v-btn
+                                v-if="item.condition"
+                                :key="item.title"
+                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined" :variant="item.variant"
+                                :color="item.color" :class="'no-uppercase nav-items' + (item.title ? ' mt-1' : '')"
+                                :icon="item.type == 'icon'"
+                                @click="item.click"
+                            >
+                                <v-badge :content="item.badge" :model-value="false">
+                                    <v-icon left dark>
+                                        {{ item.icon }}
+                                    </v-icon>
+                                </v-badge>
+                                <span v-if="item.type != 'icon'" class="d-none d-md-flex">
+                                    {{ item.title }}
+                                </span>
+                            </v-btn>
+                        </template>
                     </template>
-                    <template v-else-if="item.type == 'lang_component'">
-                        <component :is="item.component" :key="index"></component>
-                    </template>
-                    <template v-else-if="item.type == 'notification_component' && item.condition">
-                        <component :is="item.component" :key="index"></component>
-                    </template>
-                    <template v-else>
-                        <v-btn
-                            v-if="item.condition"
-                            :key="item.title"
-                            :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined" :variant="item.variant" :color="item.color" class="no-uppercase nav-items"
-                            :icon="item.type == 'icon'"
-                            @click="item.click"
-                        >
-                            <v-badge :content="item.badge" :model-value="false">
-                                <v-icon left dark>
-                                    {{ item.icon }}
-                                </v-icon>
-                            </v-badge>
-                            <template v-if="item.type != 'icon'">
-                                {{ item.title }}
-                            </template>
-                        </v-btn>
-                    </template>
-                </template>
+                </div>
             </div>
         </v-toolbar>
     </div>
@@ -133,28 +227,35 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
+import { useBrandingStore } from '@/stores/brandingStore';
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 
 
 interface MenuItem {
-  title?: ComputedRef<string> | string | undefined;
-  pathName?: string;
-  click?: () => void;
-  icon?: string;
-  type: string;
-  condition?: Ref<boolean> | boolean;
-  badge?: Ref<number> | number;
-  variant?: 'text' | 'outlined' | 'flat' | 'elevated' | 'tonal' | 'plain';
-  color?: string;
-  subItems?: MenuItem[] | Ref<MenuItem[]>;
-  component?: Component;
-  dynamicValue?: ComputedRef;
+    title?: ComputedRef<string> | string | undefined;
+    pathName?: string;
+    click?: () => void;
+    icon?: string;
+    type: string;
+    condition?: Ref<boolean> | boolean;
+    badge?: Ref<number> | number;
+    variant?: 'text' | 'outlined' | 'flat' | 'elevated' | 'tonal' | 'plain';
+    color?: string;
+    subItems?: MenuItem[] | Ref<MenuItem[]>;
+    component?: Component;
+    dynamicValue?: ComputedRef;
 }
+
 
 export default defineComponent(
     {
         name: "NavbarHeader",
         components: { LangChangeItem, NotificationItem },
         setup() {
+            const drawer = ref(false);
+            const { width } = useDisplay();
+            const isLargeScreen = computed(() => width.value > 1500);
+
             const langChangeItem = shallowRef(LangChangeItem);
             const notificationItem = shallowRef(NotificationItem);
 
@@ -207,6 +308,7 @@ export default defineComponent(
             const sidebar = ref(false);
             const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 
+            const brandingStore = useBrandingStore();
             const loginStore = useLoginStore();
             const userName = ref("");
             const router = useRouter();
@@ -233,9 +335,15 @@ export default defineComponent(
             const logout = () => {
                 AuthenticationService.logoutUser();
                 loginStore.explicitlyLogout();
-                loginStore
                 router.push({ name: "login" });
             };
+
+            watch(() => brandingStore.rebranded, () => {
+                if (brandingStore.rebranded) {
+                    appTitle.value = brandingStore.newTitle;
+                    brandingStore.rebrandingHandled();
+                }
+            });
 
             watch(() => loginStore.userLoggedIn, () => {
                 if (loginStore.userLoggedIn) {
@@ -270,21 +378,25 @@ export default defineComponent(
             const manageMenu = ref<MenuItem[]>([
                 { title: userPageLabel, type:'icon-link', pathName: 'users' },
                 { title: eventListLabel, type:'icon-link', pathName: 'events' },
-                { title: journalListLabel, type:'icon-link', pathName: 'journals' },
-                { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series' },
+                { title: journalListLabel, type:'icon-link', pathName: 'journals'},
+                { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series'},
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
                 { title: countryListLabel, type:'icon-link', pathName: "countries"},
                 { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},
+                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: brandingLabel, type:'icon-link', pathName: "branding"},
                 { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"},
-                { title: healthCheckLabel, type:'icon-link', pathName: "health-check"}
+                { title: healthCheckLabel, type:'icon-link', pathName: "health-check"},
+                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) }
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
                 { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
                 { title: classificationPageLabel, type:'icon-link', pathName: 'assessment/classifications' },
                 { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
-                { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' }
+                { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' },
+                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) },
             ]);
 
             const thesisLibraryMenu = ref<MenuItem[]>([
@@ -299,18 +411,16 @@ export default defineComponent(
                 { title: homeLabel, type: 'icon-link', pathName:"" },
                 { title: resourcesLabel, type: 'menu', subItems: resourcesMenu },
                 { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
-                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && isResearcher.value) },
+                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && (isResearcher.value || isInstitutionalEditor.value)) },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
                 { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
                 { title: institutionProfileLabel, type: 'dynamic', pathName: `organisation-units`, dynamicValue: computed(() => institutionId.value), condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu },
-                { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-                { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
-                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isViceDeanForScience.value)) },
+                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
                 { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: true }
             ]);
 
@@ -321,14 +431,14 @@ export default defineComponent(
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color:'primary' },
                 { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
-                { title: "", type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) },
+                { title: undefined, type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }
             ]);
-
 
             return { 
                 userName, userRole, logout, appTitle,
                 sidebar, menuItems, leftMenuItems, loginStore,
-                returnCurrentLocaleContent
+                returnCurrentLocaleContent, drawer,
+                isLargeScreen
             };
         }
     });
@@ -356,6 +466,10 @@ export default defineComponent(
 
 .toolbar-container {
     min-height: 64px;
+}
+
+.lowered {
+    margin-top: 10px;
 }
 
 </style>

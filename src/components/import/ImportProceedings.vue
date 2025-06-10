@@ -82,7 +82,7 @@ import type { ProceedingsPublicationLoad } from "@/models/LoadModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { EventType, type EventIndex } from "@/models/EventModel";
 import EventService from "@/services/EventService";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 import ProceedingsService from "@/services/ProceedingsService";
 import JournalService from "@/services/JournalService";
@@ -96,14 +96,20 @@ export default defineComponent({
         publicationForLoading: {
             type: Object as PropType<ProceedingsPublicationLoad>,
             required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
+            required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
 
         const eventBinded = ref(false);
         const proceedingsBinded = ref(false);
         const automaticProcessCompleted = ref(false);
+        const waitingOnUserInput = ref(false);
 
         const selectedEvent = ref<EventIndex>();
         const selectedProceedings = ref<ProceedingsResponse>();
@@ -137,6 +143,7 @@ export default defineComponent({
             proceedingsBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -158,6 +165,8 @@ export default defineComponent({
                     } else {
                         potentialMatches.value = response.data.content;
                         showTable.value = true;
+                        automaticProcessCompleted.value = true;
+                        waitingOnUserInput.value = true;
                     }   
                 }
             });
@@ -223,7 +232,10 @@ export default defineComponent({
 
             creationInProgress.value = true;
 
-            ImportService.createNewProceedings(idempotencyKey).then((response) => {
+            ImportService.createNewProceedings(
+                idempotencyKey,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then((response) => {
                 selectedEvent.value = {
                     nameSr: returnCurrentLocaleContent(response.data.eventName) as string,
                     nameOther: returnCurrentLocaleContent(response.data.eventName) as string,
@@ -315,6 +327,12 @@ export default defineComponent({
             }
         });
 
+        watch(proceedingsBinded, () => {
+            if (proceedingsBinded.value && waitingOnUserInput.value) {
+                emit("userActionComplete");
+            }
+        });
+
         return {
             potentialMatches, tableOptions, headers,
             displayTextOrPlaceholder, totalEvents,
@@ -327,3 +345,22 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="css" scoped>
+
+h1 {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+
+h2 {
+    color: #555;
+    font-weight: 500;
+    font-size: 1em;
+    line-height: 1em;
+    margin-bottom: 1em;
+}
+
+</style>

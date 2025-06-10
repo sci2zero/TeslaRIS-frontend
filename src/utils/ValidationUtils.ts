@@ -76,7 +76,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const scopusIdPattern = /^\d{6,11}$/i;
+    const scopusIdPattern = /^\d{6,12}$/i;
     const scopusIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;

@@ -35,7 +35,7 @@
                         {{ row.item.titleOther }}
                     </td>
                     <td>
-                        {{ displayTextOrPlaceholder(row.item.eISSN) }}
+                        {{ displayTextOrPlaceholder(row.item.eissn) }}
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(row.item.printISSN) }}
@@ -70,7 +70,7 @@ import type { JournalPublicationLoad } from "@/models/LoadModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import type { JournalIndex } from "@/models/JournalModel";
 import JournalService from "@/services/JournalService";
-import ImportService from "@/services/ImportService";
+import ImportService from "@/services/importer/ImportService";
 
 
 export default defineComponent({
@@ -79,13 +79,19 @@ export default defineComponent({
         publicationForLoading: {
             type: Object as PropType<JournalPublicationLoad>,
             required: true
+        },
+        topLevelInstitutionId: {
+            type: Number,
+            required: true
         }
     },
-    setup(props) {
+    emits: ["userActionComplete"],
+    setup(props, {emit}) {
         const creationInProgress = ref(false);
         const journalBinded = ref(false);
         const automaticProcessCompleted = ref(false);
         const selectedJournal = ref<JournalIndex>();
+        const waitingOnUserInput = ref(false);
 
         const showTable = ref(false);
         const potentialMatches = ref<JournalIndex[]>([]);
@@ -126,6 +132,7 @@ export default defineComponent({
             journalBinded.value = false;
             showTable.value = false;
             hadToBeCreated.value = false;
+            waitingOnUserInput.value = false;
         };
 
         const searchPotentialMatches = () => {
@@ -136,6 +143,7 @@ export default defineComponent({
                     addNew();
                 } else {
                     automaticProcessCompleted.value = true;
+                    waitingOnUserInput.value = true;
                 }
             });
         };
@@ -197,7 +205,12 @@ export default defineComponent({
 
             creationInProgress.value = true;
 
-            ImportService.createNewJournal(props.publicationForLoading.journalEIssn, props.publicationForLoading.journalPrintIssn, idempotencyKey).then((response) => {
+            ImportService.createNewJournal(
+                props.publicationForLoading.journalEIssn,
+                props.publicationForLoading.journalPrintIssn,
+                idempotencyKey,
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then((response) => {
                 selectedJournal.value = {
                     titleSr: returnCurrentLocaleContent(response.data.title) as string,
                     titleOther: returnCurrentLocaleContent(response.data.title) as string,
@@ -241,6 +254,12 @@ export default defineComponent({
         };
         const idempotencyKey = generateIdempotencyKey();
 
+        watch(journalBinded, () => {
+            if (journalBinded.value && waitingOnUserInput.value) {
+                emit("userActionComplete");
+            }
+        });
+
         return {
             potentialMatches, switchPage, 
             tableOptions, headers, refreshTable,
@@ -252,3 +271,21 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="css" scoped>
+
+h1 {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+
+h2 {
+    color: #555;
+    font-weight: 500;
+    font-size: 1em;
+    line-height: 1em;
+}
+
+</style>
