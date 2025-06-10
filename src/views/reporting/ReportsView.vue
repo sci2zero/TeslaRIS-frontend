@@ -163,12 +163,12 @@ export default defineComponent({
 
             setTimeout(() => {
                 fetchScheduledTasks();
-                useInterval(fetchScheduledTasks, 1000 * 60);
+                startTasksInterval()
             }, millisecondsUntilNextMinute);
 
             setTimeout(() => {
                 fetchAllGeneratedReports();
-                useInterval(fetchScheduledTasks, 1000 * 60);
+                startReportsInterval();
             }, millisecondsUntilNextMinute);
         });
 
@@ -184,6 +184,7 @@ export default defineComponent({
                 });
             });
         };
+        const { startInterval: startTasksInterval } = useInterval(fetchScheduledTasks, 1000 * 60);
 
         const fetchAllGeneratedReports = () => {
             allGeneratedReports.value.splice(0);
@@ -193,6 +194,7 @@ export default defineComponent({
                     });
                 });
         };
+        const { startInterval: startReportsInterval } = useInterval(fetchAllGeneratedReports, 1000 * 60);
 
         watch(i18n.locale, () => {
             populateSelectionData();

@@ -359,7 +359,9 @@ export default {
     unknownDateMessage: "Nepoznat datum",
     importerLabel: "Uvoz podataka",
     scanSourcesLabel: "Skeniraj izvore",
-    harvestDataLabel: "Uvezite podatke sa eksternih izvora",
+    harvestDataLabel: "Uvezite podatke",
+    externalSourcesLabel: "Eksterni izvori",
+    blibliographisFormatFilesLabel: "Bibliografski fajlovi",
     documentsReadyForImportLabel: "Ukupno dokumenata za uvoz",
     newlyImportedDocumentsCountLabel: "Broj novih pronađenih dokumenata",
     noNewDocumentsMessage: "Nisu pronađeni novi dokumenti.",
@@ -606,6 +608,7 @@ export default {
     createNewCommissionRelationLabel: "Dodaj novu relacionu grupu",
     classificationRuleLabel: "Klasifikaciono pravilo",
     dragDropFilesLabel: "Prevucite fajlove ovde",
+    browseFilesLabel: "Pretražite fajlove",
     assessPublicationLabel: "Vrednuj publikaciju",
     createNewEntityAssessmentLabel: "Unesi vrednovanje",
     createNewAssessmentResearcherLabel: "Dodaj istraživača",
@@ -901,5 +904,7 @@ export default {
     saveOldPublicationLabel: "Sačuvaj stari rad",
     overwriteOldPublicationLabel: "Zameni rad novim",
     dismissAllLabel: "Odbaci sve",
-    selectYourselfLabel: "Koji od ovih autora ste vi?"
+    selectYourselfLabel: "Koji od ovih autora ste vi?",
+    orChooseLocalLabel: "ili izaberite lokalno",
+    uploadLabel: "Otpremi"
 }

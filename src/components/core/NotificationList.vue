@@ -70,7 +70,6 @@
 </template>
   
 <script lang="ts">
-import { useInterval } from '@/composables/useInterval';
 import { NotificationAction } from '@/models/Common';
 import type { Notification } from '@/models/Common';
 import NotificationService from '@/services/NotificationService';
@@ -91,9 +90,6 @@ export default defineComponent({
         onMounted(() => {
             loading.value = true;
             fetchNotificationsAndCounts();
-
-            // Fetch notifications and counts every 30 seconds
-            useInterval(fetchNotificationsAndCounts, 1000 * 30);
         });
 
         const fetchNotificationsAndCounts = () => {

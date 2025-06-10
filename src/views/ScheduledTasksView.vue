@@ -244,7 +244,7 @@ export default defineComponent({
 
             setTimeout(() => {
                 fetchScheduledTasks();
-                useInterval(fetchScheduledTasks, 1000 * 60);
+                startInterval();
             }, millisecondsUntilNextMinute);
         });
 
@@ -264,6 +264,8 @@ export default defineComponent({
                 });
             });
         };
+
+        const { startInterval } = useInterval(fetchScheduledTasks, 1000 * 60);
 
         const populateSelectionData = () => {
             scheduledTaskTypes.value = getScheduledTaskTypeForGivenLocale();
