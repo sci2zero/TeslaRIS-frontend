@@ -77,10 +77,30 @@
                                     :browse-text="$t('browseFilesLabel')"
                                     :divider-text="$t('orChooseLocalLabel')"
                                     accept=".ris, .csv, .bib, .enw"
-                                    multiple>
+                                    multiple
+                                >
+                                    <template #append>
+                                        <v-tooltip location="top">
+                                            <template #activator="{ props }">
+                                                <v-icon
+                                                    v-show="isCSVFileSelected()"
+                                                    v-bind="props"
+                                                    icon="mdi-help-circle-outline"
+                                                    class="ml-2"
+                                                    color="primary"
+                                                    style="cursor: pointer"
+                                                />
+                                            </template>
+                                            <span>
+                                                <pre>{{ requiredFieldsDescription }}</pre>
+                                                <pre>{{ supportedFieldsDescription }}</pre>
+                                            </span>
+                                        </v-tooltip>
+                                    </template>
                                 </v-file-upload>
                             </v-col>
                         </v-row>
+
                         <v-row class="d-flex flex-row justify-center">
                             <v-col cols="auto">
                                 <v-btn color="primary" :disabled="files.length === 0" @click="uploadBibliographicFiles">
@@ -168,6 +188,9 @@ export default defineComponent({
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const { isAdmin, isInstitutionalEditor, isResearcher } = useUserRole();
 
+        const requiredFieldsDescription = ref("");
+        const supportedFieldsDescription = ref("");
+
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
 
@@ -182,7 +205,20 @@ export default defineComponent({
 
         watch(selectedOrganisationUnit, () => {
             fetchNumberOfHarvestedDocuments();
-        })
+        });
+
+        watch(files, () => {
+            if (isCSVFileSelected()) {
+                ImportService.getCSVFileFormatDescription().then(response => {
+                    requiredFieldsDescription.value = response.data.a;
+                    supportedFieldsDescription.value = "\n" + response.data.b;
+                });
+            }
+        });
+
+        const isCSVFileSelected = (): boolean => {
+            return files.value.some(file => file.name.endsWith(".csv"));
+        };
 
         const fetchNumberOfHarvestedDocuments = () => {
             ImportService.getHarvestedDocumentsCount(
@@ -249,7 +285,10 @@ export default defineComponent({
             selectedOrganisationUnit,
             isInstitutionalEditor,
             isResearcher, currentTab,
-            uploadBibliographicFiles
+            uploadBibliographicFiles,
+            isCSVFileSelected,
+            requiredFieldsDescription,
+            supportedFieldsDescription
         };
     },
 });

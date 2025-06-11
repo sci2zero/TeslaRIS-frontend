@@ -77,3 +77,8 @@ export interface LoadingConfiguration {
     smartLoadingByDefault: boolean;
     loadedEntitiesAreUnmanaged: boolean;
 }
+
+export interface FormatDescription {
+    a: string;
+    b: string;
+}
