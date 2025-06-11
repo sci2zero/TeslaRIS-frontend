@@ -316,11 +316,6 @@ export default defineComponent({
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
             ).then(() => {
                 stepperValue.value = shouldToggleSmartLoading ? 0 : 1;
-                importAuthorsRef.value.forEach(contribution => {
-                    if (contribution) {
-                        contribution.resetIdempotencyKey();
-                    }
-                });
                 importAuthorsRef.value = [];
                 importAuthorsRef.value.length = 0;
                 fetchNextRecordForLoading();

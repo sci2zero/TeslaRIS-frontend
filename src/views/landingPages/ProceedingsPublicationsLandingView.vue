@@ -133,7 +133,7 @@
 
         <tab-content-loader v-if="!proceedingsPublication" layout="list" />
         <v-tabs
-            v-if="proceedingsPublication"
+            v-show="proceedingsPublication"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -153,7 +153,7 @@
         </v-tabs>
 
         <v-tabs-window
-            v-if="proceedingsPublication"
+            v-show="proceedingsPublication"
             v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->

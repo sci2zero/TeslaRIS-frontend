@@ -70,6 +70,7 @@ export interface OrganisationUnitLoad {
     name: MultilingualContent[];
     nameAbbreviation: string;
     scopusAfid: string;
+    importId: string;
 }
 
 export interface LoadingConfiguration {

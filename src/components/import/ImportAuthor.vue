@@ -184,8 +184,10 @@ export default defineComponent({
                     if (loggedResearcherId.value > 0) {
                         const currentResearcherContribution =
                             potentialMatches.value.find(
-                                person => person.databaseId === loggedResearcherId.value
+                                person => person.databaseId === loggedResearcherId.value &&
+                                    !props.personForLoading.scopusAuthorId
                             );
+                            
                         if (currentResearcherContribution) {
                             selectedResearcher.value = currentResearcherContribution;
                             researcherBinded.value = true;
@@ -208,7 +210,7 @@ export default defineComponent({
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
             size.value = pageSize;
-            sort.value = sortField;
+            sort.value = sortField ? sortField : "";
             direction.value = sortDir;
             searchPotentialMatches();
         };
@@ -283,7 +285,7 @@ export default defineComponent({
 
             ImportService.createNewPerson(
                 props.personForLoading.importId,
-                idempotencyKey.value,
+                self.crypto.randomUUID(),
                 props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
             ).then(response => {
                 selectedResearcher.value = {
@@ -309,30 +311,6 @@ export default defineComponent({
             });
         };
 
-        const generateIdempotencyKey = (): string => {
-            function s4(): string {
-                return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-            }
-
-            return (
-                s4() +
-                s4() +
-                '-' +
-                s4() +
-                '-' +
-                s4() +
-                '-' +
-                s4() +
-                '-' +
-                s4() +
-                s4() +
-                s4()
-            );
-        };
-        const idempotencyKey = ref(generateIdempotencyKey());
-
         const isHandled = () => {
             const allAffiliationsBinded = importAffiliationsRef.value
                 .filter(importAffiliationRef => importAffiliationRef !== null)
@@ -348,16 +326,16 @@ export default defineComponent({
             return automaticProcessCompleted.value && allAffiliationProcessesCompleted;
         };
 
-        const resetIdempotencyKey = () => {
-            idempotencyKey.value = generateIdempotencyKey();
-        };
-
         watch(researcherBinded, () => {
             notifyParentIfAllHandled();
         });
 
         const notifyParentIfAllHandled = () => {
-            if (isHandled() && waitingOnUserInput.value) {
+            const waitingOnAffiliationUserInput = importAffiliationsRef.value
+                .filter(importAffiliationRef => importAffiliationRef !== null)
+                .some(importAffiliationRef => importAffiliationRef.waitingOnUserInput === true);
+
+            if (isHandled() && (waitingOnUserInput.value || waitingOnAffiliationUserInput)) {
                 emit("userActionComplete");
             }
         };
@@ -369,7 +347,7 @@ export default defineComponent({
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
             hadToBeCreated, importAffiliationsRef,
-            isHandled, isReady, resetIdempotencyKey,
+            isHandled, isReady,
             notifyParentIfAllHandled
         };
     },
@@ -391,4 +369,5 @@ h2 {
     font-size: 1em;
     line-height: 1em;
 }
+
 </style>

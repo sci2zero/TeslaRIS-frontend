@@ -137,15 +137,18 @@ export default defineComponent({
 
         const searchPotentialMatches = () => {
             JournalService.searchJournals(
-                `tokens=${encodeURIComponent(props.publicationForLoading.journalName[0].content)}&page=0&size=10`, null)
-                .then(response => {
+                `tokens=${encodeURIComponent(props.publicationForLoading.journalName[0].content)}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                null
+            ).then(response => {
                 potentialMatches.value = response.data.content;
                 totalJournals.value = response.data.totalElements;
-                if (totalJournals.value === 0) {
-                    addNew();
-                } else {
-                    automaticProcessCompleted.value = true;
-                    waitingOnUserInput.value = true;
+                if (page.value === 0 && !automaticProcessCompleted.value) {
+                    if (totalJournals.value === 0) {
+                        addNew();
+                    } else {
+                        automaticProcessCompleted.value = true;
+                        waitingOnUserInput.value = true;
+                    }
                 }
             });
         };
@@ -153,7 +156,7 @@ export default defineComponent({
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
             size.value = pageSize;
-            sort.value = sortField;
+            sort.value = sortField ? sortField : "";
             direction.value = sortDir;
             searchPotentialMatches();
         };

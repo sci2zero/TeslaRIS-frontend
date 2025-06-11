@@ -74,12 +74,12 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.patch, `load/mark-as-loaded${queryString}`);
     }
 
-    async createNewInstitution(scopusAfid: string, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<OrganisationUnitResponse>> {
-        return super.sendRequest(axios.post, `load/institution/${scopusAfid}${institutionId ? "?institutionId=" + institutionId : ""}`, {}, idempotencyKey);
+    async createNewInstitution(importId: string, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<OrganisationUnitResponse>> {
+        return super.sendRequest(axios.post, `load/institution/${importId}${institutionId ? "?institutionId=" + institutionId : ""}`, {}, idempotencyKey);
     }
 
-    async createNewPerson(scopusAuthorId: string, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<PersonResponse>> {
-        return super.sendRequest(axios.post, `load/person/${scopusAuthorId}${institutionId ? "?institutionId=" + institutionId : ""}`, {}, idempotencyKey);
+    async createNewPerson(importId: string, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<PersonResponse>> {
+        return super.sendRequest(axios.post, `load/person/${importId}${institutionId ? "?institutionId=" + institutionId : ""}`, {}, idempotencyKey);
     }
 
     async createNewJournal(eIssn: string, printIssn: string, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<PublicationSeries>> {
