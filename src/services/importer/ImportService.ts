@@ -1,13 +1,14 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
+import type { FormatDescription, JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import type { Page } from "@/models/Common";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 import type { PersonResponse } from "@/models/PersonModel";
+import i18n from "@/i18n";
 
 
 export class ImportService extends BaseService {
@@ -92,6 +93,10 @@ export class ImportService extends BaseService {
 
     async searchForDuplicates(parameters: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
         return super.sendRequest(axios.get, `document/deduplication-search?${parameters}`);
+    }
+
+    async getCSVFileFormatDescription(): Promise<AxiosResponse<FormatDescription>> {
+        return super.sendRequest(axios.get, `import-common/csv-file-format?language=${i18n.vueI18n.global.locale}`);
     }
 }
   
