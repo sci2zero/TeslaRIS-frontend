@@ -133,7 +133,8 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            OrganisationUnitService.findOUByImportId(props.ouForLoading.scopusAfid).then(response => {
+            console.log(props.ouForLoading.importId)
+            OrganisationUnitService.findOUByImportId(props.ouForLoading.importId).then(response => {
                 if(response.data) {
                     selectedAffiliation.value = response.data;
                     affiliationBinded.value = true;
@@ -155,7 +156,7 @@ export default defineComponent({
 
         const searchPotentialMatches = () => {
             OrganisationUnitService.searchOUs(
-                `tokens=${props.ouForLoading.name[0].content}&tokens=${props.ouForLoading.nameAbbreviation}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                `tokens=${props.ouForLoading.name[0].content}${props.ouForLoading.nameAbbreviation ? ("&tokens=" + props.ouForLoading.nameAbbreviation) : ""}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 null, null
             )
             .then(response => {
@@ -176,7 +177,7 @@ export default defineComponent({
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
             size.value = pageSize;
-            sort.value = sortField;
+            sort.value = sortField ? sortField : "";
             direction.value = sortDir;
             searchPotentialMatches();
         };
@@ -243,8 +244,8 @@ export default defineComponent({
             await new Promise(r => setTimeout(r, Math.floor(Math.random() * (500 - 10 + 1)) + 10));
 
             ImportService.createNewInstitution(
-                props.ouForLoading.scopusAfid,
-                idempotencyKey,
+                props.ouForLoading.importId,
+                self.crypto.randomUUID(),
                 props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
             ).then((response) => {
                 selectedAffiliation.value = {
@@ -283,30 +284,6 @@ export default defineComponent({
             });
         };
 
-        const generateIdempotencyKey = (): string => {
-            function s4(): string {
-                return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-            }
-
-            return (
-                s4() +
-                s4() +
-                '-' +
-                s4() +
-                '-' +
-                s4() +
-                '-' +
-                s4() +
-                '-' +
-                s4() +
-                s4() +
-                s4()
-            );
-        };
-        const idempotencyKey = generateIdempotencyKey();
-
         watch(affiliationBinded, () => {
             if (affiliationBinded.value && waitingOnUserInput.value) {
                 emit("userActionComplete");
@@ -319,7 +296,8 @@ export default defineComponent({
             displayTextOrPlaceholder, totalOUs,
             selectedAffiliation, automaticProcessCompleted, 
             showTable, selectManually, addNew, affiliationBinded,
-            hadToBeCreated, returnCurrentLocaleContent
+            hadToBeCreated, returnCurrentLocaleContent,
+            waitingOnUserInput
         };
     },
 });

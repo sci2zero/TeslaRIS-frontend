@@ -14,6 +14,7 @@ export interface PersonIndex {
     birthdateSortable: string;
     databaseId: number;
     orcid: string;
+    scopusAuthorId: string;
 }
 
 export interface BasicPerson {
