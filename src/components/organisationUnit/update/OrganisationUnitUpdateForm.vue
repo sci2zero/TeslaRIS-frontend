@@ -31,6 +31,16 @@
                 </v-row>
                 <v-row>
                     <v-col>
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="institutionOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
                         <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
                     </v-col>
                 </v-row>
@@ -106,9 +116,14 @@ export default defineComponent({
         const email = ref(props.presetOU?.contact?.contactEmail);
         const phoneNumber = ref(props.presetOU?.contact?.phoneNumber);
         const scopusAfid = ref(props.presetOU?.scopusAfid);
+        const openAlexId = ref(props.presetOU?.openAlexId);
+        const ror = ref(props.presetOU?.ror);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
-        const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
+        const {
+            requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
+            nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submit = async () => {
             if (props.inModal) {
@@ -137,6 +152,8 @@ export default defineComponent({
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
                 contact: {contactEmail: email.value as string, phoneNumber: phoneNumber.value as string},
                 scopusAfid: scopusAfid.value,
+                openAlexId: openAlexId.value,
+                ror: ror.value,
                 uris: uris.value
             };
 
@@ -152,6 +169,8 @@ export default defineComponent({
             email.value = props.presetOU?.contact?.contactEmail;
             phoneNumber.value = props.presetOU?.contact?.phoneNumber;
             scopusAfid.value = props.presetOU?.scopusAfid;
+            openAlexId.value = props.presetOU?.openAlexId;
+            ror.value = props.presetOU?.ror;
             urisRef.value?.refreshModelValue(uris.value);
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
@@ -164,7 +183,9 @@ export default defineComponent({
             requiredFieldRules, submit, message,
             toMultilingualTextInput, languageTags,
             scopusAfidValidationRules, nameRef, uris,
-            nonMandatoryEmailFieldRules, snackbar
+            nonMandatoryEmailFieldRules, snackbar, ror,
+            openAlexId, institutionOpenAlexIdValidationRules,
+            rorValidationRules
         };
     }
 });

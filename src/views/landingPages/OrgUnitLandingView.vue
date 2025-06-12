@@ -87,6 +87,24 @@
                                         {{ $t("notYetSetMessage") }}
                                     </span>
                                 </div>
+                                <div>
+                                    Open Alex ID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Research Organisation Registry ID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
                                 <div v-if="organisationUnit?.uris && organisationUnit.uris.length > 0">
                                     {{ $t("websiteLabel") }}:
                                 </div>
@@ -456,6 +474,8 @@ export default defineComponent({
             organisationUnit.value!.location = basicInfo.location;
             organisationUnit.value!.contact = basicInfo.contact;
             organisationUnit.value!.scopusAfid = basicInfo.scopusAfid;
+            organisationUnit.value!.openAlexId = basicInfo.openAlexId;
+            organisationUnit.value!.ror = basicInfo.ror;
             organisationUnit.value!.uris = basicInfo.uris;
             performUpdate(false);
         };

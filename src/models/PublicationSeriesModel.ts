@@ -6,6 +6,7 @@ export interface PublicationSeries {
     title: MultilingualContent[];
     eissn: string;
     printISSN?: string;
+    openAlexId?: string;
     contributions?: PersonPublicationSeriesContribution[];
     languageTagIds: number[];
     nameAbbreviation: MultilingualContent[];

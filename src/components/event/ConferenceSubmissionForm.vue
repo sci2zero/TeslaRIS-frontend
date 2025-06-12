@@ -85,6 +85,11 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
+                            <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Conf ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
                             <v-text-field
                                 v-model="conferenceNumber"
                                 :label="$t('conferenceNumberLabel')"
@@ -185,6 +190,7 @@ export default defineComponent({
         const eventYear = ref();
         const place = ref([]);
         const confId = ref("");
+        const openAlexId = ref("");
         const conferenceNumber = ref("");
         const entryFee = ref("");
         const serialEvent = ref(false);
@@ -200,7 +206,7 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof MultilingualTextInput>();
 
-        const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules, confIdValidationRules, sourceOpenAlexIdValidationRules } = useValidationUtils();
 
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
         const dateRangeRule = [
@@ -232,6 +238,7 @@ export default defineComponent({
                 number: conferenceNumber.value,
                 contributions: [],
                 confId: confId.value,
+                openAlexId: openAlexId.value,
                 uris: uris.value
             };
 
@@ -251,6 +258,7 @@ export default defineComponent({
                     entryFee.value = "";
                     conferenceNumber.value = "";
                     confId.value = "";
+                    openAlexId.value = "";
                     dateFrom.value = null;
                     dateTo.value = null;
                     eventYear.value = null;
@@ -273,10 +281,11 @@ export default defineComponent({
             isFormValid, additionalFields, snackbar,
             name, nameAbbreviation, description, keywords,
             dateFrom, dateTo, eventYear, countries, selectedCountry,
-            place, conferenceNumber, entryFee, serialEvent,
+            place, conferenceNumber, entryFee, serialEvent, openAlexId,
             requiredFieldRules, submit, timePeriodInput, dateRangeRule,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
-            confIdValidationRules, confId, uris, urisRef, canAddSerialEvents
+            confIdValidationRules, confId, uris, urisRef, canAddSerialEvents,
+            sourceOpenAlexIdValidationRules
         };
     }
 });

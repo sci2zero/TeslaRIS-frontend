@@ -152,11 +152,18 @@
                             </v-col>
                         </v-row>
                         <v-row>
-                            <v-col cols="12">
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="openAlex"
+                                    label="Open Alex ID"
+                                    placeholder="Open Alex ID"
+                                    :rules="personOpenAlexIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
                                 <multilingual-text-input
                                     v-model="displayTitle"
-                                    :rules="requiredFieldRules"
-                                    :label="$t('displayTitleLabel') + '*'">
+                                    :label="$t('displayTitleLabel')">
                                 </multilingual-text-input>
                             </v-col>
                         </v-row>
@@ -243,10 +250,15 @@ export default defineComponent({
         const eNaukaId = ref("");
         const apvnt = ref("");
         const scopus = ref("");
+        const openAlex = ref("");
         const displayTitle = ref([]);
 
-        const { requiredFieldRules, requiredSelectionRules, apvntValidationRules, eCrisIdValidationRules,
-            eNaukaIdValidationRules, orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
+        const { 
+            requiredFieldRules, requiredSelectionRules,
+            apvntValidationRules, eCrisIdValidationRules,
+            eNaukaIdValidationRules, orcidValidationRules,
+            scopusAuthorIdValidationRules, personOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
 
@@ -268,6 +280,7 @@ export default defineComponent({
                 eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 scopusAuthorId: scopus.value,
+                openAlexId: openAlex.value,
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
@@ -293,6 +306,7 @@ export default defineComponent({
                     eNaukaId.value = "";
                     orcid.value = "";
                     scopus.value = "";
+                    openAlex.value = "";
                     selectedSex.value = selectionPlaceholder;
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
@@ -315,7 +329,7 @@ export default defineComponent({
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules, loggedInUser, displayTitle
+            scopusAuthorIdValidationRules, loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules
         };
     }
 });

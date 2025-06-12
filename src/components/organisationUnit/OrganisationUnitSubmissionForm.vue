@@ -27,8 +27,16 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col cols="12" md="6">
                             <v-text-field v-model="scopusAfid" label="Scopus AFID" placeholder="Scopus AFID" :rules="scopusAfidValidationRules"></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="institutionOpenAlexIdValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -103,11 +111,17 @@ export default defineComponent({
         const nameAbbreviation = ref("");
         const email = ref("");
         const scopusAfid = ref("");
+        const openAlexId = ref("");
+        const ror = ref("");
         const phoneNumber = ref("");
         const keywords = ref([]);
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, scopusAfidValidationRules, nonMandatoryEmailFieldRules } = useValidationUtils();
+        const {
+            requiredFieldRules, scopusAfidValidationRules,
+            nonMandatoryEmailFieldRules, rorValidationRules,
+            institutionOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submit = (stayOnPage: boolean) => {
             const newOu: OrganisationUnitRequest = {
@@ -118,6 +132,8 @@ export default defineComponent({
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
                 contact: {contactEmail: email.value, phoneNumber: phoneNumber.value},
                 scopusAfid: scopusAfid.value,
+                openAlexId: openAlexId.value,
+                ror: ror.value,
                 uris: uris.value
             };
 
@@ -134,6 +150,8 @@ export default defineComponent({
                     email.value = "";
                     phoneNumber.value = "";
                     scopusAfid.value = "";
+                    openAlexId.value = "";
+                    ror.value = "";
                     mapRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage");
@@ -159,7 +177,9 @@ export default defineComponent({
             submit, mapRef,
             scopusAfid, uris,
             scopusAfidValidationRules,
-            nonMandatoryEmailFieldRules
+            nonMandatoryEmailFieldRules,
+            openAlexId, rorValidationRules, ror,
+            institutionOpenAlexIdValidationRules
         };
     }
 });

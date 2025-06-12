@@ -29,6 +29,8 @@ export interface OrganisationUnitRequest {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
+    openAlexId?: string;
+    ror? : string;
     uris: string[];
 }
 
@@ -41,6 +43,8 @@ export interface OrganisationUnitResponse {
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
+    openAlexId?: string;
+    ror? : string;
     uris: string[];
     logoServerFilename?: string;
     logoBackgroundHex: string;

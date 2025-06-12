@@ -880,5 +880,7 @@ export default {
     dismissAllLabel: "Dismiss all",
     selectYourselfLabel: "Who of these authors are you?",
     orChooseLocalLabel: "or choose locally",
-    uploadLabel: "Upload"
+    uploadLabel: "Upload",
+    openAlexIdFormatError: "Wrong OpenAlexID format.",
+    openAlexIdExistsError: "OpenAlexID already in use."
 }

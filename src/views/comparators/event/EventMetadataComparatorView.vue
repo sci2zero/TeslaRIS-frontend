@@ -188,6 +188,8 @@ export default defineComponent({
             conference2.number = "";
             conference1.confId = conference2.confId;
             conference2.confId = "";
+            conference1.openAlexId = conference2.openAlexId;
+            conference2.openAlexId = "";
 
             conference2.uris.forEach(uri => {
                 if (!conference1.uris.includes(uri)) {
@@ -239,6 +241,7 @@ export default defineComponent({
             leftConference.value!.fee = basicInfo.fee;
             leftConference.value!.number = basicInfo.number;
             leftConference.value!.confId = basicInfo.confId;
+            leftConference.value!.openAlexId = basicInfo.openAlexId;
             leftConference.value!.uris = basicInfo.uris;
             
             if (update.value) {
@@ -258,6 +261,7 @@ export default defineComponent({
             rightConference.value!.fee = basicInfo.fee;
             rightConference.value!.number = basicInfo.number;
             rightConference.value!.confId = basicInfo.confId;
+            rightConference.value!.openAlexId = basicInfo.openAlexId;
             rightConference.value!.uris = basicInfo.uris;
             
             if (update.value) {

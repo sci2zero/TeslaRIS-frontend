@@ -69,6 +69,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="10">
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="5">
                         <v-text-field
                             v-model="conferenceNumber"
@@ -206,9 +211,13 @@ export default defineComponent({
         const entryFee = ref(props.presetEvent?.fee);
         const serialEvent = ref(props.presetEvent?.serialEvent);
         const confId = ref(props.presetEvent?.confId);
+        const openAlexId = ref(props.presetEvent?.openAlexId);
         const uris = ref<string[]>(props.presetEvent?.uris as string[]);
 
-        const { requiredFieldRules, confIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, confIdValidationRules,
+            sourceOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
         const dateRangeRule = [
@@ -254,6 +263,7 @@ export default defineComponent({
                 number: conferenceNumber.value,
                 contributions: props.presetEvent?.contributions,
                 confId: confId.value,
+                openAlexId: openAlexId.value,
                 uris: uris.value
             }
 
@@ -280,6 +290,7 @@ export default defineComponent({
             conferenceNumber.value = props.presetEvent?.number;
             entryFee.value = props.presetEvent?.fee;
             confId.value = props.presetEvent?.confId;
+            openAlexId.value = props.presetEvent?.openAlexId;
             urisRef.value?.refreshModelValue(uris.value);
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
@@ -292,7 +303,8 @@ export default defineComponent({
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, submit, dateRangeRule,
             dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
-            eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId
+            eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId,
+            openAlexId, sourceOpenAlexIdValidationRules
         };
     }
 });

@@ -15,12 +15,15 @@ export const useValidationUtils = () => {
     const invalidOrcidIdMessage = computed(() => i18n.t("orcidIdFormatError"));
     const invalidScopusAuthorIdMessage = computed(() => i18n.t("scopusAuthorIdFormatError"));
     const invalidScopusAfidMessage = computed(() => i18n.t("scopusAfidFormatError"));
+    const invalidOpenAlexIdMessage = computed(() => i18n.t("openAlexIdFormatError"));
+    const invalidRorMessage = computed(() => i18n.t("invalidRorMessage"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
     const requiredFutureDateMessage = computed(() => i18n.t("requiredFutureDateMessage"));
     const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
     const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
+
 
     
     const requiredFieldRules = [
@@ -175,6 +178,42 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const personOpenAlexIdPattern = /^A\d{10}$/i;
+    const personOpenAlexIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (personOpenAlexIdPattern.test(value)) return true;
+            return invalidOpenAlexIdMessage.value;
+        }
+    ];
+
+    const institutionOpenAlexIdPattern = /^I\d{10}$/i;
+    const institutionOpenAlexIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (institutionOpenAlexIdPattern.test(value)) return true;
+            return invalidOpenAlexIdMessage.value;
+        }
+    ];
+
+    const sourceOpenAlexIdPattern = /^[SV]\d{10}$/i;
+    const sourceOpenAlexIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (sourceOpenAlexIdPattern.test(value)) return true;
+            return invalidOpenAlexIdMessage.value;
+        }
+    ];
+
+    const rorPattern = /^0[0-9a-hj-km-np-z]{8}$/i;
+    const rorValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (rorPattern.test(value)) return true;
+            return invalidRorMessage.value;
+        }
+    ];
+
     const confIdPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i;
     const confIdValidationRules = [
         (value: string) => {
@@ -274,6 +313,8 @@ export const useValidationUtils = () => {
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
         dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
         requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules,
-        atLeastOneRequiredRule, atLeastOneTrueRule
+        atLeastOneRequiredRule, atLeastOneTrueRule, personOpenAlexIdValidationRules,
+        institutionOpenAlexIdValidationRules, sourceOpenAlexIdValidationRules,
+        rorValidationRules
     };
 };

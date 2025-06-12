@@ -906,5 +906,7 @@ export default {
     dismissAllLabel: "Odbaci sve",
     selectYourselfLabel: "Koji od ovih autora ste vi?",
     orChooseLocalLabel: "ili izaberite lokalno",
-    uploadLabel: "Otpremi"
+    uploadLabel: "Otpremi",
+    openAlexIdFormatError: "Pogrešan OpenAlexID format.",
+    openAlexIdExistsError: "OpenAlexID je već u upotrebi."
 }

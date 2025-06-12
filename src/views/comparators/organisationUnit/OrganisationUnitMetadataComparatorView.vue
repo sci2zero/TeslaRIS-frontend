@@ -191,6 +191,10 @@ export default defineComponent({
             organisationUnit2.nameAbbreviation = "";
             organisationUnit1.scopusAfid = organisationUnit2.scopusAfid;
             organisationUnit2.scopusAfid = "";
+            organisationUnit1.openAlexId = organisationUnit2.openAlexId;
+            organisationUnit2.openAlexId = "";
+            organisationUnit1.ror = organisationUnit2.ror;
+            organisationUnit2.ror = "";
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
             organisationUnit1.contact!.phoneNumber = organisationUnit2.contact?.phoneNumber as string;
@@ -243,6 +247,8 @@ export default defineComponent({
             leftOrganisationUnit.value!.name = updatedData.name;
             leftOrganisationUnit.value!.nameAbbreviation = updatedData.nameAbbreviation;
             leftOrganisationUnit.value!.scopusAfid = updatedData.scopusAfid;
+            leftOrganisationUnit.value!.openAlexId = updatedData.openAlexId;
+            leftOrganisationUnit.value!.ror = updatedData.ror;
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
@@ -260,6 +266,8 @@ export default defineComponent({
             rightOrganisationUnit.value!.name = updatedData.name;
             rightOrganisationUnit.value!.nameAbbreviation = updatedData.nameAbbreviation;
             rightOrganisationUnit.value!.scopusAfid = updatedData.scopusAfid;
+            rightOrganisationUnit.value!.openAlexId = updatedData.openAlexId;
+            rightOrganisationUnit.value!.ror = updatedData.ror;
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.keyword = updatedData.keyword;

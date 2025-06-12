@@ -58,6 +58,12 @@
                                 <div class="response">
                                     {{ journal?.printISSN ? journal.printISSN : $t("notYetSetMessage") }}
                                 </div>
+                                <div v-if="journal?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="journal?.openAlexId" class="response">
+                                    <identifier-link :identifier="journal.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="journal?.languageTagIds && journal?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
@@ -183,11 +189,12 @@ import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink },
     setup() {
         const currentTab = ref("contributions");
 
@@ -298,6 +305,7 @@ export default defineComponent({
             journal.value!.eissn = updatedJournal.eissn;
             journal.value!.printISSN = updatedJournal.printISSN;
             journal.value!.languageTagIds = updatedJournal.languageTagIds;
+            journal.value!.openAlexId = updatedJournal.openAlexId;
             journal.value!.uris = updatedJournal.uris;
 
             performUpdate(false);
