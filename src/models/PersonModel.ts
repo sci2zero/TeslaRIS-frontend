@@ -15,6 +15,7 @@ export interface PersonIndex {
     databaseId: number;
     orcid: string;
     scopusAuthorId: string;
+    openAlexId: string;
 }
 
 export interface BasicPerson {
@@ -29,6 +30,7 @@ export interface BasicPerson {
     eNaukaId?: string | null;
     orcid?: string | null;
     scopusAuthorId?: string | null;
+    openAlexId?: string | null;
     organisationUnitId?: number;
     employmentPosition?: EmploymentPosition;
     displayTitle: MultilingualContent[];
@@ -132,6 +134,7 @@ export interface PersonalInfo {
     eNaukaId?: string;
     orcid?: string;
     scopusAuthorId?: string;
+    openAlexId?: string;
     uris: string[];
     displayTitle: MultilingualContent[];
 }

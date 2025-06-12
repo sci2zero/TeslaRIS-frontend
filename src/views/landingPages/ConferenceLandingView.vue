@@ -74,6 +74,12 @@
                                 <div v-if="conference?.confId" class="response">
                                     {{ conference.confId }}
                                 </div>
+                                <div v-if="conference?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="conference?.openAlexId" class="response">
+                                    <identifier-link :identifier="conference.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="conference?.number">
                                     {{ $t("conferenceNumberLabel") }}:
                                 </div>
@@ -216,11 +222,12 @@ import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink },
     setup() {
         const currentTab = ref("contributions");
 
@@ -344,6 +351,7 @@ export default defineComponent({
             conference.value!.fee = basicInfo.fee;
             conference.value!.number = basicInfo.number;
             conference.value!.confId = basicInfo.confId;
+            conference.value!.openAlexId = basicInfo.openAlexId;
             conference.value!.uris = basicInfo.uris;
 
             performUpdate(true);

@@ -99,6 +99,13 @@
                                         {{ $t("notYetSetMessage") }}
                                     </span>
                                 </div>
+                                <div>Open Alex ID:</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.openAlexId" :identifier="personalInfo.openAlexId" type="open_alex"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber">

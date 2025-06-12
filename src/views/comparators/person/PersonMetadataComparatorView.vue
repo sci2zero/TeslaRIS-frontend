@@ -257,6 +257,8 @@ export default defineComponent({
             person2.apvnt = "";
             person1.scopusAuthorId = person2.scopusAuthorId;
             person2.scopusAuthorId = "";
+            person1.openAlexId = person2.openAlexId;
+            person2.openAlexId = "";
             person1.contact.contactEmail = person2.contact.contactEmail;
             person2.contact.contactEmail = "";
             person1.contact.phoneNumber = person2.contact.phoneNumber;

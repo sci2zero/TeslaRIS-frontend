@@ -58,6 +58,12 @@
                                 <div class="response">
                                     {{ bookSeries?.printISSN ? bookSeries.printISSN : $t("notYetSetMessage") }}
                                 </div>
+                                <div v-if="bookSeries?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="bookSeries?.openAlexId" class="response">
+                                    <identifier-link :identifier="bookSeries.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="bookSeries?.languageTagIds && bookSeries?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
@@ -157,11 +163,12 @@ import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink },
     setup() {
         const currentTab = ref("contributions");
 
@@ -259,6 +266,7 @@ export default defineComponent({
             bookSeries.value!.nameAbbreviation = updatedBookSeries.nameAbbreviation;
             bookSeries.value!.eissn = updatedBookSeries.eissn;
             bookSeries.value!.printISSN = updatedBookSeries.printISSN;
+            bookSeries.value!.openAlexId = updatedBookSeries.openAlexId;
             bookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
             bookSeries.value!.uris = updatedBookSeries.uris;
 

@@ -20,6 +20,11 @@
                         <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
@@ -120,9 +125,13 @@ export default defineComponent({
         const nameAbbreviations = ref([]);
         const eIssn = ref("");
         const printIssn = ref("");
+        const openAlexId = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, eIssnValidationRules,
+            printIssnValidationRules, sourceOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submit = (stayOnPage: boolean) => {
             const newPublicationSeries: PublicationSeries = {
@@ -132,6 +141,7 @@ export default defineComponent({
                 languageTagIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value,
                 contributions: [],
+                openAlexId: openAlexId.value,
                 uris: uris.value
             };
 
@@ -148,6 +158,7 @@ export default defineComponent({
                             abbreviationsRef.value?.clearInput();
                             eIssn.value = "";
                             printIssn.value = "";
+                            openAlexId.value = "";
                             selectedLanguages.value = [defaultLanguage.value];
 
                             message.value = i18n.t("savedMessage");
@@ -193,7 +204,8 @@ export default defineComponent({
             title, titleRef, eIssnValidationRules,
             eIssn, printIssn, languageList, selectedLanguages,
             nameAbbreviations, abbreviationsRef,
-            requiredFieldRules, uris, urisRef
+            requiredFieldRules, uris, urisRef, openAlexId,
+            sourceOpenAlexIdValidationRules
         };
     }
 });

@@ -23,6 +23,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col>
                         <v-select
                             v-model="selectedLanguages"
@@ -124,9 +129,13 @@ export default defineComponent({
         const nameAbbreviations = ref<any[]>([]);
         const eIssn = ref(props.presetPublicationSeries?.eissn);
         const printIssn = ref(props.presetPublicationSeries?.printISSN);
+        const openAlexId = ref(props.presetPublicationSeries?.openAlexId);
         const uris = ref<string[]>(props.presetPublicationSeries?.uris as string[]);
 
-        const { requiredFieldRules, eIssnValidationRules, printIssnValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, eIssnValidationRules,
+            printIssnValidationRules, sourceOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submit = async () => {
             if (props.inModal) {
@@ -161,6 +170,7 @@ export default defineComponent({
                 languageTagIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value,
                 contributions: [],
+                openAlexId: openAlexId.value,
                 uris: uris.value
             };
 
@@ -178,6 +188,7 @@ export default defineComponent({
             selectedLanguages.value = props.presetPublicationSeries?.languageTagIds as number[];
             eIssn.value = props.presetPublicationSeries?.eissn;
             printIssn.value = props.presetPublicationSeries?.printISSN;
+            openAlexId.value = props.presetPublicationSeries?.openAlexId;
             urisRef.value?.refreshModelValue(uris.value);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
@@ -185,7 +196,7 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
+            isFormValid, openAlexId,
             title, nameAbbreviations,
             eIssn, printIssn,
             requiredFieldRules,
@@ -196,7 +207,8 @@ export default defineComponent({
             printIssnValidationRules,
             titleRef, abbreviationsRef,
             refreshForm, uris, urisRef,
-            submit, snackbar, message
+            submit, snackbar, message,
+            sourceOpenAlexIdValidationRules
         };
     }
 });

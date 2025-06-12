@@ -64,6 +64,7 @@ export interface Conference extends Event {
     number?: string;
     fee?: string;
     confId?: string;
+    openAlexId?: string;
 }
 
 export interface EventsRelation {

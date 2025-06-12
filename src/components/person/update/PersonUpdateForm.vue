@@ -52,6 +52,11 @@
                         <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID" :rules="scopusAuthorIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="openAlex" label="Open Alex ID" placeholder="Open Alex ID" :rules="personOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
                 <h3>{{ $t('contactLabel') }}</h3>
                 <v-row>
                     <v-col>
@@ -191,6 +196,7 @@ export default defineComponent({
         const eNaukaId = ref(props.presetPerson?.personalInfo.eNaukaId);
         const apvnt = ref(props.presetPerson?.personalInfo.apvnt);
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
+        const openAlex = ref(props.presetPerson?.personalInfo.openAlexId);
 
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>();
@@ -207,8 +213,11 @@ export default defineComponent({
         const sexes = getSexForGivenLocale();
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
 
-        const { apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
-            orcidValidationRules, scopusAuthorIdValidationRules } = useValidationUtils();
+        const {
+            apvntValidationRules, eCrisIdValidationRules,
+            eNaukaIdValidationRules, personOpenAlexIdValidationRules,
+            orcidValidationRules, scopusAuthorIdValidationRules
+        } = useValidationUtils();
 
         const submit = async () => {
             if (props.inModal) {
@@ -247,6 +256,7 @@ export default defineComponent({
                     streetAndNumber: streetAndNumber.value
                 },
                 scopusAuthorId: scopus.value,
+                openAlexId: openAlex.value,
                 uris: uris.value,
                 displayTitle: displayTitle.value
             };
@@ -276,6 +286,7 @@ export default defineComponent({
             eNaukaId.value = props.presetPerson?.personalInfo.eNaukaId;
             apvnt.value = props.presetPerson?.personalInfo.apvnt;
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
+            openAlex.value = props.presetPerson?.personalInfo.openAlexId;
             urisRef.value?.refreshModelValue(uris.value);
 
             cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
@@ -289,7 +300,8 @@ export default defineComponent({
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
-            streetAndNumberRef, refreshForm, uris, urisRef, displayTitle
+            streetAndNumberRef, refreshForm, uris, urisRef, displayTitle,
+            personOpenAlexIdValidationRules, openAlex
         };
     }
 });
