@@ -26,6 +26,11 @@
                         <v-text-field v-model="datasetNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
 
                 <v-row>
                     <v-col>
@@ -139,10 +144,14 @@ export default defineComponent({
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
+        const openAlexId = ref("");
         const datasetNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submitDataset = (stayOnPage: boolean) => {
             const newDataset: Dataset = {
@@ -155,6 +164,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -171,6 +181,7 @@ export default defineComponent({
                     publisherAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
+                    openAlexId.value = "";
                     datasetNumber.value = "";
                     contributionsRef.value?.clearInput();
 
@@ -205,7 +216,8 @@ export default defineComponent({
             place, placeRef, uris, urisRef,
             contributions, contributionsRef,
             requiredFieldRules, submitDataset,
-            doiValidationRules
+            doiValidationRules, openAlexId,
+            workOpenAlexIdValidationRules
         };
     }
 });

@@ -45,8 +45,16 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="5">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -196,12 +204,16 @@ export default defineComponent({
         const publicationYear = ref(props.presetProceedingsPublication?.documentDate);
         const doi = ref(props.presetProceedingsPublication?.doi);
         const scopus = ref(props.presetProceedingsPublication?.scopusId);
+        const openAlexId = ref(props.presetProceedingsPublication?.openAlexId);
         const articleNumber = ref(props.presetProceedingsPublication?.articleNumber);
         const numberOfPages = ref(props.presetProceedingsPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetProceedingsPublication?.uris as string[]);
 
-        const { requiredFieldRules, requiredSelectionRules,
-            doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
         
         const i18n = useI18n();
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -248,7 +260,8 @@ export default defineComponent({
                 const { duplicateFound } = await checkIdentifiers(
                     [
                         { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        { value: scopus.value as string, error: "scopusIdExistsError"},
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
                     ],
                     props.presetProceedingsPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -273,6 +286,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 eventId: selectedEvent.value.value,
                 proceedingsPublicationType: selectedpublicationType.value.value as ProceedingsPublicationType,
                 proceedingsId: selectedProceedings.value.value,
@@ -297,9 +311,9 @@ export default defineComponent({
             publicationYear.value = props.presetProceedingsPublication?.documentDate;
             doi.value = props.presetProceedingsPublication?.doi;
             scopus.value = props.presetProceedingsPublication?.scopusId;
+            openAlexId.value = props.presetProceedingsPublication?.openAlexId;
             articleNumber.value = props.presetProceedingsPublication?.articleNumber;
             selectedpublicationType.value = {title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType ? props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType : null};
-
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -312,14 +326,14 @@ export default defineComponent({
             isFormValid, title, subtitle,
             publicationYear, doi, scopus,
             selectedProceedings, articleNumber,
-            uris, numberOfPages, doiValidationRules,
+            uris, numberOfPages, doiValidationRules, openAlexId,
             requiredFieldRules, selectedEvent, titleRef, subtitleRef,
             submit, toMultilingualTextInput, snackbar, message,
             languageTags, startPage, endPage, requiredSelectionRules,
             publicationTypes, selectedpublicationType, availableProceedings,
             selectNewlyAddedProceedings, scopusIdValidationRules,
-            refreshForm, urisRef, ProceedingsSubmissionForm
-
+            refreshForm, urisRef, ProceedingsSubmissionForm,
+            workOpenAlexIdValidationRules
         };
     }
 });

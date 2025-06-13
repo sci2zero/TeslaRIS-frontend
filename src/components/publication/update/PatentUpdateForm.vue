@@ -24,8 +24,16 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="5">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -126,15 +134,22 @@ export default defineComponent({
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetPatent?.documentDate);
         const doi = ref(props.presetPatent?.doi);
+        const openAlexId = ref(props.presetPatent?.openAlexId);
         const patentNumber = ref(props.presetPatent?.number);
         const uris = ref<string[]>(props.presetPatent?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submit = async () => {
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
-                    [{ value: doi.value as string, error: "doiExistsError" }],
+                    [
+                        { value: doi.value as string, error: "doiExistsError" },
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                    ],
                     props.presetPatent?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
                 );
@@ -154,6 +169,7 @@ export default defineComponent({
                 contributions: props.presetPatent?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -173,6 +189,7 @@ export default defineComponent({
             patentNumber.value = props.presetPatent?.number;
             publicationYear.value = props.presetPatent?.documentDate;
             doi.value = props.presetPatent?.doi;
+            openAlexId.value = props.presetPatent?.openAlexId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -194,7 +211,9 @@ export default defineComponent({
             languageTags,
             doiValidationRules,
             titleRef, subtitleRef,
-            refreshForm, urisRef
+            refreshForm, urisRef,
+            openAlexId,
+            workOpenAlexIdValidationRules
         };
     }
 });

@@ -205,6 +205,15 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const workOpenAlexIdPattern = /^W\d{10}$/i;
+    const workOpenAlexIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (workOpenAlexIdPattern.test(value)) return true;
+            return invalidOpenAlexIdMessage.value;
+        }
+    ];
+
     const rorPattern = /^0[0-9a-hj-km-np-z]{8}$/i;
     const rorValidationRules = [
         (value: string) => {
@@ -315,6 +324,6 @@ export const useValidationUtils = () => {
         requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules,
         atLeastOneRequiredRule, atLeastOneTrueRule, personOpenAlexIdValidationRules,
         institutionOpenAlexIdValidationRules, sourceOpenAlexIdValidationRules,
-        rorValidationRules
+        rorValidationRules, workOpenAlexIdValidationRules
     };
 };

@@ -107,6 +107,12 @@
                                 <div v-if="monographPublication?.doi" class="response">
                                     <identifier-link :identifier="monographPublication.doi"></identifier-link>
                                 </div>
+                                <div v-if="monographPublication?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="monographPublication?.openAlexId" class="response">
+                                    <identifier-link :identifier="monographPublication.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="monographPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
@@ -387,6 +393,7 @@ export default defineComponent({
             monographPublication.value!.numberOfPages = basicInfo.numberOfPages;
             monographPublication.value!.articleNumber = basicInfo.articleNumber;
             monographPublication.value!.monographPublicationType = basicInfo.monographPublicationType;
+            monographPublication.value!.openAlexId = basicInfo.openAlexId;
 
             performUpdate(true);
         };

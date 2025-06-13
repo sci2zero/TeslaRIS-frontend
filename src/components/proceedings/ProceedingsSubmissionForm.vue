@@ -77,7 +77,20 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -207,6 +220,7 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const scopus = ref("");
+        const openAlexId = ref("");
         const publicationSeriesVolume = ref("");
         const publicationSeriesIssue = ref("");
 
@@ -217,7 +231,11 @@ export default defineComponent({
             }
         };
 
-        const { requiredFieldRules, doiValidationRules, isbnValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            isbnValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -251,6 +269,7 @@ export default defineComponent({
                 contributions: [],
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 eISBN: eIsbn.value,
                 eventId: selectedEvent.value?.value,
                 languageTagIds: selectedLanguages.value,
@@ -280,6 +299,7 @@ export default defineComponent({
                     eventAutocompleteRef.value?.clearInput();
                     doi.value = "";
                     scopus.value = "";
+                    openAlexId.value = "";
                     numberOfPages.value = null;
                     eIsbn.value = "";
                     printIsbn.value = "";
@@ -300,7 +320,7 @@ export default defineComponent({
             isFormValid, additionalFields,
             snackbar, message, isbnValidationRules,
             title, titleRef, subtitle, subtitleRef,
-            eventAutocompleteRef, selectedEvent,
+            eventAutocompleteRef, selectedEvent, openAlexId,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
             description, descriptionRef, doiValidationRules,
@@ -311,7 +331,7 @@ export default defineComponent({
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submit,
-            scopusIdValidationRules
+            scopusIdValidationRules, workOpenAlexIdValidationRules
         };
     }
 });

@@ -86,6 +86,12 @@
                                 <div v-if="patent?.doi" class="response">
                                     <identifier-link :identifier="patent.doi"></identifier-link>
                                 </div>
+                                <div v-if="patent?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="patent?.openAlexId" class="response">
+                                    <identifier-link :identifier="patent.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="patent?.uris && patent?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -337,6 +343,7 @@ export default defineComponent({
             patent.value!.uris = basicInfo.uris;
             patent.value!.publisherId = basicInfo.publisherId;
             patent.value!.number = basicInfo.number;
+            patent.value!.openAlexId = basicInfo.openAlexId;
 
             performUpdate(true);
         };

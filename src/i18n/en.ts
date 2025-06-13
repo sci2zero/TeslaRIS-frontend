@@ -540,7 +540,7 @@ export default {
     cancelLabel: "Cancel",
     continueLabel: "Proceed",
     areYouSureLabel: "Are you sure?",
-    setupIdentifiersMessage: "In order to scan external data sources, you have to enter your ScopusID in your researcher profile.",
+    setupIdentifiersMessage: "In order to scan external data sources, you have to set up your ScopusID or OpenAlexID in your researcher profile.",
     selectAssociateFromSystemLabel: "Select from system",
     addExternalAssociateLabel: "Add external associate",
     migrateToUnmanagedResearcherLabel: "Migrate to external associate",

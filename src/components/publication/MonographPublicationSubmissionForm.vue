@@ -72,8 +72,11 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="5">
                             <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -178,6 +181,7 @@ export default defineComponent({
         const endPage = ref("");
         const doi = ref("");
         const scopus = ref("");
+        const openAlexId = ref("");
         const articleNumber = ref("");
         const numberOfPages = ref();
         const uris = ref<string[]>([]);
@@ -185,8 +189,11 @@ export default defineComponent({
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-        const { requiredFieldRules, requiredSelectionRules,
-            doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const { 
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => i18n.locale.value === "sr" ? monographPublicationTypeSr : monographPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
@@ -222,6 +229,7 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: contributions.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 scopusId: scopus.value,
                 fileItems: [],
                 proofs: []
@@ -242,6 +250,7 @@ export default defineComponent({
                     endPage.value = "";
                     doi.value = "";
                     scopus.value = "";
+                    openAlexId.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
@@ -269,12 +278,12 @@ export default defineComponent({
             subtitle, subtitleRef, startPage, endPage,
             doi, scopus, articleNumber, numberOfPages,
             description, descriptionRef, keywords, keywordsRef,
-            uris, urisRef, myPublications, doiValidationRules,
+            uris, urisRef, myPublications, doiValidationRules, openAlexId,
             selectedMonograph, monographAutocompleteRef, listPublications,
             publicationTypes, selectedpublicationType, isResearcher,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
-            availableMonograph, errorMessage
+            availableMonograph, errorMessage, workOpenAlexIdValidationRules
         };
     }
 });

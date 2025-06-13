@@ -77,8 +77,16 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col cols="6">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -255,12 +263,17 @@ export default defineComponent({
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetThesis?.documentDate);
         const doi = ref(props.presetThesis?.doi);
+        const openAlexId = ref(props.presetThesis?.openAlexId);
         const numberOfPages = ref(props.presetThesis?.numberOfPages);
         const uris = ref<string[]>(props.presetThesis?.uris as string[]);
         const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
         const thesisDefenceDate = ref(props.presetThesis?.thesisDefenceDate as string);
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
         const selectedThesisType = ref<{ title: string, value: ThesisType | undefined }>({title: getThesisTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string, value: props.presetThesis?.thesisType as ThesisType});
@@ -268,7 +281,10 @@ export default defineComponent({
         const submit = async () => {
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
-                    [{ value: doi.value as string, error: "doiExistsError" }],
+                    [
+                        { value: doi.value as string, error: "doiExistsError" },
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                    ],
                     props.presetThesis?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
                 );
@@ -292,6 +308,7 @@ export default defineComponent({
                 contributions: props.presetThesis?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 languageId: selectedLanguage.value,
                 writingLanguageTagId: selectedWritingLanguage.value,
@@ -319,6 +336,7 @@ export default defineComponent({
             numberOfPages.value = props.presetThesis?.numberOfPages;
             publicationYear.value = props.presetThesis?.documentDate;
             doi.value = props.presetThesis?.doi;
+            openAlexId.value = props.presetThesis?.openAlexId;
             topicAcceptanceDate.value = props.presetThesis?.topicAcceptanceDate as string;
             thesisDefenceDate.value = props.presetThesis?.thesisDefenceDate as string;
 
@@ -343,7 +361,8 @@ export default defineComponent({
             selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
-            topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference
+            topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference,
+            openAlexId, workOpenAlexIdValidationRules
         };
     }
 });

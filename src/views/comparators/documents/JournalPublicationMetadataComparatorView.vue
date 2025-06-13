@@ -183,6 +183,8 @@ export default defineComponent({
             journalPublication2.volume = "";
             journalPublication1.issue = journalPublication2.issue;
             journalPublication2.issue = "";
+            journalPublication1.openAlexId = journalPublication2.openAlexId;
+            journalPublication2.openAlexId = "";
 
             journalPublication1.eventId = journalPublication2.eventId;
             journalPublication1.journalId = journalPublication2.journalId;
@@ -244,6 +246,7 @@ export default defineComponent({
             leftJournalPublication.value!.eventId = updatedInfo.eventId;
             leftJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             leftJournalPublication.value!.scopusId = updatedInfo.scopusId;
+            leftJournalPublication.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -269,6 +272,7 @@ export default defineComponent({
             rightJournalPublication.value!.eventId = updatedInfo.eventId;
             rightJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             rightJournalPublication.value!.scopusId = updatedInfo.scopusId;
+            rightJournalPublication.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

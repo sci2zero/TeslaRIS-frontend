@@ -73,6 +73,16 @@
         </v-row>
         <v-row>
             <v-col cols="12">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
                 <journal-autocomplete-search v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
             </v-col>
         </v-row>
@@ -247,11 +257,15 @@ export default defineComponent({
         const publicationYear = ref(props.presetMonograph?.documentDate);
         const doi = ref(props.presetMonograph?.doi);
         const scopus = ref(props.presetMonograph?.scopusId);
+        const openAlexId = ref(props.presetMonograph?.openAlexId);
         const number = ref(props.presetMonograph?.number);
         const volume = ref(props.presetMonograph?.volume);
 
-        const { requiredFieldRules, requiredSelectionRules,
-            doiValidationRules, scopusIdValidationRules, isbnValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules,
+            isbnValidationRules, workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -273,7 +287,8 @@ export default defineComponent({
                         { value: eIsbn.value as string, error: "eisbnExistsError" },
                         { value: printIsbn.value as string, error: "printIsbnExistsError" },
                         { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError" }
+                        { value: scopus.value as string, error: "scopusIdExistsError" },
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
                     ],
                     props.presetMonograph?.id as number,
                     (id, docId) => DocumentPublicationService.checkMonographIdentifierUsage(id, docId)
@@ -298,6 +313,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 eisbn: eIsbn.value,
                 eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 languageTagIds: selectedLanguages.value,
@@ -331,6 +347,7 @@ export default defineComponent({
             publicationYear.value = props.presetMonograph?.documentDate;
             doi.value = props.presetMonograph?.doi;
             scopus.value = props.presetMonograph?.scopusId;
+            openAlexId.value = props.presetMonograph?.openAlexId;
             volume.value = props.presetMonograph?.volume;
             number.value = props.presetMonograph?.number;
             selectedMonographType.value = {title: props.presetMonograph?.monographType ? getMonographTypeTitleFromValueAutoLocale(props.presetMonograph?.monographType as MonographType) as string : "", value: props.presetMonograph?.monographType ? props.presetMonograph?.monographType as MonographType : null};
@@ -358,7 +375,8 @@ export default defineComponent({
             selectedResearchArea, doiValidationRules,
             scopusIdValidationRules, titleRef,
             subtitleRef, refreshForm, urisRef,
-            isbnValidationRules, snackbar, message
+            isbnValidationRules, snackbar, message,
+            openAlexId, workOpenAlexIdValidationRules
         };
     }
 });

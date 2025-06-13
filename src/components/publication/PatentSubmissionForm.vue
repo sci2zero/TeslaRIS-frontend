@@ -26,6 +26,11 @@
                         <v-text-field v-model="patentNumber" :label="$t('patentNumberLabel')" :placeholder="$t('patentNumberLabel')"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
 
                 <v-row>
                     <v-col>
@@ -140,10 +145,14 @@ export default defineComponent({
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
+        const openAlexId = ref("");
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submitPatent = (stayOnPage: boolean) => {
             const newPatent: Patent = {
@@ -156,6 +165,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -172,6 +182,7 @@ export default defineComponent({
                     publisherAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
+                    openAlexId.value = "";
                     patentNumber.value = "";
                     contributionsRef.value?.clearInput();
 
@@ -206,7 +217,8 @@ export default defineComponent({
             place, placeRef, uris, urisRef,
             contributions, contributionsRef,
             requiredFieldRules, submitPatent,
-            doiValidationRules
+            doiValidationRules, openAlexId,
+            workOpenAlexIdValidationRules
         };
     }
 });

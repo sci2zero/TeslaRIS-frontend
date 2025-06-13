@@ -51,8 +51,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="5">
                         <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -190,6 +193,7 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const scopus = ref("");
+        const openAlexId = ref("");
         const articleNumber = ref("");
         const numberOfPages = ref();
         const uris = ref<string[]>([]);
@@ -197,7 +201,10 @@ export default defineComponent({
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-        const { requiredFieldRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            scopusIdValidationRules, workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: getTitleFromValueAutoLocale(JournalPublicationType.RESEARCH_ARTICLE) as string, value: JournalPublicationType.RESEARCH_ARTICLE});
@@ -236,6 +243,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
+                openAlexId: openAlexId.value,
                 doi: doi.value,
                 fileItems: [],
                 proofs: []
@@ -257,6 +265,7 @@ export default defineComponent({
                     publicationYear.value = "";
                     doi.value = "";
                     scopus.value = "";
+                    openAlexId.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
@@ -279,7 +288,7 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, subtitleRef,
+            isFormValid, subtitleRef, openAlexId, workOpenAlexIdValidationRules,
             additionalFields, snackbar, error, title, titleRef, subtitle,
             volume, issue, startPage, endPage, publicationYear, doi, scopus,
             articleNumber, numberOfPages, description, descriptionRef,

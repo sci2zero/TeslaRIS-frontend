@@ -118,6 +118,12 @@
                                 <div v-if="thesis?.doi" class="response">
                                     <identifier-link :identifier="thesis.doi"></identifier-link>
                                 </div>
+                                <div v-if="thesis?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="thesis?.openAlexId" class="response">
+                                    <identifier-link :identifier="thesis.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="thesis?.uris && thesis?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -574,6 +580,7 @@ export default defineComponent({
             thesis.value!.topicAcceptanceDate = basicInfo.topicAcceptanceDate;
             thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
             thesis.value!.thesisType = basicInfo.thesisType;
+            thesis.value!.openAlexId = basicInfo.openAlexId;
 
             performUpdate(true);
         };
