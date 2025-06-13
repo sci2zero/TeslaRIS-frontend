@@ -5,7 +5,7 @@
                 {{ $t("harvestDataLabel") }}
             </h1>
             <br />
-            <div v-if="canPerformHarvest">
+            <div>
                 <v-row
                     v-if="isAdmin"
                     class="d-flex flex-row justify-center"
@@ -40,7 +40,7 @@
                     v-model="currentTab"
                     class="mt-10">
                     <v-window-item value="externalSources">
-                        <v-row class="d-flex flex-row justify-center">
+                        <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
                             <v-col cols="4">
                                 <date-picker
                                     v-model="startDate"
@@ -58,13 +58,16 @@
                                 ></date-picker>
                             </v-col>
                         </v-row>
-                        <v-row class="d-flex flex-row justify-center">
+                        <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
                             <v-col cols="auto">
                                 <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
                                     {{ $t("scanSourcesLabel") }}
                                 </v-btn>
                             </v-col>
                         </v-row>
+                        <h2 v-else class="d-flex flex-row justify-center">
+                            {{ $t("setupIdentifiersMessage") }}
+                        </h2>
                     </v-window-item>
                     <v-window-item value="files">
                         <v-row class="d-flex flex-row justify-center">
@@ -111,9 +114,6 @@
                     </v-window-item>
                 </v-window>
             </div>
-            <h2 v-else class="d-flex flex-row justify-center">
-                {{ $t("setupIdentifiersMessage") }}
-            </h2>
 
             <v-container class="d-flex flex-row justify-center mt-10">
                 <h2>{{ $t("documentsReadyForImportLabel") }}: {{ numberOfHarvestedDocuments }}</h2>

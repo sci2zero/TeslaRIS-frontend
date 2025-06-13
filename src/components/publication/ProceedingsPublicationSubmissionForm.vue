@@ -58,8 +58,16 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="5">
                         <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field
+                            v-model="openAlexId"
+                            label="Open Alex ID"
+                            placeholder="Open Alex ID"
+                            :rules="workOpenAlexIdValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -201,6 +209,7 @@ export default defineComponent({
         const startPage = ref("");
         const endPage = ref("");
         const doi = ref("");
+        const openAlexId = ref("");
         const scopus = ref("");
         const articleNumber = ref("");
         const numberOfPages = ref();
@@ -209,8 +218,11 @@ export default defineComponent({
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-        const { requiredFieldRules, requiredSelectionRules,
-            doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
@@ -290,6 +302,7 @@ export default defineComponent({
                 uris: uris.value,
                 contributions: contributions.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 scopusId: scopus.value,
                 eventId: selectedEvent.value.value,
                 fileItems: [],
@@ -311,6 +324,7 @@ export default defineComponent({
                     startPage.value = "";
                     endPage.value = "";
                     doi.value = "";
+                    openAlexId.value = "";
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
@@ -341,11 +355,11 @@ export default defineComponent({
             keywords, keywordsRef, placeRef, uris, urisRef, titleRef,
             myPublications, doiValidationRules, selectNewlyAddedProceedings,
             selectedEvent, eventAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType, errorMessage,
+            publicationTypes, selectedpublicationType, errorMessage, openAlexId,
             contributions, contributionsRef, scopusIdValidationRules, isResearcher,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
-            searchPlaceholder, ProceedingsSubmissionForm
+            searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules
         };
     }
 });

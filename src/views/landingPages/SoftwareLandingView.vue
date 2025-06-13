@@ -86,6 +86,12 @@
                                 <div v-if="software?.doi" class="response">
                                     <identifier-link :identifier="software.doi"></identifier-link>
                                 </div>
+                                <div v-if="software?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="software?.openAlexId" class="response">
+                                    <identifier-link :identifier="software.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="software?.uris && software?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -340,6 +346,7 @@ export default defineComponent({
             software.value!.uris = basicInfo.uris;
             software.value!.publisherId = basicInfo.publisherId;
             software.value!.internalNumber = basicInfo.internalNumber;
+            software.value!.openAlexId = basicInfo.openAlexId;
 
             performUpdate(true);
         };

@@ -170,6 +170,8 @@ export default defineComponent({
             software2.internalNumber = "";
             software1.doi = software2.doi;
             software2.doi = "";
+            software1.openAlexId = software2.openAlexId;
+            software2.openAlexId = "";
             software1.scopusId = software2.scopusId;
             software2.scopusId = "";
             software1.documentDate = software2.documentDate;
@@ -228,6 +230,7 @@ export default defineComponent({
             leftSoftware.value!.eventId = updatedInfo.eventId;
             leftSoftware.value!.publisherId = updatedInfo.publisherId;
             leftSoftware.value!.scopusId = updatedInfo.scopusId;
+            leftSoftware.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -247,6 +250,7 @@ export default defineComponent({
             rightSoftware.value!.eventId = updatedInfo.eventId;
             rightSoftware.value!.publisherId = updatedInfo.publisherId;
             rightSoftware.value!.scopusId = updatedInfo.scopusId;
+            rightSoftware.value!.openAlexId = updatedInfo.openAlexId;
                         
             if (update.value) {
                 rightUpdateComplete.value = true;

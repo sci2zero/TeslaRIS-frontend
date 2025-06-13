@@ -127,15 +127,22 @@ export default defineComponent({
         const subtitle = ref<any>([]);
         const publicationYear = ref(props.presetSoftware?.documentDate);
         const doi = ref(props.presetSoftware?.doi);
+        const openAlexId = ref(props.presetSoftware?.openAlexId);
         const softwareNumber = ref(props.presetSoftware?.internalNumber);
         const uris = ref<string[]>(props.presetSoftware?.uris as string[]);
 
-        const { requiredFieldRules, doiValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submit = async () => {
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
-                    [{ value: doi.value as string, error: "doiExistsError" }],
+                    [
+                        { value: doi.value as string, error: "doiExistsError" },
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                    ],
                     props.presetSoftware?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
                 );
@@ -155,6 +162,7 @@ export default defineComponent({
                 contributions: props.presetSoftware?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -174,6 +182,7 @@ export default defineComponent({
             softwareNumber.value = props.presetSoftware?.internalNumber;
             publicationYear.value = props.presetSoftware?.documentDate;
             doi.value = props.presetSoftware?.doi;
+            openAlexId.value = props.presetSoftware?.openAlexId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -189,7 +198,8 @@ export default defineComponent({
             uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,
             languageTags, doiValidationRules,
-            refreshForm, urisRef, subtitleRef
+            refreshForm, urisRef, subtitleRef,
+            openAlexId, workOpenAlexIdValidationRules
         };
     }
 });

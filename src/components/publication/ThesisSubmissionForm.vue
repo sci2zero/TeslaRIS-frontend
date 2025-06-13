@@ -125,10 +125,18 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="6">
                             <v-text-field
                                 v-model="doi" label="DOI"
                                 placeholder="DOI" :rules="doiValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
                             </v-text-field>
                         </v-col>
                     </v-row>
@@ -293,6 +301,7 @@ export default defineComponent({
         const contributions = ref([]);
         const publicationYear = ref("");
         const doi = ref("");
+        const openAlexId = ref("");
         const numberOfPages = ref<number|null>();
         const uris = ref<string[]>([]);
         const topicAcceptanceDate = ref("");
@@ -304,7 +313,10 @@ export default defineComponent({
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
             const newThesis: Thesis = {
@@ -322,6 +334,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 researchAreaId: selectedResearchArea.value.value as number,
                 fileItems: [],
@@ -342,6 +355,7 @@ export default defineComponent({
                     ouAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
+                    openAlexId.value = "";
                     numberOfPages.value = null;
                     selectedThesisType.value = { title: "", value: null };
                     selectedResearchArea.value = { title: "", value: null };
@@ -370,7 +384,7 @@ export default defineComponent({
         return {
             isFormValid, 
             additionalFields, snackbar, error, title, titleRef,
-            subtitle, subtitleRef, publicationYear, doi,
+            subtitle, subtitleRef, publicationYear, doi, openAlexId,
             publisherAutocompleteRef, selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef, selectedLanguage,
@@ -382,7 +396,7 @@ export default defineComponent({
             externalOUName, externalOUNameRef, ouAutocompleteRef,
             selectedWritingLanguage, canAddAsNonReference,
             isInstitutionalLibrarian, topicAcceptanceDate,
-            thesisDefenceDate
+            thesisDefenceDate, workOpenAlexIdValidationRules
         };
     }
 });

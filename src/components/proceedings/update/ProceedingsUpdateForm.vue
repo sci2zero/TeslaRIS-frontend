@@ -67,6 +67,16 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
+                        <v-text-field
+                            v-model="openAlexId"
+                            label="Open Alex ID"
+                            placeholder="Open Alex ID"
+                            :rules="workOpenAlexIdValidationRules">
+                        </v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
                         <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
                     </v-col>
                 </v-row>
@@ -213,11 +223,16 @@ export default defineComponent({
         const numberOfPages = ref(props.presetProceedings?.numberOfPages);
         const publicationYear = ref(props.presetProceedings?.documentDate);
         const doi = ref(props.presetProceedings?.doi);
+        const openAlexId = ref(props.presetProceedings?.openAlexId);
         const scopus = ref(props.presetProceedings?.scopusId);
         const publicationSeriesVolume = ref(props.presetProceedings?.publicationSeriesVolume);
         const publicationSeriesIssue = ref(props.presetProceedings?.publicationSeriesIssue);
 
-        const { requiredFieldRules, doiValidationRules, isbnValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, doiValidationRules,
+            isbnValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         const validatePublicationSeriesSelection = (): void => {
@@ -273,6 +288,7 @@ export default defineComponent({
                 contributions: props.presetProceedings?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 eISBN: eIsbn.value,
                 eventId: selectedEvent.value?.value,
                 languageTagIds: selectedLanguages.value,
@@ -304,6 +320,7 @@ export default defineComponent({
             numberOfPages.value = props.presetProceedings?.numberOfPages;
             publicationYear.value = props.presetProceedings?.documentDate;
             doi.value = props.presetProceedings?.doi;
+            openAlexId.value = props.presetProceedings?.openAlexId;
             scopus.value = props.presetProceedings?.scopusId;
             publicationSeriesVolume.value = props.presetProceedings?.publicationSeriesVolume;
             publicationSeriesIssue.value = props.presetProceedings?.publicationSeriesIssue;
@@ -315,7 +332,7 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, isbnValidationRules,
+            isFormValid, isbnValidationRules, openAlexId,
             title, subtitle, selectedEvent, selectedJournal, uris,
             eIsbn, printIsbn, languageList, selectedLanguages,
             languageTags, publicationYear, doi, scopus, numberOfPages,
@@ -323,7 +340,8 @@ export default defineComponent({
             selectedPublisher, selectedBookSeries, doiValidationRules,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submit, snackbar, message,
-            scopusIdValidationRules, refreshForm, titleRef, subtitleRef
+            scopusIdValidationRules, refreshForm, titleRef, subtitleRef,
+            workOpenAlexIdValidationRules
         };
     }
 });

@@ -177,6 +177,8 @@ export default defineComponent({
             monograph2.doi = "";
             monograph1.scopusId = monograph2.scopusId;
             monograph2.scopusId = "";
+            monograph1.openAlexId = monograph2.openAlexId;
+            monograph2.openAlexId = "";
             monograph1.documentDate = monograph2.documentDate;
             monograph1.volume = monograph2.volume;
             monograph2.volume = "";
@@ -251,6 +253,7 @@ export default defineComponent({
             leftMonograph.value!.number = updatedInfo.number;
             leftMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             leftMonograph.value!.scopusId = updatedInfo.scopusId;
+            leftMonograph.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -276,6 +279,7 @@ export default defineComponent({
             rightMonograph.value!.number = updatedInfo.number;
             rightMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             rightMonograph.value!.scopusId = updatedInfo.scopusId;
+            rightMonograph.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

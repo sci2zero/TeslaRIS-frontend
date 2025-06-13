@@ -172,6 +172,8 @@ export default defineComponent({
             dataset2.doi = "";
             dataset1.scopusId = dataset2.scopusId;
             dataset2.scopusId = "";
+            dataset1.openAlexId = dataset2.openAlexId;
+            dataset2.openAlexId = "";
             dataset1.documentDate = dataset2.documentDate;
 
             dataset1.eventId = dataset2.eventId;
@@ -228,6 +230,7 @@ export default defineComponent({
             leftDataset.value!.eventId = updatedInfo.eventId;
             leftDataset.value!.publisherId = updatedInfo.publisherId;
             leftDataset.value!.scopusId = updatedInfo.scopusId;
+            leftDataset.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -247,6 +250,7 @@ export default defineComponent({
             rightDataset.value!.eventId = updatedInfo.eventId;
             rightDataset.value!.publisherId = updatedInfo.publisherId;
             rightDataset.value!.scopusId = updatedInfo.scopusId;
+            rightDataset.value!.openAlexId = updatedInfo.openAlexId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

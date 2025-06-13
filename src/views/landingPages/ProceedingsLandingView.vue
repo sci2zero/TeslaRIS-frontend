@@ -132,6 +132,12 @@
                                 <div v-if="proceedings?.doi" class="response">
                                     <identifier-link :identifier="proceedings.doi"></identifier-link>
                                 </div>
+                                <div v-if="proceedings?.openAlexId">
+                                    Open Alex ID:
+                                </div>
+                                <div v-if="proceedings?.openAlexId" class="response">
+                                    <identifier-link :identifier="proceedings.openAlexId" type="open_alex"></identifier-link>
+                                </div>
                                 <div v-if="proceedings?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
                                 </div>
@@ -420,6 +426,7 @@ export default defineComponent({
             proceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             proceedings.value!.publisherId = updatedInfo.publisherId;
             proceedings.value!.scopusId = updatedInfo.scopusId;
+            proceedings.value!.openAlexId = updatedInfo.openAlexId;
             performUpdate(false);
         };
 

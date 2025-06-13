@@ -42,6 +42,16 @@
         </v-row>
         <v-row>
             <v-col cols="10">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="10">
                 <v-select
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
@@ -164,11 +174,16 @@ export default defineComponent({
         const publicationYear = ref(props.presetMonographPublication?.documentDate);
         const doi = ref(props.presetMonographPublication?.doi);
         const scopus = ref(props.presetMonographPublication?.scopusId);
+        const openAlexId = ref(props.presetMonographPublication?.openAlexId);
         const articleNumber = ref(props.presetMonographPublication?.articleNumber);
         const numberOfPages = ref(props.presetMonographPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetMonographPublication?.uris as string[]);
 
-        const { requiredFieldRules, requiredSelectionRules, doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            requiredFieldRules, requiredSelectionRules,
+            doiValidationRules, scopusIdValidationRules,
+            workOpenAlexIdValidationRules
+        } = useValidationUtils();
         
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType as MonographPublicationType});
@@ -178,7 +193,8 @@ export default defineComponent({
                 const { duplicateFound } = await checkIdentifiers(
                     [
                         { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        { value: scopus.value as string, error: "scopusIdExistsError"},
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
                     ],
                     props.presetMonographPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -203,6 +219,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
+                openAlexId: openAlexId.value,
                 monographId: selectedMonograph.value.value,
                 eventId: selectedEvent.value.value,
                 monographPublicationType: selectedpublicationType.value.value as MonographPublicationType,
@@ -227,6 +244,7 @@ export default defineComponent({
             publicationYear.value = props.presetMonographPublication?.documentDate;
             doi.value = props.presetMonographPublication?.doi;
             scopus.value = props.presetMonographPublication?.scopusId;
+            openAlexId.value = props.presetMonographPublication?.openAlexId;
             articleNumber.value = props.presetMonographPublication?.articleNumber;
 
             selectedpublicationType.value = {title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType ? props.presetMonographPublication?.monographPublicationType as MonographPublicationType : null};
@@ -245,11 +263,12 @@ export default defineComponent({
             selectedMonograph, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
-            submit, toMultilingualTextInput,
+            submit, toMultilingualTextInput, openAlexId,
             languageTags, startPage, endPage, refreshForm,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
-            urisRef, requiredSelectionRules
+            urisRef, requiredSelectionRules,
+            workOpenAlexIdValidationRules
         };
     }
 });
