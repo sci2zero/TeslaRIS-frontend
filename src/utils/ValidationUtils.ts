@@ -178,7 +178,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const personOpenAlexIdPattern = /^A\d{10}$/i;
+    const personOpenAlexIdPattern = /^A\d{4,10}$/i;
     const personOpenAlexIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -187,7 +187,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const institutionOpenAlexIdPattern = /^I\d{10}$/i;
+    const institutionOpenAlexIdPattern = /^I\d{4,10}$/i;
     const institutionOpenAlexIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -196,7 +196,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const sourceOpenAlexIdPattern = /^[SV]\d{10}$/i;
+    const sourceOpenAlexIdPattern = /^[SV]\d{4,10}$/i;
     const sourceOpenAlexIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -205,7 +205,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const workOpenAlexIdPattern = /^W\d{10}$/i;
+    const workOpenAlexIdPattern = /^W\d{4,10}$/i;
     const workOpenAlexIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;

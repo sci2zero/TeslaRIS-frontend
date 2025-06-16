@@ -105,6 +105,10 @@
             </v-col>
         </v-row>
 
+        <publication-badge-section
+            :preloaded-doi="software?.doi"
+        />
+
         <tab-content-loader v-if="!software" layout="sections" />
         <v-tabs
             v-show="software"
@@ -210,11 +214,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -319,7 +324,7 @@ export default defineComponent({
         };
 
         const goToURL = (uri: string) => {
-            window.open(uri, '_blank');
+            window.open(uri, "_blank");
         }
 
         const updateKeywords = (keywords: MultilingualContent[]) => {

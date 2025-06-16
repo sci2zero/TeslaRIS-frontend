@@ -146,7 +146,7 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            if (props.personForLoading.scopusAuthorId) {
+            if (props.personForLoading.scopusAuthorId || props.personForLoading.openAlexId) {
                 PersonService.findResearcherByImportIdentifier(props.personForLoading.importId)
                 .then(response => {
                     if(response.data) {
@@ -259,6 +259,12 @@ export default defineComponent({
             selectedResearcher.value = researcher;
             researcherBinded.value = true;
             showTable.value = false;
+            ImportService.enrichPersonIdentifiers(
+                props.personForLoading.importId,
+                researcher.databaseId,
+                self.crypto.randomUUID(),
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            );
         };
 
         const waitForImportAffiliations = (): Promise<void> => {
@@ -300,7 +306,9 @@ export default defineComponent({
                     employmentsSrSortable: "",
                     id: "",
                     nameSortable: "",
-                    orcid: ""
+                    orcid: "",
+                    openAlexId: "",
+                    scopusAuthorId: ""
                 };
 
                 hadToBeCreated.value = true;

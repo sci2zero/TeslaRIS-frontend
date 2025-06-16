@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted } from "vue";
 import navbar from "@/components/core/Navbar.vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
@@ -23,11 +23,23 @@ import { useRouteStore } from "./stores/routeStore";
 import footerbar from "./components/core/FooterBar.vue";
 import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 import CookieConsent from "./components/core/CookieConsent.vue";
+import { useScriptLoader } from "./composables/useScriptLoader";
 
 
 export default defineComponent({
     name: "App",
     components: { navbar, footerbar, Breadcrumbs, CookieConsent },
+    setup() {
+        onMounted(async () => {
+            try {
+                await useScriptLoader("//d1bxh8uas1mnw7.cloudfront.net/assets/embed.js");
+                await useScriptLoader("//badge.dimensions.ai/badge.js");
+                await useScriptLoader("//cdn.plu.mx/widget-all.js");
+            } catch (e) {
+                console.error('Failed to load Altmetric script:', e)
+            }
+        });
+    },
     beforeMount() {
         const route = useRoute();
         const router = useRouter();

@@ -908,5 +908,6 @@ export default {
     orChooseLocalLabel: "ili izaberite lokalno",
     uploadLabel: "Otpremi",
     openAlexIdFormatError: "Pogrešan OpenAlexID format.",
-    openAlexIdExistsError: "OpenAlexID je već u upotrebi."
+    openAlexIdExistsError: "OpenAlexID je već u upotrebi.",
+    externalMetricsLabel: "Eksterne metrike"
 }

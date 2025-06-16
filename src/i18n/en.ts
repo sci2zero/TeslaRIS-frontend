@@ -882,5 +882,6 @@ export default {
     orChooseLocalLabel: "or choose locally",
     uploadLabel: "Upload",
     openAlexIdFormatError: "Wrong OpenAlexID format.",
-    openAlexIdExistsError: "OpenAlexID already in use."
+    openAlexIdExistsError: "OpenAlexID already in use.",
+    externalMetricsLabel: "External metrics"
 }

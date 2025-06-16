@@ -136,8 +136,13 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
+            let journalNameTokens = "";
+            props.publicationForLoading.journalName[0].content.split(" ").forEach(namePart => {
+                journalNameTokens += `tokens=${encodeURIComponent(namePart)}&`;
+            });
+
             JournalService.searchJournals(
-                `tokens=${encodeURIComponent(props.publicationForLoading.journalName[0].content)}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                `${journalNameTokens}page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 null
             ).then(response => {
                 potentialMatches.value = response.data.content;
@@ -201,6 +206,13 @@ export default defineComponent({
             selectedJournal.value = journal;
             journalBinded.value = true;
             showTable.value = false;
+            ImportService.enrichJournalIdentifiers(
+                props.publicationForLoading.journalEIssn ? props.publicationForLoading.journalEIssn : "NONE",
+                props.publicationForLoading.journalPrintIssn ? props.publicationForLoading.journalPrintIssn : "NONE",
+                journal.databaseId,
+                self.crypto.randomUUID(),
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            );
         };
 
         const addNew = () => {

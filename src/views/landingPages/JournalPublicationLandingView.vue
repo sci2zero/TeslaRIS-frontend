@@ -149,6 +149,10 @@
             </v-col>
         </v-row>
 
+        <publication-badge-section
+            :preloaded-doi="journalPublication?.doi"
+        />
+
         <tab-content-loader v-if="!journalPublication" layout="sections" />
         <v-tabs
             v-show="journalPublication"
@@ -259,11 +263,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -371,7 +376,7 @@ export default defineComponent({
         };
 
         const goToURL = (uri: string) => {
-            window.open(uri, '_blank');
+            window.open(uri, "_blank");
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
