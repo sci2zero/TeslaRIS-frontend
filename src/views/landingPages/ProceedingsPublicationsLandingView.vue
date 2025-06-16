@@ -137,6 +137,10 @@
             </v-col>
         </v-row>
 
+        <publication-badge-section
+            :preloaded-doi="proceedingsPublication?.doi"
+        />
+
         <tab-content-loader v-if="!proceedingsPublication" layout="list" />
         <v-tabs
             v-show="proceedingsPublication"
@@ -250,11 +254,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
     setup() {
         const currentTab = ref("contributions");
 
