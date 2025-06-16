@@ -11,6 +11,7 @@ interface DocumentLoadDTO {
     documentDate: string;
     doi: string;
     scopusId: string;
+    openAlexId: string;
     eventId: number | null;
 }
 
@@ -63,6 +64,7 @@ export interface PersonLoad {
     eNaukaId: string;
     orcid: string;
     scopusAuthorId: string;
+    openAlexId: string;
     importId: string;
 }
 
@@ -70,6 +72,7 @@ export interface OrganisationUnitLoad {
     name: MultilingualContent[];
     nameAbbreviation: string;
     scopusAfid: string;
+    openAlexId: string;
     importId: string;
 }
 

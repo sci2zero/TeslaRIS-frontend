@@ -133,7 +133,6 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            console.log(props.ouForLoading.importId)
             OrganisationUnitService.findOUByImportId(props.ouForLoading.importId).then(response => {
                 if(response.data) {
                     selectedAffiliation.value = response.data;
@@ -155,8 +154,13 @@ export default defineComponent({
         };
 
         const searchPotentialMatches = () => {
+            let namePartsQuery = "";
+            props.ouForLoading.name[0].content.split(" ").forEach(namePart => {
+                namePartsQuery += `tokens=${namePart}&`;
+            });
+
             OrganisationUnitService.searchOUs(
-                `tokens=${props.ouForLoading.name[0].content}${props.ouForLoading.nameAbbreviation ? ("&tokens=" + props.ouForLoading.nameAbbreviation) : ""}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                `${namePartsQuery}${props.ouForLoading.nameAbbreviation ? ("tokens=" + props.ouForLoading.nameAbbreviation) : ""}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 null, null
             )
             .then(response => {
@@ -231,8 +235,15 @@ export default defineComponent({
 
         const selectManually = (organisationUnit: OrganisationUnitIndex) => {
             selectedAffiliation.value = organisationUnit;
-            affiliationBinded.value = true;
-            showTable.value = false;
+            ImportService.enrichInstitutionIdentifiers(
+                props.ouForLoading.importId,
+                organisationUnit.databaseId,
+                self.crypto.randomUUID(),
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            ).then(() => {
+                affiliationBinded.value = true;
+                showTable.value = false;
+            });
         };
 
         const addNew = async () => {

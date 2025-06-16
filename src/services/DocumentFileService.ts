@@ -10,7 +10,7 @@ export class DocumentFileService extends BaseService {
     async downloadDocumentFile(serverFilename: string, fileName: string, extension: string, inline: boolean = false): Promise<void> {
         if (inline) {
             const imagePath = this.basePath + `file/${serverFilename}?inline=true`;
-            window.open(imagePath, '_blank');
+            window.open(imagePath, "_blank");
         } else {
             const response = await super.sendRequest(axios.get, `file/${serverFilename}`, {
                 responseType: "blob",

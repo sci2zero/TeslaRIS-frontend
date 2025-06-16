@@ -316,7 +316,7 @@ export default defineComponent({
         };
 
         const goToURL = (uri: string) => {
-            window.open(uri, '_blank');
+            window.open(uri, "_blank");
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {

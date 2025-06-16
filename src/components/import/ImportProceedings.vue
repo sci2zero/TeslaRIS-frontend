@@ -154,8 +154,11 @@ export default defineComponent({
         const searchPotentialMatches = () => {
             let parameters = "";
             props.publicationForLoading.conferenceName.forEach(name => {
-                parameters += `names=${name.content}&`;
+                name.content.split(" ").forEach(namePart => {
+                    parameters += `names=${encodeURIComponent(namePart)}&`;
+                });
             });
+
             parameters += `dateFrom=${props.publicationForLoading.eventDateFrom}&dateTo=${props.publicationForLoading.eventDateTo}`;
 
             EventService.searchConferencesForImport(parameters).then(response => {
@@ -192,6 +195,11 @@ export default defineComponent({
             eventBinded.value = true;
             showTable.value = false;
             selectProceedingsFromConference();
+            ImportService.enrichConferenceIdentifiers(
+                conference.databaseId,
+                self.crypto.randomUUID(),
+                props.topLevelInstitutionId > 0 ? props.topLevelInstitutionId : null
+            );
         };
 
         const selectProceedingsFromConference = () => {
