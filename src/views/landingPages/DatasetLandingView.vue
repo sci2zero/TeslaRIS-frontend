@@ -105,6 +105,10 @@
             </v-col>
         </v-row>
 
+        <publication-badge-section
+            :preloaded-doi="dataset?.doi"
+        />
+
         <tab-content-loader v-if="!dataset" layout="sections" />
         <v-tabs
             v-show="dataset"
@@ -223,11 +227,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -326,7 +331,7 @@ export default defineComponent({
 
         const goToURL = (uri: string) => {
             window.open(uri, "_blank");
-        }
+        };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
             dataset.value!.keywords = keywords;

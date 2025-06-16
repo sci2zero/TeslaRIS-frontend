@@ -157,6 +157,10 @@
             </v-col>
         </v-row>
 
+        <publication-badge-section
+            :preloaded-doi="proceedings?.doi"
+        />
+
         <br />
         <tab-content-loader v-if="!proceedings" :tab-number="3" layout="list" />
         <v-tabs
@@ -270,11 +274,12 @@ import { useLoginStore } from '@/stores/loginStore';
 import { useUserRole } from '@/composables/useUserRole';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, BasicInfoLoader, TabContentLoader },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
     setup() {
         const currentTab = ref("");
 
