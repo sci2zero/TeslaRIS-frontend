@@ -70,7 +70,7 @@
                 </v-row>
 
                 <v-row>
-                    <v-col>
+                    <v-col cols="10">
                         <h2>{{ $t("authorsLabel") }}</h2>
                         <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
                     </v-col>

@@ -16,8 +16,8 @@ export class JournalService extends BaseService {
     return super.sendRequest(axios.get, `journal/${journalId}`);
   }
 
-  async findJournalByIssn(eIssn: string, printIssn: string): Promise<AxiosResponse<JournalIndex>> {
-    return super.sendRequest(axios.get, `journal/issn?eIssn=${eIssn}&printIssn=${printIssn}`);
+  async findJournalByIdentifiers(eIssn: string, printIssn: string, openAlexId: string): Promise<AxiosResponse<JournalIndex>> {
+    return super.sendRequest(axios.get, `journal/identifier?eIssn=${eIssn}&printIssn=${printIssn}&openAlexId=${openAlexId}`);
   }
 
   async createJournal(body: Journal): Promise<AxiosResponse<Journal>> {

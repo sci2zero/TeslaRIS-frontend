@@ -154,6 +154,7 @@ export default defineComponent({
 
         const name = ref("");
         const surname = ref("");
+        const originalEmail = ref("");
         const email = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
@@ -171,6 +172,7 @@ export default defineComponent({
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
+        const savedAndEmailUpdateRequestedMessage = computed(() => i18n.t("savedAndEmailUpdateRequestedMessage"));
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: UserNotificationPeriod.NEVER };
         const notificationPeriods = getNotificationPeriodForGivenLocale();
@@ -182,7 +184,10 @@ export default defineComponent({
             UserService.getLoggedInUser().then((response) => {
                 name.value = response.data.firstname;
                 surname.value = response.data.lastName;
+
+                originalEmail.value = response.data.email;
                 email.value = response.data.email;
+                
                 allowAccountTakeover.value = response.data.canTakeRole;
                 selectedNotificationPeriod.value = {title: getTitleFromValueAutoLocale(response.data.notificationPeriod) as string, value: response.data.notificationPeriod};
                 
@@ -284,7 +289,14 @@ export default defineComponent({
             UserService.updateUser(userUpdateRequest).then((response) => {
                 localStorage.setItem("jwt", response.data.token);
                 localStorage.setItem("refreshToken", response.data.refreshToken);
-                snackbarText.value = savedMessage.value;
+
+                if (originalEmail.value !== email.value) {
+                    snackbarText.value = savedAndEmailUpdateRequestedMessage.value;
+                    email.value = originalEmail.value;
+                } else {
+                    snackbarText.value = savedMessage.value;
+                }
+                
                 snackbar.value = true;
 
                 UserService.invalidateCaches();

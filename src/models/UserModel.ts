@@ -36,6 +36,10 @@ export interface ActivateAccountRequest {
     activationToken: string;
 }
 
+export interface ConfirmEmailUpdateRequest {
+    confirmationToken: string;
+}
+
 export interface UserUpdateRequest {
     email: string;
     oldPassword: string;
