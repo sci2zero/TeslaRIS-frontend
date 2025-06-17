@@ -1,4 +1,4 @@
-import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest, UserAccountIndex, UserUpdateRequest } from "@/models/UserModel";
+import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest, UserAccountIndex, UserUpdateRequest, ConfirmEmailUpdateRequest } from "@/models/UserModel";
 import type { AxiosResponse } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BaseService } from "./BaseService";
@@ -77,6 +77,10 @@ export class UserService extends BaseService {
 
   async activateUserAccount(body: ActivateAccountRequest): Promise<AxiosResponse> {
     return super.sendRequest(axios.patch, "user/activate-account", body);
+  }
+
+  async confirmEmailChange(body: ConfirmEmailUpdateRequest): Promise<AxiosResponse> {
+    return super.sendRequest(axios.patch, "user/confirm-email-change", body);
   }
 
   async getUserObjectByPersonId(personId: number): Promise<AxiosResponse> {

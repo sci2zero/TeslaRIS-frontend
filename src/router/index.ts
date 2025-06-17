@@ -101,6 +101,7 @@ import ThesisLibraryBackupView from "@/views/thesisLibrary/ThesisLibraryBackupVi
 import DocumentBackupView from "@/views/DocumentBackupView.vue";
 import LegacyRedirectView from "@/views/LegacyRedirectView.vue";
 import NotFound from "@/views/NotFound.vue";
+import EmailUpdateConfirmationView from "@/views/EmailUpdateConfirmationView.vue";
 
 
 const roles = {
@@ -841,6 +842,15 @@ const router = createRouter({
                     path: "activate-account/:activationToken",
                     name: "activateAccount",
                     component: AccountActivationView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "update-email/:confirmationToken",
+                    name: "emailChangeConfirmation",
+                    component: EmailUpdateConfirmationView,
                     meta: {
                         authenticated: false,
                         authorities: [],

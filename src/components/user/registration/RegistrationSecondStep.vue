@@ -114,7 +114,7 @@ export default defineComponent({
         };
 
         onMounted(() => {
-            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+            LanguageService.getAllUILanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
                 response.data.forEach((language: LanguageResponse) => {
                     listOfLanguages.push({title: language.languageCode, value: language.id})
@@ -122,13 +122,13 @@ export default defineComponent({
                     if (language.languageCode === "SR") {
                         selectedLanguage.value = language.id;
                     }
-                })
-            })
+                });
+            });
         });
 
-        function isPersonSelected() {
+        const isPersonSelected = () => {
            return registerStore.registerPersonData != null
-        }
+        };
 
         return {email, emailFieldRules, requiredFieldMessage,
             register, selectedLanguage, languages, firstName, lastName, 

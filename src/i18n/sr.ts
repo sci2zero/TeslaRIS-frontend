@@ -98,7 +98,8 @@ export default {
         thesisLibraryBackup: "Bekap biblioteke završnih radova",
         documentBackup: "Bekap dokumenata",
         legacyFileRedirect: "Preusmeravanje",
-        notFound: "Nije pronađeno"
+        notFound: "Nije pronađeno",
+        emailChangeConfirmation: "Potvrda promene email-a"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -909,5 +910,9 @@ export default {
     uploadLabel: "Otpremi",
     openAlexIdFormatError: "Pogrešan OpenAlexID format.",
     openAlexIdExistsError: "OpenAlexID je već u upotrebi.",
-    externalMetricsLabel: "Eksterne metrike"
+    externalMetricsLabel: "Eksterne metrike",
+    savedAndEmailUpdateRequestedMessage: "Uspešno sačuvano. Zahtev za promenu email-a je poslat na vašu originalnu adresu. Ako nemate pristup istoj, molimo vas da kontaktirate administratora sistema.",
+    emailUpdateConfirmationInProgressMessage: "Potvrda zahteva u toku...",
+    emailUpdateConfirmationSuccessMessage: "Promena email-a uspešno potvrđena, uskoro ćete biti preusmereni na stranicu za prijavu.",
+    emailUpdateConfirmationFailedMessage: "Promena email-a nije uspela."
 }

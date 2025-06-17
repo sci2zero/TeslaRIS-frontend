@@ -116,7 +116,11 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            JournalService.findJournalByIssn(props.publicationForLoading.journalEIssn, props.publicationForLoading.journalPrintIssn).then(response => {
+            JournalService.findJournalByIdentifiers(
+                props.publicationForLoading.journalEIssn,
+                props.publicationForLoading.journalPrintIssn,
+                props.publicationForLoading.journalOpenAlexId
+            ).then(response => {
                 if(response.data) {
                     selectedJournal.value = response.data;
                     journalBinded.value = true;
@@ -206,7 +210,7 @@ export default defineComponent({
             selectedJournal.value = journal;
             journalBinded.value = true;
             showTable.value = false;
-            ImportService.enrichJournalIdentifiers(
+            ImportService.enrichPublicationSeriesIdentifiers(
                 props.publicationForLoading.journalEIssn ? props.publicationForLoading.journalEIssn : "NONE",
                 props.publicationForLoading.journalPrintIssn ? props.publicationForLoading.journalPrintIssn : "NONE",
                 journal.databaseId,

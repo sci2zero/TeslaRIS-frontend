@@ -11,12 +11,36 @@
             </template>
 
             <v-list>
-                <register-employee-modal :employee-role="UserRole.INSTITUTIONAL_EDITOR" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal :employee-role="UserRole.VICE_DEAN_FOR_SCIENCE" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal :employee-role="UserRole.COMMISSION" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal :employee-role="UserRole.INSTITUTIONAL_LIBRARIAN" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal :employee-role="UserRole.HEAD_OF_LIBRARY" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
-                <register-employee-modal :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR" @success="refreshTable(tableOptions)" @failure="displayFormNotification"></register-employee-modal>
+                <register-employee-modal
+                    :employee-role="UserRole.INSTITUTIONAL_EDITOR"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
+                <register-employee-modal
+                    :employee-role="UserRole.VICE_DEAN_FOR_SCIENCE"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification" 
+                />
+                <register-employee-modal
+                    :employee-role="UserRole.COMMISSION"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
+                <register-employee-modal
+                    :employee-role="UserRole.INSTITUTIONAL_LIBRARIAN"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
+                <register-employee-modal
+                    :employee-role="UserRole.HEAD_OF_LIBRARY"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
+                <register-employee-modal
+                    :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
             </v-list>
         </v-menu>
     </v-row>
@@ -45,11 +69,16 @@
                     <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
                     <td>
                         <div class="d-flex flex-row justify-start">
-                            <v-btn color="blue" dark @click="changeActivationStatus(row.item.databaseId)">
+                            <v-btn
+                                color="blue"
+                                dark
+                                :disabled="row.item.userRole === 'ADMIN'"
+                                @click="changeActivationStatus(row.item.databaseId)">
                                 {{ row.item.active ? $t("deactivateAccountLabel") : $t("activateAccountLabel") }}
                             </v-btn>
                             <v-btn
-                                color="blue" dark class="inline-action" :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId)"
+                                color="blue" dark class="inline-action"
+                                :disabled="!accountsThatAllowedRoleTaking.includes(row.item.databaseId) || row.item.userRole === 'ADMIN'"
                                 @click="takeRoleOfUser(row.item.email)">
                                 {{ $t("takeRoleLabel") }}
                             </v-btn>

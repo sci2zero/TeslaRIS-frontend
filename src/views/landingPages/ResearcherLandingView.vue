@@ -215,7 +215,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="totalPublications > 0" value="publications">
+            <v-tab v-if="totalPublications > 0 || canEdit" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">

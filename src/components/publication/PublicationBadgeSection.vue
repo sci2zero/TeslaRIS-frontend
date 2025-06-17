@@ -1,24 +1,37 @@
 <template>
-    <div v-show="preloadedDoi" class="actions-box pa-4 mt-15 mb-5">
-        <div class="text-subtitle-1 font-weight-medium mb-3">
+    <div v-show="preloadedDoi" class="pr-4 mt-5 mb-5">
+        <div class="d-sr-only text-subtitle-1 font-weight-medium mb-3">
             {{ $t("externalMetricsLabel") }}
         </div>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-row justify-end flex-wrap gap-2">
             <div
                 class="altmetric-embed"
-                data-badge-type="medium-donut"
-                data-badge-popover="right"
+                data-badge-type="donut"
+                data-badge-popover="left"
                 data-hide-no-mentions="true"
                 data-badge-details="hover"
                 :data-doi="preloadedDoi">
             </div>
             <span
                 class="__dimensions_badge_embed__ ml-5"
-                data-style="medium_circle"
+                data-style="small_circle"
                 data-hide-zero-citations="true"
                 :data-doi="preloadedDoi">
             </span>
-            <div ref="openCitationsContainer" class="ml-5"></div>
+            <div class="ml-5">
+                <a
+                    class="plumx-plum-print-popup plum-bigben-theme"
+                    :href="`https://plu.mx/plum/a/?doi=${preloadedDoi}`"
+                    target="_blank"
+                    data-popup="left"
+                    data-size="medium"
+                    data-site="plum"
+                    data-hide-when-empty="true"
+                >
+                    PlumX Metrics
+                </a>
+            </div>
+            <div ref="openCitationsContainer" class="openCitationsContainer ml-5"></div>
             <div
                 v-if="oaStatus !== null"
                 :class="[
@@ -30,18 +43,6 @@
                 @click="oaLocation ? accessOALocation() : null">
                 <span v-if="oaStatus === 'open'">🟢 Open</span>
                 <span v-else>🔴 Closed</span>
-            </div>
-            <div class="ml-5">
-                <a
-                    class="plumx-plum-print-popup plum-bigben-theme"
-                    :href="`https://plu.mx/plum/a/?doi=${preloadedDoi}`"
-                    data-popup="right"
-                    data-size="large"
-                    data-site="plum"
-                    data-hide-when-empty="true"
-                >
-                    PlumX Metrics
-                </a>
             </div>
         </div>
     </div>
@@ -64,12 +65,36 @@ export default defineComponent({
         const oaStatus = ref<"open" | "closed" | null>(null);
         const oaLocation = ref<string | null>(null);
 
+        const unpaywallEmail = import.meta.env.VITE_UNPAYWALL_EMAIL as string;
+
         const initBadges = () => {
             if ((typeof window) !== "undefined" && ((window as any)._altmetric_embed_init)) {
                 (window as any)._altmetric_embed_init();
+                fixLinkToSource("altmetric-embed");
+                setTimeout(() => fixLinkToSource("altmetric-embed"), 1000);
+            }
+
+            if ((typeof window) !== "undefined" && ((window as any).__dimensions_embed.addBadges)) {
                 (window as any).__dimensions_embed.addBadges();
+                fixLinkToSource("__dimensions_badge_embed__");
+            }
+
+            if ((typeof window) !== "undefined" && ((window as any).__plumX.widgets.init)) {
                 (window as any).__plumX.widgets.init();
             }
+            
+        };
+
+        const fixLinkToSource = (rootDivClassName: string) => {
+            console.log(rootDivClassName);
+            
+            document.querySelectorAll("." + rootDivClassName).forEach(container => {
+            const links = container.querySelectorAll("a");
+                links.forEach(link => {
+                    link.setAttribute("target", "_blank");
+                    link.setAttribute("rel", "noopener noreferrer");
+                });
+            });
         };
 
         watch(() => props.preloadedDoi, () => {
@@ -83,6 +108,9 @@ export default defineComponent({
                 script.setAttribute("data-return", "citation-count");
                 openCitationsContainer.value.innerHTML = '';
                 openCitationsContainer.value.appendChild(script);
+                fixLinkToSource("openCitationsContainer");
+                setTimeout(() => fixLinkToSource("openCitationsContainer"), 2000);
+
 
                 fetchUnpaywall();
                 setTimeout(initBadges, 0);
@@ -91,7 +119,7 @@ export default defineComponent({
 
         const fetchUnpaywall = () => {
             fetch(
-            `https://api.unpaywall.org/v2/${encodeURIComponent(props.preloadedDoi as string)}?email=chenejac@uns.ac.rs`
+            `https://api.unpaywall.org/v2/${encodeURIComponent(props.preloadedDoi as string)}?email=${unpaywallEmail}`
             ).then(response => {
                 response.json().then(result => {
                     console.log(result)
@@ -122,7 +150,7 @@ export default defineComponent({
 
 .unpaywall-badge {
   display: inline-block;
-  padding: 0.3em 0.4em;
+  padding: 0.3em 0.6em;
   border-radius: 4px;
   font-weight: bold;
   font-size: 0.9em;
@@ -131,6 +159,11 @@ export default defineComponent({
   background-repeat: no-repeat;
   background-position: left center;
   cursor: default;
+  height: 64px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border-top-left-radius: 100px;
+  border-bottom-left-radius: 100px;
 }
 
 .unpaywall-badge.clickable {
@@ -143,11 +176,11 @@ export default defineComponent({
 }
 
 .open {
-    padding-left: 4em;
+    padding-left: 4.5em;
 }
 
 .closed {
-    padding-left: 3.3em;
+    padding-left: 4.5em;
 }
 
 .unpaywall-badge.open {
@@ -159,4 +192,26 @@ export default defineComponent({
   background-color: #f8d7da;
   color: #842029;
 }
+</style>
+
+<style>
+
+.openCitationsContainer img {
+    width: auto;
+    height: 64px;
+}
+
+.openCitationsContainer .prev-lbl {
+    font-size: 16px !important;
+}
+
+.openCitationsContainer .prev-value {
+    font-size: 16px !important;
+}
+
+.openCitationsContainer .__oc_text__ {
+    padding: 0 !important;
+    height: 64px !important;
+}
+
 </style>

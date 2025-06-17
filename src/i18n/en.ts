@@ -98,7 +98,8 @@ export default {
         thesisLibraryBackup: "Thesis Library Backup",
         documentBackup: "Document Backup",
         legacyFileRedirect: "Redirecting",
-        notFound: "Not Found"
+        notFound: "Not Found",
+        emailChangeConfirmation: "Email confirmation change"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -883,5 +884,9 @@ export default {
     uploadLabel: "Upload",
     openAlexIdFormatError: "Wrong OpenAlexID format.",
     openAlexIdExistsError: "OpenAlexID already in use.",
-    externalMetricsLabel: "External metrics"
+    externalMetricsLabel: "External metrics",
+    savedAndEmailUpdateRequestedMessage: "Saved successfully. Email update request is sent to your original email. If you don't have access to it, please contact the system administrator.",
+    emailUpdateConfirmationInProgressMessage: "Confirmation of the request is in progress...",
+    emailUpdateConfirmationSuccessMessage: "Email change successfully confirmed. You will be redirected to the login page shortly.",
+    emailUpdateConfirmationFailedMessage: "Email change failed."
 }

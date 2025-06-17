@@ -41,6 +41,7 @@ export interface JournalPublicationLoad extends DocumentLoadDTO {
     issue: string;
     journalEIssn: string;
     journalPrintIssn: string;
+    journalOpenAlexId: string;
     journalName: MultilingualContent[];
 }
 

@@ -95,8 +95,8 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.post, `load/journal?eIssn=${eIssn}&printIssn=${printIssn}${institutionId ? "&institutionId=" + institutionId : ""}`, {}, idempotencyKey);
     }
 
-    async enrichJournalIdentifiers(eIssn: string, printIssn: string, selectedJournalId: number, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<PublicationSeries>> {
-        return super.sendRequest(axios.patch, `load/journal/${selectedJournalId}?eIssn=${eIssn}&printIssn=${printIssn}${institutionId ? "&institutionId=" + institutionId : ""}`, {}, idempotencyKey);
+    async enrichPublicationSeriesIdentifiers(eIssn: string, printIssn: string, selectedJournalId: number, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<PublicationSeries>> {
+        return super.sendRequest(axios.patch, `load/publication-series/${selectedJournalId}?eIssn=${eIssn}&printIssn=${printIssn}${institutionId ? "&institutionId=" + institutionId : ""}`, {}, idempotencyKey);
     }
 
     async enrichConferenceIdentifiers(selectedConferenceId: number, idempotencyKey: string, institutionId: number | null = null): Promise<AxiosResponse<PublicationSeries>> {
