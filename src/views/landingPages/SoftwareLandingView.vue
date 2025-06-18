@@ -107,6 +107,7 @@
 
         <publication-badge-section
             :preloaded-doi="software?.doi"
+            :document-id="software?.id"
         />
 
         <tab-content-loader v-if="!software" layout="sections" />

@@ -159,6 +159,7 @@
 
         <publication-badge-section
             :preloaded-doi="proceedings?.doi"
+            :document-id="proceedings?.id"
         />
 
         <br />

@@ -140,6 +140,7 @@
 
         <publication-badge-section
             :preloaded-doi="monographPublication?.doi"
+            :document-id="monographPublication?.id"
         />
 
         <tab-content-loader v-if="!monographPublication" layout="sections" />

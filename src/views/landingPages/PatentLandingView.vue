@@ -107,6 +107,7 @@
 
         <publication-badge-section
             :preloaded-doi="patent?.doi"
+            :document-id="patent?.id"
         />
 
         <tab-content-loader v-if="!patent" layout="sections" />

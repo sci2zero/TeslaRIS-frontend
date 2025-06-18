@@ -151,6 +151,7 @@
 
         <publication-badge-section
             :preloaded-doi="journalPublication?.doi"
+            :document-id="journalPublication?.id"
         />
 
         <tab-content-loader v-if="!journalPublication" layout="sections" />

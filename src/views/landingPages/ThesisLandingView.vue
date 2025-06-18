@@ -234,6 +234,7 @@
 
         <publication-badge-section
             :preloaded-doi="thesis?.doi"
+            :document-id="thesis?.id"
         />
 
         <tab-content-loader v-if="!thesis" layout="sections" />
