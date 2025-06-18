@@ -153,6 +153,7 @@
 
         <publication-badge-section
             :preloaded-doi="monograph?.doi"
+            :document-id="monograph?.id"
         />
 
         <tab-content-loader v-if="!monograph" layout="sections" />

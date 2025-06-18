@@ -139,6 +139,7 @@
 
         <publication-badge-section
             :preloaded-doi="proceedingsPublication?.doi"
+            :document-id="proceedingsPublication?.id"
         />
 
         <tab-content-loader v-if="!proceedingsPublication" layout="list" />

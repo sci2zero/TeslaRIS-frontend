@@ -914,5 +914,6 @@ export default {
     savedAndEmailUpdateRequestedMessage: "Uspešno sačuvano. Zahtev za promenu email-a je poslat na vašu originalnu adresu. Ako nemate pristup istoj, molimo vas da kontaktirate administratora sistema.",
     emailUpdateConfirmationInProgressMessage: "Potvrda zahteva u toku...",
     emailUpdateConfirmationSuccessMessage: "Promena email-a uspešno potvrđena, uskoro ćete biti preusmereni na stranicu za prijavu.",
-    emailUpdateConfirmationFailedMessage: "Promena email-a nije uspela."
+    emailUpdateConfirmationFailedMessage: "Promena email-a nije uspela.",
+    updateExternalIndicatorConfigurationLabel: "Prikaz spoljnih indikatora"
 }

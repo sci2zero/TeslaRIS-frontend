@@ -107,6 +107,7 @@
 
         <publication-badge-section
             :preloaded-doi="dataset?.doi"
+            :document-id="dataset?.id"
         />
 
         <tab-content-loader v-if="!dataset" layout="sections" />

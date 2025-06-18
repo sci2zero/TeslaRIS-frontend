@@ -125,6 +125,27 @@
             </v-col>
         </v-row>
 
+        <div
+            v-show="canEdit"
+            class="actions-box pa-4"
+        >
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("additionalActionsLabel") }}
+            </div>
+            <div class="d-flex flex-row">
+                <generic-crud-modal
+                    class="ml-2" 
+                    :form-component="ExternalIndicatorsConfigurationForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="ExternalIndicatorConfiguration"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="updateSuccess"
+                />
+            </div>
+        </div>
+
         <!-- Keywords -->
         <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
 
@@ -278,6 +299,7 @@ import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitLogo from '@/components/organisationUnit/OrganisationUnitLogo.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
 
 
 export default defineComponent({
@@ -524,8 +546,7 @@ export default defineComponent({
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
                 fetchOU(false);
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
@@ -547,8 +568,7 @@ export default defineComponent({
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
                 if(reload) {
                     fetchOU(false);
                 }
@@ -563,6 +583,11 @@ export default defineComponent({
 
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "organisationUnits" }});
+        };
+
+        const updateSuccess = () => {
+            snackbarMessage.value = i18n.t("updatedSuccessMessage");
+            snackbar.value = true;
         };
 
         return {
@@ -580,7 +605,8 @@ export default defineComponent({
             alumni, totalAlumni, switchAlumniPage,
             OrganisationUnitUpdateForm, fetchEmployees,
             ouIndicators, StatisticsType, loginStore,
-            ExportableEndpointType
+            ExportableEndpointType, updateSuccess,
+            ExternalIndicatorsConfigurationForm
         };
 }})
 

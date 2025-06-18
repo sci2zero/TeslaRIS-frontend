@@ -888,5 +888,6 @@ export default {
     savedAndEmailUpdateRequestedMessage: "Saved successfully. Email update request is sent to your original email. If you don't have access to it, please contact the system administrator.",
     emailUpdateConfirmationInProgressMessage: "Confirmation of the request is in progress...",
     emailUpdateConfirmationSuccessMessage: "Email change successfully confirmed. You will be redirected to the login page shortly.",
-    emailUpdateConfirmationFailedMessage: "Email change failed."
+    emailUpdateConfirmationFailedMessage: "Email change failed.",
+    updateExternalIndicatorConfigurationLabel: "External indicator showcase"
 }

@@ -49,6 +49,8 @@
 </template>
 
 <script lang="ts">
+import { type ExternalIndicatorConfiguration } from "@/models/AssessmentModel";
+import ExternalIndicatorConfigurationService from "@/services/assessment/ExternalIndicatorConfigurationService";
 import { defineComponent, type PropType, ref, watch } from "vue";
 
 
@@ -57,6 +59,10 @@ export default defineComponent({
     props: {
         preloadedDoi: {
             type: Object as PropType<string | undefined>,
+            required: true
+        },
+        documentId: {
+            type: Object as PropType<number | undefined>,
             required: true
         }
     },
@@ -67,27 +73,24 @@ export default defineComponent({
 
         const unpaywallEmail = import.meta.env.VITE_UNPAYWALL_EMAIL as string;
 
-        const initBadges = () => {
-            if ((typeof window) !== "undefined" && ((window as any)._altmetric_embed_init)) {
+        const initBadges = (configuration: ExternalIndicatorConfiguration) => {
+            if (configuration.showAltmetric && (typeof window) !== "undefined" && ((window as any)._altmetric_embed_init)) {
                 (window as any)._altmetric_embed_init();
                 fixLinkToSource("altmetric-embed");
                 setTimeout(() => fixLinkToSource("altmetric-embed"), 1000);
             }
 
-            if ((typeof window) !== "undefined" && ((window as any).__dimensions_embed.addBadges)) {
+            if (configuration.showDimensions && (typeof window) !== "undefined" && ((window as any).__dimensions_embed.addBadges)) {
                 (window as any).__dimensions_embed.addBadges();
                 fixLinkToSource("__dimensions_badge_embed__");
             }
 
-            if ((typeof window) !== "undefined" && ((window as any).__plumX.widgets.init)) {
+            if (configuration.showPlumX && (typeof window) !== "undefined" && ((window as any).__plumX.widgets.init)) {
                 (window as any).__plumX.widgets.init();
             }
-            
         };
 
         const fixLinkToSource = (rootDivClassName: string) => {
-            console.log(rootDivClassName);
-            
             document.querySelectorAll("." + rootDivClassName).forEach(container => {
             const links = container.querySelectorAll("a");
                 links.forEach(link => {
@@ -97,32 +100,45 @@ export default defineComponent({
             });
         };
 
-        watch(() => props.preloadedDoi, () => {
-            if (props.preloadedDoi) {
-                if (!openCitationsContainer.value) return;
+        watch(
+            [
+                () => props.preloadedDoi,
+                () => props.documentId
+            ], () => {
+                if (props.preloadedDoi && props.documentId) {
 
-                const script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/gh/opencitations/badge@v1.0.0/badge.js";
-                script.setAttribute("data-type", "doi");
-                script.setAttribute("data-value", props.preloadedDoi as string);
-                script.setAttribute("data-return", "citation-count");
-                openCitationsContainer.value.innerHTML = '';
-                openCitationsContainer.value.appendChild(script);
-                fixLinkToSource("openCitationsContainer");
-                setTimeout(() => fixLinkToSource("openCitationsContainer"), 2000);
+                    ExternalIndicatorConfigurationService.readConfigurationForDocument(
+                        props.documentId
+                    ).then(response => {
+                        if (openCitationsContainer.value && response.data.showOpenCitations) {
+                            const script = document.createElement("script");
+                            script.src = "https://cdn.jsdelivr.net/gh/opencitations/badge@v1.0.0/badge.js";
+                            script.setAttribute("data-type", "doi");
+                            script.setAttribute("data-value", props.preloadedDoi as string);
+                            script.setAttribute("data-return", "citation-count");
+                            openCitationsContainer.value.innerHTML = '';
+                            openCitationsContainer.value.appendChild(script);
+                            fixLinkToSource("openCitationsContainer");
+                            setTimeout(() => fixLinkToSource("openCitationsContainer"), 2000);   
+                        }
 
-
-                fetchUnpaywall();
-                setTimeout(initBadges, 0);
+                        if (response.data.showUnpaywall) {
+                            fetchUnpaywall();
+                        }
+                        
+                        setTimeout(
+                            () => initBadges(response.data)
+                        , 0);
+                    });
+                }
             }
-        });
+        );
 
         const fetchUnpaywall = () => {
             fetch(
             `https://api.unpaywall.org/v2/${encodeURIComponent(props.preloadedDoi as string)}?email=${unpaywallEmail}`
             ).then(response => {
                 response.json().then(result => {
-                    console.log(result)
                     oaStatus.value = result.is_oa ? "open" : "closed";
                     if (result.is_oa) {
                         oaLocation.value = result.best_oa_location.url;

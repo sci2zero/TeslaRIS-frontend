@@ -264,3 +264,11 @@ export interface IFTableResponse {
     if5Values: IFValue[];
     ifTableContent: IFCategoryData[];
 }
+
+export interface ExternalIndicatorConfiguration {
+    showAltmetric: boolean;
+    showDimensions: boolean;
+    showOpenCitations: boolean;
+    showPlumX: boolean;
+    showUnpaywall: boolean;
+}
