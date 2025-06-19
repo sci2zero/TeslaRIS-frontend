@@ -9,10 +9,20 @@
     />
     <v-row>
         <v-col v-if="showStatistics">
-            <div class="statistics">
+            <div
+                v-show="(viewsRef && viewsRef.statisticsEntityIndicators.length > 0) || (downloadsRef && downloadsRef.statisticsEntityIndicators.length > 0)"
+                class="statistics mt-3">
                 <h2>{{ $t("statisticsIndicatorsLabel") }}</h2>
-                <statistics-view :entity-indicators="indicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                <statistics-view :entity-indicators="indicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
+                <statistics-view
+                    ref="viewsRef"
+                    :entity-indicators="indicators"
+                    :statistics-type="StatisticsType.VIEW"
+                />
+                <statistics-view
+                    ref="downloadsRef"
+                    :entity-indicators="indicators"
+                    :statistics-type="StatisticsType.DOWNLOAD"
+                />
             </div>
         </v-col>
         <v-col>
@@ -36,7 +46,8 @@ import IndicatorsView from './IndicatorsView.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityIndicatorForm from './EntityIndicatorForm.vue';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, ref, type PropType } from 'vue';
+
 
 export default defineComponent({
     name: "IndicatorsSection",
@@ -69,6 +80,9 @@ export default defineComponent({
     },
     emits: ["create", "updated"],
     setup(_, {emit}) {
+        const viewsRef = ref<typeof StatisticsView>();
+        const downloadsRef = ref<typeof StatisticsView>();
+
         const createIndicator = (entityIndicator: any) => {
             emit("create", entityIndicator);
         };
@@ -81,7 +95,7 @@ export default defineComponent({
         return {
             EntityIndicatorForm, ApplicableEntityType,
             createIndicator, refreshIndicators,
-            StatisticsType
+            StatisticsType, viewsRef, downloadsRef
         };
     }
 });

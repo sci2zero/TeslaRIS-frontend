@@ -96,7 +96,8 @@ export default defineComponent({
         };
 
         return {
-            title, content
+            title, content,
+            statisticsEntityIndicators
         };
     }
 });
