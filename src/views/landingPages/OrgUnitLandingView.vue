@@ -252,9 +252,15 @@
                 </v-row>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="ouIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                </div>
+                <indicators-section 
+                    :indicators="ouIndicators" 
+                    :applicable-types="[ApplicableEntityType.ORGANISATION_UNIT]" 
+                    :entity-id="organisationUnit?.id"
+                    :entity-type="ApplicableEntityType.PERSON" 
+                    :can-edit="false"
+                    show-statistics
+                    @updated="fetchIndicators"
+                />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -276,7 +282,7 @@ import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
-import { ExportableEndpointType, type MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
@@ -290,7 +296,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import UriList from '@/components/core/UriList.vue';
 import OrganisationUnitUpdateForm from '@/components/organisationUnit/update/OrganisationUnitUpdateForm.vue';
 import StatisticsService from '@/services/StatisticsService';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import { useLoginStore } from '@/stores/loginStore';
@@ -300,11 +305,12 @@ import OrganisationUnitLogo from '@/components/organisationUnit/OrganisationUnit
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, StatisticsView, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("");
 
@@ -372,9 +378,7 @@ export default defineComponent({
             }
 
             fetchOU(true);
-            EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
-                ouIndicators.value = response.data;
-            });
+            fetchIndicators();
             fetchRelations();
 
             OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -414,6 +418,12 @@ export default defineComponent({
                 if(graphRef.value) {
                     graphRef.value.rendered = false;
                 }
+            });
+        };
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+                ouIndicators.value = response.data;
             });
         };
 
@@ -606,7 +616,8 @@ export default defineComponent({
             OrganisationUnitUpdateForm, fetchEmployees,
             ouIndicators, StatisticsType, loginStore,
             ExportableEndpointType, updateSuccess,
-            ExternalIndicatorsConfigurationForm
+            ExternalIndicatorsConfigurationForm,
+            ApplicableEntityType, fetchIndicators
         };
 }})
 

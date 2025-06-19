@@ -130,7 +130,8 @@ export enum EntityIndicatorSource {
     WEB_OF_SCIENCE = "WEB_OF_SCIENCE",
     SCIMAGO = "SCIMAGO",
     ERIH_PLUS = "ERIH_PLUS",
-    MKS_SLAVISTS = "MKS_SLAVISTS"
+    MKS_SLAVISTS = "MKS_SLAVISTS",
+    OPEN_ALEX = "OPEN_ALEX"
 }
 
 export enum EntityClassificationSource {

@@ -6,7 +6,8 @@ export const indicatorSourceSr = [
     { title: "Web Of Science", value: EntityIndicatorSource.WEB_OF_SCIENCE },
     { title: "Scimago", value: EntityIndicatorSource.SCIMAGO },
     { title: "ERIH PLUS", value: EntityIndicatorSource.ERIH_PLUS },
-    { title: "MKS Slavisti", value: EntityIndicatorSource.MKS_SLAVISTS }
+    { title: "MKS Slavisti", value: EntityIndicatorSource.MKS_SLAVISTS },
+    { title: "OpenAlex", value: EntityIndicatorSource.OPEN_ALEX }
 ];
 
 export const indicatorSourceEn = [
@@ -15,6 +16,7 @@ export const indicatorSourceEn = [
     { title: "Scimago", value: EntityIndicatorSource.SCIMAGO },
     { title: "ERIH PLUS", value: EntityIndicatorSource.ERIH_PLUS },
     { title: "MKS Slavists", value: EntityIndicatorSource.MKS_SLAVISTS },
+    { title: "OpenAlex", value: EntityIndicatorSource.OPEN_ALEX }
 ];
 
 export const getIndicatorSourceTitleFromValueAutoLocale = (value: EntityIndicatorSource) => {

@@ -324,12 +324,15 @@
                 </v-btn>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view
-                        :entity-indicators="personIndicators"
-                        :statistics-type="StatisticsType.VIEW">
-                    </statistics-view>
-                </div>
+                <indicators-section 
+                    :indicators="personIndicators" 
+                    :applicable-types="[ApplicableEntityType.PERSON]" 
+                    :entity-id="person?.id"
+                    :entity-type="ApplicableEntityType.PERSON" 
+                    :can-edit="false"
+                    show-statistics
+                    @updated="fetchIndicators"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
                 <person-assessments-view
@@ -347,7 +350,7 @@
 </template>
 
 <script lang="ts">
-import { type MultilingualContent, type Country, ExportableEndpointType } from '@/models/Common';
+import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
 import { computed, onMounted } from 'vue';
@@ -383,7 +386,6 @@ import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type AssessmentResearchArea, type EntityIndicatorResponse, type ResearcherAssessmentResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
 import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasure/AssessmentResearchAreaForm.vue';
@@ -396,11 +398,12 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, StatisticsView, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -461,16 +464,22 @@ export default defineComponent({
 
             fetchPerson(true);
             StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
-            EntityIndicatorService.fetchPersonIndicators(parseInt(currentRoute.params.id as string)).then(response => {
-                personIndicators.value = response.data;
-            });
-
+            
+            fetchIndicators();
             fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
         });
 
         watch(i18n.locale, () => {
             populateData();
         });
+
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchPersonIndicators(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                personIndicators.value = response.data;
+            });
+        };
 
         const fetchAssessment = (startDate: string, endDate: string) => {
             assessmentsLoading.value = true;
@@ -726,7 +735,7 @@ export default defineComponent({
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, displayExpertiseAndPrizePanel,
-            getEmploymentPositionTitleFromValueAutoLocale
+            getEmploymentPositionTitleFromValueAutoLocale, ApplicableEntityType, fetchIndicators
         };
 }});
 </script>
