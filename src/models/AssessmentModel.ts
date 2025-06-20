@@ -131,7 +131,9 @@ export enum EntityIndicatorSource {
     SCIMAGO = "SCIMAGO",
     ERIH_PLUS = "ERIH_PLUS",
     MKS_SLAVISTS = "MKS_SLAVISTS",
-    OPEN_ALEX = "OPEN_ALEX"
+    OPEN_ALEX = "OPEN_ALEX",
+    OPEN_CITATIONS = "OPEN_CITATIONS",
+    SCOPUS = "SCOPUS"
 }
 
 export enum EntityClassificationSource {

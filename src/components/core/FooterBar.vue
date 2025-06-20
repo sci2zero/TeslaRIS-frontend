@@ -49,7 +49,7 @@ export default defineComponent(
             const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
             const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
             const contactLabel = computed(() => i18n.t("contactLabel"));
-            const feedbackLabel = computed(() => i18n.t("feedbackLabel"));
+            // const feedbackLabel = computed(() => i18n.t("feedbackLabel"));
 
 
             const links = ref([
@@ -59,7 +59,7 @@ export default defineComponent(
                     { title: scientificResultsListLabel, path: "scientific-results"},
                     { title: simpleSearchLabel, path: "advanced-search"},
                     { title: contactLabel, path: "mailto:chenejac@uns.ac.rs"},
-                    { title: feedbackLabel, path: "contact"},
+                    // { title: feedbackLabel, path: "contact"},
                 ]);
 
 
