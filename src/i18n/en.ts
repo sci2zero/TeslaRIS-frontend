@@ -532,7 +532,7 @@ export default {
     updateResearchAreaLabel: "Update Research Area",
     createNewResearchAreaLabel: "Create New Research Area",
     searchInSystemLabel: "Search in system",
-    enterExternalOULabel: "Enter external affiliation",
+    enterExternalOULabel: "Enter affiliation that is not in list",
     externalOUNameLabel: "External affiliation name",
     boundToUserLabel: "(Bound to user)",
     forceDeleteLabel: "Force Delete",

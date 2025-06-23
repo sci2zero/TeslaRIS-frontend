@@ -150,16 +150,16 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="canEdit || (monographPublication?.contributions && monographPublication?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (monographPublication?.contributions && monographPublication?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
-            </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-show="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+            <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
@@ -168,6 +168,14 @@
             v-show="monographPublication"
             v-model="currentTab"
         >
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs
+                    :document-id="monographPublication?.id"
+                    :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="monographPublication?.keywords ? monographPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -176,9 +184,6 @@
                 <description-section :description="monographPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
                 <attachment-section :document="monographPublication" :can-edit="canEdit" :proofs="monographPublication?.proofs" :file-items="monographPublication?.fileItems"></attachment-section>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="monographPublication?.id" :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

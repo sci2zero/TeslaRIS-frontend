@@ -149,16 +149,16 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="canEdit || (proceedingsPublication?.contributions && proceedingsPublication?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (proceedingsPublication?.contributions && proceedingsPublication?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
-            </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-show="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canEdit" value="assessments">
+            <v-tab v-show="documentClassifications?.length > 0 || canEdit" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
@@ -176,7 +176,12 @@
                 <attachment-section :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"></attachment-section>    
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="proceedingsPublication?.id" :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
+                <person-document-contribution-tabs
+                    :document-id="proceedingsPublication?.id"
+                    :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">

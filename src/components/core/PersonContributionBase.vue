@@ -11,11 +11,13 @@
                 return-object
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
+                @blur="onAutocompleteBlur"
             ></v-autocomplete>
         </v-col>
         <v-col v-if="canUserAddPersons" cols="1">
             <generic-crud-modal
                 :form-component="PersonSubmissionForm"
+                :form-props="{ inModal: true, presetPersonName: presetPersonNameForCreation }"
                 entity-name="Person"
                 is-submission
                 :read-only="false"
@@ -23,13 +25,13 @@
             />
         </v-col>
     </v-row>
-    <v-btn
+    <!-- <v-btn
         v-if="allowExternalAssociate && !selectExternalAssociate"
         color="primary"
         class="text-body-2 mb-2"
         @click="toggleExternalSelection">
         {{ $t("addExternalAssociateLabel") }}
-    </v-btn>
+    </v-btn> -->
     <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
         <v-col v-if="!customNameInput && !selectExternalAssociate" cols="10">
             <v-select
@@ -200,33 +202,55 @@ export default defineComponent({
         const valueSet = ref(false);
 
         const selectExternalAssociate = ref(false);
+        const lastSearchInput = ref();
+        const presetPersonNameForCreation = ref<PersonName>();
 
         onMounted(() => {
+            if (!props.isUpdate) {
+                valueSet.value = true;
+            }
+
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
             });
         });
 
         const searchPersons = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
+            if (!input || input.includes("|")) {
                 return;
             }
             if (input.length >= 3) {
+                lastSearchInput.value = `(${input.replaceAll('(', '').replaceAll(')', '')})`;
+                
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                PersonService.searchResearchers(params, false, null).then((response) => {
+                PersonService.searchResearchers(
+                    params, false, null
+                ).then((response) => {
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value === "sr") {
-                            listOfPersons.push({title: removeTrailingPipeRegex(`${person.name} | ${person.birthdate ? localiseDate(person.birthdate) : i18n.t("unknownBirthdateMessage")} | ${person.employmentsSr}`), value: person.databaseId});
+                            listOfPersons.push(
+                                {title: removeTrailingPipeRegex(`${person.name} | ${person.birthdate ? localiseDate(person.birthdate) : i18n.t("unknownBirthdateMessage")} | ${person.employmentsSr}`), value: person.databaseId}
+                            );
                         } else {
-                            listOfPersons.push({title: removeTrailingPipeRegex(`${person.name} | ${person.birthdate ? localiseDate(person.birthdate) : i18n.t("unknownBirthdateMessage")} | ${person.employmentsOther}`), value: person.databaseId});
+                            listOfPersons.push(
+                                {title: removeTrailingPipeRegex(`${person.name} | ${person.birthdate ? localiseDate(person.birthdate) : i18n.t("unknownBirthdateMessage")} | ${person.employmentsOther}`), value: person.databaseId}
+                            );
                         }
-                    })
+                    });
+
+                    if (props.allowExternalAssociate) {
+                        listOfPersons.push({
+                            title: "Nije u listi (" + input.replaceAll('(', '').replaceAll(')', '') + ")",
+                            value: 0
+                        });
+                    }
+                    
                     persons.value = listOfPersons;
                 });
             }
@@ -292,6 +316,18 @@ export default defineComponent({
         }, { deep: true });
 
         const onPersonSelect = (selection: {title: string, value: number}) => {
+            if (!selection) {
+                return;
+            }
+
+            if (selection.value === 0) {
+                selectExternalAssociate.value = true;
+                customNameInput.value = true;
+                constructExternalCollaboratorFromInput(selection.title);
+                sendContentToParent();
+                return;
+            }
+
             PersonService.readPerson(selection.value).then((response) => {
                 personOtherNames.value = [{title: selection.title.split("|")[0], value: -1}];
                 selectedOtherName.value = personOtherNames.value[0];
@@ -301,6 +337,32 @@ export default defineComponent({
             });
             sendContentToParent();
         };
+
+        const constructExternalCollaboratorFromInput = (selectionTitle: string) => {
+            const nameTokens = extractTextInParentheses(selectionTitle).split(" ");
+            if (nameTokens.length > 0) {
+                lastName.value = toTitleCase(nameTokens[0]);
+
+                if (nameTokens.length > 1) {
+                    firstName.value = toTitleCase(nameTokens[nameTokens.length - 1]);
+                }
+            }
+        };
+
+        const extractTextInParentheses = (input: string) => {
+            const match = input.match(/\(([^)]+)\)/);
+            if (match && match[1]) {
+                return match[1];
+            }
+
+            return "";
+        };
+
+        function toTitleCase(str: string) {
+            return str.toLowerCase().replace(/\b\w/g, function(char) {
+                return char.toUpperCase();
+            });
+        }
 
         const sendContentToParent = () => {
             let otherName = ["", "", "", null, null];
@@ -337,6 +399,10 @@ export default defineComponent({
         watch(affiliationStatement, () => sendContentToParent());
 
         watch(selectedPerson, () => {
+            if (!selectedPerson.value || selectedPerson.value.value <= 0) {
+                return;
+            }
+
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
                 personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
@@ -388,6 +454,12 @@ export default defineComponent({
             descriptionRef.value?.clearInput();
             affiliationStatementRef.value?.clearInput();
             personOtherNames.value.splice(0);
+            firstName.value = "";
+            lastName.value = "";
+            middleName.value = "";
+
+            selectExternalAssociate.value = false;
+            customNameInput.value = false;
         };
 
         const selectNewlyAddedPerson = (person: BasicPerson) => {
@@ -404,8 +476,51 @@ export default defineComponent({
 
             customNameInput.value = selectExternalAssociate.value;
             enterExternalOU.value = selectExternalAssociate.value;
+
+            if (!selectExternalAssociate.value) {
+                selectedPerson.value = personPlaceholder;
+            }
             
             sendContentToParent();
+        };
+
+        const switchToExternalAuthor = () => {
+            if (selectedPerson.value.value <= 0) {
+                selectExternalAssociate.value = true;
+                customNameInput.value = true;
+                constructExternalCollaboratorFromInput(lastSearchInput.value);
+            }
+
+            sendContentToParent();
+        };
+
+        const onAutocompleteBlur = () => {
+            setTimeout(() => {
+                const active = document.activeElement;
+                const isInsideCrudModal = active && active.closest('.generic-crud-modal');
+
+                if (!isInsideCrudModal) {
+                    switchToExternalAuthor();
+                } else {
+                    let name = "", surname = "";
+                    const nameTokens =
+                        extractTextInParentheses(lastSearchInput.value).split(" ");
+                        
+                        if (nameTokens.length > 0) {
+                            surname = toTitleCase(nameTokens[0]);
+
+                            if (nameTokens.length > 1) {
+                                name = toTitleCase(nameTokens[nameTokens.length - 1]);
+                            }
+                        }
+                    
+                    presetPersonNameForCreation.value = {
+                        firstname: name,
+                        lastname: surname,
+                        otherName: ""
+                    };
+                }
+            }, 0);
         };
 
         return {
@@ -419,7 +534,9 @@ export default defineComponent({
                 personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput,
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
-                PersonSubmissionForm, enterExternalOU, canUserAddPersons
+                PersonSubmissionForm, enterExternalOU, canUserAddPersons,
+                constructExternalCollaboratorFromInput, onAutocompleteBlur,
+                presetPersonNameForCreation
             };
     }
 });
