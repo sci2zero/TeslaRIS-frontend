@@ -117,16 +117,16 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="canEdit || (dataset?.contributions && dataset?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (dataset?.contributions && dataset?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
-            </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-show="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+            <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
@@ -135,6 +135,14 @@
             v-show="dataset"
             v-model="currentTab"
         >
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs
+                    :document-id="dataset?.id"
+                    :contribution-list="dataset?.contributions ? dataset?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="dataset?.keywords ? dataset.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -147,14 +155,6 @@
                 </description-section>
 
                 <attachment-section :document="dataset" :can-edit="canEdit" :proofs="dataset?.proofs" :file-items="dataset?.fileItems"></attachment-section>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs
-                    :document-id="dataset?.id"
-                    :contribution-list="dataset?.contributions ? dataset?.contributions : []"
-                    :read-only="!canEdit"
-                    @update="updateContributions">
-                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

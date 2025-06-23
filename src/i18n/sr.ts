@@ -531,7 +531,7 @@ export default {
     updateResearchAreaLabel: "Ažuriraj oblast istraživanja",
     createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja",
     searchInSystemLabel: "Pretraži u sistemu",
-    enterExternalOULabel: "Unesi spoljnu afilijaciju",
+    enterExternalOULabel: "Unesi afilijaciju koja nije u listi",
     externalOUNameLabel: "Naziv spoljne afilijacije",
     boundToUserLabel: "(Vezan za korisnika)",
     forceDeleteLabel: "Forsirano brisanje",

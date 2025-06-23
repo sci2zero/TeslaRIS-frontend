@@ -161,16 +161,16 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="canEdit || (journalPublication?.contributions && journalPublication?.contributions.length > 0)" value="contributions">
+            <v-tab v-show="canEdit || (journalPublication?.contributions && journalPublication?.contributions.length > 0)" value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
+            <v-tab v-show="documentIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+            <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
@@ -179,6 +179,14 @@
             v-show="journalPublication"
             v-model="currentTab"
         >
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs
+                    :document-id="journalPublication?.id"
+                    :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="journalPublication?.keywords ? journalPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -187,9 +195,6 @@
                 <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
 
                 <attachment-section :document="journalPublication" :can-edit="canEdit" :proofs="journalPublication?.proofs" :file-items="journalPublication?.fileItems"></attachment-section>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs :document-id="journalPublication?.id" :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <div class="w-50 statistics">

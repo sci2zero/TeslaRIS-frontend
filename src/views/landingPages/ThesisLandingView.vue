@@ -244,19 +244,19 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
+                {{ $t("contributionsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
-                {{ $t("contributionsLabel") }}
-            </v-tab>
-            <v-tab v-if="thesis?.contributions && thesis.contributions.length > 0 && thesis?.contributions![0].personId" value="researchOutput">
+            <v-tab v-show="thesis?.contributions && thesis.contributions.length > 0 && thesis?.contributions![0].personId" value="researchOutput">
                 {{ $t("researchOutputLabel") }}
             </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0 || canClassify" value="indicators">
+            <v-tab v-show="documentIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="documentClassifications?.length > 0 || canClassify" value="assessments">
+            <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
         </v-tabs>
@@ -265,6 +265,12 @@
             v-show="thesis"
             v-model="currentTab"
         >
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs
+                    :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit"
+                    board-members-allowed
+                    @update="updateContributions"></person-document-contribution-tabs>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit && !thesis?.isOnPublicReview" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
@@ -295,12 +301,6 @@
                     :commission-reports="thesis?.commissionReports"
                     :is-on-public-review="thesis?.isOnPublicReview"
                 ></attachment-section>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs
-                    :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit"
-                    board-members-allowed
-                    @update="updateContributions"></person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchOutput">
                 <thesis-research-output-section

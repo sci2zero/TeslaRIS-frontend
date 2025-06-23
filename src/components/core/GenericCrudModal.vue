@@ -1,5 +1,5 @@
 <template>
-    <div justify="start">
+    <div justify="start" class="generic-crud-modal">
         <v-dialog v-model="dialog" persistent :class="wide ? 'wide' : 'narrow'">
             <template #activator="scope">
                 <div v-if="isSectionUpdate && !readOnly" class="edit-pen">

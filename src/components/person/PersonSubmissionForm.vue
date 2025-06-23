@@ -185,12 +185,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import PersonService from "@/services/PersonService";
 import { useRouter } from 'vue-router';
-import type { BasicPerson } from "@/models/PersonModel";
+import type { BasicPerson, PersonName } from "@/models/PersonModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getSexForGivenLocale } from '@/i18n/sex';
@@ -212,6 +212,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        presetPersonName: {
+            type: Object as PropType<PersonName | undefined>,
+            default: undefined
         }
     },
     emits: ["create"],
@@ -231,7 +235,20 @@ export default defineComponent({
             UserService.getLoggedInUser().then(response => {
                 loggedInUser.value = response.data;
             });
+
+            prePopulatePersonName();
         });
+
+        watch(() => props.presetPersonName, () => {
+            prePopulatePersonName();
+        });
+
+        const prePopulatePersonName = () => {
+            if (props.presetPersonName) {
+                firstName.value = props.presetPersonName.firstname;
+                lastName.value = props.presetPersonName.lastname;
+            }
+        };
 
         const router = useRouter();
 

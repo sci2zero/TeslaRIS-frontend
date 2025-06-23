@@ -170,7 +170,7 @@ export default defineComponent({
                 contributionType: {
                     title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR),
                     value: DocumentContributionType.AUTHOR
-                }, 
+                },
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
                 isBoardPresident: false,
@@ -190,22 +190,26 @@ export default defineComponent({
         };
 
         const clearInput = () => {
+            inputs.value.splice(0);
             inputs.value = [{
                 contributionType: {
                     title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR), 
                     value: DocumentContributionType.AUTHOR
                 }, 
                 isMainContributor: false, 
-                isCorrespondingContributor: false
+                isCorrespondingContributor: false,
             }];
+            
             baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
-            sendContentToParent();
+
+            emit("setInput", []);
         };
 
         const sendContentToParent = () => {
             const returnObject: PersonDocumentContribution[] = [];
+            console.log(inputs.value)
             inputs.value.forEach((input, index) => {
                 let personName = undefined;
                 if (input.contribution.selectedOtherName) {
@@ -215,7 +219,7 @@ export default defineComponent({
                                   dateFrom: input.contribution.selectedOtherName[3],
                                   dateTo: input.contribution.selectedOtherName[4]}
                 }
-                
+
                 if (input.contributionType.value === DocumentContributionType.BOARD_MEMBER && !input.employmentTitle && input.contribution.personId !== -1) {
                     InvolvementService.getEmploymentTitle(input.contribution.personId)
                     .then(response => {
