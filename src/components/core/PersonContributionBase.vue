@@ -216,7 +216,7 @@ export default defineComponent({
         });
 
         const searchPersons = lodash.debounce((input: string) => {
-            if (!input || input.includes("|")) {
+            if (!input || input.includes("|") || selectedPerson.value.value === 0) {
                 return;
             }
             if (input.length >= 3) {
@@ -339,6 +339,10 @@ export default defineComponent({
         };
 
         const constructExternalCollaboratorFromInput = (selectionTitle: string) => {
+            if (!selectionTitle) {
+                return;
+            }
+
             const nameTokens = extractTextInParentheses(selectionTitle).split(" ");
             if (nameTokens.length > 0) {
                 lastName.value = toTitleCase(nameTokens[0]);
@@ -478,7 +482,7 @@ export default defineComponent({
             enterExternalOU.value = selectExternalAssociate.value;
 
             if (!selectExternalAssociate.value) {
-                selectedPerson.value = personPlaceholder;
+                selectedPerson.value = {title: lastSearchInput.value, value: -1};
             }
             
             sendContentToParent();

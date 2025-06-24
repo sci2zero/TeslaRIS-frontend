@@ -1,4 +1,4 @@
-import { PublicationType } from "./PublicationModel";
+import type { PersonDocumentContribution, PublicationType } from "./PublicationModel";
 
 export interface Page<Type> {
     content: Type[];
@@ -208,4 +208,18 @@ export interface EntityNavigationDetails {
 export interface DocumentFileNavigationDetails {
     serverFilename: string;
     filename: string;
+}
+
+export interface PrepopulatedMetadata {
+    title: MultilingualContent[];
+    contributions: PersonDocumentContribution[];
+    publishedInName: string;
+    publishEntityId: number;
+    documentPublicationType: PublicationType;
+    volume: string;
+    issue: string;
+    year: number;
+    startPage: string;
+    endPage: string;
+    url: string;
 }

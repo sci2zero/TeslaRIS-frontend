@@ -4,6 +4,11 @@
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
                     <v-col cols="10">
+                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="10">
                         <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" required></journal-autocomplete-search>
                     </v-col>
                 </v-row>
@@ -51,10 +56,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="5">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                    </v-col>
-                    <v-col cols="5">
+                    <v-col cols="10">
                         <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
@@ -72,7 +74,11 @@
                 <v-row>
                     <v-col cols="10">
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            @set-input="contributions = $event">
+                        </person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -129,24 +135,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick, onMounted } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import { type DocumentPublicationIndex, type JournalPublication, JournalPublicationType } from "@/models/PublicationModel";
+import { type DocumentPublicationIndex, type JournalPublication, JournalPublicationType, type PersonDocumentContribution } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { AxiosError } from 'axios';
-import type { ErrorResponse } from '@/models/Common';
+import type { AxiosError, AxiosResponse } from 'axios';
+import type { ErrorResponse, LanguageTagResponse } from '@/models/Common';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import MetadataPrepopulationService from '@/services/MetadataPrepopulationService';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import LanguageService from '@/services/LanguageService';
 
 
 export default defineComponent({
@@ -181,11 +190,18 @@ export default defineComponent({
 
         const myPublications = ref<DocumentPublicationIndex[]>([]);
 
-        const title = ref([]);
+        const languageTags = ref<LanguageTagResponse[]>([]);
+        onMounted(() => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                languageTags.value = response.data;
+            });
+        });
+
+        const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
-        const contributions = ref([]);
+        const contributions = ref<PersonDocumentContribution[]>([]);
         const volume = ref("");
         const issue = ref("");
         const startPage = ref("");
@@ -222,6 +238,35 @@ export default defineComponent({
         watch(selectedJournal, (newValue) => {
             if (newValue && isResearcher.value) {
                 listPublications(newValue);
+            }
+        });
+
+        watch(doi, async () => {
+            if (doi.value && doiValidationRules[0](doi.value) === true) {
+                const response = await MetadataPrepopulationService.fetchMetadataForDoi(doi.value)
+                if (title.value.length === 0) {
+                    title.value = response.data.title;
+                    titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+                }
+                
+                volume.value = volume.value ? volume.value : response.data.volume;
+                issue.value = issue.value ? issue.value : response.data.issue;
+                startPage.value = startPage.value ? startPage.value : response.data.startPage;
+                endPage.value = endPage.value ? endPage.value : response.data.endPage;
+                uris.value.push(response.data.url);
+
+                if (selectedJournal.value.value <= 0) {
+                    selectedJournal.value = {title: response.data.publishedInName, value: response.data.publishEntityId};
+                }
+
+                if (contributions.value.length === 0) {
+                    contributions.value = response.data.contributions;
+                    contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                    await nextTick();
+
+                    contributionsRef.value?.fillInputs(contributions.value, true);
+                }
             }
         });
 
