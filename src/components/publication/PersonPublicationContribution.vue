@@ -125,14 +125,25 @@ export default defineComponent({
 
         const populateFormData = () => {
             if(props.presetContributions && props.presetContributions.length > 0) {
-                inputs.value.splice(0);
-                props.presetContributions.forEach(contribution => {
+                fillInputs(props.presetContributions, false);
+            }
+        };
+
+        const fillInputs = (contributions: PersonDocumentContribution[], resetBaseComponents: boolean) => {            
+            if (resetBaseComponents) {
+                baseContributionRef.value.filter((ref: any) => ref).forEach((ref: typeof PersonContributionBase) => {
+                    ref.valueSet = false;
+                });
+            }
+            inputs.value.splice(0);
+
+            contributions.forEach(contribution => {
                     inputs.value.push({
                         contribution: 
                             {
                                 personId: contribution.personId, 
-                                description: contribution.contributionDescription, 
-                                affiliationStatement: contribution.displayAffiliationStatement, 
+                                description: contribution.contributionDescription !== null ? contribution.contributionDescription : [], 
+                                affiliationStatement: contribution.displayAffiliationStatement !== null ? contribution.displayAffiliationStatement : [], 
                                 selectedOtherName: [
                                             contribution.personName?.firstname, 
                                             contribution.personName?.otherName, 
@@ -152,7 +163,10 @@ export default defineComponent({
                         id: contribution.id
                     });
                 });
-            }
+        };
+
+        const fillDummyAuthors = (amount: number) => {
+            inputs.value = Array.from({ length: amount }, () => ({}));
         };
 
         const contributionTypes = computed(() => {
@@ -181,7 +195,7 @@ export default defineComponent({
         const removeInput = (index: number) => {
             inputs.value.splice(index, 1);
 
-            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+            baseContributionRef.value.filter((ref: any) => ref).forEach((ref: typeof PersonContributionBase) => {
                 ref.valueSet = false;
             });
 
@@ -209,7 +223,6 @@ export default defineComponent({
 
         const sendContentToParent = () => {
             const returnObject: PersonDocumentContribution[] = [];
-            console.log(inputs.value)
             inputs.value.forEach((input, index) => {
                 let personName = undefined;
                 if (input.contribution.selectedOtherName) {
@@ -261,7 +274,8 @@ export default defineComponent({
             contributionTypes, sendContentToParent,
             baseContributionRef, clearInput,
             employmentTitles, personalTitles,
-            populateFormData
+            populateFormData, fillInputs,
+            fillDummyAuthors
         }
     }
 });

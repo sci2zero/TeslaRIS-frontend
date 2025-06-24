@@ -3,7 +3,8 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Notification, NotificationAction } from "@/models/Common";
 
-export class LanguageService extends BaseService {
+
+export class NotificationService extends BaseService {
 
   async getAllNotifications(): Promise<AxiosResponse<Notification[]>> {
     return super.sendRequest(axios.get, "notification");
@@ -26,4 +27,4 @@ export class LanguageService extends BaseService {
   }
 }
 
-export default new LanguageService();
+export default new NotificationService();
