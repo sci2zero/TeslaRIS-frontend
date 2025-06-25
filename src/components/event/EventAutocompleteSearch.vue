@@ -18,7 +18,7 @@
         <v-col v-if="!disableSubmission && !readOnly" cols="1">
             <generic-crud-modal
                 :form-component="ConferenceSubmissionForm"
-                :form-props="{readOnly: readOnly}"
+                :form-props="{readOnly: readOnly, presetName: lastSearchInput}"
                 entity-name="Conference"
                 is-submission
                 :read-only="false"
@@ -92,6 +92,8 @@ export default defineComponent({
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
 
+        const lastSearchInput = ref("");
+
         onMounted(() => {
             if (props.modelValue) {
                 selectedEvent.value = props.modelValue;
@@ -102,8 +104,12 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
 
         const searchEvents = lodash.debounce((input: string) => {
-            if (!input || input.includes("|")) return;
+            if (!input || input.includes("|")) {
+                return;
+            }
+
             if (input.length >= 3) {
+                lastSearchInput.value = input;
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
@@ -175,7 +181,7 @@ export default defineComponent({
             events, selectedEvent, searchEvents,
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedEvent, hasSelection,
-            ConferenceSubmissionForm
+            ConferenceSubmissionForm, lastSearchInput
         };
     }
 });

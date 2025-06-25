@@ -4,7 +4,10 @@
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.JOURNAL_PUBLICATION"
+                            @metadata-fetched="popuateMetadata"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -13,7 +16,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length > 0">
+                <v-row v-if="selectedJournal && selectedJournal.value > 0 && myPublications.length > 0">
                     <v-col>
                         <h3>{{ $t("recentPublicationsLabel") }}</h3>
                         <p
@@ -135,32 +138,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import { type DocumentPublicationIndex, type JournalPublication, JournalPublicationType, type PersonDocumentContribution } from "@/models/PublicationModel";
+import { type DocumentPublicationIndex, type JournalPublication, JournalPublicationType, type PersonDocumentContribution, PublicationType } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { AxiosError, AxiosResponse } from 'axios';
-import type { ErrorResponse, LanguageTagResponse } from '@/models/Common';
+import type { AxiosError } from 'axios';
+import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import MetadataPrepopulationService from '@/services/MetadataPrepopulationService';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import LanguageService from '@/services/LanguageService';
+import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator },
     props: {
         inModal: {
             type: Boolean,
@@ -190,12 +193,7 @@ export default defineComponent({
 
         const myPublications = ref<DocumentPublicationIndex[]>([]);
 
-        const languageTags = ref<LanguageTagResponse[]>([]);
-        onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                languageTags.value = response.data;
-            });
-        });
+        const { languageTags } = useLanguageTags();
 
         const title = ref<any[]>([]);
         const subtitle = ref([]);
@@ -241,34 +239,32 @@ export default defineComponent({
             }
         });
 
-        watch(doi, async () => {
-            if (doi.value && doiValidationRules[0](doi.value) === true) {
-                const response = await MetadataPrepopulationService.fetchMetadataForDoi(doi.value)
-                if (title.value.length === 0) {
-                    title.value = response.data.title;
-                    titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
-                }
-                
-                volume.value = volume.value ? volume.value : response.data.volume;
-                issue.value = issue.value ? issue.value : response.data.issue;
-                startPage.value = startPage.value ? startPage.value : response.data.startPage;
-                endPage.value = endPage.value ? endPage.value : response.data.endPage;
-                uris.value.push(response.data.url);
-
-                if (selectedJournal.value.value <= 0) {
-                    selectedJournal.value = {title: response.data.publishedInName, value: response.data.publishEntityId};
-                }
-
-                if (contributions.value.length === 0) {
-                    contributions.value = response.data.contributions;
-                    contributionsRef.value?.fillDummyAuthors(contributions.value.length);
-
-                    await nextTick();
-
-                    contributionsRef.value?.fillInputs(contributions.value, true);
-                }
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             }
-        });
+            
+            volume.value = volume.value ? volume.value : metadata.volume;
+            issue.value = issue.value ? issue.value : metadata.issue;
+            startPage.value = startPage.value ? startPage.value : metadata.startPage;
+            endPage.value = endPage.value ? endPage.value : metadata.endPage;
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (metadata.publishedInName && selectedJournal.value.value <= 0) {
+                selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
+            }
+
+            if (contributions.value.length === 0) {
+                contributions.value = metadata.contributions;
+                contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                await nextTick();
+
+                contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+        };
 
         const submitJournalPublication = (stayOnPage: boolean) => {
             const newJournalPublication: JournalPublication = {
@@ -341,7 +337,8 @@ export default defineComponent({
             selectedJournal, journalAutocompleteRef, myPublications,
             publicationTypes, selectedpublicationType, listPublications,
             contributions, contributionsRef, scopusIdValidationRules,
-            requiredFieldRules, submitJournalPublication, errorMessage
+            requiredFieldRules, submitJournalPublication, errorMessage,
+            popuateMetadata, PublicationType
         };
     }
 });

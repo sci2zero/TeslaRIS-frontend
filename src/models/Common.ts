@@ -222,4 +222,5 @@ export interface PrepopulatedMetadata {
     startPage: string;
     endPage: string;
     url: string;
+    doi: string;
 }

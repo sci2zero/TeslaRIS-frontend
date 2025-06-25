@@ -3,6 +3,14 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
+                    <v-col cols="10">
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.DATASET"
+                            @metadata-fetched="popuateMetadata"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
@@ -20,14 +28,9 @@
                 </v-row>
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                    </v-col>
-                    <v-col cols="5">
                         <v-text-field v-model="datasetNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
                     </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
+                    <v-col cols="5">
                         <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
@@ -87,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -95,17 +98,20 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Dataset } from "@/models/PublicationModel";
+import { PublicationType, type Dataset, type PersonDocumentContribution } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
-import type { ErrorResponse } from '@/models/Common';
+import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
 import Toast from '../core/Toast.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 
 
 export default defineComponent({
     name: "SubmitDataset",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator},
     props: {
         inModal: {
             type: Boolean,
@@ -136,12 +142,12 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
         const place = ref([]);
-        const contributions = ref([]);
+        const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
@@ -202,6 +208,27 @@ export default defineComponent({
             });
         };
 
+        const { languageTags } = useLanguageTags();
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            }
+
+            datasetNumber.value = datasetNumber.value ? datasetNumber.value : metadata.issue;
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (contributions.value.length === 0) {
+                contributions.value = metadata.contributions;
+                contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                await nextTick();
+
+                contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+        };
+
         return {
             isFormValid, 
             additionalFields,
@@ -217,7 +244,8 @@ export default defineComponent({
             contributions, contributionsRef,
             requiredFieldRules, submitDataset,
             doiValidationRules, openAlexId,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            popuateMetadata, PublicationType
         };
     }
 });

@@ -17,7 +17,7 @@
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
                 :form-component="PublicationSeriesSubmissionForm"
-                :form-props="{inputType: inputType}"
+                :form-props="{inputType: inputType, presetName: lastSearchInput}"
                 entity-name="Journal"
                 is-submission
                 :read-only="false"
@@ -89,6 +89,8 @@ export default defineComponent({
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
 
+        const lastSearchInput = ref("");
+
         onMounted(() => {
             if (props.modelValue) {
                 selectedJournal.value = props.modelValue;
@@ -129,7 +131,9 @@ export default defineComponent({
             if (!input || input.includes("|")) {
                 return;
             }
+            
             if (input.length >= 3) {
+                lastSearchInput.value = input
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
@@ -181,7 +185,7 @@ export default defineComponent({
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
             selectNewlyAddedJournal, hasSelection,
-            PublicationSeriesSubmissionForm
+            PublicationSeriesSubmissionForm, lastSearchInput
         };
     }
 });

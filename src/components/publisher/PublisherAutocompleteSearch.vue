@@ -15,6 +15,7 @@
         <v-col cols="1">
             <generic-crud-modal
                 :form-component="PublisherSubmissionForm"
+                :form-props="{presetName: lastSearchInput}"
                 entity-name="Publisher"
                 is-submission
                 :read-only="false"
@@ -62,6 +63,8 @@ export default defineComponent({
         const publishers = ref<{ title: string; value: number; }[]>([]);
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
+        const lastSearchInput = ref("");
+
         onMounted(() => {
             if(props.modelValue && props.modelValue.value !== -1) {
                 selectedPublisher.value = props.modelValue;
@@ -73,7 +76,9 @@ export default defineComponent({
             if (input.includes("|")) {
                 return;
             }
+
             if (input.length >= 3) {
+                lastSearchInput.value = input;
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
@@ -129,7 +134,7 @@ export default defineComponent({
         return {
             publishers, selectedPublisher, searchPublishers,
             sendContentToParent, clearInput, selectNewlyAddedPublisher,
-            PublisherSubmissionForm
+            PublisherSubmissionForm, lastSearchInput
         };
     }
 });

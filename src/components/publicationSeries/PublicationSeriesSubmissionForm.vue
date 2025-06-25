@@ -59,12 +59,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -75,6 +75,9 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import UriInput from '@/components/core/UriInput.vue';
 import Toast from '../core/Toast.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import { useUserRole } from '@/composables/useUserRole';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -88,6 +91,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        presetName: {
+            type: String,
+            default: ""
         }
     },
     emits: ["create"],
@@ -115,13 +122,34 @@ export default defineComponent({
                     }
                 })
             });
-        })
+        });
+
+        const { languageTags } = useLanguageTags();
+        const { loggedInUser } = useUserRole();
+        watch(() => languageTags.value, () => {
+            presetName();
+        });
+
+        const presetName = async () => {
+            if (props.presetName) {
+                const tag = languageTags.value.find(
+                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                );
+                if (tag) {
+                    const mc: MultilingualContent[] = [
+                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                    ];
+                    title.value = mc;
+                    titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
+                }
+            }
+        };
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const abbreviationsRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof MultilingualTextInput>();
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const nameAbbreviations = ref([]);
         const eIssn = ref("");
         const printIssn = ref("");

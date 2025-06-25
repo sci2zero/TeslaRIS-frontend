@@ -3,6 +3,14 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
+                    <v-col cols="10">
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.SOFTWARE"
+                            @metadata-fetched="popuateMetadata"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
@@ -20,15 +28,19 @@
                 </v-row>
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="softwareNumber"
+                            :label="$t('internalNumberLabel')"
+                            :placeholder="$t('internalNumberLabel')">
+                        </v-text-field>
                     </v-col>
                     <v-col cols="5">
-                        <v-text-field v-model="softwareNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="openAlexId"
+                            label="Open Alex ID"
+                            placeholder="Open Alex ID"
+                            :rules="workOpenAlexIdValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
 
@@ -82,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -90,17 +102,20 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Software } from "@/models/PublicationModel";
+import { PublicationType, type PersonDocumentContribution, type Software } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse } from '@/models/Common';
+import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import Toast from '../core/Toast.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 
 
 export default defineComponent({
     name: "SubmitSoftware",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator},
     props: {
         inModal: {
             type: Boolean,
@@ -130,11 +145,11 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
-        const contributions = ref([]);
+        const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
@@ -194,14 +209,35 @@ export default defineComponent({
             });
         };
 
+        const { languageTags } = useLanguageTags();
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            }
+
+            softwareNumber.value = softwareNumber.value ? softwareNumber.value : metadata.issue;
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (contributions.value.length === 0) {
+                contributions.value = metadata.contributions;
+                contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                await nextTick();
+
+                contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+        };
+
         return {
             isFormValid, 
             additionalFields,
             snackbar, error,
             title, titleRef,
             subtitle, subtitleRef,
-            publicationYear, doi,
-            publisherAutocompleteRef,
+            publicationYear, doi, PublicationType,
+            publisherAutocompleteRef, popuateMetadata,
             selectedPublisher, softwareNumber, openAlexId,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef,

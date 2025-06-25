@@ -19,6 +19,7 @@
         <v-col v-if="!disableSubmission && isAdmin" cols="1">
             <generic-crud-modal
                 :form-component="OrganisationUnitSubmissionForm"
+                :form-props="{ presetName: lastSearchInput }"
                 entity-name="OU"
                 is-submission
                 :read-only="false"
@@ -115,6 +116,8 @@ export default defineComponent({
             props.multiple ? (selectedOrganisationUnit.value as any[]).length > 0 : (selectedOrganisationUnit.value as { title: '', value: -1 }).value !== -1
         );
 
+        const lastSearchInput = ref("");
+
         onMounted(() => {
             if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
@@ -129,7 +132,12 @@ export default defineComponent({
         });
 
         const searchOUs = lodash.debounce((input: string) => {
+            if (!input || input.includes("|")) {
+                return;
+            }
+            
             if (input.length >= 3) {
+                lastSearchInput.value = input
                 let params = "";
                 input.split(" ").forEach(token => {
                     params += `tokens=${token}&`;
@@ -185,7 +193,7 @@ export default defineComponent({
 
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
-            requiredSelectionRules, calculateAutocompleteWidth,
+            requiredSelectionRules, calculateAutocompleteWidth, lastSearchInput,
             sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules
         };

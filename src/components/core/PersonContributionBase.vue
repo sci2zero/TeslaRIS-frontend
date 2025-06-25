@@ -482,7 +482,14 @@ export default defineComponent({
             enterExternalOU.value = selectExternalAssociate.value;
 
             if (!selectExternalAssociate.value) {
-                selectedPerson.value = {title: lastSearchInput.value, value: -1};
+                let searchInput = lastSearchInput.value ? lastSearchInput.value : (lastName.value + " " + firstName.value);
+                if (searchInput.startsWith("(") && searchInput.endsWith(")")) {
+                    searchInput = searchInput.slice(1, -1);
+                }
+                
+                selectedPerson.value = {
+                    title: searchInput, value: -1
+                };
             }
             
             sendContentToParent();

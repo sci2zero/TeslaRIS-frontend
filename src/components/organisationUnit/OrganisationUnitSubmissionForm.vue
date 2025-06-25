@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -81,6 +81,10 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { useI18n } from 'vue-i18n';
 import UriInput from '../core/UriInput.vue';
 import Toast from '../core/Toast.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import type { MultilingualContent } from '@/models/Common';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -90,6 +94,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        presetName: {
+            type: String,
+            default: ""
         }
     },
     emits: ["create"],
@@ -107,7 +115,7 @@ export default defineComponent({
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const mapRef = ref<typeof OpenLayersMap>();
 
-        const name = ref([]);
+        const name = ref<any[]>([]);
         const nameAbbreviation = ref("");
         const email = ref("");
         const scopusAfid = ref("");
@@ -116,6 +124,27 @@ export default defineComponent({
         const phoneNumber = ref("");
         const keywords = ref([]);
         const uris = ref<string[]>([]);
+
+        const { languageTags } = useLanguageTags();
+        const { loggedInUser } = useUserRole();
+        watch(() => languageTags.value, () => {
+            presetName();
+        });
+
+        const presetName = async () => {
+            if (props.presetName) {
+                const tag = languageTags.value.find(
+                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                );
+                if (tag) {
+                    const mc: MultilingualContent[] = [
+                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                    ];
+                    name.value = mc;
+                    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
+                }
+            }
+        };
 
         const {
             requiredFieldRules, scopusAfidValidationRules,

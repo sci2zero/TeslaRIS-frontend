@@ -889,5 +889,6 @@ export default {
     emailUpdateConfirmationInProgressMessage: "Confirmation of the request is in progress...",
     emailUpdateConfirmationSuccessMessage: "Email change successfully confirmed. You will be redirected to the login page shortly.",
     emailUpdateConfirmationFailedMessage: "Email change failed.",
-    updateExternalIndicatorConfigurationLabel: "External indicator showcase"
+    updateExternalIndicatorConfigurationLabel: "External indicator showcase",
+    mismatchedPublicationTypesMessage: "Document type does not match the form document type, harvested document type is: "
 }

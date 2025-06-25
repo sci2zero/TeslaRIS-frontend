@@ -915,5 +915,6 @@ export default {
     emailUpdateConfirmationInProgressMessage: "Potvrda zahteva u toku...",
     emailUpdateConfirmationSuccessMessage: "Promena email-a uspešno potvrđena, uskoro ćete biti preusmereni na stranicu za prijavu.",
     emailUpdateConfirmationFailedMessage: "Promena email-a nije uspela.",
-    updateExternalIndicatorConfigurationLabel: "Prikaz spoljnih indikatora"
+    updateExternalIndicatorConfigurationLabel: "Prikaz spoljnih indikatora",
+    mismatchedPublicationTypesMessage: "Tip dokumenta se ne poklapa sa tipom forme, preuzet tip publikacije je: "
 }
