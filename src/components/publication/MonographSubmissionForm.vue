@@ -4,6 +4,14 @@
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col cols="12">
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.MONOGRAPH"
+                            @metadata-fetched="popuateMetadata"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
                         <multilingual-text-input
                             ref="titleRef"
                             v-model="title"
@@ -32,16 +40,6 @@
                             :disabled="inModal"
                             return-object
                         ></v-select>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="doi"
-                            label="DOI"
-                            placeholder="DOI"
-                            :rules="doiValidationRules">
-                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -221,19 +219,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, PrepopulatedMetadata } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import UriInput from '../core/UriInput.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import { MonographType, type Monograph } from "@/models/PublicationModel";
+import { MonographType, type PersonDocumentContribution, PublicationType, type Monograph } from "@/models/PublicationModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
@@ -247,11 +245,12 @@ import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
+import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator},
     props: {
         inModal: {
             type: Boolean,
@@ -331,10 +330,10 @@ export default defineComponent({
 
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const subtitle = ref([]);
-        const contributions = ref([]);
-        const uris = ref([]);
+        const contributions = ref<PersonDocumentContribution[]>([]);
+        const uris = ref<string[]>([]);
         const keywords = ref([]);
         const description = ref([]);
         const eIsbn = ref("");
@@ -445,8 +444,33 @@ export default defineComponent({
             });
         };
 
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            }
+            
+            volume.value = volume.value ? volume.value : metadata.volume;
+            number.value = number.value ? number.value : metadata.issue;
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (metadata.publishedInName && selectedJournal.value.value <= 0) {
+                selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
+            }
+
+            if (contributions.value.length === 0) {
+                contributions.value = metadata.contributions;
+                contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                await nextTick();
+
+                contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+        };
+
         return {
-            isFormValid, additionalFields,
+            isFormValid, additionalFields, PublicationType,
             snackbar, message, researchAreasSelectable,
             title, titleRef, subtitle, subtitleRef,
             selectedEvent, doiValidationRules, openAlexId,
@@ -462,7 +486,7 @@ export default defineComponent({
             selectedResearchArea, toMultilingualTextInput,
             languageTags, contributionsRef, contributions,
             isbnValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules, popuateMetadata
         };
     }
 });

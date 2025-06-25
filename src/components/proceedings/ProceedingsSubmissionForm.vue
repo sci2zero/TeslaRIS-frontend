@@ -3,6 +3,14 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
+                    <v-col cols="12">
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.PROCEEDINGS"
+                            @metadata-fetched="popuateMetadata"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col>
                         <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
                     </v-col>
@@ -20,11 +28,6 @@
                 <v-row>
                     <v-col cols="10">
                         <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -132,7 +135,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import type { LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse, PrepopulatedMetadata } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -149,6 +152,9 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { PropType } from 'vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import { PublicationType } from '@/models/PublicationModel';
 
 
 export default defineComponent({
@@ -209,9 +215,9 @@ export default defineComponent({
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
         const selectedBookSeries = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const subtitle = ref([]);
-        const uris = ref([]);
+        const uris = ref<string[]>([]);
         const keywords = ref([]);
         const description = ref([]);
         const eIsbn = ref("");
@@ -316,10 +322,27 @@ export default defineComponent({
             });
         };
 
+        const { languageTags } = useLanguageTags();
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            }
+            
+            publicationSeriesVolume.value = publicationSeriesVolume.value ? publicationSeriesVolume.value : metadata.volume;
+            publicationSeriesIssue.value = publicationSeriesIssue.value ? publicationSeriesIssue.value : metadata.issue;
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (metadata.publishedInName && selectedJournal.value.value <= 0) {
+                selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
+            }
+        };
+
         return {
-            isFormValid, additionalFields,
+            isFormValid, additionalFields, popuateMetadata,
             snackbar, message, isbnValidationRules,
-            title, titleRef, subtitle, subtitleRef,
+            title, titleRef, subtitle, subtitleRef, PublicationType,
             eventAutocompleteRef, selectedEvent, openAlexId,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,

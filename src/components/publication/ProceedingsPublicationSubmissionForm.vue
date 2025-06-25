@@ -3,6 +3,14 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
+                    <v-col cols="10">
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                            @metadata-fetched="popuateMetadata"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="11">
                         <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
                     </v-col>
@@ -19,7 +27,7 @@
                         </p>
                     </v-col>
                 </v-row>
-                <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length == 0 && isResearcher">
+                <v-row v-if="selectedEvent && selectedEvent.value > 0 && myPublications.length == 0 && isResearcher">
                     <v-col><h3>{{ $t("noRecentPublicationsConferenceLabel") }}</h3></v-col>
                 </v-row>
                 <v-row>
@@ -39,7 +47,7 @@
                             :form-props="{conference: selectedEvent ? selectedEvent : searchPlaceholder}"
                             entity-name="Proceedings"
                             is-submission
-                            :read-only="selectedEvent.value === -1"
+                            :read-only="!selectedEvent || selectedEvent.value === -1"
                             @create="selectNewlyAddedProceedings"
                         />
                     </v-col>
@@ -55,19 +63,6 @@
                     </v-col>
                     <v-col cols="5">
                         <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="5">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="openAlexId"
-                            label="Open Alex ID"
-                            placeholder="Open Alex ID"
-                            :rules="workOpenAlexIdValidationRules">
-                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -97,8 +92,21 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -140,35 +148,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
-import type { ProceedingsPublicationResponse, ProceedingsPublicationType } from "@/models/PublicationModel";
+import { PublicationType, type ProceedingsPublicationResponse, type ProceedingsPublicationType } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import type { ProceedingsPublication } from "@/models/PublicationModel";
+import type { PersonDocumentContribution, ProceedingsPublication } from "@/models/PublicationModel";
 import ProceedingsService from '@/services/ProceedingsService';
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
-import type { ErrorResponse } from '@/models/Common';
+import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import type { AxiosError } from 'axios';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import Toast from '../core/Toast.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast, IDFMetadataPrepopulator},
     props: {
         inModal: {
             type: Boolean,
@@ -199,11 +209,11 @@ export default defineComponent({
 
         const myPublications = ref<ProceedingsPublicationResponse[]>([]);
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
-        const contributions = ref([]);
+        const contributions = ref<PersonDocumentContribution[]>([]);
         const availableProceedings = ref<{title: string, value: number}[]>([]);
         const selectedProceedings = ref(searchPlaceholder);
         const startPage = ref("");
@@ -236,6 +246,10 @@ export default defineComponent({
         };
 
         const fetchProceedings = (event: { title: string, value: number }) => {
+            if (event.value <= 0) {
+                return;
+            }
+
             ProceedingsService.readProceedingsForEvent(event.value).then((response) => {
                 response.data.forEach((proceedingsResponse: ProceedingsResponse) => {
                     let title: string | undefined;
@@ -270,6 +284,32 @@ export default defineComponent({
                 fetchProceedings(newValue);
             }
         });
+
+        const { languageTags } = useLanguageTags();
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            }
+            
+            startPage.value = startPage.value ? startPage.value : metadata.startPage;
+            endPage.value = endPage.value ? endPage.value : metadata.endPage;
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (metadata.publishedInName && selectedEvent.value.value <= 0) {
+                selectedEvent.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
+            }
+
+            if (contributions.value.length === 0) {
+                contributions.value = metadata.contributions;
+                contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                await nextTick();
+
+                contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+        };
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
             let title: string | undefined;
@@ -354,12 +394,13 @@ export default defineComponent({
             articleNumber, numberOfPages, description, descriptionRef,
             keywords, keywordsRef, placeRef, uris, urisRef, titleRef,
             myPublications, doiValidationRules, selectNewlyAddedProceedings,
-            selectedEvent, eventAutocompleteRef, listPublications,
+            selectedEvent, eventAutocompleteRef, listPublications, PublicationType,
             publicationTypes, selectedpublicationType, errorMessage, openAlexId,
             contributions, contributionsRef, scopusIdValidationRules, isResearcher,
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
-            searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules
+            searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules,
+            popuateMetadata
         };
     }
 });

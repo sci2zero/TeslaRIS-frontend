@@ -3,6 +3,14 @@
         <v-row>
             <v-col cols="8">
                 <v-row>
+                    <v-col cols="12">
+                        <i-d-f-metadata-prepopulator
+                            :document-type="PublicationType.THESIS"
+                            @metadata-fetched="popuateMetadata"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col v-if="!enterExternalOU" cols="12">
                         <organisation-unit-autocomplete-search
                             ref="ouAutocompleteRef"
@@ -125,13 +133,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field
-                                v-model="doi" label="DOI"
-                                placeholder="DOI" :rules="doiValidationRules">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="6">
+                        <v-col cols="12">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
@@ -192,7 +194,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
+import { computed, defineComponent, nextTick, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -200,27 +202,28 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Thesis, ThesisType } from "@/models/PublicationModel";
+import { type PersonDocumentContribution, PublicationType, type Thesis, type ThesisType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, LanguageResponse } from '@/models/Common';
+import type { ErrorResponse, LanguageResponse, PrepopulatedMetadata } from '@/models/Common';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
 import DatePicker from '../core/DatePicker.vue';
+import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator},
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -293,12 +296,12 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
-        const title = ref([]);
+        const title = ref<any[]>([]);
         const externalOUName = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
-        const contributions = ref([]);
+        const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
@@ -381,8 +384,28 @@ export default defineComponent({
             });
         };
 
+        const { languageTags } = useLanguageTags();
+        const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
+            if (title.value.length === 0) {
+                title.value = metadata.title;
+                titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
+            }
+            
+            uris.value.push(metadata.url);
+            doi.value = doi.value ? doi.value : metadata.doi;
+
+            if (contributions.value.length === 0) {
+                contributions.value = metadata.contributions;
+                contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+                await nextTick();
+
+                contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+        };
+
         return {
-            isFormValid, 
+            isFormValid, PublicationType, popuateMetadata,
             additionalFields, snackbar, error, title, titleRef,
             subtitle, subtitleRef, publicationYear, doi, openAlexId,
             publisherAutocompleteRef, selectedPublisher, numberOfPages,

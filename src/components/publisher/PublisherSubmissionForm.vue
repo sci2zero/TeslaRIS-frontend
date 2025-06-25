@@ -41,16 +41,17 @@ import { defineComponent, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import type { Country } from '@/models/Common';
+import type { Country, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import type { AxiosResponse } from 'axios';
 import type { Publisher } from "@/models/PublisherModel";
 import PublisherService from "@/services/PublisherService";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import CountryService from '@/services/CountryService';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import Toast from '../core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -60,6 +61,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        presetName: {
+            type: String,
+            default: ""
         }
     },
     emits: ["create"],
@@ -70,7 +75,6 @@ export default defineComponent({
         const error = ref(false);
 
         const router = useRouter();
-        const i18n = useI18n();
 
         onMounted(() => {
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
@@ -81,18 +85,31 @@ export default defineComponent({
             });
         });
 
-        const fetchCountries = () => {
-            
-        };
-
-        watch(i18n.locale, () => {
-            fetchCountries();
+        const { languageTags } = useLanguageTags();
+        const { loggedInUser } = useUserRole();
+        watch(() => languageTags.value, () => {
+            presetName();
         });
+
+        const presetName = async () => {
+            if (props.presetName) {
+                const tag = languageTags.value.find(
+                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                );
+                if (tag) {
+                    const mc: MultilingualContent[] = [
+                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                    ];
+                    name.value = mc;
+                    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
+                }
+            }
+        };
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
 
-        const name = ref([]);
+        const name = ref<any[]>([]);
         const place = ref([]);
 
         const countries = ref<{title: string, value: number}[]>([]);

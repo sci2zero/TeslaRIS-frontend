@@ -127,7 +127,7 @@ import { ref } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { useI18n } from 'vue-i18n';
 import EventService from "@/services/EventService";
-import type { Country } from '@/models/Common';
+import type { Country, MultilingualContent } from '@/models/Common';
 import type { Conference } from '@/models/EventModel';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
@@ -135,10 +135,11 @@ import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import DatePicker from '../core/DatePicker.vue';
 import CountryService from '@/services/CountryService';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import UriInput from '../core/UriInput.vue';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
@@ -148,6 +149,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        presetName: {
+            type: String,
+            default: ""
         }
     },
     emits: ["create"],
@@ -162,7 +167,7 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
 
-        const { canAddSerialEvents } = useUserRole();
+        const { canAddSerialEvents, loggedInUser } = useUserRole();
 
         onMounted(() => {
             fetchCountries();
@@ -181,7 +186,27 @@ export default defineComponent({
             fetchCountries();
         });
 
-        const name = ref([]);
+        const { languageTags } = useLanguageTags();
+        watch(() => languageTags.value, () => {
+            presetName();
+        });
+
+        const presetName = async () => {
+            if (props.presetName) {
+                const tag = languageTags.value.find(
+                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                );
+                if (tag) {
+                    const mc: MultilingualContent[] = [
+                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                    ];
+                    name.value = mc;
+                    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
+                }
+            }
+        };
+
+        const name = ref<any[]>([]);
         const nameAbbreviation = ref([]);
         const description = ref([]);
         const keywords = ref([]);
