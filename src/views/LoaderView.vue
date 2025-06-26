@@ -578,6 +578,10 @@ export default defineComponent({
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
                         submissionDTO.value = newJournalPublication;
                         authorshipSelectionRef.value!.show();
+                    } else if (error.response.data.message === "unauthorizedPublicationEditAttemptByEmployeeMessage") {
+                        errorMessage.value = i18n.t("allAuthorsUnmanagedMessage");
+                        snackbar.value = true;
+                        loading.value = false;
                     }
                 });
             } else if (loadingProceedingsPublication.value) {
@@ -611,6 +615,10 @@ export default defineComponent({
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
                         submissionDTO.value = newProceedingsPublication;
                         authorshipSelectionRef.value!.show();
+                    } else if (error.response.data.message === "unauthorizedPublicationEditAttemptByEmployeeMessage") {
+                        errorMessage.value = i18n.t("allAuthorsUnmanagedMessage");
+                        snackbar.value = true;
+                        loading.value = false;
                     }
                 });
             }
@@ -625,7 +633,12 @@ export default defineComponent({
         const deduplicate = (oldDocumentId: number, deleteOldDocument: boolean) => {
             if (deleteOldDocument) {
                 documentIdToDelete.value = oldDocumentId;
-                finishLoad();
+                ImportService.prepareOldDocumentForOverwriting(
+                    documentIdToDelete.value,
+                    selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+                ).then(() => {
+                    finishLoad();
+                });
             } else {
                 markAsLoadedAndFetchNext(oldDocumentId, deleteOldDocument);
             }

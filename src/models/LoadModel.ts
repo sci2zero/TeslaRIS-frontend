@@ -80,6 +80,7 @@ export interface OrganisationUnitLoad {
 export interface LoadingConfiguration {
     smartLoadingByDefault: boolean;
     loadedEntitiesAreUnmanaged: boolean;
+    priorityLoading: boolean;
 }
 
 export interface FormatDescription {

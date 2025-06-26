@@ -15,18 +15,60 @@
                             v-model:model-value="selectedOrganisationUnit"
                             required
                             disable-submission
-                            only-harvestable-institutions
+                            :only-harvestable-institutions="searchHarvestableInstitutions"
                         ></organisation-unit-autocomplete-search>
+                    </v-col>
+                    <v-col cols="2">
+                        <v-checkbox
+                            v-model="searchHarvestableInstitutions"
+                            :label="$t('showOnlyHarvestableLabel')"
+                            hide-details
+                        />
                     </v-col>
                 </v-row>
                 <loading-configuration-form
                     v-if="isInstitutionalEditor || (isAdmin && selectedOrganisationUnit.value > 0)"
                     :top-level-institution-id="selectedOrganisationUnit.value"
                 />
+                <v-row
+                    v-if="isAdmin && selectedOrganisationUnit.value > 0 && researcherSelection"
+                    class="d-flex flex-row justify-center"
+                >
+                    <v-col cols="8">
+                        <person-autocomplete-search
+                            v-model="selectedPersons"
+                            required multiple
+                            disable-submission
+                            :institution-id="selectedOrganisationUnit.value"
+                        />
+                    </v-col>
+                    <v-col cols="2">
+                        <v-btn
+                            density="compact"
+                            class="mt-5"
+                            @click="researcherSelection = false">
+                            {{ $t("importForAllAuthors") }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row
+                    v-if="isAdmin && selectedOrganisationUnit.value > 0 && !researcherSelection"
+                    class="d-flex flex-row justify-center">
+                    <v-col cols="2">
+                        <v-btn
+                            density="compact"
+                            class="bottom-spacer"
+                            @click="researcherSelection = true">
+                            {{ $t("selectAuthorsForImport") }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
 
                 <v-tabs
                     v-model="currentTab"
+                    class="mt-15"
                     color="deep-purple-accent-4"
+                    bg-color="blue-grey-lighten-5"
                     align-tabs="center">
                     <v-tab value="externalSources">
                         {{ $t("externalSourcesLabel") }}
@@ -162,11 +204,15 @@ import { useInterval } from "@/composables/useInterval";
 import { useUserRole } from "@/composables/useUserRole";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import LoadingConfigurationForm from "@/components/import/LoadingConfigurationForm.vue";
+import OrganisationUnitService from "@/services/OrganisationUnitService";
+import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
+import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
+import { useRouter } from "vue-router";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm },
+    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
@@ -177,6 +223,10 @@ export default defineComponent({
         const i18n = useI18n();
 
         const files = ref<File[]>([]);
+        const searchHarvestableInstitutions = ref(true);
+        const researcherSelection = ref(false);
+        const mustHarvestUsingResearcherIds = ref(false);
+        const router = useRouter();
 
         const startDate = ref();
         const endDate = ref();
@@ -186,6 +236,7 @@ export default defineComponent({
         const newDocumentsHarvested = ref(0);
 
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
+        const selectedPersons = ref<{title: string, value: number}[]>([]);
         const { isAdmin, isInstitutionalEditor, isResearcher } = useUserRole();
 
         const requiredFieldsDescription = ref("");
@@ -194,7 +245,7 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
 
-            fetchNumberOfHarvestedDocuments();
+            fetchNumberOfHarvestedDocuments(true);
 
             ImportService.canPerformHarvest().then(response => {
                 canPerformHarvest.value = response.data;
@@ -204,7 +255,9 @@ export default defineComponent({
         });
 
         watch(selectedOrganisationUnit, () => {
+            selectedPersons.value.splice(0);
             fetchNumberOfHarvestedDocuments();
+            fetchOU();
         });
 
         watch(files, () => {
@@ -220,12 +273,35 @@ export default defineComponent({
             return files.value.some(file => file.name.endsWith(".csv"));
         };
 
-        const fetchNumberOfHarvestedDocuments = () => {
+        const fetchNumberOfHarvestedDocuments = (checkPriorityLoad: boolean = false) => {
             ImportService.getHarvestedDocumentsCount(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
             ).then(response => {
                 numberOfHarvestedDocuments.value = response.data;
+                
+                if (checkPriorityLoad) {
+                    checkForPriorityLoading();
+                }
             });
+        };
+
+        const fetchOU = () => {
+            if (selectedOrganisationUnit.value.value > 0) {
+                OrganisationUnitService.readOU(selectedOrganisationUnit.value.value)
+                .then(response => {
+                    mustHarvestUsingResearcherIds.value = (!response.data.scopusAfid && !response.data.openAlexId);
+                });
+            }
+        };
+
+        const checkForPriorityLoading = () => {
+            if (isResearcher.value) {
+                LoadingConfigurationService.fetchLoadingConfiguration().then(response => {
+                    if (response.data.priorityLoading && numberOfHarvestedDocuments.value > 0) {
+                        router.push({ name: "loader" });
+                    }
+                })
+            }
         };
 
         // Fetch number of imported documents 10 seconds
@@ -288,7 +364,9 @@ export default defineComponent({
             uploadBibliographicFiles,
             isCSVFileSelected,
             requiredFieldsDescription,
-            supportedFieldsDescription
+            supportedFieldsDescription,
+            searchHarvestableInstitutions,
+            selectedPersons, researcherSelection
         };
     },
 });

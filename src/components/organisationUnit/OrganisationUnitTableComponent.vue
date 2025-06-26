@@ -16,7 +16,7 @@
     </v-btn>
 
     <table-export-modal
-        v-if="enableExport && loggedInUser"
+        v-if="enableExport && isUserLoggedIn"
         :export-entity="ExportEntity.ORGANISATION_UNIT"
         :export-ids="(selectedOUs.map(orgUnit => orgUnit.databaseId) as number[])"
         :disabled="selectedOUs.length === 0"
@@ -33,7 +33,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalOUs"
-        :show-select="isAdmin"
+        :show-select="isAdmin || (enableExport && isUserLoggedIn)"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -42,7 +42,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="isAdmin">
+                <td v-if="isAdmin || (enableExport && isUserLoggedIn)">
                     <v-checkbox
                         v-model="selectedOUs"
                         :value="row.item"
@@ -171,7 +171,7 @@ export default defineComponent({
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
         const superOULabel = computed(() => i18n.t("superOULabel"));
 
-        const { isAdmin, loggedInUser } = useUserRole();
+        const { isAdmin, isUserLoggedIn } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
@@ -285,7 +285,7 @@ export default defineComponent({
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
-            startMetadataComparison, ExportEntity, loggedInUser
+            startMetadataComparison, ExportEntity, isUserLoggedIn
         };
     }
 });

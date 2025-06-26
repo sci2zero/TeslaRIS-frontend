@@ -181,12 +181,23 @@
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
                 <h1>{{ $t("publicationsLabel") }}</h1>
+                <div
+                    v-if="canEdit"
+                    class="mb-5 mt-5">
+                    <add-publication-menu compact />
+                </div>
                 <publication-table-component
                     :publications="publications"
                     :total-publications="totalPublications"
                     enable-export
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    :endpoint-body-parameters="
+                        {
+                            allowedTypes: publicationTypes?.map(publicationType => publicationType.value),
+                            institutionId: organisationUnit.id,
+                            commissionId: null
+                        }"
                     @switch-page="switchPublicationsPage">
                 </publication-table-component>
             </v-tabs-window-item>
@@ -269,7 +280,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -306,11 +317,13 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu },
     setup() {
         const currentTab = ref("");
 
@@ -367,6 +380,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
         const { isAdmin } = useUserRole();
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -604,7 +618,7 @@ export default defineComponent({
             organisationUnit, currentTab,
             publications, totalPublications,
             employees, totalEmployees,
-            switchPublicationsPage,
+            switchPublicationsPage, publicationTypes,
             switchEmployeesPage, isAdmin,
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,

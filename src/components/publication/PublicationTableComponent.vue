@@ -24,7 +24,7 @@
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <table-export-modal
-        v-if="enableExport && loggedInUser"
+        v-if="enableExport && isUserLoggedIn"
         :export-entity="exportEntity"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"
@@ -43,7 +43,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            :show-select="isAdmin || allowSelection || enableExport"
+            :show-select="isAdmin || allowSelection || (enableExport && isUserLoggedIn)"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -64,7 +64,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in properties.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || allowSelection || enableExport">
+                        <td v-if="isAdmin || allowSelection || (enableExport && isUserLoggedIn)">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -308,7 +308,7 @@ export default defineComponent({
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
 
-        const { isAdmin, isCommission, isInstitutionalLibrarian, isHeadOfLibrary, loggedInUser } = useUserRole();
+        const { isAdmin, isCommission, isInstitutionalLibrarian, isHeadOfLibrary, loggedInUser, isUserLoggedIn } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
@@ -484,7 +484,7 @@ export default defineComponent({
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
             ApplicableEntityType, removeResearchOutputs, ExportEntity,
-            getConcretePublicationType
+            getConcretePublicationType, isUserLoggedIn
         };
     }
 });
