@@ -39,9 +39,9 @@
 <script lang="ts">
 import RegistrationFirstStep from '@/components/user/registration/RegistrationFirstStep.vue';
 import RegistrationSecondStep from '@/components/user/registration/RegistrationSecondStep.vue';
-
 import { defineComponent, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 
 export default defineComponent({
     name: "RegisterView",

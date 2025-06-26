@@ -6,7 +6,7 @@ import PersonService from "@/services/PersonService";
 
 
 export function useUserRole() {
-    const userRole = ref(UserService.provideUserRole());
+    const userRole = ref<string | undefined>(UserService.provideUserRole());
     const isUserBoundToOU = computed(() => userRole.value && userRole.value !== "ADMIN" && userRole.value !== "RESEARCHER");
     
     const isAdmin = computed(() => userRole.value === "ADMIN");
@@ -46,7 +46,11 @@ export function useUserRole() {
 
     watch(() => loginStore.userLoggedIn, () => {
         userRole.value = UserService.provideUserRole();
-    })
+    });
+
+    watch(() => loginStore.explicitlyLoggedOut, () => {
+        userRole.value = undefined;
+    });
 
     return {
         userRole, canUserAddPublications,

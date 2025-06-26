@@ -51,6 +51,10 @@ export class ImportService extends BaseService {
           return super.sendRequest(axios.patch, `load/skip${institutionId ? "?institutionId=" + institutionId : ""}`);
     }
 
+    async prepareOldDocumentForOverwriting(oldDocumentId: number, institutionId: number | null = null): Promise<AxiosResponse<void>> {
+          return super.sendRequest(axios.patch, `load/prepare-for-overwriting/${oldDocumentId}${institutionId ? "?institutionId=" + institutionId : ""}`);
+    }
+
     async markCurrentAsLoaded(
         institutionId: number | null = null,
         oldDocumentId: number | null = null,

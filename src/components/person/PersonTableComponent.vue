@@ -21,7 +21,7 @@
     </v-btn>
     
     <table-export-modal
-        v-if="enableExport && loggedInUser"
+        v-if="enableExport && isUserLoggedIn"
         :export-entity="ExportEntity.PERSON"
         :export-ids="(selectedPersons.map(person => person.databaseId) as number[])"
         :disabled="selectedPersons.length === 0"
@@ -46,7 +46,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPersons"
-            :show-select="isAdmin"
+            :show-select="isAdmin || (enableExport && isUserLoggedIn)"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -67,7 +67,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin">
+                        <td v-if="isAdmin || (enableExport && isUserLoggedIn)">
                             <v-checkbox
                                 v-model="selectedPersons"
                                 :value="item"
@@ -209,7 +209,7 @@ export default defineComponent({
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
         const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
 
-        const { isAdmin, isInstitutionalEditor, isCommission, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isCommission, isUserLoggedIn } = useUserRole();
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
@@ -338,7 +338,7 @@ export default defineComponent({
         };
 
         return {
-            selectedPersons, headers, notifications, loggedInUser,
+            selectedPersons, headers, notifications, isUserLoggedIn,
             refreshTable, isAdmin, deleteSelection, ExportEntity,
             tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
             localiseDate, startPublicationComparison, isCommission,

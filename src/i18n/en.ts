@@ -890,5 +890,10 @@ export default {
     emailUpdateConfirmationSuccessMessage: "Email change successfully confirmed. You will be redirected to the login page shortly.",
     emailUpdateConfirmationFailedMessage: "Email change failed.",
     updateExternalIndicatorConfigurationLabel: "External indicator showcase",
-    mismatchedPublicationTypesMessage: "Document type does not match the form document type, harvested document type is: "
+    mismatchedPublicationTypesMessage: "Document type does not match the form document type, harvested document type is: ",
+    showOnlyHarvestableLabel: "Show only with institution identifiers",
+    priorityLoadingLabel: "Priority loading",
+    allAuthorsUnmanagedMessage: "No author from this publication has a research account tied to your institution. Skip this document.",
+    importForAllAuthors: "Scan for all authors",
+    selectAuthorsForImport: "Select authors for scanning"
 }

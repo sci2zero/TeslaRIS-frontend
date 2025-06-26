@@ -1,11 +1,14 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center ml-15">
-            <v-col cols="12" sm="6" md="4">
+            <v-col cols="12" sm="4" md="2">
                 <v-checkbox v-model="smartLoadingByDefault" :label="$t('smartLoadingByDefaultLabel')" />
             </v-col>
-            <v-col cols="12" sm="6" md="4">
+            <v-col cols="12" sm="4" md="2">
                 <v-checkbox v-model="loadedEntitiesAreUnamanged" :label="$t('loadedEntitiesAreUnamangedLabel')" />
+            </v-col>
+            <v-col cols="12" sm="4" md="2">
+                <v-checkbox v-model="priorityLoading" :label="$t('priorityLoadingLabel')" />
             </v-col>
         </v-row>
     </v-form>
@@ -32,6 +35,7 @@ export default defineComponent({
 
         const smartLoadingByDefault = ref(false);
         const loadedEntitiesAreUnamanged = ref(false);
+        const priorityLoading = ref(false);
 
         const canSave = ref(false);
 
@@ -47,6 +51,7 @@ export default defineComponent({
             ).then(response => {
                 smartLoadingByDefault.value = response.data.smartLoadingByDefault;
                 loadedEntitiesAreUnamanged.value = response.data.loadedEntitiesAreUnmanaged;
+                priorityLoading.value = response.data.priorityLoading;
                 canSave.value = true;
             });
         };
@@ -57,7 +62,11 @@ export default defineComponent({
             }
         });
 
-        watch([smartLoadingByDefault, loadedEntitiesAreUnamanged], () => {
+        watch([
+            smartLoadingByDefault,
+            loadedEntitiesAreUnamanged,
+            priorityLoading
+        ], () => {
             if (!canSave.value) {
                 return;
             }
@@ -65,7 +74,8 @@ export default defineComponent({
             LoadingConfigurationService.saveLoadingConfiguration(
                 {
                     loadedEntitiesAreUnmanaged: loadedEntitiesAreUnamanged.value,
-                    smartLoadingByDefault: smartLoadingByDefault.value
+                    smartLoadingByDefault: smartLoadingByDefault.value,
+                    priorityLoading: priorityLoading.value
                 },
                 isAdmin.value ? props.topLevelInstitutionId : null
             ).then(() => {
@@ -74,7 +84,7 @@ export default defineComponent({
         });
 
         return {
-            isFormValid,
+            isFormValid, priorityLoading,
             smartLoadingByDefault,
             loadedEntitiesAreUnamanged
         };

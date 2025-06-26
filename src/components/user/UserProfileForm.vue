@@ -37,10 +37,9 @@
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
                     :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator) ? requiredSelectionRules : []"
-                    :readonly="isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator"
+                    :readonly="true"
                     :no-data-text="$t('noDataMessage')"
                     return-object
-                    @update:search="searchOUs($event)"
                 ></v-autocomplete>
             </v-col>
             <v-col v-else cols="0" md="6" />
@@ -118,17 +117,14 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import LanguageService from "@/services/LanguageService";
-import OrganisationUnitService from "@/services/OrganisationUnitService";
 import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue";
 import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageResponse, MultilingualContent } from "@/models/Common";
-import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { UserNotificationPeriod, type UserUpdateRequest } from "@/models/UserModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import UserService from "@/services/UserService";
-import lodash from "lodash";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/notificationPeriod";
 import { useRouter } from "vue-router";
@@ -236,28 +232,6 @@ export default defineComponent({
             })
         };
 
-        const searchOUs = lodash.debounce((input: string) => {
-            if (input.length >= 3) {
-                let params = "";
-                const tokens = input.split(" ");
-                tokens.forEach((token) => {
-                    params += `tokens=${token}&`
-                });
-                params += "page=0&size=5";
-                OrganisationUnitService.searchOUs(params, null, null).then((response) => {
-                    const listOfOUs: { title: string, value: number }[] = [];
-                    response.data.content.forEach((organisationUnit: OrganisationUnitIndex) => {
-                        if (i18n.locale.value === "sr") {
-                            listOfOUs.push({title: organisationUnit.nameSr, value: organisationUnit.databaseId});
-                        } else {
-                            listOfOUs.push({title: organisationUnit.nameOther, value: organisationUnit.databaseId});
-                        }
-                    })
-                    organisationUnits.value = listOfOUs;
-                });
-            }
-        }, 300);
-
         const filterOUs = (): boolean => {
             return true;
         };
@@ -301,6 +275,8 @@ export default defineComponent({
 
                 UserService.invalidateCaches();
                 loginStore.emitReloadUsername();
+
+                i18n.locale.value = selectedLanguage.value.title.toLocaleLowerCase();
             }).catch((error: AxiosError<any, any>) => {
                 snackbarText.value = i18n.t(error.response?.data.message);
                 snackbar.value = true;
@@ -326,7 +302,7 @@ export default defineComponent({
             changePassword, name, surname, selectedReferenceLanguage,
             organisationUnits, selectedOrganisationUnit, 
             email, showOldPassword, languages, selectedLanguage, 
-            searchOUs, filterOUs, allowAccountTakeover, isInstitutionalEditor,
+            filterOUs, allowAccountTakeover, isInstitutionalEditor,
             updateUser, setNewPassword, selectedNotificationPeriod,
             emailFieldRules, requiredFieldRules, requiredSelectionRules,
             isFormValid, notificationPeriods, oldPassword, newPassword,

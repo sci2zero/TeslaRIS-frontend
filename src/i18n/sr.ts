@@ -916,5 +916,10 @@ export default {
     emailUpdateConfirmationSuccessMessage: "Promena email-a uspešno potvrđena, uskoro ćete biti preusmereni na stranicu za prijavu.",
     emailUpdateConfirmationFailedMessage: "Promena email-a nije uspela.",
     updateExternalIndicatorConfigurationLabel: "Prikaz spoljnih indikatora",
-    mismatchedPublicationTypesMessage: "Tip dokumenta se ne poklapa sa tipom forme, preuzet tip publikacije je: "
+    mismatchedPublicationTypesMessage: "Tip dokumenta se ne poklapa sa tipom forme, preuzet tip publikacije je: ",
+    showOnlyHarvestableLabel: "Prikaži samo one sa institucionim identifikatorima",
+    priorityLoadingLabel: "Prioritetan uvoz",
+    allAuthorsUnmanagedMessage: "Nijedan autor sa ove publikacije nema nalog istraživača vezan za vašu instituciju. Preskočite dokument.",
+    importForAllAuthors: "Skeniraj za sve autore",
+    selectAuthorsForImport: "Selektuj autore za skeniranje"
 }
