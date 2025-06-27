@@ -921,5 +921,6 @@ export default {
     priorityLoadingLabel: "Prioritetan uvoz",
     allAuthorsUnmanagedMessage: "Nijedan autor sa ove publikacije nema nalog istraživača vezan za vašu instituciju. Preskočite dokument.",
     importForAllAuthors: "Skeniraj za sve autore",
-    selectAuthorsForImport: "Selektuj autore za skeniranje"
+    selectAuthorsForImport: "Selektuj autore za skeniranje",
+    addSubUnitLabel: "Dodaj podjedinicu"
 }

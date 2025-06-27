@@ -895,5 +895,6 @@ export default {
     priorityLoadingLabel: "Priority loading",
     allAuthorsUnmanagedMessage: "No author from this publication has a research account tied to your institution. Skip this document.",
     importForAllAuthors: "Scan for all authors",
-    selectAuthorsForImport: "Select authors for scanning"
+    selectAuthorsForImport: "Select authors for scanning",
+    addSubUnitLabel: "Add sub-unit"
 }

@@ -87,3 +87,9 @@ export interface FormatDescription {
     a: string;
     b: string;
 }
+
+export interface AuthorCentricInstitutionHarvestRequest {
+    institutionId: number;
+    allAuthors: boolean;
+    authorIds: number[]
+}

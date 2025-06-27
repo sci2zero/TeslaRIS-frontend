@@ -26,6 +26,13 @@
         :endpoint-token-parameters="endpointTokenParameters">
     </table-export-modal>
 
+    <add-sub-unit-modal 
+        v-if="topLevelInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
+        class="mt-3"
+        :institution-id="topLevelInstitutionId"
+        @update="notifyUserAndRefreshTable"
+    />
+
     <v-data-table-server
         v-model="selectedOUs"
         :sort-by="tableOptions.sortBy"
@@ -131,10 +138,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 import { isEqual } from 'lodash';
+import AddSubUnitModal from './AddSubUnitModal.vue';
+
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
-    components: { LocalizedLink, TableExportModal },
+    components: { LocalizedLink, TableExportModal, AddSubUnitModal },
     props: {
         organisationUnits: {
             type: Array<OrganisationUnitIndex>,
@@ -155,7 +164,11 @@ export default defineComponent({
         endpointTokenParameters: {
             type: Array<string>,
             default: []
-        }
+        },
+        topLevelInstitutionId: {
+            type: Number,
+            default: -1
+        },
     },
     emits: ["switchPage"],
     setup(_, {emit}) {
@@ -171,7 +184,7 @@ export default defineComponent({
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
         const superOULabel = computed(() => i18n.t("superOULabel"));
 
-        const { isAdmin, isUserLoggedIn } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isUserLoggedIn } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
@@ -280,12 +293,24 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
+        const notifyUserAndRefreshTable = (success: boolean) => {
+            if (success) {
+                addNotification(i18n.t("savedMessage"));
+            } else {
+                addNotification(i18n.t("genericErrorMessage"));
+            }
+
+            refreshTable(tableOptions.value);
+        };
+
         return {
             selectedOUs, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
-            startMetadataComparison, ExportEntity, isUserLoggedIn
+            startMetadataComparison, ExportEntity,
+            isUserLoggedIn, isInstitutionalEditor,
+            notifyUserAndRefreshTable
         };
     }
 });

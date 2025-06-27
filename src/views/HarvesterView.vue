@@ -31,7 +31,7 @@
                     :top-level-institution-id="selectedOrganisationUnit.value"
                 />
                 <v-row
-                    v-if="isAdmin && selectedOrganisationUnit.value > 0 && researcherSelection"
+                    v-if="((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && researcherSelection"
                     class="d-flex flex-row justify-center"
                 >
                     <v-col cols="8">
@@ -39,6 +39,7 @@
                             v-model="selectedPersons"
                             required multiple
                             disable-submission
+                            only-harvestable
                             :institution-id="selectedOrganisationUnit.value"
                         />
                     </v-col>
@@ -52,7 +53,7 @@
                     </v-col>
                 </v-row>
                 <v-row
-                    v-if="isAdmin && selectedOrganisationUnit.value > 0 && !researcherSelection"
+                    v-if="((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && !researcherSelection"
                     class="d-flex flex-row justify-center">
                     <v-col cols="2">
                         <v-btn
@@ -208,6 +209,7 @@ import OrganisationUnitService from "@/services/OrganisationUnitService";
 import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
 import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
 import { useRouter } from "vue-router";
+import { type AuthorCentricInstitutionHarvestRequest } from "@/models/LoadModel";
 
 
 export default defineComponent({
@@ -249,6 +251,10 @@ export default defineComponent({
 
             ImportService.canPerformHarvest().then(response => {
                 canPerformHarvest.value = response.data;
+                if (isInstitutionalEditor.value && !response.data) {
+                    mustHarvestUsingResearcherIds.value = true;
+                    canPerformHarvest.value = true;
+                }
             });
 
             startInterval();
@@ -310,7 +316,35 @@ export default defineComponent({
         const startHarvest = () => {
             startLoading();
 
-            ImportService.startHarvest(startDate.value, endDate.value, selectedOrganisationUnit.value.value).then(response => {
+            if (!mustHarvestUsingResearcherIds.value && !researcherSelection.value) {
+                regularIdentifierHarvest();
+            } else {
+                authorCentricInstitutionHarvest();
+            }
+            
+        };
+
+        const regularIdentifierHarvest = () => {
+            ImportService.startHarvest(
+                startDate.value, endDate.value,
+                selectedOrganisationUnit.value.value
+            ).then(response => {
+                finishLoading(response.data);
+            }).catch((error) => {
+                handleError(error.response.status);
+            });
+        };
+
+        const authorCentricInstitutionHarvest = () => {
+            const request: AuthorCentricInstitutionHarvestRequest = {
+                authorIds: selectedPersons.value.map(person => person.value),
+                allAuthors: mustHarvestUsingResearcherIds.value && !researcherSelection.value,
+                institutionId: selectedOrganisationUnit.value.value
+            }
+
+            ImportService.startAuthorCentricInstitutionHarvest(
+                startDate.value, endDate.value, request
+            ).then(response => {
                 finishLoading(response.data);
             }).catch((error) => {
                 handleError(error.response.status);

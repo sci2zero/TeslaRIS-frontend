@@ -96,6 +96,10 @@ export default defineComponent({
         onlyHarvestableInstitutions: {
             type: Boolean,
             default: false
+        },
+        onlyIndependentInstitutions: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -147,7 +151,8 @@ export default defineComponent({
                         params,
                         props.forPersonId,
                         props.topLevelInstitutionId,
-                        props.onlyHarvestableInstitutions
+                        props.onlyHarvestableInstitutions,
+                        props.onlyIndependentInstitutions
                     ).then((response) => {
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
                             title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,

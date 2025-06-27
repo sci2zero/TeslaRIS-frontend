@@ -6,7 +6,7 @@
                 :label="(label ? $t(label) : (multiple ? $t('personListLabel') : $t('personLabel'))) + (required ? '*' : '')"
                 :items="persons"
                 :custom-filter="((): boolean => true)"
-                :rules="requiredSelectionRules"
+                :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
                 :no-data-text="$t('noDataMessage')"
                 :multiple="multiple"
                 return-object
@@ -83,6 +83,10 @@ export default defineComponent({
         label: {
             type: String,
             default: ""
+        },
+        onlyHarvestable: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -102,7 +106,7 @@ export default defineComponent({
             sendContentToParent();
         });
         
-        const { requiredSelectionRules } = useValidationUtils();
+        const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
         const searchPersons = lodash.debounce((input: string) => {
             if (input.includes("|")) {
@@ -115,7 +119,11 @@ export default defineComponent({
                     params += `tokens=${token}&`
                 });
                 params += "page=0&size=5";
-                PersonService.searchResearchersFromInstitution(params, false, props.institutionId).then((response) => {
+                PersonService.searchResearchersFromInstitution(
+                    params, false,
+                    props.institutionId,
+                    props.onlyHarvestable
+                ).then((response) => {
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value === "sr") {
@@ -164,7 +172,7 @@ export default defineComponent({
             persons, selectedPerson, searchPersons,
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedPerson, hasSelection,
-            PersonSubmissionForm
+            PersonSubmissionForm, requiredMultiSelectionRules
         };
     }
 });

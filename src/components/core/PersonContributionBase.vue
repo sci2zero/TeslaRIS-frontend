@@ -418,6 +418,10 @@ export default defineComponent({
                     );
                 });
 
+                if (props.basic) {
+                    enterExternalOU.value = false;
+                }
+
                 selectedAffiliations.value.splice(0);
                 if(props.basic) {
                     selectLatestAffiliation();
