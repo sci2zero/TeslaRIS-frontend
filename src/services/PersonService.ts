@@ -22,8 +22,8 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
   }
 
-  async searchResearchersFromInstitution(tokens: string, strict: boolean, institutionId: number): Promise<AxiosResponse<Page<PersonIndex>>> {
-    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}&institutionId=${institutionId}`);
+  async searchResearchersFromInstitution(tokens: string, strict: boolean, institutionId: number, harvestable: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}&institutionId=${institutionId}&harvestable=${harvestable}`);
   }
 
   async findResearcherByImportIdentifier(identifier: string): Promise<AxiosResponse<PersonIndex | null>> {

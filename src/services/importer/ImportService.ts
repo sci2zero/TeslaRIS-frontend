@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { FormatDescription, JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
+import type { AuthorCentricInstitutionHarvestRequest, FormatDescription, JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import type { Page } from "@/models/Common";
@@ -21,6 +21,10 @@ export class ImportService extends BaseService {
   
     async startHarvest(dateFrom: string, dateTo: string, institutionId: number = 0): Promise<AxiosResponse<number>> {
         return super.sendRequest(axios.get, `import-common/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}`);
+    }
+
+    async startAuthorCentricInstitutionHarvest(dateFrom: string, dateTo: string, request: AuthorCentricInstitutionHarvestRequest): Promise<AxiosResponse<number>> {
+        return super.sendRequest(axios.post, `import-common/author-centric-for-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}`, request);
     }
 
     async uploadBibiographicFiles(files: File[]): Promise<AxiosResponse<number>> {

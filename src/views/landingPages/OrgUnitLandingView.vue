@@ -234,13 +234,14 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                <div v-if="totalSubUnits > 0">
+                <div class="mt-5">
                     <h1>{{ $t("subUnitsLabel") }}</h1>
                     <v-row>
                         <v-col>
                             <organisation-unit-table-component
                                 :organisation-units="subUnits"
                                 :total-o-us="totalSubUnits"
+                                :top-level-institution-id="organisationUnit.id"
                                 @switch-page="switchSubUnitsPage">
                             </organisation-unit-table-component>
                         </v-col>

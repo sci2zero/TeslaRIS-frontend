@@ -32,8 +32,8 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
 
-  async searchOUs(tokens: string, forPersonId: number | null, topLevelInstitutionId: number | null, onlyHarvestableInstitutions: boolean | null = null): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
-    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${onlyHarvestableInstitutions ? ("&onlyReturnOnesWhichCanHarvest=" + onlyHarvestableInstitutions) : ""}`);
+  async searchOUs(tokens: string, forPersonId: number | null, topLevelInstitutionId: number | null, onlyHarvestableInstitutions: boolean | null = null, onlyIndependentInstitutions: boolean | null = null): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${onlyHarvestableInstitutions ? ("&onlyReturnOnesWhichCanHarvest=" + onlyHarvestableInstitutions) : ""}${onlyIndependentInstitutions ? ("&onlyIndependent=" + onlyIndependentInstitutions) : ""}`);
   }
 
   async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
@@ -65,6 +65,10 @@ export class OrganisationUnitService extends BaseService {
 
   async createOURelation(relation: OrganisationUnitRelationRequest): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.post, "organisation-unit-relation", relation, OrganisationUnitService.idempotencyKey);
+  }
+
+  async addSubUnit(institutionId: number, subUnitId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.post, `organisation-unit-relation/${institutionId}/${subUnitId}`, {}, OrganisationUnitService.idempotencyKey);
   }
 
   async updateOURelation(relation: OrganisationUnitRelationRequest, relationId: number): Promise<AxiosResponse<void>> {

@@ -80,11 +80,12 @@ export default defineComponent({
         const returnOnlyUnclassifiedEntities = ref(true);
         const tableRef = ref<typeof EventTableComponent>();
 
-        const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+        const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
             loading.value = true;
+            search(searchParams.value);
         });
 
         watch([returnSerialEvents, returnOnlyInstitutionRelatedEntities, returnOnlyUnclassifiedEntities], () => {
@@ -102,7 +103,8 @@ export default defineComponent({
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
 
-            if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+            if (returnOnlyInstitutionRelatedEntities.value && !isUserBoundToOU.value) {
+                loading.value = false;
                 return;
             }
 
