@@ -21,7 +21,7 @@
     </v-btn>
     
     <table-export-modal
-        v-if="enableExport && isUserLoggedIn"
+        v-if="enableExport"
         :export-entity="ExportEntity.PERSON"
         :export-ids="(selectedPersons.map(person => person.databaseId) as number[])"
         :disabled="selectedPersons.length === 0"
@@ -46,7 +46,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPersons"
-            :show-select="isAdmin || (enableExport && isUserLoggedIn)"
+            :show-select="isAdmin || enableExport"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -67,7 +67,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || (enableExport && isUserLoggedIn)">
+                        <td v-if="isAdmin || enableExport">
                             <v-checkbox
                                 v-model="selectedPersons"
                                 :value="item"
@@ -84,9 +84,14 @@
                             <span v-if="item.employmentsSr.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
                                 {{ displayTextOrPlaceholder(item.employmentsSr) }}
                             </span>
-                            <localized-link v-for="(employment, index) in item.employmentsSr.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
-                                {{ `${employment}; ` }}
-                            </localized-link>
+                            <span v-for="(employment, index) in item.employmentsSr.split('; ')" v-else :key="index">
+                                <localized-link
+                                    v-if="item.employmentInstitutionsId[index] !== -1"
+                                    :to="'organisation-units/' + item.employmentInstitutionsId[index]">
+                                    {{ `🏢${employment.trim()}; ` }}
+                                </localized-link>
+                                <span v-else>{{ `${employment.trim()};` }}</span>
+                            </span>
                         </td>
                         <td v-else>
                             <span v-if="item.employmentsOther.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">

@@ -71,7 +71,7 @@ export default defineComponent({
                 props.publicationForLoading.title.forEach(title => {
                     parameters.value += `titles=${title.content}&`;
                 });
-                parameters.value += `doi=${props.publicationForLoading.doi}&scopusId=${props.publicationForLoading.scopusId}`;
+                parameters.value += `doi=${props.publicationForLoading.doi}&scopusId=${props.publicationForLoading.scopusId}&openAlexId=${props.publicationForLoading.openAlexId}`;
                 fetchPotentialMatches();
             }
         });

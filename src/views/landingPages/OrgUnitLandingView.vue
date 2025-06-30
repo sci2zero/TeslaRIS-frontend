@@ -180,18 +180,22 @@
         >
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
-                <h1>{{ $t("publicationsLabel") }}</h1>
+                <search-bar-component
+                    class="mt-5"
+                    @search="clearSortAndPerformPublicationSearch($event)"
+                />
                 <div
                     v-if="canEdit"
                     class="mb-5 mt-5">
                     <add-publication-menu compact />
                 </div>
                 <publication-table-component
+                    ref="publicationsRef"
                     :publications="publications"
                     :total-publications="totalPublications"
                     enable-export
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
-                    :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`, publicationSearchParams]"
                     :endpoint-body-parameters="
                         {
                             allowedTypes: publicationTypes?.map(publicationType => publicationType.value),
@@ -203,21 +207,35 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
                 <!-- Employees -->
-                <h1>{{ $t("employeesLabel") }}</h1>
+                <search-bar-component
+                    class="mt-5"
+                    @search="clearSortAndPerformPersonSearch($event)"
+                />
                 <person-table-component
+                    ref="employeesRef"
                     :persons="employees"
                     :total-persons="totalEmployees"
                     :employment-institution-id="organisationUnit?.id"
                     enable-export
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
-                    :endpoint-token-parameters="[`${organisationUnit?.id}`]"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
                     @delete="fetchEmployees(true)">
                 </person-table-component>
 
                 <div v-if="totalAlumni > 0">
                     <h1>{{ $t("alumniLabel") }}</h1>
-                    <person-table-component :persons="alumni" :total-persons="totalAlumni" is-alumni-table @switch-page="switchAlumniPage"></person-table-component>
+                    <person-table-component
+                        ref="alumniRef"
+                        :persons="alumni"
+                        :total-persons="totalAlumni"
+                        is-alumni-table
+                        :employment-institution-id="organisationUnit?.id"
+                        enable-export
+                        :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
+                        :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
+                        @switch-page="switchAlumniPage">
+                    </person-table-component>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
@@ -320,11 +338,12 @@ import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicat
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
+import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent },
     setup() {
         const currentTab = ref("");
 
@@ -352,16 +371,17 @@ export default defineComponent({
         const publicationsSize = ref(1);
         const publicationsSort = ref("");
         const publicationsDirection = ref("");
+        const publicationSearchParams = ref("tokens=*");
 
         const employeesPage = ref(0);
         const employeesSize = ref(1);
         const employeesSort = ref("");
         const employeesDirection = ref("");
-
         const alumniPage = ref(0);
         const alumniSize = ref(1);
         const alumniSort = ref("");
         const alumniDirection = ref("");
+        const personSearchParams = ref("tokens=*");
 
         const subUnitsPage = ref(0);
         const subUnitsSize = ref(1);
@@ -382,6 +402,10 @@ export default defineComponent({
         const loginStore = useLoginStore();
         const { isAdmin } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
+
+        const employeesRef = ref<typeof PersonTableComponent>();
+        const alumniRef = ref<typeof PersonTableComponent>();
+        const publicationsRef = ref<typeof PublicationTableComponent>();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -477,7 +501,7 @@ export default defineComponent({
         const fetchPublications = () => {
             return DocumentPublicationService.findPublicationsForOrganisationUnit(
                 parseInt(currentRoute.params.id as string),
-                `page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`
+                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`
             ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements;
@@ -487,7 +511,7 @@ export default defineComponent({
         const fetchEmployees = (fetchAlumni: boolean) => {
             return PersonService.findEmployeesForOU(
                 parseInt(currentRoute.params.id as string),
-                `page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`,
+                `${personSearchParams.value}&page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`,
                 fetchAlumni
             ).then((response) => {
                 if (fetchAlumni) {
@@ -498,6 +522,26 @@ export default defineComponent({
                     totalEmployees.value = response.data.totalElements;
                 }
             });
+        };
+
+        const clearSortAndPerformPersonSearch = (tokenParams: string) => {
+            personSearchParams.value = tokenParams;
+            employeesRef.value?.setSortAndPageOption([], 1);
+            alumniRef.value?.setSortAndPageOption([], 1);
+            employeesPage.value = 0;
+            employeesSort.value = "";
+            employeesDirection.value = "";
+            fetchEmployees(false);
+            fetchEmployees(true);
+        };
+
+        const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
+            publicationSearchParams.value = tokenParams;
+            publicationsRef.value?.setSortAndPageOption([], 1);
+            publicationsPage.value = 0;
+            publicationsSort.value = "";
+            publicationsDirection.value = "";
+            fetchPublications();
         };
 
         const setStartTab = () => {
@@ -618,7 +662,7 @@ export default defineComponent({
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
-            employees, totalEmployees,
+            employees, totalEmployees, publicationsRef,
             switchPublicationsPage, publicationTypes,
             switchEmployeesPage, isAdmin,
             searchKeyword, relationChain,
@@ -632,7 +676,11 @@ export default defineComponent({
             ouIndicators, StatisticsType, loginStore,
             ExportableEndpointType, updateSuccess,
             ExternalIndicatorsConfigurationForm,
-            ApplicableEntityType, fetchIndicators
+            ApplicableEntityType, fetchIndicators,
+            clearSortAndPerformPersonSearch,
+            clearSortAndPerformPublicationSearch,
+            employeesRef, alumniRef, personSearchParams,
+            publicationSearchParams
         };
 }})
 

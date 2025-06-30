@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, type PropType } from 'vue';
+import { defineComponent, onMounted, ref, watch, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
 import GenericCrudModal from './GenericCrudModal.vue';
@@ -64,9 +64,21 @@ export default defineComponent({
             emit("update", description);
         };
 
-        watch([() => props.description, i18n.locale], () => {
-            descriptionDisplay.value = returnCurrentLocaleContent(props.description) as string;
+        onMounted(() => {
+            displayDescription();
         });
+
+        watch([() => props.description, i18n.locale], () => {
+            displayDescription();
+        });
+
+        const displayDescription = () => {
+            if (!props.description) {
+                return;
+            }
+            
+            descriptionDisplay.value = returnCurrentLocaleContent(props.description) as string;
+        };
 
         return { 
             emitToParent, returnCurrentLocaleContent,
