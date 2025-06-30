@@ -245,8 +245,13 @@ export default defineComponent({
                     });
 
                     if (props.allowExternalAssociate) {
+                        let personName = input;
+                        if (personName.startsWith("(") && personName.endsWith(")")) {
+                            personName = personName.substring(1, -1);
+                        }
+
                         listOfPersons.push({
-                            title: "Nije u listi (" + input.replaceAll('(', '').replaceAll(')', '') + ")",
+                            title: i18n.t("notInListLabel", [personName]),
                             value: 0
                         });
                     }

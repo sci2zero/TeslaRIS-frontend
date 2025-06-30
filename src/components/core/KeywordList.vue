@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import GenericCrudModal from './GenericCrudModal.vue';
 import type { MultilingualContent } from '@/models/Common';
 import { watch } from 'vue';
@@ -53,6 +53,10 @@ export default defineComponent({
         const parsedKeywords = ref<string[]>([]);
 
         const i18n = useI18n();
+
+        onMounted(() => {
+            displayKeywords();
+        });
         
         const searchKeyword = (keyword: string) => {
             emit("searchKeyword", keyword)
@@ -63,8 +67,16 @@ export default defineComponent({
         }
 
         watch(() => props.keywords, () => {
-            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
+            displayKeywords();
         });
+
+        const displayKeywords = () => {
+            if (!props.keywords) {
+                return;
+            }
+
+            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
+        };
 
         watch(i18n.locale, () => {
             parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];

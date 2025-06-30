@@ -16,7 +16,7 @@
     </v-btn>
 
     <table-export-modal
-        v-if="enableExport && isUserLoggedIn"
+        v-if="enableExport"
         :export-entity="ExportEntity.ORGANISATION_UNIT"
         :export-ids="(selectedOUs.map(orgUnit => orgUnit.databaseId) as number[])"
         :disabled="selectedOUs.length === 0"
@@ -40,7 +40,7 @@
         :headers="headers"
         item-value="row"
         :items-length="totalOUs"
-        :show-select="isAdmin || (enableExport && isUserLoggedIn)"
+        :show-select="isAdmin || enableExport"
         return-object
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 10, 25, 50]"
@@ -49,7 +49,7 @@
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td v-if="isAdmin || (enableExport && isUserLoggedIn)">
+                <td v-if="isAdmin || enableExport">
                     <v-checkbox
                         v-model="selectedOUs"
                         :value="row.item"

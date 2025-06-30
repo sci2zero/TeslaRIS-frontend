@@ -24,7 +24,7 @@
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <table-export-modal
-        v-if="enableExport && isUserLoggedIn"
+        v-if="enableExport"
         :export-entity="exportEntity"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"
@@ -43,7 +43,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalPublications"
-            :show-select="isAdmin || allowSelection || (enableExport && isUserLoggedIn)"
+            :show-select="isAdmin || allowSelection || enableExport"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -64,7 +64,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in properties.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || allowSelection || (enableExport && isUserLoggedIn)">
+                        <td v-if="isAdmin || allowSelection || enableExport">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"

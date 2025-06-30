@@ -896,5 +896,7 @@ export default {
     allAuthorsUnmanagedMessage: "No author from this publication has a research account tied to your institution. Skip this document.",
     importForAllAuthors: "Scan for all authors",
     selectAuthorsForImport: "Select authors for scanning",
-    addSubUnitLabel: "Add sub-unit"
+    addSubUnitLabel: "Add sub-unit",
+    notInListLabel: "Not in list ({0}).",
+    copiedLabel: "Copied to clipboard."
 }
