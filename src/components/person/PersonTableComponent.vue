@@ -19,6 +19,13 @@
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
+
+    <add-employment-modal 
+        v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
+        class="mt-3 mb-1"
+        :institution-id="employmentInstitutionId"
+        @update="notifyUserAndRefreshTable">
+    </add-employment-modal>
     
     <table-export-modal
         v-if="enableExport"
@@ -30,13 +37,6 @@
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters">
     </table-export-modal>
-
-    <add-employment-modal 
-        v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
-        class="mt-3"
-        :institution-id="employmentInstitutionId"
-        @update="notifyUserAndRefreshTable">
-    </add-employment-modal>
     
     <div ref="tableWrapper">
         <v-data-table-server

@@ -19,16 +19,16 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-if="editorList.length > 0" value="editors">
+                        <v-tab v-show="editorList.length > 0" value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab v-if="associateEditorList.length > 0" value="associateEditors">
+                        <v-tab v-show="associateEditorList.length > 0" value="associateEditors">
                             {{ $t("associateEditorsLabel") }}
                         </v-tab>
-                        <v-tab v-if="reviewerList.length > 0" value="reviewers">
+                        <v-tab v-show="reviewerList.length > 0" value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-if="scientificBoardMemberList.length > 0" value="scientificBoardMembers">
+                        <v-tab v-show="scientificBoardMemberList.length > 0" value="scientificBoardMembers">
                             {{ $t("scientificBoardMembersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -122,6 +122,8 @@ export default defineComponent({
             associateEditorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.ASSOCIATE_EDITOR]);
             reviewerList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.REVIEWER]);
             scientificBoardMemberList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER]);
+        
+            selectFirstNonEmptyTab();
         });
 
         const updateOrderInParentList = () => {
@@ -132,6 +134,7 @@ export default defineComponent({
             scientificBoardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
 
             updateContributionPositions(indexes);
+            selectFirstNonEmptyTab();
         };
 
         const updateContributionPositions = (indexes: number[]) => {
@@ -148,6 +151,20 @@ export default defineComponent({
 
         const sendToParent = (contributions: any[]) => {
             emit("update", contributions);
+        };
+
+        const selectFirstNonEmptyTab = () => {
+            if (editorList.value.length > 0) {
+                currentTab.value = "editors";
+            } else if (associateEditorList.value.length > 0) {
+                currentTab.value = "associateEditors";
+            } else if (reviewerList.value.length > 0) {
+                currentTab.value = "reviewers";
+            } else if (scientificBoardMemberList.value.length > 0) {
+                currentTab.value = "scientificBoardMembers";
+            } else {
+                currentTab.value = "";
+            }
         };
 
         return {

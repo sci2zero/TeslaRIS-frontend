@@ -152,3 +152,11 @@ label {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.action-section {
+    max-height: 50px;
+}
+
+.move-up {
+    margin-top: -30px;
+}

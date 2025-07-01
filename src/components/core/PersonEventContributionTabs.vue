@@ -183,6 +183,8 @@ export default defineComponent({
             chairList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.CHAIR]);
             audienceList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.AUDIENCE]);
             demonstratorList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.DEMONSTRATOR]);
+
+            selectFirstNonEmptyTab();
         });
         
         const sendToParent = (contributions: any[]) => {
@@ -201,6 +203,7 @@ export default defineComponent({
             demonstratorList.value.forEach(contribution => indexes.push(contribution.id as number));
 
             updateContributionPositions(indexes);
+            selectFirstNonEmptyTab();
         };
 
         const updateContributionPositions = (indexes: number[]) => {
@@ -213,6 +216,28 @@ export default defineComponent({
             localContributions.value = indexes
                 .map(id => contributionMap.get(id))
                 .filter((c): c is NonNullable<typeof c> => !!c);
+        };
+
+        const selectFirstNonEmptyTab = () => {
+            if (orgBoardChairList.value.length > 0) {
+                currentTab.value = "orgBoardChair";
+            } else if (orgBoardMemberList.value.length > 0) {
+                currentTab.value = "orgBoardMembers";
+            } else if (reviewerList.value.length > 0) {
+                currentTab.value = "reviewers";
+            } else if (progBoardMemberList.value.length > 0) {
+                currentTab.value = "progBoardMembers";
+            } else if (speakerList.value.length > 0) {
+                currentTab.value = "speakers";
+            } else if (panelistList.value.length > 0) {
+                currentTab.value = "panelists";
+            } else if (chairList.value.length > 0) {
+                currentTab.value = "chair";
+            } else if (audienceList.value.length > 0) {
+                currentTab.value = "audience";
+            } else if (demonstratorList.value.length > 0) {
+                currentTab.value = "demonstrators";
+            }
         };
 
         return {

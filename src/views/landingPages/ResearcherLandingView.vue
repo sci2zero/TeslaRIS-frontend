@@ -205,6 +205,13 @@
                     @click="performNavigation('massInstitutionAssignment')">
                     {{ $t("massInstitutionAssignmentLabel") }}
                 </v-btn>
+                <v-btn
+                    v-if="isResearcher && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('importer')">
+                    {{ $t("importerLabel") }}
+                </v-btn>
             </div>
         </div>
 
@@ -234,9 +241,6 @@
             v-model="currentTab"
         >
             <v-tabs-window-item value="publications">
-                <h1 class="mt-5">
-                    {{ $t("publicationsLabel") }}
-                </h1>
                 <div class="mb-5 mt-5">
                     <add-publication-menu compact />
                     <v-btn

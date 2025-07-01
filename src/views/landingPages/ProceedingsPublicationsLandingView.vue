@@ -51,7 +51,6 @@
                         <basic-info-loader v-if="!proceedingsPublication" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
                                     {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
@@ -137,9 +136,10 @@
             </v-col>
         </v-row>
 
-        <publication-badge-section
-            :preloaded-doi="proceedingsPublication?.doi"
-            :document-id="proceedingsPublication?.id"
+        <document-action-box
+            ref="actionsRef"
+            :doi="proceedingsPublication?.doi"
+            :document-id="parseInt(currentRoute.params.id as string)"
         />
 
         <tab-content-loader v-if="!proceedingsPublication" layout="list" />
@@ -184,10 +184,17 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                </div>
+                <indicators-section 
+                    :indicators="documentIndicators" 
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]" 
+                    :entity-id="proceedingsPublication?.id" 
+                    :entity-type="ApplicableEntityType.DOCUMENT" 
+                    :can-edit="canEdit"
+                    show-statistics
+                    :has-attached-files="proceedingsPublication?.fileItems && proceedingsPublication?.fileItems.length > 0"
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
                 <v-btn v-if="proceedingsPublication?.documentDate" density="compact" class="ml-5" @click="assessProceedingsPublication">
@@ -247,25 +254,25 @@ import ProceedingsPublicationUpdateForm from '@/components/publication/update/Pr
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { type DocumentAssessmentClassification, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
-import CitationSelector from '@/components/publication/CitationSelector.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
+import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -298,7 +305,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
-        const citationRef = ref<typeof CitationSelector>();
+        const actionsRef = ref<typeof DocumentActionBox>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -364,7 +371,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-            citationRef.value?.fetchCitations();
+            actionsRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -440,10 +447,14 @@ export default defineComponent({
             });
         };
 
+        const {createDocumentClassification, createDocumentIndicator} = useDocumentAssessmentActions();
+        
         const createClassification = (documentClassification: DocumentAssessmentClassification) => {
-            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
-                fetchClassifications();
-            });
+            createDocumentClassification(documentClassification, () => fetchClassifications())
+        };
+
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
         return {
@@ -457,7 +468,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
-            currentRoute, citationRef
+            currentRoute, actionsRef, fetchIndicators, createIndicator
         };
 }})
 

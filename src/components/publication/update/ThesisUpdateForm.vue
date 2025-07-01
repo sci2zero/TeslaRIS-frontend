@@ -71,6 +71,7 @@
                 <v-select
                     v-model="selectedResearchArea"
                     :label="$t('researchAreaLabel')"
+                    :placeholder="$t('researchAreaLabel')"
                     :items="researchAreasSelectable"
                     return-object
                 ></v-select>

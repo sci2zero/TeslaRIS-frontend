@@ -51,7 +51,6 @@
                         <basic-info-loader v-if="!patent" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="patent?.number">
                                     {{ $t("patentNumberLabel") }}:
                                 </div>
@@ -104,6 +103,12 @@
                 </v-card>
             </v-col>
         </v-row>
+
+        <document-action-box
+            ref="actionsRef"
+            :doi="patent?.doi"
+            :document-id="parseInt(currentRoute.params.id as string)"
+        />
 
         <publication-badge-section
             :preloaded-doi="patent?.doi"
@@ -160,6 +165,7 @@
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit"
                     show-statistics
+                    :has-attached-files="patent?.fileItems && patent?.fileItems.length > 0"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -213,7 +219,6 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import CitationSelector from '@/components/publication/CitationSelector.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { ApplicableEntityType } from '@/models/Common';
@@ -224,11 +229,13 @@ import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
+import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
+import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, CitationSelector, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
     setup() {
         const currentTab = ref("contributions");
 
@@ -255,7 +262,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
-        const citationRef = ref<typeof CitationSelector>();
+        const actionsRef = ref<typeof DocumentActionBox>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -319,7 +326,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-            citationRef.value?.fetchCitations();
+            actionsRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -381,18 +388,14 @@ export default defineComponent({
             fetchDisplayData();
         };
 
-        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
-            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
-                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
-                    fetchIndicators();
-                });
-            });
+        const {createDocumentClassification, createDocumentIndicator} = useDocumentAssessmentActions();
+        
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            createDocumentClassification(documentClassification, () => fetchClassifications())
         };
 
-        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
-            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
-                fetchClassifications();
-            });
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
         return {
@@ -401,7 +404,7 @@ export default defineComponent({
             languageTagMap, searchKeyword, goToURL, canEdit, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
-            StatisticsType, documentIndicators, citationRef, currentRoute,
+            StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
             createIndicator, fetchIndicators
         };

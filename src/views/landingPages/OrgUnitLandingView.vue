@@ -188,6 +188,12 @@
                     v-if="canEdit"
                     class="mb-5 mt-5">
                     <add-publication-menu compact />
+                    <v-btn
+                        v-if="isInstitutionalEditor && canEdit"
+                        class="ml-2" color="primary" density="compact"
+                        @click="performNavigation('importer')">
+                        {{ $t("importerLabel") }}
+                    </v-btn>
                 </div>
                 <publication-table-component
                     ref="publicationsRef"
@@ -345,7 +351,7 @@ export default defineComponent({
     name: "OrgUnitLanding",
     components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent },
     setup() {
-        const currentTab = ref("");
+        const currentTab = ref("relations");
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -400,7 +406,7 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isInstitutionalEditor } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
 
         const employeesRef = ref<typeof PersonTableComponent>();
@@ -659,12 +665,16 @@ export default defineComponent({
             snackbar.value = true;
         };
 
+        const performNavigation = (pageName: string) => {
+            router.push({name: pageName});
+        };
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
             employees, totalEmployees, publicationsRef,
             switchPublicationsPage, publicationTypes,
-            switchEmployeesPage, isAdmin,
+            switchEmployeesPage, isAdmin, performNavigation,
             searchKeyword, relationChain,
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
@@ -680,7 +690,7 @@ export default defineComponent({
             clearSortAndPerformPersonSearch,
             clearSortAndPerformPublicationSearch,
             employeesRef, alumniRef, personSearchParams,
-            publicationSearchParams
+            publicationSearchParams, isInstitutionalEditor
         };
 }})
 

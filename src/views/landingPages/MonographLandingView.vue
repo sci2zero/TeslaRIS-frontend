@@ -51,7 +51,6 @@
                         <basic-info-loader v-if="!monograph" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="monograph?.monographType">
                                     {{ $t("monographTypeLabel") }}:
                                 </div>
@@ -151,9 +150,10 @@
             </v-col>
         </v-row>
 
-        <publication-badge-section
-            :preloaded-doi="monograph?.doi"
-            :document-id="monograph?.id"
+        <document-action-box
+            ref="actionsRef"
+            :doi="monograph?.doi"
+            :document-id="parseInt(currentRoute.params.id as string)"
         />
 
         <tab-content-loader v-if="!monograph" layout="sections" />
@@ -236,6 +236,7 @@
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit"
                     show-statistics
+                    :has-attached-files="monograph?.fileItems && monograph?.fileItems.length > 0"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -300,7 +301,6 @@ import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import CitationSelector from '@/components/publication/CitationSelector.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
@@ -308,12 +308,13 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
+import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
+import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, CitationSelector, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
     setup() {
         const currentTab = ref("contributions");
 
@@ -352,7 +353,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
-        const citationRef = ref<typeof CitationSelector>();
+        const actionsRef = ref<typeof DocumentActionBox>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -418,7 +419,7 @@ export default defineComponent({
                     researchAreaHierarchy.value = response.data;
                 });
             }
-            citationRef.value?.fetchCitations();
+            actionsRef.value?.fetchCitations();
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -531,22 +532,18 @@ export default defineComponent({
             fetchDisplayData();
         };
 
-        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
-            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
-                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
-                    fetchIndicators();
-                });
-            });
+        const {createDocumentClassification, createDocumentIndicator} = useDocumentAssessmentActions();
+        
+        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
+            createDocumentClassification(documentClassification, () => fetchClassifications())
         };
 
-        const createClassification = (documentClassification: DocumentAssessmentClassification) => {
-            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
-                fetchClassifications();
-            });
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
         return {
-            monograph, icon, citationRef,
+            monograph, icon, actionsRef,
             returnCurrentLocaleContent,
             languageTagMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
