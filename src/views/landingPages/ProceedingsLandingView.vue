@@ -52,10 +52,6 @@
                         <basic-info-loader v-if="!proceedings" :citation-button="false" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <!-- <citation-selector
-                                    ref="citationRef"
-                                    :document-id="parseInt(currentRoute.params.id as string)">
-                                </citation-selector> -->
                                 <div v-if="proceedings?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>
@@ -219,10 +215,17 @@
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                </div>
+                <indicators-section 
+                    :indicators="documentIndicators" 
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]" 
+                    :entity-id="proceedings?.id" 
+                    :entity-type="ApplicableEntityType.DOCUMENT" 
+                    :can-edit="canEdit"
+                    show-statistics
+                    :has-attached-files="proceedings?.fileItems && proceedings?.fileItems.length > 0"
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -233,7 +236,7 @@
 </template>
 
 <script lang="ts">
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -267,20 +270,20 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
+import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import { useUserRole } from '@/composables/useUserRole';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, StatisticsView, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, IndicatorsSection },
     setup() {
         const currentTab = ref("");
 
@@ -330,6 +333,10 @@ export default defineComponent({
 
             fetchProceedings(true);
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
+            fetchIndicators();
+        };
+
+        const fetchIndicators = () => {
             EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 documentIndicators.value = response.data;
             });
@@ -486,10 +493,18 @@ export default defineComponent({
             fetchDisplayData();
         };
 
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
+                    fetchIndicators();
+                });
+            });
+        };
+
         return {
-            proceedings, icon,
-            publications, event, currentTab,
-            totalPublications, switchPage,
+            proceedings, icon, fetchIndicators,
+            publications, event, currentTab, createIndicator,
+            totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseDate,
             languageTagMap, publicationSeriesType,
             searchKeyword, goToURL, canEdit, publisher,

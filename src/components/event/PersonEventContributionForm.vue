@@ -1,8 +1,16 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
+    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer contributions-box">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="false" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base
+                    :ref="(el) => (baseContributionRef[index] = el)"
+                    :basic="false"
+                    required
+                    allow-external-associate
+                    is-update
+                    :preset-contribution-value="input.contribution"
+                    @set-input="input.contribution = $event; sendContentToParent();"
+                />
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -60,19 +68,20 @@ export default defineComponent({
 
         onMounted(() => {
             if(props.presetContributions && props.presetContributions.length > 0) {
-                inputs.value = [];
+                inputs.value.splice(0);
                 props.presetContributions.forEach(contribution => {
-                    inputs.value.push({contribution: {
-                                                    personId: contribution.personId, 
-                                                    description: contribution.contributionDescription, 
-                                                    affiliationStatement: contribution.displayAffiliationStatement, 
-                                                    selectedOtherName: [
-                                                                contribution.personName?.firstname, 
-                                                                contribution.personName?.otherName, 
-                                                                contribution.personName?.lastname
-                                                            ],
-                                                    institutionIds: contribution.institutionIds
-                                                    }, 
+                    inputs.value.push({
+                        contribution: {
+                            personId: contribution.personId, 
+                            description: contribution.contributionDescription, 
+                            affiliationStatement: contribution.displayAffiliationStatement, 
+                            selectedOtherName: [
+                                        contribution.personName?.firstname, 
+                                        contribution.personName?.otherName, 
+                                        contribution.personName?.lastname
+                                    ],
+                            institutionIds: contribution.institutionIds
+                        }, 
                     eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType), value: contribution.eventContributionType},
                     id: contribution.id});
                 });
@@ -92,7 +101,7 @@ export default defineComponent({
         const removeInput = (index: number) => {
             inputs.value.splice(index, 1);
 
-            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+            baseContributionRef.value.filter((ref: any) => ref).forEach((ref: typeof PersonContributionBase) => {
                 ref.valueSet = false;
             });
 
@@ -104,10 +113,15 @@ export default defineComponent({
             inputs.value = [{contribution: {}, eventContributionType: {
                     title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER), 
                     value: EventContributionType.PROGRAMME_BOARD_MEMBER
-                }}];
-            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+                }
+            }];
+
+            baseContributionRef.value
+            .filter((ref: any) => ref)
+            .forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
+
             sendContentToParent();
         };
 

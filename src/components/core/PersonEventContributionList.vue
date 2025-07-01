@@ -11,7 +11,16 @@
             <h4 v-else>
                 <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong>
             </h4>
-            <p>{{ getTitleFromValueAutoLocale(contribution.eventContributionType) }}</p>
+            <div v-if="contribution.institutionIds?.length === 0">
+                <em>
+                    {{ returnCurrentLocaleContent(contribution.displayAffiliationStatement) }}
+                </em>
+            </div>
+            <div v-for="(mc, idx) in contribution.displayInstitutionNames" v-else :key="idx">
+                <em>
+                    {{ returnCurrentLocaleContent(mc) }}
+                </em>
+            </div>
             <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
         </div>
     </draggable>
@@ -24,6 +33,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/eventContributionType';
 import type { PersonEventContribution } from '@/models/EventModel';
 import { VueDraggableNext } from 'vue-draggable-next'
 import EventService from '@/services/EventService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -58,7 +68,11 @@ export default defineComponent({
             }
         };
 
-        return { getTitleFromValueAutoLocale, reorderContributors };
+        return {
+            getTitleFromValueAutoLocale,
+            reorderContributors,
+            returnCurrentLocaleContent
+        };
     },
 });
 </script>

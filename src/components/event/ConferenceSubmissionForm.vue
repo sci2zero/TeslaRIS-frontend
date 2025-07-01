@@ -1,5 +1,5 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
+    <v-form v-model="isFormInputValid" @submit.prevent>
         <v-row>
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
@@ -17,20 +17,20 @@
                     <v-row>
                         <v-col v-if="timePeriodInput" cols="3">
                             <date-picker
+                                ref="fromRef"
                                 v-model="dateFrom"
                                 :label="$t('fromLabel') + '*'"
                                 color="primary"
                                 required
-                                :additional-rules="dateRangeRule"
                             ></date-picker>
                         </v-col>
                         <v-col v-if="timePeriodInput" cols="3">
                             <date-picker
+                                ref="toRef"
                                 v-model="dateTo"
                                 :label="$t('toLabel') + '*'"
                                 color="primary"
                                 required
-                                :additional-rules="dateRangeRule"
                             ></date-picker>
                         </v-col>
                         <v-col v-if="!timePeriodInput" cols="6">
@@ -44,6 +44,9 @@
                             </v-btn>
                         </v-col>
                     </v-row>
+                    <p v-show="dateRangeError" class="mb-2 text-red">
+                        {{ dateRangeFormatError }}
+                    </p>
                 </div>
                 <v-row v-if="canAddSerialEvents" class="serial-event">
                     <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
@@ -157,7 +160,11 @@ export default defineComponent({
     },
     emits: ["create"],
     setup(props, { emit }) {
-        const isFormValid = ref(false);
+        const isFormInputValid = ref(false);
+        const manualValidationsPassed = ref(false);
+
+        const isFormValid = computed(() => isFormInputValid.value && manualValidationsPassed.value);
+
         const timePeriodInput = ref(false);
         const additionalFields = ref(false);
 
@@ -234,14 +241,26 @@ export default defineComponent({
         const { requiredFieldRules, confIdValidationRules, sourceOpenAlexIdValidationRules } = useValidationUtils();
 
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
-        const dateRangeRule = [
-            (value: string) => {
-                if (!dateFrom.value || !dateTo.value || !value) return true;
-                if (dateFrom.value > dateTo.value) return dateRangeFormatError.value;
+        const dateRangeError = ref(false);
 
-                return true;
+        watch([dateFrom, dateTo], () => {
+            const from = dateFrom.value;
+            const to = dateTo.value;
+
+            if (!from || !to) {
+                dateRangeError.value = false;
+                return;
             }
-        ];
+
+            if (from > to) {
+                dateRangeError.value = true;
+                manualValidationsPassed.value = false;
+                return;
+            }
+
+            dateRangeError.value = false;
+            manualValidationsPassed.value = true;
+        });
 
         const submit = (stayOnPage: boolean) => {
             if (!timePeriodInput.value) {
@@ -303,14 +322,14 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, additionalFields, snackbar,
+            isFormValid, isFormInputValid, additionalFields, snackbar,
             name, nameAbbreviation, description, keywords,
             dateFrom, dateTo, eventYear, countries, selectedCountry,
             place, conferenceNumber, entryFee, serialEvent, openAlexId,
-            requiredFieldRules, submit, timePeriodInput, dateRangeRule,
+            requiredFieldRules, submit, timePeriodInput, dateRangeFormatError,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
             confIdValidationRules, confId, uris, urisRef, canAddSerialEvents,
-            sourceOpenAlexIdValidationRules
+            sourceOpenAlexIdValidationRules, dateRangeError, manualValidationsPassed
         };
     }
 });

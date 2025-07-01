@@ -358,7 +358,7 @@ export default {
     updateMonographLabel: "Update Monograph",
     unknownBirthdateMessage: "Unknown birthdate",
     unknownDateMessage: "Unknown date",
-    importerLabel: "Data import",
+    importerLabel: "Results import",
     scanSourcesLabel: "Scan data sources",
     harvestDataLabel: "Harvest data",
     externalSourcesLabel: "External sources",

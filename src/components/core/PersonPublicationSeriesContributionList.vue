@@ -14,7 +14,16 @@
             </h4>
             
             <p>{{ contribution.dateFrom ? `${localiseDate(contribution.dateFrom)} - ${contribution.dateTo ? localiseDate(contribution.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}</p>
-            <p>{{ getTitleFromValueAutoLocale(contribution.contributionType) }}</p>
+            <div v-if="contribution.institutionIds?.length === 0">
+                <em>
+                    {{ returnCurrentLocaleContent(contribution.displayAffiliationStatement) }}
+                </em>
+            </div>
+            <div v-for="(mc, idx) in contribution.displayInstitutionNames" v-else :key="idx">
+                <em>
+                    {{ returnCurrentLocaleContent(mc) }}
+                </em>
+            </div>
             <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
         </div>
     </draggable>
@@ -28,6 +37,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/publicationSeriesContributio
 import { localiseDate } from '@/i18n/dateLocalisation';
 import { VueDraggableNext } from 'vue-draggable-next'
 import PublicationSeriesService from '@/services/PublicationSeriesService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -68,7 +78,8 @@ export default defineComponent({
 
         return {
             getTitleFromValueAutoLocale,
-            localiseDate, reorderContributors
+            localiseDate, reorderContributors,
+            returnCurrentLocaleContent
         };
     },
 });

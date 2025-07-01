@@ -74,7 +74,19 @@ export default defineComponent({
 
         const buildDisplayData = () => {
             content.value.splice(0);
-            statisticsEntityIndicators.value.sort((a, b) => -a.fromDate!.localeCompare(b.fromDate as string));
+            
+            statisticsEntityIndicators.value.sort((a, b) => {
+                const dateA = a.fromDate;
+                const dateB = b.fromDate;
+
+                if (!dateA && !dateB) return 0;
+                if (!dateA) return 1; // nulls go to the end
+                if (!dateB) return -1;
+
+                return -dateA.localeCompare(dateB);
+            });
+
+
             statisticsEntityIndicators.value.forEach(statisticsEntityIndicator => {
                 if (statisticsEntityIndicator.indicatorResponse.code === getIndicatorForTotalCount()) {
                     title.value = `${returnCurrentLocaleContent(statisticsEntityIndicator.indicatorResponse.title)}: ${statisticsEntityIndicator.numericValue}`;

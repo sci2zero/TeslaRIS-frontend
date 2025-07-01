@@ -214,7 +214,9 @@ export default defineComponent({
                 isCorrespondingContributor: false,
             }];
             
-            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+            baseContributionRef.value
+            .filter((ref: any) => ref)
+            .forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
 

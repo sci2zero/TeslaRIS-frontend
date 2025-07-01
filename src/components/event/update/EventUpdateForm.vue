@@ -1,5 +1,5 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
+    <v-form v-model="isFormInputValid" @submit.prevent>
         <v-row>
             <v-col cols="12">
                 <v-row>
@@ -24,7 +24,6 @@
                             :label="$t('fromLabel') + '*'"
                             color="primary"
                             required
-                            :additional-rules="dateRangeRule"
                         ></date-picker>
                     </v-col>
                     <v-col v-if="timePeriodInput" cols="3">
@@ -33,7 +32,6 @@
                             :label="$t('toLabel') + '*'"
                             color="primary"
                             required
-                            :additional-rules="dateRangeRule"
                         ></date-picker>
                     </v-col>
                     <v-col v-if="!timePeriodInput" cols="6">
@@ -47,6 +45,9 @@
                         </v-btn>
                     </v-col>
                 </v-row>
+                <p v-show="dateRangeError" class="mb-2 text-red">
+                    {{ dateRangeFormatError }}
+                </p>
                 <v-row>
                     <v-col>
                         <v-select
@@ -147,7 +148,10 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
-        const isFormValid = ref(false);
+        const isFormInputValid = ref(false);
+        const manualValidationsPassed = ref(false);
+
+        const isFormValid = computed(() => isFormInputValid.value && manualValidationsPassed.value);
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
@@ -220,14 +224,25 @@ export default defineComponent({
         } = useValidationUtils();
 
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
-        const dateRangeRule = [
-            (value: string) => {
-                if (!dateFrom.value || !dateTo.value || !value) return true;
-                if (dateFrom.value > dateTo.value) return dateRangeFormatError.value;
+        const dateRangeError = ref(false);
+        watch([dateFrom, dateTo], () => {
+            const from = dateFrom.value;
+            const to = dateTo.value;
 
-                return true;
+            if (!from || !to) {
+                dateRangeError.value = false;
+                return;
             }
-        ];
+
+            if (from > to) {
+                dateRangeError.value = true;
+                manualValidationsPassed.value = false;
+                return;
+            }
+
+            dateRangeError.value = false;
+            manualValidationsPassed.value = true;
+        });
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
@@ -298,13 +313,13 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
+            isFormInputValid, isFormValid, dateRangeError,
             name, nameAbbreviation, urisRef, refreshForm, uris, message, snackbar,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
-            requiredFieldRules, publicationSeriesExternalValidation, submit, dateRangeRule,
+            requiredFieldRules, publicationSeriesExternalValidation, submit,
             dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
             eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId,
-            openAlexId, sourceOpenAlexIdValidationRules
+            openAlexId, sourceOpenAlexIdValidationRules, dateRangeFormatError
         };
     }
 });

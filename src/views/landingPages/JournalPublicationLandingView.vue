@@ -51,7 +51,6 @@
                         <basic-info-loader v-if="!journalPublication" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
                                 <div v-if="journalPublication?.journalPublicationType">
                                     {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
@@ -149,9 +148,10 @@
             </v-col>
         </v-row>
 
-        <publication-badge-section
-            :preloaded-doi="journalPublication?.doi"
-            :document-id="journalPublication?.id"
+        <document-action-box
+            ref="actionsRef"
+            :doi="journalPublication?.doi"
+            :document-id="parseInt(currentRoute.params.id as string)"
         />
 
         <tab-content-loader v-if="!journalPublication" layout="sections" />
@@ -197,10 +197,17 @@
                 <attachment-section :document="journalPublication" :can-edit="canEdit" :proofs="journalPublication?.proofs" :file-items="journalPublication?.fileItems"></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="w-50 statistics">
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.VIEW"></statistics-view>
-                    <statistics-view :entity-indicators="documentIndicators" :statistics-type="StatisticsType.DOWNLOAD"></statistics-view>
-                </div>
+                <indicators-section 
+                    :indicators="documentIndicators" 
+                    :applicable-types="[ApplicableEntityType.DOCUMENT]" 
+                    :entity-id="journalPublication?.id" 
+                    :entity-type="ApplicableEntityType.DOCUMENT" 
+                    :can-edit="canEdit"
+                    show-statistics
+                    :has-attached-files="journalPublication?.fileItems && journalPublication?.fileItems.length > 0"
+                    @create="createIndicator"
+                    @updated="fetchIndicators"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
                 <v-btn v-if="journalPublication?.documentDate && canEdit" density="compact" class="ml-5" @click="assessJournalPublication">
@@ -256,25 +263,25 @@ import JournalPublicationUpdateForm from '@/components/publication/update/Journa
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
-import StatisticsView from '@/components/assessment/statistics/StatisticsView.vue';
+import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentAssessmentClassification, type DocumentIndicator } from '@/models/AssessmentModel';
 import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import { useLoginStore } from '@/stores/loginStore';
-import CitationSelector from '@/components/publication/CitationSelector.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
+import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, StatisticsView, PublicationUnbindButton, EntityClassificationView, CitationSelector, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox },
     setup() {
         const currentTab = ref("contributions");
 
@@ -305,7 +312,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
-        const citationRef = ref<typeof CitationSelector>();
+        const actionsRef = ref<typeof DocumentActionBox>();
 
         onMounted(() => {
             fetchDisplayData();
@@ -374,7 +381,7 @@ export default defineComponent({
                     languageTagMap.value.set(languageTag.id, languageTag);
                 })
             });
-            citationRef.value?.fetchCitations();
+            actionsRef.value?.fetchCitations();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -453,10 +460,14 @@ export default defineComponent({
             });
         };
 
+        const {createDocumentClassification, createDocumentIndicator} = useDocumentAssessmentActions();
+        
         const createClassification = (documentClassification: DocumentAssessmentClassification) => {
-            EntityClassificationService.createDocumentClassification(documentClassification).then(() => {
-                fetchClassifications();
-            });
+            createDocumentClassification(documentClassification, () => fetchClassifications())
+        };
+
+        const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
+            createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
         return {
@@ -464,13 +475,13 @@ export default defineComponent({
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, journal, JournalPublicationUpdateForm,
-            StatisticsType, documentIndicators, currentTab,
-            searchKeyword, goToURL, canEdit, localiseDate,
-            addAttachment, deleteAttachment, updateAttachment,
+            StatisticsType, documentIndicators, currentTab, createIndicator,
+            searchKeyword, goToURL, canEdit, localiseDate, fetchIndicators,
+            addAttachment, deleteAttachment, updateAttachment, actionsRef,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
-            createClassification, fetchClassifications, currentRoute, citationRef
+            createClassification, fetchClassifications, currentRoute
         };
 }})
 

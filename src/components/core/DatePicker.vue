@@ -35,112 +35,114 @@ import { ref, computed, watch, defineComponent } from "vue";
 import { VTextField } from "vuetify/lib/components/index.mjs";
 
 export default defineComponent({
-  name: "DatePicker",
-  props: {
-    label: {
-      type: String,
-      required: true,
+    name: "DatePicker",
+    props: {
+        label: {
+            type: String,
+            required: true,
+        },
+        color: {
+            type: String,
+            required: true,
+        },
+        required: {
+            type: Boolean,
+            default: false
+        },
+        inFuture: {
+            type: Boolean,
+            default: false
+        },
+        persistent: {
+            type: Boolean,
+            default: false
+        },
+        modelValue: {
+            type: Object as PropType<string | undefined>,
+            required: true,
+        },
+        additionalRules: {
+            type: Array as PropType<Array<(value: string) => string | true>>,
+            default: () => []
+        }
     },
-    color: {
-      type: String,
-      required: true,
-    },
-    required: {
-      type: Boolean,
-      default: false
-    },
-    inFuture: {
-      type: Boolean,
-      default: false
-    },
-    persistent: {
-      type: Boolean,
-      default: false
-    },
-    modelValue: {
-      type: Object as PropType<string | undefined>,
-      required: true,
-    },
-    additionalRules: {
-      type: Array as PropType<Array<(value: string) => string | true>>,
-      default: () => []
-    }
-  },
-  emits: ["update:modelValue"],
-  setup(props, { emit }) {
-    const isMenuOpen = ref(false);
-    const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
+    emits: ["update:modelValue"],
+    setup(props, { emit }) {
+        const isMenuOpen = ref(false);
+        const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
 
-    const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
+        const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
 
-    const fieldRef = ref<typeof VTextField>();
+        const fieldRef = ref<typeof VTextField>();
 
-    const toIsoString = (date: Date) => {
-      const pad = function(num : number) {
-              return (num < 10 ? '0' : '') + num;
+        const toIsoString = (date: Date) => {
+        const pad = function(num : number) {
+                return (num < 10 ? '0' : '') + num;
+            };
+
+            return date.getFullYear() +
+                '-' + pad(date.getMonth() + 1) +
+                '-' + pad(date.getDate()) +
+                'T' + pad(date.getHours()) +
+                ':' + pad(date.getMinutes()) +
+                ':' + pad(date.getSeconds());
         };
 
-        return date.getFullYear() +
-            '-' + pad(date.getMonth() + 1) +
-            '-' + pad(date.getDate()) +
-            'T' + pad(date.getHours()) +
-            ':' + pad(date.getMinutes()) +
-            ':' + pad(date.getSeconds());
-    };
 
+        const formattedDate = computed(() => {
+            return selectedDate.value ? new Date(selectedDate.value).toLocaleDateString("sr") : "";
+        });
 
-    const formattedDate = computed(() => {
-      return selectedDate.value ? new Date(selectedDate.value).toLocaleDateString("sr") : "";
-    });
+        const clearDate = () => {
+            selectedDate.value = undefined;
+        };
 
-    const clearDate = () => {
-      selectedDate.value = undefined;
-    };
+        watch(() => props.modelValue, (newDate) => {
+            if(newDate) {
+                selectedDate.value = new Date(newDate);
+            }
+        });
 
-    watch(() => props.modelValue, (newDate) => {
-      if(newDate) {
-        selectedDate.value = new Date(newDate);
-      }
-    });
+        watch(selectedDate, (newDate) => {
+            if (newDate) {
+                emit("update:modelValue", toIsoString(newDate));
+            } else {
+                emit("update:modelValue", "");
+            }
+            });
 
-    watch(selectedDate, (newDate) => {
-      if (newDate) {
-        emit("update:modelValue", toIsoString(newDate));
-      } else {
-        emit("update:modelValue", "");
-      }
-    });
+            const applyRules = () => {
+            const rules = [];
+            
+            if (props.required) {
+                rules.push(requiredFieldRules[0]);
+            }
 
-    const applyRules = () => {
-      const rules = [];
-      
-      if (props.required) {
-        rules.push(requiredFieldRules[0]);
-      }
+            if (props.inFuture) {
+                rules.push(dateTodayOrFutureRules[0]);
+            }
 
-      if (props.inFuture) {
-        rules.push(dateTodayOrFutureRules[0]);
-      }
+            if (props.additionalRules.length > 0) {
+                props.additionalRules.forEach(rule => {
+                rules.push(rule);
+                });
+            }
 
-      if (props.additionalRules.length > 0) {
-        rules.push(...props.additionalRules);
-      }
+            return rules;
+        };
 
-      return rules;
-    };
+        const validate = () => {
+            fieldRef.value?.validate?.();
+        };
 
-    const validate = () => {
-      fieldRef.value?.validate?.();
-    };
-
-    return {
-      isMenuOpen,
-      selectedDate,
-      formattedDate,
-      clearDate, applyRules,
-      fieldRef, validate
-    };
-  },
+        return {
+            isMenuOpen,
+            selectedDate,
+            formattedDate,
+            clearDate, applyRules,
+            fieldRef, validate
+        };
+    },
 });
 </script>
 

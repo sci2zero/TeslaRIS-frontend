@@ -1,8 +1,16 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer">
+    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer contributions-box">
         <v-row>
             <v-col cols="10">
-                <person-contribution-base :ref="(el) => (baseContributionRef[index] = el)" :basic="false" :preset-contribution-value="input.contribution" @set-input="input.contribution = $event; sendContentToParent();"></person-contribution-base>
+                <person-contribution-base
+                    :ref="(el) => (baseContributionRef[index] = el)"
+                    :basic="false"
+                    required
+                    allow-external-associate
+                    is-update
+                    :preset-contribution-value="input.contribution"
+                    @set-input="input.contribution = $event; sendContentToParent();"
+                />
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -113,7 +121,7 @@ export default defineComponent({
         const removeInput = (index: number) => {
             inputs.value.splice(index, 1);
 
-            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+            baseContributionRef.value.filter((ref: any) => ref).forEach((ref: typeof PersonContributionBase) => {
                 ref.valueSet = false;
             });
 
@@ -125,8 +133,11 @@ export default defineComponent({
             inputs.value = [{contribution: {}, contributionType: {
                     title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), 
                     value: PublicationSeriesContributionType.EDITOR
-                }}];
-            baseContributionRef.value.forEach((ref: typeof PersonContributionBase) => {
+                }
+            }];
+            baseContributionRef.value
+            .filter((ref: any) => ref)
+            .forEach((ref: typeof PersonContributionBase) => {
                 ref.clearInput();
             });
             sendContentToParent();

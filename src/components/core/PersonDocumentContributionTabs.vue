@@ -20,19 +20,19 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-if="authorList.length > 0" value="authors">
+                        <v-tab v-show="authorList.length > 0" value="authors">
                             {{ $t("authorsLabel") }}
                         </v-tab>
-                        <v-tab v-if="editorList.length > 0" value="editors">
+                        <v-tab v-show="editorList.length > 0" value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab v-if="reviewerList.length > 0" value="reviewers">
+                        <v-tab v-show="reviewerList.length > 0" value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-if="advisorList.length > 0" value="advisors">
+                        <v-tab v-show="advisorList.length > 0" value="advisors">
                             {{ $t("advisorsLabel") }}
                         </v-tab>
-                        <v-tab v-if="boardMemberList.length > 0" value="boardMembers">
+                        <v-tab v-show="boardMemberList.length > 0" value="boardMembers">
                             {{ $t("boardMembersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -140,6 +140,8 @@ export default defineComponent({
             reviewerList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.REVIEWER]);
             advisorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ADVISOR]);
             boardMemberList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.BOARD_MEMBER]);
+
+            selectFirstNonEmptyTab();
         });
 
         const sendToParent = (contributions: any[]) => {
@@ -155,6 +157,7 @@ export default defineComponent({
             boardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
 
             updateContributionPositions(indexes);
+            selectFirstNonEmptyTab();
         };
 
         const updateContributionPositions = (indexes: number[]) => {
@@ -167,6 +170,22 @@ export default defineComponent({
             localContributions.value = indexes
                 .map(id => contributionMap.get(id))
                 .filter((c): c is NonNullable<typeof c> => !!c);
+        };
+
+        const selectFirstNonEmptyTab = () => {
+            if (authorList.value.length > 0) {
+                currentTab.value = "authors";
+            } else if (editorList.value.length > 0) {
+                currentTab.value = "editors";
+            } else if (reviewerList.value.length > 0) {
+                currentTab.value = "reviewers";
+            } else if (advisorList.value.length > 0) {
+                currentTab.value = "advisors";
+            } else if (boardMemberList.value.length > 0) {
+                currentTab.value = "boardMembers";
+            } else {
+                currentTab.value = "";
+            }
         };
 
         return {

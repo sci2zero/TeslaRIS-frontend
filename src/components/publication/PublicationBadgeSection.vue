@@ -1,5 +1,5 @@
 <template>
-    <div v-show="preloadedDoi" class="pr-4 mt-5 mb-5">
+    <div v-show="preloadedDoi" class="pr-4">
         <div class="d-sr-only text-subtitle-1 font-weight-medium mb-3">
             {{ $t("externalMetricsLabel") }}
         </div>
@@ -208,6 +208,7 @@ export default defineComponent({
   background-color: #f8d7da;
   color: #842029;
 }
+
 </style>
 
 <style>

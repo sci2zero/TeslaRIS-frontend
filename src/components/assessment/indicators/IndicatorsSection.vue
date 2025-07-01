@@ -19,6 +19,7 @@
                     :statistics-type="StatisticsType.VIEW"
                 />
                 <statistics-view
+                    v-show="hasAttachedFiles"
                     ref="downloadsRef"
                     :entity-indicators="indicators"
                     :statistics-type="StatisticsType.DOWNLOAD"
@@ -74,6 +75,10 @@ export default defineComponent({
             default: false
         },
         showStatistics: {
+            type: Boolean,
+            default: false
+        },
+        hasAttachedFiles: {
             type: Boolean,
             default: false
         }
