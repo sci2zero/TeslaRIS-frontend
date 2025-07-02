@@ -19,6 +19,7 @@
 <script lang="ts">
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import { PublicationType } from '@/models/PublicationModel';
+import DocumentPublicationService from '@/services/DocumentPublicationService';
 import MetadataPrepopulationService from '@/services/MetadataPrepopulationService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { computed, defineComponent, type PropType, ref, watch } from 'vue';
@@ -47,9 +48,15 @@ export default defineComponent({
 
         const { doiValidationRules } = useValidationUtils();
 
-        watch(doi, () => {
+        watch(doi, async () => {
             errorMessage.value = "";
             if (doi.value && doiValidationRules[0](doi.value) === true) {
+                const isDoiInUse = await DocumentPublicationService.checkDoiUsage(doi.value);
+                if (isDoiInUse.data) {
+                    errorMessage.value = i18n.t("doiExistsError");
+                    return;
+                }
+
                 isLoading.value = true;
                 MetadataPrepopulationService.fetchMetadataForDoi(
                     doi.value
@@ -62,6 +69,9 @@ export default defineComponent({
                     }
 
                     emit("metadataFetched", response.data)
+                }).catch(() => {
+                    isLoading.value = false;
+                    errorMessage.value = i18n.t("unableToFetchMetadataMessage");
                 });
             }
         });

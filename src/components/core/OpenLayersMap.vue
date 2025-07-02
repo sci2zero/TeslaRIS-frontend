@@ -59,12 +59,18 @@ export default defineComponent({
 
         onMounted(() => {
             initializeMap(map.value);
+            drawMap(props.initCoordinates);
         });
 
         watch(() => props.initCoordinates, (position) => {
+            drawMap(position);
+        });
+
+        const drawMap = (position: number[]) => {
             if(position[0] === null || position[1] === null) {
                 return;
             }
+
             view.setCenter(fromLonLat(position));
             view.setZoom(15);
             setMarker(position);
@@ -72,7 +78,7 @@ export default defineComponent({
             currentPosition.value.lat = parseFloat(position.toString().split(",")[1]);
             currentPosition.value.lon = parseFloat(position.toString().split(",")[0]);
             reverseGeolocation(position);
-        });
+        }
 
         const initializeMap = (mapElement: any) => {
 
@@ -143,6 +149,8 @@ export default defineComponent({
                 }
 
                 address.value = removeLeadingAndTrailingCommas(address.value.replace(/undefined/g, ""));
+
+                console.log(address.value)
             });
         };
 

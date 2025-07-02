@@ -76,7 +76,7 @@ export default defineComponent({
                                 displayMode: false,
                             });
                             return DOMPurify.sanitize(renderedMath);
-                        } catch (error) {
+                        } catch (_error) {
                             return DOMPurify.sanitize(part);
                         }
                     } else {

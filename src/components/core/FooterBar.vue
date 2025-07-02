@@ -58,8 +58,8 @@ export default defineComponent(
                     { title: ouListLabel, path: "organisation-units"},
                     { title: scientificResultsListLabel, path: "scientific-results"},
                     { title: simpleSearchLabel, path: "advanced-search"},
-                    { title: contactLabel, path: "mailto:chenejac@uns.ac.rs"},
-                    // { title: feedbackLabel, path: "contact"},
+                    // { title: contactLabel, path: "mailto:chenejac@uns.ac.rs"},
+                    { title: contactLabel, path: "contact"}
                 ]);
 
 

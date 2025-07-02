@@ -354,7 +354,7 @@ export default defineComponent({
                 await MergeService.switchAllIndicatorsToOtherOrganisationUnit(id as number, transferTargetId as number);
 
                 router.push({ name: "deduplication", query: { tab: "organisationUnits" } });
-            } catch (error) {
+            } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification",
                     { name: returnCurrentLocaleContent(name) }

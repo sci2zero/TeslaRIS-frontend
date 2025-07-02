@@ -240,6 +240,7 @@ export interface ImaginaryPublicationAssessmentRequest {
     simulation: boolean;
     journalPublicationType: string;
     proceedingsPublicationType: string;
+    captchaToken: string;
 }
 
 export interface ImaginaryPublicationAssessmentResponse {

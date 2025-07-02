@@ -336,7 +336,7 @@ export default defineComponent({
                 await MergeService.switchAllClassificationsToOtherConference(id as number, transferTargetId as number);
 
                 router.push({ name: "deduplication", query: { tab: "events" } });
-            } catch (error) {
+            } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification", 
                     { name: returnCurrentLocaleContent(name) }

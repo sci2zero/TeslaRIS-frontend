@@ -76,8 +76,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/for-publisher/${publisherId}?${pageable}`);
   }
 
-  async findPublicationsForOrganisationUnit(organisationUnitId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `document/for-organisation-unit/${organisationUnitId}?${pageable}`);
+  async findPublicationsForOrganisationUnit(organisationUnitId: number, allowedTypes: PublicationType[], pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    let allowedTypesParam= "";
+    allowedTypes.forEach(allowedType => {
+      allowedTypesParam += `&allowedTypes=${allowedType}`;
+    });
+    
+    return super.sendRequest(axios.get, `document/for-organisation-unit/${organisationUnitId}?${pageable}${allowedTypesParam}`);
   }
 
   async createJournalPublication(body: JournalPublication, idempotencyKey: string | null = null): Promise<AxiosResponse<JournalPublication>> {
@@ -230,6 +235,10 @@ export class DocumentPublicationService extends BaseService {
 
   async checkIdentifierUsage(identifier: string, documentId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `document/identifier-usage/${documentId}?identifier=${encodeURIComponent(identifier)}`);
+  }
+
+  async checkDoiUsage(doi: string): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `document/doi-usage?doi=${encodeURIComponent(doi)}`);
   }
 
   async checkMonographIdentifierUsage(identifier: string, monographId: number): Promise<AxiosResponse<boolean>> {

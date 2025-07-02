@@ -687,12 +687,11 @@ export default defineComponent({
                 fetchPerson();
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-            } catch (error) {
+            } catch (_error) {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
             }
         };
-
 
         const selectPrimaryName = (personNameId: number) => {
             PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {

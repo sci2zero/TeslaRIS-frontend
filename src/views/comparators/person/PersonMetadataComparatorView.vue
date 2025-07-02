@@ -441,7 +441,7 @@ export default defineComponent({
                 await MergeService.switchAllIndicatorsToOtherPerson(id as number, transferTargetId as number);
 
                 router.push({ name: "deduplication", query: { tab: "persons" } });
-            } catch (error) {
+            } catch (_error) {
                 snackbarMessage.value =
                     isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
                 snackbar.value = true;

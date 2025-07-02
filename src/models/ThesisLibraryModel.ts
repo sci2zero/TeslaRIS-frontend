@@ -153,3 +153,8 @@ export enum ThesisFileSection {
     PRELIMINARY_SUPPLEMENTS = "PRELIMINARY_SUPPLEMENTS",
     COMMISSION_REPORTS = "COMMISSION_REPORTS"
 }
+
+export interface AttendanceCancellationRequest {
+    attendanceIdentifier: string,
+    captchaToken: string
+}

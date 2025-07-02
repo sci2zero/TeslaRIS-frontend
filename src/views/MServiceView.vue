@@ -299,11 +299,12 @@ export default defineComponent({
                 theoretical: publicationType.value === "theoretical",
                 simulation: publicationType.value === "simulation",
                 journalPublicationType: getNameFromOrdinal(JournalPublicationType, selectedJournalPublicationType.value.value) as string,
-                proceedingsPublicationType: getNameFromOrdinal(ProceedingsPublicationType, selectedProceedingsPublicationType.value.value) as string
+                proceedingsPublicationType: getNameFromOrdinal(ProceedingsPublicationType, selectedProceedingsPublicationType.value.value) as string,
+                captchaToken: token.value
             };
 
             if (isJournalPublication) {
-                AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest, token.value).then(response => {
+                AssessmentClassificationService.assessImaginaryJournalPublication(assessmentRequest).then(response => {
                     assessmentResponse.value = response.data;
                     token.value = "";
                     vueRecaptcha.value?.reset();
@@ -311,7 +312,7 @@ export default defineComponent({
 
                 fetchIFTableData((yearOfPublication.value as number) - 2, yearOfPublication.value as number);
             } else {
-                AssessmentClassificationService.assessImaginaryProceedingsPublication(assessmentRequest, token.value).then(response => {
+                AssessmentClassificationService.assessImaginaryProceedingsPublication(assessmentRequest).then(response => {
                     assessmentResponse.value = response.data;
                     token.value = "";
                     vueRecaptcha.value?.reset();

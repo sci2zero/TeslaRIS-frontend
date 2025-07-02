@@ -104,9 +104,13 @@ export default defineComponent({
         };
     
         const performAction = (notificationId: number, action: NotificationAction) => {
-            NotificationService.performAction(notificationId, action).then(() => {
+            NotificationService.performAction(notificationId, action).then((response) => {
                 removeHandledNotification(notificationId);
                 notificationCountStore.decrementCounter();
+                if (response.data.value) {
+                    console.log(response.data)
+                    router.push('/' + response.data.value);
+                }
             });
 
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
@@ -117,8 +121,10 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("events");
             } else if (action === NotificationAction.PERFORM_DOCUMENT_ASSESSMENT) {
                 decrementCounterAndNavigateToPage("scientificResults");
-            } else if (action === NotificationAction.PROMOTION_NOTIFICATION) {
+            } else if (action === NotificationAction.GO_TO_PROMOTIONS_PAGE) {
                 decrementCounterAndNavigateToPage("registryBookList");
+            } else if (action === NotificationAction.GO_TO_HARVESTER_PAGE) {
+                decrementCounterAndNavigateToPage("importer");
             }
         };
 

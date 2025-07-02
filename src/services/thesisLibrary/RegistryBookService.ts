@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { InstitutionPromotionCountsReport, PhdThesisPrePopulatedData, RegistryBookEntry } from "@/models/ThesisLibraryModel";
+import type { AttendanceCancellationRequest, InstitutionPromotionCountsReport, PhdThesisPrePopulatedData, RegistryBookEntry } from "@/models/ThesisLibraryModel";
 import { type Page } from "@/models/Common";
 import i18n from "@/i18n";
 
@@ -70,8 +70,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.patch, `registry-book/promote-all/${promotionId}`);
     }
 
-    async cancelAttendance(attendanceIdentifier: string, captchaToken: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `registry-book/cancel-attendance/${attendanceIdentifier}?token=${captchaToken}`);
+    async cancelAttendance(body: AttendanceCancellationRequest): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/cancel-attendance`, body);
     }
 
     async isAttendanceCancellable(attendanceIdentifier: string): Promise<AxiosResponse<boolean>> {
