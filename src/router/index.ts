@@ -102,6 +102,7 @@ import DocumentBackupView from "@/views/DocumentBackupView.vue";
 import LegacyRedirectView from "@/views/LegacyRedirectView.vue";
 import NotFound from "@/views/NotFound.vue";
 import EmailUpdateConfirmationView from "@/views/EmailUpdateConfirmationView.vue";
+import FeedbackForm from "@/components/core/FeedbackForm.vue";
 
 
 const roles = {
@@ -117,6 +118,9 @@ const roles = {
 
 
 const router = createRouter({
+    scrollBehavior(_to, _from, _savedPosition) {
+        return { top: 0 };
+    },
     history: createWebHistory(),
     routes: [
         {
@@ -150,6 +154,15 @@ const router = createRouter({
                     path: "",
                     name: "home",
                     component: HomeView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                },
+                {
+                    path: "contact",
+                    name: "contact",
+                    component: FeedbackForm,
                     meta: {
                         authenticated: false,
                         authorities: [],

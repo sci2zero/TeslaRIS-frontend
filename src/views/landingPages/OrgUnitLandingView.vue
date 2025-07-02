@@ -195,6 +195,14 @@
                         {{ $t("importerLabel") }}
                     </v-btn>
                 </div>
+                <v-select
+                    v-model="selectedPublicationTypes"
+                    :items="publicationTypes"
+                    :label="$t('typeOfPublicationLabel')"
+                    return-object
+                    class="publication-type-select mt-3"
+                    multiple
+                ></v-select>
                 <publication-table-component
                     ref="publicationsRef"
                     :publications="publications"
@@ -204,7 +212,7 @@
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, publicationSearchParams]"
                     :endpoint-body-parameters="
                         {
-                            allowedTypes: publicationTypes?.map(publicationType => publicationType.value),
+                            allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
                             institutionId: organisationUnit.id,
                             commissionId: null
                         }"
@@ -309,7 +317,7 @@ import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import type { DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
@@ -408,6 +416,7 @@ export default defineComponent({
         const loginStore = useLoginStore();
         const { isAdmin, isInstitutionalEditor } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
+        const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const employeesRef = ref<typeof PersonTableComponent>();
         const alumniRef = ref<typeof PersonTableComponent>();
@@ -428,6 +437,13 @@ export default defineComponent({
 
             OrganisationUnitService.getAllRelationsForSourceOU(parseInt(currentRoute.params.id as string)).then((response) => {
                 relations.value = response.data;
+            });
+
+            selectedPublicationTypes.value.splice(0);
+            publicationTypes.value?.forEach(publicationType => {
+                selectedPublicationTypes.value.push(
+                    {title: publicationType.title, value: publicationType.value}
+                );
             });
         });
 
@@ -507,6 +523,7 @@ export default defineComponent({
         const fetchPublications = () => {
             return DocumentPublicationService.findPublicationsForOrganisationUnit(
                 parseInt(currentRoute.params.id as string),
+                selectedPublicationTypes.value.map(publicationType => publicationType.value),
                 `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`
             ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
@@ -675,7 +692,7 @@ export default defineComponent({
             employees, totalEmployees, publicationsRef,
             switchPublicationsPage, publicationTypes,
             switchEmployeesPage, isAdmin, performNavigation,
-            searchKeyword, relationChain,
+            searchKeyword, relationChain, selectedPublicationTypes,
             returnCurrentLocaleContent, canEdit,
             updateKeywords, updateBasicInfo,
             snackbar, snackbarMessage, relations,
@@ -726,4 +743,9 @@ export default defineComponent({
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
     }
+
+    .publication-type-select {
+        max-width: 500px;
+    }
+
 </style>

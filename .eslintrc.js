@@ -14,7 +14,19 @@ module.exports = {
         ],
         "vue/html-closing-bracket-newline": "off",
         "vue/html-self-closing": "off",
-        "@typescript-eslint/no-explicit-any": "off", // Disable the rule after we figure how to bypass any for some types
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "args": "all",
+                "argsIgnorePattern": "^_",
+                "caughtErrors": "all",
+                "caughtErrorsIgnorePattern": "^_",
+                "destructuredArrayIgnorePattern": "^_",
+                "varsIgnorePattern": "^_",
+                "ignoreRestSiblings": true
+            }
+        ]
     },
     parserOptions: {
         parser: "@typescript-eslint/parser",

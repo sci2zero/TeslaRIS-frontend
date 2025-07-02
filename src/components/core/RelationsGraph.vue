@@ -93,7 +93,7 @@ export default defineComponent({
                 .enter().append('line')
                 .attr('class', 'link')
                 .attr('stroke-width', '3')
-                .attr('marker-end', (d: any, i: number) => `url(#arrow-${i})`)
+                .attr('marker-end', (_d: any, i: number) => `url(#arrow-${i})`)
                 .attr('stroke', (_: any, i: number) => linkColors[i]);
 
                         link.each(function(_: any, i: number) {
@@ -123,7 +123,7 @@ export default defineComponent({
                     .on("start", dragStarted)
                     .on("drag", dragged)
                     .on("end", dragEnded))
-                .on('click', (event: any, d: any) => seeOUPage(d.id));
+                .on('click', (_event: any, d: any) => seeOUPage(d.id));
     
             const nodeText = svg.selectAll('.node-text')
                 .data(uniqueNodes)
@@ -135,7 +135,7 @@ export default defineComponent({
                 .attr('width', (d: any) => returnCurrentLocaleContent(d.name)!.length * 1.5)
                 .attr('font-size', '12px')
                 .style('text-wrap', 'stable')
-                .on('click', (event: any, d: any) => seeOUPage(d.id));
+                .on('click', (_event: any, d: any) => seeOUPage(d.id));
 
             const legend = svg.append('g')
                 .attr('class', 'legend')

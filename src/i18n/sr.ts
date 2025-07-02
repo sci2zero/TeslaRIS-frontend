@@ -99,7 +99,8 @@ export default {
         documentBackup: "Bekap dokumenata",
         legacyFileRedirect: "Preusmeravanje",
         notFound: "Nije pronađeno",
-        emailChangeConfirmation: "Potvrda promene email-a"
+        emailChangeConfirmation: "Potvrda promene email-a",
+        contact: "Kontakt"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -398,7 +399,7 @@ export default {
     detailsNotReviewedMessage: "Niste završili povezivanje za detalje publikacije.",
     finishLoadLabel: "Uvezi",
     invalidDOIError: "Neispravan DOI format",
-    doiExistsError: "DOI je već u upotrebi",
+    doiExistsError: "Postoji rad sa ovim DOI-em.",
     potentialDuplicateMessage: "Ovaj dokument je detektovan kao potencijalni duplikat. Selektujte rad u listi ispod ako isti odgovara ovom dokumentu:",
     loadSuccessMessage: "Uspešno uvezeno.",
     invalidUriError: "Neispravan URL format",
@@ -646,7 +647,7 @@ export default {
     impactFactorTableLabel: "Tabela Impakt Faktora",
     experimentalPublicationLabel: "Eksperimentalan rad",
     theoreticalPublicationLabel: "Teoretski rad",
-    simulationPublicationLabel: "SImulacija",
+    simulationPublicationLabel: "Simulacija",
     noClassificationsLabel: "Nema klasifikacija za ovaj entitet.",
     typeLabel: "Tip",
     ifValuesLabel: "Impakt Faktori",
@@ -924,5 +925,13 @@ export default {
     selectAuthorsForImport: "Selektuj autore za skeniranje",
     addSubUnitLabel: "Dodaj podjedinicu",
     notInListLabel: "Nije u listi ({0}).",
-    copiedLabel: "Uspešno kopirano"
+    copiedLabel: "Uspešno kopirano",
+    feedbackMessage: "Rado ćemo odgovoriti na sva vaša pitanja. Samo nam pošaljite poruku putem forme ispod.",
+    subjectLabel: "Tema",
+    bodyLabel: "Poruka",
+    locationLabel: "Lokacija",
+    submitFeedbackLabel: "Pošalji povratnu informaciju",
+    messageSentLabel: "Poruka uspešno poslata.",
+    unableToFetchMetadataMessage: "Prikupljanje metapodataka nije uspelo.",
+    updateJournalPublicationLabel: "Ažuriraj rad u časopisu"
 }

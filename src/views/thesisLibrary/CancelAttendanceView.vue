@@ -70,8 +70,10 @@ export default defineComponent({
 
         const cancelAttendance = () => {
             RegistryBookService.cancelAttendance(
-                currentRoute.params.attendanceIdentifier as string,
-                token.value
+                {
+                    attendanceIdentifier: currentRoute.params.attendanceIdentifier as string,
+                    captchaToken: token.value
+                }
             ).then(() => {
                 cancellationComplete.value = true;
             });

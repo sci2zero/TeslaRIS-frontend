@@ -99,7 +99,8 @@ export default {
         documentBackup: "Document Backup",
         legacyFileRedirect: "Redirecting",
         notFound: "Not Found",
-        emailChangeConfirmation: "Email confirmation change"
+        emailChangeConfirmation: "Email confirmation change",
+        contact: "Contact"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -399,7 +400,7 @@ export default {
     detailsNotReviewedMessage: "You did not review publication details.",
     finishLoadLabel: "Import",
     invalidDOIError: "Invalid DOI format",
-    doiExistsError: "DOI is already in use",
+    doiExistsError: "There exists a publication with this DOI.",
     potentialDuplicateMessage: "This document has been detected as a potential duplicate. Select the publication from the list below if it matches this document:",
     loadSuccessMessage: "Successfully loaded.",
     invalidUriError: "Invalid URL format",
@@ -898,5 +899,13 @@ export default {
     selectAuthorsForImport: "Select authors for scanning",
     addSubUnitLabel: "Add sub-unit",
     notInListLabel: "Not in list ({0}).",
-    copiedLabel: "Copied to clipboard."
+    copiedLabel: "Copied to clipboard.",
+    feedbackMessage: "We are happy to answer any questions you have. Just send us a message in the form below.",
+    subjectLabel: "Subject",
+    bodyLabel: "Body",
+    locationLabel: "Location",
+    submitFeedbackLabel: "Submit feedback",
+    messageSentLabel: "Feedback sent successfully.",
+    unableToFetchMetadataMessage: "Metadata harvest was unsuccessfull.",
+    updateJournalPublicationLabel: "Update journal publication"
 }

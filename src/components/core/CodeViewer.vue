@@ -50,7 +50,7 @@ export default defineComponent({
             const resultDoc = xsltProcessor.transformToDocument(xmlDoc);
             const resultXml = new XMLSerializer().serializeToString(resultDoc);
             return resultXml;
-        } catch (error) {
+        } catch (_error) {
             return "Invalid XML";
         }
     };

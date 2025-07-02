@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { Notification, NotificationAction } from "@/models/Common";
+import type { Notification, NotificationAction, NotificationActionResult } from "@/models/Common";
 
 
 export class NotificationService extends BaseService {
@@ -14,7 +14,7 @@ export class NotificationService extends BaseService {
     return super.sendRequest(axios.get, "notification/count");
   }
 
-  async performAction(notificationId: number, action: NotificationAction): Promise<AxiosResponse<void>> {
+  async performAction(notificationId: number, action: NotificationAction): Promise<AxiosResponse<NotificationActionResult>> {
     return super.sendRequest(axios.patch, `notification/${notificationId}/perform?action=${action}`);
   }
 

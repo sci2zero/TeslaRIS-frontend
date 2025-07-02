@@ -278,7 +278,7 @@ export default defineComponent({
                 await MergeService.switchAllClassificationsToOtherJournal(id as number, transferTargetId as number);
 
                 router.push({ name: "deduplication", query: { tab: "journals" } });
-            } catch (error) {
+            } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification", 
                     { name: returnCurrentLocaleContent(name) }

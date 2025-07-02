@@ -65,7 +65,9 @@ export enum NotificationAction {
     BROWSE_CLAIMABLE_DOCUMENTS = "BROWSE_CLAIMABLE_DOCUMENTS",
     PERFORM_EVENT_CLASSIFICATION = "PERFORM_EVENT_CLASSIFICATION",
     PERFORM_DOCUMENT_ASSESSMENT = "PERFORM_DOCUMENT_ASSESSMENT",
-    PROMOTION_NOTIFICATION = "PROMOTION_NOTIFICATION"
+    GO_TO_PROMOTIONS_PAGE = "GO_TO_PROMOTIONS_PAGE",
+    GO_TO_HARVESTER_PAGE = "GO_TO_HARVESTER_PAGE",
+    NAVIGATE_TO_URL = "NAVIGATE_TO_URL"
 }
 
 export interface Notification {
@@ -223,4 +225,16 @@ export interface PrepopulatedMetadata {
     endPage: string;
     url: string;
     doi: string;
+}
+
+export interface ContactFormData {
+    name: string,
+    senderEmail: string,
+    subject: string,
+    message: string,
+    captchaToken: string
+}
+
+export interface NotificationActionResult {
+    value: string
 }
