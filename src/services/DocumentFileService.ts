@@ -1,4 +1,4 @@
-import { License, ResourceType, ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
+import { AccessRights, ResourceType, ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
 import { BaseService } from "./BaseService";
 import axios, { type AxiosResponse } from "axios";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
@@ -21,14 +21,14 @@ export class DocumentFileService extends BaseService {
     }
 
     async addInvolvementProof(proof: any, involvementId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
-        proof.license = getNameFromOrdinal(License, proof.license);
+        proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
         return super.sendMultipartFormDataRequest(axios.patch, `involvement/${involvementId}/${personId}`, proof, DocumentFileService.idempotencyKey);
     }
 
     async updateInvolvementProof(proof: any, proofId: any, involvementId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
-        if (typeof proof.license === "number") {
-            proof.license = getNameFromOrdinal(License, proof.license);
+        if (typeof proof.accessRights === "number") {
+            proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         }
         if (typeof proof.resourceType === "number") {
             proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
@@ -41,20 +41,20 @@ export class DocumentFileService extends BaseService {
     }
 
     async addDocumentFileAttachment(attachment: any, publicationId: number, isProof: boolean): Promise<AxiosResponse<DocumentFileResponse>> {
-        attachment.license = getNameFromOrdinal(License, attachment.license);
+        attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
         attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
         return super.sendMultipartFormDataRequest(axios.patch, `document/${publicationId}?isProof=${isProof}`, attachment, DocumentFileService.idempotencyKey);
     }
 
     async addThesisFileAttachment(attachment: any, thesisId: number, attachmentType: ThesisAttachmentType): Promise<AxiosResponse<DocumentFileResponse>> {
-        attachment.license = getNameFromOrdinal(License, attachment.license);
+        attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
         attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
         return super.sendMultipartFormDataRequest(axios.patch, `thesis/${attachmentType}/${thesisId}`, attachment, DocumentFileService.idempotencyKey);
     }
 
     async updateDocumentFileAttachment(attachment: any, documentId?: number, isProof?: boolean): Promise<AxiosResponse<DocumentFileResponse>> {
-        if (typeof attachment.license === "number") {
-            attachment.license = getNameFromOrdinal(License, attachment.license);
+        if (typeof attachment.accessRights === "number") {
+            attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
         }
         if (typeof attachment.resourceType === "number") {
             attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
@@ -71,14 +71,14 @@ export class DocumentFileService extends BaseService {
     }
 
     async addExpertiseOrSkillProof(proof: any, expertiseOrSkillId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
-        proof.license = getNameFromOrdinal(License, proof.license);
+        proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
         return super.sendMultipartFormDataRequest(axios.patch, `expertise-or-skill/${personId}/${expertiseOrSkillId}`, proof, DocumentFileService.idempotencyKey);
     }
 
     async updateExpertiseOrSkillProof(proof: any, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
-        if (typeof proof.license === "number") {
-            proof.license = getNameFromOrdinal(License, proof.license);
+        if (typeof proof.accessRights === "number") {
+            proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         }
         if (typeof proof.resourceType === "number") {
             proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
@@ -91,14 +91,14 @@ export class DocumentFileService extends BaseService {
     }
 
     async addPrizeProof(proof: any, prizeId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
-        proof.license = getNameFromOrdinal(License, proof.license);
+        proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
         return super.sendMultipartFormDataRequest(axios.patch, `prize/${personId}/${prizeId}`, proof, DocumentFileService.idempotencyKey);
     }
 
     async updatePrizeProof(proof: any, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
-        if (typeof proof.license === "number") {
-            proof.license = getNameFromOrdinal(License, proof.license);
+        if (typeof proof.accessRights === "number") {
+            proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         }
         if (typeof proof.resourceType === "number") {
             proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);

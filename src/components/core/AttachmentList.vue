@@ -39,8 +39,8 @@
 
                             <template #append>
                                 <c-c-license-badge
-                                    v-if="attachment.license.toString() === 'OPEN_ACCESS' && attachment.ccLicense"
-                                    :license="attachment.ccLicense.toLowerCase()"
+                                    v-if="attachment.accessRights.toString() === 'OPEN_ACCESS' && attachment.license"
+                                    :license="attachment.license.toLowerCase()"
                                 />
                                 <v-row v-if="canEdit">
                                     <v-col v-if="!disableUpdates || isAdmin || isHeadOfLibrary">
