@@ -231,6 +231,7 @@
                     :total-persons="totalEmployees"
                     :employment-institution-id="organisationUnit?.id"
                     enable-export
+                    allow-comparison
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"

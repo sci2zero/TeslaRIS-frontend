@@ -29,7 +29,13 @@
   
             <v-row justify="center" class="mt-5">
                 <v-col cols="12" sm="6" md="3">
-                    <commission-autocomplete-search v-model="selectedCommission" only-load-commissions required></commission-autocomplete-search>
+                    <v-select
+                        v-model="selectedCommission"
+                        :readonly="!isUserLoggedIn"
+                        :items="commissions"
+                        :label="$t('commissionLabel') + '*'"
+                        return-object
+                    />
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                     <v-select
@@ -208,7 +214,6 @@ import { ref } from 'vue';
 import type { IFTableResponse, ImaginaryPublicationAssessmentRequest, ImaginaryPublicationAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
-import CommissionAutocompleteSearch from '@/components/assessment/commission/CommissionAutocompleteSearch.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import IFTableComponent from '@/components/assessment/indicators/IFTableComponent.vue';
@@ -223,11 +228,13 @@ import { getTypesForGivenLocale as getProceedingsPublicationTypes, getTitleFromV
 import VueRecaptcha from 'vue3-recaptcha2';
 import { useI18n } from 'vue-i18n';
 import { useLoginStore } from '@/stores/loginStore';
+import CommissionService from '@/services/assessment/CommissionService';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "JournalMServiceView",
-    components: { JournalAutocompleteSearch, CommissionAutocompleteSearch, IFTableComponent, EventAutocompleteSearch, VueRecaptcha },
+    components: { JournalAutocompleteSearch, IFTableComponent, EventAutocompleteSearch, VueRecaptcha },
     setup() {
         const isFormValid = ref(false);
         const ifTableData = ref<IFTableResponse>();
@@ -235,6 +242,8 @@ export default defineComponent({
         const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string;
 
         const loginStore = useLoginStore();
+
+        const { isUserLoggedIn } = useUserRole();
 
         const { researchAreas } = useResearchAreas();
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
@@ -247,6 +256,8 @@ export default defineComponent({
         const searchPlaceholder = {title: "", value: -1};
         const selectedJournal = ref<{title: string, value: number}>(searchPlaceholder);
         const selectedEvent = ref<{title: string, value: number}>(searchPlaceholder);
+
+        const commissions = ref<{title: string, value: number}[]>([]);
         const selectedCommission = ref<{title: string, value: number}>(searchPlaceholder);
 
         const vueRecaptcha = ref<typeof VueRecaptcha>();
@@ -255,7 +266,26 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
+            fetchCommissions();
         });
+
+        const fetchCommissions = () => {
+            CommissionService.readAllCommissions(true, false).then(response => {
+                commissions.value.splice(0)
+                response.data.content.forEach(commission => {
+                    commissions.value.push(
+                        { title: returnCurrentLocaleContent(commission.description) as string, value: commission.id }
+                    );
+                })
+                CommissionService.getDefaultCommissionId().then(resp => {
+                    if (resp.data > 0) {
+                        selectedCommission.value = commissions.value.find(commission => commission.value === resp.data) as {title: string, value: number};
+                    } else if (commissions.value.length > 0) {
+                        selectedCommission.value = commissions.value[0];
+                    }
+                });
+            });
+        };
 
         watch(selectedApplicableType, () => {
             if (selectedApplicableType.value.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION) {
@@ -349,7 +379,8 @@ export default defineComponent({
             MServiceApplicableTypes, journalPublicationTypes,
             proceedingsPublicationTypes, selectedJournalPublicationType,
             selectedProceedingsPublicationType, resetChallenge,
-            handleVerifyCallback, vueRecaptcha, token, siteKey
+            handleVerifyCallback, vueRecaptcha, token, siteKey,
+            isUserLoggedIn, commissions
         };
     }
 });

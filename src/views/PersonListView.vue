@@ -29,6 +29,7 @@
             :persons="persons"
             :total-persons="totalPersons"
             enable-export
+            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
             @switch-page="switchPage">

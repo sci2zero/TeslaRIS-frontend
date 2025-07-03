@@ -131,6 +131,10 @@ label {
     margin-bottom: -50px;
 }
 
+.commission-select {
+    max-width: 400px;
+}
+
 /* Comparators */
 
 .middle-arrow {

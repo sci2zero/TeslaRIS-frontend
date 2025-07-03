@@ -9,6 +9,7 @@ export interface JournalIndex {
     eissn: string;
     printISSN: string;
     databaseId: number;
+    classifiedBy?: number[];
 }
 
 export interface Journal extends PublicationSeries {

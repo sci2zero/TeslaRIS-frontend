@@ -8,8 +8,8 @@ export class JournalService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchJournals(tokens: string, institutionId: number | null): Promise<AxiosResponse<Page<JournalIndex>>> {
-    return super.sendRequest(axios.get, `journal/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
+  async searchJournals(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean = false, commissionId: number | null = null): Promise<AxiosResponse<Page<JournalIndex>>> {
+    return super.sendRequest(axios.get, `journal/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}`);
   }
 
   async readJournal(journalId: number): Promise<AxiosResponse<Journal>> {

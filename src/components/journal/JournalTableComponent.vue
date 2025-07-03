@@ -54,6 +54,18 @@
                 <td>
                     {{ displayTextOrPlaceholder(row.item.printISSN) }}
                 </td>
+                <td>
+                    <entity-classification-modal-content
+                        :entity-id="row.item.databaseId"
+                        :entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                        @classified="journalClassified(row.item)"
+                        @update="refreshTable(tableOptions)">
+                    </entity-classification-modal-content>
+                </td>
+                <td v-if="isCommission">
+                    <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
+                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -71,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type {JournalIndex} from '@/models/JournalModel';
@@ -81,11 +93,13 @@ import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import router from '@/router';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
+import { ApplicableEntityType } from '@/models/Common';
+import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
 
 
 export default defineComponent({
     name: "JournalTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, EntityClassificationModalContent },
     props: {
         journals: {
             type: Array<JournalIndex>,
@@ -106,17 +120,31 @@ export default defineComponent({
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
 
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isCommission, loggedInUser } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
 
-        const headers = [
+
+        const actionLabel = computed(() => i18n.t("actionLabel"));
+        const classifiedByMeLabel = computed(() => i18n.t("classifiedByMeLabel"));
+
+        onMounted(() => {
+            if (isAdmin.value || isCommission.value) {
+                headers.value.push({ title: actionLabel, align: "start", sortable: false, key: "action"});
+            }
+
+            if (isCommission.value) {
+                headers.value.push({ title: classifiedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
+            }
+        });
+
+        const headers = ref<any[]>([
           { title: titleLabel, align: "start", sortable: true, key: titleColumn},
           { title: "eISSN", align: "start", sortable: true, key: "eISSN"},
           { title: "Print ISSN", align: "start", sortable: true, key: "printISSN"},
-        ];
+        ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
@@ -207,12 +235,24 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
+        const journalClassified = (journal: JournalIndex) => {
+            const commissionId = loggedInUser.value?.commissionId as number;
+            if (journal.classifiedBy) {
+                if (!journal.classifiedBy.includes(commissionId)) {
+                    journal.classifiedBy.push(commissionId);
+                }
+            } else {
+                journal.classifiedBy = [commissionId];
+            }
+        };
+
         return {
             selectedJournals, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startPublicationComparison, startMetadataComparison,
-            setSortAndPageOption
+            setSortAndPageOption, isCommission, loggedInUser,
+            ApplicableEntityType, journalClassified
         };
     }
 });

@@ -527,7 +527,7 @@ const router = createRouter({
                             component: PersonPublicationsComparatorView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.institutionalEditor],
                             },
                         },
                         {
@@ -536,7 +536,7 @@ const router = createRouter({
                             component: PersonMetadataComparatorView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.institutionalEditor],
                             },
                         },
                     ]
@@ -569,7 +569,7 @@ const router = createRouter({
                             component: OrganisationUnitEmployeeComparatorView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.institutionalEditor],
                             },
                         },
                         {
@@ -578,7 +578,7 @@ const router = createRouter({
                             component: OrganisationUnitMetadataComparatorView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.institutionalEditor],
                             },
                         },
                     ]
@@ -614,7 +614,7 @@ const router = createRouter({
                                     component: JournalPublicationMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]
@@ -637,7 +637,7 @@ const router = createRouter({
                                     component: ProceedingsPublicationComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]
@@ -660,7 +660,7 @@ const router = createRouter({
                                     component: SoftwareMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]
@@ -683,7 +683,7 @@ const router = createRouter({
                                     component: DatasetMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]
@@ -706,7 +706,7 @@ const router = createRouter({
                                     component: PatentMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]
@@ -729,7 +729,7 @@ const router = createRouter({
                                     component: MonographMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                                 {
@@ -761,7 +761,7 @@ const router = createRouter({
                                     component: MonographPublicationMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]
@@ -784,7 +784,7 @@ const router = createRouter({
                                     component: ThesisMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin],
+                                        authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
                             ]

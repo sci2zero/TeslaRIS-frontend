@@ -10,8 +10,12 @@ export class CommissionService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async fetchAllCommissions(parameters: string, onlyLoadCommissions: boolean, onlyClassificationCommissions: boolean): Promise<AxiosResponse<Page<CommissionResponse>>> {
+    async searchCommissions(parameters: string, onlyLoadCommissions: boolean, onlyClassificationCommissions: boolean): Promise<AxiosResponse<Page<CommissionResponse>>> {
         return super.sendRequest(axios.get, `assessment/commission?${parameters}&lang=${i18n.vueI18n.global.locale}&onlyLoad=${onlyLoadCommissions}&onlyClassification=${onlyClassificationCommissions}`);
+    }
+
+    async readAllCommissions(onlyLoadCommissions: boolean, onlyClassificationCommissions: boolean): Promise<AxiosResponse<Page<CommissionResponse>>> {
+        return super.sendRequest(axios.get, `assessment/commission?&lang=${i18n.vueI18n.global.locale}&onlyLoad=${onlyLoadCommissions}&onlyClassification=${onlyClassificationCommissions}`);
     }
 
     async readCommission(commissionId: number): Promise<AxiosResponse<CommissionResponse>> {
@@ -36,6 +40,10 @@ export class CommissionService extends BaseService {
 
     async deleteCommission(commissionId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.delete, `assessment/commission/${commissionId}`);
+    }
+
+    async getDefaultCommissionId(): Promise<AxiosResponse<number>> {
+        return super.sendRequest(axios.get, "assessment/commission/default");
     }
 }
 

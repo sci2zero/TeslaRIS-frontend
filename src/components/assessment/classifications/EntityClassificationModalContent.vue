@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import type { DocumentAssessmentClassification, EntityAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification } from '@/models/AssessmentModel';
+import type { DocumentAssessmentClassification, EntityAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import { defineComponent, type PropType, ref, watch } from 'vue';
@@ -93,6 +93,13 @@ export default defineComponent({
                         emit("update", props.entityId);
                     });
                     break;
+                case ApplicableEntityType.PUBLICATION_SERIES:
+                    EntityClassificationService.fetchPublicationSeriesClassifications(props.entityId)
+                    .then(response => {
+                        entityClassifications.value = response.data;
+                        emit("update", props.entityId);
+                    });
+                    break;
             }
         };
 
@@ -107,6 +114,13 @@ export default defineComponent({
                     break;
                 case ApplicableEntityType.DOCUMENT:
                     EntityClassificationService.createDocumentClassification(entityClassification as DocumentAssessmentClassification)
+                    .then(() => {
+                        fetchClassifications();
+                        emit("classified", props.entityId);
+                    });
+                    break;
+                case ApplicableEntityType.PUBLICATION_SERIES:
+                    EntityClassificationService.createPublicationSeriesClassification(entityClassification as PublicationSeriesAssessmentClassification)
                     .then(() => {
                         fetchClassifications();
                         emit("classified", props.entityId);

@@ -8,7 +8,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
+            <v-col>
                 <date-picker
                     v-model="dateFrom"
                     :label="$t('fromLabel') + '*'"
@@ -16,7 +16,7 @@
                     required
                 ></date-picker>
             </v-col>
-            <v-col cols="5">
+            <v-col>
                 <date-picker
                     v-model="dateTo"
                     :label="$t('toLabel') + '*'"
@@ -34,6 +34,14 @@
                     :rules="requiredSelectionRules"
                     return-object>
                 </v-select>
+            </v-col>
+            <v-col>
+                <v-checkbox
+                    v-model="isDefault"
+                    :label="$t('defaultForMServiceLabel')"
+                    class="table-checkbox"
+                    hide-details
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -127,6 +135,7 @@ export default defineComponent({
         const description = ref<any>(props.presetCommission?.description ? props.presetCommission?.description : []);
         const dateFrom = ref(props.presetCommission?.assessmentDateFrom ? props.presetCommission.assessmentDateFrom : undefined);
         const dateTo = ref(props.presetCommission?.assessmentDateTo ? props.presetCommission.assessmentDateTo : undefined);
+        const isDefault = ref(props.presetCommission?.isDefault ? props.presetCommission?.isDefault : false)
 
         const { requiredFieldRules, requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
@@ -138,7 +147,8 @@ export default defineComponent({
                 assessmentDateFrom: dateFrom.value as string,
                 assessmentDateTo: dateTo.value as string,
                 formalDescriptionOfRule: formalDescriptionOfRule.value.value,
-                recognisedResearchAreas: selectedResearchAreas.value.map(researchArea => researchArea.value)
+                recognisedResearchAreas: selectedResearchAreas.value.map(researchArea => researchArea.value),
+                isDefault: isDefault.value
             };
 
             emit("create", commission);
@@ -152,7 +162,7 @@ export default defineComponent({
             languageTags, requiredFieldRules,
             requiredSelectionRules, submit,
             dateFrom, dateTo, ruleEngines,
-            formalDescriptionOfRule,
+            formalDescriptionOfRule, isDefault,
             researchAreas, selectedResearchAreas,
             requiredMultiSelectionRules
         };
