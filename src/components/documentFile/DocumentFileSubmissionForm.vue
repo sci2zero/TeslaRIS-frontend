@@ -30,8 +30,8 @@
                 <v-row v-if="allowLicenceSelection">
                     <v-col>
                         <v-select
-                            v-model="selectedLicense"
-                            :items="licenses"
+                            v-model="selectedAccessRight"
+                            :items="accessRights"
                             :label="$t('licenseLabel') + '*'"
                             :rules="requiredSelectionRules"
                             return-object>
@@ -119,9 +119,9 @@ export default defineComponent({
             
             if(props.edit && props.presetDocumentFile) {
                     file.value = new File([], props.presetDocumentFile.fileName);
-                    selectedLicense.value = { title: licenses.find(license => getNameFromOrdinal(License, license.value) === props.presetDocumentFile?.license.toString())?.title as string, value: props.presetDocumentFile.accessRights };
+                    selectedAccessRight.value = { title: accessRights.find(accessRights => getNameFromOrdinal(License, accessRights.value) === props.presetDocumentFile?.accessRights.toString())?.title as string, value: props.presetDocumentFile.accessRights };
 
-                    if (props.presetDocumentFile.license.toString() === "OPEN_ACCESS") {
+                    if (props.presetDocumentFile.accessRights.toString() === "OPEN_ACCESS") {
                         isOpenAccess.value = true;
                         selectedCCLicense.value = { title: cclicenseTypes.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
                     }
@@ -139,7 +139,7 @@ export default defineComponent({
         const resourceTypes = computed(() => i18n.locale.value === "sr" ? resourceTypeSr : resourceTypeEn);
         const selectedResourceType = ref(selectionPlaceholder);
 
-        const licenses = [
+        const accessRights = [
             { title: "Creative Commons", value: AccessRights.CREATIVE_COMMONS },
             { title: "Embargoed Access", value: AccessRights.EMBARGOED_ACCESS },
             { title: "Public Domain", value: AccessRights.PUBLIC_DOMAIN },
@@ -158,7 +158,7 @@ export default defineComponent({
             { title: "CC Zero (Public Domain)", value: License.CC0 }
         ];
 
-        const selectedLicense = ref({ title: "All Rights Reserved", value: AccessRights.ALL_RIGHTS_RESERVED });
+        const selectedAccessRight = ref({ title: "All Rights Reserved", value: AccessRights.ALL_RIGHTS_RESERVED });
         const selectedCCLicense = ref({ title: "NC BY", value: License.BY });
         const isOpenAccess = ref<boolean>(false);
 
@@ -174,7 +174,7 @@ export default defineComponent({
             }
 
             if (props.allowLicenceSelection) {
-                newDocumentFile.accessRights = selectedLicense.value.value;
+                newDocumentFile.accessRights = selectedAccessRight.value.value;
             } else {
                 newDocumentFile.accessRights = isOpenAccess.value ? AccessRights.OPEN_ACCESS : AccessRights.RESTRICTED_ACCESS;
             }
@@ -190,8 +190,8 @@ export default defineComponent({
         return {
             isFormValid, file, ResourceType, cclicenseTypes,
             description, descriptionRef, isOpenAccess,
-            requiredFieldRules, licenses, resourceTypes,
-            selectedLicense, selectedResourceType,
+            requiredFieldRules, accessRights, resourceTypes,
+            selectedAccessRight, selectedResourceType,
             addDocumentFile, requiredSelectionRules, 
             languageTags, toMultilingualTextInput,
             selectedCCLicense
