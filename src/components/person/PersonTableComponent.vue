@@ -10,12 +10,12 @@
         {{ $t("removeResearcherLabel") }}
     </v-btn>
     <v-btn
-        v-if="isAdmin && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
     <v-btn
-        v-if="isAdmin && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
+        v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -187,6 +187,10 @@ export default defineComponent({
         endpointTokenParameters: {
             type: Array<string>,
             default: []
+        },
+        allowComparison: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "delete"],

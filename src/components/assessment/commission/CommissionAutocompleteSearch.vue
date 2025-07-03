@@ -105,7 +105,7 @@ export default defineComponent({
             }
             if (input.length >= 3) {
                 const params = `searchExpression=${input}&page=0&size=5`;
-                CommissionService.fetchAllCommissions(params, props.onlyLoadCommissions, props.onlyClassificationCommissions).then((response) => {
+                CommissionService.searchCommissions(params, props.onlyLoadCommissions, props.onlyClassificationCommissions).then((response) => {
                     const listOfCommissions: { title: string; value: number; date?: string }[] = [];
                     response.data.content.forEach((commission: CommissionResponse) => {
                         listOfCommissions.push({

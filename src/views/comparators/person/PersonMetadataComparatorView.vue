@@ -102,7 +102,7 @@
             </v-col>
         </v-row>
 
-        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
+        <comparison-actions :supports-force-delete="isAdmin" @update="updateAll" @delete="deleteSide"></comparison-actions>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -130,6 +130,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { ComparisonSide } from '@/models/MergeModel';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -162,7 +163,7 @@ export default defineComponent({
         const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
         const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
         
-
+        const { isAdmin } = useUserRole();
         const i18n = useI18n();
 
         onMounted(() => {
@@ -452,7 +453,7 @@ export default defineComponent({
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
             leftPerson, rightPerson, deleteSide,
-            moveAll, updateAll, updateLeft,
+            moveAll, updateAll, updateLeft, isAdmin,
             updateLeftRef, updateRightRef, updateRight,
             leftEmployments, leftEducation, leftMemberships,
             rightEmployments, rightEducation, rightMemberships,

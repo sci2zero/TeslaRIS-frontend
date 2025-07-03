@@ -10,7 +10,11 @@
             :tab-number="1"
             layout="table"
         />
-        <commission-table-component :commissions="commissions" :total-commissions="totalCommissions" @switch-page="switchPage"></commission-table-component>
+        <commission-table-component
+            :commissions="commissions"
+            :total-commissions="totalCommissions"
+            @switch-page="switchPage">
+        </commission-table-component>
     </v-container>
 </template>
 
@@ -53,7 +57,8 @@ export default defineComponent({
         });
 
         const search = () => {
-            CommissionService.fetchAllCommissions(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false, false)
+            CommissionService.searchCommissions(
+                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`, false, false)
             .then((response: AxiosResponse<Page<CommissionResponse>>) => {
                 commissions.value = response.data.content;
                 totalCommissions.value = response.data.totalElements;

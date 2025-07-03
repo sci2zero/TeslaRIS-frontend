@@ -933,5 +933,7 @@ export default {
     submitFeedbackLabel: "Pošalji povratnu informaciju",
     messageSentLabel: "Poruka uspešno poslata.",
     unableToFetchMetadataMessage: "Prikupljanje metapodataka nije uspelo.",
-    updateJournalPublicationLabel: "Ažuriraj rad u časopisu"
+    updateJournalPublicationLabel: "Ažuriraj rad u časopisu",
+    commissionViewLabel: "Posmatraj kao komisija",
+    defaultForMServiceLabel: "Podrazumevana za M-Servis"
 }

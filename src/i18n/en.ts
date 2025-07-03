@@ -907,5 +907,7 @@ export default {
     submitFeedbackLabel: "Submit feedback",
     messageSentLabel: "Feedback sent successfully.",
     unableToFetchMetadataMessage: "Metadata harvest was unsuccessfull.",
-    updateJournalPublicationLabel: "Update journal publication"
+    updateJournalPublicationLabel: "Update journal publication",
+    commissionViewLabel: "View as commission",
+    defaultForMServiceLabel: "Default for M-Service"
 }

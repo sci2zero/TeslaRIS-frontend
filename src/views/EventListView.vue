@@ -9,21 +9,33 @@
             <v-btn v-if="isAdmin" color="primary" @click="addConference">
                 {{ $t("createNewConferenceLabel") }}
             </v-btn>
-            <v-checkbox
-                v-model="returnSerialEvents"
-                :label="$t('showSerialEventsLabel')"
-                class="ml-4 mt-5"
-            ></v-checkbox>
+        </span>
+        <span class="d-flex align-center">
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-select
+                v-if="isAdmin"
+                v-model="selectedCommission"
+                class="commission-select"
+                :items="commissions"
+                :label="$t('commissionViewLabel')"
+                return-object
+                clearable
+                @click:clear="onClearCommission"
+            />
             <v-checkbox
-                v-if="isCommission"
+                v-if="isCommission || (isAdmin && selectedCommission.value > 0)"
                 v-model="returnOnlyUnclassifiedEntities"
                 :label="$t('showUnclassifiedLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+            <v-checkbox
+                v-model="returnSerialEvents"
+                :label="$t('showSerialEventsLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
         </span>
@@ -56,6 +68,8 @@ import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import CommissionService from '@/services/assessment/CommissionService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -80,16 +94,38 @@ export default defineComponent({
         const returnOnlyUnclassifiedEntities = ref(true);
         const tableRef = ref<typeof EventTableComponent>();
 
+        const commissions = ref<{title: string, value: number}[]>([]);
+        const selectedCommission = ref({ title: '', value: -1 });
+
         const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
             loading.value = true;
             search(searchParams.value);
+
+            fetchCommissions();
         });
 
-        watch([returnSerialEvents, returnOnlyInstitutionRelatedEntities, returnOnlyUnclassifiedEntities], () => {
+        const fetchCommissions = () => {
+            CommissionService.readAllCommissions(true, false).then(response => {
+                commissions.value.splice(0)
+                response.data.content.forEach(commission => {
+                    commissions.value.push(
+                        { title: returnCurrentLocaleContent(commission.description) as string, value: commission.id }
+                    );
+                })
+            });
+        };
+
+        watch([
+            returnSerialEvents,
+            returnOnlyInstitutionRelatedEntities,
+            returnOnlyUnclassifiedEntities,
+            selectedCommission
+        ], () => {
             search(searchParams.value);
+            loading.value = true;
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -113,8 +149,9 @@ export default defineComponent({
                 !returnSerialEvents.value,
                 false,
                 returnOnlyInstitutionRelatedEntities.value as boolean,
-                isCommission.value && returnOnlyUnclassifiedEntities.value)
-            .then((response) => {
+                (isCommission.value || isAdmin && selectedCommission.value.value > 0) && returnOnlyUnclassifiedEntities.value,
+                selectedCommission.value.value > 0 ? selectedCommission.value.value : null
+            ).then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
             })
@@ -135,12 +172,17 @@ export default defineComponent({
             router.push({name: "submitConference"});
         };
 
+        const onClearCommission = () => {
+            selectedCommission.value = { title: '', value: -1 };
+        };
+
         return {
             search, events, totalEvents, switchPage, isAdmin,
             addConference, presetSearchParams, returnSerialEvents,
             tableRef, clearSortAndPerformSearch, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities, isCommission,
-            returnOnlyUnclassifiedEntities, loading
+            returnOnlyUnclassifiedEntities, loading, commissions,
+            selectedCommission, onClearCommission
         };
     }
 });
