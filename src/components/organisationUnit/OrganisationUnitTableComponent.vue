@@ -1,16 +1,16 @@
 <template>
     <v-btn
-        v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedOUs.length === 0"
+        v-if="(isAdmin || allowComparison)" density="compact" class="bottom-spacer" :disabled="selectedOUs.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
-        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        v-if="(isAdmin || allowComparison)" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
         @click="startEmploymentComparison">
         {{ $t("compareEmployeesLabel") }}
     </v-btn>
     <v-btn
-        v-if="isAdmin" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
+        v-if="(isAdmin || allowComparison)" density="compact" class="compare-button" :disabled="selectedOUs.length !== 2"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
@@ -169,6 +169,10 @@ export default defineComponent({
             type: Number,
             default: -1
         },
+        allowComparison: {
+            type: Boolean,
+            default: false
+        }
     },
     emits: ["switchPage"],
     setup(_, {emit}) {

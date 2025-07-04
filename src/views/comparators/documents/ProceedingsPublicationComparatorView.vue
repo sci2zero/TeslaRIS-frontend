@@ -84,7 +84,11 @@
             </v-col>
         </v-row>
 
-        <comparison-actions @update="updateAll" @delete="deleteSide($event)"></comparison-actions>
+        <comparison-actions
+            :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            @update="updateAll"
+            @delete="deleteSide($event)">
+        </comparison-actions>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -334,7 +338,7 @@ export default defineComponent({
 
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "deduplication", query: { tab: "documents" } });
+                router.push({ name: "proceedingsPublicationLandingPage", query: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.title : rightProceedingsPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

@@ -1,6 +1,6 @@
 <template>
     <v-btn
-        v-if="isAdmin"
+        v-if="(isAdmin || allowComparison)"
         density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
@@ -12,7 +12,7 @@
         {{ $t("removeLabel") }}
     </v-btn>
     <v-btn
-        v-if="isAdmin && !inComparator" density="compact" class="compare-button"
+        v-if="(isAdmin || allowComparison) && !inComparator" density="compact" class="compare-button"
         :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
         @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
@@ -257,6 +257,10 @@ export default defineComponent({
             default: ExportEntity.DOCUMENT
         },
         showPublicationConcreteType: {
+            type: Boolean,
+            default: false
+        },
+        allowComparison: {
             type: Boolean,
             default: false
         }

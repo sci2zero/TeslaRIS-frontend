@@ -3,18 +3,33 @@
         <v-btn color="blue darken-1" @click="deleteLeft">
             {{ $t("deleteLeftLabel") }}
         </v-btn>
-        <delete-dropdown v-if="supportsForceDelete" @delete="forceDeleteLeft"></delete-dropdown>
+        <delete-dropdown
+            v-if="supportsForceDelete"
+            @delete="forceDeleteLeft">
+        </delete-dropdown>
 
-        <v-btn color="blue darken-1" class="ml-2" @click="updateBoth">
+        <v-btn
+            color="blue darken-1"
+            class="ml-2"
+            :disabled="!isFormValid"
+            @click="updateBoth">
             {{ $t("updateLabel") }}
         </v-btn>
 
         <v-btn color="blue darken-1" class="ml-2" @click="deleteRight">
             {{ $t("deleteRightLabel") }}
         </v-btn>
-        <delete-dropdown v-if="supportsForceDelete" @delete="forceDeleteRight"></delete-dropdown>
+        <delete-dropdown
+            v-if="supportsForceDelete"
+            @delete="forceDeleteRight">
+        </delete-dropdown>
 
-        <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="completeForceDelete"></persistent-question-dialog>
+        <persistent-question-dialog
+            ref="dialogRef"
+            :title="$t('areYouSureLabel')"
+            :message="dialogMessage"
+            @continue="completeForceDelete"
+        />
     </v-row>
 </template>
 
@@ -40,6 +55,10 @@ export default defineComponent({
         rightWarningMessage: {
             type: String,
             default: ""
+        },
+        isFormValid: {
+            type: Boolean,
+            required: true
         }
     },
     emits: ["delete", "update"],

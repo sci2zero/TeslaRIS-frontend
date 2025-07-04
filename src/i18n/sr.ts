@@ -918,7 +918,7 @@ export default {
     emailUpdateConfirmationFailedMessage: "Promena email-a nije uspela.",
     updateExternalIndicatorConfigurationLabel: "Prikaz spoljnih indikatora",
     mismatchedPublicationTypesMessage: "Tip dokumenta se ne poklapa sa tipom forme, preuzet tip publikacije je: ",
-    showOnlyHarvestableLabel: "Prikaži samo one sa institucionim identifikatorima",
+    showOnlyHarvestableLabel: "Prikaži samo one sa institucionalnim identifikatorima",
     priorityLoadingLabel: "Prioritetan uvoz",
     allAuthorsUnmanagedMessage: "Nijedan autor sa ove publikacije nema nalog istraživača vezan za vašu instituciju. Preskočite dokument.",
     importForAllAuthors: "Skeniraj za sve autore",
@@ -935,5 +935,6 @@ export default {
     unableToFetchMetadataMessage: "Prikupljanje metapodataka nije uspelo.",
     updateJournalPublicationLabel: "Ažuriraj rad u časopisu",
     commissionViewLabel: "Posmatraj kao komisija",
-    defaultForMServiceLabel: "Podrazumevana za M-Servis"
+    defaultForMServiceLabel: "Podrazumevana za M-Servis",
+    cyclicOrgUnitRelationLabel: "Organizaciona jedinica ne može biti deo same sebe."
 }

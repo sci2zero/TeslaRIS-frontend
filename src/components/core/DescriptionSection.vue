@@ -1,5 +1,5 @@
 <template>
-    <v-row v-if="canEdit || (description && description.length > 0)">
+    <v-row>
         <v-col cols="12">
             <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">

@@ -1,6 +1,5 @@
 <template>
     <v-card
-        v-if="canEdit || (prizes && prizes?.length > 0)"
         class="pa-3"
         variant="flat"
         color="grey-lighten-5">

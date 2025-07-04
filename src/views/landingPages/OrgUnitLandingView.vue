@@ -157,10 +157,10 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="totalPublications > 0" value="publications">
+            <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
-            <v-tab v-if="totalEmployees > 0 || canEdit" value="employees">
+            <v-tab value="employees">
                 {{ $t("employeesLabel") }}
             </v-tab>
             <v-tab value="relations">
@@ -274,6 +274,10 @@
                             <organisation-unit-table-component
                                 :organisation-units="subUnits"
                                 :total-o-us="totalSubUnits"
+                                allow-comparison
+                                enable-export
+                                :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
+                                :endpoint-token-parameters="['*', String(organisationUnit.id)]"
                                 :top-level-institution-id="organisationUnit.id"
                                 @switch-page="switchSubUnitsPage">
                             </organisation-unit-table-component>

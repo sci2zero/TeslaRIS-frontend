@@ -84,7 +84,12 @@
             </v-col>
         </v-row>
 
-        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
+        <comparison-actions
+            :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :supports-force-delete="isAdmin"
+            @update="updateAll"
+            @delete="deleteSide"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -111,6 +116,7 @@ import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -119,6 +125,8 @@ export default defineComponent({
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
+
+        const { isAdmin } = useUserRole();
 
         const currentRoute = useRoute();
         const router = useRouter();
@@ -340,13 +348,14 @@ export default defineComponent({
         const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftProceedings.value?.id as number : rightProceedings.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftProceedings.value?.title : rightProceedings.value?.title;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightProceedings.value?.id : leftProceedings.value?.id;
 
             const deleteAction = isForceDelete 
                 ? ProceedingsService.forceDeleteProceedings(id)
                 : ProceedingsService.deleteProceedings(id);
 
             deleteAction.then(() => {
-                router.push({ name: "deduplication", query: { tab: "documents" } });
+                router.push({ name: "proceedingsLandingPage", query: { id: transferTargetId } });
             }).catch(() => {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
@@ -357,7 +366,7 @@ export default defineComponent({
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
             leftProceedings, rightProceedings,
-            moveAll, updateAll, updateLeft,
+            moveAll, updateAll, updateLeft, isAdmin,
             updateLeftRef, updateRightRef, updateRight,
             updateRightDescriptionRef, updateLeftDescriptionRef,
             updateRightKeywordsRef, updateLeftKeywordsRef,

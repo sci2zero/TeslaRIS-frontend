@@ -102,7 +102,12 @@
             </v-col>
         </v-row>
 
-        <comparison-actions :supports-force-delete="isAdmin" @update="updateAll" @delete="deleteSide"></comparison-actions>
+        <comparison-actions
+            :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :supports-force-delete="isAdmin"
+            @update="updateAll"
+            @delete="deleteSide">
+        </comparison-actions>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -386,9 +391,6 @@ export default defineComponent({
                 
                 try {
                     await Promise.all([
-                        // Personal information
-                        MergeService.saveMergedPersonsMetadata(leftPerson.value?.id as number, rightPerson.value?.id as number, {leftPerson: leftPerson.value?.personalInfo as PersonalInfo, rightPerson: rightPerson.value?.personalInfo as PersonalInfo}),
-
                         // Left Person
                         PersonService.updateKeywords(leftPerson.value?.id as number, leftPerson.value?.keyword as MultilingualContent[]),
                         PersonService.updateBiography(leftPerson.value?.id as number, leftPerson.value?.biography as MultilingualContent[]),
@@ -418,6 +420,16 @@ export default defineComponent({
                         MergeService.switchSkillsToOtherPerson(rightPerson.value?.expertisesOrSkills.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number)
                     ]);
 
+                    // Personal information
+                    await MergeService.saveMergedPersonsMetadata(
+                        leftPerson.value?.id as number,
+                        rightPerson.value?.id as number,
+                        {
+                            leftPerson: leftPerson.value?.personalInfo as PersonalInfo,
+                            rightPerson: rightPerson.value?.personalInfo as PersonalInfo
+                        }
+                    );
+
                     snackbarMessage.value = i18n.t("updatedSuccessMessage");
                     snackbar.value = true;
                 } catch (error: any) {
@@ -435,13 +447,13 @@ export default defineComponent({
             try {
                 const deleteAction = isForceDelete 
                     ? PersonService.forceDeleteResearcher(id)
-                    : PersonService.forceDeleteResearcher(id);
+                    : PersonService.deleteResearcher(id);
 
                 await deleteAction;
 
                 await MergeService.switchAllIndicatorsToOtherPerson(id as number, transferTargetId as number);
 
-                router.push({ name: "deduplication", query: { tab: "persons" } });
+                router.push({ name: "researcherLandingPage", query: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value =
                     isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });

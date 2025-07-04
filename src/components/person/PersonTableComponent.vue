@@ -1,6 +1,6 @@
 <template>
     <v-btn
-        v-if="isAdmin && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
+        v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>

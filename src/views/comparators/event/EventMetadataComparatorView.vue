@@ -82,7 +82,12 @@
             </v-col>
         </v-row>
 
-        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
+        <comparison-actions
+            :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            supports-force-delete
+            @update="updateAll"
+            @delete="deleteSide">
+        </comparison-actions>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
 
@@ -335,7 +340,7 @@ export default defineComponent({
                 await MergeService.switchAllIndicatorsToOtherConference(id as number, transferTargetId as number);
                 await MergeService.switchAllClassificationsToOtherConference(id as number, transferTargetId as number);
 
-                router.push({ name: "deduplication", query: { tab: "events" } });
+                router.push({ name: "conferenceLandingPage", query: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification", 

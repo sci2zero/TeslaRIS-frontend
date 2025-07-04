@@ -75,8 +75,13 @@
         </v-row>
 
         <comparison-actions
-            supports-force-delete :left-warning-message="leftWarningMessage" :right-warning-message="rightWarningMessage" @update="updateAll"
-            @delete="deleteSide"></comparison-actions>
+            :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :supports-force-delete="isAdmin"
+            :left-warning-message="leftWarningMessage"
+            :right-warning-message="rightWarningMessage"
+            @update="updateAll"
+            @delete="deleteSide"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -100,6 +105,7 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import OrganisationUnitRelationUpdateForm from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -108,6 +114,8 @@ export default defineComponent({
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
+
+        const { isAdmin } = useUserRole();
 
         const currentRoute = useRoute();
         const router = useRouter();
@@ -353,7 +361,7 @@ export default defineComponent({
 
                 await MergeService.switchAllIndicatorsToOtherOrganisationUnit(id as number, transferTargetId as number);
 
-                router.push({ name: "deduplication", query: { tab: "organisationUnits" } });
+                router.push({ name: "organisationUnitLandingPage", query: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification",
@@ -406,7 +414,7 @@ export default defineComponent({
             updateLeftKeywords, updateRightKeywords,
             updateRightKeywordsRef, updateLeftKeywordsRef,
             leftRelations, rightRelations, snackbar,
-            leftRelationsRef, rightRelationsRef,
+            leftRelationsRef, rightRelationsRef, isAdmin,
             updateLeftRelations, updateRightRelations,
             leftWarningMessage, rightWarningMessage
         };

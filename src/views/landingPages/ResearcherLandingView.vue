@@ -222,7 +222,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="totalPublications > 0 || canEdit" value="publications">
+            <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -267,9 +267,7 @@
                 <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
 
                 <v-row>
-                    <v-col
-                        v-if="displayExpertiseAndPrizePanel()"
-                        cols="6">
+                    <v-col cols="6">
                         <!-- Expertises and Skills -->
                         <expertise-or-skill-list
                             :expertise-or-skills="person?.expertisesOrSkills"
@@ -723,10 +721,6 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
-        const displayExpertiseAndPrizePanel = () => {
-            return person.value && (canEdit.value || person.value.expertisesOrSkills.length > 0 || person.value.prizes.length > 0);
-        };
-
         return {
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword,
@@ -737,8 +731,8 @@ export default defineComponent({
             currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
-            ExportableEndpointType, isResearcher, performNavigation, displayExpertiseAndPrizePanel,
-            getEmploymentPositionTitleFromValueAutoLocale, ApplicableEntityType, fetchIndicators
+            ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType,
+            getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators
         };
 }});
 </script>
