@@ -73,6 +73,7 @@
             :publications="publications"
             :total-publications="totalPublications"
             enable-export
+            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
             :endpoint-body-parameters="
@@ -128,7 +129,7 @@ export default defineComponent({
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
-        const { isCommission, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+        const { isCommission, isInstitutionalEditor, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
 
         const searchFields = ref<SearchFieldsResponse[]>([]);
 
@@ -216,7 +217,7 @@ export default defineComponent({
 
         return {
             search, publications, totalPublications,
-            switchPage,
+            switchPage, isInstitutionalEditor,
             tableRef, clearSortAndPerformSearch, searchFields,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,

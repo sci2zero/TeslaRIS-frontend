@@ -34,7 +34,12 @@
             </v-col>
         </v-row>
 
-        <comparison-actions supports-force-delete @update="updateAll" @delete="deleteSide"></comparison-actions>
+        <comparison-actions
+            :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            supports-force-delete
+            @update="updateAll"
+            @delete="deleteSide">
+        </comparison-actions>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -195,13 +200,14 @@ export default defineComponent({
         const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftPublisher.value?.id as number : rightPublisher.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftPublisher.value?.name : rightPublisher.value?.name;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightPublisher.value?.id : leftPublisher.value?.id;
 
             const deleteAction = isForceDelete 
                 ? PublisherService.forceDeletePublisher(id)
                 : PublisherService.deletePublisher(id);
 
             deleteAction.then(() => {
-                router.push({ name: "deduplication", query: { tab: "publishers" } });
+                router.push({ name: "publisherLandingPage", query: { id: transferTargetId } });
             }).catch(() => {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;

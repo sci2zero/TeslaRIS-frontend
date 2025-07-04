@@ -29,8 +29,9 @@
             :organisation-units="organisationUnits"
             :total-o-us="totalOUs"
             enable-export
+            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
-            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+            :endpoint-token-parameters="[searchParams, returnOnlyInstitutionRelatedEntities ? String(loggedInUser?.organisationUnitId) : 'null']"
             @switch-page="switchPage">
         </organisation-unit-table-component>
     </v-container>
@@ -68,7 +69,7 @@ export default defineComponent({
         const router = useRouter();
         const tableRef = ref<typeof OrganisationUnitTableComponent>();
 
-        const { isAdmin, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("ouListLabel");
@@ -124,7 +125,7 @@ export default defineComponent({
             clearSortAndPerformSearch, tableRef,
             returnOnlyInstitutionRelatedEntities,
             isUserBoundToOU, ExportableEndpointType,
-            loading
+            loading, isInstitutionalEditor, loggedInUser
         };
     }
 });

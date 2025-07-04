@@ -4,10 +4,10 @@ import i18n from ".";
 export const userTypesSr = [
     { title: "Administrator", value: UserRole.ADMIN },
     { title: "Istraživač", value: UserRole.RESEARCHER },
-    { title: "Institucioni urednik", value: UserRole.INSTITUTIONAL_EDITOR },
+    { title: "Institucionalni urednik", value: UserRole.INSTITUTIONAL_EDITOR },
     { title: "Komisija", value: UserRole.COMMISSION },
     { title: "Prodekan za nauku", value: UserRole.VICE_DEAN_FOR_SCIENCE },
-    { title: "Institucioni bibliotekar", value: UserRole.INSTITUTIONAL_LIBRARIAN },
+    { title: "Institucionalni bibliotekar", value: UserRole.INSTITUTIONAL_LIBRARIAN },
     { title: "Administrator biblioteke", value: UserRole.HEAD_OF_LIBRARY },
     { title: "Administrator matične knjige", value: UserRole.PROMOTION_REGISTRY_ADMINISTRATOR }
 ];

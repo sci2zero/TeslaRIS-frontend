@@ -909,5 +909,6 @@ export default {
     unableToFetchMetadataMessage: "Metadata harvest was unsuccessfull.",
     updateJournalPublicationLabel: "Update journal publication",
     commissionViewLabel: "View as commission",
-    defaultForMServiceLabel: "Default for M-Service"
+    defaultForMServiceLabel: "Default for M-Service",
+    cyclicOrgUnitRelationLabel: "Organisation unit can't be a part of itself."
 }

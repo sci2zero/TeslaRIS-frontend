@@ -38,6 +38,8 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <toast v-model="snackbar" :message="message" />
     </v-row>
 </template>
 
@@ -47,11 +49,13 @@ import { defineComponent } from "vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import OrganisationUnitAutocompleteSearch from "./OrganisationUnitAutocompleteSearch.vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
+import Toast from "../core/Toast.vue";
+import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
     name: "AddSubUnitModal",
-    components: { OrganisationUnitAutocompleteSearch },
+    components: { OrganisationUnitAutocompleteSearch, Toast },
     props: {
         institutionId: {
             type: Number,
@@ -62,6 +66,10 @@ export default defineComponent({
     setup(props, { emit }) {
         const dialog = ref(false);
         const isFormValid = ref(false);
+
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedOU = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -74,13 +82,19 @@ export default defineComponent({
             ).then(() => {
                 emit("update", true);
                 dialog.value = false;
+            }).catch(error => {
+                if (error.response.status === 409) {
+                    message.value = i18n.t(error.response.data.message as string);
+                    snackbar.value = true;
+                }
             });
         };
 
         return {
             dialog, selectedOU,
             saveSubUnit, isFormValid,
-            requiredSelectionRules
+            requiredSelectionRules,
+            snackbar, message
         };
     }
 });
