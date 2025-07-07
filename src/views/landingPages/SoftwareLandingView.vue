@@ -117,7 +117,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (software?.contributions && software?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -144,12 +144,26 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="software?.keywords ? software.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="software?.keywords ? software.keywords : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="software?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="software?.description"
+                    :can-edit="canEdit"
+                    @update="updateDescription">
+                </description-section>
 
-                <attachment-section :document="software" :can-edit="canEdit" :proofs="software?.proofs" :file-items="software?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="software"
+                    :can-edit="canEdit"
+                    :proofs="software?.proofs"
+                    :file-items="software?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -177,7 +191,11 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(software?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(software?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

@@ -261,10 +261,20 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="keywords" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="keywords"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Biography -->
-                <description-section :description="biography" :can-edit="canEdit" is-biography @update="updateBiography"></description-section>
+                <description-section
+                    :description="biography"
+                    :can-edit="canEdit"
+                    is-biography
+                    @update="updateBiography">
+                </description-section>
 
                 <v-row>
                     <v-col cols="6">

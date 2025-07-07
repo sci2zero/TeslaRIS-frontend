@@ -161,7 +161,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (journalPublication?.contributions && journalPublication?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -189,12 +189,26 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="journalPublication?.keywords ? journalPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="journalPublication?.keywords ? journalPublication.keywords : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="journalPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="journalPublication?.description"
+                    :can-edit="canEdit"
+                    @update="updateDescription">
+                </description-section>
 
-                <attachment-section :document="journalPublication" :can-edit="canEdit" :proofs="journalPublication?.proofs" :file-items="journalPublication?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="journalPublication"
+                    :can-edit="canEdit"
+                    :proofs="journalPublication?.proofs"
+                    :file-items="journalPublication?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -225,7 +239,11 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(journalPublication?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(journalPublication?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

@@ -118,7 +118,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (dataset?.contributions && dataset?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -146,7 +146,12 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="dataset?.keywords ? dataset.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="dataset?.keywords ? dataset.keywords : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
                 <description-section
@@ -155,7 +160,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section :document="dataset" :can-edit="canEdit" :proofs="dataset?.proofs" :file-items="dataset?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="dataset"
+                    :can-edit="canEdit"
+                    :proofs="dataset?.proofs"
+                    :file-items="dataset?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -183,7 +193,11 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(dataset?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(dataset?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

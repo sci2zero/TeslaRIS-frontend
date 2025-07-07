@@ -122,7 +122,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (patent?.contributions && patent?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -150,12 +150,26 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="patent?.keywords ? patent.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="patent?.keywords ? patent.keywords : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="patent?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="patent?.description"
+                    :can-edit="canEdit"
+                    @update="updateDescription">
+                </description-section>
 
-                <attachment-section :document="patent" :can-edit="canEdit" :proofs="patent?.proofs" :file-items="patent?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="patent"
+                    :can-edit="canEdit"
+                    :proofs="patent?.proofs"
+                    :file-items="patent?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
