@@ -37,10 +37,10 @@
             <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
-            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
+            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER' && shouldDiplayBoardPresidentBox(input)">
                 <v-checkbox v-model="input.isBoardPresident" :label="$t('boardPresidentLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
-            <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR'">
+            <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR' && shouldDisplayAlsoBoardMemberBox(input)">
                 <v-checkbox v-model="input.isAlsoABoardMember" :label="$t('isAlsoABoardMemberLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
             <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
@@ -76,6 +76,7 @@ import { getEmploymentTitlesForGivenLocale } from "@/i18n/employmentTitle";
 import { getPersonalTitlesForGivenLocale } from "@/i18n/personalTitle";
 import { EmploymentTitle, PersonalTitle } from "@/models/InvolvementModel";
 import InvolvementService from "@/services/InvolvementService";
+import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
@@ -118,6 +119,8 @@ export default defineComponent({
 
         const employmentTitles = computed(() => getEmploymentTitlesForGivenLocale());
         const personalTitles = computed(() => getPersonalTitlesForGivenLocale());
+
+        const i18n = useI18n();
 
         onMounted(() => {
             populateFormData();
@@ -173,7 +176,15 @@ export default defineComponent({
             const types = getTypesForGivenLocale();
 
             if (types && !props.boardMembersAllowed) {
-                return types.filter(type => type.value !== 'BOARD_MEMBER');
+                return types.filter(type => type.value !== "BOARD_MEMBER");
+            }
+
+            if (types && props.boardMembersAllowed) {
+                types.forEach(type => {
+                    if (type.value === "ADVISOR") {
+                        type.title = i18n.t("mentorLabel");
+                    }
+                });
             }
 
             return types;
@@ -271,13 +282,31 @@ export default defineComponent({
             emit("setInput", returnObject);
         };
 
+        const shouldDiplayBoardPresidentBox = (input: any) => {
+            if (inputs.value.find(i => i.isBoardPresident)) {
+                return input.isBoardPresident;
+            }
+
+            return true;
+        };
+
+        const shouldDisplayAlsoBoardMemberBox = (input: any) => {
+            if (inputs.value.find(i => i.contribution.personId === input.contribution.personId && i.contributionType.value === "BOARD_MEMBER")) {
+                return false;
+            }
+
+            return true;
+        };
+
         return {
             inputs, addInput, removeInput,
             contributionTypes, sendContentToParent,
             baseContributionRef, clearInput,
             employmentTitles, personalTitles,
             populateFormData, fillInputs,
-            fillDummyAuthors
+            fillDummyAuthors,
+            shouldDiplayBoardPresidentBox,
+            shouldDisplayAlsoBoardMemberBox
         }
     }
 });

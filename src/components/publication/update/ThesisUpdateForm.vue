@@ -67,14 +67,19 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
-                <v-select
-                    v-model="selectedResearchArea"
-                    :label="$t('researchAreaLabel')"
-                    :placeholder="$t('researchAreaLabel')"
-                    :items="researchAreasSelectable"
-                    return-object
-                ></v-select>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="scientificArea"
+                    :label="$t('scientificAreaLabel')"
+                    :placeholder="$t('scientificAreaLabel')">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="scientificSubArea"
+                    :label="$t('scientificSubAreaLabel')"
+                    :placeholder="$t('scientificSubAreaLabel')">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -91,8 +96,93 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
-                <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="numberOfPages" type="number"
+                    :label="$t('numberOfPagesLabel')"
+                    :placeholder="$t('numberOfPagesLabel')">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="numberOfChapters" type="number"
+                    :label="$t('numberOfChaptersLabel')"
+                    :placeholder="$t('numberOfChaptersLabel')">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="numberOfReferences" type="number"
+                    :label="$t('numberOfReferencesLabel')"
+                    :placeholder="$t('numberOfReferencesLabel')">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="numberOfGraphs" type="number"
+                    :label="$t('numberOfGraphsLabel')"
+                    :placeholder="$t('numberOfGraphsLabel')">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="numberOfIllustrations" type="number"
+                    :label="$t('numberOfIllustrationsLabel')"
+                    :placeholder="$t('numberOfIllustrationsLabel')">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="numberOfTables" type="number"
+                    :label="$t('numberOfTablesLabel')"
+                    :placeholder="$t('numberOfTablesLabel')">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="numberOfAppendices" type="number"
+                    :label="$t('numberOfAppendicesLabel')"
+                    :placeholder="$t('numberOfAppendicesLabel')">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="eIsbn"
+                    label="E-ISBN"
+                    placeholder="E-ISBN"
+                    :rules="isbnValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="printIsbn"
+                    label="Print ISBN"
+                    placeholder="Print ISBN"
+                    :rules="isbnValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="placeOfKeep"
+                    :label="$t('placeOfKeepLabel')"
+                    :placeholder="$t('placeOfKeepLabel')">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="udc"
+                    :label="$t('udcLabel')"
+                    :placeholder="$t('udcLabel')"
+                    :rules="udcValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -115,6 +205,7 @@
                     v-model="selectedWritingLanguage"
                     :label="$t('writingLanguageLabel')"
                     :items="languageTagsList"
+                    return-object
                 ></v-select>
             </v-col>
         </v-row>
@@ -150,8 +241,6 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/Mult
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { getThesisTypesForGivenLocale, getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
-import ResearchAreaService from '@/services/ResearchAreaService';
-import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import { computed } from 'vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
@@ -188,21 +277,19 @@ export default defineComponent({
         const { isAdmin, isInstitutionalLibrarian } = useUserRole();
         const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
-        const { languageTags, languageTagsList } = useLanguageTags();
+        const { languageTags } = useLanguageTags();
+        const languageTagsList = ref<any[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguage = ref<number>(props.presetThesis?.languageId as number);
-        const selectedWritingLanguage = ref<number>(props.presetThesis?.writingLanguageTagId as number);
+        const selectedWritingLanguage = ref<{title: string, value: number}>();
+        const languages = ref<LanguageResponse[]>();
 
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                languages.value = response.data;
                 response.data.forEach((language: LanguageResponse) => {
                     languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                 });
-            });
-
-            ResearchAreaService.listAllResearchAreas().then(response => {
-                allResearchAreas.value = response.data;
-                populateSelectionData();
             });
             
             fetchDetails();
@@ -225,25 +312,32 @@ export default defineComponent({
                         selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                     });
                 }
-
-                if (props.presetThesis.researchAreaId) {
-                    ResearchAreaService.readResearchAreaHierarchy(props.presetThesis.researchAreaId).then((response) => {
-                        selectedResearchArea.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
-                    });
-                }
             }
-        };
-
-        const populateSelectionData = () => {
-            researchAreasSelectable.value = [];
-            allResearchAreas.value.forEach(researchArea => {
-                researchAreasSelectable.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.id as number});
-            });
         };
 
         watch(() => props.presetThesis, () => {
             if (props.presetThesis) {
                 refreshForm();
+            }
+        });
+
+        watch([selectedLanguage, languageTags], () => {
+            if (!selectedLanguage.value || !languageTags.value || languageTags.value.length === 0) {
+                return;
+            }
+
+            const language = languages.value?.find(lang => lang.id === selectedLanguage.value);
+            if (language) {
+                languageTagsList.value = languageTags.value
+                    .filter(tag => tag.languageCode.startsWith(language.languageCode))
+                    .map(tag => ({ title: tag.display, value: tag.id }));
+            } else {
+                languageTagsList.value = languageTags.value
+                    .map(tag => ({ title: tag.display, value: tag.id }));
+            }
+
+            if (!selectedWritingLanguage.value && props.presetThesis?.writingLanguageTagId) {
+                selectedWritingLanguage.value = languageTagsList.value.find(tag => tag.value === props.presetThesis?.writingLanguageTagId);
             }
         });
 
@@ -254,10 +348,6 @@ export default defineComponent({
 
         const selectedPublisher = ref<{ title: string, value: number }>({title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number});
         const selectedOrganisationUnit = ref<{ title: string, value: number }>();
-
-        const allResearchAreas = ref<ResearchArea[]>([]);
-        const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
-        const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
 
         const title = ref<any>([]);
         const externalOUName = ref<any>([]);
@@ -270,10 +360,24 @@ export default defineComponent({
         const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
         const thesisDefenceDate = ref(props.presetThesis?.thesisDefenceDate as string);
 
+        const scientificArea = ref(props.presetThesis?.scientificArea as string);
+        const scientificSubArea = ref(props.presetThesis?.scientificSubArea as string);
+        const numberOfChapters = ref(props.presetThesis?.numberOfChapters as number);
+        const numberOfReferences = ref(props.presetThesis?.numberOfReferences as number);
+        const numberOfGraphs = ref(props.presetThesis?.numberOfGraphs as number);
+        const numberOfIllustrations = ref(props.presetThesis?.numberOfIllustrations as number);
+        const numberOfTables = ref(props.presetThesis?.numberOfTables as number);
+        const numberOfAppendices = ref(props.presetThesis?.numberOfAppendices);
+        const eIsbn = ref(props.presetThesis?.eisbn as string);
+        const printIsbn = ref(props.presetThesis?.printISBN as string);
+        const placeOfKeep = ref(props.presetThesis?.placeOfKeep as string);
+        const udc = ref(props.presetThesis?.udc as string);
+
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules, isbnValidationRules,
+            udcValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
@@ -294,14 +398,21 @@ export default defineComponent({
                     return;
                 }
             }
-
+            
             const updatedThesis: Thesis = {
                 organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
                 externalOrganisationUnitName: externalOUName.value,
-                researchAreaId: selectedResearchArea.value.value as number,
+                scientificArea: scientificArea.value,
+                scientificSubArea: scientificSubArea.value,
                 thesisType: selectedThesisType.value.value as ThesisType,
                 title: title.value as MultilingualContent[],
                 numberOfPages: numberOfPages.value as number,
+                numberOfChapters: numberOfChapters.value as number,
+                numberOfReferences: numberOfReferences.value as number,
+                numberOfIllustrations: numberOfIllustrations.value as number,
+                numberOfGraphs: numberOfGraphs.value as number,
+                numberOfTables: numberOfTables.value as number,
+                numberOfAppendices: numberOfAppendices.value as number,
                 description: props.presetThesis?.description as MultilingualContent[],
                 keywords: props.presetThesis?.keywords as MultilingualContent[],
                 subTitle: subtitle.value as MultilingualContent[],
@@ -312,11 +423,15 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 languageId: selectedLanguage.value,
-                writingLanguageTagId: selectedWritingLanguage.value,
+                writingLanguageTagId: selectedWritingLanguage.value?.value as number,
                 fileItems: [],
                 proofs: [],
                 topicAcceptanceDate: topicAcceptanceDate.value,
-                thesisDefenceDate: thesisDefenceDate.value
+                thesisDefenceDate: thesisDefenceDate.value,
+                printISBN: printIsbn.value,
+                eisbn: eIsbn.value,
+                udc: udc.value,
+                placeOfKeep: placeOfKeep.value
             };
 
             emit("update", updatedThesis);
@@ -335,11 +450,23 @@ export default defineComponent({
             selectedLanguage.value = props.presetThesis?.languageId as number;
             uris.value = props.presetThesis?.uris as string[];
             numberOfPages.value = props.presetThesis?.numberOfPages;
+            numberOfChapters.value = props.presetThesis?.numberOfChapters as number;
+            numberOfReferences.value = props.presetThesis?.numberOfReferences as number;
+            numberOfTables.value = props.presetThesis?.numberOfTables as number;
+            numberOfIllustrations.value = props.presetThesis?.numberOfIllustrations as number;
+            numberOfGraphs.value = props.presetThesis?.numberOfGraphs as number;
+            numberOfAppendices.value = props.presetThesis?.numberOfAppendices as number;
             publicationYear.value = props.presetThesis?.documentDate;
             doi.value = props.presetThesis?.doi;
             openAlexId.value = props.presetThesis?.openAlexId;
             topicAcceptanceDate.value = props.presetThesis?.topicAcceptanceDate as string;
             thesisDefenceDate.value = props.presetThesis?.thesisDefenceDate as string;
+            scientificArea.value = props.presetThesis?.scientificArea as string;
+            scientificSubArea.value = props.presetThesis?.scientificSubArea as string;
+            printIsbn.value = props.presetThesis?.printISBN as string;
+            eIsbn.value = props.presetThesis?.eisbn as string;
+            placeOfKeep.value = props.presetThesis?.placeOfKeep as string;
+            udc.value = props.presetThesis?.udc as string;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -358,12 +485,15 @@ export default defineComponent({
             submit, toMultilingualTextInput, selectedWritingLanguage,
             languageTags, doiValidationRules, enterExternalOU,
             scopusIdValidationRules, selectedOrganisationUnit,
-            researchAreasSelectable, selectedResearchArea,
             selectedLanguage, publicationTypes, selectedThesisType,
             languageList, titleRef, subtitleRef, refreshForm,
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
             topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference,
-            openAlexId, workOpenAlexIdValidationRules
+            openAlexId, workOpenAlexIdValidationRules, isbnValidationRules,
+            udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
+            numberOfChapters, numberOfReferences, numberOfTables,
+            numberOfIllustrations, numberOfGraphs, numberOfAppendices,
+            scientificArea, scientificSubArea
         };
     }
 });

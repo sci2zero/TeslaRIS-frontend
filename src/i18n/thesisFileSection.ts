@@ -4,7 +4,7 @@ import i18n from ".";
 export const thesisFileSectionSr = [
     { title: "Dokazi", value: ThesisFileSection.PROOFS },
     { title: "Fajlovi", value: ThesisFileSection.FILE_ITEMS },
-    { title: "Preliminarni fajlovi", value: ThesisFileSection.PRELIMINARY_FILES },
+    { title: "Preliminarni dokumenti", value: ThesisFileSection.PRELIMINARY_FILES },
     { title: "Preliminarni suplementi", value: ThesisFileSection.PRELIMINARY_SUPPLEMENTS },
     { title: "Izveštaji komisije", value: ThesisFileSection.COMMISSION_REPORTS }
 ];
@@ -12,7 +12,7 @@ export const thesisFileSectionSr = [
 export const thesisFileSectionEn = [
     { title: "Proofs", value: ThesisFileSection.PROOFS },
     { title: "File items", value: ThesisFileSection.FILE_ITEMS },
-    { title: "Preliminary files", value: ThesisFileSection.PRELIMINARY_FILES },
+    { title: "Preliminary documents", value: ThesisFileSection.PRELIMINARY_FILES },
     { title: "Preliminary supplements", value: ThesisFileSection.PRELIMINARY_SUPPLEMENTS },
     { title: "Commission reports", value: ThesisFileSection.COMMISSION_REPORTS }
 ];
