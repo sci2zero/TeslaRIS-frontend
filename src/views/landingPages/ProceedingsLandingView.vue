@@ -166,13 +166,13 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="totalPublications > 0" value="publications">
+            <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (proceedings?.contributions && proceedings?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
@@ -197,13 +197,27 @@
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <br />
-                <keyword-list :keywords="proceedings?.keywords ? proceedings.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="proceedings?.keywords ? proceedings.keywords : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="proceedings?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="proceedings?.description"
+                    :can-edit="canEdit"
+                    @update="updateDescription">
+                </description-section>
 
                 <br />
-                <attachment-section :document="proceedings" :can-edit="canEdit" :proofs="proceedings?.proofs" :file-items="proceedings?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="proceedings"
+                    :can-edit="canEdit"
+                    :proofs="proceedings?.proofs"
+                    :file-items="proceedings?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -229,7 +243,11 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(proceedings?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(proceedings?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

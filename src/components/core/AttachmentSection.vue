@@ -1,5 +1,5 @@
 <template>
-    <v-row v-if="canEditThesisAttachments || (preliminaryFiles?.length > 0 && isOnPublicReview)" class="mt-10">
+    <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminaryFilesLabel") }}</h2>
             <attachment-list
@@ -10,7 +10,7 @@
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"></attachment-list>
         </v-col>
     </v-row>
-    <v-row v-if="canEditThesisAttachments || (preliminarySupplements?.length > 0 && isOnPublicReview)" class="mt-10">
+    <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
             <attachment-list
@@ -21,7 +21,7 @@
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"></attachment-list>
         </v-col>
     </v-row>
-    <v-row v-if="canEditThesisAttachments || (commissionReports?.length > 0 && isOnPublicReview)" class="mt-10">
+    <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("commissionReportsLabel") }}</h2>
             <attachment-list
@@ -32,7 +32,7 @@
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"></attachment-list>
         </v-col>
     </v-row>
-    <v-row v-if="canEdit || (fileItems && fileItems.length > 0)" class="mt-10">
+    <v-row class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <attachment-list
@@ -40,7 +40,7 @@
                 @delete="deleteAttachment($event, false, document)" @update="updateAttachment($event, false, document)"></attachment-list>
         </v-col>
     </v-row>
-    <v-row v-if="canEdit || (proofs && proofs.length > 0)" class="mt-10">
+    <v-row class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("proofsLabel") }}</h2>
             <attachment-list

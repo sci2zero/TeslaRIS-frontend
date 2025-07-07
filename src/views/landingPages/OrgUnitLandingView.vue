@@ -147,7 +147,12 @@
         </div>
 
         <!-- Keywords -->
-        <keyword-list :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+        <keyword-list
+            :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
+            :can-edit="canEdit"
+            @search-keyword="searchKeyword($event)"
+            @update="updateKeywords">
+        </keyword-list>
 
         <br />
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />

@@ -93,10 +93,10 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="totalPublications > 0" value="publications">
+            <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (journal?.contributions && journal?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab v-if="canClassify || journalIndicators.length > 0" value="indicators">

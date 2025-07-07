@@ -93,10 +93,10 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-if="totalPublications > 0" value="publications">
+            <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (bookSeries?.contributions && bookSeries?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab v-if="bookSeriesIndicators.length > 0" value="indicators">
@@ -111,7 +111,12 @@
             <v-tabs-window-item value="publications">
                 <!-- Publications Table -->
                 <h2>{{ $t("journalPublicationsLabel") }}</h2>
-                <publication-table-component :publications="publications" :total-publications="totalPublications" in-comparator @switch-page="switchPage"></publication-table-component>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    in-comparator
+                    @switch-page="switchPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs

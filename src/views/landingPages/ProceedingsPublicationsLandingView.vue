@@ -149,7 +149,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (proceedingsPublication?.contributions && proceedingsPublication?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">

@@ -163,13 +163,13 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (monograph?.contributions && monograph?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="researchAreaHierarchy || canEdit" value="researchArea">
+            <v-tab value="researchArea">
                 {{ $t("researchAreaLabel") }}
             </v-tab>
             <v-tab v-show="documentIndicators?.length > 0 || canEdit" value="indicators">
@@ -194,10 +194,19 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="monograph?.keywords ? monograph.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="monograph?.keywords ? monograph.keywords : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="monograph?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="monograph?.description"
+                    :can-edit="canEdit"
+                    @update="updateDescription">
+                </description-section>
                 
                 <!-- Publications Table -->
                 <v-row>
@@ -213,16 +222,28 @@
                     </v-col>
                 </v-row>
 
-                <attachment-section :document="monograph" :can-edit="canEdit" :proofs="monograph?.proofs" :file-items="monograph?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="monograph"
+                    :can-edit="canEdit"
+                    :proofs="monograph?.proofs"
+                    :file-items="monograph?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <research-areas-update-modal :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []" :read-only="!canEdit" limit-one @update="updateResearchAreas"></research-areas-update-modal>
+                                <research-areas-update-modal
+                                    :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []"
+                                    :read-only="!canEdit"
+                                    limit-one
+                                    @update="updateResearchAreas">
+                                </research-areas-update-modal>
                                 <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                                <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
+                                <research-area-hierarchy
+                                    :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []">
+                                </research-area-hierarchy>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -254,7 +275,11 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(monograph?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(monograph?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

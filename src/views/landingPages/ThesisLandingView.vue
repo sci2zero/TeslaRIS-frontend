@@ -244,13 +244,15 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="canEdit || (thesis?.contributions && thesis?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="thesis?.contributions && thesis.contributions.length > 0 && thesis?.contributions![0].personId" value="researchOutput">
+            <v-tab
+                v-show="thesis?.contributions && thesis.contributions.length > 0 && thesis?.contributions![0].personId"
+                value="researchOutput">
                 {{ $t("researchOutputLabel") }}
             </v-tab>
             <v-tab v-show="documentIndicators?.length > 0 || canClassify" value="indicators">
@@ -273,10 +275,19 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="thesis?.keywords ? thesis.keywords : []" :can-edit="canEdit && !thesis?.isOnPublicReview" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="thesis?.keywords ? thesis.keywords : []"
+                    :can-edit="canEdit && !thesis?.isOnPublicReview"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="thesis?.description" :can-edit="canEdit && !thesis?.isOnPublicReview" @update="updateDescription"></description-section>
+                <description-section
+                    :description="thesis?.description"
+                    :can-edit="canEdit && !thesis?.isOnPublicReview"
+                    @update="updateDescription">
+                </description-section>
 
                 <!-- Research Area -->
                 <v-row>
@@ -336,9 +347,18 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher && !thesis?.isOnPublicReview" :document-id="(thesis?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher && !thesis?.isOnPublicReview"
+            :document-id="(thesis?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
 
-        <persistent-question-dialog ref="publicDialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="commitThesisStatusChange"></persistent-question-dialog>
+        <persistent-question-dialog
+            ref="publicDialogRef"
+            :title="$t('areYouSureLabel')"
+            :message="dialogMessage"
+            @continue="commitThesisStatusChange">
+        </persistent-question-dialog>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

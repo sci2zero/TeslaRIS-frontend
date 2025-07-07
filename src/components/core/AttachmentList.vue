@@ -1,5 +1,5 @@
 <template>
-    <v-card v-if="canEdit || attachments.length > 0" class="pa-3" variant="flat" color="grey-lighten-5">
+    <v-card class="pa-3" variant="flat" color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
             <document-file-submission-modal
                 v-if="canEdit"

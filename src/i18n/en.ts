@@ -675,7 +675,7 @@ export default {
     removeFromPublicReviewLabel: "Remove from public review",
     missingAttachmentsMessage: "Number of preliminary files, supplements and commission reports.",
     datesOfPublicReviewLabel: "Dates when put on public review:",
-    noAttachmentsMessage: "There are missing attachments",
+    noAttachmentsMessage: "The required data and documents for public review have not been provided. The required data are: Title, Author, and Organization Unit. The required (preliminary) documents are: the dissertation and the commission report.",
     putOnPublicReviewWarningMessage: "When the thesis is placed under public review, all modifications will be disabled until the public review period ends.",
     removeFromPublicReviewWarningMessage: "By removing the thesis from public review, modifications will be allowed, after which you will be able to start a new or continue the current public review. This operation should only be used in exceptional situations.",    classifiedByMeLabel: "Classified by me",
     institutionProfileLabel: "Institution profile",

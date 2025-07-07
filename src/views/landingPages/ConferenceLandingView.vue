@@ -122,7 +122,7 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="canEdit || (conference?.contributions && conference?.contributions.length > 0)" value="contributions">
+            <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab v-if="eventIndicators?.length > 0 || canClassify" value="indicators">
@@ -138,8 +138,16 @@
             v-model="currentTab"
         >
             <v-tabs-window-item value="additionalInfo">
-                <keyword-list :keywords="conference?.keywords ? conference?.keywords : []" :can-edit="canEdit" @update="updateKeywords"></keyword-list>
-                <description-section :description="conference?.description ? conference.description : []" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <keyword-list
+                    :keywords="conference?.keywords ? conference?.keywords : []"
+                    :can-edit="canEdit"
+                    @update="updateKeywords">
+                </keyword-list>
+                <description-section
+                    :description="conference?.description ? conference.description : []"
+                    :can-edit="canEdit"
+                    @update="updateDescription">
+                </description-section>
             
                 <!-- Proceedings List -->
                 <div v-if="!conference?.serialEvent">
@@ -154,11 +162,20 @@
                 <!-- Publication Table -->
                 <div v-if="!conference?.serialEvent" class="mt-10">
                     <h2>{{ $t("publicationsLabel") }}</h2>
-                    <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPublicationsPage"></publication-table-component>
+                    <publication-table-component
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        @switch-page="switchPublicationsPage">
+                    </publication-table-component>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-event-contribution-tabs :event-id="conference?.id" :contribution-list="conference?.contributions ? conference.contributions : []" :read-only="!canEdit" @update="updateContributions"></person-event-contribution-tabs>
+                <person-event-contribution-tabs
+                    :event-id="conference?.id"
+                    :contribution-list="conference?.contributions ? conference.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions">
+                </person-event-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

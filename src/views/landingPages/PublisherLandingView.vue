@@ -73,8 +73,17 @@
 
         <!-- Publication Table -->
         <br />
-        <tab-content-loader v-if="!publisher" :button-header="false" layout="table" />
-        <publication-table-component v-else :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+        <tab-content-loader
+            v-if="!publisher"
+            :button-header="false"
+            layout="table"
+        />
+        <publication-table-component
+            v-else
+            :publications="publications"
+            :total-publications="totalPublications"
+            @switch-page="switchPage">
+        </publication-table-component>
         
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
