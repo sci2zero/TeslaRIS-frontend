@@ -249,6 +249,10 @@ export interface Thesis extends Document {
     printISBN?: string;
     placeOfKeep?: string,
     udc?: string;
+    typeOfTitle?: string;
+    extendedAbstract?: MultilingualContent[];
+    remark?: MultilingualContent[];
+    alternateTitle?: MultilingualContent[];
 }
 
 export interface CitationResponse {

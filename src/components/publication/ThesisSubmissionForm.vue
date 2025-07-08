@@ -119,6 +119,7 @@
                                 v-model="selectedWritingLanguage"
                                 :label="$t('writingLanguageLabel')"
                                 :items="languageTagsList"
+                                return-object
                             ></v-select>
                         </v-col>
                     </v-row>
@@ -236,6 +237,15 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="typeOfTitle"
+                                :label="$t('typeOfTitleLabel')"
+                                :placeholder="$t('typeOfTitleLabel')">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col>
                             <multilingual-text-input
                                 ref="descriptionRef" v-model="description"
@@ -325,7 +335,7 @@ export default defineComponent({
         const languageTagsList = ref<any[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguage = ref<number>();
-        const selectedWritingLanguage = ref<number>();
+        const selectedWritingLanguage = ref<{title: string, value: number}>();
         const languages = ref<LanguageResponse[]>();
 
         onMounted(() => {
@@ -349,10 +359,10 @@ export default defineComponent({
             if (language) {
                 languageTagsList.value = languageTags.value
                     .filter(tag => tag.languageCode.startsWith(language.languageCode))
-                    .map(tag => ({ title: tag.display, id: tag.id }));
+                    .map(tag => ({ title: tag.display, value: tag.id }));
             } else {
                 languageTagsList.value = languageTags.value
-                    .map(tag => ({ title: tag.display, id: tag.id }));
+                    .map(tag => ({ title: tag.display, value: tag.id }));
             }
         });
 
@@ -407,6 +417,7 @@ export default defineComponent({
         const printIsbn = ref("");
         const placeOfKeep = ref("");
         const udc = ref("");
+        const typeOfTitle = ref("PhD (dr)");
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
@@ -425,7 +436,7 @@ export default defineComponent({
                 title: title.value,
                 thesisType: selectedThesisType.value.value as ThesisType,
                 languageId: selectedLanguage.value as number,
-                writingLanguageTagId: selectedWritingLanguage.value as number,
+                writingLanguageTagId: selectedWritingLanguage.value?.value as number,
                 numberOfPages: numberOfPages.value as number,
                 numberOfChapters: numberOfChapters.value as number,
                 numberOfReferences: numberOfReferences.value as number,
@@ -453,7 +464,8 @@ export default defineComponent({
                 printISBN: printIsbn.value,
                 eisbn: eIsbn.value,
                 udc: udc.value,
-                placeOfKeep: placeOfKeep.value
+                placeOfKeep: placeOfKeep.value,
+                typeOfTitle: typeOfTitle.value
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
@@ -487,6 +499,7 @@ export default defineComponent({
                     printIsbn.value = "";
                     placeOfKeep.value = "";
                     udc.value = "";
+                    typeOfTitle.value = "";
 
                     error.value = false;
                     snackbar.value = true;
@@ -542,7 +555,8 @@ export default defineComponent({
             numberOfChapters, numberOfReferences, numberOfGraphs,
             numberOfIllustrations, numberOfTables, numberOfAppendices,
             scientificArea, eIsbn, printIsbn, isbnValidationRules,
-            udcValidationRules, placeOfKeep, udc, scientificSubArea
+            udcValidationRules, placeOfKeep, udc, scientificSubArea,
+            typeOfTitle
         };
     }
 });

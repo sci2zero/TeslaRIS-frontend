@@ -515,6 +515,10 @@ export default defineComponent({
         };
 
         const onAutocompleteBlur = () => {
+            if (!props.allowExternalAssociate) {
+                return;
+            }
+
             setTimeout(() => {
                 const active = document.activeElement;
                 const isInsideCrudModal = active && active.closest('.generic-crud-modal');

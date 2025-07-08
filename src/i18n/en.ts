@@ -804,31 +804,31 @@ export default {
     },
     "licenses": {
         "by": {
-            "title": "CC BY",
+            "title": "Attribution (CC BY)",
             "description": "You must give appropriate credit."
         },
         "by_sa": {
-            "title": "CC BY-SA",
+            "title": "Attribution - Share Alike (CC BY-SA)",
             "description": "You must give appropriate credit and share any derivative works under the same license."
         },
         "by_nd": {
-            "title": "CC BY-ND",
+            "title": "Attribution - No Derivs (CC BY-ND)",
             "description": "You must give appropriate credit, and you may not distribute modified material."
         },
         "by_nc": {
-            "title": "CC BY-NC",
+            "title": "Attribution - Non Commercial (CC BY-NC)",
             "description": "You must give appropriate credit and may not use the material for commercial purposes."
         },
         "by_nc_sa": {
-            "title": "CC BY-NC-SA",
+            "title": "Attribution - Non Commercial - Share Alike (CC BY-NC-SA)",
             "description": "You must give appropriate credit, may not use the material for commercial purposes, and must share any derivatives under the same license."
         },
         "by_nc_nd": {
-            "title": "CC BY-NC-ND",
+            "title": "Attribution - Non Commercial - No Derivs (CC BY-NC-ND)",
             "description": "You must give appropriate credit, may not use the material for commercial purposes, and may not distribute modified material."
         },
         "cc0": {
-            "title": "CC0 (Public Domain)",
+            "title": "Public Domain (CC0)",
             "description": "No rights reserved. You can copy, modify, and distribute without asking permission."
         }
     },
@@ -922,5 +922,12 @@ export default {
     scientificSubAreaLabel: "Scientific subfield (scientific discipline)",
     placeOfKeepLabel: "Place of storage",
     udcLabel: "UDC number",
-    mentorLabel: "Advisor"
+    mentorLabel: "Advisor",
+    typeOfTitleLabel: "Type of title",
+    extendedAbstractLabel: "Summary",
+    remarkLabel: "Remark",
+    updateExtendedAbstractLabel: "Update summary",
+    updateRemarkLabel: "Update remark",
+    updateTitleLabel: "Update title",
+    alternateTitleLabel: "Alternate title"
 }

@@ -210,6 +210,15 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="12">
+                <v-text-field
+                    v-model="typeOfTitle"
+                    :label="$t('typeOfTitleLabel')"
+                    :placeholder="$t('typeOfTitleLabel')">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col cols="10">
                 <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
             </v-col>
@@ -372,6 +381,7 @@ export default defineComponent({
         const printIsbn = ref(props.presetThesis?.printISBN as string);
         const placeOfKeep = ref(props.presetThesis?.placeOfKeep as string);
         const udc = ref(props.presetThesis?.udc as string);
+        const typeOfTitle = ref(props.presetThesis?.typeOfTitle as string);
 
         const {
             requiredFieldRules, requiredSelectionRules,
@@ -431,7 +441,8 @@ export default defineComponent({
                 printISBN: printIsbn.value,
                 eisbn: eIsbn.value,
                 udc: udc.value,
-                placeOfKeep: placeOfKeep.value
+                placeOfKeep: placeOfKeep.value,
+                typeOfTitle: typeOfTitle.value
             };
 
             emit("update", updatedThesis);
@@ -467,6 +478,7 @@ export default defineComponent({
             eIsbn.value = props.presetThesis?.eisbn as string;
             placeOfKeep.value = props.presetThesis?.placeOfKeep as string;
             udc.value = props.presetThesis?.udc as string;
+            typeOfTitle.value = props.presetThesis?.typeOfTitle as string;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -493,7 +505,7 @@ export default defineComponent({
             udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
             numberOfChapters, numberOfReferences, numberOfTables,
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
-            scientificArea, scientificSubArea
+            scientificArea, scientificSubArea, typeOfTitle
         };
     }
 });

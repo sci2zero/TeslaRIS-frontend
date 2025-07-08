@@ -13,7 +13,10 @@
             </v-col>
             <v-col cols="2">
                 <v-col>
-                    <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
+                    <v-btn
+                        v-show="inputs.length > ((presetContributions && presetContributions.length > 0) ? 0 : 1)"
+                        icon
+                        @click="removeInput(index)">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
                     <v-btn v-show="index === inputs.length - 1 && !limitOne" icon @click="addInput">
@@ -29,6 +32,7 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
+                    :readonly="lockContributionType !== undefined"
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
@@ -110,11 +114,31 @@ export default defineComponent({
         isUpdate: {
             type: Boolean,
             default: false
+        },
+        lockContributionType: {
+            type: Object as PropType<DocumentContributionType | undefined>,
+            default: undefined
+        },
+        boardMemberIds: {
+            type: Array<number>,
+            default: []
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR), value: DocumentContributionType.AUTHOR}, isMainContributor: false, isCorrespondingContributor: false}]);
+        const inputs = ref<any[]>(
+            props.presetContributions.length > 0 ?
+            Array.from({ length: props.presetContributions.length }, () => ({})) : 
+            [
+                {
+                    contributionType: {
+                        title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR),
+                        value: props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR
+                    },
+                    isMainContributor: false, isCorrespondingContributor: false
+                }
+            ]
+        );
         const baseContributionRef = ref<any>([]);
 
         const employmentTitles = computed(() => getEmploymentTitlesForGivenLocale());
@@ -194,7 +218,7 @@ export default defineComponent({
             inputs.value.push({
                 contributionType: {
                     title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR),
-                    value: DocumentContributionType.AUTHOR
+                    value: props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR
                 },
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
@@ -291,8 +315,10 @@ export default defineComponent({
         };
 
         const shouldDisplayAlsoBoardMemberBox = (input: any) => {
-            if (inputs.value.find(i => i.contribution.personId === input.contribution.personId && i.contributionType.value === "BOARD_MEMBER")) {
-                return false;
+            for(const boardMemberId of props.boardMemberIds) {
+                if (input.contribution && input.contribution.personId === boardMemberId) {
+                    return false;
+                }
             }
 
             return true;

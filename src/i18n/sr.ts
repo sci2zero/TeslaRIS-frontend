@@ -830,31 +830,31 @@ export default {
     },
     "licenses": {
         "by": {
-            "title": "CC BY",
+            "title": "Autorstvo (CC BY)",
             "description": "Mora se navesti autorstvo."
         },
         "by_sa": {
-            "title": "CC BY-SA",
+            "title": "Autorstvo - deliti pod istim uslovima (CC BY-SA)",
             "description": "Mora se navesti autorstvo i deljeni radovi moraju biti pod istom licencom."
         },
         "by_nd": {
-            "title": "CC BY-ND",
+            "title": "Autorstvo - bez prerade (CC BY-ND)",
             "description": "Mora se navesti autorstvo, a izmenjeni materijal se ne sme distribuirati."
         },
         "by_nc": {
-            "title": "CC BY-NC",
+            "title": "Autorstvo - nekomercijalno (CC BY-NC)",
             "description": "Mora se navesti autorstvo i materijal se ne sme koristiti u komercijalne svrhe."
         },
         "by_nc_sa": {
-            "title": "CC BY-NC-SA",
+            "title": "Autorstvo - nekomercijalno - deliti pod istim uslovima (CC BY-NC-SA)",
             "description": "Mora se navesti autorstvo, ne sme se koristiti u komercijalne svrhe i radovi moraju biti deljeni pod istim uslovima."
         },
         "by_nc_nd": {
-            "title": "CC BY-NC-ND",
+            "title": "Autorstvo - nekomercijalno - bez prerade (CC BY-NC-ND)",
             "description": "Mora se navesti autorstvo, materijal se ne sme koristiti u komercijalne svrhe niti menjati ili distribuirati izmenjen."
         },
         "cc0": {
-            "title": "CC0 (Public Domain)",
+            "title": "U javnom vlasništvu (CC0)",
             "description": "Autor se odrekao svih prava. Možete slobodno kopirati, menjati i distribuirati bez dozvole."
         }
     },
@@ -947,5 +947,12 @@ export default {
     scientificAreaLabel: "Naučna oblast",
     scientificSubAreaLabel: "Uža naučna oblast (naučna disciplina)",
     placeOfKeepLabel: "Mesto čuvanja",
-    udcLabel: "UDK broj"
+    udcLabel: "UDK broj",
+    typeOfTitleLabel: "Vrsta titule",
+    extendedAbstractLabel: "Prošireni apstrakt",
+    remarkLabel: "Napomena",
+    updateExtendedAbstractLabel: "Ažuriraj prošireni apstrakt",
+    updateRemarkLabel: "Ažuriraj napomenu",
+    updateTitleLabel: "Ažuriraj naslov",
+    alternateTitleLabel: "Alternativni naslov"
 }

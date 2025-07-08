@@ -31,6 +31,11 @@
             <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
         </div>
     </draggable>
+    <strong
+        v-if="!contributionList || contributionList.length === 0"
+        class="mt-15">
+        {{ $t("notYetSetMessage") }}
+    </strong>
 </template>
 
 <script lang="ts">

@@ -4,7 +4,7 @@
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
+                    <v-card-title class="text-h5 text-center edit-pen-container">
                         <v-skeleton-loader
                             :loading="!thesis"
                             type="heading"
@@ -12,6 +12,19 @@
                             class="text-center"
                         >
                             <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)"></rich-title-renderer>
+                            <div>
+                                <generic-crud-modal
+                                    class="mb-6"
+                                    :form-component="AlternateTitleForm"
+                                    :form-props="{ presetTitle: thesis?.title, presetAlternateTitle: thesis?.alternateTitle }"
+                                    entity-name="Title"
+                                    is-update
+                                    is-section-update
+                                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                                    @update="updateTitle"
+                                />
+                            </div>
+                            <rich-title-renderer v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0" :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"></rich-title-renderer>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -108,6 +121,12 @@
                                 </div>
                                 <div v-if="thesis?.uris && thesis?.uris.length > 0" class="response">
                                     <uri-list :uris="thesis?.uris"></uri-list>
+                                </div>
+                                <div v-if="thesis?.typeOfTitle">
+                                    {{ $t("typeOfTitleLabel") }}:
+                                </div>
+                                <div v-if="thesis?.typeOfTitle" class="response">
+                                    {{ thesis.typeOfTitle }}
                                 </div>
                             </v-col>
                             <v-col cols="3">
@@ -343,9 +362,13 @@
         >
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
-                    :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit"
+                    :document-id="thesis?.id"
+                    :contribution-list="thesis?.contributions ? thesis?.contributions : []"
+                    :read-only="!canEdit"
                     board-members-allowed
-                    @update="updateContributions"></person-document-contribution-tabs>
+                    limit-one-author
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -357,11 +380,25 @@
                 </keyword-list>
 
                 <!-- Description -->
-                <description-section
-                    :description="thesis?.description"
-                    :can-edit="canEdit && !thesis?.isOnPublicReview"
-                    @update="updateDescription">
-                </description-section>
+                <div>
+                    <description-section
+                        :description="thesis?.description"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        @update="updateDescription"
+                    />
+                    <description-section
+                        :description="thesis?.extendedAbstract"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        is-extended-abstract
+                        @update="updateExtendedAbstract"
+                    />
+                    <description-section
+                        :description="thesis?.remark"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        is-remark
+                        @update="updateRemark"
+                    />
+                </div>
 
                 <attachment-section 
                     :document="thesis"
@@ -478,6 +515,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
 
 
 export default defineComponent({
@@ -638,6 +676,22 @@ export default defineComponent({
             performUpdate(false);
         };
 
+        const updateExtendedAbstract = (extendedAbstract: MultilingualContent[]) => {
+            thesis.value!.extendedAbstract = extendedAbstract;
+            performUpdate(false);
+        };
+
+        const updateRemark = (remark: MultilingualContent[]) => {
+            thesis.value!.remark = remark;
+            performUpdate(true);
+        };
+
+        const updateTitle = (titleInformation: {title: MultilingualContent[], alternateTitle: MultilingualContent[]}) => {
+            thesis.value!.title = titleInformation.title;
+            thesis.value!.alternateTitle = titleInformation.alternateTitle;
+            performUpdate(true);
+        };
+
         const updateContributions = (contributions: PersonDocumentContribution[]) => {
             thesis.value!.contributions = contributions;
             performUpdate(true);
@@ -673,6 +727,7 @@ export default defineComponent({
             thesis.value!.udc = basicInfo.udc;
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
+            thesis.value!.typeOfTitle = basicInfo.typeOfTitle;
 
             performUpdate(true);
         };
@@ -822,17 +877,17 @@ export default defineComponent({
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
-            addAttachment, updateAttachment, deleteAttachment,
+            addAttachment, updateAttachment, deleteAttachment, AlternateTitleForm,
             updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,
             snackbar, snackbarMessage, updateContributions, registryBookEntryId,
-            updateBasicInfo, organisationUnit, ThesisUpdateForm,
-            event, getThesisTitleFromValueAutoLocale,
+            updateBasicInfo, organisationUnit, ThesisUpdateForm, updateRemark,
+            event, getThesisTitleFromValueAutoLocale, updateExtendedAbstract,
             handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
             currentRoute, actionsRef, ApplicableEntityType, canClassify,
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
-            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState,
+            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry
         };
 }})

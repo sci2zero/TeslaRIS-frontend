@@ -184,6 +184,8 @@ export default defineComponent({
             thesis2.placeOfKeep = "";
             thesis1.udc = thesis2.udc;
             thesis2.udc = "";
+            thesis1.typeOfTitle = thesis2.typeOfTitle;
+            thesis2.typeOfTitle = "";
 
             thesis1.numberOfPages = thesis2.numberOfPages;
             thesis2.numberOfPages = 0;
@@ -283,6 +285,7 @@ export default defineComponent({
             leftThesis.value!.eisbn = updatedInfo.eisbn;
             leftThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
             leftThesis.value!.udc = updatedInfo.udc;
+            leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -318,6 +321,7 @@ export default defineComponent({
             rightThesis.value!.eisbn = updatedInfo.eisbn;
             rightThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
             rightThesis.value!.udc = updatedInfo.udc;
+            rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
