@@ -143,6 +143,12 @@
                     :read-only="!canEdit"
                     @update="updateSuccess"
                 />
+                <v-btn
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="navigateToPublicTheses">
+                    {{ $t("routeLabel.publicDissertationsReport") }}
+                </v-btn>
             </div>
         </div>
 
@@ -696,6 +702,10 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
+        const navigateToPublicTheses = () => {
+            router.push({name: "publicDissertationsReport", query: {institutionId: organisationUnit.value?.id as number}});
+        };
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
@@ -704,7 +714,7 @@ export default defineComponent({
             switchEmployeesPage, isAdmin, performNavigation,
             searchKeyword, relationChain, selectedPublicationTypes,
             returnCurrentLocaleContent, canEdit,
-            updateKeywords, updateBasicInfo,
+            updateKeywords, updateBasicInfo, navigateToPublicTheses,
             snackbar, snackbarMessage, relations,
             updateRelations, graphRef, updateResearchAreas,
             subUnits, totalSubUnits, switchSubUnitsPage,

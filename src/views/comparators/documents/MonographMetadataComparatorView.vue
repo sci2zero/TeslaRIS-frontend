@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftMonograph?.contributions ? leftMonograph.contributions : []"
                             :document-id="leftMonograph?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightMonograph?.contributions ? rightMonograph.contributions : []"
                             :document-id="rightMonograph?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>

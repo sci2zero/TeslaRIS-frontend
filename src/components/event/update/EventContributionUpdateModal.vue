@@ -21,6 +21,7 @@
                             <person-event-contribution-form
                                 ref="updateFormRef"
                                 :preset-contributions="presetEventContributions"
+                                :lock-contribution-type="lockContributionType"
                                 is-update
                                 @set-input="contributions = $event"
                             />
@@ -45,8 +46,9 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { PersonEventContribution } from "@/models/EventModel";
+import type { EventContributionType, PersonEventContribution } from "@/models/EventModel";
 import PersonEventContributionForm from "../PersonEventContributionForm.vue";
+
 
 export default defineComponent({
     name: "EventContributionUpdateModal",
@@ -59,6 +61,10 @@ export default defineComponent({
         presetEventContributions: {
             type: Object as PropType<PersonEventContribution[]>,
             required: true
+        },
+        lockContributionType: {
+            type: Object as PropType<EventContributionType | undefined>,
+            default: undefined
         }
     },
     emits: ["update"],

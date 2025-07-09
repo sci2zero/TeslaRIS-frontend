@@ -158,3 +158,15 @@ export interface AttendanceCancellationRequest {
     attendanceIdentifier: string,
     captchaToken: string
 }
+
+export interface ThesisPublicReviewResponse {
+    nameAndSurname: string;
+    titleSr: string;
+    titleOther: string;
+    organisationUnitNameSr: string;
+    organisationUnitNameOther: string;
+    scientificArea: string;
+    publicReviewStartDate: string;
+    publicReviewEndDate: string;
+    databaseId: number;
+}

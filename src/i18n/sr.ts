@@ -100,7 +100,8 @@ export default {
         legacyFileRedirect: "Preusmeravanje",
         notFound: "Nije pronađeno",
         emailChangeConfirmation: "Potvrda promene email-a",
-        contact: "Kontakt"
+        contact: "Kontakt",
+        publicDissertationsReport: "Disertacije na javnom uvidu"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -736,7 +737,7 @@ export default {
     newSearchLabel: "Novi upit",
     applyFiltersLabel: "Primeni",
     resetFiltersLabel: "Resetuj",
-    filesForDownloadLabel: "Fajlovi za preuzimanje",
+    filesForDownloadLabel: "Dokumenta za preuzimanje",
     exportTableLabel: "Izvoz tabele",
     exportFileFormatLabel: "Format izvezenog fajla",
     exportAllLabel: "Izvezi sve",
@@ -954,5 +955,21 @@ export default {
     updateExtendedAbstractLabel: "Ažuriraj prošireni apstrakt",
     updateRemarkLabel: "Ažuriraj napomenu",
     updateTitleLabel: "Ažuriraj naslov",
-    alternateTitleLabel: "Alternativni naslov"
+    alternateTitleLabel: "Alternativni naslov",
+    navigateToThesisSearchMessage: "Након одбране, електронска верзија докторске дисертације и докторског уметничког пројекта ће бити доступна преко Дигиталне библиотеке дисертација, на ",
+    linkLabel: "линку.",
+    browseArchiveForYearLabel: "Да претражите архиву јавних увида изаберите годину:",
+    notYetDefendedNavigationLabel: "Докторске дисертације kojе су биле на јавном увиду 30 дана, а нису још одбрањене су доступне на овом ",
+    publicReviewOngoingLabel: "Докторске дисертације и докторски уметнички пројекти кojи су на јавном увиду у периоду од 30 дана су доступни на овом ",
+    facultyLabel: "Факултет",
+    scientificOrArtFieldLabel: "Научна или уметничка област",
+    surnameAndNameLabel: "Презиме и име",
+    publicationTitleLabel: "Наслов рада",
+    publicReviewPeriodLabel: "Стављено на увид јавности у периоду",
+    downloadableDocumentsLabel: "Документа за преузимање",
+    archiveYearLabel: "Година",
+    institutionPublicReviewDissertationsLabel: "Докторске дисертације и докторски уметнички пројекти кojи су на јавном увиду за {0}",
+    allPublicReviewDissertationsLabel: "Све докторске дисертације и докторски уметнички пројекти кojи су на јавном увиду",
+    institutionPublicReviewDissertationsArchiveLabel: "Архива докторских дисертација и докторских уметничких пројеката на јавном увиду за {0}",
+    publicReviewDissertationsArchiveLabel: "Архива свих докторских дисертација и докторских уметничких пројеката на јавном увиду"
 }

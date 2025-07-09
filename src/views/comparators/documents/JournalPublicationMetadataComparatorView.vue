@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftJournalPublication?.contributions ? leftJournalPublication.contributions : []"
                             :document-id="leftJournalPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightJournalPublication?.contributions ? rightJournalPublication.contributions : []"
                             :document-id="rightJournalPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>

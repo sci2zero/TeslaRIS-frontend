@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []"
                             :document-id="leftPatent?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []"
                             :document-id="rightPatent?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>

@@ -6,10 +6,10 @@
         @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" elementk :to="'persons/' + contribution.personId">
-                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong></h4>
+                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + displayContributionType(contribution) }}</strong></h4>
             </localized-link>
             <h4 v-else>
-                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname }}</strong>
+                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + displayContributionType(contribution) }}</strong>
             </h4>
             <div v-if="contribution.institutionIds?.length === 0">
                 <em>
@@ -24,6 +24,11 @@
             <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
         </div>
     </draggable>
+    <strong
+        v-if="!contributionList || contributionList.length === 0"
+        class="mt-15">
+        {{ $t("notYetSetMessage") }}
+    </strong>
 </template>
 
 <script lang="ts">
@@ -51,6 +56,10 @@ export default defineComponent({
         canReorder: {
             type: Boolean,
             default: false
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["positionsChanged"],
@@ -68,10 +77,17 @@ export default defineComponent({
             }
         };
 
+        const displayContributionType = (contribution: PersonEventContribution) => {
+            if (!props.inComparator) {
+                return "";
+            }
+
+            return ` - ${getTitleFromValueAutoLocale(contribution.eventContributionType)}`;
+        };
+
         return {
-            getTitleFromValueAutoLocale,
-            reorderContributors,
-            returnCurrentLocaleContent
+            getTitleFromValueAutoLocale, reorderContributors,
+            returnCurrentLocaleContent, displayContributionType
         };
     },
 });

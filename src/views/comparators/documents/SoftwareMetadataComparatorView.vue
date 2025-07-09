@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []"
                             :document-id="leftSoftware?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []"
                             :document-id="rightSoftware?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>

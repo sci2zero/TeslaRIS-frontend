@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftDataset?.contributions ? leftDataset.contributions : []"
                             :document-id="leftDataset?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightDataset?.contributions ? rightDataset.contributions : []"
                             :document-id="rightDataset?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>

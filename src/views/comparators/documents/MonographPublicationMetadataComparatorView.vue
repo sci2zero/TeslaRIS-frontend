@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftMonographPublication?.contributions ? leftMonographPublication.contributions : []"
                             :document-id="leftMonographPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -72,7 +73,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightMonographPublication?.contributions ? rightMonographPublication.contributions : []" :document-id="rightMonographPublication?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightMonographPublication?.contributions ? rightMonographPublication.contributions : []"
+                            :document-id="rightMonographPublication?.id"
+                            in-comparator>
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 

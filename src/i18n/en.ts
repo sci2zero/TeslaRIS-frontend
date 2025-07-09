@@ -100,7 +100,9 @@ export default {
         legacyFileRedirect: "Redirecting",
         notFound: "Not Found",
         emailChangeConfirmation: "Email confirmation change",
-        contact: "Contact"
+        contact: "Contact",
+        publicDissertationsReport: "Disertations on public review"
+
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -929,5 +931,21 @@ export default {
     updateExtendedAbstractLabel: "Update summary",
     updateRemarkLabel: "Update remark",
     updateTitleLabel: "Update title",
-    alternateTitleLabel: "Alternate title"
+    alternateTitleLabel: "Alternate title",
+    navigateToThesisSearchMessage: "After the defense, the electronic version of the doctoral dissertation or doctoral art project will be available through the Digital Dissertation Library at ",
+    linkLabel: "this link.",
+    browseArchiveForYearLabel: "To browse the public review archive, select a year:",
+    notYetDefendedNavigationLabel: "Doctoral dissertations that were under public review for 30 days and have not yet been defended are available at this ",
+    publicReviewOngoingLabel: "Doctoral dissertations and doctoral art projects currently under public review for a period of 30 days are available at this ",
+    facultyLabel: "Faculty",
+    scientificOrArtFieldLabel: "Scientific or Artistic Field",
+    surnameAndNameLabel: "Surname and Name",
+    publicationTitleLabel: "Title of Work",
+    publicReviewPeriodLabel: "Under public review during the period",
+    downloadableDocumentsLabel: "Documents for Download",
+    archiveYearLabel: "Year",
+    institutionPublicReviewDissertationsLabel: "Doctoral dissertations and doctoral art projects under public review for {0}",
+    allPublicReviewDissertationsLabel: "All doctoral dissertations and doctoral art projects under public review",
+    institutionPublicReviewDissertationsArchiveLabel: "Archive of doctoral dissertations and doctoral art projects under public review for {0}",
+    publicReviewDissertationsArchiveLabel: "Archive of all doctoral dissertations and doctoral art projects under public review"
 }
