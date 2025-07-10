@@ -132,7 +132,8 @@ export default defineComponent({
             router.replace({
                 query: {
                     ...currentRoute.query,
-                    year: selectedYear.value !== null ? selectedYear.value.toString() : undefined
+                    year: selectedYear.value !== null ? selectedYear.value.toString() : undefined,
+                    notYetDefended: "false"
                 }
             });
         });
@@ -166,6 +167,12 @@ export default defineComponent({
         };
 
         const navigateToThisView = (notYetDefended: boolean) => {
+            console.log(currentRoute.query.institutionId)
+            if (!currentRoute.query.institutionId) {
+                router.push({name: "notFound"});
+                return;
+            }
+            
             router.push({name: "publicDissertationsReport", query: {institutionId: parseInt(currentRoute.query.institutionId as string), notYetDefended: `${notYetDefended}`}});
         };
 

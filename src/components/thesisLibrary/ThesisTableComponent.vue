@@ -8,14 +8,14 @@
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 25, 50]"
             :items-per-page="25"
-            show-select
+            :show-select="allowSelection"
             return-object
             :no-data-text="$t('noDataInTableMessage')"
             :page="tableOptions.page"
             @update:options="refreshTable">
             <template #item="row">
                 <tr>
-                    <td>
+                    <td v-if="allowSelection">
                         <v-checkbox
                             v-model="selectedTheses"
                             :value="row.item"
@@ -60,6 +60,7 @@
                             <v-list min-width="150">
                                 <publication-file-download-modal
                                     :document-id="(row.item.databaseId as number)"
+                                    show-thesis-sections
                                 />
                             </v-list>
                         </v-menu>
@@ -104,6 +105,10 @@ export default defineComponent({
         showReviewEndDate: {
             type: Boolean,
             default: true
+        },
+        allowSelection: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage"],

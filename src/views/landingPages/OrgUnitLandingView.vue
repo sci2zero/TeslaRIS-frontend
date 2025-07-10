@@ -125,15 +125,13 @@
             </v-col>
         </v-row>
 
-        <div
-            v-show="canEdit"
-            class="actions-box pa-4"
-        >
+        <div class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("additionalActionsLabel") }}
             </div>
             <div class="d-flex flex-row">
                 <generic-crud-modal
+                    v-if="canEdit"
                     class="ml-2" 
                     :form-component="ExternalIndicatorsConfigurationForm"
                     :form-props="{ institutionId: organisationUnit?.id }"
