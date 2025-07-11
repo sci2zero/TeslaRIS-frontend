@@ -948,5 +948,6 @@ export default {
     allPublicReviewDissertationsLabel: "All doctoral dissertations and doctoral art projects under public review",
     institutionPublicReviewDissertationsArchiveLabel: "Archive of doctoral dissertations and doctoral art projects under public review for {0}",
     publicReviewDissertationsArchiveLabel: "Archive of all doctoral dissertations and doctoral art projects under public review",
-    publicReviewDissertationsLabel: "Dissertation public review"
+    publicReviewDissertationsLabel: "Dissertation public review",
+    importantNoteLabel: "Important"
 }

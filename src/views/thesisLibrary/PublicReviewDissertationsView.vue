@@ -51,7 +51,16 @@
                 <p>{{ $t("notYetDefendedNavigationLabel") }}<a href="#" @click.prevent="navigateToThisView(true)">{{ $t("linkLabel") }}</a></p>
             </v-col>
         </v-row>
-        <v-row>
+
+        <public-review-page-content-display
+            v-if="institutionId"
+            :content-types="[PageContentType.IMPORTANT_NOTE, PageContentType.NOTE]"
+            :institution-id="parseInt(institutionId)"
+            :thesis-types="[ThesisType.PHD, ThesisType.PHD_ART_PROJECT]"
+            :page-type="getPageType()"
+        />
+
+        <v-row class="mt-10 mb-10">
             <v-col>
                 <tab-content-loader
                     v-if="loading"
@@ -70,6 +79,15 @@
                 </thesis-table-component>
             </v-col>
         </v-row>
+
+        <public-review-page-content-display
+            v-if="institutionId"
+            class="mt-10"
+            :content-types="[PageContentType.TEXT]"
+            :institution-id="parseInt(institutionId)"
+            :thesis-types="[ThesisType.PHD, ThesisType.PHD_ART_PROJECT]"
+            :page-type="getPageType()"
+        />
     </v-container>
 </template>
 
@@ -80,17 +98,19 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ThesisTableComponent from '@/components/thesisLibrary/ThesisTableComponent.vue';
-import type { ThesisPublicReviewResponse } from '@/models/ThesisLibraryModel';
+import { PageContentType, PageType, type ThesisPublicReviewResponse } from '@/models/ThesisLibraryModel';
 import { useRoute, useRouter } from 'vue-router';
 import ThesisLibraryReportingService from '@/services/thesisLibrary/ThesisLibraryReportingService';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import PublicReviewPageContentDisplay from './PublicReviewPageContentDisplay.vue';
+import { ThesisType } from '@/models/PublicationModel';
 
 
 export default defineComponent({
     name: "UserListView",
-    components: { ThesisTableComponent, TabContentLoader },
+    components: { ThesisTableComponent, TabContentLoader, PublicReviewPageContentDisplay },
     setup() {
         const loading = ref(false);
 
@@ -108,6 +128,7 @@ export default defineComponent({
         const years = ref<number[]>([]);
         const selectedYear = ref<number | null>((currentRoute.query.year as string) ? parseInt(currentRoute.query.year as string) : null);
 
+        const institutionId = ref(currentRoute.query.institutionId as string);
         const organisationUnit = ref<OrganisationUnitResponse>();
 
         const showingNotDefended = computed(() => (currentRoute.query.notYetDefended as string) === 'true');
@@ -139,11 +160,10 @@ export default defineComponent({
         });
 
         const fetchPublicReviewTheses = () => {
-            const institutionId = currentRoute.query.institutionId as string;
             const notDefended = currentRoute.query.notYetDefended as string;
 
             ThesisLibraryReportingService.fetchPublicReviewDissertations(
-                institutionId ? parseInt(institutionId) : null,
+                institutionId.value ? parseInt(institutionId.value) : null,
                 selectedYear.value,
                 notDefended ? notDefended === "true" : false,
                 `&page=${page.value}&size=${size.value}`
@@ -167,13 +187,30 @@ export default defineComponent({
         };
 
         const navigateToThisView = (notYetDefended: boolean) => {
-            console.log(currentRoute.query.institutionId)
             if (!currentRoute.query.institutionId) {
                 router.push({name: "notFound"});
                 return;
             }
             
-            router.push({name: "publicDissertationsReport", query: {institutionId: parseInt(currentRoute.query.institutionId as string), notYetDefended: `${notYetDefended}`}});
+            router.push(
+                {
+                    name: "publicDissertationsReport",
+                    query: {
+                        institutionId: parseInt(currentRoute.query.institutionId as string),
+                        notYetDefended: `${notYetDefended}`
+                    }
+                }
+            );
+        };
+
+        const getPageType = () => {
+            if (selectedYear.value) {
+                return PageType.ARCHIVE;
+            } else if (showingNotDefended.value) {
+                return PageType.NOT_DEFENDED;
+            }
+
+            return PageType.CURRENT;
         };
 
         return {
@@ -183,7 +220,8 @@ export default defineComponent({
             selectedYear, organisationUnit,
             returnCurrentLocaleContent,
             navigateToSearch, navigateToThisView,
-            showingNotDefended
+            showingNotDefended, PageContentType,
+            institutionId, ThesisType, getPageType
         };
     }
 });

@@ -372,7 +372,7 @@ export default defineComponent(
             const resourcesMenu = ref<MenuItem[]>([
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
                 { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' },
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
             ]);
 
             const manageMenu = ref<MenuItem[]>([
@@ -405,7 +405,8 @@ export default defineComponent(
                 { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search' },
                 { title: promotionListLabel, type:'icon-link', pathName: 'promotions', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
                 { title: registryBookLabel, type:'icon-link', pathName: 'registry-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
-                { title: publicReviewDissertationsLabel, type:'icon-link', pathName: 'thesis-library/public-dissertations' }
+                { title: publicReviewDissertationsLabel, type:'icon-link', pathName: 'thesis-library/public-dissertations' },
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results', condition: computed(() => (isInstitutionalLibrarian.value)) }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([

@@ -170,3 +170,24 @@ export interface ThesisPublicReviewResponse {
     publicReviewEndDate: string;
     databaseId: number;
 }
+
+export enum PageContentType {
+    NOTE = "NOTE",
+    IMPORTANT_NOTE = "IMPORTANT_NOTE",
+    TEXT = "TEXT"
+}
+
+export enum PageType {
+    CURRENT = "CURRENT",
+    ARCHIVE = "ARCHIVE",
+    NOT_DEFENDED = "NOT_DEFENDED",
+    ALL = "ALL"
+}
+
+export interface PublicReviewPageContent {
+    institutionId: number;
+    contentType: PageContentType;
+    pageType: PageType
+    thesisTypes: ThesisType[];
+    content: MultilingualContent[];
+}

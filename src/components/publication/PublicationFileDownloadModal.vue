@@ -72,7 +72,6 @@ export default defineComponent({
                 DocumentPublicationService.readThesis(
                     props.documentId
                 ).then(response => {
-                    console.log(response.data as Thesis)
                     document.value = response.data;
                 });
             } else {

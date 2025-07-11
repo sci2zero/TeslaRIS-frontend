@@ -2,7 +2,7 @@ import i18n from ".";
 import { License } from "@/models/DocumentFileModel";
 
 
-export const sexSr = [
+export const licensesSr = [
     { title: "Autorstvo (CC BY)", value: License.BY },
     { title: "Autorstvo - deliti pod istim uslovima (CC BY-SA)", value: License.BY_SA },
     { title: "Autorstvo - nekomercijalno (CC BY-NC)", value: License.BY_NC },
@@ -12,7 +12,7 @@ export const sexSr = [
     { title: "U javnom vlasništvu (CC Zero)", value: License.CC0 }
 ];
 
-export const sexEn = [
+export const licensesEn = [
     { title: "Attribution (CC BY)", value: License.BY },
     { title: "Attribution - Share Alike (CC BY-SA)", value: License.BY_SA },
     { title: "Attribution - Non Commercial (CC BY-NC)", value: License.BY_NC },
@@ -25,19 +25,19 @@ export const sexEn = [
 export const getLicenseTitleFromValueAutoLocale = (value: License) => {
     const locale = i18n.vueI18n.global.locale;
 
-    let sexArray = sexEn;
+    let licenseArray = licensesEn;
     if (locale == "sr") {
-        sexArray = sexSr;
+        licenseArray = licensesSr;
     }
 
-    return (sexArray.find(item => item.value === value) || {}).title;
+    return (licenseArray.find(item => item.value === value) || {}).title;
 };
 
 export const getLisenseTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
-            return sexSr;
+            return licensesSr;
         case "en":
-            return sexEn;
+            return licensesEn;
     }
 };
