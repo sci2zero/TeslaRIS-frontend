@@ -973,5 +973,6 @@ export default {
     institutionPublicReviewDissertationsArchiveLabel: "Arhiva doktorskih disertacija i doktorskih umetničkih projekata na javnom uvidu za {0}",
     publicReviewDissertationsArchiveLabel: "Arhiva svih doktorskih disertacija i doktorskih umetničkih projekata na javnom uvidu",
     publicReviewDissertationsLabel: "Javni uvid disertacija",
-    importantNoteLabel: "Važno"
+    importantNoteLabel: "Važno",
+    thesesLabel: "Završni radovi"
 }

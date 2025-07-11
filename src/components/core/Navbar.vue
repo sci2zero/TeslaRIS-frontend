@@ -301,6 +301,7 @@ export default defineComponent(
             const healthCheckLabel = computed(() => i18n.t("routeLabel.healthCheck"));
             const backupLabel = computed(() => i18n.t("backupLabel"));
             const publicReviewDissertationsLabel = computed(() => i18n.t("publicReviewDissertationsLabel"));
+            const thesesLabel = computed(() => i18n.t("thesesLabel"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -406,7 +407,7 @@ export default defineComponent(
                 { title: promotionListLabel, type:'icon-link', pathName: 'promotions', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
                 { title: registryBookLabel, type:'icon-link', pathName: 'registry-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
                 { title: publicReviewDissertationsLabel, type:'icon-link', pathName: 'thesis-library/public-dissertations' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results', condition: computed(() => (isInstitutionalLibrarian.value)) }
+                { title: thesesLabel, type:'icon-link', pathName: 'scientific-results', condition: computed(() => (isInstitutionalLibrarian.value)) }
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([
