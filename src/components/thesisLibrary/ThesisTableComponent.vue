@@ -32,12 +32,16 @@
                     </td>
                     <td>{{ row.item.scientificArea }}</td>
                     <td v-if="$i18n.locale == 'sr'">
-                        <localized-link :to="'scientific-results/thesis/' + row.item.databaseId">
+                        <localized-link
+                            :to="'scientific-results/thesis/' + row.item.databaseId"
+                            open-in-new-tab>
                             <rich-title-renderer :title="row.item.titleSr"></rich-title-renderer>
                         </localized-link>
                     </td>
                     <td v-else>
-                        <localized-link :to="'scientific-results/thesis/' + row.item.databaseId">
+                        <localized-link
+                            :to="'scientific-results/thesis/' + row.item.databaseId"
+                            open-in-new-tab>
                             <rich-title-renderer :title="row.item.titleOther"></rich-title-renderer>
                         </localized-link>
                     </td>

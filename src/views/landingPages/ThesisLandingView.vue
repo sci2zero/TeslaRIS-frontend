@@ -289,7 +289,7 @@
                     {{ $t("restartPublicReviewLabel") }}
                 </v-btn>
                 <v-btn
-                    v-if="userCanPutOnPublicReview && !thesis?.isArchived"
+                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="changeArchiveState(true)">

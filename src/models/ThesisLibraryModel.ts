@@ -185,7 +185,7 @@ export enum PageType {
 }
 
 export interface PublicReviewPageContent {
-    institutionId: number;
+    institutionId?: number;
     contentType: PageContentType;
     pageType: PageType
     thesisTypes: ThesisType[];

@@ -58,7 +58,7 @@
                     color="primary"
                 ></date-picker>
             </v-col>
-            <v-col cols="6">
+            <v-col v-show="presetThesis?.publicReviewCompleted" cols="6">
                 <date-picker
                     v-model="thesisDefenceDate"
                     :label="$t('defenceDateLabel')"

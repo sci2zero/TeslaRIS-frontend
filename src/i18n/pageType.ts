@@ -3,17 +3,17 @@ import i18n from ".";
 
 
 const pageTypeEn = [
-    { title: "Current", value: PageType.CURRENT },
-    { title: "Archive", value: PageType.ARCHIVE },
+    { title: "Currently on public review", value: PageType.CURRENT },
+    { title: "Public review archive", value: PageType.ARCHIVE },
     { title: "Not defended", value: PageType.NOT_DEFENDED },
     { title: "All", value: PageType.ALL }
 ];
 
 const pageTypeSr = [
-    { title: "Trenutne", value: PageType.CURRENT },
-    { title: "Arhiva", value: PageType.ARCHIVE },
-    { title: "Neodbranjene", value: PageType.NOT_DEFENDED },
-    { title: "Sve", value: PageType.NOT_DEFENDED }
+    { title: "Trenutno na javnom uvidu", value: PageType.CURRENT },
+    { title: "Arhiva javnih uvida", value: PageType.ARCHIVE },
+    { title: "Neodbranjeno", value: PageType.NOT_DEFENDED },
+    { title: "Sve", value: PageType.ALL }
 ];
 
 export const getPageTypeFromValueAutoLocale = (value: PageType) => {
@@ -21,7 +21,7 @@ export const getPageTypeFromValueAutoLocale = (value: PageType) => {
     
     let pageTypeArray = pageTypeEn;
     if (locale == "sr") {
-        pageTypeArray = pageTypeEn;
+        pageTypeArray = pageTypeSr;
     }
 
     return (pageTypeArray.find(item => item.value === value) || {}).title;

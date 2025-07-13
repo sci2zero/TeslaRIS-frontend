@@ -950,5 +950,9 @@ export default {
     publicReviewDissertationsArchiveLabel: "Archive of all doctoral dissertations and doctoral art projects under public review",
     publicReviewDissertationsLabel: "Dissertation public review",
     importantNoteLabel: "Important",
-    thesesLabel: "Theses"
+    thesesLabel: "Theses",
+    contentLabel: "Content",
+    pageTypeLabel: "Page type",
+    updateOrganisationUnitLabel: "Update organisation unit",
+    publicReviewPageContentLabel: "Public review page content"
 }

@@ -23,8 +23,8 @@ export class PublicReviewPageConfigurationService extends BaseService {
         return super.sendRequest(axios.get, `public-review-page-content/for-institution-and-type/${institutionId}?${thesisTypeParam}`);
     }
 
-    async saveConfiguration(body: PublicReviewPageContent[]): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, "public-review-page-content", body);
+    async saveConfiguration(body: PublicReviewPageContent[], institutionId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `public-review-page-content/${institutionId}`, body);
     }
 }
 

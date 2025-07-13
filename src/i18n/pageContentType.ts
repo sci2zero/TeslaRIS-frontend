@@ -19,7 +19,7 @@ export const getPageContentTypeFromValueAutoLocale = (value: PageContentType) =>
     
     let pageContentTypeArray = pageContentTypeEn;
     if (locale == "sr") {
-        pageContentTypeArray = pageContentTypeEn;
+        pageContentTypeArray = pageContentTypeSr;
     }
 
     return (pageContentTypeArray.find(item => item.value === value) || {}).title;

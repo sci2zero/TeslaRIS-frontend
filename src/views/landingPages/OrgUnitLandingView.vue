@@ -147,6 +147,17 @@
                     @click="navigateToPublicTheses">
                     {{ $t("routeLabel.publicDissertationsReport") }}
                 </v-btn>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    class="ml-2"
+                    :form-component="PublicReviewContentForm"
+                    :form-props="{ institutionId: organisationUnit?.id, presetPageContent: publicReviewPageContent }"
+                    entity-name="PublicReviewPageContent"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="updateSuccess(); fetchPublicReviewPageContent()"
+                />
             </div>
         </div>
 
@@ -367,6 +378,9 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
+import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
+import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
+import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
 
 
 export default defineComponent({
@@ -459,6 +473,8 @@ export default defineComponent({
                     {title: publicationType.title, value: publicationType.value}
                 );
             });
+
+            fetchPublicReviewPageContent();
         });
 
         const fetchOU = (uponStartup: boolean) => {
@@ -704,6 +720,16 @@ export default defineComponent({
             router.push({name: "publicDissertationsReport", query: {institutionId: organisationUnit.value?.id as number}});
         };
 
+        const publicReviewPageContent = ref<PublicReviewPageContent[]>([]);
+        const fetchPublicReviewPageContent = () => {
+            publicReviewPageContent.value.splice(0);
+            PublicReviewPageConfigurationService.getConfigurationForInstitution(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                publicReviewPageContent.value = response.data;
+            });
+        };
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
@@ -725,7 +751,9 @@ export default defineComponent({
             clearSortAndPerformPersonSearch,
             clearSortAndPerformPublicationSearch,
             employeesRef, alumniRef, personSearchParams,
-            publicationSearchParams, isInstitutionalEditor
+            publicationSearchParams, isInstitutionalEditor,
+            PublicReviewContentForm, publicReviewPageContent,
+            fetchPublicReviewPageContent
         };
 }})
 
