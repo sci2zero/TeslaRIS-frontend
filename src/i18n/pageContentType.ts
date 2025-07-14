@@ -1,5 +1,6 @@
 import { PageContentType } from "@/models/ThesisLibraryModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 const pageContentTypeEn = [
@@ -20,6 +21,8 @@ export const getPageContentTypeFromValueAutoLocale = (value: PageContentType) =>
     let pageContentTypeArray = pageContentTypeEn;
     if (locale == "sr") {
         pageContentTypeArray = pageContentTypeSr;
+    } else if (locale == "sr-cyr") {
+        pageContentTypeArray = transliterateContentToCyrillic(pageContentTypeSr);
     }
 
     return (pageContentTypeArray.find(item => item.value === value) || {}).title;
@@ -29,6 +32,8 @@ export const getPageContentTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return pageContentTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(pageContentTypeSr);
         case "en":
             return pageContentTypeEn;
     }

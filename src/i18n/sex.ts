@@ -1,6 +1,7 @@
 import { Sex } from "@/models/PersonModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const sexSr = [
     { title: "Muški", value: Sex.MALE },
@@ -18,6 +19,8 @@ export const getTitleFromValueAutoLocale = (value: Sex) => {
     let sexArray = sexEn;
     if (locale == "sr") {
         sexArray = sexSr;
+    } else if (locale == "sr-cyr") {
+        sexArray = transliterateContentToCyrillic(sexSr);
     }
 
     if (typeof value === "number") {
@@ -31,6 +34,8 @@ export const getSexForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return sexSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(sexSr);
         case "en":
             return sexEn;
     }

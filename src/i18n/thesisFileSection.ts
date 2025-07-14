@@ -1,5 +1,6 @@
 import { ThesisFileSection } from "@/models/ThesisLibraryModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const thesisFileSectionSr = [
     { title: "Dokazi", value: ThesisFileSection.PROOFS },
@@ -23,6 +24,8 @@ export const getThesisFileSectionFromValueAutoLocale = (value: ThesisFileSection
     let thesisFileSectionArray = thesisFileSectionEn;
     if (locale == "sr") {
         thesisFileSectionArray = thesisFileSectionSr;
+    } else if (locale == "sr-cyr") {
+        thesisFileSectionArray = transliterateContentToCyrillic(thesisFileSectionSr);
     }
 
     return (thesisFileSectionArray.find(item => item.value === value) || {}).title;
@@ -32,6 +35,8 @@ export const getThesisFileSectionsForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return thesisFileSectionSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(thesisFileSectionSr);
         case "en":
             return thesisFileSectionEn;
     }

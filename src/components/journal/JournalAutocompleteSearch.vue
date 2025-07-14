@@ -143,7 +143,7 @@ export default defineComponent({
                 JournalService.searchJournals(params, null).then((response) => {
                     const listOfJournals: { title: string, value: number }[] = [];
                     response.data.content.forEach((journal: JournalIndex) => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             listOfJournals.push({title: journal.titleSr, value: journal.databaseId});
                         } else {
                             listOfJournals.push({title: journal.titleOther, value: journal.databaseId});

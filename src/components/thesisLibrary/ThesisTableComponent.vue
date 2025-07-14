@@ -24,14 +24,14 @@
                         />
                     </td>
                     <td>{{ row.item.nameAndSurname.replaceAll("*", "") }}</td>
-                    <td v-if="institutionId === undefined && $i18n.locale === 'sr'">
+                    <td v-if="institutionId === undefined && $i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameSr }}
                     </td>
-                    <td v-if="institutionId === undefined && $i18n.locale !== 'sr'">
+                    <td v-if="institutionId === undefined && !$i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameOther }}
                     </td>
                     <td>{{ row.item.scientificArea }}</td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         <localized-link
                             :to="'scientific-results/thesis/' + row.item.databaseId"
                             open-in-new-tab>

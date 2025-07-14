@@ -1,5 +1,6 @@
 import { MonographPublicationType } from "@/models/PublicationModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 export const monographPublicationTypeEn = [
@@ -30,6 +31,8 @@ export const getTitleFromValueAutoLocale = (value: MonographPublicationType | st
     let monographPublicationTypeArray = monographPublicationTypeEn;
     if (locale == "sr") {
         monographPublicationTypeArray = monographPublicationTypeSr;
+    } else if (locale == "sr-cyr") {
+        monographPublicationTypeArray = transliterateContentToCyrillic(monographPublicationTypeSr);
     }
 
     return (monographPublicationTypeArray.find(item => item.value === value) || {}).title;
@@ -39,6 +42,8 @@ export const getMonographPublicationTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return monographPublicationTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(monographPublicationTypeSr);
         case "en":
             return monographPublicationTypeEn;
     }

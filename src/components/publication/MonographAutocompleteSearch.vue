@@ -96,7 +96,7 @@ export default defineComponent({
                 DocumentPublicationService.searchMonographs(params, props.onlyBooks).then((response) => {
                     const listOfMonographs: { title: string, value: number }[] = [];
                     response.data.content.forEach((monograph: DocumentPublicationIndex) => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             listOfMonographs.push({title: `${monograph.titleSr} | ${monograph.year !== -1 ? monograph.year : i18n.t("unknownDateMessage")}`, value: monograph.databaseId as number});
                         } else {
                             listOfMonographs.push({title: `${monograph.titleOther} | ${monograph.year !== -1 ? monograph.year : i18n.t("unknownDateMessage")}`, value: monograph.databaseId as number});

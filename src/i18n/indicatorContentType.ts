@@ -1,5 +1,6 @@
 import { IndicatorContentType } from "@/models/AssessmentModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const indicatorContentTypeSr = [
     { title: "Tekst", value: IndicatorContentType.TEXT },
@@ -21,6 +22,8 @@ export const getIndicatorContentTypeTitleFromValueAutoLocale = (value: Indicator
     let indicatorContentTypeArray = indicatorContentTypeEn;
     if (locale == "sr") {
         indicatorContentTypeArray = indicatorContentTypeSr;
+    } else if (locale == "sr-cyr") {
+        indicatorContentTypeArray = transliterateContentToCyrillic(indicatorContentTypeSr);
     }
 
     return (indicatorContentTypeArray.find(item => item.value === value) || {}).title;
@@ -30,6 +33,8 @@ export const getIndicatorContentTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return indicatorContentTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(indicatorContentTypeSr);
         case "en":
             return indicatorContentTypeEn;
     }

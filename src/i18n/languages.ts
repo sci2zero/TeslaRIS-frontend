@@ -1,13 +1,17 @@
 const langItems = [
     {
-      title: "Srpski",
-      value: "sr"
+        title: "Srpski",
+        value: "sr"
     },
     {
-      title: "English",
-      value: "en"
+        title: "Српски",
+        value: "sr-cyr"
     },
-]
+    {
+        title: "English",
+        value: "en"
+    },
+];
 
 export const getLangItems = () => {
     return langItems;

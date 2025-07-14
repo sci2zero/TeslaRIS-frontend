@@ -1,6 +1,7 @@
 import { PublicationSeriesContributionType } from "@/models/PublicationSeriesModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const contributionTypesEn = [
     { title: "Editor", value: PublicationSeriesContributionType.EDITOR },
@@ -26,6 +27,8 @@ export const getTitleFromValueAutoLocale = (value: PublicationSeriesContribution
     let contributionTypeArray = contributionTypesEn;
     if (locale == "sr") {
         contributionTypeArray = contributionTypesSr;
+    } else if (locale == "sr-cyr") {
+        contributionTypeArray = transliterateContentToCyrillic(contributionTypesSr);
     }
 
     if (typeof value === "number") {
@@ -39,6 +42,8 @@ export const getTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return contributionTypesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(contributionTypesSr);
         case "en":
             return contributionTypesEn;
     }

@@ -164,7 +164,7 @@ import type { PersonDocumentContribution, ProceedingsPublication } from "@/model
 import ProceedingsService from '@/services/ProceedingsService';
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn } from "@/i18n/proceedingsPublicationType";
+import { getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -234,7 +234,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules
         } = useValidationUtils();
 
-        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
+        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => (getTypesForGivenLocale() as { title: string; value: ProceedingsPublicationType; }[]));
         const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
 
         const listPublications = (event: { title: string, value: number }) => {

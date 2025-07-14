@@ -190,7 +190,7 @@ export default defineComponent({
                 let ouNameSr = "";
                 let ouNameOther = "";
                 response.data.organisationUnitName.forEach((mc: MultilingualContent) => {
-                    if(mc.languageTag === "SR") {
+                    if(mc.languageTag.startsWith("SR")) {
                         ouNameSr = mc.content;
                     } else {
                         ouNameOther = mc.content;
@@ -201,7 +201,7 @@ export default defineComponent({
                 ouNameOther = ouNameOther === "" ? ouNameSr : ouNameOther;
 
                 if(response.data.organisationUnitId !== -1) {
-                    if (i18n.locale.value === "sr") {
+                    if (i18n.locale.value.startsWith("sr")) {
                         selectedOrganisationUnit.value = { title: ouNameSr, value: response.data.organisationUnitId }
                     } else {
                         selectedOrganisationUnit.value = { title: ouNameOther, value: response.data.organisationUnitId }

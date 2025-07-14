@@ -24,7 +24,7 @@
                             :key="i"
                             :value="publicationIndex"
                         >
-                            {{ $i18n.locale === "sr" ? publicationIndex.titleSr : publicationIndex.titleOther }}
+                            {{ $i18n.locale.startsWith("sr") ? publicationIndex.titleSr : publicationIndex.titleOther }}
                         </p>
                     </v-col>
                 </v-row>

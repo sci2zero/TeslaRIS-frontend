@@ -270,7 +270,7 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async getWordcloudForSingleDocument(documentId: number): Promise<AxiosResponse<TermFrequency[]>> {
-    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?foreignLanguage=${i18n.vueI18n.global.locale !== 'sr'}`);
+    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?foreignLanguage=${!i18n.vueI18n.global.locale.toString().startsWith('sr')}`);
   }
 }
 

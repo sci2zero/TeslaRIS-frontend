@@ -1,5 +1,6 @@
 import { DocumentFileSection } from "@/models/DocumentFileModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const documentFileSectionSr = [
     { title: "Dokazi", value: DocumentFileSection.PROOFS },
@@ -17,6 +18,8 @@ export const getDocumentFileSectionFromValueAutoLocale = (value: DocumentFileSec
     let documentFileSectionArray = documentFileSectionEn;
     if (locale == "sr") {
         documentFileSectionArray = documentFileSectionSr;
+    } else if (locale == "sr-cyr") {
+        documentFileSectionArray = transliterateContentToCyrillic(documentFileSectionSr);
     }
 
     return (documentFileSectionArray.find(item => item.value === value) || {}).title;
@@ -26,6 +29,8 @@ export const getDocumentFileSectionsForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return documentFileSectionSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(documentFileSectionSr);
         case "en":
             return documentFileSectionEn;
     }
