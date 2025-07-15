@@ -34,7 +34,7 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { supportedLocales, defaultLocale } from '../../i18n'
 import { getLangItems } from '@/i18n/languages';
@@ -66,6 +66,14 @@ import { getLangItems } from '@/i18n/languages';
 
         onMounted(async () => {
             await router.isReady()
+            presetCurrentLocale();
+        });
+
+        watch(() => currentRoute.params.locale, () => {
+            presetCurrentLocale();
+        });
+        
+        const presetCurrentLocale = () => {
             const currentLocale = currentRoute.params.locale as string;
             
             if (supportedLocales.includes(currentLocale)) {
@@ -73,7 +81,7 @@ import { getLangItems } from '@/i18n/languages';
             } else {
                 selectedLocale.value = langItems.find(x=>x.value == defaultLocale)
             }
-        });
+        };
     
         return {
             switchLang,
