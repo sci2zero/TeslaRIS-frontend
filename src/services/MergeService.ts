@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedSoftware, MergedTheses } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedSoftware, MergedTheses } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -172,6 +172,10 @@ export class MergeService extends BaseService {
 
     async saveMergedPublishersMetadata(leftPublisherId: number, rightPublisherId: number, body: MergedPublishers): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/publisher/metadata/${leftPublisherId}/${rightPublisherId}`, body);
+    }
+
+    async migrateIdentifierHistory(deletionEntityId: number, mergedEntityId: number, entityType: EntityType): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `migrate-identifier-history/${entityType}/${deletionEntityId}/${mergedEntityId}`);
     }
 }
 
