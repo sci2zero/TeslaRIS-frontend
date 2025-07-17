@@ -336,11 +336,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightMonographPublication.value?.id : leftMonographPublication.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "monographPublicationLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "monographPublicationLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftMonographPublication.value?.title : rightMonographPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

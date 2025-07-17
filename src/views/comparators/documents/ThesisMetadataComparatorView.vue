@@ -390,11 +390,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightThesis.value?.id : leftThesis.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "thesisLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "thesisLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftThesis.value?.title : rightThesis.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

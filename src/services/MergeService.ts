@@ -174,8 +174,20 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/publisher/metadata/${leftPublisherId}/${rightPublisherId}`, body);
     }
 
-    async migrateIdentifierHistory(deletionEntityId: number, mergedEntityId: number, entityType: EntityType): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `migrate-identifier-history/${entityType}/${deletionEntityId}/${mergedEntityId}`);
+    async migrateGenericIdentifierHistory(deletionEntityId: number, mergedEntityId: number, entityType: EntityType): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/generic/${entityType}/${deletionEntityId}/${mergedEntityId}`);
+    }
+
+    async migratePersonIdentifierHistory(deletionEntityId: number, mergedEntityId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/person/${deletionEntityId}/${mergedEntityId}`);
+    }
+
+    async migratePublicationIdentifierHistory(deletionEntityId: number, mergedEntityId: number, entityType: "publication" | "monograph" | "proceedings"): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/publication/${entityType}/${deletionEntityId}/${mergedEntityId}`);
+    }
+
+    async migrateOrganisationUnitIdentifierHistory(deletionEntityId: number, mergedEntityId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/organisation-unit/${deletionEntityId}/${mergedEntityId}`);
     }
 }
 

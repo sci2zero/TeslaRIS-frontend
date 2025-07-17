@@ -359,9 +359,10 @@ export default defineComponent({
 
                 await deleteAction;
 
+                await MergeService.migrateOrganisationUnitIdentifierHistory(id, transferTargetId as number);
                 await MergeService.switchAllIndicatorsToOtherOrganisationUnit(id as number, transferTargetId as number);
 
-                router.push({ name: "organisationUnitLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "organisationUnitLandingPage", params: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification",

@@ -76,7 +76,6 @@ export default defineComponent({
         router.beforeEach((to: any, from: any, next: any) => {
             const newLocale: string = to.params.locale;
             const prevLocale: string = from.params.locale;
-            console.log(newLocale, prevLocale)
             if (newLocale === undefined) {
                 next();
                 return;

@@ -55,7 +55,7 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
@@ -197,21 +197,25 @@ export default defineComponent({
             }
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftPublisher.value?.id as number : rightPublisher.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftPublisher.value?.name : rightPublisher.value?.name;
             const transferTargetId = side === ComparisonSide.LEFT ? rightPublisher.value?.id : leftPublisher.value?.id;
 
-            const deleteAction = isForceDelete 
-                ? PublisherService.forceDeletePublisher(id)
-                : PublisherService.deletePublisher(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? PublisherService.forceDeletePublisher(id)
+                    : PublisherService.deletePublisher(id);
 
-            deleteAction.then(() => {
-                router.push({ name: "publisherLandingPage", query: { id: transferTargetId } });
-            }).catch(() => {
+                await deleteAction;
+
+                await MergeService.migrateGenericIdentifierHistory(id, transferTargetId as number, EntityType.PUBLISHER);
+                
+                router.push({ name: "publisherLandingPage", params: { id: transferTargetId } });
+            } catch (_error) {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

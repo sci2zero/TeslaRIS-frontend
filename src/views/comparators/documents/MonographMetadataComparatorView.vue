@@ -361,9 +361,10 @@ export default defineComponent({
 
                 await deleteAction;
 
+                await MergeService.migratePublicationIdentifierHistory(id, transferTargetId as number, "monograph");
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "monographLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "monographLandingPage", params: { id: transferTargetId } });
             } catch {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;

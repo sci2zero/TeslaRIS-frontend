@@ -323,11 +323,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightSoftware.value?.id : leftSoftware.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "softwareLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "softwareLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftSoftware.value?.title : rightSoftware.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

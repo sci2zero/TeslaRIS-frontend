@@ -451,9 +451,10 @@ export default defineComponent({
 
                 await deleteAction;
 
+                await MergeService.migratePersonIdentifierHistory(id, transferTargetId as number);
                 await MergeService.switchAllIndicatorsToOtherPerson(id as number, transferTargetId as number);
 
-                router.push({ name: "researcherLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "researcherLandingPage", params: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value =
                     isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
