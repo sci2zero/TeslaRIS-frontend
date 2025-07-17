@@ -279,7 +279,9 @@ export default defineComponent({
                 })
                 CommissionService.getDefaultCommissionId().then(resp => {
                     if (resp.data > 0) {
-                        selectedCommission.value = commissions.value.find(commission => commission.value === resp.data) as {title: string, value: number};
+                        selectedCommission.value = commissions.value.find(
+                            commission => commission.value === resp.data
+                        ) as {title: string, value: number};
                     } else if (commissions.value.length > 0) {
                         selectedCommission.value = commissions.value[0];
                     }
