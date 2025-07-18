@@ -22,7 +22,7 @@ export class ThesisLibrarySearchService extends BaseService {
     }
 
     async performWordCloudSearch(body: ThesisSearchRequest, queryType: "simple" | "advanced"): Promise<AxiosResponse<TermFrequency[]>> {
-        return super.sendRequest(axios.post, `thesis-library/search/wordcloud/${queryType}?foreignLanguage=${i18n.vueI18n.global.locale.toString().toLowerCase() !== "sr"}`, body);
+        return super.sendRequest(axios.post, `thesis-library/search/wordcloud/${queryType}?foreignLanguage=${!i18n.vueI18n.global.locale.toString().toLowerCase().startsWith("sr")}`, body);
     }
 }
 

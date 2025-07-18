@@ -1,5 +1,6 @@
 import { EntityType } from "@/models/MergeModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const entityTypeSr = [
     { title: "Publikacije", value: EntityType.PUBLICATION },
@@ -29,6 +30,8 @@ export const getEntityTypeTitleFromValueAutoLocale = (value: EntityType) => {
     let entityTypeArray = entityTypeEn;
     if (locale == "sr") {
         entityTypeArray = entityTypeSr;
+    } else if (locale == "sr-cyr") {
+        entityTypeArray = transliterateContentToCyrillic(entityTypeSr);
     }
 
     return (entityTypeArray.find(item => item.value === value) || {}).title;
@@ -38,6 +41,8 @@ export const getEntityTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return entityTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(entityTypeSr);
         case "en":
             return entityTypeEn;
     }

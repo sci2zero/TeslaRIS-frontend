@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftMonographPublication?.contributions ? leftMonographPublication.contributions : []"
                             :document-id="leftMonographPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -72,7 +73,11 @@
                             <b>{{ $t("contributionsLabel") }}</b>
                         </div>
 
-                        <person-document-contribution-list :contribution-list="rightMonographPublication?.contributions ? rightMonographPublication.contributions : []" :document-id="rightMonographPublication?.id"></person-document-contribution-list>
+                        <person-document-contribution-list
+                            :contribution-list="rightMonographPublication?.contributions ? rightMonographPublication.contributions : []"
+                            :document-id="rightMonographPublication?.id"
+                            in-comparator>
+                        </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
 
@@ -331,11 +336,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightMonographPublication.value?.id : leftMonographPublication.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "monographPublicationLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "monographPublicationLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftMonographPublication.value?.title : rightMonographPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

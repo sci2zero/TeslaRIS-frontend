@@ -60,7 +60,7 @@
                 <tr>
                     <td>{{ row.item.fullName }}</td>
                     <td>{{ row.item.email }}</td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
                     </td>
                     <td v-else>

@@ -38,7 +38,7 @@
                         hide-details
                     />
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     <localized-link :to="'journals/' + row.item.databaseId">
                         {{ row.item.titleSr }}
                     </localized-link>
@@ -172,14 +172,14 @@ export default defineComponent({
             Promise.all(selectedJournals.value.map((journal: JournalIndex) => {
                 return JournalService.deleteJournal(journal.databaseId)
                     .then(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteSuccessNotification", { name: journal.titleSr }));
                         } else {
                             addNotification(i18n.t("deleteSuccessNotification", { name: journal.titleOther }));
                         }
                     })
                     .catch(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteFailedNotification", { name: journal.titleSr }));
                         } else {
                             addNotification(i18n.t("deleteFailedNotification", { name: journal.titleOther }));

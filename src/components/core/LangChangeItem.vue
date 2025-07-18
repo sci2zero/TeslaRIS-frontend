@@ -34,7 +34,7 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { supportedLocales, defaultLocale } from '../../i18n'
 import { getLangItems } from '@/i18n/languages';
@@ -43,68 +43,78 @@ import { getLangItems } from '@/i18n/languages';
   export default defineComponent({
     name: "LangChangeItem",
     setup() {
-      const currentRoute = useRoute();
-      const router = useRouter();
+        const currentRoute = useRoute();
+        const router = useRouter();
 
-      const selectedLocale: any = ref({});
-      const langItems = getLangItems();
-  
-      const switchLang = (lang: any) => {
-        selectedLocale.value = lang; 
-        const currentPath = currentRoute.path.replace(/^\/[a-z]+/, `/${lang.value}`);
-        router.push(currentPath);
-      };
+        const selectedLocale: any = ref({});
+        const langItems = getLangItems();
 
-      onMounted(async () => {
-        await router.isReady()
-        const currentLocale = currentRoute.params.locale as string;
+        const fav = ref(true);
+        const menu = ref(false);
+        const message = ref(false);
+        const hints = ref(true);
+    
+        const switchLang = (lang: any) => {
+            selectedLocale.value = lang; 
+            const newPath = currentRoute.path.replace(/^\/(sr-cyr|sr|en)/, `/${lang.value}`);
+            
+            router.push({
+                path: newPath,
+                query: currentRoute.query,
+            });
+        };
+
+        onMounted(async () => {
+            await router.isReady()
+            presetCurrentLocale();
+        });
+
+        watch(() => currentRoute.params.locale, () => {
+            presetCurrentLocale();
+        });
         
-        if (supportedLocales.includes(currentLocale)) {
-          selectedLocale.value = langItems.find(x=>x.value == currentLocale);
-        } else {
-          selectedLocale.value = langItems.find(x=>x.value == defaultLocale)
-        }
-      });
-  
-      return {
-        switchLang,
-        selectedLocale,
-        langItems
-      };
-    },
-
-    data: () => ({
-      fav: true,
-      menu: false,
-      message: false,
-      hints: true,
-    }),
-
-
+        const presetCurrentLocale = () => {
+            const currentLocale = currentRoute.params.locale as string;
+            
+            if (supportedLocales.includes(currentLocale)) {
+                selectedLocale.value = langItems.find(x=>x.value == currentLocale);
+            } else {
+                selectedLocale.value = langItems.find(x=>x.value == defaultLocale)
+            }
+        };
+    
+        return {
+            switchLang,
+            selectedLocale,
+            langItems, fav,
+            menu, message,
+            hints
+        };
+    }
   });
 </script>
   
-  <style scoped>
-  label {
+<style scoped>
+label {
     cursor: pointer;
     padding: 0.5em;
     margin: 0.2em;
     border: 1px solid #ccc;
     border-radius: 4px;
     display: inline-block;
-  }
+}
   
-  .sr {
+.sr {
     padding-right: 0.125em;
-  }
+}
   
-  .en {
+.en {
     padding-left: 0.125em;
-  }
+}
 
-  .selected {
+.selected {
     background: #494c5f;
     color: white;
-  }
-  </style>
+}
+</style>
   

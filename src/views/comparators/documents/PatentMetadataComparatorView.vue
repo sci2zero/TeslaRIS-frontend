@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []"
                             :document-id="leftPatent?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []"
                             :document-id="rightPatent?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -321,11 +323,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightPatent.value?.id : leftPatent.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "patentLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "patentLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftPatent.value?.title : rightPatent.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

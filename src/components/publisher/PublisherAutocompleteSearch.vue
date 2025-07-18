@@ -88,7 +88,7 @@ export default defineComponent({
                 PublisherService.searchPublishers(params).then((response) => {
                     const listOfPublishers: { title: string, value: number }[] = [];
                     response.data.content.forEach((publisher: PublisherIndex) => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             listOfPublishers.push({title: publisher.nameSr, value: publisher.databaseId});
                         } else {
                             listOfPublishers.push({title: publisher.nameOther, value: publisher.databaseId});

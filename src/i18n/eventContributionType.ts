@@ -1,6 +1,7 @@
 import { EventContributionType } from "@/models/EventModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const contributionTypesEn = [
     {title: "Organisation Board Chair", value: EventContributionType.ORGANIZATION_BOARD_CHAIR},
@@ -36,6 +37,8 @@ export const getTitleFromValueAutoLocale = (value: EventContributionType) => {
     let contributionTypeArray = contributionTypesEn;
     if (locale == "sr") {
         contributionTypeArray = contributionTypesSr;
+    } else if (locale == "sr-cyr") {
+        contributionTypeArray = transliterateContentToCyrillic(contributionTypesSr);
     }
 
     if (typeof value === "number") {
@@ -49,6 +52,8 @@ export const getTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return contributionTypesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(contributionTypesSr);
         case "en":
             return contributionTypesEn;
     }

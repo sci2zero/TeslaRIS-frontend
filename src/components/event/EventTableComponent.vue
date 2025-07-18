@@ -38,7 +38,7 @@
                         hide-details
                     />
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     <localized-link :to="'events/conference/' + row.item.databaseId">
                         {{ row.item.nameSr }}
                     </localized-link>
@@ -51,7 +51,7 @@
                 <td>
                     {{ displayTextOrPlaceholder(row.item.dateFromTo) }}
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     {{ displayTextOrPlaceholder(row.item.stateSr) }}
                 </td>
                 <td v-else>
@@ -200,13 +200,13 @@ export default defineComponent({
 
         const pushlocalizedMessage = (success: boolean, event: EventIndex) => {
             if (success) {
-                if (i18n.locale.value === "sr") {
+                if (i18n.locale.value.startsWith("sr")) {
                     addNotification(i18n.t("deleteSuccessNotification", { name: event.nameSr }));
                 } else {
                     addNotification(i18n.t("deleteSuccessNotification", { name: event.nameOther }));
                 }
             } else {
-                if (i18n.locale.value === "sr") {
+                if (i18n.locale.value.startsWith("sr")) {
                     addNotification(i18n.t("deleteFailedNotification", { name: event.nameSr }));
                 } else {
                     addNotification(i18n.t("deleteFailedNotification", { name: event.nameOther }));

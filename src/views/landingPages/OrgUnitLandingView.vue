@@ -125,15 +125,13 @@
             </v-col>
         </v-row>
 
-        <div
-            v-show="canEdit"
-            class="actions-box pa-4"
-        >
+        <div class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("additionalActionsLabel") }}
             </div>
             <div class="d-flex flex-row">
                 <generic-crud-modal
+                    v-if="canEdit"
                     class="ml-2" 
                     :form-component="ExternalIndicatorsConfigurationForm"
                     :form-props="{ institutionId: organisationUnit?.id }"
@@ -143,6 +141,25 @@
                     :read-only="!canEdit"
                     @update="updateSuccess"
                 />
+                <v-btn
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="navigateToPublicTheses">
+                    {{ $t("routeLabel.publicDissertationsReport") }}
+                </v-btn>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    class="ml-2"
+                    :form-component="PublicReviewContentForm"
+                    :form-props="{ institutionId: organisationUnit?.id, presetPageContent: publicReviewPageContent }"
+                    entity-name="PublicReviewPageContent"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="updateSuccess(); fetchPublicReviewPageContent()"
+                />
+                =======
+                >>>>>>> main
             </div>
         </div>
 
@@ -363,6 +380,9 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
+import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
+import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
+import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
 
 
 export default defineComponent({
@@ -455,6 +475,8 @@ export default defineComponent({
                     {title: publicationType.title, value: publicationType.value}
                 );
             });
+
+            fetchPublicReviewPageContent();
         });
 
         const fetchOU = (uponStartup: boolean) => {
@@ -696,6 +718,20 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
+        const navigateToPublicTheses = () => {
+            router.push({name: "publicDissertationsReport", query: {institutionId: organisationUnit.value?.id as number}});
+        };
+
+        const publicReviewPageContent = ref<PublicReviewPageContent[]>([]);
+        const fetchPublicReviewPageContent = () => {
+            publicReviewPageContent.value.splice(0);
+            PublicReviewPageConfigurationService.getConfigurationForInstitution(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                publicReviewPageContent.value = response.data;
+            });
+        };
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
@@ -704,7 +740,7 @@ export default defineComponent({
             switchEmployeesPage, isAdmin, performNavigation,
             searchKeyword, relationChain, selectedPublicationTypes,
             returnCurrentLocaleContent, canEdit,
-            updateKeywords, updateBasicInfo,
+            updateKeywords, updateBasicInfo, navigateToPublicTheses,
             snackbar, snackbarMessage, relations,
             updateRelations, graphRef, updateResearchAreas,
             subUnits, totalSubUnits, switchSubUnitsPage,
@@ -717,7 +753,9 @@ export default defineComponent({
             clearSortAndPerformPersonSearch,
             clearSortAndPerformPublicationSearch,
             employeesRef, alumniRef, personSearchParams,
-            publicationSearchParams, isInstitutionalEditor
+            publicationSearchParams, isInstitutionalEditor,
+            PublicReviewContentForm, publicReviewPageContent,
+            fetchPublicReviewPageContent
         };
 }})
 

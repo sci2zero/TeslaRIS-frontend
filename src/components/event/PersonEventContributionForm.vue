@@ -30,6 +30,7 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
+                    :readonly="lockContributionType !== undefined"
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
@@ -59,11 +60,27 @@ export default defineComponent({
         isUpdate: {
             type: Boolean,
             default: false
+        },
+        lockContributionType: {
+            type: Object as PropType<EventContributionType | undefined>,
+            default: undefined
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{eventContributionType: {title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER), value: EventContributionType.PROGRAMME_BOARD_MEMBER}}]);
+        const inputs = ref<any[]>(
+            props.presetContributions.length > 0 ? Array.from(
+                { length: props.presetContributions.length }, () => ({})
+            ) : 
+            [
+                {
+                    eventContributionType: {
+                        title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER),
+                        value: props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                    }
+                }
+            ]
+        );
         const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
@@ -92,8 +109,8 @@ export default defineComponent({
 
         const addInput = () => {
             inputs.value.push({eventContributionType: {
-                    title: getTitleFromValueAutoLocale(EventContributionType.PROGRAMME_BOARD_MEMBER), 
-                    value: EventContributionType.PROGRAMME_BOARD_MEMBER
+                    title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER), 
+                    value: props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
                 }
             });
         };

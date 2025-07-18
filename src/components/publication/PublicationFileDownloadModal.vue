@@ -13,7 +13,15 @@
             <v-card v-if="dialog" class="d-flex flex-column align-right pa-4">
                 <v-card-title>{{ $t("filesForDownloadLabel") }}</v-card-title>
                 <v-card-text>
-                    <attachment-section :document="document" :proofs="[]" :file-items="document?.fileItems"></attachment-section>
+                    <attachment-section
+                        :document="document"
+                        :is-on-public-review="showThesisSections"
+                        :file-items="document?.fileItems"
+                        :proofs="document?.proofs"
+                        :preliminary-files="(showThesisSections && document) ? (document as Thesis).preliminaryFiles : []"
+                        :preliminary-supplements="(showThesisSections && document) ? (document as Thesis).preliminarySupplements : []"
+                        :commission-reports="(showThesisSections && document) ? (document as Thesis).commissionReports : []">
+                    </attachment-section>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -28,7 +36,7 @@
 
 
 <script lang="ts">
-import { type Document } from "@/models/PublicationModel";
+import type { Thesis, Document } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { ref, watch } from "vue";
 import { defineComponent } from "vue";
@@ -42,12 +50,16 @@ export default defineComponent({
         documentId: {
             type: Number,
             required: true
+        },
+        showThesisSections: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {
         const currentTab = ref("simpleSearch");
         const dialog = ref(false);
-        const document = ref<Document>();
+        const document = ref<Document | Thesis>();
 
         watch(dialog, () => {
             if (dialog.value) {
@@ -56,11 +68,19 @@ export default defineComponent({
         });
 
         const fetchDocument = () => {
-            DocumentPublicationService.readDocumentPublication(
-                props.documentId
-            ).then(response => {
-                document.value = response.data;
-            });
+            if (props.showThesisSections) {
+                DocumentPublicationService.readThesis(
+                    props.documentId
+                ).then(response => {
+                    document.value = response.data;
+                });
+            } else {
+                DocumentPublicationService.readDocumentPublication(
+                    props.documentId
+                ).then(response => {
+                    document.value = response.data;
+                });
+            }
         };
 
         return {

@@ -22,7 +22,10 @@
                                 ref="updateFormRef"
                                 :preset-contributions="presetDocumentContributions"
                                 :board-members-allowed="boardMembersAllowed"
+                                :board-member-ids="boardMemberIds"
                                 is-update
+                                :limit-one="limitOne"
+                                :lock-contribution-type="lockContributionType"
                                 @set-input="contributions = $event">
                             </person-publication-contribution>
                         </v-container>
@@ -46,7 +49,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { PersonDocumentContribution } from "@/models/PublicationModel";
+import type { DocumentContributionType, PersonDocumentContribution } from "@/models/PublicationModel";
 import PersonPublicationContribution from "@/components/publication/PersonPublicationContribution.vue";
 
 
@@ -63,6 +66,18 @@ export default defineComponent({
             required: true
         },
         boardMembersAllowed: {
+            type: Boolean,
+            default: false
+        },
+        lockContributionType: {
+            type: Object as PropType<DocumentContributionType | undefined>,
+            default: undefined
+        },
+        boardMemberIds: {
+            type: Array<number>,
+            default: []
+        },
+        limitOne: {
             type: Boolean,
             default: false
         }

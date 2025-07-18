@@ -15,6 +15,14 @@ export const returnCurrentLocaleContent = (multilingualContentList: Multilingual
         }
     });
 
+    if (!selectedContent) {
+        multilingualContentList.forEach((multilingualContent) => {
+            if (multilingualContent.languageTag.startsWith(currentLocale)) {
+                selectedContent = multilingualContent;
+            }
+        });
+    }
+
     if (selectedContent) {
         return (selectedContent as MultilingualContent).content;
     } else {

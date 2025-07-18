@@ -23,6 +23,7 @@ export const useValidationUtils = () => {
     const requiredFutureDateMessage = computed(() => i18n.t("requiredFutureDateMessage"));
     const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
     const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
+    const invalidUDCMessage = computed(() => i18n.t("udcFormatError"));
 
 
     
@@ -232,6 +233,15 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const udcPattern = /^\d{1,3}([.:/]\d{1,5})*(\(\d{1,5}(\.\d{1,5})?\))?$/;
+    const udcValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (udcPattern.test(value)) return true;
+            return invalidUDCMessage.value;
+        }
+    ];
+
     const emailFieldRules = [
         (value: string) => {
             if (!value) return requiredFieldMessage.value;
@@ -324,6 +334,6 @@ export const useValidationUtils = () => {
         requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules,
         atLeastOneRequiredRule, atLeastOneTrueRule, personOpenAlexIdValidationRules,
         institutionOpenAlexIdValidationRules, sourceOpenAlexIdValidationRules,
-        rorValidationRules, workOpenAlexIdValidationRules
+        rorValidationRules, workOpenAlexIdValidationRules, udcValidationRules
     };
 };

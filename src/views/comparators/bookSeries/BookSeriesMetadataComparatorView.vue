@@ -279,7 +279,7 @@ export default defineComponent({
 
                 await MergeService.switchAllIndicatorsToOtherBookSeries(id as number, transferTargetId as number);
 
-                router.push({ name: "bookSeriesLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "bookSeriesLandingPage", params: { id: transferTargetId } });
             } catch {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;

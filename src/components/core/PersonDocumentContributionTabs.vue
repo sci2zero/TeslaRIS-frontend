@@ -5,12 +5,17 @@
                 <v-card-text class="edit-pen-container">
                     <publication-contribution-update-modal
                         :read-only="readOnly"
-                        :preset-document-contributions="localContributions"
+                        :preset-document-contributions="getContributorGroupForUpdating()"
                         :board-members-allowed="boardMembersAllowed"
+                        :board-member-ids="boardMembersAllowed ? boardMemberList.map(bm => bm.personId).filter(id => !!id) : []"
+                        :lock-contribution-type="getLockedContributionType()"
+                        :limit-one="limitOneAuthor && currentTab === 'authors'"
                         @update="sendToParent">
                     </publication-contribution-update-modal>
 
-                    <div v-if="contributionList?.length === 0">
+                    <div
+                        v-if="contributionList?.length === 0"
+                        class="mt-5">
                         <b>{{ showsBoardAndReviewers ? $t("boardAndReviewersLabel") : $t("contributionsLabel") }}</b>
                     </div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
@@ -20,19 +25,19 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-show="authorList.length > 0" value="authors">
+                        <v-tab value="authors">
                             {{ $t("authorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="editorList.length > 0" value="editors">
+                        <v-tab value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="reviewerList.length > 0" value="reviewers">
+                        <v-tab value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-show="advisorList.length > 0" value="advisors">
+                        <v-tab value="advisors">
                             {{ $t("advisorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="boardMemberList.length > 0" value="boardMembers">
+                        <v-tab v-show="boardMembersAllowed" value="boardMembers">
                             {{ $t("boardMembersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -118,6 +123,10 @@ export default defineComponent({
         showsBoardAndReviewers: {
             type: Boolean,
             default: false
+        },
+        limitOneAuthor: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update", "positionsChanged"],
@@ -145,7 +154,47 @@ export default defineComponent({
         });
 
         const sendToParent = (contributions: any[]) => {
-            emit("update", contributions);
+            const contributionLists: Record<string, any[]> = {
+                authors: authorList.value,
+                editors: editorList.value,
+                reviewers: reviewerList.value,
+                advisors: advisorList.value,
+                boardMembers: boardMemberList.value
+            };
+
+            const tabs = Object.keys(contributionLists);
+            const allContributions: any[] = [];
+
+            if (tabs.includes(currentTab.value)) {
+                for (const tab of tabs) {
+                    if (tab === currentTab.value) {
+                        allContributions.push(...contributions);
+                    } else {
+                        allContributions.push(...(contributionLists[tab] || []));
+                    }
+                }
+            } else {
+                allContributions.push(...contributions);
+            }
+
+            emit("update", allContributions);
+        };
+
+        const getLockedContributionType = () => {
+            switch (currentTab.value) {
+                case "authors":
+                    return DocumentContributionType.AUTHOR;
+                case "editors":
+                    return DocumentContributionType.EDITOR;
+                case "reviewers":
+                    return DocumentContributionType.REVIEWER;
+                case "advisors":
+                    return DocumentContributionType.ADVISOR;
+                case "boardMembers":
+                    return DocumentContributionType.BOARD_MEMBER;
+            }
+
+            return DocumentContributionType.AUTHOR;
         };
 
         const updateOrderInParentList = () => {
@@ -188,11 +237,30 @@ export default defineComponent({
             }
         };
 
+        const getContributorGroupForUpdating = () => {
+            switch (currentTab.value) {
+                case "authors":
+                    return authorList.value;
+                case "editors":
+                    return editorList.value;
+                case "reviewers":
+                    return reviewerList.value;
+                case "advisors":
+                    return advisorList.value;
+                case "boardMembers":
+                    return boardMemberList.value;
+            }
+
+            return boardMemberList.value;
+        };
+
         return {
             sendToParent, getTitleFromValueAutoLocale,
             currentTab, authorList, editorList,
             reviewerList, advisorList, boardMemberList,
-            updateOrderInParentList, localContributions
+            updateOrderInParentList, localContributions,
+            getContributorGroupForUpdating,
+            getLockedContributionType
         };
     },
 });

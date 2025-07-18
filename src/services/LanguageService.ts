@@ -9,7 +9,7 @@ export class LanguageService extends BaseService {
 
   private cachedLanguages: AxiosResponse<LanguageResponse[]> | null = null;
   
-  private cachedUILanguages: AxiosResponse<LanguageResponse[]> | null = null;
+  private cachedUILanguages: AxiosResponse<LanguageTagResponse[]> | null = null;
   
   private cachedLanguageTags: AxiosResponse<LanguageTagResponse[]> | null = null;
 
@@ -30,7 +30,7 @@ export class LanguageService extends BaseService {
     return response;
   }
 
-  async getAllUILanguages(): Promise<AxiosResponse<LanguageResponse[]>> {
+  async getAllUILanguages(): Promise<AxiosResponse<LanguageTagResponse[]>> {
     if (this.cachedUILanguages) {
       return Promise.resolve(this.cachedUILanguages);
     }

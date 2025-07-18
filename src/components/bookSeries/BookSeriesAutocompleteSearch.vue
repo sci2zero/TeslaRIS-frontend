@@ -124,7 +124,7 @@ export default defineComponent({
                 BookSeriesService.searchBookSeries(params).then((response) => {
                     const listOfBookSeries: { title: string, value: number }[] = [];
                     response.data.content.forEach((bookSeries: BookSeriesIndex) => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             listOfBookSeries.push({title: bookSeries.titleSr, value: bookSeries.databaseId});
                         } else {
                             listOfBookSeries.push({title: bookSeries.titleOther, value: bookSeries.databaseId});

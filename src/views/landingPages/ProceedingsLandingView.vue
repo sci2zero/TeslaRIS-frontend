@@ -11,9 +11,9 @@
                             color="blue-lighten-3"
                             class="d-flex justify-center align-center"
                         >
-                            <p class="text-h5">
-                                {{ returnCurrentLocaleContent(proceedings?.title) }}
-                            </p>
+                            <rich-title-renderer
+                                :title="returnCurrentLocaleContent(proceedings?.title)">
+                            </rich-title-renderer>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -297,11 +297,12 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, IndicatorsSection },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer },
     setup() {
         const currentTab = ref("");
 
@@ -401,7 +402,10 @@ export default defineComponent({
         };
 
         const fetchPublications = () => {
-            return DocumentPublicationService.findPublicationsInProceedings(proceedings.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsInProceedings(
+                parseInt(currentRoute.params.id as string),
+                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+            ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });

@@ -46,8 +46,8 @@ export interface UserUpdateRequest {
     newPassword: string;
     firstname: string;
     lastName: string;
-    preferredUILanguageId: number;
-    preferredReferenceCataloguingLanguageId: number;
+    preferredUILanguageTagId: number;
+    preferredReferenceCataloguingLanguageTagId: number;
     organisationUnitId?: number;
     notificationPeriod: UserNotificationPeriod;
 }

@@ -5,7 +5,8 @@
                 <v-card-text class="edit-pen-container">
                     <publication-series-contribution-update-modal
                         :read-only="readOnly"
-                        :preset-publication-series-contributions="localContributions"
+                        :preset-publication-series-contributions="getContributorGroupForUpdating()"
+                        :lock-contribution-type="getLockedContributionType()"
                         @update="sendToParent">
                     </publication-series-contribution-update-modal>
 
@@ -19,16 +20,16 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-show="editorList.length > 0" value="editors">
+                        <v-tab value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="associateEditorList.length > 0" value="associateEditors">
+                        <v-tab value="associateEditors">
                             {{ $t("associateEditorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="reviewerList.length > 0" value="reviewers">
+                        <v-tab value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-show="scientificBoardMemberList.length > 0" value="scientificBoardMembers">
+                        <v-tab value="scientificBoardMembers">
                             {{ $t("scientificBoardMembersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -150,7 +151,59 @@ export default defineComponent({
         };
 
         const sendToParent = (contributions: any[]) => {
-            emit("update", contributions);
+            const contributionLists: Record<string, any[]> = {
+                editors: editorList.value,
+                associateEditors: associateEditorList.value,
+                reviewers: reviewerList.value,
+                scientificBoardMembers: scientificBoardMemberList.value
+            };
+
+            const tabs = Object.keys(contributionLists);
+            const allContributions: any[] = [];
+
+            if (tabs.includes(currentTab.value)) {
+                for (const tab of tabs) {
+                    if (tab === currentTab.value) {
+                        allContributions.push(...contributions);
+                    } else {
+                        allContributions.push(...(contributionLists[tab] || []));
+                    }
+                }
+            } else {
+                allContributions.push(...contributions);
+            }
+
+            emit("update", allContributions);
+        };
+
+        const getLockedContributionType = () => {
+            switch (currentTab.value) {
+                case "editors":
+                    return PublicationSeriesContributionType.EDITOR;
+                case "associateEditors":
+                    return PublicationSeriesContributionType.ASSOCIATE_EDITOR;
+                case "reviewers":
+                    return PublicationSeriesContributionType.REVIEWER;
+                case "scientificBoardMembers":
+                    return PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER;
+            }
+
+            return undefined;
+        };
+
+        const getContributorGroupForUpdating = () => {
+            switch (currentTab.value) {
+                case "editors":
+                    return editorList.value;
+                case "associatedEditors":
+                    return associateEditorList.value;
+                case "reviewers":
+                    return reviewerList.value;
+                case "scientificBoardMembers":
+                    return scientificBoardMemberList.value;
+            }
+
+            return editorList.value;
         };
 
         const selectFirstNonEmptyTab = () => {
@@ -174,7 +227,9 @@ export default defineComponent({
             associateEditorList, reviewerList,
             scientificBoardMemberList,
             localContributions,
-            updateOrderInParentList
+            updateOrderInParentList,
+            getLockedContributionType,
+            getContributorGroupForUpdating
         };
     },
 });

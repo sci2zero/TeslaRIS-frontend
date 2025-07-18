@@ -47,7 +47,7 @@
                 <v-select
                     v-model="selectedLanguage"
                     :label="$t('preferredLanguageLabel')"
-                    :items="languages"
+                    :items="uiLanguages"
                     return-object
                 ></v-select>
             </v-col>
@@ -120,7 +120,7 @@ import LanguageService from "@/services/LanguageService";
 import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue";
 import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
-import type { LanguageResponse, MultilingualContent } from "@/models/Common";
+import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
 import { UserNotificationPeriod, type UserUpdateRequest } from "@/models/UserModel";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
@@ -153,6 +153,7 @@ export default defineComponent({
         const originalEmail = ref("");
         const email = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
+        const uiLanguages = ref<{ title: string, value: number }[]>([]);
         const selectedLanguage = ref<{ title: string, value: number }>({title: "SR", value: -1});
         const selectedReferenceLanguage = ref<{ title: string, value: number }>({title: "EN", value: -1});
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
@@ -190,7 +191,7 @@ export default defineComponent({
                 let ouNameSr = "";
                 let ouNameOther = "";
                 response.data.organisationUnitName.forEach((mc: MultilingualContent) => {
-                    if(mc.languageTag === "SR") {
+                    if(mc.languageTag.startsWith("SR")) {
                         ouNameSr = mc.content;
                     } else {
                         ouNameOther = mc.content;
@@ -201,7 +202,7 @@ export default defineComponent({
                 ouNameOther = ouNameOther === "" ? ouNameSr : ouNameOther;
 
                 if(response.data.organisationUnitId !== -1) {
-                    if (i18n.locale.value === "sr") {
+                    if (i18n.locale.value.startsWith("sr")) {
                         selectedOrganisationUnit.value = { title: ouNameSr, value: response.data.organisationUnitId }
                     } else {
                         selectedOrganisationUnit.value = { title: ouNameOther, value: response.data.organisationUnitId }
@@ -215,11 +216,15 @@ export default defineComponent({
         };
 
         const populateLanguageData = (preferredUILanguage: string, preferredReferenceCataloguingLanguage: string) => {
-            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
-                response.data.forEach((language: LanguageResponse) => {
+                uiLanguages.value.splice(0);
+                response.data.forEach((language: LanguageTagResponse) => {
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
+                    if (i18n.availableLocales.includes(language.languageCode.toLowerCase())) {
+                        uiLanguages.value.push({title: language.languageCode, value: language.id})
+                    }
                     
                     if (language.languageCode === preferredUILanguage) {
                         selectedLanguage.value = { title: language.languageCode, value: language.id};
@@ -252,8 +257,8 @@ export default defineComponent({
                 firstname: name.value,
                 lastName: surname.value,
                 email: email.value,
-                preferredUILanguageId: selectedLanguage.value.value,
-                preferredReferenceCataloguingLanguageId: selectedReferenceLanguage.value.value,
+                preferredUILanguageTagId: selectedLanguage.value.value,
+                preferredReferenceCataloguingLanguageTagId: selectedReferenceLanguage.value.value,
                 organisationUnitId: organisationUnitId,
                 oldPassword: changePassword.value ? oldPassword.value : "",
                 newPassword: changePassword.value ? newPassword.value : "",
@@ -309,7 +314,7 @@ export default defineComponent({
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
             isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary,
-            isPromotionRegistryAdministrator
+            isPromotionRegistryAdministrator, uiLanguages
         };
     }
 });

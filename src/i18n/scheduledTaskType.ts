@@ -1,5 +1,6 @@
 import { ScheduledTaskType } from "@/models/Common";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const scheduledTaskTypeSr = [
     { title: "Reindeksiranje", value: ScheduledTaskType.REINDEXING },
@@ -29,6 +30,8 @@ export const getScheduledTaskTypeTitleFromValueAutoLocale = (value: ScheduledTas
     let scheduledtaskTypeArray = scheduledTaskTypeEn;
     if (locale == "sr") {
         scheduledtaskTypeArray = scheduledTaskTypeSr;
+    } else if (locale == "sr-cyr") {
+        scheduledtaskTypeArray = transliterateContentToCyrillic(scheduledTaskTypeSr);
     }
 
     return (scheduledtaskTypeArray.find(item => item.value === value) || {}).title;
@@ -38,6 +41,8 @@ export const getScheduledTaskTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return scheduledTaskTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(scheduledTaskTypeSr);
         case "en":
             return scheduledTaskTypeEn;
     }

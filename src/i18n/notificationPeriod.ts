@@ -1,5 +1,6 @@
 import { UserNotificationPeriod } from "@/models/UserModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const notificationPeriodSr = [
     { title: "Dnevno", value: UserNotificationPeriod.DAILY },
@@ -19,6 +20,8 @@ export const getTitleFromValueAutoLocale = (value: UserNotificationPeriod) => {
     let notificationPeriodArray = notificationPeriodEn;
     if (locale == "sr") {
         notificationPeriodArray = notificationPeriodSr;
+    } else if (locale == "sr-cyr") {
+        notificationPeriodArray = transliterateContentToCyrillic(notificationPeriodSr);
     }
 
     return (notificationPeriodArray.find(item => item.value === value) || {}).title;
@@ -28,6 +31,8 @@ export const getNotificationPeriodForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return notificationPeriodSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(notificationPeriodSr);
         case "en":
             return notificationPeriodEn;
     }

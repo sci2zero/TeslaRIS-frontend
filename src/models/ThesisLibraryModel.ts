@@ -158,3 +158,36 @@ export interface AttendanceCancellationRequest {
     attendanceIdentifier: string,
     captchaToken: string
 }
+
+export interface ThesisPublicReviewResponse {
+    nameAndSurname: string;
+    titleSr: string;
+    titleOther: string;
+    organisationUnitNameSr: string;
+    organisationUnitNameOther: string;
+    scientificArea: string;
+    publicReviewStartDate: string;
+    publicReviewEndDate: string;
+    databaseId: number;
+}
+
+export enum PageContentType {
+    NOTE = "NOTE",
+    IMPORTANT_NOTE = "IMPORTANT_NOTE",
+    TEXT = "TEXT"
+}
+
+export enum PageType {
+    CURRENT = "CURRENT",
+    ARCHIVE = "ARCHIVE",
+    NOT_DEFENDED = "NOT_DEFENDED",
+    ALL = "ALL"
+}
+
+export interface PublicReviewPageContent {
+    institutionId?: number;
+    contentType: PageContentType;
+    pageType: PageType
+    thesisTypes: ThesisType[];
+    content: MultilingualContent[];
+}

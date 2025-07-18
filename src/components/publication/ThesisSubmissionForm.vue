@@ -119,18 +119,24 @@
                                 v-model="selectedWritingLanguage"
                                 :label="$t('writingLanguageLabel')"
                                 :items="languageTagsList"
+                                return-object
                             ></v-select>
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
-                            <v-select
-                                v-model="selectedResearchArea"
-                                :label="$t('researchAreaLabel')"
-                                :placeholder="$t('researchAreaLabel')"
-                                :items="researchAreasSelectable"
-                                return-object
-                            ></v-select>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="scientificArea"
+                                :label="$t('scientificAreaLabel')"
+                                :placeholder="$t('scientificAreaLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="scientificSubArea"
+                                :label="$t('scientificSubAreaLabel')"
+                                :placeholder="$t('scientificSubAreaLabel')">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -144,11 +150,98 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="4">
                             <v-text-field
                                 v-model="numberOfPages" type="number"
                                 :label="$t('numberOfPagesLabel')"
                                 :placeholder="$t('numberOfPagesLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="numberOfChapters" type="number"
+                                :label="$t('numberOfChaptersLabel')"
+                                :placeholder="$t('numberOfChaptersLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="numberOfReferences" type="number"
+                                :label="$t('numberOfReferencesLabel')"
+                                :placeholder="$t('numberOfReferencesLabel')">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="numberOfGraphs" type="number"
+                                :label="$t('numberOfGraphsLabel')"
+                                :placeholder="$t('numberOfGraphsLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="numberOfIllustrations" type="number"
+                                :label="$t('numberOfIllustrationsLabel')"
+                                :placeholder="$t('numberOfIllustrationsLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="numberOfTables" type="number"
+                                :label="$t('numberOfTablesLabel')"
+                                :placeholder="$t('numberOfTablesLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="numberOfAppendices" type="number"
+                                :label="$t('numberOfAppendicesLabel')"
+                                :placeholder="$t('numberOfAppendicesLabel')">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="eIsbn"
+                                label="E-ISBN"
+                                placeholder="E-ISBN"
+                                :rules="isbnValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="printIsbn"
+                                label="Print ISBN"
+                                placeholder="Print ISBN"
+                                :rules="isbnValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="placeOfKeep"
+                                :label="$t('placeOfKeepLabel')"
+                                :placeholder="$t('placeOfKeepLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="udc"
+                                :label="$t('udcLabel')"
+                                :placeholder="$t('udcLabel')"
+                                :rules="udcValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="typeOfTitle"
+                                :label="$t('typeOfTitleLabel')"
+                                :placeholder="$t('typeOfTitleLabel')">
                             </v-text-field>
                         </v-col>
                     </v-row>
@@ -208,10 +301,8 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
 import type { ErrorResponse, LanguageResponse, PrepopulatedMetadata } from '@/models/Common';
-import ResearchAreaService from '@/services/ResearchAreaService';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
-import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
@@ -240,13 +331,16 @@ export default defineComponent({
         const { isAdmin, isInstitutionalLibrarian, loggedInUser } = useUserRole();
         const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
-        const { languageTagsList } = useLanguageTags();
+        const { languageTags } = useLanguageTags();
+        const languageTagsList = ref<any[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguage = ref<number>();
-        const selectedWritingLanguage = ref<number>();
+        const selectedWritingLanguage = ref<{title: string, value: number}>();
+        const languages = ref<LanguageResponse[]>();
 
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                languages.value = response.data;
                 response.data.forEach((language: LanguageResponse) => {
                     languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                     if (i18n.locale.value.toUpperCase() === language.languageCode) {
@@ -254,11 +348,22 @@ export default defineComponent({
                     }
                 })
             });
+        });
 
-            ResearchAreaService.listAllResearchAreas().then(response => {
-                allResearchAreas.value = response.data;
-                populateSelectionData();
-            });
+        watch([selectedLanguage, languageTags], () => {
+            if (!selectedLanguage.value || !languageTags.value || languageTags.value.length === 0) {
+                return;
+            }
+
+            const language = languages.value?.find(lang => lang.id === selectedLanguage.value);
+            if (language) {
+                languageTagsList.value = languageTags.value
+                    .filter(tag => tag.languageCode.startsWith(language.languageCode))
+                    .map(tag => ({ title: tag.display, value: tag.id }));
+            } else {
+                languageTagsList.value = languageTags.value
+                    .map(tag => ({ title: tag.display, value: tag.id }));
+            }
         });
 
         watch([loggedInUser, i18n], () => {
@@ -274,16 +379,8 @@ export default defineComponent({
             }
         };
 
-        const populateSelectionData = () => {
-            researchAreasSelectable.value = [];
-            allResearchAreas.value.forEach(researchArea => {
-                researchAreasSelectable.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.id as number});
-            });
-        };
-
-        const allResearchAreas = ref<ResearchArea[]>([]);
-        const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
-        const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
+        const scientificArea = ref("");
+        const scientificSubArea = ref("");
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const externalOUNameRef = ref<typeof MultilingualTextInput>();
@@ -307,9 +404,20 @@ export default defineComponent({
         const doi = ref("");
         const openAlexId = ref("");
         const numberOfPages = ref<number|null>();
+        const numberOfChapters = ref<number|null>();
+        const numberOfReferences = ref<number|null>();
+        const numberOfGraphs = ref<number|null>();
+        const numberOfIllustrations = ref<number|null>();
+        const numberOfTables = ref<number|null>();
+        const numberOfAppendices = ref<number|null>();
         const uris = ref<string[]>([]);
         const topicAcceptanceDate = ref("");
         const thesisDefenceDate = ref("");
+        const eIsbn = ref("");
+        const printIsbn = ref("");
+        const placeOfKeep = ref("");
+        const udc = ref("");
+        const typeOfTitle = ref("PhD (dr)");
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
@@ -319,7 +427,8 @@ export default defineComponent({
 
         const {
             requiredFieldRules, requiredSelectionRules,
-            doiValidationRules, workOpenAlexIdValidationRules
+            doiValidationRules, workOpenAlexIdValidationRules,
+            isbnValidationRules, udcValidationRules
         } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
@@ -327,8 +436,14 @@ export default defineComponent({
                 title: title.value,
                 thesisType: selectedThesisType.value.value as ThesisType,
                 languageId: selectedLanguage.value as number,
-                writingLanguageTagId: selectedWritingLanguage.value as number,
+                writingLanguageTagId: selectedWritingLanguage.value?.value as number,
                 numberOfPages: numberOfPages.value as number,
+                numberOfChapters: numberOfChapters.value as number,
+                numberOfReferences: numberOfReferences.value as number,
+                numberOfIllustrations: numberOfIllustrations.value as number,
+                numberOfGraphs: numberOfGraphs.value as number,
+                numberOfTables: numberOfTables.value as number,
+                numberOfAppendices: numberOfAppendices.value as number,
                 organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value?.value as number,
                 externalOrganisationUnitName: externalOUName.value,
                 description: description.value,
@@ -340,11 +455,17 @@ export default defineComponent({
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
-                researchAreaId: selectedResearchArea.value.value as number,
+                scientificArea: scientificArea.value,
+                scientificSubArea: scientificSubArea.value,
                 fileItems: [],
                 proofs: [],
                 topicAcceptanceDate: topicAcceptanceDate.value,
-                thesisDefenceDate: thesisDefenceDate.value
+                thesisDefenceDate: thesisDefenceDate.value,
+                printISBN: printIsbn.value,
+                eisbn: eIsbn.value,
+                udc: udc.value,
+                placeOfKeep: placeOfKeep.value,
+                typeOfTitle: typeOfTitle.value,
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
@@ -361,12 +482,24 @@ export default defineComponent({
                     doi.value = "";
                     openAlexId.value = "";
                     numberOfPages.value = null;
+                    numberOfChapters.value = null;
+                    numberOfReferences.value = null;
+                    numberOfIllustrations.value = null;
+                    numberOfGraphs.value = null;
+                    numberOfTables.value = null;
+                    numberOfAppendices.value = null;
                     selectedThesisType.value = { title: "", value: null };
-                    selectedResearchArea.value = { title: "", value: null };
+                    scientificArea.value = "";
+                    scientificSubArea.value = "";
                     selectedOrganisationUnit.value = {title: "", value: -1};
                     contributionsRef.value?.clearInput();
                     topicAcceptanceDate.value = "";
                     thesisDefenceDate.value = "";
+                    eIsbn.value = "";
+                    printIsbn.value = "";
+                    placeOfKeep.value = "";
+                    udc.value = "";
+                    typeOfTitle.value = "";
 
                     error.value = false;
                     snackbar.value = true;
@@ -385,7 +518,6 @@ export default defineComponent({
             });
         };
 
-        const { languageTags } = useLanguageTags();
         const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
             if (title.value.length === 0) {
                 title.value = metadata.title;
@@ -415,12 +547,16 @@ export default defineComponent({
             contributions, contributionsRef, languageList,
             requiredFieldRules, submitThesis, errorMessage,
             requiredSelectionRules, enterExternalOU, languageTagsList,
-            researchAreasSelectable, selectedResearchArea,
             selectedThesisType, thesisTypes, selectedOrganisationUnit,
             externalOUName, externalOUNameRef, ouAutocompleteRef,
             selectedWritingLanguage, canAddAsNonReference,
             isInstitutionalLibrarian, topicAcceptanceDate,
-            thesisDefenceDate, workOpenAlexIdValidationRules
+            thesisDefenceDate, workOpenAlexIdValidationRules,
+            numberOfChapters, numberOfReferences, numberOfGraphs,
+            numberOfIllustrations, numberOfTables, numberOfAppendices,
+            scientificArea, eIsbn, printIsbn, isbnValidationRules,
+            udcValidationRules, placeOfKeep, udc, scientificSubArea,
+            typeOfTitle
         };
     }
 });

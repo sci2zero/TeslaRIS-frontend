@@ -1,5 +1,6 @@
 import { PersonalTitle } from "@/models/InvolvementModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 const personalTitlesEn = [
@@ -24,6 +25,8 @@ export const getPersonalTitleFromValueAutoLocale = (value: PersonalTitle) => {
     let personalTitleArray = personalTitlesEn;
     if (locale == "sr") {
         personalTitleArray = personalTitlesSr;
+    } else if (locale == "sr-cyr") {
+        personalTitleArray = transliterateContentToCyrillic(personalTitlesSr);
     }
 
     return (personalTitleArray.find(item => item.value === value) || {}).title;
@@ -33,6 +36,8 @@ export const getPersonalTitlesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return personalTitlesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(personalTitlesSr);
         case "en":
             return personalTitlesEn;
     }

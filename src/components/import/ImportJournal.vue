@@ -3,11 +3,11 @@
         <h1>{{ $t("journalLabel") }} - {{ returnCurrentLocaleContent(publicationForLoading.journalName) }}</h1>
 
         <h2 v-if="journalBinded && !hadToBeCreated">
-            {{ $t("foundAsLabel", [$i18n.locale == 'sr' ? selectedJournal?.titleSr as string : selectedJournal?.titleOther as string]) }}
+            {{ $t("foundAsLabel", [$i18n.locale.startsWith('sr') ? selectedJournal?.titleSr as string : selectedJournal?.titleOther as string]) }}
         </h2>
 
         <h2 v-if="journalBinded && hadToBeCreated">
-            {{ $t("createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedJournal?.titleSr as string : selectedJournal?.titleOther as string]) }}
+            {{ $t("createdNewEntityLabel", [$i18n.locale.startsWith('sr') ? selectedJournal?.titleSr as string : selectedJournal?.titleOther as string]) }}
         </h2>
 
         <h2 v-if="showTable" class="can-not-find-message">
@@ -28,7 +28,7 @@
             @update:options="refreshTable">
             <template #item="row">
                 <tr>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ row.item.titleSr }}
                     </td>
                     <td v-else>

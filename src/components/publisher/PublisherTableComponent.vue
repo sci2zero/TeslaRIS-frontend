@@ -40,7 +40,7 @@
                         hide-details
                     />
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     <localized-link :to="'publishers/' + row.item.databaseId">
                         {{ row.item.nameSr }}
                     </localized-link>
@@ -50,13 +50,13 @@
                         {{ row.item.nameOther }}
                     </localized-link>
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     {{ displayTextOrPlaceholder(row.item.placeSr) }}
                 </td>
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.placeOther) }}
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     {{ displayTextOrPlaceholder(row.item.stateSr) }}
                 </td>
                 <td v-else>
@@ -158,14 +158,14 @@ export default defineComponent({
             Promise.all(selectedPublishers.value.map((publisher: PublisherIndex) => {
                 return PublisherService.deletePublisher(publisher.databaseId)
                     .then(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteSuccessNotification", { name: publisher.nameSr }));
                         } else {
                             addNotification(i18n.t("deleteSuccessNotification", { name: publisher.nameOther }));
                         }
                     })
                     .catch(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteFailedNotification", { name: publisher.nameSr }));
                         } else {
                             addNotification(i18n.t("deleteFailedNotification", { name: publisher.nameOther }));

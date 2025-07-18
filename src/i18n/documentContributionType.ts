@@ -1,5 +1,6 @@
 import { DocumentContributionType } from "@/models/PublicationModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 export const contributionTypesEn = [
@@ -24,6 +25,8 @@ export const getTitleFromValueAutoLocale = (value: DocumentContributionType) => 
     let documentContributionTypeArray = contributionTypesEn;
     if (locale == "sr") {
         documentContributionTypeArray = contributionTypesSr;
+    } else if (locale == "sr-cyr") {
+        documentContributionTypeArray = transliterateContentToCyrillic(contributionTypesSr);
     }
 
     return (documentContributionTypeArray.find(item => item.value === value) || {}).title;
@@ -33,6 +36,8 @@ export const getTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return contributionTypesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(contributionTypesSr);
         case "en":
             return contributionTypesEn;
     }

@@ -1,5 +1,6 @@
 import { UserRole } from "@/models/UserModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const userTypesSr = [
     { title: "Administrator", value: UserRole.ADMIN },
@@ -29,6 +30,8 @@ export const getTitleFromValueAutoLocale = (value: UserRole | string) => {
     let userTypeArray = userTypesEn;
     if (locale == "sr") {
         userTypeArray = userTypesSr;
+    } else if (locale == "sr-cyr") {
+        userTypeArray = transliterateContentToCyrillic(userTypesSr);
     }
 
     return (userTypeArray.find(item => item.value === value) || {}).title;
@@ -38,7 +41,9 @@ export const getUserTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return userTypesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(userTypesSr);
         case "en":
             return userTypesEn;
     }
-}
+};

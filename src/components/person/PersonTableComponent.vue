@@ -80,7 +80,7 @@
                                 {{ item.name }}
                             </localized-link>
                         </td>
-                        <td v-if="$i18n.locale == 'sr'">
+                        <td v-if="$i18n.locale.startsWith('sr')">
                             <span v-if="item.employmentsSr.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
                                 {{ displayTextOrPlaceholder(item.employmentsSr) }}
                             </span>

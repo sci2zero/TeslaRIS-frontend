@@ -1,3 +1,4 @@
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 import i18n from ".";
 import { EntityIndicatorSource } from "@/models/AssessmentModel";
 
@@ -29,6 +30,8 @@ export const getIndicatorSourceTitleFromValueAutoLocale = (value: EntityIndicato
     let entityIndicatorSourceArray = indicatorSourceEn;
     if (locale == "sr") {
         entityIndicatorSourceArray = indicatorSourceSr;
+    } else if (locale == "sr-cyr") {
+        entityIndicatorSourceArray = transliterateContentToCyrillic(indicatorSourceSr);
     }
 
     return (entityIndicatorSourceArray.find(item => item.value === value) || {}).title;
@@ -38,6 +41,8 @@ export const getIndicatorSourceForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return indicatorSourceSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(indicatorSourceSr);
         case "en":
             return indicatorSourceEn;
     }

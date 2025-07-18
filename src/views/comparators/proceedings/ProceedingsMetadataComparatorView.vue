@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftProceedings?.contributions ? leftProceedings.contributions : []"
                             :document-id="leftProceedings?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightProceedings?.contributions ? rightProceedings.contributions : []"
                             :document-id="rightProceedings?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -345,21 +347,25 @@ export default defineComponent({
             rightProceedings.value!.keywords = keywords;
         };
 
-        const deleteSide = (side: ComparisonSide, isForceDelete = false) => {
+        const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
             const id = side === ComparisonSide.LEFT ? leftProceedings.value?.id as number : rightProceedings.value?.id as number;
             const name = side === ComparisonSide.LEFT ? leftProceedings.value?.title : rightProceedings.value?.title;
             const transferTargetId = side === ComparisonSide.LEFT ? rightProceedings.value?.id : leftProceedings.value?.id;
 
-            const deleteAction = isForceDelete 
-                ? ProceedingsService.forceDeleteProceedings(id)
-                : ProceedingsService.deleteProceedings(id);
+            try {
+                const deleteAction = isForceDelete 
+                    ? ProceedingsService.forceDeleteProceedings(id)
+                    : ProceedingsService.deleteProceedings(id);
 
-            deleteAction.then(() => {
-                router.push({ name: "proceedingsLandingPage", query: { id: transferTargetId } });
-            }).catch(() => {
+                await deleteAction;
+
+                await MergeService.migratePublicationIdentifierHistory(id, transferTargetId as number, "proceedings");
+                
+                router.push({ name: "proceedingsLandingPage", params: { id: transferTargetId } });
+            } catch (_error) {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
-            });
+            }
         };
 
         return {

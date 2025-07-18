@@ -1,5 +1,6 @@
 import { PublicationType } from "@/models/PublicationModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 const publicationTypeEn = [
     { title: "Journal Publication", value: PublicationType.JOURNAL_PUBLICATION },
@@ -35,6 +36,8 @@ export const getPublicationTypeTitleFromValueAutoLocale = (value: PublicationTyp
     let publicationTypeArray = publicationTypeEn;
     if (locale == "sr") {
         publicationTypeArray = publicationTypeSr;
+    } else if (locale == "sr-cyr") {
+        publicationTypeArray = transliterateContentToCyrillic(publicationTypeSr);
     }
 
     return (publicationTypeArray.find(item => item.value === value) || {}).title;
@@ -44,6 +47,8 @@ export const getPublicationTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return publicationTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(publicationTypeSr);
         case "en":
             return publicationTypeEn;
     }

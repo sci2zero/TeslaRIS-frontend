@@ -3,11 +3,11 @@
         <h1>{{ $t("conferenceLabel") }} - {{ returnCurrentLocaleContent(publicationForLoading.conferenceName) }}</h1>
 
         <h2 v-if="eventBinded && !hadToBeCreated">
-            {{ $t("foundAsLabel", [$i18n.locale == 'sr' ? selectedEvent?.nameSr as string : selectedEvent?.nameOther as string]) }}
+            {{ $t("foundAsLabel", [$i18n.locale.startsWith('sr') ? selectedEvent?.nameSr as string : selectedEvent?.nameOther as string]) }}
         </h2>
 
         <h2 v-if="eventBinded && hadToBeCreated">
-            {{ $t("createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedEvent?.nameSr as string : selectedEvent?.nameOther as string]) }}
+            {{ $t("createdNewEntityLabel", [$i18n.locale.startsWith('sr') ? selectedEvent?.nameSr as string : selectedEvent?.nameOther as string]) }}
         </h2>
 
         <h2 v-if="showTable" class="can-not-find-message">
@@ -42,7 +42,7 @@
             :no-data-text="$t('noDataInTableMessage')">
             <template #item="row">
                 <tr>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ row.item.nameSr }}
                     </td>
                     <td v-else>
@@ -51,7 +51,7 @@
                     <td>
                         {{ displayTextOrPlaceholder(row.item.dateFromTo) }}
                     </td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.stateSr) }}
                     </td>
                     <td v-else>

@@ -97,7 +97,7 @@ import PersonPublicationSeriesContributionList from '@/components/core/PersonPub
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
@@ -279,10 +279,11 @@ export default defineComponent({
 
                 await deleteAction;
 
+                await MergeService.migrateGenericIdentifierHistory(id as number, transferTargetId as number, EntityType.JOURNAL);
                 await MergeService.switchAllIndicatorsToOtherJournal(id as number, transferTargetId as number);
                 await MergeService.switchAllClassificationsToOtherJournal(id as number, transferTargetId as number);
 
-                router.push({ name: "journalLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "journalLandingPage", params: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification", 

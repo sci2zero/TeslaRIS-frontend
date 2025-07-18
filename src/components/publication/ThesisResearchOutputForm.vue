@@ -113,7 +113,7 @@ export default defineComponent({
 
         const submit = () => {
             const selectedResearchOutput = tableRef.value!.selectedPublications;
-            const isInSerbian = i18n.locale.value === "sr";
+            const isInSerbian = i18n.locale.value.startsWith("sr");
 
             let noneFailed = true;
 

@@ -108,7 +108,6 @@ export default defineComponent({
                 removeHandledNotification(notificationId);
                 notificationCountStore.decrementCounter();
                 if (response.data.value) {
-                    console.log(response.data)
                     router.push('/' + response.data.value);
                 }
             });

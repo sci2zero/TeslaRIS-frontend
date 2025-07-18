@@ -86,7 +86,7 @@ export default defineComponent({
                     const listOfDocuments: { title: string, value: number }[] = [];
                     response.data.content.forEach((documentPublication: DocumentPublicationIndex) => {
                         const displayTitle =
-                            `${i18n.locale.value === "sr" ? documentPublication.titleSr : documentPublication.titleOther} (${documentPublication.authorNames}) ${documentPublication.year && documentPublication.year > 0 ? documentPublication.year : ""}`;
+                            `${i18n.locale.value.startsWith("sr") ? documentPublication.titleSr : documentPublication.titleOther} (${documentPublication.authorNames}) ${documentPublication.year && documentPublication.year > 0 ? documentPublication.year : ""}`;
 
                         listOfDocuments.push(
                             {

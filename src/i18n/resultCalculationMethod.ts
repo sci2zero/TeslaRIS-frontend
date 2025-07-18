@@ -1,5 +1,6 @@
 import { ResultCalculationMethod } from "@/models/AssessmentModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const resultCalculationMethodsSr = [
     { title: "Uzima se najbolja vrednost", value: ResultCalculationMethod.BEST_VALUE },
@@ -17,6 +18,8 @@ export const getResultCalculationMethodTitleFromValueAutoLocale = (value: Result
     let resultCalculationMethodArray = resultCalculationMethodsEn;
     if (locale == "sr") {
         resultCalculationMethodArray = resultCalculationMethodsSr;
+    } else if (locale == "sr-cyr") {
+        resultCalculationMethodArray = transliterateContentToCyrillic(resultCalculationMethodsSr);
     }
 
     return (resultCalculationMethodArray.find(item => item.value === value) || {}).title;
@@ -26,6 +29,8 @@ export const getResultCalculationMethodsForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return resultCalculationMethodsSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(resultCalculationMethodsSr);
         case "en":
             return resultCalculationMethodsEn;
     }

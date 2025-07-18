@@ -197,6 +197,12 @@
             @unbind="handleResearcherUnbind">
         </publication-unbind-button>
 
+        <share-buttons
+            v-if="software && isResearcher && canEdit"
+            :document-id="(software.id as number)"
+            :document-type="PublicationType.SOFTWARE"
+        />
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
@@ -208,7 +214,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Software } from '@/models/PublicationModel';
@@ -240,11 +246,12 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import ShareButtons from '@/components/core/ShareButtons.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -417,7 +424,7 @@ export default defineComponent({
             handleResearcherUnbind, documentIndicators,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
-            fetchIndicators, createIndicator
+            fetchIndicators, createIndicator, PublicationType
         };
 }})
 

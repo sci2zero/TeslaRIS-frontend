@@ -155,7 +155,7 @@ export default defineComponent({
                         props.onlyIndependentInstitutions
                     ).then((response) => {
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
-                            title: i18n.locale.value === "sr" ? organisationUnit.nameSr : organisationUnit.nameOther,
+                            title: i18n.locale.value.startsWith("sr") ? organisationUnit.nameSr : organisationUnit.nameOther,
                             value: organisationUnit.databaseId,
                         }));
                     }

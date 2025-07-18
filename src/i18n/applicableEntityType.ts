@@ -1,5 +1,6 @@
 import { ApplicableEntityType } from "@/models/Common";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const applicableEntityTypeSr = [
     { title: "Monografija", value: ApplicableEntityType.MONOGRAPH },
@@ -27,6 +28,8 @@ export const getApplicableEntityTypeTitleFromValueAutoLocale = (value: Applicabl
     let applicableEntityTypeArray = applicableEntityTypeEn;
     if (locale == "sr") {
         applicableEntityTypeArray = applicableEntityTypeSr;
+    } else if (locale == "sr-cyr") {
+        applicableEntityTypeArray = transliterateContentToCyrillic(applicableEntityTypeSr);
     }
 
     return (applicableEntityTypeArray.find(item => item.value === value) || {}).title;
@@ -36,6 +39,8 @@ export const getApplicableEntityTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return applicableEntityTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(applicableEntityTypeSr);
         case "en":
             return applicableEntityTypeEn;
     }

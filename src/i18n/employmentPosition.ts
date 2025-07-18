@@ -1,6 +1,7 @@
 import { EmploymentPosition } from "@/models/PersonModel";
 import i18n from ".";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 const employmentPositionsEn = [
     { title: "Collaborator", value: EmploymentPosition.COLLABORATOR },
@@ -76,6 +77,8 @@ export const getEmploymentPositionTitleFromValueAutoLocale = (value: EmploymentP
     let employmentPositionArray = employmentPositionsEn;
     if (locale == "sr") {
         employmentPositionArray = employmentPositionsSr;
+    } else if (locale == "sr-cyr") {
+        employmentPositionArray = transliterateContentToCyrillic(employmentPositionsSr);
     }
 
     if (typeof value === "number") {
@@ -89,6 +92,8 @@ export const getEmploymentPositionsForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return employmentPositionsSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(employmentPositionsSr);
         case "en":
             return employmentPositionsEn;
     }

@@ -13,7 +13,10 @@
             </v-col>
             <v-col cols="2">
                 <v-col>
-                    <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
+                    <v-btn
+                        v-show="inputs.length > ((presetContributions && presetContributions.length > 0) ? 0 : 1)"
+                        icon
+                        @click="removeInput(index)">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
                     <v-btn v-show="index === inputs.length - 1 && !limitOne" icon @click="addInput">
@@ -29,6 +32,7 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
+                    :readonly="lockContributionType !== undefined"
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
@@ -37,10 +41,10 @@
             <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
                 <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
-            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER'">
+            <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER' && shouldDiplayBoardPresidentBox(input)">
                 <v-checkbox v-model="input.isBoardPresident" :label="$t('boardPresidentLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
-            <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR'">
+            <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR' && shouldDisplayAlsoBoardMemberBox(input)">
                 <v-checkbox v-model="input.isAlsoABoardMember" :label="$t('isAlsoABoardMemberLabel')" @update:model-value="sendContentToParent"></v-checkbox>
             </v-col>
             <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
@@ -76,6 +80,7 @@ import { getEmploymentTitlesForGivenLocale } from "@/i18n/employmentTitle";
 import { getPersonalTitlesForGivenLocale } from "@/i18n/personalTitle";
 import { EmploymentTitle, PersonalTitle } from "@/models/InvolvementModel";
 import InvolvementService from "@/services/InvolvementService";
+import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
@@ -109,15 +114,37 @@ export default defineComponent({
         isUpdate: {
             type: Boolean,
             default: false
+        },
+        lockContributionType: {
+            type: Object as PropType<DocumentContributionType | undefined>,
+            default: undefined
+        },
+        boardMemberIds: {
+            type: Array<number>,
+            default: []
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR), value: DocumentContributionType.AUTHOR}, isMainContributor: false, isCorrespondingContributor: false}]);
+        const inputs = ref<any[]>(
+            props.presetContributions.length > 0 ?
+            Array.from({ length: props.presetContributions.length }, () => ({})) : 
+            [
+                {
+                    contributionType: {
+                        title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR),
+                        value: props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR
+                    },
+                    isMainContributor: false, isCorrespondingContributor: false
+                }
+            ]
+        );
         const baseContributionRef = ref<any>([]);
 
         const employmentTitles = computed(() => getEmploymentTitlesForGivenLocale());
         const personalTitles = computed(() => getPersonalTitlesForGivenLocale());
+
+        const i18n = useI18n();
 
         onMounted(() => {
             populateFormData();
@@ -173,7 +200,15 @@ export default defineComponent({
             const types = getTypesForGivenLocale();
 
             if (types && !props.boardMembersAllowed) {
-                return types.filter(type => type.value !== 'BOARD_MEMBER');
+                return types.filter(type => type.value !== "BOARD_MEMBER");
+            }
+
+            if (types && props.boardMembersAllowed) {
+                types.forEach(type => {
+                    if (type.value === "ADVISOR") {
+                        type.title = i18n.t("mentorLabel");
+                    }
+                });
             }
 
             return types;
@@ -183,7 +218,7 @@ export default defineComponent({
             inputs.value.push({
                 contributionType: {
                     title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR),
-                    value: DocumentContributionType.AUTHOR
+                    value: props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR
                 },
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
@@ -271,13 +306,33 @@ export default defineComponent({
             emit("setInput", returnObject);
         };
 
+        const shouldDiplayBoardPresidentBox = (input: any) => {
+            if (inputs.value.find(i => i.isBoardPresident)) {
+                return input.isBoardPresident;
+            }
+
+            return true;
+        };
+
+        const shouldDisplayAlsoBoardMemberBox = (input: any) => {
+            for(const boardMemberId of props.boardMemberIds) {
+                if (input.contribution && input.contribution.personId === boardMemberId) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
         return {
             inputs, addInput, removeInput,
             contributionTypes, sendContentToParent,
             baseContributionRef, clearInput,
             employmentTitles, personalTitles,
             populateFormData, fillInputs,
-            fillDummyAuthors
+            fillDummyAuthors,
+            shouldDiplayBoardPresidentBox,
+            shouldDisplayAlsoBoardMemberBox
         }
     }
 });

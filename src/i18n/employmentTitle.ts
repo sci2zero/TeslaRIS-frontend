@@ -1,5 +1,6 @@
 import { EmploymentTitle } from "@/models/InvolvementModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 const employmentTitlesEn = [
@@ -32,6 +33,8 @@ export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) =>
     let employmentTitleArray = employmentTitlesEn;
     if (locale == "sr") {
         employmentTitleArray = employmentTitlesSr;
+    } else if (locale == "sr-cyr") {
+        employmentTitleArray = transliterateContentToCyrillic(employmentTitlesSr);
     }
 
     return (employmentTitleArray.find(item => item.value === value) || {}).title;
@@ -41,6 +44,8 @@ export const getEmploymentTitlesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return employmentTitlesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(employmentTitlesSr);
         case "en":
             return employmentTitlesEn;
     }

@@ -5,7 +5,8 @@
                 <v-card-text class="edit-pen-container">
                     <event-contribution-update-modal
                         :read-only="readOnly"
-                        :preset-event-contributions="localContributions"
+                        :preset-event-contributions="getContributorGroupForUpdating()"
+                        :lock-contribution-type="getLockedContributionType()"
                         @update="sendToParent">
                     </event-contribution-update-modal>
 
@@ -19,31 +20,31 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-if="orgBoardChairList.length > 0" value="orgBoardChair">
+                        <v-tab value="orgBoardChair">
                             {{ $t("orgBoardChairLabel") }}
                         </v-tab>
-                        <v-tab v-if="orgBoardMemberList.length > 0" value="orgBoardMembers">
+                        <v-tab value="orgBoardMembers">
                             {{ $t("orgBoardMembersLabel") }}
                         </v-tab>
-                        <v-tab v-if="reviewerList.length > 0" value="reviewers">
+                        <v-tab value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-if="progBoardMemberList.length > 0" value="progBoardMembers">
+                        <v-tab value="progBoardMembers">
                             {{ $t("progBoardMembersLabel") }}
                         </v-tab>
-                        <v-tab v-if="speakerList.length > 0" value="speakers">
+                        <v-tab value="speakers">
                             {{ $t("speakersLabel") }}
                         </v-tab>
-                        <v-tab v-if="panelistList.length > 0" value="panelists">
+                        <v-tab value="panelists">
                             {{ $t("panelistsLabel") }}
                         </v-tab>
-                        <v-tab v-if="chairList.length > 0" value="chair">
+                        <v-tab value="chair">
                             {{ $t("chairLabel") }}
                         </v-tab>
-                        <v-tab v-if="audienceList.length > 0" value="audience">
+                        <v-tab value="audience">
                             {{ $t("audienceLabel") }}
                         </v-tab>
-                        <v-tab v-if="demonstratorList.length > 0" value="demonstrators">
+                        <v-tab value="demonstrators">
                             {{ $t("demonstratorsLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -188,7 +189,34 @@ export default defineComponent({
         });
         
         const sendToParent = (contributions: any[]) => {
-            emit("update", contributions);
+            const contributionLists: Record<string, any[]> = {
+                orgBoardChair: orgBoardChairList.value,
+                orgBoardMembers: orgBoardMemberList.value,
+                reviewers: reviewerList.value,
+                progBoardMembers: progBoardMemberList.value,
+                speakers: speakerList.value,
+                panelists: panelistList.value,
+                chair: chairList.value,
+                audience: audienceList.value,
+                demonstrators: demonstratorList.value
+            };
+
+            const tabs = Object.keys(contributionLists);
+            const allContributions: any[] = [];
+
+            if (tabs.includes(currentTab.value)) {
+                for (const tab of tabs) {
+                    if (tab === currentTab.value) {
+                        allContributions.push(...contributions);
+                    } else {
+                        allContributions.push(...(contributionLists[tab] || []));
+                    }
+                }
+            } else {
+                allContributions.push(...contributions);
+            }
+
+            emit("update", allContributions);
         };
 
         const updateOrderInParentList = () => {
@@ -237,7 +265,59 @@ export default defineComponent({
                 currentTab.value = "audience";
             } else if (demonstratorList.value.length > 0) {
                 currentTab.value = "demonstrators";
+            } else {
+                currentTab.value = "";
             }
+        };
+
+        const getLockedContributionType = () => {
+            switch (currentTab.value) {
+                case "orgBoardChair":
+                    return EventContributionType.ORGANIZATION_BOARD_CHAIR;
+                case "orgBoardMembers":
+                    return EventContributionType.ORGANIZATION_BOARD_MEMBER;
+                case "reviewers":
+                    return EventContributionType.REVIEWER;
+                case "progBoardMembers":
+                    return EventContributionType.PROGRAMME_BOARD_MEMBER;
+                case "speakers":
+                    return EventContributionType.SPEAKER;
+                case "panelists":
+                    return EventContributionType.PANELISTS;
+                case "chair":
+                    return EventContributionType.CHAIR;
+                case "audience":
+                    return EventContributionType.AUDIENCE;
+                case "demonstrators":
+                    return EventContributionType.DEMONSTRATOR;
+            }
+            
+            return undefined;
+        };
+
+        const getContributorGroupForUpdating = () => {
+            switch (currentTab.value) {
+                case "orgBoardChair":
+                    return orgBoardChairList.value;
+                case "orgBoardMembers":
+                    return orgBoardMemberList.value;
+                case "reviewers":
+                    return reviewerList.value;
+                case "progBoardMembers":
+                    return progBoardMemberList.value;
+                case "speakers":
+                    return speakerList.value;
+                case "panelists":
+                    return panelistList.value;
+                case "chair":
+                    return chairList.value;
+                case "audience":
+                    return audienceList.value;
+                case "demonstrators":
+                    return demonstratorList.value;
+            }
+
+            return orgBoardChairList.value;
         };
 
         return {
@@ -247,7 +327,9 @@ export default defineComponent({
             orgBoardMemberList, progBoardMemberList,
             speakerList, panelistList, chairList,
             audienceList, demonstratorList,
-            localContributions
+            localContributions,
+            getLockedContributionType,
+            getContributorGroupForUpdating
         };
     },
 });

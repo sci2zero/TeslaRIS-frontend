@@ -1,17 +1,30 @@
 <template>
     <v-app>
         <v-main>
-            <navbar />
-            <breadcrumbs />
-            <router-view :key="$route.fullPath" />
-            <cookie-consent />
+            <navbar
+                v-if="!hideLayout"
+            />
+            
+            <breadcrumbs
+                v-if="!hideLayout"
+            />
+            
+            <router-view
+                :key="$route.fullPath"
+            />
+            
+            <cookie-consent
+                v-if="!hideLayout"
+            />
         </v-main>
-        <footerbar />
+        <footerbar
+            v-if="!hideLayout"
+        />
     </v-app>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import navbar from "@/components/core/Navbar.vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
@@ -30,6 +43,15 @@ export default defineComponent({
     name: "App",
     components: { navbar, footerbar, Breadcrumbs, CookieConsent },
     setup() {
+        const route = useRoute();
+
+        const hideLayout = computed(() => {
+            return (
+                route.name === "publicDissertationsReport" &&
+                route.query.embed === "true"
+            );
+        });
+
         onMounted(async () => {
             try {
                 await useScriptLoader("//d1bxh8uas1mnw7.cloudfront.net/assets/embed.js");
@@ -39,6 +61,10 @@ export default defineComponent({
                 console.error('Failed to load Altmetric script:', e)
             }
         });
+
+        return {
+            hideLayout
+        };
     },
     beforeMount() {
         const route = useRoute();

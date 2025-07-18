@@ -8,7 +8,7 @@
                 v-for="potentialMatch in potentialMatches"
                 :key="(potentialMatch.databaseId as number)"
                 class="d-flex flex-row justify-left"
-                :title="$i18n.locale == 'sr' ? potentialMatch.titleSr : potentialMatch.titleOther"
+                :title="$i18n.locale.startsWith('sr') ? potentialMatch.titleSr : potentialMatch.titleOther"
                 :subtitle="potentialMatch.authorNames + 
                     ((potentialMatch.year && potentialMatch.year > 0) ? ` · ${potentialMatch.year}` : '')"
             >

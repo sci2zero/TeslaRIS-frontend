@@ -223,9 +223,16 @@ export interface Thesis extends Document {
     externalOrganisationUnitName?: MultilingualContent[];
     thesisType: ThesisType;
     numberOfPages?: number;
+    numberOfChapters?: number;
+    numberOfReferences?: number;
+    numberOfGraphs?: number;
+    numberOfIllustrations?: number;
+    numberOfTables?: number;
+    numberOfAppendices?: number;
     languageId?: number;
     writingLanguageTagId?: number;
-    researchAreaId?: number;
+    scientificArea?: string;
+    scientificSubArea?: string;
     publisherId?: number;
     languageCode?: string;
     preliminaryFiles?: DocumentFileResponse[];
@@ -238,6 +245,15 @@ export interface Thesis extends Document {
     topicAcceptanceDate: string;
     thesisDefenceDate: string;
     isArchived?: boolean;
+    eisbn?: string;
+    printISBN?: string;
+    placeOfKeep?: string,
+    udc?: string;
+    typeOfTitle?: string;
+    extendedAbstract?: MultilingualContent[];
+    remark?: MultilingualContent[];
+    alternateTitle?: MultilingualContent[];
+    publicReviewCompleted?: boolean;
 }
 
 export interface CitationResponse {

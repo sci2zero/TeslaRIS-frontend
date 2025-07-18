@@ -1,5 +1,6 @@
 import { InvolvementType } from "@/models/InvolvementModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 const involvementTypeEn = [
     { title: "Studied At", value: InvolvementType.STUDIED_AT },
@@ -31,6 +32,8 @@ export const getInvolvementTypeTitleFromValueAutoLocale = (value: InvolvementTyp
     let involvementTypeArray = involvementTypeEn;
     if (locale == "sr") {
         involvementTypeArray = involvementTypeSr;
+    } else if (locale == "sr-cyr") {
+        involvementTypeArray = transliterateContentToCyrillic(involvementTypeSr);
     }
 
     return (involvementTypeArray.find(item => item.value === value) || {}).title;
@@ -40,6 +43,8 @@ export const getInvolvementTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return involvementTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(involvementTypeSr);
         case "en":
             return involvementTypeEn;
     }

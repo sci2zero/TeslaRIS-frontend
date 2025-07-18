@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftMonograph?.contributions ? leftMonograph.contributions : []"
                             :document-id="leftMonograph?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightMonograph?.contributions ? rightMonograph.contributions : []"
                             :document-id="rightMonograph?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -359,9 +361,10 @@ export default defineComponent({
 
                 await deleteAction;
 
+                await MergeService.migratePublicationIdentifierHistory(id, transferTargetId as number, "monograph");
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "monographLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "monographLandingPage", params: { id: transferTargetId } });
             } catch {
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;

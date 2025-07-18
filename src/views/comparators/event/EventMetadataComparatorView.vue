@@ -111,7 +111,7 @@ import PersistentStopDialog from '@/components/core/PersistentStopDialog.vue';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import Toast from '@/components/core/Toast.vue';
 
@@ -337,10 +337,11 @@ export default defineComponent({
 
                 await deleteAction;
 
+                await MergeService.migrateGenericIdentifierHistory(id as number, transferTargetId as number, EntityType.EVENT);
                 await MergeService.switchAllIndicatorsToOtherConference(id as number, transferTargetId as number);
                 await MergeService.switchAllClassificationsToOtherConference(id as number, transferTargetId as number);
 
-                router.push({ name: "conferenceLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "conferenceLandingPage", params: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification", 

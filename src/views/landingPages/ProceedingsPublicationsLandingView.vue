@@ -243,7 +243,7 @@ import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/Attac
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
-import { proceedingsPublicationTypeSr, proceedingsPublicationTypeEn, getTitleFromValue } from "@/i18n/proceedingsPublicationType";
+import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { localiseDate } from '@/i18n/dateLocalisation';
 import UriList from '@/components/core/UriList.vue';
@@ -296,7 +296,7 @@ export default defineComponent({
         const totalPublications = ref<number>(0);
 
         const i18n = useI18n();
-        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType }[] => i18n.locale.value === "sr" ? proceedingsPublicationTypeSr : proceedingsPublicationTypeEn);
+        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType }[] => (getTypesForGivenLocale() as { title: string; value: ProceedingsPublicationType; }[]));
 
         const icon = ref("mdi-newspaper-variant");
 

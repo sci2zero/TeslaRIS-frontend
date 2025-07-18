@@ -1,6 +1,7 @@
 import { JournalPublicationType } from "@/models/PublicationModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 const journalPublicationTypeEn = [
     { title: "Research Article", value: JournalPublicationType.RESEARCH_ARTICLE },
@@ -34,6 +35,8 @@ export const getTitleFromValueAutoLocale = (value: JournalPublicationType | stri
     let journalPublicationTypeArray = journalPublicationTypeEn;
     if (locale == "sr") {
         journalPublicationTypeArray = journalPublicationTypeSr;
+    } else if (locale == "sr-cyr") {
+        journalPublicationTypeArray = transliterateContentToCyrillic(journalPublicationTypeSr);
     }
 
     if (typeof value === "number") {
@@ -47,6 +50,8 @@ export const getTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return journalPublicationTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(journalPublicationTypeSr);
         case "en":
             return journalPublicationTypeEn;
     }

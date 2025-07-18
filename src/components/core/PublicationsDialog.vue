@@ -70,7 +70,7 @@ export default defineComponent({
                 }
                 
                 response.data.content.forEach(publication => {
-                    if (i18n.locale.value === "sr") {
+                    if (i18n.locale.value.startsWith("sr")) {
                         text.value += publication.titleSr + "\n";
                     } else {
                         text.value += publication.titleOther + "\n";
