@@ -954,5 +954,6 @@ export default {
     contentLabel: "Content",
     pageTypeLabel: "Page type",
     updateOrganisationUnitLabel: "Update organisation unit",
-    publicReviewPageContentLabel: "Public review page content"
+    publicReviewPageContentLabel: "Public review page content",
+    shareLabel: "Share via"
 }
