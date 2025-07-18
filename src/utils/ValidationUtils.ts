@@ -25,6 +25,7 @@ export const useValidationUtils = () => {
     const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
     const invalidUDCMessage = computed(() => i18n.t("udcFormatError"));
 
+
     
     const requiredFieldRules = [
         (value: string) => {

@@ -465,7 +465,7 @@ export default defineComponent({
                 eisbn: eIsbn.value,
                 udc: udc.value,
                 placeOfKeep: placeOfKeep.value,
-                typeOfTitle: typeOfTitle.value
+                typeOfTitle: typeOfTitle.value,
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {

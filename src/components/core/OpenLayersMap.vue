@@ -149,6 +149,8 @@ export default defineComponent({
                 }
 
                 address.value = removeLeadingAndTrailingCommas(address.value.replace(/undefined/g, ""));
+
+                console.log(address.value)
             });
         };
 
