@@ -158,8 +158,17 @@
                     :read-only="!canEdit"
                     @update="updateSuccess(); fetchPublicReviewPageContent()"
                 />
-                =======
-                >>>>>>> main
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="OrganisationUnitTrustConfigurationForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="OrganisationUnitTruestConfiguration"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="updateSuccess()"
+                />
             </div>
         </div>
 
@@ -383,6 +392,7 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
 import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
 import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
+import OrganisationUnitTrustConfigurationForm from '@/components/organisationUnit/OrganisationUnitTrustConfigurationForm.vue';
 
 
 export default defineComponent({
@@ -755,7 +765,8 @@ export default defineComponent({
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
-            fetchPublicReviewPageContent
+            fetchPublicReviewPageContent,
+            OrganisationUnitTrustConfigurationForm
         };
 }})
 

@@ -979,5 +979,8 @@ export default {
     pageTypeLabel: "Tip stranice",
     updateOrganisationUnitLabel: "Ažuriraj organizacionu jedinicu",
     updatePublicReviewPageContentLabel: "Sadržaj stranica za javni uvid",
-    shareLabel: "Podeli preko"
+    shareLabel: "Podeli preko",
+    trustNewPublicationsLabel: "Potrebna je validacija novih publikacija",
+    trustNewDocumentFilesLabel: "Potrebna je validacija novih otpremljenih dokumenata",
+    updateOrganisationUnitTruestConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete"
 }

@@ -955,5 +955,8 @@ export default {
     pageTypeLabel: "Page type",
     updateOrganisationUnitLabel: "Update organisation unit",
     publicReviewPageContentLabel: "Public review page content",
-    shareLabel: "Share via"
+    shareLabel: "Share via",
+    trustNewPublicationsLabel: "Validation is needed for new publications",
+    trustNewDocumentFilesLabel: "Validation is needed for new uploaded documents",
+    updateOrganisationUnitTruestConfigurationLabel: "Update trust level configuration for new entities"
 }
