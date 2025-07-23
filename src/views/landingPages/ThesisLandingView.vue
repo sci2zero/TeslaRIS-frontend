@@ -327,7 +327,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="thesis?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="thesis?.isMetadataValid"
+            :files-valid="thesis?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(thesis?.description)"
+            @update="fetchValidationStatus(thesis?.id as number, thesis as _Document)"
         />
 
         <tab-content-loader v-if="!thesis" layout="sections" />
@@ -473,7 +478,7 @@ import { watch } from 'vue';
 import { ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Thesis } from '@/models/PublicationModel';
+import type { Document as _Document, Thesis } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -516,6 +521,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -596,7 +602,9 @@ export default defineComponent({
         });
 
         const fetchThesis = () => {
-            DocumentPublicationService.readThesis(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readThesis(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 thesis.value = response.data;
                 if (thesis.value.isArchived) {
                     canEdit.value = false;
@@ -627,6 +635,8 @@ export default defineComponent({
                 canBePutOnPublicReview.value = thesis.value.thesisType === ThesisType.PHD || thesis.value.thesisType === ThesisType.PHD_ART_PROJECT;
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -873,6 +883,8 @@ export default defineComponent({
             }
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
@@ -888,7 +900,8 @@ export default defineComponent({
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
-            RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry
+            RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
+            fetchValidationStatus
         };
 }})
 

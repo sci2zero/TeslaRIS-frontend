@@ -164,7 +164,7 @@ import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common'
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -214,6 +214,7 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const icon = ref("mdi-book-open-blank-variant");
 
@@ -247,7 +248,9 @@ export default defineComponent({
         });
 
         const fetchJournal = (uponStartup: boolean) => {
-            JournalService.readJournal(parseInt(currentRoute.params.id as string)).then((response) => {
+            JournalService.readJournal(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 journal.value = response.data;
 
                 document.title = returnCurrentLocaleContent(journal.value.title) as string;
@@ -261,6 +264,8 @@ export default defineComponent({
                 }
 
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

@@ -3,22 +3,28 @@
         <v-col cols="12">
             <h2>{{ $t("preliminaryFilesLabel") }}</h2>
             <attachment-list
-                :attachments="preliminaryFiles" :can-edit="canEditThesisAttachments" :in-comparator="inComparator"
+                :attachments="preliminaryFiles"
+                :can-edit="canEditThesisAttachments"
+                :in-comparator="inComparator"
                 disable-updates
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
-                @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"></attachment-list>
+                @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
+            />
         </v-col>
     </v-row>
     <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
             <attachment-list
-                :attachments="preliminarySupplements" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
+                :attachments="preliminarySupplements"
+                :can-edit="canEditThesisAttachments"
+                :in-comparator="inComparator"
                 disable-updates 
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
-                @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"></attachment-list>
+                @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
+            />
         </v-col>
     </v-row>
     <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
@@ -26,26 +32,38 @@
             <h2>{{ $t("commissionReportsLabel") }}</h2>
             <attachment-list
                 :attachments="commissionReports" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
-                disable-updates 
+                disable-updates
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
-                @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"></attachment-list>
+                @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
+            />
         </v-col>
     </v-row>
     <v-row class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <attachment-list
-                :attachments="fileItems ? fileItems : []" :can-edit="canEdit" :in-comparator="inComparator" @create="addAttachment($event, false, document)"
-                @delete="deleteAttachment($event, false, document)" @update="updateAttachment($event, false, document)"></attachment-list>
+                :attachments="fileItems ? fileItems : []"
+                :can-edit="canEdit"
+                :in-comparator="inComparator"
+                @create="addAttachment($event, false, document); notifyAboutSectionChange();"
+                @delete="deleteAttachment($event, false, document); notifyAboutSectionChange();"
+                @update="updateAttachment($event, false, document); notifyAboutSectionChange();"
+            />
         </v-col>
     </v-row>
     <v-row class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("proofsLabel") }}</h2>
             <attachment-list
-                :attachments="proofs ? proofs : []" :can-edit="canEdit" is-proof :in-comparator="inComparator"
-                @create="addAttachment($event, true, document)" @delete="deleteAttachment($event, true, document)" @update="updateAttachment($event, true, document)"></attachment-list>
+                :attachments="proofs ? proofs : []"
+                :can-edit="canEdit"
+                is-proof
+                :in-comparator="inComparator"
+                @create="addAttachment($event, true, document); notifyAboutSectionChange();"
+                @delete="deleteAttachment($event, true, document); notifyAboutSectionChange();"
+                @update="updateAttachment($event, true, document); notifyAboutSectionChange();"
+            />
         </v-col>
     </v-row>
 </template>
@@ -105,9 +123,12 @@ export default defineComponent({
         default: false
     }
   },
-  emits: ["update:modelValue"],
-  setup(props) {
-    const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+  emits: ["update"],
+  setup(props, { emit }) {
+    const {
+        isAdmin, isInstitutionalEditor,
+        isInstitutionalLibrarian, isHeadOfLibrary
+    } = useUserRole();
 
     const canEditThesisAttachments = computed(() => 
         (
@@ -116,10 +137,15 @@ export default defineComponent({
         ) && props.isThesisSection
     );
 
+    const notifyAboutSectionChange = () => {
+        emit("update");
+    };
+
     return {
         addAttachment, updateAttachment, deleteAttachment,
         canEditThesisAttachments, addThesisAttachment,
-        deleteThesisAttachment, ThesisAttachmentType
+        deleteThesisAttachment, ThesisAttachmentType,
+        notifyAboutSectionChange
     };
   },
 });

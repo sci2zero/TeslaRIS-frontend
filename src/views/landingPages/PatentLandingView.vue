@@ -107,12 +107,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="patent?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="patent?.isMetadataValid"
+            :files-valid="patent?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
-        />
-
-        <publication-badge-section
-            :preloaded-doi="patent?.doi"
-            :document-id="patent?.id"
+            :description="returnCurrentLocaleContent(patent?.description)"
+            @update="fetchValidationStatus(patent?.id as number, patent as _Document)"
         />
 
         <tab-content-loader v-if="!patent" layout="sections" />
@@ -210,7 +210,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Patent } from '@/models/PublicationModel';
@@ -242,14 +242,14 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
     setup() {
         const currentTab = ref("contributions");
 
@@ -305,7 +305,9 @@ export default defineComponent({
         });
 
         const fetchPatent = () => {
-            DocumentPublicationService.readPatent(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readPatent(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 patent.value = response.data;
 
                 document.title = returnCurrentLocaleContent(patent.value.title) as string;
@@ -319,6 +321,8 @@ export default defineComponent({
                 }
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -412,6 +416,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             patent, icon, publisher, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, PatentUpdateForm, canClassify,
@@ -420,7 +426,7 @@ export default defineComponent({
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
-            createIndicator, fetchIndicators
+            createIndicator, fetchIndicators, fetchValidationStatus
         };
 }})
 

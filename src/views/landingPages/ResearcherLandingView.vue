@@ -502,7 +502,9 @@ export default defineComponent({
         };
 
         const fetchPerson = (switchTab: boolean = false) => {
-            PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
+            PersonService.readPerson(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 person.value = response.data;
 
                 document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
@@ -541,6 +543,8 @@ export default defineComponent({
 
                 fetchPublications(switchTab);                
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

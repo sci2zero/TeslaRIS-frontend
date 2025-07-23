@@ -139,7 +139,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="proceedingsPublication?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="proceedingsPublication?.isMetadataValid"
+            :files-valid="proceedingsPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
+            @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 
         <tab-content-loader v-if="!proceedingsPublication" layout="list" />
@@ -229,7 +234,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
@@ -268,6 +273,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -346,7 +352,9 @@ export default defineComponent({
         });
 
         const fetchProceedingsPublication = () => {
-            DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readProceedingsPublication(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 proceedingsPublication.value = response.data;
 
                 document.title = returnCurrentLocaleContent(proceedingsPublication.value.title) as string;
@@ -362,6 +370,8 @@ export default defineComponent({
                 });
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -457,6 +467,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, isResearcher,
@@ -468,7 +480,8 @@ export default defineComponent({
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
-            currentRoute, actionsRef, fetchIndicators, createIndicator
+            currentRoute, actionsRef, fetchIndicators, createIndicator,
+            fetchValidationStatus
         };
 }})
 

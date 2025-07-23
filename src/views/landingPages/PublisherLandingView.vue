@@ -94,7 +94,7 @@ import type { Country, LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -133,6 +133,7 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
+        const router = useRouter();
 
         const icon = ref("mdi-account-group");
 
@@ -148,7 +149,13 @@ export default defineComponent({
                 });
             }
 
-            PublisherService.readPublisher(parseInt(currentRoute.params.id as string)).then((response) => {
+            fetchPublisher();
+        });
+
+        const fetchPublisher = () => {
+            PublisherService.readPublisher(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 publisher.value = response.data;
 
                 document.title = returnCurrentLocaleContent(publisher.value.name) as string;
@@ -156,8 +163,10 @@ export default defineComponent({
                 fetchPublications();     
                 populateData();
                 fetchDetails();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
-        });
+        };
 
         watch(i18n.locale, () => {
             populateData();

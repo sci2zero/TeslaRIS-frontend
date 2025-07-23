@@ -86,6 +86,8 @@ export interface Document {
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;
+    isMetadataValid?: boolean;
+    areFilesValid?: boolean;
 }
 
 export interface JournalPublication extends Document {

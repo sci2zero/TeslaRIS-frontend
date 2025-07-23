@@ -31,7 +31,19 @@
                     PlumX Metrics
                 </a>
             </div>
-            <div ref="openCitationsContainer" class="openCitationsContainer ml-5"></div>
+            <div
+                ref="openCitationsContainer"
+                class="openCitationsContainer
+                ml-5">
+            </div>
+            <div 
+                v-if="description"
+                style="z-index: 5;"
+                class="sdg-wheel"
+                data-wheel-height="70"
+                data-model="aurora-sdg-multi"
+                :data-text="description.substring(0, (description.length > 1000 ? 1000 : description.length))">
+            </div>
             <div
                 v-if="oaStatus !== null"
                 :class="[
@@ -64,6 +76,10 @@ export default defineComponent({
         documentId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        description: {
+            type: Object as PropType<string | null>,
+            default: undefined
         }
     },
     setup(props) {

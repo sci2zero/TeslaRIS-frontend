@@ -490,7 +490,9 @@ export default defineComponent({
         });
 
         const fetchOU = (uponStartup: boolean) => {
-            OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
+            OrganisationUnitService.readOU(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 organisationUnit.value = response.data;
 
                 document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
@@ -502,6 +504,8 @@ export default defineComponent({
                 }
 
                 fetchSubUnits();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

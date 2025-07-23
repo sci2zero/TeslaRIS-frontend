@@ -879,7 +879,7 @@ export default {
     migrateLabel: "Migriraj",
     migratedDataToMessage: "Uspešno migrirao podatke na: {0}",
     redirectingToResourceMessage: "Preusmeravamo vas na traženi resurs...",
-    notFoundMessage: "Izgleda da stranica koju tražite više nije dostupna.",
+    notFoundMessage: "Izgleda da stranica koju tražite nije dostupna, ili nemate prava da vidite istu. Probajte da se ulogujete u sistem.",
     redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu.",
     displayTitleLabel: "Titula za prikazivanje",
     chooseFromListLabel: "Izaberi iz liste",
@@ -982,5 +982,7 @@ export default {
     shareLabel: "Podeli preko",
     trustNewPublicationsLabel: "Potrebna je validacija novih publikacija",
     trustNewDocumentFilesLabel: "Potrebna je validacija novih otpremljenih dokumenata",
-    updateOrganisationUnitTruestConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete"
+    updateOrganisationUnitTruestConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete",
+    validateMetadataLabel: "Validiraj metapodatke",
+    validateUploadedFilesLabel: "Validiraj otpremljene fajlove"
 }

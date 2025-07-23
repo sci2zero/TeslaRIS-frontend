@@ -210,7 +210,7 @@
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import KeywordList from '@/components/core/KeywordList.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -263,6 +263,7 @@ export default defineComponent({
         const direction = ref("");
         
         const i18n = useI18n();
+        const router = useRouter();
 
         const icon = ref("mdi-presentation");
 
@@ -305,13 +306,17 @@ export default defineComponent({
         };
 
         const fetchConference = () => {
-            EventService.readConference(parseInt(currentRoute.params.id as string)).then((response) => {
+            EventService.readConference(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 conference.value = response.data;
                 
                 document.title = returnCurrentLocaleContent(conference.value.name) as string;
 
                 fetchPublications();
                 fetchDetails();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

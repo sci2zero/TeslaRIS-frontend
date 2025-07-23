@@ -57,8 +57,9 @@ export default defineComponent({
                 await useScriptLoader("//d1bxh8uas1mnw7.cloudfront.net/assets/embed.js");
                 await useScriptLoader("//badge.dimensions.ai/badge.js");
                 await useScriptLoader("//cdn.plu.mx/widget-all.js");
+                await useScriptLoader("//aurora-sdg.labs.vu.nl/resources/widget.js");
             } catch (e) {
-                console.error('Failed to load Altmetric script:', e)
+                console.error('Failed to load static script:', e)
             }
         });
 
@@ -120,9 +121,16 @@ export default defineComponent({
                     if (loginStore.explicitlyLoggedOut) {
                         loginStore.reachedLoginPage();
                     } else {
-                        routeStore.setRouteAndParams(from.name, from.params);
+                        if (from.name !== "notFound") {
+                            routeStore.setRouteAndParams(from.name, from.params);
+                        }
                     }
                 }
+
+                if (to.name === "notFound") {
+                    routeStore.setRouteAndParams(from.name, from.params);
+                }
+                
                 next();
             }
         });

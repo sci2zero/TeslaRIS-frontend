@@ -156,6 +156,7 @@
         <publication-badge-section
             :preloaded-doi="proceedings?.doi"
             :document-id="proceedings?.id"
+            :description="returnCurrentLocaleContent(proceedings?.description)"
         />
 
         <br />
@@ -366,7 +367,9 @@ export default defineComponent({
         });
 
         const fetchProceedings = (uponStartup: boolean) => {
-            ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
+            ProceedingsService.readProceedings(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 proceedings.value = response.data;
 
                 document.title = returnCurrentLocaleContent(proceedings.value.title) as string;
@@ -382,6 +385,8 @@ export default defineComponent({
                         setStartTab();
                     });
                 }
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

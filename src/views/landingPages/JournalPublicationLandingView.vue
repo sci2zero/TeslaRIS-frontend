@@ -151,7 +151,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="journalPublication?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="journalPublication?.isMetadataValid"
+            :files-valid="journalPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(journalPublication?.description)"
+            @update="fetchValidationStatus(journalPublication?.id as number, journalPublication as _Document)"
         />
 
         <tab-content-loader v-if="!journalPublication" layout="sections" />
@@ -256,7 +261,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
@@ -295,6 +300,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -372,7 +378,9 @@ export default defineComponent({
         });
 
         const fetchJournalPublication = () => {
-            DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readJournalPublication(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 journalPublication.value = response.data;
 
                 document.title = returnCurrentLocaleContent(journalPublication.value.title) as string;
@@ -390,6 +398,8 @@ export default defineComponent({
                 });
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -488,8 +498,10 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
-            journalPublication, icon, canClassify,
+            journalPublication, icon, canClassify, fetchJournalPublication,
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, journal, JournalPublicationUpdateForm,
@@ -499,7 +511,8 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
-            createClassification, fetchClassifications, currentRoute
+            createClassification, fetchClassifications, currentRoute,
+            fetchValidationStatus
         };
 }})
 

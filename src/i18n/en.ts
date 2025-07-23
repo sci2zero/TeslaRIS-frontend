@@ -854,7 +854,7 @@ export default {
     migrateLabel: "Migrate",
     migratedDataToMessage: "Successfully migrated data to: {0}",
     redirectingToResourceMessage: "Redirecting you to a requested resource...",
-    notFoundMessage: "It looks like the page you are looking for is no longer here.",
+    notFoundMessage: "It looks like the page you are looking for is not here, or you don't have sufficient access rights. Please, try logging in.",
     redirectionFinishedMessage: "Redirection successfull, you may close this page now.",
     displayTitleLabel: "Display title",
     chooseFromListLabel: "Choose from list",
@@ -958,5 +958,7 @@ export default {
     shareLabel: "Share via",
     trustNewPublicationsLabel: "Validation is needed for new publications",
     trustNewDocumentFilesLabel: "Validation is needed for new uploaded documents",
-    updateOrganisationUnitTruestConfigurationLabel: "Update trust level configuration for new entities"
+    updateOrganisationUnitTruestConfigurationLabel: "Update trust level configuration for new entities",
+    validateMetadataLabel: "Validate metadata",
+    validateUploadedFilesLabel: "Validate uploaded files"
 }

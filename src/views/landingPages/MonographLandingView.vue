@@ -153,7 +153,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="monograph?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="monograph?.isMetadataValid"
+            :files-valid="monograph?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(monograph?.description)"
+            @update="fetchValidationStatus(monograph?.id as number, monograph as _Document)"
         />
 
         <tab-content-loader v-if="!monograph" layout="sections" />
@@ -292,7 +297,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
@@ -335,6 +340,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -413,7 +419,9 @@ export default defineComponent({
         });
 
         const fetchMonograph = () => {
-            DocumentPublicationService.readMonograph(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readMonograph(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 monograph.value = response.data;
 
                 document.title = returnCurrentLocaleContent(monograph.value.title) as string;
@@ -423,6 +431,8 @@ export default defineComponent({
                 fetchConnectedEntities();
                 fetchPublications();
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -567,6 +577,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             monograph, icon, actionsRef,
             returnCurrentLocaleContent,
@@ -586,7 +598,8 @@ export default defineComponent({
             ApplicableEntityType, currentRoute,
             createIndicator, fetchIndicators,
             createClassification, fetchClassifications,
-            documentClassifications, canClassify
+            documentClassifications, canClassify,
+            fetchValidationStatus
         };
 }})
 

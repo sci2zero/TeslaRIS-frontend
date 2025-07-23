@@ -107,7 +107,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="software?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="software?.isMetadataValid"
+            :files-valid="software?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(software?.description)"
+            @update="fetchValidationStatus(software?.id as number, software as _Document)"
         />
 
         <tab-content-loader v-if="!software" layout="sections" />
@@ -217,7 +222,7 @@ import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Software } from '@/models/PublicationModel';
+import type { Document as _Document, Software } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -247,6 +252,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -313,7 +319,9 @@ export default defineComponent({
         });
 
         const fetchSoftware = () => {
-            DocumentPublicationService.readSoftware(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readSoftware(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 software.value = response.data;
 
                 document.title = returnCurrentLocaleContent(software.value.title) as string;
@@ -327,6 +335,8 @@ export default defineComponent({
                 }
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -414,6 +424,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             software, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
@@ -424,7 +436,8 @@ export default defineComponent({
             handleResearcherUnbind, documentIndicators,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
-            fetchIndicators, createIndicator, PublicationType
+            fetchIndicators, createIndicator, PublicationType,
+            fetchSoftware, fetchValidationStatus
         };
 }})
 

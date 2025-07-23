@@ -108,7 +108,12 @@
         <document-action-box
             ref="actionsRef"
             :doi="dataset?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="dataset?.isMetadataValid"
+            :files-valid="dataset?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(dataset?.description)"
+            @update="fetchValidationStatus(dataset?.id as number, dataset as _Document)"
         />
 
         <tab-content-loader v-if="!dataset" layout="sections" />
@@ -210,7 +215,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Dataset } from '@/models/PublicationModel';
@@ -245,6 +250,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -304,7 +310,9 @@ export default defineComponent({
         });
 
         const fetchDataset = () => {
-            DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readDataset(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 dataset.value = response.data;
 
                 document.title = returnCurrentLocaleContent(dataset.value.title) as string;
@@ -318,6 +326,8 @@ export default defineComponent({
                 }
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -411,6 +421,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             dataset, icon, publisher, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -421,7 +433,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, localiseDate,
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
-            createIndicator, fetchIndicators
+            createIndicator, fetchIndicators, fetchValidationStatus
         };
 }})
 
