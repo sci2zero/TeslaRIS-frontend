@@ -353,7 +353,7 @@ import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import type { DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
@@ -455,7 +455,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
         const { isAdmin, isInstitutionalEditor } = useUserRole();
-        const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const employeesRef = ref<typeof PersonTableComponent>();

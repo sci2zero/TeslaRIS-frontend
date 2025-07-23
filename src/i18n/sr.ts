@@ -101,7 +101,8 @@ export default {
         notFound: "Nije pronađeno",
         emailChangeConfirmation: "Potvrda promene email-a",
         contact: "Kontakt",
-        publicDissertationsReport: "Disertacije na javnom uvidu"
+        publicDissertationsReport: "Disertacije na javnom uvidu",
+        publicationsValidation: "Validacija publikacija"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -984,5 +985,9 @@ export default {
     trustNewDocumentFilesLabel: "Potrebna je validacija novih otpremljenih dokumenata",
     updateOrganisationUnitTruestConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete",
     validateMetadataLabel: "Validiraj metapodatke",
-    validateUploadedFilesLabel: "Validiraj otpremljene fajlove"
+    validateUploadedFilesLabel: "Validiraj otpremljene fajlove",
+    validationSuccessNotification: "Validacija uspešna za publikaciju '{name}'.",
+    validationFailedNotification: "Validacija neuspešna za publikaciju '{name}'.",
+    showNonValidatedMetadataLabel: "Prikaži sa nevalidiranim metapodacima",
+    showNonValidatedFilesLabel: "Prikaži sa nevalidiranim fajlovima"
 }

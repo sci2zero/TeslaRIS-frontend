@@ -101,8 +101,8 @@ export default {
         notFound: "Not Found",
         emailChangeConfirmation: "Email confirmation change",
         contact: "Contact",
-        publicDissertationsReport: "Disertations on public review"
-
+        publicDissertationsReport: "Disertations on public review",
+        publicationsValidation: "Validation of publications"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -960,5 +960,9 @@ export default {
     trustNewDocumentFilesLabel: "Validation is needed for new uploaded documents",
     updateOrganisationUnitTruestConfigurationLabel: "Update trust level configuration for new entities",
     validateMetadataLabel: "Validate metadata",
-    validateUploadedFilesLabel: "Validate uploaded files"
+    validateUploadedFilesLabel: "Validate uploaded files",
+    validationSuccessNotification: "Validation successfull for publication '{name}'.",
+    validationFailedNotification: "Validation failed for publication '{name}'.",
+    showNonValidatedMetadataLabel: "Show with non validated metadata",
+    showNonValidatedFilesLabel: "Show with non validated files"
 }

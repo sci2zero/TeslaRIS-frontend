@@ -36,6 +36,8 @@ export interface DocumentPublicationIndex {
     doi: string;
     assessedBy?: number[];
     publicationType: string;
+    isApproved: boolean;
+    areFilesValid: boolean;
 }
 
 export enum PublicationType {

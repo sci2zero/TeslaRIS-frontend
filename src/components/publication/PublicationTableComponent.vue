@@ -23,6 +23,22 @@
         @click="startPublicationComparison">
         {{ $t("comparePublicationsLabel") }}
     </v-btn>
+    <v-btn
+        v-if="validationView"
+        class="compare-button"
+        density="compact"
+        :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.isApproved === true)"
+        @click="validateSectionForAll(true)">
+        {{ $t("validateMetadataLabel") }}
+    </v-btn>
+    <v-btn
+        v-if="validationView"
+        class="compare-button"
+        density="compact"
+        :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.areFilesValid === true)"
+        @click="validateSectionForAll(false)">
+        {{ $t("validateUploadedFilesLabel") }}
+    </v-btn>
     <table-export-modal
         v-if="enableExport"
         :export-entity="exportEntity"
@@ -142,13 +158,30 @@
                                 {{ $t("declineClaimLabel") }}
                             </v-btn>
                             <entity-classification-modal-content
-                                v-if="(isAdmin || isCommission) && !richResultsView"
+                                v-if="(isAdmin || isCommission) && !richResultsView && !validationView"
                                 :entity-id="(item.databaseId as number)"
                                 :entity-type="ApplicableEntityType.DOCUMENT"
                                 :disabled="!item.year || item.year < 0"
                                 @classified="documentClassified(item)"
                                 @update="refreshTable(tableOptions)">
                             </entity-classification-modal-content>
+                            <v-btn
+                                v-if="validationView"
+                                size="small"
+                                color="primary"
+                                :disabled="item.isApproved"
+                                @click="validateSection(item.databaseId as number, true)">
+                                {{ $t("validateMetadataLabel") }}
+                            </v-btn>
+                            <v-btn
+                                v-if="validationView"
+                                class="ml-1"
+                                size="small"
+                                color="primary"
+                                :disabled="item.areFilesValid"
+                                @click="validateSection(item.databaseId as number, false)">
+                                {{ $t("validateUploadedFilesLabel") }}
+                            </v-btn>
                         </td>
                         <td v-if="isCommission">
                             <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
@@ -198,6 +231,7 @@ import { isEqual } from 'lodash';
 import { getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@/i18n/journalPublicationType';
 import { getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
 import { getTitleFromValueAutoLocale as getMonographPublicationTypeTitle } from '@/i18n/monographPublicationType';
+import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 
 
 export default defineComponent({
@@ -263,6 +297,10 @@ export default defineComponent({
         allowComparison: {
             type: Boolean,
             default: false
+        },
+        validationView: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -277,7 +315,12 @@ export default defineComponent({
         const tableWrapper = ref<any>(null);
 
         onMounted(() => {
-            if (props.inClaimer || isAdmin.value || isCommission.value || props.richResultsView) {
+            if (props.inClaimer ||
+                isAdmin.value ||
+                isCommission.value ||
+                props.richResultsView ||
+                props.validationView
+            ) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
 
@@ -316,7 +359,9 @@ export default defineComponent({
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]});
+        const tableOptions = ref<any>(
+            {initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]}
+        );
 
         const headers = ref<any>([
             { title: titleLabel, align: "start", sortable: true, key: titleColumn},
@@ -348,7 +393,7 @@ export default defineComponent({
             tableOptions.value = event;
             let sortField: string | undefined = "";
             let sortDir: string | undefined = "";
-            if (event.sortBy.length > 0) {
+            if (event.sortBy?.length > 0) {
                 sortField = headersSortableMappings.get(event.sortBy[0].key);
                 sortDir = event.sortBy[0].order.toUpperCase();
             }
@@ -479,6 +524,40 @@ export default defineComponent({
             return possibleValues.find(publicationType => publicationType);
         };
 
+        const validateSection = async (documentId: number, metadata: boolean) => {
+            const validationMethod = metadata ? 
+                () => OrganisationUnitTrustConfigurationService.validateDocumentMetadata(documentId) :
+                () => OrganisationUnitTrustConfigurationService.validateDocumentFiles(documentId);
+
+            await validationMethod();
+            refreshTable(tableOptions);
+        };
+
+        const validateSectionForAll = async (metadata: boolean) => {
+            const validationMethod = metadata
+                ? (documentId: number) => OrganisationUnitTrustConfigurationService.validateDocumentMetadata(documentId)
+                : (documentId: number) => OrganisationUnitTrustConfigurationService.validateDocumentFiles(documentId);
+
+            const promises = selectedPublications.value.map(publication => {
+                return validationMethod(publication.databaseId as number)
+                    .then(() => {
+                        const name = i18n.locale.value.startsWith("sr")
+                            ? publication.titleSr
+                            : publication.titleOther;
+                        addNotification(i18n.t("validationSuccessNotification", { name }));
+                    })
+                    .catch(() => {
+                        const name = i18n.locale.value.startsWith("sr")
+                            ? publication.titleSr
+                            : publication.titleOther;
+                        addNotification(i18n.t("validationFailedNotification", { name }));
+                    });
+            });
+
+            await Promise.all(promises);
+            refreshTable(tableOptions);
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -488,7 +567,8 @@ export default defineComponent({
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
             ApplicableEntityType, removeResearchOutputs, ExportEntity,
-            getConcretePublicationType, isUserLoggedIn
+            getConcretePublicationType, isUserLoggedIn, validateSection,
+            validateSectionForAll
         };
     }
 });

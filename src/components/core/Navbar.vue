@@ -302,6 +302,7 @@ export default defineComponent(
             const backupLabel = computed(() => i18n.t("backupLabel"));
             const publicReviewDissertationsLabel = computed(() => i18n.t("publicReviewDissertationsLabel"));
             const thesesLabel = computed(() => i18n.t("thesesLabel"));
+            const publicationsValidationLabel = computed(() => i18n.t("routeLabel.publicationsValidation"));
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
@@ -373,7 +374,8 @@ export default defineComponent(
             const resourcesMenu = ref<MenuItem[]>([
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
                 { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' },
+                { title: publicationsValidationLabel, type:'icon-link', pathName: 'scientific-results/validation', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
             ]);
 
             const manageMenu = ref<MenuItem[]>([

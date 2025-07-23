@@ -124,6 +124,8 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("registryBookList");
             } else if (action === NotificationAction.GO_TO_HARVESTER_PAGE) {
                 decrementCounterAndNavigateToPage("importer");
+            } else if (action === NotificationAction.GO_TO_VALIDATION_PAGE) {
+                decrementCounterAndNavigateToPage("publicationsValidation");
             }
         };
 

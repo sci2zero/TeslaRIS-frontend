@@ -104,6 +104,7 @@ import NotFound from "@/views/NotFound.vue";
 import EmailUpdateConfirmationView from "@/views/EmailUpdateConfirmationView.vue";
 import FeedbackForm from "@/components/core/FeedbackForm.vue";
 import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDissertationsView.vue";
+import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 
 
 const roles = {
@@ -595,6 +596,15 @@ const router = createRouter({
                             meta: {
                                 authenticated: false,
                                 authorities: [],
+                            },
+                        },
+                        {
+                            path: "validation",
+                            name: "publicationsValidation",
+                            component: PublicationsValidationView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin, roles.institutionalEditor],
                             },
                         },
                         {

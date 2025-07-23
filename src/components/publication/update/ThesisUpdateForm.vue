@@ -2,7 +2,12 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col v-if="!enterExternalOU" cols="11">
-                <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" :readonly="isInstitutionalLibrarian" required></organisation-unit-autocomplete-search>
+                <organisation-unit-autocomplete-search
+                    ref="ouAutocompleteRef"
+                    v-model:model-value="selectedOrganisationUnit"
+                    :readonly="isInstitutionalLibrarian"
+                    required
+                />
             </v-col>
             <v-col v-else>
                 <multilingual-text-input
