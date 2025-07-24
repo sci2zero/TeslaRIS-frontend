@@ -231,8 +231,8 @@ export interface Thesis extends Document {
     numberOfAppendices?: number;
     languageId?: number;
     writingLanguageTagId?: number;
-    scientificArea?: string;
-    scientificSubArea?: string;
+    scientificArea?: MultilingualContent[];
+    scientificSubArea?: MultilingualContent[];
     publisherId?: number;
     languageCode?: string;
     preliminaryFiles?: DocumentFileResponse[];
@@ -247,9 +247,9 @@ export interface Thesis extends Document {
     isArchived?: boolean;
     eisbn?: string;
     printISBN?: string;
-    placeOfKeep?: string,
+    placeOfKeep?: MultilingualContent[],
     udc?: string;
-    typeOfTitle?: string;
+    typeOfTitle?: MultilingualContent[];
     extendedAbstract?: MultilingualContent[];
     remark?: MultilingualContent[];
     alternateTitle?: MultilingualContent[];

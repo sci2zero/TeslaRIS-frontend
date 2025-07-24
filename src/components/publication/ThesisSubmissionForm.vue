@@ -124,19 +124,21 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field
+                        <v-col cols="12">
+                            <multilingual-text-input
+                                ref="scientificAreaRef"
                                 v-model="scientificArea"
-                                :label="$t('scientificAreaLabel')"
-                                :placeholder="$t('scientificAreaLabel')">
-                            </v-text-field>
+                                :label="$t('scientificAreaLabel')">
+                            </multilingual-text-input>
                         </v-col>
-                        <v-col cols="6">
-                            <v-text-field
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <multilingual-text-input
+                                ref="scientificSubAreaRef"
                                 v-model="scientificSubArea"
-                                :label="$t('scientificSubAreaLabel')"
-                                :placeholder="$t('scientificSubAreaLabel')">
-                            </v-text-field>
+                                :label="$t('scientificSubAreaLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -221,14 +223,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field
-                                v-model="placeOfKeep"
-                                :label="$t('placeOfKeepLabel')"
-                                :placeholder="$t('placeOfKeepLabel')">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="6">
+                        <v-col cols="12">
                             <v-text-field
                                 v-model="udc"
                                 :label="$t('udcLabel')"
@@ -238,11 +233,21 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field
+                            <multilingual-text-input
+                                ref="placeOfKeepRef"
+                                v-model="placeOfKeep"
+                                :label="$t('placeOfKeepLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <multilingual-text-input
+                                ref="typeOfTitleRef"
                                 v-model="typeOfTitle"
                                 :label="$t('typeOfTitleLabel')"
-                                :placeholder="$t('typeOfTitleLabel')">
-                            </v-text-field>
+                                default-placeholder="PhD (dr)">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -379,14 +384,18 @@ export default defineComponent({
             }
         };
 
-        const scientificArea = ref("");
-        const scientificSubArea = ref("");
+        const scientificArea = ref<any[]>([]);
+        const scientificSubArea = ref<any[]>([]);
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const scientificAreaRef = ref<typeof MultilingualTextInput>();
+        const scientificSubAreaRef = ref<typeof MultilingualTextInput>();
+        const typeOfTitleRef = ref<typeof MultilingualTextInput>();
+        const placeOfKeepRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
@@ -415,9 +424,9 @@ export default defineComponent({
         const thesisDefenceDate = ref("");
         const eIsbn = ref("");
         const printIsbn = ref("");
-        const placeOfKeep = ref("");
+        const placeOfKeep = ref<any[]>([]);
         const udc = ref("");
-        const typeOfTitle = ref("PhD (dr)");
+        const typeOfTitle = ref<any[]>([]);
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
@@ -489,17 +498,17 @@ export default defineComponent({
                     numberOfTables.value = null;
                     numberOfAppendices.value = null;
                     selectedThesisType.value = { title: "", value: null };
-                    scientificArea.value = "";
-                    scientificSubArea.value = "";
+                    scientificAreaRef.value?.clearInput();
+                    scientificSubAreaRef.value?.clearInput();
                     selectedOrganisationUnit.value = {title: "", value: -1};
                     contributionsRef.value?.clearInput();
                     topicAcceptanceDate.value = "";
                     thesisDefenceDate.value = "";
                     eIsbn.value = "";
                     printIsbn.value = "";
-                    placeOfKeep.value = "";
+                    placeOfKeepRef.value?.clearInput();
                     udc.value = "";
-                    typeOfTitle.value = "";
+                    typeOfTitleRef.value?.clearInput();
 
                     error.value = false;
                     snackbar.value = true;
@@ -556,7 +565,8 @@ export default defineComponent({
             numberOfIllustrations, numberOfTables, numberOfAppendices,
             scientificArea, eIsbn, printIsbn, isbnValidationRules,
             udcValidationRules, placeOfKeep, udc, scientificSubArea,
-            typeOfTitle
+            typeOfTitle, scientificAreaRef, scientificSubAreaRef,
+            placeOfKeepRef, typeOfTitleRef
         };
     }
 });

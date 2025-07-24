@@ -122,11 +122,11 @@
                                 <div v-if="thesis?.uris && thesis?.uris.length > 0" class="response">
                                     <uri-list :uris="thesis?.uris"></uri-list>
                                 </div>
-                                <div v-if="thesis?.typeOfTitle">
+                                <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0">
                                     {{ $t("typeOfTitleLabel") }}:
                                 </div>
-                                <div v-if="thesis?.typeOfTitle" class="response">
-                                    {{ thesis.typeOfTitle }}
+                                <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.typeOfTitle) }}
                                 </div>
                             </v-col>
                             <v-col cols="3">
@@ -176,23 +176,23 @@
                                         {{ languageTagMap.get(thesis?.writingLanguageTagId)?.display }}
                                     </v-chip>
                                 </div>
-                                <div v-if="thesis?.placeOfKeep">
+                                <div v-if="thesis?.placeOfKeep && thesis?.placeOfKeep.length > 0">
                                     {{ $t("placeOfKeepLabel") }}:
                                 </div>
-                                <div v-if="thesis?.placeOfKeep" class="response">
-                                    {{ thesis.placeOfKeep }}
+                                <div v-if="thesis?.placeOfKeep && thesis?.placeOfKeep.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.placeOfKeep) }}
                                 </div>
-                                <div v-if="thesis?.scientificArea">
+                                <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0">
                                     {{ $t("scientificAreaLabel") }}:
                                 </div>
-                                <div v-if="thesis?.scientificArea" class="response">
-                                    {{ thesis.scientificArea }}
+                                <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.scientificArea) }}
                                 </div>
-                                <div v-if="thesis?.scientificSubArea">
+                                <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0">
                                     {{ $t("scientificSubAreaLabel") }}:
                                 </div>
-                                <div v-if="thesis?.scientificSubArea" class="response">
-                                    {{ thesis.scientificSubArea }}
+                                <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.scientificSubArea) }}
                                 </div>
                                 <div v-if="thesis?.isOnPublicReview" class="response mt-5">
                                     {{ $t("onPublicReviewLabel", [localiseDate(thesis?.publicReviewEnd)]) }}

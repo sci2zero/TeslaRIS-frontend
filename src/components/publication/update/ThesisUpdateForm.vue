@@ -26,7 +26,12 @@
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetThesis?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                    :initial-value="toMultilingualTextInput(presetThesis?.subTitle, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
@@ -67,19 +72,23 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
-                <v-text-field
+            <v-col>
+                <multilingual-text-input
+                    ref="scientificAreaRef"
                     v-model="scientificArea"
                     :label="$t('scientificAreaLabel')"
-                    :placeholder="$t('scientificAreaLabel')">
-                </v-text-field>
+                    :initial-value="toMultilingualTextInput(presetThesis?.scientificArea, languageTags)">
+                </multilingual-text-input>
             </v-col>
-            <v-col cols="6">
-                <v-text-field
+        </v-row>
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="scientificSubAreaRef"
                     v-model="scientificSubArea"
                     :label="$t('scientificSubAreaLabel')"
-                    :placeholder="$t('scientificSubAreaLabel')">
-                </v-text-field>
+                    :initial-value="toMultilingualTextInput(presetThesis?.scientificSubArea, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
@@ -169,14 +178,17 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
-                <v-text-field
+            <v-col>
+                <multilingual-text-input
+                    ref="placeOfKeepRef"
                     v-model="placeOfKeep"
                     :label="$t('placeOfKeepLabel')"
-                    :placeholder="$t('placeOfKeepLabel')">
-                </v-text-field>
+                    :initial-value="toMultilingualTextInput(presetThesis?.placeOfKeep, languageTags)">
+                </multilingual-text-input>
             </v-col>
-            <v-col cols="6">
+        </v-row>
+        <v-row>
+            <v-col cols="12">
                 <v-text-field
                     v-model="udc"
                     :label="$t('udcLabel')"
@@ -210,12 +222,13 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="12">
-                <v-text-field
+            <v-col>
+                <multilingual-text-input
+                    ref="typeOfTitleRef"
                     v-model="typeOfTitle"
                     :label="$t('typeOfTitleLabel')"
-                    :placeholder="$t('typeOfTitleLabel')">
-                </v-text-field>
+                    :initial-value="toMultilingualTextInput(presetThesis?.typeOfTitle, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
@@ -354,6 +367,10 @@ export default defineComponent({
         const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
+        const scientificAreaRef = ref<typeof MultilingualTextInput>();
+        const scientificSubAreaRef = ref<typeof MultilingualTextInput>();
+        const typeOfTitleRef = ref<typeof MultilingualTextInput>();
+        const placeOfKeepRef = ref<typeof MultilingualTextInput>();
 
         const selectedPublisher = ref<{ title: string, value: number }>({title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number});
         const selectedOrganisationUnit = ref<{ title: string, value: number }>();
@@ -369,8 +386,8 @@ export default defineComponent({
         const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
         const thesisDefenceDate = ref(props.presetThesis?.thesisDefenceDate as string);
 
-        const scientificArea = ref(props.presetThesis?.scientificArea as string);
-        const scientificSubArea = ref(props.presetThesis?.scientificSubArea as string);
+        const scientificArea = ref<any>([]);
+        const scientificSubArea = ref<any>([]);
         const numberOfChapters = ref(props.presetThesis?.numberOfChapters as number);
         const numberOfReferences = ref(props.presetThesis?.numberOfReferences as number);
         const numberOfGraphs = ref(props.presetThesis?.numberOfGraphs as number);
@@ -379,9 +396,9 @@ export default defineComponent({
         const numberOfAppendices = ref(props.presetThesis?.numberOfAppendices);
         const eIsbn = ref(props.presetThesis?.eisbn as string);
         const printIsbn = ref(props.presetThesis?.printISBN as string);
-        const placeOfKeep = ref(props.presetThesis?.placeOfKeep as string);
+        const placeOfKeep = ref<any>([]);
         const udc = ref(props.presetThesis?.udc as string);
-        const typeOfTitle = ref(props.presetThesis?.typeOfTitle as string);
+        const typeOfTitle = ref<any>([]);
 
         const {
             requiredFieldRules, requiredSelectionRules,
@@ -458,6 +475,18 @@ export default defineComponent({
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetThesis?.subTitle as MultilingualContent[];
 
+            scientificAreaRef.value?.clearInput();
+            scientificArea.value = props.presetThesis?.scientificArea as MultilingualContent[];
+
+            scientificSubAreaRef.value?.clearInput();
+            scientificSubArea.value = props.presetThesis?.scientificSubArea as MultilingualContent[];
+
+            placeOfKeepRef.value?.clearInput();
+            placeOfKeep.value = props.presetThesis?.placeOfKeep as MultilingualContent[];
+
+            typeOfTitleRef.value?.clearInput();
+            typeOfTitle.value = props.presetThesis?.typeOfTitle as MultilingualContent[];
+
             selectedLanguage.value = props.presetThesis?.languageId as number;
             uris.value = props.presetThesis?.uris as string[];
             numberOfPages.value = props.presetThesis?.numberOfPages;
@@ -472,19 +501,21 @@ export default defineComponent({
             openAlexId.value = props.presetThesis?.openAlexId;
             topicAcceptanceDate.value = props.presetThesis?.topicAcceptanceDate as string;
             thesisDefenceDate.value = props.presetThesis?.thesisDefenceDate as string;
-            scientificArea.value = props.presetThesis?.scientificArea as string;
-            scientificSubArea.value = props.presetThesis?.scientificSubArea as string;
             printIsbn.value = props.presetThesis?.printISBN as string;
             eIsbn.value = props.presetThesis?.eisbn as string;
-            placeOfKeep.value = props.presetThesis?.placeOfKeep as string;
             udc.value = props.presetThesis?.udc as string;
-            typeOfTitle.value = props.presetThesis?.typeOfTitle as string;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
 
-            selectedThesisType.value = {title: props.presetThesis?.thesisType ? getThesisTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string : "", value: props.presetThesis?.thesisType ? props.presetThesis?.thesisType as ThesisType : undefined};
+            selectedThesisType.value = {
+                title: 
+                    props.presetThesis?.thesisType ? 
+                        getThesisTitleFromValueAutoLocale(props.presetThesis?.thesisType as ThesisType) as string : "", 
+                value: 
+                    props.presetThesis?.thesisType ? props.presetThesis?.thesisType as ThesisType : undefined
+            };
 
             fetchDetails();
         };
@@ -505,7 +536,8 @@ export default defineComponent({
             udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
             numberOfChapters, numberOfReferences, numberOfTables,
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
-            scientificArea, scientificSubArea, typeOfTitle
+            scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
+            scientificSubAreaRef, placeOfKeepRef, typeOfTitleRef
         };
     }
 });
