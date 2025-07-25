@@ -40,7 +40,7 @@
                             entity-name="JournalPublication"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || journalPublication?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -151,11 +151,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="journalPublication?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !journalPublication?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="journalPublication?.isMetadataValid"
             :files-valid="journalPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(journalPublication?.description)"
+            :document="journalPublication"
             @update="fetchValidationStatus(journalPublication?.id as number, journalPublication as _Document)"
         />
 
@@ -188,7 +190,7 @@
                 <person-document-contribution-tabs
                     :document-id="journalPublication?.id"
                     :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || journalPublication?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -196,7 +198,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="journalPublication?.keywords ? journalPublication.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -204,13 +206,13 @@
                 <!-- Description -->
                 <description-section
                     :description="journalPublication?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="journalPublication"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
                     :proofs="journalPublication?.proofs"
                     :file-items="journalPublication?.fileItems">
                 </attachment-section>

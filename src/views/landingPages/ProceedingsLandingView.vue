@@ -153,10 +153,17 @@
             </v-col>
         </v-row>
 
-        <publication-badge-section
-            :preloaded-doi="proceedings?.doi"
-            :document-id="proceedings?.id"
+        <document-action-box
+            ref="actionsRef"
+            :doi="proceedings?.doi"
+            :can-edit="canEdit && !proceedings?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="proceedings?.isMetadataValid"
+            :files-valid="proceedings?.areFilesValid"
+            :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(proceedings?.description)"
+            :document="proceedings"
+            :display-citation="false"
         />
 
         <br />
@@ -260,7 +267,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -296,14 +303,14 @@ import { useLoginStore } from '@/stores/loginStore';
 import { useUserRole } from '@/composables/useUserRole';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer },
     setup() {
         const currentTab = ref("");
 

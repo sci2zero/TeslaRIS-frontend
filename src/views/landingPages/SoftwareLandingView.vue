@@ -40,7 +40,7 @@
                             entity-name="Software"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || software?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -107,11 +107,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="software?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !software?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="software?.isMetadataValid"
             :files-valid="software?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(software?.description)"
+            :document="software"
             @update="fetchValidationStatus(software?.id as number, software as _Document)"
         />
 
@@ -143,7 +145,7 @@
                 <person-document-contribution-tabs
                     :document-id="software?.id"
                     :contribution-list="software?.contributions ? software?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || software?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -151,7 +153,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="software?.keywords ? software.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !software?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -159,13 +161,13 @@
                 <!-- Description -->
                 <description-section
                     :description="software?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !software?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="software"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !software?.isArchived"
                     :proofs="software?.proofs"
                     :file-items="software?.fileItems">
                 </attachment-section>

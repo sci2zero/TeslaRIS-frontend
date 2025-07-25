@@ -40,7 +40,7 @@
                             entity-name="MonographPublication"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || monographPublication?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -140,11 +140,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="monographPublication?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !monographPublication?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="monographPublication?.isMetadataValid"
             :files-valid="monographPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monographPublication?.description)"
+            :document="monographPublication"
             @update="fetchValidationStatus(monographPublication?.id as number, monographPublication as _Document)"
         />
 
@@ -177,7 +179,7 @@
                 <person-document-contribution-tabs
                     :document-id="monographPublication?.id"
                     :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || monographPublication?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -185,7 +187,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="monographPublication?.keywords ? monographPublication.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -193,13 +195,13 @@
                 <!-- Description -->
                 <description-section
                     :description="monographPublication?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="monographPublication"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
                     :proofs="monographPublication?.proofs"
                     :file-items="monographPublication?.fileItems">
                 </attachment-section>

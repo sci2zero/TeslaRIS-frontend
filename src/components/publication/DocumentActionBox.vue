@@ -8,6 +8,7 @@
             <v-col cols="12" sm="6" class="action-section">
                 <div class="d-flex flex-row justify-start">
                     <citation-selector
+                        v-if="displayCitation"
                         ref="citationRef"
                         :document-id="documentId">
                     </citation-selector>
@@ -25,6 +26,20 @@
                         @click="validateUploadedFiles">
                         {{ $t("validateUploadedFilesLabel") }}
                     </v-btn>
+                    <v-btn
+                        v-if="displayArchiveActions && couldArchive && document?.documentDate && (isAdmin || isInstitutionalEditor) && !document?.isArchived"
+                        class="mb-5 ml-2" color="primary" density="compact"
+                        variant="outlined"
+                        @click="changeArchiveState(true)">
+                        {{ $t("archiveLabel") }}
+                    </v-btn>
+                    <v-btn
+                        v-if="displayArchiveActions && couldArchive && (isAdmin || isInstitutionalEditor) && document?.isArchived"
+                        class="mb-5 ml-2" color="primary" density="compact"
+                        variant="outlined"
+                        @click="changeArchiveState(false)">
+                        {{ $t("unarchiveLabel") }}
+                    </v-btn>
                 </div>
             </v-col>
             <v-col cols="12" sm="6" class="action-section">
@@ -36,6 +51,8 @@
                 />
             </v-col>
         </v-row>
+
+        <toast v-model="snackbar" :message="snackbarMessage"></toast>
     </div>
 </template>
 
@@ -45,11 +62,15 @@ import CitationSelector from '@/components/publication/CitationSelector.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
+import type { Document } from '@/models/PublicationModel';
+import { commitArchiveStateChange } from '@/utils/DocumentUtil';
+import Toast from '../core/Toast.vue';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
     name: "DocumentActionBox",
-    components: { CitationSelector, PublicationBadgeSection },
+    components: { CitationSelector, PublicationBadgeSection, Toast },
     props: {
         documentId: {
             type: Number,
@@ -71,13 +92,34 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        couldArchive: {
+            type: Boolean,
+            default: false
+        },
         description: {
             type: Object as PropType<string | null>,
             default: undefined
+        },
+        document: {
+            type: Object as PropType<Document | undefined>,
+            default: undefined
+        },
+        displayArchiveActions: {
+            type: Boolean,
+            default: true
+        },
+        displayCitation: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update"],
     setup(props, {emit}) {
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
+
+        const router = useRouter();
+
         const citationRef = ref<typeof CitationSelector>();
 
         const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian } = useUserRole();
@@ -104,11 +146,22 @@ export default defineComponent({
             });
         };
 
+        const changeArchiveState = (archive: boolean) => {
+            if (!props.document) {
+                return;
+            }
+
+            commitArchiveStateChange(archive, props.document, snackbar, snackbarMessage, router);
+        };
+        
         return {
             fetchCitations,
             canValidate,
             validateMetadata,
-            validateUploadedFiles
+            validateUploadedFiles,
+            isAdmin, isInstitutionalEditor,
+            changeArchiveState, snackbar,
+            snackbarMessage
         };
 }})
 

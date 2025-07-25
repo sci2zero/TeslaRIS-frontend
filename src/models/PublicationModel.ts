@@ -90,6 +90,7 @@ export interface Document {
     proofs: DocumentFileResponse[] | undefined;
     isMetadataValid?: boolean;
     areFilesValid?: boolean;
+    isArchived?: boolean;
 }
 
 export interface JournalPublication extends Document {
@@ -248,7 +249,6 @@ export interface Thesis extends Document {
     isOnPublicReviewPause?: boolean;
     topicAcceptanceDate: string;
     thesisDefenceDate: string;
-    isArchived?: boolean;
     eisbn?: string;
     printISBN?: string;
     placeOfKeep?: string,

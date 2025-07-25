@@ -108,11 +108,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="dataset?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !dataset?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="dataset?.isMetadataValid"
             :files-valid="dataset?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(dataset?.description)"
+            :document="dataset"
             @update="fetchValidationStatus(dataset?.id as number, dataset as _Document)"
         />
 
@@ -153,7 +155,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="dataset?.keywords ? dataset.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !dataset?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -161,13 +163,13 @@
                 <!-- Description -->
                 <description-section
                     :description="dataset?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !dataset?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="dataset"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !dataset?.isArchived"
                     :proofs="dataset?.proofs"
                     :file-items="dataset?.fileItems">
                 </attachment-section>

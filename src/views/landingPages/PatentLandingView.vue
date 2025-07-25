@@ -40,7 +40,7 @@
                             entity-name="Patent"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || patent?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -107,11 +107,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="patent?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !patent?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="patent?.isMetadataValid"
             :files-valid="patent?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(patent?.description)"
+            :document="patent"
             @update="fetchValidationStatus(patent?.id as number, patent as _Document)"
         />
 
@@ -144,7 +146,7 @@
                 <person-document-contribution-tabs
                     :document-id="patent?.id"
                     :contribution-list="patent?.contributions ? patent?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || patent?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -152,7 +154,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="patent?.keywords ? patent.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !patent?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -160,13 +162,13 @@
                 <!-- Description -->
                 <description-section
                     :description="patent?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !patent?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="patent"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !patent?.isArchived"
                     :proofs="patent?.proofs"
                     :file-items="patent?.fileItems">
                 </attachment-section>

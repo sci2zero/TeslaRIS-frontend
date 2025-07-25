@@ -332,6 +332,7 @@
             :files-valid="thesis?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(thesis?.description)"
+            :display-archive-actions="false"
             @update="fetchValidationStatus(thesis?.id as number, thesis as _Document)"
         />
 

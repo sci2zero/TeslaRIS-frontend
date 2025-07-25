@@ -153,11 +153,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="monograph?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !monograph?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="monograph?.isMetadataValid"
             :files-valid="monograph?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monograph?.description)"
+            :document="monograph"
             @update="fetchValidationStatus(monograph?.id as number, monograph as _Document)"
         />
 
@@ -193,7 +195,7 @@
                 <person-document-contribution-tabs
                     :document-id="monograph?.id"
                     :contribution-list="monograph?.contributions ? monograph?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || monograph?.isArchived"
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
@@ -201,7 +203,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="monograph?.keywords ? monograph.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monograph?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -209,7 +211,7 @@
                 <!-- Description -->
                 <description-section
                     :description="monograph?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monograph?.isArchived"
                     @update="updateDescription">
                 </description-section>
                 
@@ -229,7 +231,7 @@
 
                 <attachment-section
                     :document="monograph"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monograph?.isArchived"
                     :proofs="monograph?.proofs"
                     :file-items="monograph?.fileItems">
                 </attachment-section>
@@ -241,7 +243,7 @@
                             <v-card-text class="edit-pen-container">
                                 <research-areas-update-modal
                                     :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []"
-                                    :read-only="!canEdit"
+                                    :read-only="!canEdit || monograph?.isArchived"
                                     limit-one
                                     @update="updateResearchAreas">
                                 </research-areas-update-modal>

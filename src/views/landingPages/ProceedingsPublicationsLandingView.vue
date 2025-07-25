@@ -40,7 +40,7 @@
                             entity-name="ProceedingsPublication"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || proceedingsPublication?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -139,11 +139,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="proceedingsPublication?.doi"
-            :can-edit="canEdit"
+            :can-edit="canEdit && !proceedingsPublication?.isArchived"
+            :could-archive="canEdit"
             :metadata-valid="proceedingsPublication?.isMetadataValid"
             :files-valid="proceedingsPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
+            :document="proceedingsPublication"
             @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 
@@ -173,18 +175,32 @@
             v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="proceedingsPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="proceedingsPublication?.description"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    @update="updateDescription">
+                </description-section>
 
-                <attachment-section :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"></attachment-section>    
+                <attachment-section
+                    :document="proceedingsPublication"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    :proofs="proceedingsPublication?.proofs"
+                    :file-items="proceedingsPublication?.fileItems">
+                </attachment-section>    
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="proceedingsPublication?.id"
                     :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || proceedingsPublication?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
