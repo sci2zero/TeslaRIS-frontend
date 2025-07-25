@@ -158,8 +158,6 @@
                     :read-only="!canEdit"
                     @update="updateSuccess(); fetchPublicReviewPageContent()"
                 />
-                =======
-                >>>>>>> main
             </div>
         </div>
 
