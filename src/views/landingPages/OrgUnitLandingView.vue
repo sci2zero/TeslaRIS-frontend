@@ -158,6 +158,17 @@
                     :read-only="!canEdit"
                     @update="updateSuccess(); fetchPublicReviewPageContent()"
                 />
+                <generic-crud-modal
+                    v-if="(canEdit && (isAdmin || isInstitutionalEditor)) || (isInstitutionalLibrarian && loggedInUser?.organisationUnitId === organisationUnit?.id)"
+                    class="ml-2"
+                    :form-component="InstitutionDefaultSubmissionContentForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="InstitutionDefaultSubmissionContent"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="false"
+                    @update="updateSuccess()"
+                />
             </div>
         </div>
 
@@ -381,6 +392,7 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
 import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
 import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
+import InstitutionDefaultSubmissionContentForm from '@/components/organisationUnit/InstitutionDefaultSubmissionContentForm.vue';
 
 
 export default defineComponent({
@@ -442,7 +454,7 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, loggedInUser } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
@@ -753,7 +765,8 @@ export default defineComponent({
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
-            fetchPublicReviewPageContent
+            fetchPublicReviewPageContent, isInstitutionalLibrarian,
+            InstitutionDefaultSubmissionContentForm, loggedInUser
         };
 }})
 

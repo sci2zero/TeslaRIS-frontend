@@ -979,5 +979,6 @@ export default {
     pageTypeLabel: "Tip stranice",
     updateOrganisationUnitLabel: "Ažuriraj organizacionu jedinicu",
     updatePublicReviewPageContentLabel: "Sadržaj stranica za javni uvid",
-    shareLabel: "Podeli preko"
+    shareLabel: "Podeli preko",
+    updateInstitutionDefaultSubmissionContentLabel: "Podrazumevani sadržaj za unos"
 }

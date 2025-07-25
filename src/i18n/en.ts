@@ -955,5 +955,6 @@ export default {
     pageTypeLabel: "Page type",
     updateOrganisationUnitLabel: "Update organisation unit",
     publicReviewPageContentLabel: "Public review page content",
-    shareLabel: "Share via"
+    shareLabel: "Share via",
+    updateInstitutionDefaultSubmissionContentLabel: "Default submission content"
 }

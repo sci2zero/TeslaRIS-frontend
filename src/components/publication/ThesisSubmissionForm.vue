@@ -236,7 +236,9 @@
                             <multilingual-text-input
                                 ref="placeOfKeepRef"
                                 v-model="placeOfKeep"
-                                :label="$t('placeOfKeepLabel')">
+                                :initial-value="toMultilingualTextInput(presetContent?.placeOfKeep, languageTagsList)"
+                                :label="$t('placeOfKeepLabel')"
+                                :default-placeholder="(presetContent?.placeOfKeep && presetContent?.placeOfKeep.length > 0) ? '.' : ''">
                             </multilingual-text-input>
                         </v-col>
                     </v-row>
@@ -246,6 +248,7 @@
                                 ref="typeOfTitleRef"
                                 v-model="typeOfTitle"
                                 :label="$t('typeOfTitleLabel')"
+                                :initial-value="toMultilingualTextInput(presetContent?.typeOfTitle, languageTagsList)"
                                 default-placeholder="PhD (dr)">
                             </multilingual-text-input>
                         </v-col>
@@ -316,6 +319,8 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
 import DatePicker from '../core/DatePicker.vue';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
+import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDefaultSubmissionContentService';
+import type { InstitutionDefaultSubmissionContent } from '@/models/OrganisationUnitModel';
 
 
 export default defineComponent({
@@ -343,6 +348,8 @@ export default defineComponent({
         const selectedWritingLanguage = ref<{title: string, value: number}>();
         const languages = ref<LanguageResponse[]>();
 
+        const presetContent = ref<InstitutionDefaultSubmissionContent>();
+
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
@@ -353,7 +360,15 @@ export default defineComponent({
                     }
                 })
             });
+
+            fetchDefaultContent();
         });
+
+        const fetchDefaultContent = () => {
+            InstitutionDefaultSubmissionContentService.getContentForUser().then(response => {
+                presetContent.value = response.data;
+            });
+        };
 
         watch([selectedLanguage, languageTags], () => {
             if (!selectedLanguage.value || !languageTags.value || languageTags.value.length === 0) {
@@ -566,7 +581,8 @@ export default defineComponent({
             scientificArea, eIsbn, printIsbn, isbnValidationRules,
             udcValidationRules, placeOfKeep, udc, scientificSubArea,
             typeOfTitle, scientificAreaRef, scientificSubAreaRef,
-            placeOfKeepRef, typeOfTitleRef
+            placeOfKeepRef, typeOfTitleRef, presetContent,
+            toMultilingualTextInput
         };
     }
 });

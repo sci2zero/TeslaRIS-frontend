@@ -111,3 +111,8 @@ export interface InstitutionLogoRequest {
     width: number;
     backgroundHex: string;
 }
+
+export interface InstitutionDefaultSubmissionContent {
+    placeOfKeep: MultilingualContent[];
+    typeOfTitle: MultilingualContent[];
+}
