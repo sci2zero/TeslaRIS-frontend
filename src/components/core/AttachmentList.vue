@@ -58,6 +58,13 @@
                                             @update="sendUpdateRequestToParent($event, attachment.id)"
                                         ></document-file-submission-modal>
                                     </v-col>
+                                    <v-col v-if="(canMakeOfficial && canEdit) && (isAdmin || isInstitutionalLibrarian)">
+                                        <v-btn
+                                            icon variant="outlined" size="x-small" color="primary"
+                                            class="inline-action" @click="moveToOfficial(attachment)">
+                                            <v-icon size="x-large" icon="mdi-file-move-outline"></v-icon>
+                                        </v-btn>
+                                    </v-col>
                                 </v-row>
                             </template>
                         </v-list-item>
@@ -87,6 +94,7 @@ import Toast from './Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getNameFromOrdinal } from '@/utils/EnumUtil';
 import CCLicenseBadge from './CCLicenseBadge.vue';
+import { useRoute } from 'vue-router';
 
 
 export default defineComponent({
@@ -120,6 +128,10 @@ export default defineComponent({
         disableResourceTypeSelection: {
             type: Boolean,
             default: false
+        },
+        canMakeOfficial: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "delete", "update"],
@@ -127,8 +139,9 @@ export default defineComponent({
         const errorMessage = ref("");
         const snackbar = ref(false);
 
-        const { isAdmin, isHeadOfLibrary } = useUserRole();
+        const { isAdmin, isHeadOfLibrary, isInstitutionalLibrarian } = useUserRole();
 
+        const currentRoute = useRoute();
         const i18n = useI18n();
 
         const download = (attachment: DocumentFileResponse) => {
@@ -155,11 +168,21 @@ export default defineComponent({
             emit("delete", attachmentId);
         };
 
+        const moveToOfficial = (documentFile: DocumentFileResponse) => {
+            DocumentFileService.makeThesisPreprintOfficial(
+                parseInt(currentRoute.params.id as string),
+                documentFile.id as number
+            ).then(() => {
+                emit("update", documentFile);
+            });
+        };
+
         return {
             download, sendDataToParent, sendDeleteRequestToParent, 
             sendUpdateRequestToParent, returnCurrentLocaleContent, isAdmin,
             errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale,
-            isHeadOfLibrary, License, getNameFromOrdinal
+            isHeadOfLibrary, License, getNameFromOrdinal, moveToOfficial,
+            isInstitutionalLibrarian
         };
     }
 });

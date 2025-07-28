@@ -7,9 +7,11 @@
                 :can-edit="canEditThesisAttachments"
                 :in-comparator="inComparator"
                 disable-updates
+                :can-make-official="isThesisSection && fileItems && !fileItems.some(f => f.resourceType === ResourceType.OFFICIAL_PUBLICATION || String(f.resourceType) === 'OFFICIAL_PUBLICATION')"
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
+                @update="notifyAboutSectionChange()"
             />
         </v-col>
     </v-row>
@@ -73,7 +75,7 @@ import type { PropType } from "vue";
 import { computed, defineComponent } from "vue";
 import AttachmentList from "./AttachmentList.vue";
 import { addAttachment, updateAttachment, deleteAttachment, addThesisAttachment, deleteThesisAttachment } from "@/utils/AttachmentUtil";
-import { ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
+import { ResourceType, ThesisAttachmentType, type DocumentFileResponse } from "@/models/DocumentFileModel";
 import type { Document, Thesis } from "@/models/PublicationModel";
 import { useUserRole } from "@/composables/useUserRole";
 
@@ -145,7 +147,7 @@ export default defineComponent({
         addAttachment, updateAttachment, deleteAttachment,
         canEditThesisAttachments, addThesisAttachment,
         deleteThesisAttachment, ThesisAttachmentType,
-        notifyAboutSectionChange
+        notifyAboutSectionChange, ResourceType
     };
   },
 });

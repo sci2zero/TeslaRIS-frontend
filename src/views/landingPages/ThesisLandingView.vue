@@ -416,6 +416,7 @@
                     :preliminary-supplements="thesis?.preliminarySupplements"
                     :commission-reports="thesis?.commissionReports"
                     :is-on-public-review="thesis?.isOnPublicReview"
+                    @update="fetchThesis"
                 ></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchOutput">
@@ -902,7 +903,7 @@ export default defineComponent({
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
-            fetchValidationStatus
+            fetchValidationStatus, fetchThesis
         };
 }})
 
