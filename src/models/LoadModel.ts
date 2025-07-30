@@ -93,3 +93,12 @@ export interface AuthorCentricInstitutionHarvestRequest {
     allAuthors: boolean;
     authorIds: number[]
 }
+
+export enum RecurrenceType {
+    ONCE = "ONCE",
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    MONTHLY = "MONTHLY",
+    THREE_MONTHLY = "THREE_MONTHLY",
+    YEARLY = "YEARLY"
+}

@@ -77,6 +77,9 @@
                     <v-tab v-if="isResearcher" value="files">
                         {{ $t("blibliographisFormatFilesLabel") }}
                     </v-tab>
+                    <v-tab v-if="isAdmin || isInstitutionalEditor" value="scheduledHarvests">
+                        {{ $t("scheduledHarvestsLabel") }}
+                    </v-tab>
                 </v-tabs>
 
                 <v-window
@@ -106,6 +109,18 @@
                                 <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
                                     {{ $t("scanSourcesLabel") }}
                                 </v-btn>
+                            </v-col>
+                        </v-row>
+                        <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
+                            <v-col cols="auto">
+                                <generic-crud-modal
+                                    :form-component="ScheduleHarvestForm"
+                                    :form-props="{}"
+                                    entity-name="ScheduleHarvest"
+                                    primary-color
+                                    :disabled="!isFormValid"
+                                    @create="scheduleHarvest"
+                                />
                             </v-col>
                         </v-row>
                         <h2 v-else class="d-flex flex-row justify-center">
@@ -154,6 +169,12 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
+                    </v-window-item>
+                    <v-window-item value="scheduledHarvests">
+                        <scheduled-tasks-list
+                            :scheduled-tasks="scheduledTasks"
+                            @delete="deleteScheduledHarvestTask">
+                        </scheduled-tasks-list>
                     </v-window-item>
                 </v-window>
             </div>
@@ -210,11 +231,16 @@ import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSear
 import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
 import { useRouter } from "vue-router";
 import { type AuthorCentricInstitutionHarvestRequest } from "@/models/LoadModel";
+import ScheduleHarvestForm from "@/components/import/ScheduleHarvestForm.vue";
+import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import { type ScheduledTaskResponse } from "@/models/Common";
+import TaskManagerService from "@/services/TaskManagerService";
+import ScheduledTasksList from "@/components/core/ScheduledTasksList.vue";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch },
+    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
@@ -244,6 +270,8 @@ export default defineComponent({
         const requiredFieldsDescription = ref("");
         const supportedFieldsDescription = ref("");
 
+        const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
+
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
 
@@ -258,6 +286,7 @@ export default defineComponent({
             });
 
             startInterval();
+            fetchScheduledTasks();
         });
 
         watch(selectedOrganisationUnit, () => {
@@ -321,7 +350,6 @@ export default defineComponent({
             } else {
                 authorCentricInstitutionHarvest();
             }
-            
         };
 
         const regularIdentifierHarvest = () => {
@@ -340,7 +368,7 @@ export default defineComponent({
                 authorIds: selectedPersons.value.map(person => person.value),
                 allAuthors: mustHarvestUsingResearcherIds.value && !researcherSelection.value,
                 institutionId: selectedOrganisationUnit.value.value
-            }
+            };
 
             ImportService.startAuthorCentricInstitutionHarvest(
                 startDate.value, endDate.value, request
@@ -377,11 +405,68 @@ export default defineComponent({
         const handleError = (errorStatus: number) => {
             if(errorStatus === 500) {
                 errorMessage.value = i18n.t("harvestFailedMessage");
+            } else if(errorStatus === 400) {
+                errorMessage.value = i18n.t("cantScheduleInPastMessage");
             } else {
                 errorMessage.value = i18n.t("genericErrorMessage");
             }
             snackbar.value = true;
             loading.value = false;
+        };
+
+        const fetchScheduledTasks = () => {
+            TaskManagerService.listScheduledHarvestTasks().then((response) => {
+                scheduledTasks.value = response.data;
+                scheduledTasks.value.sort((a, b) => {
+                    if(!a.executionTime) {
+                        return 1;
+                    }
+
+                    return a.executionTime.localeCompare(b.executionTime);
+                });
+            });
+        };
+
+        const scheduleHarvest = (scheduleParams: any) => {
+            if (!mustHarvestUsingResearcherIds.value && !researcherSelection.value) {
+                ImportService.scheduleHarvest(
+                    scheduleParams[0], scheduleParams[1],
+                    startDate.value, endDate.value,
+                    selectedOrganisationUnit.value.value
+                ).then(() => {
+                    fetchScheduledTasks();
+                    currentTab.value = "scheduledHarvests";
+                }).catch((error) => {
+                    handleError(error.response.status);
+                });
+            } else {
+                const request: AuthorCentricInstitutionHarvestRequest = {
+                    authorIds: selectedPersons.value.map(person => person.value),
+                    allAuthors: mustHarvestUsingResearcherIds.value && !researcherSelection.value,
+                    institutionId: selectedOrganisationUnit.value.value
+                };
+
+                ImportService.scheduleAuthorCentricInstitutionHarvest(
+                    scheduleParams[0], scheduleParams[1],
+                    startDate.value, endDate.value, request
+                ).then(() => {
+                    fetchScheduledTasks();
+                    currentTab.value = "scheduledHarvests";
+                }).catch((error) => {
+                    handleError(error.response.status);
+                });
+            }
+        };
+
+        const deleteScheduledHarvestTask = (taskId: string) => {
+            TaskManagerService.canceltask(taskId).then(() => {
+                errorMessage.value = i18n.t("cancelSuccessMessage");
+                snackbar.value = true;
+                fetchScheduledTasks();
+            }).catch(() => {
+                errorMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
         };
 
         return {
@@ -400,7 +485,9 @@ export default defineComponent({
             requiredFieldsDescription,
             supportedFieldsDescription,
             searchHarvestableInstitutions,
-            selectedPersons, researcherSelection
+            selectedPersons, researcherSelection,
+            ScheduleHarvestForm, scheduleHarvest,
+            scheduledTasks, deleteScheduledHarvestTask
         };
     },
 });

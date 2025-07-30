@@ -18,6 +18,10 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.get, "scheduled-task/report-generation");
     }
 
+    async listScheduledHarvestTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
+        return super.sendRequest(axios.get, "scheduled-task/harvest");
+    }
+
     async scheduleIndicatorLoadingTask(timestamp: string, source: string): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-load?timestamp=${timestamp}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
     }

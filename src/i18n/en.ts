@@ -964,5 +964,8 @@ export default {
     validationSuccessNotification: "Validation successfull for publication '{name}'.",
     validationFailedNotification: "Validation failed for publication '{name}'.",
     showNonValidatedMetadataLabel: "Show with non validated metadata",
-    showNonValidatedFilesLabel: "Show with non validated files"
+    showNonValidatedFilesLabel: "Show with non validated files",
+    recurrenceTypeLabel: "Recurrence",
+    createNewScheduleHarvestLabel: "Schedule scan",
+    scheduledHarvestsLabel: "Scheduled harvests"
 }

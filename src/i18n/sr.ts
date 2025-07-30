@@ -989,5 +989,8 @@ export default {
     validationSuccessNotification: "Validacija uspešna za publikaciju '{name}'.",
     validationFailedNotification: "Validacija neuspešna za publikaciju '{name}'.",
     showNonValidatedMetadataLabel: "Prikaži sa nevalidiranim metapodacima",
-    showNonValidatedFilesLabel: "Prikaži sa nevalidiranim fajlovima"
+    showNonValidatedFilesLabel: "Prikaži sa nevalidiranim fajlovima",
+    recurrenceTypeLabel: "Ponavljanje",
+    createNewScheduleHarvestLabel: "Zakaži skeniranje",
+    scheduledHarvestsLabel: "Zakazana skeniranja"
 }

@@ -1,3 +1,4 @@
+import { RecurrenceType } from "./LoadModel";
 import type { PersonDocumentContribution, PublicationType } from "./PublicationModel";
 
 export interface Page<Type> {
@@ -110,6 +111,7 @@ export enum ApplicableEntityType {
 export interface ScheduledTaskResponse {
     taskId: string;
     executionTime: string;
+    recurrenceType: RecurrenceType;
 }
 
 export enum ScheduledTaskType {
