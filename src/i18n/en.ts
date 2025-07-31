@@ -967,5 +967,6 @@ export default {
     showNonValidatedFilesLabel: "Show with non validated files",
     recurrenceTypeLabel: "Recurrence",
     createNewScheduleHarvestLabel: "Schedule scan",
-    scheduledHarvestsLabel: "Scheduled harvests"
+    scheduledHarvestsLabel: "Scheduled harvests",
+    scheduledBackupsLabel: "Scheduled backups"
 }

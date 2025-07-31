@@ -51,6 +51,17 @@
                             :class="isSummaryReport() ? 'comfortable' : ''">
                         </v-select>
                     </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row justify-center bg-grey-lighten-5">
+                    <v-col cols="12" sm="4" md="3">
+                        <v-select
+                            v-model="selectedRecurrenceType"
+                            :items="recurrenceTypes"
+                            :label="$t('recurrenceTypeLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
                     <v-col cols="12" sm="3" md="1">
                         <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleReportGeneration">
                             {{ $t("scheduleLabel") }}
@@ -80,9 +91,19 @@
                 </v-list>
             </v-row>
 
-            <scheduled-tasks-list :scheduled-tasks="scheduledTasks" @delete="deleteScheduledLoadTask"></scheduled-tasks-list>
+            <scheduled-tasks-list
+                class="mt-10"
+                :scheduled-tasks="scheduledTasks"
+                @delete="deleteScheduledLoadTask">
+            </scheduled-tasks-list>
         </v-tabs-window-item>
         <v-tabs-window-item value="generated">
+            <h2
+                v-if="generatedReports.length === 0"
+                class="d-flex fler-row justify-center mt-10">
+                {{ $t("noDataInTableMessage") }}
+            </h2>
+
             <v-list
                 :lines="false"
                 density="comfortable"
@@ -104,7 +125,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, watch } from 'vue';
+import { computed, defineComponent, onMounted, watch } from 'vue';
 import { ref } from 'vue';
 import CommissionAutocompleteSearch from '@/components/assessment/commission/CommissionAutocompleteSearch.vue';
 import { getReportTypesForGivenLocale } from '@/i18n/reportType';
@@ -119,6 +140,8 @@ import Toast from '@/components/core/Toast.vue';
 import { AxiosError } from 'axios';
 import { ReportType } from '@/models/AssessmentModel';
 import { useInterval } from '@/composables/useInterval';
+import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from '@/i18n/recurrenceType';
+import { RecurrenceType } from '@/models/LoadModel';
 
 
 export default defineComponent({
@@ -146,6 +169,11 @@ export default defineComponent({
         const allGeneratedReports = ref<{name: string, value: number}[]>([]);
 
         const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
+
+        const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
+        const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
+            {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
+        );
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -246,10 +274,11 @@ export default defineComponent({
 
         const scheduleReportGeneration = () => {
             const topLevelInstitutionId = (selectedOUs.value as {title: string, value: number}).value;
+            const timeToRun = new Date(Date.now() + 60 * 60 * 1000).toLocaleString('sv-SE').replace(' ', 'T').slice(0, 19);
             TaskManagerService.scheduleReportGeneration(
-                (new Date(((new Date()).getTime() + 61 * 60 * 1000 ))).toISOString().split(".")[0], selectedReportType.value,
+                timeToRun, selectedReportType.value,
                 selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? (selectedCommissions.value as {title: string, value: number}[]).map(commission => commission.value) : [(selectedCommissions.value as {title: string, value: number}).value],
-                selectedYear.value, topLevelInstitutionId, "sr"
+                selectedYear.value, topLevelInstitutionId, "sr", selectedRecurrenceType.value.value
             )
             .then(() => fetchScheduledTasks())
             .catch((axiosError: AxiosError<ErrorResponse>) => {
@@ -287,7 +316,8 @@ export default defineComponent({
             isFormValid, generatedReports,
             downloadReport, scheduledTasks,
             deleteScheduledLoadTask, message, snackbar,
-            currentTab, allGeneratedReports
+            currentTab, allGeneratedReports,
+            recurrenceTypes, selectedRecurrenceType
         };
     }
 });

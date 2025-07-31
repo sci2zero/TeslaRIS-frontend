@@ -22,7 +22,7 @@
                     v-model="selectedRecurrenceType"
                     :items="recurrenceTypes"
                     :label="$t('recurrenceTypeLabel') + '*'"
-                    :rules="requiredMultiSelectionRules"
+                    :rules="requiredSelectionRules"
                     return-object>
                 </v-select>
             </v-col>
@@ -54,7 +54,7 @@ export default defineComponent({
         );
         const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
 
-        const { requiredMultiSelectionRules } = useValidationUtils();
+        const { requiredSelectionRules } = useValidationUtils();
 
         const submit = () => {
             emit("create", [`${scheduleDate.value.split("T")[0]}T${scheduledTime.value}`, selectedRecurrenceType.value.value])
@@ -65,7 +65,7 @@ export default defineComponent({
             scheduleDate, scheduledTime,
             selectedRecurrenceType,
             recurrenceTypes, submit,
-            requiredMultiSelectionRules
+            requiredSelectionRules
         };
     }
 });

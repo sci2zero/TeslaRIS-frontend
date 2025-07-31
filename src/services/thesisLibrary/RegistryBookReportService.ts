@@ -5,8 +5,8 @@ import axios from "axios";
 
 export class RegistryBookReportService extends BaseService {
 
-    async scheduleReportGeneration(params: string): Promise<AxiosResponse<string>> {
-        return super.sendRequest(axios.post, `registry-book/report/schedule-generation?${params}`);
+    async scheduleReportGeneration(params: string, recurrence: string): Promise<AxiosResponse<string>> {
+        return super.sendRequest(axios.post, `registry-book/report/schedule-generation?${params}&recurrence=${recurrence}`);
     }
 
     async listGeneratedReports(): Promise<AxiosResponse<string[]>> {

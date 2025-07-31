@@ -992,5 +992,6 @@ export default {
     showNonValidatedFilesLabel: "Prikaži sa nevalidiranim fajlovima",
     recurrenceTypeLabel: "Ponavljanje",
     createNewScheduleHarvestLabel: "Zakaži skeniranje",
-    scheduledHarvestsLabel: "Zakazana skeniranja"
+    scheduledHarvestsLabel: "Zakazana skeniranja",
+    scheduledBackupsLabel: "Zakazani bekapi"
 }
