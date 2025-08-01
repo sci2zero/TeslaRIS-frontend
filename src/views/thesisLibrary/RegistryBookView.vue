@@ -18,7 +18,7 @@
                 {{ $t("promotedLabel") }}
             </v-tab>
             <v-tab value="scheduledTasks">
-                {{ $t("scheduledLabel") }}
+                {{ $t("scheduleTasksLabel") }}
             </v-tab>
             <v-tab value="reports">
                 {{ $t("generatedRegistryBooksLabel") }}
@@ -160,6 +160,7 @@
             </v-window-item>
             <v-window-item value="scheduledTasks">
                 <scheduled-tasks-list
+                    class="mt-10"
                     :scheduled-tasks="scheduledTasks"
                     @delete="deleteScheduledTask">
                 </scheduled-tasks-list>
@@ -221,7 +222,8 @@ import lodash, { type DebouncedFunc } from 'lodash';
 import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from '@/i18n/recurrenceType';
 import { RecurrenceType } from '@/models/LoadModel';
 import TaskManagerService from '@/services/TaskManagerService';
-import { ScheduledTaskResponse } from '@/models/Common';
+import { type ScheduledTaskResponse } from '@/models/Common';
+import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -238,7 +240,7 @@ interface EntryTableState {
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
@@ -391,6 +393,7 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("registryBookLabel");
             fetchPromotions();
+            fetchScheduledTasks();
         });
 
         const promotionPreviewRef = ref<typeof PersistentTableDialog>();
@@ -440,6 +443,7 @@ export default defineComponent({
             ).then((response) => {
                 message.value = i18n.t("reportGenerationScheduledMessage", [response.data]);
                 snackbar.value = true;
+                fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;

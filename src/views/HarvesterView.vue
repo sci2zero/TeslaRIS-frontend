@@ -74,10 +74,10 @@
                     <v-tab value="externalSources">
                         {{ $t("externalSourcesLabel") }}
                     </v-tab>
-                    <v-tab v-if="isResearcher" value="files">
+                    <v-tab v-show="isResearcher" value="files">
                         {{ $t("blibliographisFormatFilesLabel") }}
                     </v-tab>
-                    <v-tab v-if="isAdmin || isInstitutionalEditor" value="scheduledHarvests">
+                    <v-tab v-show="isAdmin || isInstitutionalEditor" value="scheduledHarvests">
                         {{ $t("scheduledHarvestsLabel") }}
                     </v-tab>
                 </v-tabs>

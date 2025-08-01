@@ -31,7 +31,7 @@ export class TaskSchedulingService extends BaseService {
     }
 
     async listScheduledRegistryBookGenerationTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
-        return super.sendRequest(axios.get, "scheduled-task/registry-book-generation");
+        return super.sendRequest(axios.get, "scheduled-task/registry-book-report-generation");
     }
 
     async scheduleIndicatorLoadingTask(timestamp: string, source: string): Promise<AxiosResponse<void>> {
