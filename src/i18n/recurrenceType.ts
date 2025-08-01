@@ -4,7 +4,7 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 export const recurrenceTypeSr = [
-    { title: "Jednom", value: RecurrenceType.ONCE },
+    { title: "Bez ponavljanja", value: RecurrenceType.ONCE },
     { title: "Dnevno", value: RecurrenceType.DAILY },
     { title: "Nedeljno", value: RecurrenceType.WEEKLY },
     { title: "Mesečno", value: RecurrenceType.MONTHLY },
@@ -13,7 +13,7 @@ export const recurrenceTypeSr = [
 ];
 
 export const recurrenceTypeEn = [
-    { title: "Once", value: RecurrenceType.ONCE },
+    { title: "No recurrence", value: RecurrenceType.ONCE },
     { title: "Daily", value: RecurrenceType.DAILY },
     { title: "Weekly", value: RecurrenceType.WEEKLY },
     { title: "Monthly", value: RecurrenceType.MONTHLY },
