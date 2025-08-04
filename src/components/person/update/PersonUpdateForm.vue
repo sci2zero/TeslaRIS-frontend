@@ -57,6 +57,11 @@
                         <v-text-field v-model="openAlex" label="Open Alex ID" placeholder="Open Alex ID" :rules="personOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="webOfScienceId" label="ResearcherID (WoS)" placeholder="ResearcherID (WoS)" :rules="personWebOfScienceIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
                 <h3>{{ $t('contactLabel') }}</h3>
                 <v-row>
                     <v-col>
@@ -197,6 +202,7 @@ export default defineComponent({
         const apvnt = ref(props.presetPerson?.personalInfo.apvnt);
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
         const openAlex = ref(props.presetPerson?.personalInfo.openAlexId);
+        const webOfScienceId = ref(props.presetPerson?.personalInfo.webOfScienceId);
 
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>();
@@ -216,7 +222,8 @@ export default defineComponent({
         const {
             apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, personOpenAlexIdValidationRules,
-            orcidValidationRules, scopusAuthorIdValidationRules
+            orcidValidationRules, scopusAuthorIdValidationRules,
+            personWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -227,7 +234,9 @@ export default defineComponent({
                         { value: scopus.value as string, error: "scopusIdExistsError" },
                         { value: apvnt.value as string, error: "apvntExistsError" },
                         { value: eCrisId.value as string, error: "eCrisIdExistsError" },
-                        { value: orcid.value as string, error: "orcidIdExistsError" }
+                        { value: orcid.value as string, error: "orcidIdExistsError" },
+                        { value: openAlex.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError" }
                     ],
                     props.presetPerson?.id as number,
                     (id, docId) => PersonService.checkIdentifierUsage(id, docId)
@@ -257,6 +266,7 @@ export default defineComponent({
                 },
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
+                webOfScienceId: webOfScienceId.value,
                 uris: uris.value,
                 displayTitle: displayTitle.value
             };
@@ -287,6 +297,7 @@ export default defineComponent({
             apvnt.value = props.presetPerson?.personalInfo.apvnt;
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
             openAlex.value = props.presetPerson?.personalInfo.openAlexId;
+            webOfScienceId.value = props.presetPerson?.personalInfo.webOfScienceId;
             urisRef.value?.refreshModelValue(uris.value);
 
             cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
@@ -301,7 +312,8 @@ export default defineComponent({
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
             streetAndNumberRef, refreshForm, uris, urisRef, displayTitle,
-            personOpenAlexIdValidationRules, openAlex
+            personOpenAlexIdValidationRules, openAlex, webOfScienceId,
+            personWebOfScienceIdValidationRules
         };
     }
 });

@@ -106,6 +106,13 @@
                                         {{ $t("notYetSetMessage") }}
                                     </span>
                                 </div>
+                                <div>ResearcherID (WoS):</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.webOfScienceId" :identifier="personalInfo.webOfScienceId" type="researcher_id"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber">

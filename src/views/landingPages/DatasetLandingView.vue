@@ -92,6 +92,12 @@
                                 <div v-if="dataset?.openAlexId" class="response">
                                     <identifier-link :identifier="dataset.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="dataset?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="dataset?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="dataset.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="dataset?.uris && dataset?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -387,6 +393,7 @@ export default defineComponent({
             dataset.value!.publisherId = basicInfo.publisherId;
             dataset.value!.internalNumber = basicInfo.internalNumber;
             dataset.value!.openAlexId = basicInfo.openAlexId;
+            dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };

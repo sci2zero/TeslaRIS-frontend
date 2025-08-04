@@ -34,6 +34,24 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID" 
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <uri-input ref="urisRef" v-model="uris"></uri-input>
             </v-col>
@@ -128,12 +146,14 @@ export default defineComponent({
         const publicationYear = ref(props.presetSoftware?.documentDate);
         const doi = ref(props.presetSoftware?.doi);
         const openAlexId = ref(props.presetSoftware?.openAlexId);
+        const webOfScienceId = ref(props.presetSoftware?.webOfScienceId);
         const softwareNumber = ref(props.presetSoftware?.internalNumber);
         const uris = ref<string[]>(props.presetSoftware?.uris as string[]);
 
         const {
             requiredFieldRules, doiValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -141,7 +161,8 @@ export default defineComponent({
                 const { duplicateFound } = await checkIdentifiers(
                     [
                         { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                     ],
                     props.presetSoftware?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -163,6 +184,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -183,6 +205,7 @@ export default defineComponent({
             publicationYear.value = props.presetSoftware?.documentDate;
             doi.value = props.presetSoftware?.doi;
             openAlexId.value = props.presetSoftware?.openAlexId;
+            webOfScienceId.value = props.presetSoftware?.webOfScienceId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -199,7 +222,8 @@ export default defineComponent({
             submit, toMultilingualTextInput,
             languageTags, doiValidationRules,
             refreshForm, urisRef, subtitleRef,
-            openAlexId, workOpenAlexIdValidationRules
+            openAlexId, workOpenAlexIdValidationRules,
+            webOfScienceId, documentWebOfScienceIdValidationRules
         };
     }
 });

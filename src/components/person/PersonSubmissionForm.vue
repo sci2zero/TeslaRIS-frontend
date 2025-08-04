@@ -161,6 +161,16 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="webOfScienceId"
+                                    label="ReearcherID (WoS)"
+                                    placeholder="ResearcherID (WoS)"
+                                    :rules="personWebOfScienceIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12">
                                 <multilingual-text-input
                                     v-model="displayTitle"
                                     :label="$t('displayTitleLabel')">
@@ -268,13 +278,15 @@ export default defineComponent({
         const apvnt = ref("");
         const scopus = ref("");
         const openAlex = ref("");
+        const webOfScienceId = ref("");
         const displayTitle = ref([]);
 
         const { 
             requiredFieldRules, requiredSelectionRules,
             apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules, personOpenAlexIdValidationRules
+            scopusAuthorIdValidationRules, personOpenAlexIdValidationRules,
+            personWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
@@ -298,6 +310,7 @@ export default defineComponent({
                 orcid: orcid.value,
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
+                webOfScienceId: webOfScienceId.value,
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
@@ -324,6 +337,7 @@ export default defineComponent({
                     orcid.value = "";
                     scopus.value = "";
                     openAlex.value = "";
+                    webOfScienceId.value = "";
                     selectedSex.value = selectionPlaceholder;
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
@@ -346,7 +360,8 @@ export default defineComponent({
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules, loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules
+            scopusAuthorIdValidationRules, loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
+            personWebOfScienceIdValidationRules, webOfScienceId
         };
     }
 });

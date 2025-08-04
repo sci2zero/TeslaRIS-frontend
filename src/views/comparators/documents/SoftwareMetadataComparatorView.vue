@@ -178,6 +178,8 @@ export default defineComponent({
             software2.doi = "";
             software1.openAlexId = software2.openAlexId;
             software2.openAlexId = "";
+            software1.webOfScienceId = software2.webOfScienceId;
+            software2.webOfScienceId = "";
             software1.scopusId = software2.scopusId;
             software2.scopusId = "";
             software1.documentDate = software2.documentDate;
@@ -237,6 +239,7 @@ export default defineComponent({
             leftSoftware.value!.publisherId = updatedInfo.publisherId;
             leftSoftware.value!.scopusId = updatedInfo.scopusId;
             leftSoftware.value!.openAlexId = updatedInfo.openAlexId;
+            leftSoftware.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -257,6 +260,7 @@ export default defineComponent({
             rightSoftware.value!.publisherId = updatedInfo.publisherId;
             rightSoftware.value!.scopusId = updatedInfo.scopusId;
             rightSoftware.value!.openAlexId = updatedInfo.openAlexId;
+            rightSoftware.value!.webOfScienceId = updatedInfo.webOfScienceId;
                         
             if (update.value) {
                 rightUpdateComplete.value = true;

@@ -91,6 +91,12 @@
                                 <div v-if="software?.openAlexId" class="response">
                                     <identifier-link :identifier="software.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="software?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="software?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="software.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="software?.uris && software?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -396,6 +402,7 @@ export default defineComponent({
             software.value!.publisherId = basicInfo.publisherId;
             software.value!.internalNumber = basicInfo.internalNumber;
             software.value!.openAlexId = basicInfo.openAlexId;
+            software.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };

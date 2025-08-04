@@ -265,6 +265,8 @@ export default defineComponent({
             person2.scopusAuthorId = "";
             person1.openAlexId = person2.openAlexId;
             person2.openAlexId = "";
+            person1.webOfScienceId = person2.webOfScienceId;
+            person2.webOfScienceId = "";
             person1.contact.contactEmail = person2.contact.contactEmail;
             person2.contact.contactEmail = "";
             person1.contact.phoneNumber = person2.contact.phoneNumber;

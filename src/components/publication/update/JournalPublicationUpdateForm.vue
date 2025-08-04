@@ -49,12 +49,20 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="5">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -183,6 +191,7 @@ export default defineComponent({
         const publicationYear = ref(props.presetJournalPublication?.documentDate);
         const doi = ref(props.presetJournalPublication?.doi);
         const openAlexId = ref(props.presetJournalPublication?.openAlexId);
+        const webOfScienceId = ref(props.presetJournalPublication?.webOfScienceId);
         const scopus = ref(props.presetJournalPublication?.scopusId);
         const articleNumber = ref(props.presetJournalPublication?.articleNumber);
         const numberOfPages = ref(props.presetJournalPublication?.numberOfPages);
@@ -190,7 +199,8 @@ export default defineComponent({
 
         const {
             requiredFieldRules, doiValidationRules,
-            scopusIdValidationRules, workOpenAlexIdValidationRules
+            scopusIdValidationRules, workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
         
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -202,7 +212,8 @@ export default defineComponent({
                     [
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: scopus.value as string, error: "scopusIdExistsError"},
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                     ],
                     props.presetJournalPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -230,6 +241,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 journalId: selectedJournal.value.value,
                 eventId: selectedEvent.value.value,
                 journalPublicationType: selectedpublicationType.value.value as JournalPublicationType,
@@ -255,11 +267,11 @@ export default defineComponent({
             doi.value = props.presetJournalPublication?.doi;
             scopus.value = props.presetJournalPublication?.scopusId;
             openAlexId.value = props.presetJournalPublication?.openAlexId;
+            webOfScienceId.value = props.presetJournalPublication?.webOfScienceId;
             articleNumber.value = props.presetJournalPublication?.articleNumber;
             volume.value = props.presetJournalPublication?.volume;
             issue.value = props.presetJournalPublication?.issue;
             selectedpublicationType.value = {title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType ? props.presetJournalPublication?.journalPublicationType as JournalPublicationType : null};
-
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -280,7 +292,8 @@ export default defineComponent({
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
             refreshForm, urisRef, message, snackbar,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules, webOfScienceId,
+            documentWebOfScienceIdValidationRules
         };
     }
 });

@@ -143,7 +143,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
+                        <v-col cols="4">
                             <v-text-field
                                 v-model="scopus"
                                 label="Scopus ID"
@@ -151,12 +151,20 @@
                                 :rules="scopusIdValidationRules">
                             </v-text-field>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="4">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
                                 :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
                             </v-text-field>
                         </v-col>
                     </v-row>
@@ -345,6 +353,7 @@ export default defineComponent({
         const number = ref("");
         const volume = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
 
         const setPublicationYear = (date: string) => {
             const year = /\d{4}/.exec(date);
@@ -355,7 +364,8 @@ export default defineComponent({
 
         const { 
             requiredFieldRules, requiredSelectionRules, doiValidationRules,
-            isbnValidationRules, scopusIdValidationRules, workOpenAlexIdValidationRules
+            isbnValidationRules, scopusIdValidationRules, workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -402,6 +412,7 @@ export default defineComponent({
                 publicationSeriesId: publicationSeriesId as number,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 monographType: selectedMonographType.value.value as MonographType,
                 number: number.value,
                 volume: volume.value,
@@ -425,6 +436,7 @@ export default defineComponent({
                     doi.value = "";
                     scopus.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     numberOfPages.value = null;
                     selectedResearchArea.value = { title: "", value: null };
                     selectedMonographType.value = { title: "", value: null };
@@ -486,7 +498,8 @@ export default defineComponent({
             selectedResearchArea, toMultilingualTextInput,
             languageTags, contributionsRef, contributions,
             isbnValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules, popuateMetadata
+            workOpenAlexIdValidationRules, popuateMetadata,
+            documentWebOfScienceIdValidationRules, webOfScienceId
         };
     }
 });

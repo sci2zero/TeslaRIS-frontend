@@ -124,7 +124,6 @@
           model = 'aurora-sdg-multi';
         }
         var canvas = document.createElement('canvas')
-        console.log(height)
         div.style.maxWidth = height + 'px'
         canvas.height = height;
         canvas.width = height;

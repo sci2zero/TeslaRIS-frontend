@@ -85,6 +85,7 @@ export interface Document {
     doi?: string;
     scopusId?: string;
     openAlexId?: string;
+    webOfScienceId?: string;
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;

@@ -16,6 +16,8 @@ export const useValidationUtils = () => {
     const invalidScopusAuthorIdMessage = computed(() => i18n.t("scopusAuthorIdFormatError"));
     const invalidScopusAfidMessage = computed(() => i18n.t("scopusAfidFormatError"));
     const invalidOpenAlexIdMessage = computed(() => i18n.t("openAlexIdFormatError"));
+    const invalidWebOfScienceIdMessage = computed(() => i18n.t("webOfScienceIdFormatError"));
+    const invalidWebOfScienceResearcherIdMessage = computed(() => i18n.t("webOfScienceResearcherIdFormatError"));
     const invalidRorMessage = computed(() => i18n.t("invalidRorMessage"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
@@ -188,6 +190,24 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const personWebOfScienceIdPattern = /^[A-Z]{3}-\d{4}-\d{4}$/i;
+    const personWebOfScienceIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (personWebOfScienceIdPattern.test(value)) return true;
+            return invalidWebOfScienceResearcherIdMessage.value;
+        }
+    ];
+
+    const documentWebOfScienceIdPattern = /^\d{15}$/i;
+    const documentWebOfScienceIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (documentWebOfScienceIdPattern.test(value)) return true;
+            return invalidWebOfScienceIdMessage.value;
+        }
+    ];
+
     const institutionOpenAlexIdPattern = /^I\d{4,10}$/i;
     const institutionOpenAlexIdValidationRules = [
         (value: string) => {
@@ -334,6 +354,7 @@ export const useValidationUtils = () => {
         requiredStringSelectionRules, requiredNumericGreaterThanZeroFieldRules,
         atLeastOneRequiredRule, atLeastOneTrueRule, personOpenAlexIdValidationRules,
         institutionOpenAlexIdValidationRules, sourceOpenAlexIdValidationRules,
-        rorValidationRules, workOpenAlexIdValidationRules, udcValidationRules
+        rorValidationRules, workOpenAlexIdValidationRules, udcValidationRules,
+        personWebOfScienceIdValidationRules, documentWebOfScienceIdValidationRules
     };
 };

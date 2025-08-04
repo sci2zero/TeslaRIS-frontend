@@ -140,12 +140,20 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="6">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
                                 :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
                             </v-text-field>
                         </v-col>
                     </v-row>
@@ -403,6 +411,7 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const numberOfPages = ref<number|null>();
         const numberOfChapters = ref<number|null>();
         const numberOfReferences = ref<number|null>();
@@ -428,7 +437,8 @@ export default defineComponent({
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, workOpenAlexIdValidationRules,
-            isbnValidationRules, udcValidationRules
+            isbnValidationRules, udcValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
@@ -454,6 +464,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 scientificArea: scientificArea.value,
                 scientificSubArea: scientificSubArea.value,
@@ -481,6 +492,7 @@ export default defineComponent({
                     publicationYear.value = "";
                     doi.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     numberOfPages.value = null;
                     numberOfChapters.value = null;
                     numberOfReferences.value = null;
@@ -556,7 +568,7 @@ export default defineComponent({
             numberOfIllustrations, numberOfTables, numberOfAppendices,
             scientificArea, eIsbn, printIsbn, isbnValidationRules,
             udcValidationRules, placeOfKeep, udc, scientificSubArea,
-            typeOfTitle
+            typeOfTitle, documentWebOfScienceIdValidationRules, webOfScienceId
         };
     }
 });

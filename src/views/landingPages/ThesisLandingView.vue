@@ -154,6 +154,12 @@
                                 <div v-if="thesis?.openAlexId" class="response">
                                     <identifier-link :identifier="thesis.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="thesis?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="thesis?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="thesis.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="thesis?.udc">
                                     {{ $t("udcLabel") }}:
                                 </div>
@@ -732,6 +738,7 @@ export default defineComponent({
             thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
             thesis.value!.thesisType = basicInfo.thesisType;
             thesis.value!.openAlexId = basicInfo.openAlexId;
+            thesis.value!.webOfScienceId = basicInfo.webOfScienceId;
             thesis.value!.scientificArea = basicInfo.scientificArea;
             thesis.value!.scientificSubArea = basicInfo.scientificSubArea;
             thesis.value!.eisbn = basicInfo.eisbn;

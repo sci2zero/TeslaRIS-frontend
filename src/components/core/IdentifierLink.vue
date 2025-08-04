@@ -45,6 +45,10 @@ export default defineComponent({
                     return "https://openalex.org/";
                 case "ror":
                     return "https://ror.org/";
+                case "researcher_id":
+                    return "https://www.webofscience.com/wos/author/record/";
+                case "web_of_science":
+                    return "https://www.webofscience.com/wos/woscc/full-record/WOS:";
             }
 
             return "https://doi.org/";

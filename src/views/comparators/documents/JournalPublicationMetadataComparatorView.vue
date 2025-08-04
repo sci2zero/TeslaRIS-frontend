@@ -191,6 +191,8 @@ export default defineComponent({
             journalPublication2.issue = "";
             journalPublication1.openAlexId = journalPublication2.openAlexId;
             journalPublication2.openAlexId = "";
+            journalPublication1.webOfScienceId = journalPublication2.webOfScienceId;
+            journalPublication2.webOfScienceId = "";
 
             journalPublication1.eventId = journalPublication2.eventId;
             journalPublication1.journalId = journalPublication2.journalId;
@@ -253,6 +255,7 @@ export default defineComponent({
             leftJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             leftJournalPublication.value!.scopusId = updatedInfo.scopusId;
             leftJournalPublication.value!.openAlexId = updatedInfo.openAlexId;
+            leftJournalPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -279,6 +282,7 @@ export default defineComponent({
             rightJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             rightJournalPublication.value!.scopusId = updatedInfo.scopusId;
             rightJournalPublication.value!.openAlexId = updatedInfo.openAlexId;
+            rightJournalPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

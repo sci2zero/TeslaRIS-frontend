@@ -180,6 +180,8 @@ export default defineComponent({
             dataset2.scopusId = "";
             dataset1.openAlexId = dataset2.openAlexId;
             dataset2.openAlexId = "";
+            dataset1.webOfScienceId = dataset2.webOfScienceId;
+            dataset2.webOfScienceId = "";
             dataset1.documentDate = dataset2.documentDate;
 
             dataset1.eventId = dataset2.eventId;
@@ -237,6 +239,7 @@ export default defineComponent({
             leftDataset.value!.publisherId = updatedInfo.publisherId;
             leftDataset.value!.scopusId = updatedInfo.scopusId;
             leftDataset.value!.openAlexId = updatedInfo.openAlexId;
+            leftDataset.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -257,6 +260,7 @@ export default defineComponent({
             rightDataset.value!.publisherId = updatedInfo.publisherId;
             rightDataset.value!.scopusId = updatedInfo.scopusId;
             rightDataset.value!.openAlexId = updatedInfo.openAlexId;
+            rightDataset.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

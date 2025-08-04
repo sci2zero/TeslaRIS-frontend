@@ -112,6 +112,12 @@
                                 <div v-if="monographPublication?.openAlexId" class="response">
                                     <identifier-link :identifier="monographPublication.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="monographPublication?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="monographPublication?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="monographPublication.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="monographPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
@@ -436,6 +442,7 @@ export default defineComponent({
             monographPublication.value!.articleNumber = basicInfo.articleNumber;
             monographPublication.value!.monographPublicationType = basicInfo.monographPublicationType;
             monographPublication.value!.openAlexId = basicInfo.openAlexId;
+            monographPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };

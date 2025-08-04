@@ -79,7 +79,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="10">
+                        <v-col cols="5">
                             <v-text-field
                                 v-model="scopus"
                                 label="Scopus ID"
@@ -93,6 +93,16 @@
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
                                 :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
                             </v-text-field>
                         </v-col>
                     </v-row>
@@ -227,6 +237,7 @@ export default defineComponent({
         const doi = ref("");
         const scopus = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const publicationSeriesVolume = ref("");
         const publicationSeriesIssue = ref("");
 
@@ -240,7 +251,8 @@ export default defineComponent({
         const {
             requiredFieldRules, doiValidationRules,
             isbnValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -276,6 +288,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 eISBN: eIsbn.value,
                 eventId: selectedEvent.value?.value,
                 languageTagIds: selectedLanguages.value,
@@ -306,6 +319,7 @@ export default defineComponent({
                     doi.value = "";
                     scopus.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     numberOfPages.value = null;
                     eIsbn.value = "";
                     printIsbn.value = "";
@@ -354,7 +368,8 @@ export default defineComponent({
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submit,
-            scopusIdValidationRules, workOpenAlexIdValidationRules
+            scopusIdValidationRules, workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules, webOfScienceId
         };
     }
 });

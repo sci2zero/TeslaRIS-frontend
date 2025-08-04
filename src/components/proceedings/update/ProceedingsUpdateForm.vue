@@ -66,12 +66,20 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="6">
                         <v-text-field
                             v-model="openAlexId"
                             label="Open Alex ID"
                             placeholder="Open Alex ID"
                             :rules="workOpenAlexIdValidationRules">
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field
+                            v-model="webOfScienceId"
+                            label="Web of Science ID"
+                            placeholder="Web of Science ID"
+                            :rules="documentWebOfScienceIdValidationRules">
                         </v-text-field>
                     </v-col>
                 </v-row>
@@ -224,6 +232,7 @@ export default defineComponent({
         const publicationYear = ref(props.presetProceedings?.documentDate);
         const doi = ref(props.presetProceedings?.doi);
         const openAlexId = ref(props.presetProceedings?.openAlexId);
+        const webOfScienceId = ref(props.presetProceedings?.webOfScienceId);
         const scopus = ref(props.presetProceedings?.scopusId);
         const publicationSeriesVolume = ref(props.presetProceedings?.publicationSeriesVolume);
         const publicationSeriesIssue = ref(props.presetProceedings?.publicationSeriesIssue);
@@ -231,7 +240,8 @@ export default defineComponent({
         const {
             requiredFieldRules, doiValidationRules,
             isbnValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -254,7 +264,8 @@ export default defineComponent({
                     { value: eIsbn.value, error: "eisbnExistsError" },
                     { value: printIsbn.value, error: "printIsbnExistsError" },
                     { value: doi.value, error: "doiExistsError" },
-                    { value: scopus.value, error: "scopusIdExistsError" }
+                    { value: scopus.value, error: "scopusIdExistsError" },
+                    { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                 ].filter(id => id.value);
 
                 const results = await Promise.all(
@@ -289,6 +300,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 eISBN: eIsbn.value,
                 eventId: selectedEvent.value?.value,
                 languageTagIds: selectedLanguages.value,
@@ -321,6 +333,7 @@ export default defineComponent({
             publicationYear.value = props.presetProceedings?.documentDate;
             doi.value = props.presetProceedings?.doi;
             openAlexId.value = props.presetProceedings?.openAlexId;
+            webOfScienceId.value = props.presetProceedings?.webOfScienceId;
             scopus.value = props.presetProceedings?.scopusId;
             publicationSeriesVolume.value = props.presetProceedings?.publicationSeriesVolume;
             publicationSeriesIssue.value = props.presetProceedings?.publicationSeriesIssue;
@@ -338,10 +351,10 @@ export default defineComponent({
             languageTags, publicationYear, doi, scopus, numberOfPages,
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
             selectedPublisher, selectedBookSeries, doiValidationRules,
-            requiredFieldRules, validatePublicationSeriesSelection, 
+            requiredFieldRules, validatePublicationSeriesSelection, webOfScienceId,
             publicationSeriesExternalValidation, submit, snackbar, message,
             scopusIdValidationRules, refreshForm, titleRef, subtitleRef,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules, documentWebOfScienceIdValidationRules
         };
     }
 });

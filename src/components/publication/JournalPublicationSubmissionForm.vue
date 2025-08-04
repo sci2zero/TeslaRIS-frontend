@@ -59,8 +59,16 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="5">
                         <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field
+                            v-model="webOfScienceId"
+                            label="Web of Science ID"
+                            placeholder="Web of Science ID"
+                            :rules="documentWebOfScienceIdValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -208,6 +216,7 @@ export default defineComponent({
         const doi = ref("");
         const scopus = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const articleNumber = ref("");
         const numberOfPages = ref();
         const uris = ref<string[]>([]);
@@ -217,7 +226,8 @@ export default defineComponent({
 
         const {
             requiredFieldRules, doiValidationRules,
-            scopusIdValidationRules, workOpenAlexIdValidationRules
+            scopusIdValidationRules, workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -285,6 +295,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 doi: doi.value,
                 fileItems: [],
                 proofs: []
@@ -307,6 +318,7 @@ export default defineComponent({
                     doi.value = "";
                     scopus.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
@@ -338,7 +350,8 @@ export default defineComponent({
             publicationTypes, selectedpublicationType, listPublications,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, submitJournalPublication, errorMessage,
-            popuateMetadata, PublicationType
+            popuateMetadata, PublicationType, documentWebOfScienceIdValidationRules,
+            webOfScienceId
         };
     }
 });
