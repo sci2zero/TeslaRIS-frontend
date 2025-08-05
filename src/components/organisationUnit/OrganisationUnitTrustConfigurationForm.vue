@@ -27,7 +27,7 @@ import type { OrganisationUnitTrustConfiguration } from '@/models/OrganisationUn
 
 
 export default defineComponent({
-    name: "ExternalIndicatorConfigurationForm",
+    name: "OrganisationUnitTrustConfigurationForm",
     props: {
         institutionId: {
             type: Number,

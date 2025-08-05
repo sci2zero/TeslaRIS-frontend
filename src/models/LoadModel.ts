@@ -12,6 +12,7 @@ interface DocumentLoadDTO {
     doi: string;
     scopusId: string;
     openAlexId: string;
+    webOfScienceId: string;
     eventId: number | null;
 }
 
@@ -66,6 +67,7 @@ export interface PersonLoad {
     orcid: string;
     scopusAuthorId: string;
     openAlexId: string;
+    webOfScienceId: string;
     importId: string;
 }
 

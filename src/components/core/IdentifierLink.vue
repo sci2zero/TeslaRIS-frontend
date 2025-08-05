@@ -46,9 +46,9 @@ export default defineComponent({
                 case "ror":
                     return "https://ror.org/";
                 case "researcher_id":
-                    return "https://www.webofscience.com/wos/author/record/";
+                    return "http://www.researcherid.com/rid/";
                 case "web_of_science":
-                    return "https://www.webofscience.com/wos/woscc/full-record/WOS:";
+                    return "https://www.webofscience.com/api/gateway?GWVersion=2&SrcApp=teslaris&SrcAuth=WosAPI&DestLinkType=FullRecord&DestApp=WOS_CPL&KeyUT=WOS:";
             }
 
             return "https://doi.org/";

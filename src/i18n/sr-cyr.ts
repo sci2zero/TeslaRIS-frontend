@@ -34,7 +34,7 @@ export default {
     scopusIdExistsError: "Scopus ID је већ у употреби.",
     confIdFormatError: "Погрешан формат Conf ID-а.",
     confIdExistsError: "Conf ID је већ у употреби.",
-    setupIdentifiersMessage: "Да бисте скенирали екстерне изворе података, морате унети ваш Scopus ID, OpenAlex ID или Researcher ID у профилу истраживача.",
+    setupIdentifiersMessage: "Да бисте скенирали екстерне изворе података, морате унети ваш Scopus ID, OpenAlex ID или Researcher ID у профилу истраживача. Уколико сте унели идентификаторе а идаље видите ову поруку, институционални уредник је онемогућио скенирање.",
     emailInUseMessage: "Email {0} је већ у употреби.",
     if2ValueLabel: "IF2 број",
     if5ValueLabel: "IF5 број",

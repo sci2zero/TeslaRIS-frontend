@@ -543,7 +543,7 @@ export default {
     cancelLabel: "Odustani",
     continueLabel: "Nastavi",
     areYouSureLabel: "Da li ste sigurni?",
-    setupIdentifiersMessage: "Da biste skenirali eksterne izvore podataka, morate uneti vaš ScopusID, OpenAlexID ili ResearcherID u profilu istraživača.",
+    setupIdentifiersMessage: "Da biste skenirali eksterne izvore podataka, morate uneti vaš ScopusID, OpenAlexID ili ResearcherID u profilu istraživača. Ukoliko ste uneli identifikatore a idalje vidite ovu poruku, institucionalni urednik je onemogućio skeniranje.",
     selectAssociateFromSystemLabel: "Selektuj iz sistema",
     addExternalAssociateLabel: "Dodaj spoljnog saradnika",
     migrateToUnmanagedResearcherLabel: "Prebaci u spoljnog saradnika",
@@ -986,7 +986,7 @@ export default {
     shareLabel: "Podeli preko",
     trustNewPublicationsLabel: "Potrebna je validacija novih publikacija",
     trustNewDocumentFilesLabel: "Potrebna je validacija novih otpremljenih dokumenata",
-    updateOrganisationUnitTruestConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete",
+    updateOrganisationUnitTrustConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete",
     validateMetadataLabel: "Validiraj metapodatke",
     validateUploadedFilesLabel: "Validiraj otpremljene fajlove",
     validationSuccessNotification: "Validacija uspešna za publikaciju '{name}'.",
@@ -996,5 +996,8 @@ export default {
     recurrenceTypeLabel: "Ponavljanje",
     createNewScheduleHarvestLabel: "Zakaži skeniranje",
     scheduledHarvestsLabel: "Zakazana skeniranja",
-    scheduledBackupsLabel: "Zakazani bekapi"
+    scheduledBackupsLabel: "Zakazani bekapi",
+    harvestDisabledMessage: "Skeniranje izvora je onemogućeno.",
+    updateOrganisationUnitImportSourceLabel: "Izvori podataka",
+    notMyPublicationLabel: "Nije moj rad"
 }

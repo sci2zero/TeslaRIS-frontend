@@ -73,6 +73,14 @@
                                         {{ returnCurrentLocaleContent(proceedings?.title) }}
                                     </localized-link>
                                 </div>
+                                <div v-if="proceedingsPublication?.documentDate">
+                                    {{ $t("yearOfPublicationLabel") }}:
+                                </div>
+                                <div v-if="proceedingsPublication?.documentDate" class="response">
+                                    {{ localiseDate(proceedingsPublication.documentDate) }}
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
                                 <div v-if="proceedingsPublication?.startPage">
                                     {{ $t("startPageLabel") }}:
                                 </div>
@@ -85,14 +93,12 @@
                                 <div v-if="proceedingsPublication?.endPage" class="response">
                                     {{ proceedingsPublication.endPage }}
                                 </div>
-                                <div v-if="proceedingsPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                <div v-if="proceedingsPublication?.numberOfPages">
+                                    {{ $t("numberOfPagesLabel") }}:
                                 </div>
-                                <div v-if="proceedingsPublication?.documentDate" class="response">
-                                    {{ localiseDate(proceedingsPublication.documentDate) }}
+                                <div v-if="proceedingsPublication?.numberOfPages" class="response">
+                                    {{ proceedingsPublication.numberOfPages }}
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
                                 <div v-if="proceedingsPublication?.scopusId">
                                     Scopus ID:
                                 </div>
@@ -122,12 +128,6 @@
                                 </div>
                                 <div v-if="proceedingsPublication?.articleNumber" class="response">
                                     {{ proceedingsPublication.articleNumber }}
-                                </div>
-                                <div v-if="proceedingsPublication?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.numberOfPages" class="response">
-                                    {{ proceedingsPublication.numberOfPages }}
                                 </div>
                                 <div v-if="proceedingsPublication?.uris && proceedingsPublication?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:

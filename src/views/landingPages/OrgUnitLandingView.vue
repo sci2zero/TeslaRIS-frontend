@@ -163,8 +163,19 @@
                     class="ml-2"
                     :form-component="OrganisationUnitTrustConfigurationForm"
                     :form-props="{ institutionId: organisationUnit?.id }"
-                    entity-name="OrganisationUnitTruestConfiguration"
-                    is-update compact wide
+                    entity-name="OrganisationUnitTrustConfiguration"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="updateSuccess()"
+                />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="OrganisationUnitImportSourceForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="OrganisationUnitImportSource"
+                    is-update compact
                     primary-color outlined
                     :read-only="!canEdit"
                     @update="updateSuccess()"
@@ -393,6 +404,7 @@ import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewCont
 import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
 import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
 import OrganisationUnitTrustConfigurationForm from '@/components/organisationUnit/OrganisationUnitTrustConfigurationForm.vue';
+import OrganisationUnitImportSourceForm from '@/components/organisationUnit/OrganisationUnitImportSourceForm.vue';
 
 
 export default defineComponent({
@@ -770,7 +782,8 @@ export default defineComponent({
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
             fetchPublicReviewPageContent,
-            OrganisationUnitTrustConfigurationForm
+            OrganisationUnitTrustConfigurationForm,
+            OrganisationUnitImportSourceForm
         };
 }})
 

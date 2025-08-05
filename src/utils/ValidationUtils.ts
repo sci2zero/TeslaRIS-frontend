@@ -190,7 +190,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const personWebOfScienceIdPattern = /^[A-Z]{3}-\d{4}-\d{4}$/i;
+    const personWebOfScienceIdPattern = /^[A-Z]{1,3}-\d{4}-\d{4}$/i;
     const personWebOfScienceIdValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;

@@ -59,8 +59,8 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.get, `load/load-wizard${institutionId ? "?institutionId=" + institutionId : ""}`);
     }
 
-    async skipWizard(institutionId: number | null = null): Promise<AxiosResponse<void>> {
-          return super.sendRequest(axios.patch, `load/skip${institutionId ? "?institutionId=" + institutionId : ""}`);
+    async skipWizard(institutionId: number | null = null, removeFromRecord: boolean = false): Promise<AxiosResponse<void>> {
+          return super.sendRequest(axios.patch, `load/skip?removeFromRecord=${removeFromRecord}${institutionId ? "&institutionId=" + institutionId : ""}`);
     }
 
     async prepareOldDocumentForOverwriting(oldDocumentId: number, institutionId: number | null = null): Promise<AxiosResponse<void>> {

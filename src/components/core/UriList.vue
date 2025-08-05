@@ -5,7 +5,7 @@
             class="no-uppercase m-0 p-0 h-auto semi-transparent text-h6"
             :href="uri"
             target="_blank">
-            {{ uri }}
+            {{ truncateUri(uri) }}
         </v-btn>
     </div>
 </template>
@@ -23,6 +23,16 @@ export default defineComponent({
             required: true,
         }
     },
+    setup() {
+        const truncateUri = (uri: string) => {
+            const maxLength = 50;
+            return uri.length > maxLength ? uri.slice(0, maxLength) + '…' : uri;
+        };
+
+        return {
+            truncateUri
+        };
+    }
 });
 </script>
 

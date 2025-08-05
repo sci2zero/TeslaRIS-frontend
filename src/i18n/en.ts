@@ -544,7 +544,7 @@ export default {
     cancelLabel: "Cancel",
     continueLabel: "Proceed",
     areYouSureLabel: "Are you sure?",
-    setupIdentifiersMessage: "In order to scan external data sources, you have to set up your ScopusID, OpenAlexID or ResearcherID in your researcher profile.",
+    setupIdentifiersMessage: "In order to scan external data sources, you have to set up your ScopusID, OpenAlexID or ResearcherID in your researcher profile. If identifers are set, and you still see this message, institutional editor disabled source scanning.",
     selectAssociateFromSystemLabel: "Select from system",
     addExternalAssociateLabel: "Add external associate",
     migrateToUnmanagedResearcherLabel: "Migrate to external associate",
@@ -961,7 +961,7 @@ export default {
     shareLabel: "Share via",
     trustNewPublicationsLabel: "Validation is needed for new publications",
     trustNewDocumentFilesLabel: "Validation is needed for new uploaded documents",
-    updateOrganisationUnitTruestConfigurationLabel: "Update trust level configuration for new entities",
+    updateOrganisationUnitTrustConfigurationLabel: "Update trust level configuration for new entities",
     validateMetadataLabel: "Validate metadata",
     validateUploadedFilesLabel: "Validate uploaded files",
     validationSuccessNotification: "Validation successfull for publication '{name}'.",
@@ -971,5 +971,8 @@ export default {
     recurrenceTypeLabel: "Recurrence",
     createNewScheduleHarvestLabel: "Schedule scan",
     scheduledHarvestsLabel: "Scheduled harvests",
-    scheduledBackupsLabel: "Scheduled backups"
+    scheduledBackupsLabel: "Scheduled backups",
+    harvestDisabledMessage: "Source scanning is disabled.",
+    updateOrganisationUnitImportSourceLabel: "Data sources",
+    notMyPublicationLabel: "Not my publication"
 }

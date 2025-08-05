@@ -59,6 +59,16 @@
         </v-row>
         <v-row>
             <v-col cols="10">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="10">
                 <v-select
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
@@ -205,6 +215,7 @@ export default defineComponent({
         const doi = ref(props.presetProceedingsPublication?.doi);
         const scopus = ref(props.presetProceedingsPublication?.scopusId);
         const openAlexId = ref(props.presetProceedingsPublication?.openAlexId);
+        const webOfScienceId = ref(props.presetProceedingsPublication?.openAlexId);
         const articleNumber = ref(props.presetProceedingsPublication?.articleNumber);
         const numberOfPages = ref(props.presetProceedingsPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetProceedingsPublication?.uris as string[]);
@@ -212,7 +223,8 @@ export default defineComponent({
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
         
         const i18n = useI18n();
@@ -261,7 +273,8 @@ export default defineComponent({
                     [
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: scopus.value as string, error: "scopusIdExistsError"},
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                     ],
                     props.presetProceedingsPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -287,6 +300,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 eventId: selectedEvent.value.value,
                 proceedingsPublicationType: selectedpublicationType.value.value as ProceedingsPublicationType,
                 proceedingsId: selectedProceedings.value.value,
@@ -312,6 +326,7 @@ export default defineComponent({
             doi.value = props.presetProceedingsPublication?.doi;
             scopus.value = props.presetProceedingsPublication?.scopusId;
             openAlexId.value = props.presetProceedingsPublication?.openAlexId;
+            webOfScienceId.value = props.presetProceedingsPublication?.webOfScienceId;
             articleNumber.value = props.presetProceedingsPublication?.articleNumber;
             selectedpublicationType.value = {title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType ? props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType : null};
 
@@ -333,7 +348,8 @@ export default defineComponent({
             publicationTypes, selectedpublicationType, availableProceedings,
             selectNewlyAddedProceedings, scopusIdValidationRules,
             refreshForm, urisRef, ProceedingsSubmissionForm,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules, webOfScienceId,
+            documentWebOfScienceIdValidationRules
         };
     }
 });

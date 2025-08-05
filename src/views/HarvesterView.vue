@@ -31,7 +31,7 @@
                     :top-level-institution-id="selectedOrganisationUnit.value"
                 />
                 <v-row
-                    v-if="((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && researcherSelection"
+                    v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && researcherSelection"
                     class="d-flex flex-row justify-center"
                 >
                     <v-col cols="8">
@@ -53,7 +53,7 @@
                     </v-col>
                 </v-row>
                 <v-row
-                    v-if="((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && !researcherSelection"
+                    v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && !researcherSelection"
                     class="d-flex flex-row justify-center">
                     <v-col cols="2">
                         <v-btn
@@ -74,10 +74,10 @@
                     <v-tab value="externalSources">
                         {{ $t("externalSourcesLabel") }}
                     </v-tab>
-                    <v-tab v-show="isResearcher" value="files">
+                    <v-tab v-if="isResearcher" value="files">
                         {{ $t("blibliographisFormatFilesLabel") }}
                     </v-tab>
-                    <v-tab v-show="isAdmin || isInstitutionalEditor" value="scheduledHarvests">
+                    <v-tab v-if="isAdmin || isInstitutionalEditor" value="scheduledHarvests">
                         {{ $t("scheduledHarvestsLabel") }}
                     </v-tab>
                 </v-tabs>
@@ -111,7 +111,7 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
+                        <v-row v-if="canPerformHarvest && !isResearcher" class="d-flex flex-row justify-center">
                             <v-col cols="auto">
                                 <generic-crud-modal
                                     :form-component="ScheduleHarvestForm"
@@ -123,8 +123,8 @@
                                 />
                             </v-col>
                         </v-row>
-                        <h2 v-else class="d-flex flex-row justify-center">
-                            {{ $t("setupIdentifiersMessage") }}
+                        <h2 v-else class="d-flex flex-row justify-center text-center">
+                            {{ isInstitutionalEditor ? $t("harvestDisabledMessage") : $t("setupIdentifiersMessage") }}
                         </h2>
                     </v-window-item>
                     <v-window-item value="files">
@@ -236,6 +236,8 @@ import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import { type ScheduledTaskResponse } from "@/models/Common";
 import TaskManagerService from "@/services/TaskManagerService";
 import ScheduledTasksList from "@/components/core/ScheduledTasksList.vue";
+import { useLoginStore } from "@/stores/loginStore";
+import OrganisationUnitImportSourceService from "@/services/importer/OrganisationUnitImportSourceService";
 
 
 export default defineComponent({
@@ -265,7 +267,7 @@ export default defineComponent({
 
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const selectedPersons = ref<{title: string, value: number}[]>([]);
-        const { isAdmin, isInstitutionalEditor, isResearcher } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isResearcher, loggedInUser } = useUserRole();
 
         const requiredFieldsDescription = ref("");
         const supportedFieldsDescription = ref("");
@@ -280,8 +282,13 @@ export default defineComponent({
             ImportService.canPerformHarvest().then(response => {
                 canPerformHarvest.value = response.data;
                 if (isInstitutionalEditor.value && !response.data) {
-                    mustHarvestUsingResearcherIds.value = true;
-                    canPerformHarvest.value = true;
+                    OrganisationUnitImportSourceService.fetchConfigurationForOrganisationUnit(loggedInUser.value?.organisationUnitId as number)
+                    .then(response => {
+                        if (response.data.importScopus || response.data.importOpenAlex || response.data.importWebOfScience) {
+                            mustHarvestUsingResearcherIds.value = true;
+                            canPerformHarvest.value = true;
+                        }
+                    });
                 }
             });
 
@@ -293,6 +300,11 @@ export default defineComponent({
             selectedPersons.value.splice(0);
             fetchNumberOfHarvestedDocuments();
             fetchOU();
+        });
+
+        const loginStore = useLoginStore();
+        watch(() => loginStore.userLoggedIn, () => {
+            currentTab.value = "externalSources";
         });
 
         watch(files, () => {
