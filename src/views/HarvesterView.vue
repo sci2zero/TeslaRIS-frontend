@@ -123,7 +123,7 @@
                                 />
                             </v-col>
                         </v-row>
-                        <h2 v-else class="d-flex flex-row justify-center text-center">
+                        <h2 v-if="!canPerformHarvest" class="d-flex flex-row justify-center text-center">
                             {{ isInstitutionalEditor ? $t("harvestDisabledMessage") : $t("setupIdentifiersMessage") }}
                         </h2>
                     </v-window-item>
