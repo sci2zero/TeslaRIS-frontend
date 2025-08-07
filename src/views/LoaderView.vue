@@ -185,6 +185,7 @@ import LoadingConfigurationService from "@/services/importer/LoadingConfiguratio
 import LanguageService from "@/services/LanguageService";
 import { type LanguageTagResponse } from "@/models/Common";
 import AuthorshipSelectionModal from "@/components/import/AuthorshipSelectionModal.vue";
+import { getErrorMessageForErrorKey } from "@/i18n";
 
 
 export default defineComponent({
@@ -580,8 +581,8 @@ export default defineComponent({
                 DocumentPublicationService.createJournalPublication(
                     newJournalPublication,
                     self.crypto.randomUUID()
-                ).then(() => {
-                    fetchNextAfterLoading();
+                ).then((response) => {
+                    fetchNextAfterLoading(response.data.id as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -589,6 +590,10 @@ export default defineComponent({
                         authorshipSelectionRef.value!.show();
                     } else if (error.response.data.message === "unauthorizedPublicationEditAttemptByEmployeeMessage") {
                         errorMessage.value = i18n.t("allAuthorsUnmanagedMessage");
+                        snackbar.value = true;
+                        loading.value = false;
+                    } else {
+                        errorMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                         snackbar.value = true;
                         loading.value = false;
                     }
@@ -619,8 +624,8 @@ export default defineComponent({
 
                 DocumentPublicationService.createProceedingsPublication(
                     newProceedingsPublication, self.crypto.randomUUID()
-                ).then(() => {
-                    fetchNextAfterLoading();
+                ).then((response) => {
+                    fetchNextAfterLoading(response.data.id as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -630,13 +635,17 @@ export default defineComponent({
                         errorMessage.value = i18n.t("allAuthorsUnmanagedMessage");
                         snackbar.value = true;
                         loading.value = false;
+                    } else {
+                        errorMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                        snackbar.value = true;
+                        loading.value = false;
                     }
                 });
             }
         };
 
-        const fetchNextAfterLoading = () => {
-            markAsLoadedAndFetchNext(documentIdToDelete.value, documentIdToDelete.value !== null);
+        const fetchNextAfterLoading = (newDocumentId: number) => {
+            markAsLoadedAndFetchNext(newDocumentId, documentIdToDelete.value, documentIdToDelete.value !== null);
             loading.value = false;
             documentIdToDelete.value = null;
         };
@@ -651,17 +660,18 @@ export default defineComponent({
                     finishLoad();
                 });
             } else {
-                markAsLoadedAndFetchNext(oldDocumentId, deleteOldDocument);
+                markAsLoadedAndFetchNext(null, oldDocumentId, deleteOldDocument);
             }
         };
 
-        const markAsLoadedAndFetchNext = (oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
+        const markAsLoadedAndFetchNext = (newDocumentId: number | null = null, oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
             ImportService.markCurrentAsLoaded(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
                 oldDocumentId,
-                deleteOldDocument
+                deleteOldDocument,
+                newDocumentId
             ).then(() => {
                 stepperValue.value = smartLoading.value ? 0 : 1;
                 fetchNextRecordForLoading();

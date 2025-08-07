@@ -72,5 +72,7 @@ export default {
     openAlexIdExistsError: "OpenAlex ID је већ у употреби.",
     webOfScienceIdFormatError: "Погрешан WOS ID формат.",
     webOfScienceResearcherIdFormatError: "Погрешан Researcher ID формат.",
-    webOfScienceIdExistsError: "WoS ID је већ у употреби."
+    webOfScienceIdExistsError: "WoS ID је већ у употреби.",
+    oaiSourcesLabel: "OAI-PMH извори",
+    oaiSourceLabel: "OAI-PMH извор"
 };

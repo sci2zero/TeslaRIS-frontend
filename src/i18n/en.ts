@@ -974,5 +974,7 @@ export default {
     scheduledBackupsLabel: "Scheduled backups",
     harvestDisabledMessage: "Source scanning is disabled.",
     updateOrganisationUnitImportSourceLabel: "Data sources",
-    notMyPublicationLabel: "Not my publication"
+    notMyPublicationLabel: "Not my publication",
+    oaiSourcesLabel: "OAI-PMH sources",
+    oaiSourceLabel: "OAI-PMH source"
 }

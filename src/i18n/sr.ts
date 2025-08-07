@@ -999,5 +999,7 @@ export default {
     scheduledBackupsLabel: "Zakazani bekapi",
     harvestDisabledMessage: "Skeniranje izvora je onemogućeno.",
     updateOrganisationUnitImportSourceLabel: "Izvori podataka",
-    notMyPublicationLabel: "Nije moj rad"
+    notMyPublicationLabel: "Nije moj rad",
+    oaiSourcesLabel: "OAI-PMH izvori",
+    oaiSourceLabel: "OAI-PMH izvor"
 }

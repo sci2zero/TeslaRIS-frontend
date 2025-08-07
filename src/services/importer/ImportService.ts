@@ -70,7 +70,8 @@ export class ImportService extends BaseService {
     async markCurrentAsLoaded(
         institutionId: number | null = null,
         oldDocumentId: number | null = null,
-        deleteOldDocument: boolean | null = null
+        deleteOldDocument: boolean | null = null,
+        newDocumentId: number | null = null
     ): Promise<AxiosResponse<void>> {
         const queryParams: string[] = [];
 
@@ -84,6 +85,10 @@ export class ImportService extends BaseService {
 
         if (deleteOldDocument !== null) {
             queryParams.push(`deleteOldDocument=${deleteOldDocument}`);
+        }
+
+        if (newDocumentId !== null) {
+            queryParams.push(`newDocumentId=${newDocumentId}`);
         }
 
         const queryString = queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
@@ -129,6 +134,14 @@ export class ImportService extends BaseService {
 
     async getCSVFileFormatDescription(): Promise<AxiosResponse<FormatDescription>> {
         return super.sendRequest(axios.get, `import-common/csv-file-format?language=${i18n.vueI18n.global.locale}`);
+    }
+
+    async fetchOAIPMHSources(): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, "oai-harvest/sources");
+    }
+
+    async scheduleOAIPMHHarvest(sourceName: string, timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, `oai-harvest/schedule?sourceName=${sourceName}&from=${dateFrom}&until=${dateTo}&timestamp=${timestamp}&recurrence=${recurrence}`);
     }
 }
   
