@@ -39,7 +39,7 @@ import { defineComponent, type PropType } from 'vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/publicationSeriesContributionType';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
 import PublicationSeriesService from '@/services/PublicationSeriesService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';

@@ -394,7 +394,7 @@ import InvolvementList from '@/components/person/involvement/InvolvementList.vue
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
 import PrizeList from '@/components/person/prize/PrizeList.vue';
 import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';

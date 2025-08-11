@@ -272,7 +272,7 @@ import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';

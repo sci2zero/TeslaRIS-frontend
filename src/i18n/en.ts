@@ -976,5 +976,9 @@ export default {
     updateOrganisationUnitImportSourceLabel: "Data sources",
     notMyPublicationLabel: "Not my publication",
     oaiSourcesLabel: "OAI-PMH sources",
-    oaiSourceLabel: "OAI-PMH source"
+    oaiSourceLabel: "OAI-PMH source",
+    dayLabel: "Day",
+    monthLabel: "Month",
+    yearLabel: "Year",
+    taskExecutionPeriodPreviewMessage: "Example of next executions:"
 }

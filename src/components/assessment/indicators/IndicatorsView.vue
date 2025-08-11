@@ -58,7 +58,7 @@ import { ref } from 'vue';
 import { EntityIndicatorSource, type PublicationSeriesIndicatorResponse, type EntityIndicatorResponse, IndicatorContentType } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useI18n } from 'vue-i18n';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import EntityIndicatorForm from './EntityIndicatorForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { ApplicableEntityType } from '@/models/Common';

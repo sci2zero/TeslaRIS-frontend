@@ -41,7 +41,7 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { removeTrailingPipeRegex } from '@/utils/StringUtil';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PersonSubmissionForm from './PersonSubmissionForm.vue';
 

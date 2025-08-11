@@ -271,7 +271,7 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
 import type { Monograph } from '@/models/PublicationModel';
 import MonographService from '@/services/DocumentPublicationService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';

@@ -31,7 +31,7 @@
 import { computed, defineComponent } from "vue";
 import { type ScheduledTaskResponse } from "@/models/Common";
 import { useI18n } from "vue-i18n";
-import { localiseDate } from "@/i18n/dateLocalisation";
+import { localiseDate } from "@/utils/DateUtil";
 import { getRecurrenceTypeTitleFromValueAutoLocale } from "@/i18n/recurrenceType";
 
 

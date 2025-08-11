@@ -163,7 +163,7 @@
 
 <script lang="ts">
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
-import { localiseDate } from "@/i18n/dateLocalisation";
+import { localiseDate } from "@/utils/DateUtil";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import ImportService from "@/services/importer/ImportService";
 import { ref, watch } from "vue";

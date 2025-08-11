@@ -285,7 +285,7 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';

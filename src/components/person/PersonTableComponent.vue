@@ -135,7 +135,7 @@ import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { useRouter } from 'vue-router';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';

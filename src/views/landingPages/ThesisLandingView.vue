@@ -500,7 +500,7 @@ import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';

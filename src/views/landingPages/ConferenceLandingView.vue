@@ -222,7 +222,7 @@ import PersonEventContributionTabs from '@/components/core/PersonEventContributi
 import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import { localiseDateRange } from '@/i18n/dateLocalisation';
+import { localiseDateRange } from '@/utils/DateUtil';
 import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';

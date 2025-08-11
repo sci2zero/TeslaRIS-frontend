@@ -76,20 +76,31 @@
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
                     <v-col cols="12" sm="6" md="2">
-                        <v-select
+                        <v-text-field
                             v-model="startYear"
-                            :items="years"
+                            type="number"
                             :label="$t('fromLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :placeholder="$t('fromLabel') + '*'"
+                            :rules="requiredNumericFieldRules"
+                        ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
-                        <v-select
+                        <v-text-field
                             v-model="endYear"
-                            :items="years"
+                            type="number"
                             :label="$t('toLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :placeholder="$t('toLabel') + '*'"
+                            :rules="requiredNumericFieldRules"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row justify-center">
+                    <v-col cols="12" md="4">
+                        <relative-date-preview
+                            :start-year="startYear"
+                            :end-year="endYear"
+                            :recurrence-period="selectedRecurrenceType.value"
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -147,11 +158,12 @@ import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLo
 import { RecurrenceType } from '@/models/LoadModel';
 import TaskManagerService from '@/services/TaskManagerService';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
+import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
 
 
 export default defineComponent({
     name: "DocumentBackupView",
-    components: { Toast, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList },
+    components: { Toast, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList, RelativeDatePreview },
     setup() {
         const currentTab = ref("backupGeneration");
         const isFormValid = ref(false);
@@ -173,8 +185,7 @@ export default defineComponent({
         const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLS]);
         const selectedExportFileFormat = ref<ExportFileFormat>(ExportFileFormat.CSV);
 
-        const { requiredSelectionRules } = useValidationUtils();
-        const years = ref<number[]>([]);
+        const { requiredSelectionRules, requiredNumericFieldRules } = useValidationUtils();
 
         const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
         const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
@@ -191,11 +202,6 @@ export default defineComponent({
             fileSections.value?.forEach(fileSection => {
                 selectedFileSections.value.push(fileSection);
             });
-
-            const now = new Date();
-            for(let i = 1900; i <= now.getFullYear(); i++) {
-                years.value.push(i);
-            }
 
             document.title = i18n.t("routeLabel.documentBackup");
             fetchScheduledTasks();
@@ -255,7 +261,8 @@ export default defineComponent({
             isFormValid, documentTypes,
             requiredSelectionRules,
             selectedOU, startYear,
-            selectedDocumentTypes, years,
+            selectedDocumentTypes,
+            requiredNumericFieldRules,
             endYear, generateBackupRequest,
             fileSections, langItems, selectedLang,
             snackbar, message, loggedInUser,

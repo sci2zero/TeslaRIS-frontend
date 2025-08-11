@@ -1001,5 +1001,9 @@ export default {
     updateOrganisationUnitImportSourceLabel: "Izvori podataka",
     notMyPublicationLabel: "Nije moj rad",
     oaiSourcesLabel: "OAI-PMH izvori",
-    oaiSourceLabel: "OAI-PMH izvor"
+    oaiSourceLabel: "OAI-PMH izvor",
+    dayLabel: "Dan",
+    monthLabel: "Mesec",
+    yearLabel: "Godina",
+    taskExecutionPeriodPreviewMessage: "Primer sledećih izvršavanja:"
 }

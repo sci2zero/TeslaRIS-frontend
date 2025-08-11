@@ -93,15 +93,31 @@
                     <v-window-item value="externalSources">
                         <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
                             <v-col cols="12" sm="4">
-                                <date-picker
+                                <date-picker-split
+                                    v-if="isAdmin || isInstitutionalEditor"
                                     v-model="startDate"
                                     :label="$t('startDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker-split>
+                                <date-picker
+                                    v-else
+                                    v-model="endDate"
+                                    :label="$t('endDateLabel')"
                                     color="primary"
                                     required
                                 ></date-picker>
                             </v-col>
                             <v-col cols="12" sm="4">
+                                <date-picker-split
+                                    v-if="isAdmin || isInstitutionalEditor"
+                                    v-model="endDate"
+                                    :label="$t('endDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker-split>
                                 <date-picker
+                                    v-else
                                     v-model="endDate"
                                     :label="$t('endDateLabel')"
                                     color="primary"
@@ -145,20 +161,20 @@
                         </v-row>
                         <v-row class="d-flex flex-row justify-center">
                             <v-col cols="12" sm="4">
-                                <date-picker
+                                <date-picker-split
                                     v-model="startDate"
                                     :label="$t('startDateLabel')"
                                     color="primary"
                                     required
-                                ></date-picker>
+                                ></date-picker-split>
                             </v-col>
                             <v-col cols="12" sm="4">
-                                <date-picker
+                                <date-picker-split
                                     v-model="endDate"
                                     :label="$t('endDateLabel')"
                                     color="primary"
                                     required
-                                ></date-picker>
+                                ></date-picker-split>
                             </v-col>
                         </v-row>
                         <v-row class="d-flex flex-row justify-center">
@@ -286,11 +302,12 @@ import ScheduledTasksList from "@/components/core/ScheduledTasksList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import OrganisationUnitImportSourceService from "@/services/importer/OrganisationUnitImportSourceService";
 import { useValidationUtils } from "@/utils/ValidationUtils";
+import DatePickerSplit from "@/components/core/DatePickerSplit.vue";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList },
+    components: { DatePicker, DatePickerSplit, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);

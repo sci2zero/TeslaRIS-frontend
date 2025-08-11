@@ -83,7 +83,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import type { AssessmentRulebook, AssessmentRulebookResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentRulebookForm from './AssessmentRulebookForm.vue';
