@@ -74,5 +74,6 @@ export default {
     webOfScienceResearcherIdFormatError: "Погрешан Researcher ID формат.",
     webOfScienceIdExistsError: "WoS ID је већ у употреби.",
     oaiSourcesLabel: "OAI-PMH извори",
-    oaiSourceLabel: "OAI-PMH извор"
+    oaiSourceLabel: "OAI-PMH извор",
+    signInWithOrcidLabel: "Улогуј се путем ORCID-а"
 };

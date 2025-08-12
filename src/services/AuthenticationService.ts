@@ -35,6 +35,10 @@ class AuthenticationService extends BaseService {
     return super.sendRequest(axios.patch, "user/reset-password", body, AuthenticationService.idempotencyKey);
   }
 
+  async finishOAuth2Workflow(code: string, identifier: string): Promise<AxiosResponse<AuthenticationResponse>> {
+    return super.sendRequest(axios.get, `oauth2/finish-workflow?code=${code}&identifier=${identifier}`);
+  }
+
   userLoggedIn() {
     return !!localStorage.getItem("jwt");
   }

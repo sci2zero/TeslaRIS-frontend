@@ -102,7 +102,8 @@ export default {
         emailChangeConfirmation: "Email confirmation change",
         contact: "Contact",
         publicDissertationsReport: "Disertations on public review",
-        publicationsValidation: "Validation of publications"
+        publicationsValidation: "Validation of publications",
+        oauth2: "External authorization"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -980,5 +981,10 @@ export default {
     dayLabel: "Day",
     monthLabel: "Month",
     yearLabel: "Year",
-    taskExecutionPeriodPreviewMessage: "Example of next executions:"
+    taskExecutionPeriodPreviewMessage: "Example of next executions:",
+    signInWithOrcidLabel: "Sign in with ORCID",
+    authorizingLabel: "Authorizing {name}",
+    pleaseWaitLabel: "Please wait",
+    redirectingLabel: "Redirecting...",
+    orcidNotLinked: "ORCID ID is not specified in your researcher profile or you don't have an account."
 }

@@ -102,7 +102,8 @@ export default {
         emailChangeConfirmation: "Potvrda promene email-a",
         contact: "Kontakt",
         publicDissertationsReport: "Disertacije na javnom uvidu",
-        publicationsValidation: "Validacija publikacija"
+        publicationsValidation: "Validacija publikacija",
+        oauth2: "Eksterna autorizacija"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1005,5 +1006,10 @@ export default {
     dayLabel: "Dan",
     monthLabel: "Mesec",
     yearLabel: "Godina",
-    taskExecutionPeriodPreviewMessage: "Primer sledećih izvršavanja:"
+    taskExecutionPeriodPreviewMessage: "Primer sledećih izvršavanja:",
+    signInWithOrcidLabel: "Uloguj se putem ORCID-a",
+    authorizingLabel: "Autorizuje se {name}",
+    pleaseWaitLabel: "Molimo Vas, sačekajte",
+    redirectingLabel: "Redirektovanje...",
+    orcidNotLinked: "ORCID ID nije specificiran u Vašem profilu istraživača ili nemate kreiran nalog."
 }
