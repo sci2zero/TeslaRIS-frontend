@@ -986,5 +986,7 @@ export default {
     authorizingLabel: "Authorizing {name}",
     pleaseWaitLabel: "Please wait",
     redirectingLabel: "Redirecting...",
-    orcidNotLinked: "ORCID ID is not specified in your researcher profile or you don't have an account."
+    orcidNotLinked: "Your ORCID ID is not specified in any researcher profile.",
+    enterYourNameLabel: "Enter your name",
+    noneOfTheOfferedLabel: "None of the offered"
 }

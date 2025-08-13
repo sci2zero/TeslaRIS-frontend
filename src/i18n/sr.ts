@@ -1011,5 +1011,7 @@ export default {
     authorizingLabel: "Autorizuje se {name}",
     pleaseWaitLabel: "Molimo Vas, sačekajte",
     redirectingLabel: "Redirektovanje...",
-    orcidNotLinked: "ORCID ID nije specificiran u Vašem profilu istraživača ili nemate kreiran nalog."
+    orcidNotLinked: "Vaš ORCID ID nije specificiran ni u jednom profilu istraživača.",
+    enterYourNameLabel: "Unesite vaše ime",
+    noneOfTheOfferedLabel: "Nijedan od ponuđenih"
 }

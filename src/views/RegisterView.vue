@@ -11,22 +11,33 @@
                 :prev-text="$t('previousLabel')">
                 <template #[`item.1`]>
                     <div class="reg-step">
-                        <registration-first-step @registration-next-step="nextStep" @field-update="checkForNextStep"></registration-first-step>
+                        <registration-first-step
+                            @registration-next-step="nextStep"
+                            @field-update="checkForNextStep">
+                        </registration-first-step>
                     </div>
                 </template>
 
                 <template #[`item.2`]>
                     <div class="reg-step">
-                        <registration-second-step :firstname="userDetails.firstName" :lastname="userDetails.lastName"></registration-second-step>
+                        <registration-second-step
+                            :firstname="userDetails.firstName"
+                            :lastname="userDetails.lastName">
+                        </registration-second-step>
                     </div>
                 </template>
 
                 <template #actions>
                     <div class="d-flex flex-row justify-between">
-                        <v-btn :disabled="stepperValue === 1" @click="previousStep">
+                        <v-btn
+                            :disabled="stepperValue === 1"
+                            @click="previousStep">
                             {{ $t('previousLabel') }}
                         </v-btn>
-                        <v-btn :disabled="stepperValue === 2 || !canAdvance" @click="nextStep">
+                        <v-btn
+                            v-show="newResearcherCreationAllowed"
+                            :disabled="stepperValue === 2 || !canAdvance"
+                            @click="nextStep">
                             {{ $t('nextLabel') }}
                         </v-btn>
                     </div>
@@ -39,6 +50,7 @@
 <script lang="ts">
 import RegistrationFirstStep from '@/components/user/registration/RegistrationFirstStep.vue';
 import RegistrationSecondStep from '@/components/user/registration/RegistrationSecondStep.vue';
+import UserService from '@/services/UserService';
 import { defineComponent, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -50,11 +62,16 @@ export default defineComponent({
     setup() {
         const stepperValue = ref(1);
         const canAdvance = ref(false);
+        const newResearcherCreationAllowed = ref(false);
 
         const i18n = useI18n();
 
         onMounted(() => {
             document.title = i18n.t("registerLabel");
+
+            UserService.isRegisterResearcherCreationAllowed().then(response => {
+                newResearcherCreationAllowed.value = response.data;
+            });
         });
 
         const userDetails = ref({
@@ -63,8 +80,14 @@ export default defineComponent({
         });
 
         const nextStep = (data: {firstName: string, lastName: string}) => {
-            if (data.firstName) userDetails.value.firstName = data.firstName
-            if (data.lastName) userDetails.value.lastName = data.lastName
+            if (data.firstName) {
+                userDetails.value.firstName = data.firstName;
+            }
+
+            if (data.lastName) {
+                userDetails.value.lastName = data.lastName;
+            }
+            
             stepperValue.value = 2;
         };
 
@@ -82,9 +105,12 @@ export default defineComponent({
             }
         };
 
-        return {stepperValue, nextStep,
+        return {
+            stepperValue, nextStep,
             userDetails, previousStep,
-            checkForNextStep, canAdvance}
+            checkForNextStep, canAdvance,
+            newResearcherCreationAllowed
+        }
     }
 });
 </script>
@@ -100,12 +126,12 @@ export default defineComponent({
         font-size: 1.6em;
         color: #444444;
     }
-
-    
 </style>
 
 <style>
+
     #registerStepper .v-stepper-header {
         display: none;
     }
+
 </style>
