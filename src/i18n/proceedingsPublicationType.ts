@@ -1,6 +1,7 @@
 import { ProceedingsPublicationType } from "@/models/PublicationModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const proceedingsPublicationTypeEn = [
     { title: "Regular Full Article", value: ProceedingsPublicationType.REGULAR_FULL_ARTICLE },
@@ -34,6 +35,8 @@ export const getTitleFromValueAutoLocale = (value: ProceedingsPublicationType | 
     let proceedingsPublicationTypeArray = proceedingsPublicationTypeEn;
     if (locale == "sr") {
         proceedingsPublicationTypeArray = proceedingsPublicationTypeSr;
+    } else if (locale == "sr-cyr") {
+        proceedingsPublicationTypeArray = transliterateContentToCyrillic(proceedingsPublicationTypeSr);
     }
 
     if (typeof value === "number") {
@@ -47,6 +50,8 @@ export const getTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return proceedingsPublicationTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(proceedingsPublicationTypeSr);
         case "en":
             return proceedingsPublicationTypeEn;
     }

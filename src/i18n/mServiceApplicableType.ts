@@ -1,5 +1,6 @@
 import { MServiceApplicableTypes } from "@/models/PublicationModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const mServiceApplicableTypesSr = [
     { title: "Rad u časopisu", value: MServiceApplicableTypes.JOURNAL_PUBLICATION },
@@ -17,6 +18,8 @@ export const getMServiceApplicableTypeTitleFromValueAutoLocale = (value: MServic
     let mServiceApplicableTypeArray = mServiceApplicableTypesEn;
     if (locale == "sr") {
         mServiceApplicableTypeArray = mServiceApplicableTypesSr;
+    } else if (locale == "sr-cyr") {
+        mServiceApplicableTypeArray = transliterateContentToCyrillic(mServiceApplicableTypesSr);
     }
 
     return (mServiceApplicableTypeArray.find(item => item.value === value) || {}).title;
@@ -26,6 +29,8 @@ export const getMServiceApplicableTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return mServiceApplicableTypesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(mServiceApplicableTypesSr);
         case "en":
             return mServiceApplicableTypesEn;
     }

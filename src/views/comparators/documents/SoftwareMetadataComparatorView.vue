@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftSoftware?.contributions ? leftSoftware.contributions : []"
                             :document-id="leftSoftware?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightSoftware?.contributions ? rightSoftware.contributions : []"
                             :document-id="rightSoftware?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -321,11 +323,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightSoftware.value?.id : leftSoftware.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "softwareLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "softwareLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftSoftware.value?.title : rightSoftware.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

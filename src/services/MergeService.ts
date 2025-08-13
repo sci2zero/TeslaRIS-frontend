@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedSoftware, MergedTheses } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedSoftware, MergedTheses } from "@/models/MergeModel";
 
 export class MergeService extends BaseService {
 
@@ -172,6 +172,22 @@ export class MergeService extends BaseService {
 
     async saveMergedPublishersMetadata(leftPublisherId: number, rightPublisherId: number, body: MergedPublishers): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/publisher/metadata/${leftPublisherId}/${rightPublisherId}`, body);
+    }
+
+    async migrateGenericIdentifierHistory(deletionEntityId: number, mergedEntityId: number, entityType: EntityType): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/generic/${entityType}/${deletionEntityId}/${mergedEntityId}`);
+    }
+
+    async migratePersonIdentifierHistory(deletionEntityId: number, mergedEntityId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/person/${deletionEntityId}/${mergedEntityId}`);
+    }
+
+    async migratePublicationIdentifierHistory(deletionEntityId: number, mergedEntityId: number, entityType: "publication" | "monograph" | "proceedings"): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/publication/${entityType}/${deletionEntityId}/${mergedEntityId}`);
+    }
+
+    async migrateOrganisationUnitIdentifierHistory(deletionEntityId: number, mergedEntityId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/migrate-identifier-history/organisation-unit/${deletionEntityId}/${mergedEntityId}`);
     }
 }
 

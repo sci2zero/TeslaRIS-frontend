@@ -15,6 +15,14 @@ export const returnCurrentLocaleContent = (multilingualContentList: Multilingual
         }
     });
 
+    if (!selectedContent) {
+        multilingualContentList.forEach((multilingualContent) => {
+            if (multilingualContent.languageTag.startsWith(currentLocale)) {
+                selectedContent = multilingualContent;
+            }
+        });
+    }
+
     if (selectedContent) {
         return (selectedContent as MultilingualContent).content;
     } else {
@@ -56,7 +64,15 @@ export const toMultilingualTextInput = (multilingualContentArray: MultilingualCo
     return presetInput;
 };
 
-export const mergeMultilingualContentField = (content1: MultilingualContent[], content2: MultilingualContent[]) => {
+export const mergeMultilingualContentField = (content1: MultilingualContent[] | undefined, content2: MultilingualContent[] | undefined) => {
+    if (content1 === undefined) {
+        content1 = [];
+    }
+
+    if (content2 === undefined) {
+        content2 = [];
+    }
+    
     content2.forEach(content => {
         let merged = false;
         content1.forEach(currentContent => {

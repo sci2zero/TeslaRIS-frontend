@@ -1,5 +1,6 @@
 import { EventsRelationType } from "@/models/EventModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 export const eventsRelationTypesSr = [
@@ -22,6 +23,8 @@ export const getEventsRelationTitleFromValueAutoLocale = (value: EventsRelationT
     let eventsRelationArray = eventsRelationTypesEn;
     if (locale == "sr") {
         eventsRelationArray = eventsRelationTypesSr;
+    } else if (locale == "sr-cyr") {
+        eventsRelationArray = transliterateContentToCyrillic(eventsRelationTypesSr);
     }
     
     return (eventsRelationArray.find(item => item.value === value) || {}).title;
@@ -31,6 +34,8 @@ export const getEventsRelationTypeForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return eventsRelationTypesSr.filter(relation => relation.value !== EventsRelationType.HAS_PART);
+        case "sr-cyr":
+            return transliterateContentToCyrillic(eventsRelationTypesSr.filter(relation => relation.value !== EventsRelationType.HAS_PART));
         case "en":
             return eventsRelationTypesEn.filter(relation => relation.value !== EventsRelationType.HAS_PART);
     }

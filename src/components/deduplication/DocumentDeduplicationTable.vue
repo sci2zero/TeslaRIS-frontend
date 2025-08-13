@@ -29,12 +29,12 @@
                     </td>
                     <td>
                         <localized-link :to="`${getLandingPageBasePath(row.item)}` + row.item.leftEntityId">
-                            {{ $i18n.locale == 'sr' ? row.item.leftTitleSr : row.item.leftTitleOther }}
+                            {{ $i18n.locale.startsWith('sr') ? row.item.leftTitleSr : row.item.leftTitleOther }}
                         </localized-link>
                     </td>
                     <td>
                         <localized-link :to="`${getLandingPageBasePath(row.item)}` + row.item.rightEntityId">
-                            {{ $i18n.locale == 'sr' ? row.item.rightTitleSr : row.item.rightTitleOther }}
+                            {{ $i18n.locale.startsWith('sr') ? row.item.rightTitleSr : row.item.rightTitleOther }}
                         </localized-link>
                     </td>
                     <td>
@@ -125,10 +125,10 @@ export default defineComponent({
             Promise.all(selectedSuggestions.value.map((suggestion: DeduplicationSuggestion) => {
                 return DeduplicationService.flagAsNotDuplicate(suggestion.id)
                     .then(() => {
-                        addNotification(i18n.t("flagSuccessNotification", { name: i18n.locale.value == 'sr' ? suggestion.leftTitleSr : suggestion.leftTitleOther }));
+                        addNotification(i18n.t("flagSuccessNotification", { name: i18n.locale.value.startsWith('sr') ? suggestion.leftTitleSr : suggestion.leftTitleOther }));
                     })
                     .catch(() => {
-                        addNotification(i18n.t("flagFailedNotification", { name: i18n.locale.value == 'sr' ? suggestion.leftTitleSr : suggestion.leftTitleOther }));
+                        addNotification(i18n.t("flagFailedNotification", { name: i18n.locale.value.startsWith('sr') ? suggestion.leftTitleSr : suggestion.leftTitleOther }));
                         return suggestion;
                     });
             })).then((failedFlags) => {

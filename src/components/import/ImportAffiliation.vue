@@ -3,11 +3,11 @@
         <h1>{{ $t("authorAffiliationsLabel") }} - {{ returnCurrentLocaleContent(ouForLoading.name) }}</h1>
 
         <h2 v-if="affiliationBinded && !hadToBeCreated">
-            {{ $t("foundAsLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
+            {{ $t("foundAsLabel", [$i18n.locale.startsWith('sr') ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
         </h2>
 
         <h2 v-if="affiliationBinded && hadToBeCreated">
-            {{ $t(importAsUnmanaged ? "bindedUnmanagedEntityLabel" : "createdNewEntityLabel", [$i18n.locale == 'sr' ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
+            {{ $t(importAsUnmanaged ? "bindedUnmanagedEntityLabel" : "createdNewEntityLabel", [$i18n.locale.startsWith('sr') ? selectedAffiliation?.nameSr as string : selectedAffiliation?.nameOther as string]) }}
         </h2>
 
         <h2 v-if="showTable" class="can-not-find-message">
@@ -28,25 +28,25 @@
             @update:options="refreshTable">
             <template #item="row">
                 <tr>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.nameSr) }}
                     </td>
                     <td v-else>
                         {{ displayTextOrPlaceholder(row.item.nameOther) }}
                     </td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
                     </td>
                     <td v-else>
                         {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
                     </td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.keywordsSr) }}
                     </td>
                     <td v-else>
                         {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
                     </td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.researchAreasSr) }}
                     </td>
                     <td v-else>

@@ -43,7 +43,7 @@ import AuthenticationService from "@/services/AuthenticationService";
 import LanguageService from "@/services/LanguageService";
 import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue";
 import type { AxiosResponse } from "axios";
-import type { LanguageResponse } from "@/models/Common";
+import type { LanguageTagResponse } from "@/models/Common";
 import { useRegisterStore } from '@/stores/registerStore';
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getErrorMessageForErrorKey } from "@/i18n";
@@ -114,9 +114,9 @@ export default defineComponent({
         };
 
         onMounted(() => {
-            LanguageService.getAllUILanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+            LanguageService.getAllUILanguages().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
-                response.data.forEach((language: LanguageResponse) => {
+                response.data.forEach((language: LanguageTagResponse) => {
                     listOfLanguages.push({title: language.languageCode, value: language.id})
                     languages.value = listOfLanguages;
                     if (language.languageCode === "SR") {

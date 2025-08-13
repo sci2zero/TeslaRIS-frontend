@@ -57,7 +57,7 @@
                         hide-details
                     />
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     <localized-link :to="'organisation-units/' + row.item.databaseId">
                         {{ row.item.nameSr }}
                     </localized-link>
@@ -67,7 +67,7 @@
                         {{ row.item.nameOther }}
                     </localized-link>
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     <localized-link v-if="row.item.superOUId" :to="'organisation-units/' + row.item.superOUId">
                         {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
                     </localized-link>
@@ -83,7 +83,7 @@
                         {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
                     </span>
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     <span v-if="row.item.keywordsSr">
                         <localized-link v-for="(keyword, index) in row.item.keywordsSr.split('\n')" :key="index" :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`">
                             {{ `${displayTextOrPlaceholder(keyword)}; ` }}
@@ -103,7 +103,7 @@
                         {{ displayTextOrPlaceholder(row.item.keywordsOther) }}
                     </span>
                 </td>
-                <td v-if="$i18n.locale == 'sr'">
+                <td v-if="$i18n.locale.startsWith('sr')">
                     {{ displayTextOrPlaceholder(row.item.researchAreasSr) }}
                 </td>
                 <td v-else>
@@ -234,14 +234,14 @@ export default defineComponent({
             Promise.all(selectedOUs.value.map((organisationUnit: OrganisationUnitIndex) => {
                 return OrganisationUnitService.deleteOrganisationUnit(organisationUnit.databaseId)
                     .then(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameSr }));
                         } else {
                             addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameOther }));
                         }
                     })
                     .catch(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameSr }));
                         } else {
                             addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameOther }));

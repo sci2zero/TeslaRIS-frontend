@@ -1,5 +1,6 @@
 import { EmploymentTitle } from "@/models/InvolvementModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 const employmentTitlesEn = [
@@ -11,7 +12,8 @@ const employmentTitlesEn = [
     { title: "Senior scientific collaborator", value: EmploymentTitle.SENIOR_SCIENTIFIC_COLLABORATOR },
     { title: "Scientific advisor", value: EmploymentTitle.SCIENTIFIC_ADVISOR },
     { title: "Retired professor", value: EmploymentTitle.RETIRED_PROFESSOR },
-    { title: "Professor engineer habilitated", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED }
+    { title: "Professor engineer habilitated", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED },
+    { title: "Academician", value: EmploymentTitle.ACADEMICIAN }
 ];
 
 const employmentTitlesSr = [
@@ -23,7 +25,8 @@ const employmentTitlesSr = [
     { title: "Stariji naučni saradnik", value: EmploymentTitle.SENIOR_SCIENTIFIC_COLLABORATOR },
     { title: "Naučni savetnik", value: EmploymentTitle.SCIENTIFIC_ADVISOR },
     { title: "Profesor u penziji", value: EmploymentTitle.RETIRED_PROFESSOR },
-    { title: "Profesor inženjer habilitovan", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED }
+    { title: "Profesor inženjer habilitovan", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED },
+    { title: "Akademik", value: EmploymentTitle.ACADEMICIAN }
 ];
 
 export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) => {
@@ -32,6 +35,8 @@ export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) =>
     let employmentTitleArray = employmentTitlesEn;
     if (locale == "sr") {
         employmentTitleArray = employmentTitlesSr;
+    } else if (locale == "sr-cyr") {
+        employmentTitleArray = transliterateContentToCyrillic(employmentTitlesSr);
     }
 
     return (employmentTitleArray.find(item => item.value === value) || {}).title;
@@ -41,6 +46,8 @@ export const getEmploymentTitlesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return employmentTitlesSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(employmentTitlesSr);
         case "en":
             return employmentTitlesEn;
     }

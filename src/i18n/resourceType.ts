@@ -1,6 +1,7 @@
 import { ResourceType } from "@/models/DocumentFileModel";
 import i18n from ".";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const resourceTypeSr = [
     { title: "Preprint", value: ResourceType.PREPRINT },
@@ -24,11 +25,24 @@ export const getResourceTypeTitleFromValueAutoLocale = (value: ResourceType) => 
     let resourceTypeArray = resourceTypeEn;
     if (locale == "sr") {
         resourceTypeArray = resourceTypeSr;
+    } else if (locale == "sr-cyr") {
+        resourceTypeArray = transliterateContentToCyrillic(resourceTypeSr);
     }
 
     if (typeof value === "number") {
         return (resourceTypeArray.find(item => item.value === value) || {}).title;
     } else if (typeof value === "string") {
         return (resourceTypeArray.find(item => getNameFromOrdinal(ResourceType, item.value) === value) || {}).title;
+    }
+};
+
+export const getResourceTypesForGivenLocale = () => {
+    switch(i18n.vueI18n.global.locale) {
+        case "sr":
+            return resourceTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(resourceTypeSr);
+        case "en":
+            return resourceTypeEn;
     }
 };

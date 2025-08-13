@@ -72,7 +72,7 @@
                                 hide-details
                             />
                         </td>
-                        <td v-if="$i18n.locale == 'sr'">
+                        <td v-if="$i18n.locale.startsWith('sr')">
                             <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
                                 <rich-title-renderer :title="item.titleSr"></rich-title-renderer>
                             </localized-link>
@@ -360,14 +360,14 @@ export default defineComponent({
                 if (publication.type === PublicationType.MONOGRAPH) {
                     return DocumentPublicationService.deleteMonograph(publication.databaseId as number)
                         .then(() => {
-                            if (i18n.locale.value === "sr") {
+                            if (i18n.locale.value.startsWith("sr")) {
                                 addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
                             } else {
                                 addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
                             }
                         })
                         .catch(() => {
-                            if (i18n.locale.value === "sr") {
+                            if (i18n.locale.value.startsWith("sr")) {
                                 addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
                             } else {
                                 addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
@@ -378,14 +378,14 @@ export default defineComponent({
                 
                 return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
                     .then(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
                         } else {
                             addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
                         }
                     })
                     .catch(() => {
-                        if (i18n.locale.value === "sr") {
+                        if (i18n.locale.value.startsWith("sr")) {
                             addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
                         } else {
                             addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));

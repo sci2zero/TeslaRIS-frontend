@@ -1,5 +1,6 @@
 import { ReportType } from "@/models/AssessmentModel";
 import i18n from ".";
+import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const reportTypeSr = [
     { title: "Tabela 6.3.", value: ReportType.TABLE_63 },
@@ -27,6 +28,8 @@ export const getReportTypeTitleFromValueAutoLocale = (value: ReportType) => {
     let reportTypeArray = reportTypeEn;
     if (locale == "sr") {
         reportTypeArray = reportTypeSr;
+    } else if (locale == "sr-cyr") {
+        reportTypeArray = transliterateContentToCyrillic(reportTypeSr);
     }
 
     return (reportTypeArray.find(item => item.value === value) || {}).title;
@@ -36,6 +39,8 @@ export const getReportTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
             return reportTypeSr;
+        case "sr-cyr":
+            return transliterateContentToCyrillic(reportTypeSr);
         case "en":
             return reportTypeEn;
     }

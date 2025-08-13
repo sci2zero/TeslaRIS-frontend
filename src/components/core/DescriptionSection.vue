@@ -6,7 +6,7 @@
                     <generic-crud-modal
                         :form-component="DescriptionOrBiographyUpdateForm"
                         :form-props="{ presetDescriptionOrBiography: description ? description : [] }"
-                        :entity-name="isGeneralDescription ? '' : (isBiography ? 'Biography' : 'Abstract')"
+                        :entity-name="getEntityName()"
                         is-update
                         is-section-update
                         :read-only="!canEdit"
@@ -14,7 +14,7 @@
                         @update="emitToParent"
                     />
 
-                    <div><b>{{ isGeneralDescription ? $t('descriptionLabel') : (isBiography ? $t("biographyLabel") : $t("abstractLabel")) }}</b></div>
+                    <div><b>{{ getSectionTitle() }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <rich-text-editor v-model="descriptionDisplay" :editable="false"></rich-text-editor>
                 </v-card-text>
@@ -49,6 +49,14 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        isExtendedAbstract: {
+            type: Boolean,
+            default: false
+        },
+        isRemark: {
+            type: Boolean,
+            default: false
+        },
         description: {
             type: Object as PropType<MultilingualContent[] | undefined>,
             required: true
@@ -80,10 +88,37 @@ export default defineComponent({
             descriptionDisplay.value = returnCurrentLocaleContent(props.description) as string;
         };
 
+        const getSectionTitle = () => {
+            if (props.isGeneralDescription) {
+                return i18n.t('descriptionLabel');
+            } else if (props.isBiography) {
+                return i18n.t("biographyLabel");
+            } else if (props.isExtendedAbstract) {
+                return i18n.t("extendedAbstractLabel");
+            } else if (props.isRemark) {
+                return i18n.t("remarkLabel")
+            }
+
+            return i18n.t("abstractLabel")
+        };
+
+        const getEntityName = () => {
+            if (props.isBiography) {
+                return "Biography";
+            } else if (props.isExtendedAbstract) {
+                return "ExtendedAbstract";
+            } else if (props.isRemark) {
+                return "Remark";
+            }
+
+            return props.isGeneralDescription ? "" : "Abstract";
+        };
+
         return { 
             emitToParent, returnCurrentLocaleContent,
             DescriptionOrBiographyUpdateForm,
-            descriptionDisplay
+            descriptionDisplay, getSectionTitle,
+            getEntityName
         };
     },
 });

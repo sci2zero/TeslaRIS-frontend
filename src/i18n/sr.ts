@@ -100,7 +100,8 @@ export default {
         legacyFileRedirect: "Preusmeravanje",
         notFound: "Nije pronađeno",
         emailChangeConfirmation: "Potvrda promene email-a",
-        contact: "Kontakt"
+        contact: "Kontakt",
+        publicDissertationsReport: "Disertacije na javnom uvidu"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -666,17 +667,17 @@ export default {
     clientPreferredLanguageLabel: "Izabrani jezik klijenta",
     dailyRequestsLabel: "Dnevni limit zahtjeva",
     writingLanguageLabel: "Pismo",
-    preliminaryFilesLabel: "Preliminarni fajlovi",
+    preliminaryFilesLabel: "Preliminarni dokumenti",
     preliminarySupplementsLabel: "Preliminarni dodaci",
     commissionReportsLabel: "Izveštaji komisije",
     onPublicReviewLabel: "Završni rad je na javnom uvidu do {0}",
     putOnPublicReviewLabel: "Postavi na uvid javnosti",
     removeFromPublicReviewLabel: "Skloni sa javnog uvida",
-    missingAttachmentsMessage: "Broj preliminarnih fajlova, dodataka i izveštaja sa konferencije nije jednak.",
-    datesOfPublicReviewLabel: "Datumi stavljanja na uvid javnosti:",
-    noAttachmentsMessage: "Nisu unešeni neophodni podaci i dokumenti za postavljanje na uvid javnosti. Neophodni podaci su: Naslov, Autor, i Organizaciona jedinica. Neophodni (preliminarni) dokumenti su: disertacija i izveštaj komisije.",
-    putOnPublicReviewWarningMessage: "Kada se završni rad stavi na uvid javnosti, sve izmene biće onemogućene do isteka perioda javnog uvida.",
-    removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa uvida javnosti biće omogućene izmene nakon čega ćete moći da započnete novi ili nastavite trenutni uvid. Ovo je operacija koju ne bi trebalo koristiti osim u vanrednim situacijama.",
+    missingAttachmentsMessage: "Broj preliminarnih dokumenata, dodataka i izveštaja sa konferencije nije jednak.",
+    datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
+    noAttachmentsMessage: "Nisu unešeni neophodni podaci i dokumenti za postavljanje na javni uvid. Neophodni podaci su: Naslov, Autor, i Organizaciona jedinica. Neophodni (preliminarni) dokumenti su: disertacija i izveštaj komisije.",
+    putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka perioda javnog uvida.",
+    removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene nakon čega ćete moći da započnete novi ili nastavite trenutni uvid. Ovo je operacija koju ne bi trebalo koristiti osim u vanrednim situacijama.",
     classifiedByMeLabel: "Klasifikovano od strane mene",
     institutionProfileLabel: "Profil institucije",
     assessedByMeLabel: "Vrednovano od strane mene",
@@ -736,7 +737,7 @@ export default {
     newSearchLabel: "Novi upit",
     applyFiltersLabel: "Primeni",
     resetFiltersLabel: "Resetuj",
-    filesForDownloadLabel: "Fajlovi za preuzimanje",
+    filesForDownloadLabel: "Dokumenta za preuzimanje",
     exportTableLabel: "Izvoz tabele",
     exportFileFormatLabel: "Format izvezenog fajla",
     exportAllLabel: "Izvezi sve",
@@ -830,31 +831,31 @@ export default {
     },
     "licenses": {
         "by": {
-            "title": "CC BY",
+            "title": "Autorstvo (CC BY)",
             "description": "Mora se navesti autorstvo."
         },
         "by_sa": {
-            "title": "CC BY-SA",
+            "title": "Autorstvo - deliti pod istim uslovima (CC BY-SA)",
             "description": "Mora se navesti autorstvo i deljeni radovi moraju biti pod istom licencom."
         },
         "by_nd": {
-            "title": "CC BY-ND",
+            "title": "Autorstvo - bez prerade (CC BY-ND)",
             "description": "Mora se navesti autorstvo, a izmenjeni materijal se ne sme distribuirati."
         },
         "by_nc": {
-            "title": "CC BY-NC",
+            "title": "Autorstvo - nekomercijalno (CC BY-NC)",
             "description": "Mora se navesti autorstvo i materijal se ne sme koristiti u komercijalne svrhe."
         },
         "by_nc_sa": {
-            "title": "CC BY-NC-SA",
+            "title": "Autorstvo - nekomercijalno - deliti pod istim uslovima (CC BY-NC-SA)",
             "description": "Mora se navesti autorstvo, ne sme se koristiti u komercijalne svrhe i radovi moraju biti deljeni pod istim uslovima."
         },
         "by_nc_nd": {
-            "title": "CC BY-NC-ND",
+            "title": "Autorstvo - nekomercijalno - bez prerade (CC BY-NC-ND)",
             "description": "Mora se navesti autorstvo, materijal se ne sme koristiti u komercijalne svrhe niti menjati ili distribuirati izmenjen."
         },
         "cc0": {
-            "title": "CC0 (Public Domain)",
+            "title": "U javnom vlasništvu (CC0)",
             "description": "Autor se odrekao svih prava. Možete slobodno kopirati, menjati i distribuirati bez dozvole."
         }
     },
@@ -936,5 +937,48 @@ export default {
     updateJournalPublicationLabel: "Ažuriraj rad u časopisu",
     commissionViewLabel: "Posmatraj kao komisija",
     defaultForMServiceLabel: "Podrazumevana za M-Servis",
-    cyclicOrgUnitRelationLabel: "Organizaciona jedinica ne može biti deo same sebe."
+    cyclicOrgUnitRelationLabel: "Organizaciona jedinica ne može biti deo same sebe.",
+    udcFormatError: "Pogrešan format UDK broja.",
+    numberOfChaptersLabel: "Broj poglavlja",
+    numberOfReferencesLabel: "Broj referenci",
+    numberOfIllustrationsLabel: "Broj ilustracija",
+    numberOfGraphsLabel: "Broj grafova",
+    numberOfTablesLabel: "Broj tabela",
+    numberOfAppendicesLabel: "Broj priloga",
+    scientificAreaLabel: "Naučna oblast",
+    scientificSubAreaLabel: "Uža naučna oblast (naučna disciplina)",
+    placeOfKeepLabel: "Mesto čuvanja",
+    udcLabel: "UDK broj",
+    typeOfTitleLabel: "Vrsta titule",
+    extendedAbstractLabel: "Prošireni apstrakt",
+    remarkLabel: "Napomena",
+    updateExtendedAbstractLabel: "Ažuriraj prošireni apstrakt",
+    updateRemarkLabel: "Ažuriraj napomenu",
+    updateTitleLabel: "Ažuriraj naslov",
+    alternateTitleLabel: "Alternativni naslov",
+    navigateToThesisSearchMessage: "Nakon odbrane, elektronska verzija doktorske disertacije i doktorskog umetničkog projekta će biti dostupna preko Digitalne biblioteke disertacija, na ",
+    linkLabel: "linku.",
+    browseArchiveForYearLabel: "Da pretražite arhivu javnih uvida izaberite godinu:",
+    notYetDefendedNavigationLabel: "Doktorske disertacije koje su bile na javnom uvidu 30 dana, a nisu još odbranjene su dostupne na ovom ",
+    publicReviewOngoingLabel: "Doktorske disertacije i doktorski umetnički projekti koji su na javnom uvidu u periodu od 30 dana su dostupni na ovom ",
+    facultyLabel: "Fakultet",
+    scientificOrArtFieldLabel: "Naučna ili umetnička oblast",
+    surnameAndNameLabel: "Prezime i ime",
+    publicationTitleLabel: "Naslov rada",
+    publicReviewPeriodLabel: "Stavljeno na uvid javnosti u periodu",
+    downloadableDocumentsLabel: "Dokumenta za preuzimanje",
+    archiveYearLabel: "Godina",
+    institutionPublicReviewDissertationsLabel: "Doktorske disertacije i doktorski umetnički projekti koji su na javnom uvidu za {0}",
+    allPublicReviewDissertationsLabel: "Sve doktorske disertacije i doktorski umetnički projekti koji su na javnom uvidu",
+    institutionPublicReviewDissertationsArchiveLabel: "Arhiva doktorskih disertacija i doktorskih umetničkih projekata na javnom uvidu za {0}",
+    publicReviewDissertationsArchiveLabel: "Arhiva svih doktorskih disertacija i doktorskih umetničkih projekata na javnom uvidu",
+    publicReviewDissertationsLabel: "Javni uvid disertacija",
+    importantNoteLabel: "Važno",
+    thesesLabel: "Završni radovi",
+    contentLabel: "Sadržaj",
+    pageTypeLabel: "Tip stranice",
+    updateOrganisationUnitLabel: "Ažuriraj organizacionu jedinicu",
+    updatePublicReviewPageContentLabel: "Sadržaj stranica za javni uvid",
+    shareLabel: "Podeli preko",
+    updateInstitutionDefaultSubmissionContentLabel: "Podrazumevani sadržaj za unos"
 }

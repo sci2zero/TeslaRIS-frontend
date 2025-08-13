@@ -31,7 +31,7 @@
                     <td>
                         {{ row.item.name }}
                     </td>
-                    <td v-if="$i18n.locale == 'sr'">
+                    <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.employmentsSr) }}
                     </td>
                     <td v-else>

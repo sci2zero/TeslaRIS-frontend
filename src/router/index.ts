@@ -103,6 +103,7 @@ import LegacyRedirectView from "@/views/LegacyRedirectView.vue";
 import NotFound from "@/views/NotFound.vue";
 import EmailUpdateConfirmationView from "@/views/EmailUpdateConfirmationView.vue";
 import FeedbackForm from "@/components/core/FeedbackForm.vue";
+import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDissertationsView.vue";
 
 
 const roles = {
@@ -1107,6 +1108,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalLibrarian, roles.headOfLibrary],
+                    },
+                },
+                {
+                    path: "thesis-library/public-dissertations",
+                    name: "publicDissertationsReport",
+                    component: PublicReviewDissertationsView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
                     },
                 },
                 {

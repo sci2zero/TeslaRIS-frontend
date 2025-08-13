@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftProceedingsPublication?.contributions ? leftProceedingsPublication.contributions : []"
                             :document-id="leftProceedingsPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightProceedingsPublication?.contributions ? rightProceedingsPublication.contributions : []"
                             :document-id="rightProceedingsPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -334,11 +336,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightProceedingsPublication.value?.id : leftProceedingsPublication.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "proceedingsPublicationLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "proceedingsPublicationLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftProceedingsPublication.value?.title : rightProceedingsPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

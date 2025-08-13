@@ -4,7 +4,7 @@
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
+                    <v-card-title class="text-h5 text-center edit-pen-container">
                         <v-skeleton-loader
                             :loading="!thesis"
                             type="heading"
@@ -12,6 +12,19 @@
                             class="text-center"
                         >
                             <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)"></rich-title-renderer>
+                            <div>
+                                <generic-crud-modal
+                                    class="mb-6"
+                                    :form-component="AlternateTitleForm"
+                                    :form-props="{ presetTitle: thesis?.title, presetAlternateTitle: thesis?.alternateTitle }"
+                                    entity-name="Title"
+                                    is-update
+                                    is-section-update
+                                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                                    @update="updateTitle"
+                                />
+                            </div>
+                            <rich-title-renderer v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0" :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"></rich-title-renderer>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -103,13 +116,31 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div v-if="thesis?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
+                                <div v-if="thesis?.uris && thesis?.uris.length > 0">
+                                    {{ $t("uriInputLabel") }}:
                                 </div>
-                                <div v-if="thesis?.numberOfPages" class="response">
-                                    {{ thesis.numberOfPages }}
+                                <div v-if="thesis?.uris && thesis?.uris.length > 0" class="response">
+                                    <uri-list :uris="thesis?.uris"></uri-list>
+                                </div>
+                                <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0">
+                                    {{ $t("typeOfTitleLabel") }}:
+                                </div>
+                                <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.typeOfTitle) }}
+                                </div>
+                            </v-col>
+                            <v-col cols="3">
+                                <div v-if="thesis?.eisbn">
+                                    eISBN:
+                                </div>
+                                <div v-if="thesis?.eisbn" class="response">
+                                    {{ thesis.eisbn }}
+                                </div>
+                                <div v-if="thesis?.printISBN">
+                                    Print ISBN:
+                                </div>
+                                <div v-if="thesis?.printISBN" class="response">
+                                    {{ thesis.printISBN }}
                                 </div>
                                 <div v-if="thesis?.doi">
                                     DOI:
@@ -123,11 +154,11 @@
                                 <div v-if="thesis?.openAlexId" class="response">
                                     <identifier-link :identifier="thesis.openAlexId" type="open_alex"></identifier-link>
                                 </div>
-                                <div v-if="thesis?.uris && thesis?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
+                                <div v-if="thesis?.udc">
+                                    {{ $t("udcLabel") }}:
                                 </div>
-                                <div v-if="thesis?.uris && thesis?.uris.length > 0" class="response">
-                                    <uri-list :uris="thesis?.uris"></uri-list>
+                                <div v-if="thesis?.udc" class="response">
+                                    {{ thesis.udc }}
                                 </div>
                                 <div v-if="thesis?.languageId">
                                     {{ $t("languageLabel") }}:
@@ -145,6 +176,24 @@
                                         {{ languageTagMap.get(thesis?.writingLanguageTagId)?.display }}
                                     </v-chip>
                                 </div>
+                                <div v-if="thesis?.placeOfKeep && thesis?.placeOfKeep.length > 0">
+                                    {{ $t("placeOfKeepLabel") }}:
+                                </div>
+                                <div v-if="thesis?.placeOfKeep && thesis?.placeOfKeep.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.placeOfKeep) }}
+                                </div>
+                                <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0">
+                                    {{ $t("scientificAreaLabel") }}:
+                                </div>
+                                <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.scientificArea) }}
+                                </div>
+                                <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0">
+                                    {{ $t("scientificSubAreaLabel") }}:
+                                </div>
+                                <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(thesis.scientificSubArea) }}
+                                </div>
                                 <div v-if="thesis?.isOnPublicReview" class="response mt-5">
                                     {{ $t("onPublicReviewLabel", [localiseDate(thesis?.publicReviewEnd)]) }}
                                 </div>
@@ -154,6 +203,50 @@
                                     <p v-for="date in thesis.publicReviewDates" :key="date">
                                         {{ localiseDate(date) }}
                                     </p>
+                                </div>
+                            </v-col>
+                            <v-col cols="3">
+                                <div v-if="thesis?.numberOfPages">
+                                    {{ $t("numberOfPagesLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfPages" class="response">
+                                    {{ thesis.numberOfPages }}
+                                </div>
+                                <div v-if="thesis?.numberOfChapters">
+                                    {{ $t("numberOfChaptersLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfChapters" class="response">
+                                    {{ thesis.numberOfChapters }}
+                                </div>
+                                <div v-if="thesis?.numberOfReferences">
+                                    {{ $t("numberOfReferencesLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfReferences" class="response">
+                                    {{ thesis.numberOfReferences }}
+                                </div>
+                                <div v-if="thesis?.numberOfIllustrations">
+                                    {{ $t("numberOfIllustrationsLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfIllustrations" class="response">
+                                    {{ thesis.numberOfIllustrations }}
+                                </div>
+                                <div v-if="thesis?.numberOfGraphs">
+                                    {{ $t("numberOfGraphsLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfGraphs" class="response">
+                                    {{ thesis.numberOfGraphs }}
+                                </div>
+                                <div v-if="thesis?.numberOfTables">
+                                    {{ $t("numberOfTablesLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfTables" class="response">
+                                    {{ thesis.numberOfTables }}
+                                </div>
+                                <div v-if="thesis?.numberOfAppendices">
+                                    {{ $t("numberOfAppendicesLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfAppendices" class="response">
+                                    {{ thesis.numberOfAppendices }}
                                 </div>
                             </v-col>
                         </v-row>
@@ -196,7 +289,7 @@
                     {{ $t("restartPublicReviewLabel") }}
                 </v-btn>
                 <v-btn
-                    v-if="userCanPutOnPublicReview && !thesis?.isArchived"
+                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="changeArchiveState(true)">
@@ -269,9 +362,13 @@
         >
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
-                    :document-id="thesis?.id" :contribution-list="thesis?.contributions ? thesis?.contributions : []" :read-only="!canEdit"
+                    :document-id="thesis?.id"
+                    :contribution-list="thesis?.contributions ? thesis?.contributions : []"
+                    :read-only="!canEdit"
                     board-members-allowed
-                    @update="updateContributions"></person-document-contribution-tabs>
+                    limit-one-author
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -283,23 +380,25 @@
                 </keyword-list>
 
                 <!-- Description -->
-                <description-section
-                    :description="thesis?.description"
-                    :can-edit="canEdit && !thesis?.isOnPublicReview"
-                    @update="updateDescription">
-                </description-section>
-
-                <!-- Research Area -->
-                <v-row>
-                    <v-col cols="12">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text class="edit-pen-container">
-                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                                <research-area-hierarchy :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"></research-area-hierarchy>
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                <div>
+                    <description-section
+                        :description="thesis?.description"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        @update="updateDescription"
+                    />
+                    <description-section
+                        :description="thesis?.extendedAbstract"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        is-extended-abstract
+                        @update="updateExtendedAbstract"
+                    />
+                    <description-section
+                        :description="thesis?.remark"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        is-remark
+                        @update="updateRemark"
+                    />
+                </div>
 
                 <attachment-section 
                     :document="thesis"
@@ -387,10 +486,8 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
-import type { OrganisationUnitResponse, ResearchArea } from '@/models/OrganisationUnitModel';
+import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import { localiseDate } from '@/i18n/dateLocalisation';
-import ResearchAreaService from '@/services/ResearchAreaService';
-import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
@@ -418,11 +515,12 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, ResearchAreaHierarchy, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
     setup() {
         const currentTab = ref("contributions");
 
@@ -453,8 +551,6 @@ export default defineComponent({
         const registryBookEntryId = ref(-1);
 
         const documentClassifications = ref<EntityClassificationResponse[]>([]);
-
-        const researchAreaHierarchy = ref<ResearchArea>();
 
         const icon = ref("mdi-certificate-outline");
 
@@ -559,11 +655,6 @@ export default defineComponent({
                 })
             });
 
-            if (thesis.value?.researchAreaId) {
-                ResearchAreaService.readResearchAreaHierarchy(thesis.value?.researchAreaId).then(response => {
-                    researchAreaHierarchy.value = response.data;
-                });
-            }
             actionsRef.value?.fetchCitations();
         };
 
@@ -585,6 +676,22 @@ export default defineComponent({
             performUpdate(false);
         };
 
+        const updateExtendedAbstract = (extendedAbstract: MultilingualContent[]) => {
+            thesis.value!.extendedAbstract = extendedAbstract;
+            performUpdate(false);
+        };
+
+        const updateRemark = (remark: MultilingualContent[]) => {
+            thesis.value!.remark = remark;
+            performUpdate(true);
+        };
+
+        const updateTitle = (titleInformation: {title: MultilingualContent[], alternateTitle: MultilingualContent[]}) => {
+            thesis.value!.title = titleInformation.title;
+            thesis.value!.alternateTitle = titleInformation.alternateTitle;
+            performUpdate(true);
+        };
+
         const updateContributions = (contributions: PersonDocumentContribution[]) => {
             thesis.value!.contributions = contributions;
             performUpdate(true);
@@ -600,14 +707,27 @@ export default defineComponent({
             thesis.value!.publisherId = basicInfo.publisherId;
             thesis.value!.organisationUnitId = basicInfo.organisationUnitId;
             thesis.value!.numberOfPages = basicInfo.numberOfPages;
+            thesis.value!.numberOfChapters = basicInfo.numberOfChapters;
+            thesis.value!.numberOfReferences = basicInfo.numberOfReferences;
+            thesis.value!.numberOfIllustrations = basicInfo.numberOfIllustrations;
+            thesis.value!.numberOfTables = basicInfo.numberOfTables;
+            thesis.value!.numberOfGraphs = basicInfo.numberOfGraphs;
+            thesis.value!.numberOfAppendices = basicInfo.numberOfAppendices;
             thesis.value!.languageId = basicInfo.languageId;
             thesis.value!.writingLanguageTagId = basicInfo.writingLanguageTagId;
-            thesis.value!.researchAreaId = basicInfo.researchAreaId;
             thesis.value!.externalOrganisationUnitName = basicInfo.externalOrganisationUnitName;
             thesis.value!.topicAcceptanceDate = basicInfo.topicAcceptanceDate;
             thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
             thesis.value!.thesisType = basicInfo.thesisType;
             thesis.value!.openAlexId = basicInfo.openAlexId;
+            thesis.value!.scientificArea = basicInfo.scientificArea;
+            thesis.value!.scientificSubArea = basicInfo.scientificSubArea;
+            thesis.value!.eisbn = basicInfo.eisbn;
+            thesis.value!.printISBN = basicInfo.printISBN;
+            thesis.value!.udc = basicInfo.udc;
+            thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
+            thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
+            thesis.value!.typeOfTitle = basicInfo.typeOfTitle;
 
             performUpdate(true);
         };
@@ -757,17 +877,17 @@ export default defineComponent({
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
-            addAttachment, updateAttachment, deleteAttachment,
+            addAttachment, updateAttachment, deleteAttachment, AlternateTitleForm,
             updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,
             snackbar, snackbarMessage, updateContributions, registryBookEntryId,
-            updateBasicInfo, organisationUnit, ThesisUpdateForm,
-            researchAreaHierarchy, event, getThesisTitleFromValueAutoLocale,
+            updateBasicInfo, organisationUnit, ThesisUpdateForm, updateRemark,
+            event, getThesisTitleFromValueAutoLocale, updateExtendedAbstract,
             handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
             currentRoute, actionsRef, ApplicableEntityType, canClassify,
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
-            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState,
+            isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry
         };
 }})

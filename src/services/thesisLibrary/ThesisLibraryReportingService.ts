@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { ThesisReportCounts, ThesisReportRequest } from "@/models/ThesisLibraryModel";
+import type { ThesisPublicReviewResponse, ThesisReportCounts, ThesisReportRequest } from "@/models/ThesisLibraryModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 
 
@@ -31,6 +31,10 @@ export class ThesisLibraryReportingService extends BaseService {
     async downloadReport(body: ThesisReportRequest, lang: string): Promise<void> {
         const response = await axios.post(this.basePath + `thesis-library/report/download/${lang}`, body, {responseType: 'blob'})
         this.initialzeDownload(response, "report.docx", ".docx");
+    }
+
+    async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {
+        return super.sendRequest(axios.get, `thesis-library/dissertation-report?notDefendedOnly=${notDefendedOnly}${institutionId ? ("&institutionId=" + institutionId) : ""}${year ? ("&year=" + year) : ""}${pageable}`);
     }
 }
 

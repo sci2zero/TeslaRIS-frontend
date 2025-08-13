@@ -14,7 +14,10 @@
             </v-col>
             <v-col cols="2">
                 <v-col>
-                    <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
+                    <v-btn
+                        v-show="inputs.length > ((presetContributions && presetContributions.length > 0) ? 0 : 1)"
+                        icon
+                        @click="removeInput(index)">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
                     <v-btn v-show="index === inputs.length - 1" icon @click="addInput">
@@ -30,6 +33,7 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
+                    :readonly="lockContributionType !== undefined"
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
@@ -78,11 +82,28 @@ export default defineComponent({
         isUpdate: {
             type: Boolean,
             default: false
+        },
+        lockContributionType: {
+            type: Object as PropType<PublicationSeriesContributionType | undefined>,
+            default: undefined
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const inputs = ref<any[]>(props.presetContributions.length > 0 ? Array.from({ length: props.presetContributions.length }, () => ({})) : [{contributionType: {title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), value: PublicationSeriesContributionType.EDITOR}}]);
+        const inputs = ref<any[]>(
+            props.presetContributions.length > 0 ? Array.from(
+                { length: props.presetContributions.length }, () => ({})) : 
+                [
+                    {
+                        contributionType: {
+                            title: getTitleFromValueAutoLocale(
+                                props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR
+                            ),
+                            value: props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR
+                        }
+                    }
+                ]
+            );
         const baseContributionRef = ref<any>([]);
 
         onMounted(() => {
@@ -112,8 +133,8 @@ export default defineComponent({
 
         const addInput = () => {
             inputs.value.push({contributionType: {
-                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), 
-                    value: PublicationSeriesContributionType.EDITOR
+                    title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR), 
+                    value: props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR
                 }
             });
         };

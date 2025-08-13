@@ -22,6 +22,7 @@
                                 ref="updateFormRef"
                                 :preset-contributions="presetPublicationSeriesContributions"
                                 is-update
+                                :lock-contribution-type="lockContributionType"
                                 @set-input="contributions = $event"
                             />
                         </v-container>
@@ -45,7 +46,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { PersonPublicationSeriesContribution } from "@/models/PublicationSeriesModel";
+import type { PersonPublicationSeriesContribution, PublicationSeriesContributionType } from "@/models/PublicationSeriesModel";
 import PersonPublicationSeriesContributionForm from "../PersonPublicationSeriesContributionForm.vue";
 
 
@@ -60,6 +61,10 @@ export default defineComponent({
         presetPublicationSeriesContributions: {
             type: Object as PropType<PersonPublicationSeriesContribution[]>,
             required: true
+        },
+        lockContributionType: {
+            type: Object as PropType<PublicationSeriesContributionType | undefined>,
+            default: undefined
         }
     },
     emits: ["update"],

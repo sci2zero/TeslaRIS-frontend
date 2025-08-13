@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftJournalPublication?.contributions ? leftJournalPublication.contributions : []"
                             :document-id="leftJournalPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightJournalPublication?.contributions ? rightJournalPublication.contributions : []"
                             :document-id="rightJournalPublication?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -343,11 +345,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightJournalPublication.value?.id : leftJournalPublication.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "journalPublicationLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "journalPublicationLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftJournalPublication.value?.title : rightJournalPublication.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

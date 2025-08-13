@@ -67,11 +67,9 @@
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
-import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { DocumentFile, DocumentFileResponse } from '@/models/DocumentFileModel';
-import { resourceTypeSr, resourceTypeEn } from "@/i18n/resourceType";
 import { AccessRights, License, ResourceType } from "@/models/DocumentFileModel";
 import type { PropType } from 'vue';
 import { onMounted } from 'vue';
@@ -79,6 +77,8 @@ import { getNameFromOrdinal } from '@/utils/EnumUtil';
 import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
+import { getLicenseTitleFromValueAutoLocale, getLisenseTypesForGivenLocale } from '@/i18n/license';
+import { getResourceTypesForGivenLocale } from '@/i18n/resourceType';
 
 export default defineComponent({
     name: "DocumentFileSubmissionForm",
@@ -109,8 +109,9 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
-        const i18n = useI18n();
         const languageTags = ref<LanguageTagResponse[]>([]);
+
+        const cclicenseTypes = getLisenseTypesForGivenLocale();
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -123,10 +124,10 @@ export default defineComponent({
 
                     if (props.presetDocumentFile.accessRights.toString() === "OPEN_ACCESS") {
                         isOpenAccess.value = true;
-                        selectedCCLicense.value = { title: cclicenseTypes.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
+                        selectedCCLicense.value = { title: cclicenseTypes?.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
                     }
 
-                    selectedResourceType.value = { title: resourceTypes.value.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
+                    selectedResourceType.value = { title: resourceTypes.value?.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
             } 
         });
 
@@ -136,7 +137,7 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: null };
-        const resourceTypes = computed(() => i18n.locale.value === "sr" ? resourceTypeSr : resourceTypeEn);
+        const resourceTypes = computed(() => getResourceTypesForGivenLocale());
         const selectedResourceType = ref(selectionPlaceholder);
 
         const accessRights = [
@@ -148,18 +149,8 @@ export default defineComponent({
             { title: "Restricted Access", value: AccessRights.RESTRICTED_ACCESS },
         ];
 
-        const cclicenseTypes = [
-            { title: "CC BY", value: License.BY },
-            { title: "CC BY-SA", value: License.BY_SA },
-            { title: "CC BY-NC", value: License.BY_NC },
-            { title: "CC BY-NC-SA", value: License.BY_NC_SA },
-            { title: "CC BY-ND", value: License.BY_ND },
-            { title: "CC BY-NC-ND", value: License.BY_NC_ND },
-            { title: "CC Zero (Public Domain)", value: License.CC0 }
-        ];
-
         const selectedAccessRight = ref({ title: "All Rights Reserved", value: AccessRights.ALL_RIGHTS_RESERVED });
-        const selectedCCLicense = ref({ title: "NC BY", value: License.BY });
+        const selectedCCLicense = ref({ title: getLicenseTitleFromValueAutoLocale(License.BY) as string, value: License.BY });
         const isOpenAccess = ref<boolean>(false);
 
         const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();

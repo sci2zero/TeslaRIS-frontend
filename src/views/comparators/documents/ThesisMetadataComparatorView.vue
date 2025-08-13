@@ -29,7 +29,8 @@
                         <person-document-contribution-list
                             :contribution-list="leftThesis?.contributions ? leftThesis.contributions : []"
                             :document-id="leftThesis?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -75,7 +76,8 @@
                         <person-document-contribution-list
                             :contribution-list="rightThesis?.contributions ? rightThesis.contributions : []"
                             :document-id="rightThesis?.id"
-                            :can-reorder="true">
+                            :can-reorder="true"
+                            in-comparator>
                         </person-document-contribution-list>
                     </v-card-text>
                 </v-card>
@@ -168,14 +170,43 @@ export default defineComponent({
             mergeMultilingualContentField(thesis1.description, thesis2.description);
             thesis2.description = [];
 
+            mergeMultilingualContentField(thesis1.scientificArea, thesis2.scientificArea);
+            thesis2.scientificArea = [];
+
+            mergeMultilingualContentField(thesis1.scientificSubArea, thesis2.scientificSubArea);
+            thesis2.scientificSubArea = [];
+
+            mergeMultilingualContentField(thesis1.typeOfTitle, thesis2.typeOfTitle);
+            thesis2.typeOfTitle = [];
+
+            mergeMultilingualContentField(thesis1.placeOfKeep, thesis2.placeOfKeep);
+            thesis2.placeOfKeep = [];
+
             mergeDocumentAttachments(thesis1, thesis2);
 
             thesis1.organisationUnitId = thesis2.organisationUnitId;
             thesis1.thesisType = thesis2.thesisType;
-            thesis1.researchAreaId = thesis2.researchAreaId;
+            thesis1.printISBN = thesis2.printISBN;
+            thesis2.printISBN = "";
+            thesis1.eisbn = thesis2.eisbn;
+            thesis2.eisbn = "";
+            thesis1.udc = thesis2.udc;
+            thesis2.udc = "";
 
             thesis1.numberOfPages = thesis2.numberOfPages;
             thesis2.numberOfPages = 0;
+            thesis1.numberOfChapters = thesis2.numberOfChapters;
+            thesis2.numberOfChapters = 0;
+            thesis1.numberOfReferences = thesis2.numberOfReferences;
+            thesis2.numberOfReferences = 0;
+            thesis1.numberOfGraphs = thesis2.numberOfGraphs;
+            thesis2.numberOfGraphs = 0;
+            thesis1.numberOfIllustrations = thesis2.numberOfIllustrations;
+            thesis2.numberOfIllustrations = 0;
+            thesis1.numberOfTables = thesis2.numberOfTables;
+            thesis2.numberOfTables = 0;
+            thesis1.numberOfAppendices = thesis2.numberOfAppendices;
+            thesis2.numberOfAppendices = 0;
             thesis1.doi = thesis2.doi;
             thesis2.doi = "";
             thesis1.openAlexId = thesis2.openAlexId;
@@ -242,7 +273,12 @@ export default defineComponent({
             leftThesis.value!.doi = updatedInfo.doi;
             leftThesis.value!.openAlexId = updatedInfo.openAlexId;
             leftThesis.value!.numberOfPages = updatedInfo.numberOfPages;
-            leftThesis.value!.researchAreaId = updatedInfo.researchAreaId;
+            leftThesis.value!.numberOfChapters = updatedInfo.numberOfChapters;
+            leftThesis.value!.numberOfReferences = updatedInfo.numberOfReferences;
+            leftThesis.value!.numberOfIllustrations = updatedInfo.numberOfIllustrations;
+            leftThesis.value!.numberOfTables = updatedInfo.numberOfTables;
+            leftThesis.value!.numberOfGraphs = updatedInfo.numberOfGraphs;
+            leftThesis.value!.numberOfAppendices = updatedInfo.numberOfAppendices;
             leftThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
             leftThesis.value!.languageId = updatedInfo.languageId;
             leftThesis.value!.writingLanguageTagId = updatedInfo.writingLanguageTagId;
@@ -251,6 +287,11 @@ export default defineComponent({
             leftThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
             leftThesis.value!.topicAcceptanceDate = updatedInfo.topicAcceptanceDate;
             leftThesis.value!.thesisDefenceDate = updatedInfo.thesisDefenceDate;
+            leftThesis.value!.printISBN = updatedInfo.printISBN;
+            leftThesis.value!.eisbn = updatedInfo.eisbn;
+            leftThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
+            leftThesis.value!.udc = updatedInfo.udc;
+            leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -268,7 +309,12 @@ export default defineComponent({
             rightThesis.value!.doi = updatedInfo.doi;
             rightThesis.value!.openAlexId = updatedInfo.openAlexId;
             rightThesis.value!.numberOfPages = updatedInfo.numberOfPages;
-            rightThesis.value!.researchAreaId = updatedInfo.researchAreaId;
+            rightThesis.value!.numberOfChapters = updatedInfo.numberOfChapters;
+            rightThesis.value!.numberOfReferences = updatedInfo.numberOfReferences;
+            rightThesis.value!.numberOfIllustrations = updatedInfo.numberOfIllustrations;
+            rightThesis.value!.numberOfTables = updatedInfo.numberOfTables;
+            rightThesis.value!.numberOfGraphs = updatedInfo.numberOfGraphs;
+            rightThesis.value!.numberOfAppendices = updatedInfo.numberOfAppendices;
             rightThesis.value!.organisationUnitId = updatedInfo.organisationUnitId;
             rightThesis.value!.languageId = updatedInfo.languageId;
             rightThesis.value!.writingLanguageTagId = updatedInfo.writingLanguageTagId;
@@ -277,6 +323,11 @@ export default defineComponent({
             rightThesis.value!.externalOrganisationUnitName = updatedInfo.externalOrganisationUnitName;
             rightThesis.value!.topicAcceptanceDate = updatedInfo.topicAcceptanceDate;
             rightThesis.value!.thesisDefenceDate = updatedInfo.thesisDefenceDate;
+            rightThesis.value!.printISBN = updatedInfo.printISBN;
+            rightThesis.value!.eisbn = updatedInfo.eisbn;
+            rightThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
+            rightThesis.value!.udc = updatedInfo.udc;
+            rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
@@ -343,11 +394,11 @@ export default defineComponent({
             const transferTargetId = side === ComparisonSide.LEFT ? rightThesis.value?.id : leftThesis.value?.id;
 
             try {
+                await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
-
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "thesisLandingPage", query: { id: transferTargetId } });
+                router.push({ name: "thesisLandingPage", params: { id: transferTargetId } });
             } catch {
                 const name = side === ComparisonSide.LEFT ? leftThesis.value?.title : rightThesis.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });

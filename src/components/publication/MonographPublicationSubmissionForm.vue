@@ -28,7 +28,7 @@
                             :key="i"
                             :value="publicationIndex"
                         >
-                            {{ $i18n.locale === "sr" ? publicationIndex.titleSr : publicationIndex.titleOther }}
+                            {{ $i18n.locale.startsWith("sr") ? publicationIndex.titleSr : publicationIndex.titleOther }}
                         </p>
                     </v-col>
                 </v-row>
@@ -134,7 +134,7 @@ import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { MonographPublication, PersonDocumentContribution } from "@/models/PublicationModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { monographPublicationTypeSr, monographPublicationTypeEn } from "@/i18n/monographPublicationType";
+import { getMonographPublicationTypesForGivenLocale } from "@/i18n/monographPublicationType";
 import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
@@ -201,7 +201,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules
         } = useValidationUtils();
 
-        const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => i18n.locale.value === "sr" ? monographPublicationTypeSr : monographPublicationTypeEn);
+        const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => (getMonographPublicationTypesForGivenLocale() as { title: string; value: MonographPublicationType; }[]));
         const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
 
         const listPublications = (monograph: { title: string, value: number }) => {
