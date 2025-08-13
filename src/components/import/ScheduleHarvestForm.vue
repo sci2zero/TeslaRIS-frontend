@@ -27,6 +27,15 @@
                 </v-select>
             </v-col>
         </v-row>
+        <v-row v-if="selectedRecurrenceType.value != RecurrenceType.ONCE">
+            <v-col cols="12">
+                <relative-date-preview
+                    :start-date="startDate"
+                    :end-date="endDate"
+                    :recurrence-period="selectedRecurrenceType.value"
+                />
+            </v-col>
+        </v-row>
     </v-form>
 </template>
 
@@ -37,11 +46,22 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { computed, defineComponent, ref } from 'vue';
 import DatePicker from '../core/DatePicker.vue';
 import TimePicker from '../core/TimePicker.vue';
+import RelativeDatePreview from '../core/RelativeDatePreview.vue';
 
 
 export default defineComponent({
     name: "ScheduleHarvestForm",
-    components: { DatePicker, TimePicker },
+    components: { DatePicker, TimePicker, RelativeDatePreview },
+    props: {
+        startDate: {
+            type: String,
+            required: true
+        },
+        endDate: {
+            type: String,
+            required: true
+        }
+    },
     emits: ["create"],
     setup(_, { emit }) {
         const isFormValid = ref(false);
@@ -65,7 +85,8 @@ export default defineComponent({
             scheduleDate, scheduledTime,
             selectedRecurrenceType,
             recurrenceTypes, submit,
-            requiredSelectionRules
+            requiredSelectionRules,
+            RecurrenceType
         };
     }
 });

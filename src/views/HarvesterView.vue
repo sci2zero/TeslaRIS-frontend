@@ -90,7 +90,7 @@
                 <v-window
                     v-model="currentTab"
                     class="mt-10">
-                    <v-window-item value="externalSources">
+                    <v-window-item v-if="currentTab === 'externalSources'" value="externalSources">
                         <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
                             <v-col cols="12" sm="4">
                                 <date-picker-split
@@ -136,7 +136,7 @@
                             <v-col cols="auto">
                                 <generic-crud-modal
                                     :form-component="ScheduleHarvestForm"
-                                    :form-props="{}"
+                                    :form-props="{startDate: startDate, endDate: endDate}"
                                     entity-name="ScheduleHarvest"
                                     primary-color
                                     :disabled="!isFormValid"
@@ -162,7 +162,7 @@
                         <v-row class="d-flex flex-row justify-center">
                             <v-col cols="12" sm="4">
                                 <date-picker-split
-                                    v-model="startDate"
+                                    v-model="startDateOai"
                                     :label="$t('startDateLabel')"
                                     color="primary"
                                     required
@@ -170,7 +170,7 @@
                             </v-col>
                             <v-col cols="12" sm="4">
                                 <date-picker-split
-                                    v-model="endDate"
+                                    v-model="endDateOai"
                                     :label="$t('endDateLabel')"
                                     color="primary"
                                     required
@@ -181,7 +181,7 @@
                             <v-col cols="auto">
                                 <generic-crud-modal
                                     :form-component="ScheduleHarvestForm"
-                                    :form-props="{}"
+                                    :form-props="{startDate: startDateOai, endDate: endDateOai}"
                                     entity-name="ScheduleHarvest"
                                     primary-color
                                     :disabled="!isFormValid"
@@ -325,6 +325,10 @@ export default defineComponent({
 
         const startDate = ref();
         const endDate = ref();
+
+        const startDateOai = ref();
+        const endDateOai = ref();
+
         const loading = ref(false);
         const harvestComplete = ref(false);
         const numberOfHarvestedDocuments = ref(0);
@@ -568,8 +572,8 @@ export default defineComponent({
                 selectedOaiSource.value,
                 scheduleParams[0],
                 scheduleParams[1],
-                startDate.value.split("T")[0],
-                endDate.value.split("T")[0]
+                startDateOai.value.split("T")[0],
+                endDateOai.value.split("T")[0]
             ).then(() => {
                 fetchScheduledTasks();
                 currentTab.value = "scheduledHarvests";
@@ -599,7 +603,7 @@ export default defineComponent({
             ScheduleHarvestForm, scheduleHarvest,
             scheduledTasks, deleteScheduledHarvestTask,
             oaiSources, selectedOaiSource,
-            scheduleOaiHarvest
+            scheduleOaiHarvest, startDateOai, endDateOai
         };
     },
 });
