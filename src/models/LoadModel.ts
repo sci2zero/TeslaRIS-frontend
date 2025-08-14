@@ -67,7 +67,7 @@ export interface PersonLoad {
     orcid: string;
     scopusAuthorId: string;
     openAlexId: string;
-    webOfScienceId: string;
+    webOfScienceResearcherId: string;
     importId: string;
 }
 

@@ -310,7 +310,7 @@ export default defineComponent({
                 orcid: orcid.value,
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
-                webOfScienceId: webOfScienceId.value,
+                webOfScienceResearcherId: webOfScienceId.value,
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,

@@ -146,7 +146,7 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            if (props.personForLoading.scopusAuthorId || props.personForLoading.openAlexId || props.personForLoading.webOfScienceId) {
+            if (props.personForLoading.scopusAuthorId || props.personForLoading.openAlexId || props.personForLoading.webOfScienceResearcherId) {
                 PersonService.findResearcherByImportIdentifier(props.personForLoading.importId)
                 .then(response => {
                     if(response.data) {
@@ -309,7 +309,7 @@ export default defineComponent({
                     orcid: "",
                     openAlexId: "",
                     scopusAuthorId: "",
-                    webOfScienceId: ""
+                    webOfScienceResearcherId: ""
                 };
 
                 hadToBeCreated.value = true;
