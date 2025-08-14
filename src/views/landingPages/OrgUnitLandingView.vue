@@ -178,6 +178,16 @@
                     is-update compact
                     primary-color outlined
                     :read-only="!canEdit"
+                />
+                <generic-crud-modal
+                    v-if="(canEdit && (isAdmin || isInstitutionalEditor)) || (isInstitutionalLibrarian && loggedInUser?.organisationUnitId === organisationUnit?.id)"
+                    class="ml-2"
+                    :form-component="InstitutionDefaultSubmissionContentForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="InstitutionDefaultSubmissionContent"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="false"
                     @update="updateSuccess()"
                 />
             </div>
@@ -405,6 +415,7 @@ import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
 import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
 import OrganisationUnitTrustConfigurationForm from '@/components/organisationUnit/OrganisationUnitTrustConfigurationForm.vue';
 import OrganisationUnitImportSourceForm from '@/components/organisationUnit/OrganisationUnitImportSourceForm.vue';
+import InstitutionDefaultSubmissionContentForm from '@/components/organisationUnit/InstitutionDefaultSubmissionContentForm.vue';
 
 
 export default defineComponent({
@@ -466,7 +477,7 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, loggedInUser } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
@@ -783,7 +794,8 @@ export default defineComponent({
             PublicReviewContentForm, publicReviewPageContent,
             fetchPublicReviewPageContent,
             OrganisationUnitTrustConfigurationForm,
-            OrganisationUnitImportSourceForm
+            OrganisationUnitImportSourceForm,
+            InstitutionDefaultSubmissionContentForm, loggedInUser
         };
 }})
 

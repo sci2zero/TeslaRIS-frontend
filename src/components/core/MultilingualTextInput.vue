@@ -75,6 +75,10 @@ export default defineComponent({
             type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] | undefined>,
             required: false,
             default: undefined
+        },
+        defaultPlaceholder: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update:modelValue"],
@@ -101,10 +105,20 @@ export default defineComponent({
                         if (language.languageCode === userPreferredLanguage.value.tag) {
                             userPreferredLanguage.value.id = language.id;
                             if(inputs.value.length === 0) {
-                                inputs.value.push({ language: {title: language.languageCode, value: language.id}, text: "", supportedLanguages: supportedLanguages.value });
+                                inputs.value.push(
+                                    {
+                                        language: {title: language.languageCode, value: language.id}, 
+                                        text: props.defaultPlaceholder,
+                                        supportedLanguages: supportedLanguages.value 
+                                    }
+                                );
                             }
                         }
                     });
+
+                    if (props.defaultPlaceholder !== "") {
+                        sendContentToParent();
+                    }
                 });
             });
         };

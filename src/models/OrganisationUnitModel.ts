@@ -122,3 +122,8 @@ export interface OrganisationUnitImportSource {
     importOpenAlex: boolean;
     importWebOfScience: boolean;
 }
+
+export interface InstitutionDefaultSubmissionContent {
+    placeOfKeep: MultilingualContent[];
+    typeOfTitle: MultilingualContent[];
+}

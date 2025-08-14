@@ -974,5 +974,6 @@ export default {
     scheduledBackupsLabel: "Scheduled backups",
     harvestDisabledMessage: "Source scanning is disabled.",
     updateOrganisationUnitImportSourceLabel: "Data sources",
-    notMyPublicationLabel: "Not my publication"
+    notMyPublicationLabel: "Not my publication",
+    updateInstitutionDefaultSubmissionContentLabel: "Default submission content"
 }

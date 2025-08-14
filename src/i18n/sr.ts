@@ -999,5 +999,6 @@ export default {
     scheduledBackupsLabel: "Zakazani bekapi",
     harvestDisabledMessage: "Skeniranje izvora je onemogućeno.",
     updateOrganisationUnitImportSourceLabel: "Izvori podataka",
-    notMyPublicationLabel: "Nije moj rad"
+    notMyPublicationLabel: "Nije moj rad",
+    updateInstitutionDefaultSubmissionContentLabel: "Podrazumevani sadržaj za unos"
 }
