@@ -1,4 +1,4 @@
-@import "./base.css";
+@import "tailwindcss";
 
 #app {
     margin: 0 auto;
@@ -40,7 +40,7 @@ input {
     display: block;
     width: 100%;
     padding: 0.4em;
-    border: 1px solid #bcbcbc;;
+    border: 1px solid #bcbcbc;
     border-radius: 0.25em;
 }
 
@@ -67,7 +67,7 @@ label {
 
 .can-not-find-message {
     margin-top: 20px;
-    margin-bottom: 20px
+    margin-bottom: 20px;
 }
 
 .contributions-box {
