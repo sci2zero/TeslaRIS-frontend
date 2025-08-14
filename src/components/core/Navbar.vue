@@ -10,12 +10,11 @@
                     </v-toolbar-title>
 
                     <!-- Menu -->
-                    <div 
-                        v-if="isLargeScreen" 
-                        class="d-flex ps-5 flex-wrap">
+                    <div v-if="isLargeScreen" class="d-flex ps-5 flex-wrap">
                         <div v-for="item in leftMenuItems" :key="item.title" class="text-center">
                             <template v-if="item.type == 'menu'">
-                                <v-menu v-if="item.condition == undefined || item.condition" open-on-hover open-delay="0">
+                                <v-menu v-if="item.condition == undefined || item.condition" open-on-hover
+                                    open-delay="0">
                                     <template #activator="{ props }">
                                         <v-btn size="small" v-bind="props" class="no-uppercase">
                                             {{ item.title }}
@@ -31,8 +30,7 @@
                                             v-for="(subItem, index) in item.subItems?.filter(subItem => subItem.condition != false)"
                                             :key="index" class="ps-5 pe-5" :value="item.title"
                                             :to="subItem.pathName !== undefined ? '/' + $i18n.locale + '/' + subItem.pathName : undefined"
-                                            link
-                                        >
+                                            link>
                                             <v-list-item-title>
                                                 {{ subItem.title }}
                                             </v-list-item-title>
@@ -41,26 +39,19 @@
                                 </v-menu>
                             </template>
                             <template v-else-if="item.type == 'dynamic' && item.condition">
-                                <v-btn
-                                    v-if="item.condition"
-                                    :key="item.title"
-                                    size="small"
-                                    :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName + '/' + item.dynamicValue : undefined" :variant="item.variant" :color="item.color" class="no-uppercase nav-items"
-                                    @click="item.click"
-                                >
+                                <v-btn v-if="item.condition" :key="item.title" size="small"
+                                    :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName + '/' + item.dynamicValue : undefined"
+                                    :variant="item.variant" :color="item.color" class="no-uppercase nav-items"
+                                    @click="item.click">
                                     {{ item.title }}
                                 </v-btn>
                             </template>
                             <template v-else>
-                                <v-btn
-                                    v-if="item.condition == undefined || item.condition"
-                                    :key="item.title"
+                                <v-btn v-if="item.condition == undefined || item.condition" :key="item.title"
                                     size="small"
                                     :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
                                     :variant="item.variant" :color="item.color" class="no-uppercase"
-                                    :icon="item.type == 'icon'"
-                                    exact
-                                >
+                                    :icon="item.type == 'icon'" exact>
                                     <v-icon v-if="item.icon" left dark>
                                         {{ item.icon }}
                                     </v-icon>
@@ -71,23 +62,14 @@
                             </template>
                         </div>
                     </div>
-                    <v-app-bar-nav-icon
-                        v-if="!isLargeScreen"
-                        @click="drawer = !drawer"
-                    />
-                    <v-navigation-drawer
-                        v-if="!isLargeScreen"
-                        v-model="drawer"
-                        temporary
-                        location="left"
-                    >
+                    <v-app-bar-nav-icon v-if="!isLargeScreen" @click="drawer = !drawer" />
+                    <v-navigation-drawer v-if="!isLargeScreen" v-model="drawer" temporary location="left">
                         <v-list class="align-start">
                             <template v-for="item in leftMenuItems" :key="item.title">
                                 <!-- menu type -->
                                 <v-list-item
                                     v-if="item.type === 'menu' && (item.condition === undefined || item.condition)"
-                                    class="text-left"
-                                >
+                                    class="text-left">
                                     <v-menu open-on-hover location="end bottom" open-delay="0">
                                         <template #activator="{ props }">
                                             <v-btn size="small" v-bind="props" class="no-uppercase">
@@ -98,11 +80,9 @@
                                         <v-list>
                                             <v-list-item
                                                 v-for="(subItem, index) in item.subItems?.filter(subItem => subItem.condition !== false)"
-                                                :key="index"
-                                                class="ps-5 pe-5"
+                                                :key="index" class="ps-5 pe-5"
                                                 :to="subItem.pathName !== undefined ? '/' + $i18n.locale + '/' + subItem.pathName : undefined"
-                                                link
-                                            >
+                                                link>
                                                 <v-list-item-title>{{ subItem.title }}</v-list-item-title>
                                             </v-list-item>
                                         </v-list>
@@ -110,36 +90,22 @@
                                 </v-list-item>
 
                                 <!-- dynamic type -->
-                                <v-list-item
-                                    v-else-if="item.type === 'dynamic' && item.condition"
-                                    class="text-left"
-                                >
-                                    <v-btn
-                                        size="small"
+                                <v-list-item v-else-if="item.type === 'dynamic' && item.condition" class="text-left">
+                                    <v-btn size="small"
                                         :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName + '/' + item.dynamicValue : undefined"
-                                        :variant="item.variant"
-                                        :color="item.color"
-                                        class="no-uppercase nav-items"
-                                        @click="item.click"
-                                    >
+                                        :variant="item.variant" :color="item.color" class="no-uppercase nav-items"
+                                        @click="item.click">
                                         {{ item.title }}
                                     </v-btn>
                                 </v-list-item>
 
                                 <!-- default type -->
-                                <v-list-item
-                                    v-else-if="item.condition === undefined || item.condition"
-                                    class="text-left"
-                                >
-                                    <v-btn
-                                        size="small"
+                                <v-list-item v-else-if="item.condition === undefined || item.condition"
+                                    class="text-left">
+                                    <v-btn size="small"
                                         :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
-                                        :variant="item.variant"
-                                        :color="item.color"
-                                        class="no-uppercase"
-                                        :icon="item.type === 'icon'"
-                                        exact
-                                    >
+                                        :variant="item.variant" :color="item.color" class="no-uppercase"
+                                        :icon="item.type === 'icon'" exact>
                                         <v-icon v-if="item.icon" left dark>
                                             {{ item.icon }}
                                         </v-icon>
@@ -153,12 +119,7 @@
                         <v-divider class="my-2" />
 
                         <div class="text-center pa-2">
-                            <v-btn
-                                color="primary"
-                                variant="text"
-                                class="no-uppercase"
-                                @click="drawer = false"
-                            >
+                            <v-btn color="primary" variant="text" class="no-uppercase" @click="drawer = false">
                                 <v-icon start icon="mdi-close" />
                                 {{ $t("closeLabel") }}
                             </v-btn>
@@ -171,11 +132,7 @@
                 <div class="d-flex">
                     <template v-for="(item, index) in menuItems">
                         <template v-if="item.type == 'divider'">
-                            <v-divider
-                                :key="index"
-                                inset
-                                class="ms-2 me-2"
-                                vertical></v-divider>
+                            <v-divider :key="index" inset class="ms-2 me-2" vertical></v-divider>
                         </template>
                         <template v-else-if="item.type == 'lang_component'">
                             <component :is="item.component" :key="index"></component>
@@ -184,14 +141,11 @@
                             <component :is="item.component" :key="index"></component>
                         </template>
                         <template v-else>
-                            <v-btn
-                                v-if="item.condition"
-                                :key="item.title"
-                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined" :variant="item.variant"
-                                :color="item.color" :class="'no-uppercase nav-items' + (item.title ? ' mt-1' : '')"
-                                :icon="item.type == 'icon'"
-                                @click="item.click"
-                            >
+                            <v-btn v-if="item.condition" :key="item.title"
+                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                                :variant="item.variant" :color="item.color"
+                                :class="'no-uppercase nav-items' + (item.title ? ' mt-1' : '')"
+                                :icon="item.type == 'icon'" @click="item.click">
                                 <v-badge :content="item.badge" :model-value="false">
                                     <v-icon left dark>
                                         {{ item.icon }}
@@ -265,7 +219,7 @@ export default defineComponent(
             const institutionId = ref(-1);
 
             const homeLabel = computed(() => i18n.t("homeLabel"));
-            
+
             const resourcesLabel = computed(() => i18n.t("resources"));
             const manageLabel = computed(() => i18n.t("manage"));
 
@@ -306,7 +260,7 @@ export default defineComponent(
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
-            
+
             const appTitle = ref();
             const sidebar = ref(false);
             const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
@@ -323,13 +277,13 @@ export default defineComponent(
                     if (isCommission.value) {
                         commissionId.value = response.data.commissionId;
                     }
-                    
+
                     if (isUserBoundToOU.value) {
                         institutionId.value = response.data.organisationUnitId;
                     }
                 });
                 PersonService.getPersonId().then(response => {
-                    if(response.data) {
+                    if (response.data) {
                         personId.value = response.data;
                     }
                 });
@@ -379,13 +333,13 @@ export default defineComponent(
             ]);
 
             const manageMenu = ref<MenuItem[]>([
-                { title: userPageLabel, type:'icon-link', pathName: 'users' },
-                { title: eventListLabel, type:'icon-link', pathName: 'events' },
-                { title: journalListLabel, type:'icon-link', pathName: 'journals'},
-                { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series'},
-                { title: publisherListLabel, type:'icon-link', pathName: 'publishers' },
-                { title: countryListLabel, type:'icon-link', pathName: "countries"},
-                { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas"},
+                { title: userPageLabel, type: 'icon-link', pathName: 'users' },
+                { title: eventListLabel, type: 'icon-link', pathName: 'events' },
+                { title: journalListLabel, type: 'icon-link', pathName: 'journals' },
+                { title: bookSeriesListLabel, type: 'icon-link', pathName: 'book-series' },
+                { title: publisherListLabel, type: 'icon-link', pathName: 'publishers' },
+                { title: countryListLabel, type: 'icon-link', pathName: "countries" },
+                { title: researchAreaListLabel, type: 'icon-link', pathName: "research-areas" },
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: brandingLabel, type:'icon-link', pathName: "branding"},
                 { title: apiKeyManagementLabel, type:'icon-link', pathName: "api-key-management"},
@@ -396,11 +350,11 @@ export default defineComponent(
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
-                { title: indicatorPageLabel, type:'icon-link', pathName: 'assessment/indicators' },
-                { title: classificationPageLabel, type:'icon-link', pathName: 'assessment/classifications' },
-                { title: assessmentRulebookPageLabel, type:'icon-link', pathName: 'assessment/assessment-rulebooks' },
-                { title: commissionsLabel, type:'icon-link', pathName: 'assessment/commissions' },
-                { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) }
+                { title: indicatorPageLabel, type: 'icon-link', pathName: 'assessment/indicators' },
+                { title: classificationPageLabel, type: 'icon-link', pathName: 'assessment/classifications' },
+                { title: assessmentRulebookPageLabel, type: 'icon-link', pathName: 'assessment/assessment-rulebooks' },
+                { title: commissionsLabel, type: 'icon-link', pathName: 'assessment/commissions' },
+                { title: reportingLabel, type: 'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) }
             ]);
 
             const thesisLibraryMenu = ref<MenuItem[]>([
@@ -414,7 +368,7 @@ export default defineComponent(
             ]);
 
             const leftMenuItems = ref<MenuItem[]>([
-                { title: homeLabel, type: 'icon-link', pathName:"" },
+                { title: homeLabel, type: 'icon-link', pathName: "" },
                 { title: resourcesLabel, type: 'menu', subItems: resourcesMenu },
                 { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search' },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
@@ -431,16 +385,16 @@ export default defineComponent(
             ]);
 
             const menuItems = ref<MenuItem[]>([
-                { title: undefined, type:'lang_component', icon: 'mdi-translate', condition: true, component: langChangeItem },
-                { type:'divider' },
-                { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
-                { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
-                { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color:'primary' },
-                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value as string) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
-                { title: undefined, type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }
+                { title: undefined, type: 'lang_component', icon: 'mdi-translate', condition: true, component: langChangeItem },
+                { type: 'divider' },
+                { title: undefined, type: 'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
+                { title: registerLabel, type: 'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
+                { title: loginTitle, type: 'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color: 'primary' },
+                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value as string) + ")"), type: 'icon-link', pathName: 'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color: 'primary' },
+                { title: undefined, type: 'icon', click: logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }
             ]);
 
-            return { 
+            return {
                 userName, userRole, logout, appTitle,
                 sidebar, menuItems, leftMenuItems, loginStore,
                 returnCurrentLocaleContent, drawer,
@@ -477,5 +431,4 @@ export default defineComponent(
 .lowered {
     margin-top: 10px;
 }
-
 </style>

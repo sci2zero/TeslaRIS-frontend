@@ -5,7 +5,7 @@ import vuetify from "./plugins/vuetify";
 import { loadFonts } from "./plugins/webfontloader";
 import { createPinia } from "pinia";
 
-import './assets/base.css';
+import './assets/vuetify-custom.scss';
 import './assets/main.css';
 import i18n from './i18n';
 import { createHead } from "@vueuse/head";

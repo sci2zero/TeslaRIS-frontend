@@ -106,7 +106,7 @@ import FeedbackForm from "@/components/core/FeedbackForm.vue";
 import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDissertationsView.vue";
 import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
-
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 const roles = {
     researcher: "RESEARCHER",
@@ -152,6 +152,7 @@ const router = createRouter({
         {
             path: "/:locale",
             name: "baseLocale",
+            component: DefaultLayout,
             children: [
                 {
                     path: "",

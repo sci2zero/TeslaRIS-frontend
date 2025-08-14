@@ -1,20 +1,12 @@
 <template>
     <div id="footer">
-        <v-footer class="bg-cyan-lighten-5 pa-5" absolute inset app>
+        <v-footer class="bg-cyan-lighten-5 pa-5">
             <v-row justify="space-between" no-gutters>
                 <div class="d-flex flex-wrap">
-                    <v-btn
-                        v-for="link in links"
-                        :key="link.title"
-                        size="x-small"
-                        color="black"
-                        :active="false"
-                        variant="text"
-                        class="mx-2"
-                        rounded="xl"
+                    <v-btn v-for="link in links" :key="link.title" size="x-small" color="black" :active="false"
+                        variant="text" class="mx-2" rounded="xl"
                         :to="(link.path !== undefined && !link.path.startsWith('mailto')) ? '/' + $i18n.locale + '/' + link.path : undefined"
-                        :href="link.path.startsWith('mailto') ? link.path : undefined"
-                    >
+                        :href="link.path.startsWith('mailto') ? link.path : undefined">
                         {{ link.title }}
                     </v-btn>
                 </div>
@@ -53,14 +45,14 @@ export default defineComponent(
 
 
             const links = ref([
-                    { title: homeLabel, path: ""},
-                    { title: personListLabel, path: "persons"},
-                    { title: ouListLabel, path: "organisation-units"},
-                    { title: scientificResultsListLabel, path: "scientific-results"},
-                    { title: simpleSearchLabel, path: "advanced-search"},
-                    // { title: contactLabel, path: "mailto:chenejac@uns.ac.rs"},
-                    { title: contactLabel, path: "contact"}
-                ]);
+                { title: homeLabel, path: "" },
+                { title: personListLabel, path: "persons" },
+                { title: ouListLabel, path: "organisation-units" },
+                { title: scientificResultsListLabel, path: "scientific-results" },
+                { title: simpleSearchLabel, path: "advanced-search" },
+                // { title: contactLabel, path: "mailto:chenejac@uns.ac.rs"},
+                { title: contactLabel, path: "contact" }
+            ]);
 
 
             return {

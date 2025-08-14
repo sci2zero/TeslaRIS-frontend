@@ -1,13 +1,13 @@
 <template>
     <v-app>
         <v-main>
-            <navbar
+            <!-- <navbar
                 v-if="!hideLayout"
             />
             
             <breadcrumbs
                 v-if="!hideLayout"
-            />
+            /> -->
             
             <router-view
                 :key="$route.fullPath"
@@ -17,9 +17,9 @@
                 v-if="!hideLayout"
             />
         </v-main>
-        <footerbar
+        <!-- <footerbar
             v-if="!hideLayout"
-        />
+        /> -->
     </v-app>
 </template>
 
