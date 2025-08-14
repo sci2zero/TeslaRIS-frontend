@@ -40,7 +40,7 @@
                             entity-name="MonographPublication"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || monographPublication?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -112,6 +112,12 @@
                                 <div v-if="monographPublication?.openAlexId" class="response">
                                     <identifier-link :identifier="monographPublication.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="monographPublication?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="monographPublication?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="monographPublication.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="monographPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
@@ -140,7 +146,14 @@
         <document-action-box
             ref="actionsRef"
             :doi="monographPublication?.doi"
+            :can-edit="canEdit && !monographPublication?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="monographPublication?.isMetadataValid"
+            :files-valid="monographPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(monographPublication?.description)"
+            :document="monographPublication"
+            @update="fetchValidationStatus(monographPublication?.id as number, monographPublication as _Document)"
         />
 
         <tab-content-loader v-if="!monographPublication" layout="sections" />
@@ -172,7 +185,7 @@
                 <person-document-contribution-tabs
                     :document-id="monographPublication?.id"
                     :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || monographPublication?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -180,7 +193,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="monographPublication?.keywords ? monographPublication.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -188,13 +201,13 @@
                 <!-- Description -->
                 <description-section
                     :description="monographPublication?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="monographPublication"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
                     :proofs="monographPublication?.proofs"
                     :file-items="monographPublication?.fileItems">
                 </attachment-section>
@@ -242,7 +255,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MonographPublication } from '@/models/PublicationModel';
@@ -280,6 +293,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -344,7 +358,9 @@ export default defineComponent({
         });
 
         const fetchMonographPublication = () => {
-            DocumentPublicationService.readMonographPublication(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readMonographPublication(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 monographPublication.value = response.data;
 
                 document.title = returnCurrentLocaleContent(monographPublication.value.title) as string;
@@ -362,6 +378,8 @@ export default defineComponent({
                 });
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -424,6 +442,7 @@ export default defineComponent({
             monographPublication.value!.articleNumber = basicInfo.articleNumber;
             monographPublication.value!.monographPublicationType = basicInfo.monographPublicationType;
             monographPublication.value!.openAlexId = basicInfo.openAlexId;
+            monographPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };
@@ -460,6 +479,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -471,7 +492,7 @@ export default defineComponent({
             documentIndicators, StatisticsType, currentTab, currentRoute,
             ApplicableEntityType, canClassify, documentClassifications,
             fetchClassifications, createClassification, fetchIndicators,
-            createIndicator, actionsRef
+            createIndicator, actionsRef, fetchValidationStatus
         };
 }})
 

@@ -112,6 +112,17 @@ export interface InstitutionLogoRequest {
     backgroundHex: string;
 }
 
+export interface OrganisationUnitTrustConfiguration {
+    trustNewPublications: boolean;
+    trustNewDocumentFiles: boolean;
+}
+
+export interface OrganisationUnitImportSource {
+    importScopus: boolean;
+    importOpenAlex: boolean;
+    importWebOfScience: boolean;
+}
+
 export interface InstitutionDefaultSubmissionContent {
     placeOfKeep: MultilingualContent[];
     typeOfTitle: MultilingualContent[];

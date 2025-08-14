@@ -159,6 +159,27 @@
                     @update="updateSuccess(); fetchPublicReviewPageContent()"
                 />
                 <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="OrganisationUnitTrustConfigurationForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="OrganisationUnitTrustConfiguration"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="updateSuccess()"
+                />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="OrganisationUnitImportSourceForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="OrganisationUnitImportSource"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                />
+                <generic-crud-modal
                     v-if="(canEdit && (isAdmin || isInstitutionalEditor)) || (isInstitutionalLibrarian && loggedInUser?.organisationUnitId === organisationUnit?.id)"
                     class="ml-2"
                     :form-component="InstitutionDefaultSubmissionContentForm"
@@ -353,7 +374,7 @@ import { computed, onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import type { DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
@@ -392,6 +413,8 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
 import { type PublicReviewPageContent } from '@/models/ThesisLibraryModel';
 import PublicReviewPageConfigurationService from '@/services/thesisLibrary/PublicReviewPageConfigurationService';
+import OrganisationUnitTrustConfigurationForm from '@/components/organisationUnit/OrganisationUnitTrustConfigurationForm.vue';
+import OrganisationUnitImportSourceForm from '@/components/organisationUnit/OrganisationUnitImportSourceForm.vue';
 import InstitutionDefaultSubmissionContentForm from '@/components/organisationUnit/InstitutionDefaultSubmissionContentForm.vue';
 
 
@@ -454,8 +477,8 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, loggedInUser } = useUserRole();
-        const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
+        const { isAdmin, isInstitutionalEditor, loggedInUser } = useUserRole();
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const employeesRef = ref<typeof PersonTableComponent>();
@@ -490,7 +513,9 @@ export default defineComponent({
         });
 
         const fetchOU = (uponStartup: boolean) => {
-            OrganisationUnitService.readOU(parseInt(currentRoute.params.id as string)).then((response) => {
+            OrganisationUnitService.readOU(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 organisationUnit.value = response.data;
 
                 document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
@@ -502,6 +527,8 @@ export default defineComponent({
                 }
 
                 fetchSubUnits();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -765,7 +792,9 @@ export default defineComponent({
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
-            fetchPublicReviewPageContent, isInstitutionalLibrarian,
+            fetchPublicReviewPageContent,
+            OrganisationUnitTrustConfigurationForm,
+            OrganisationUnitImportSourceForm,
             InstitutionDefaultSubmissionContentForm, loggedInUser
         };
 }})

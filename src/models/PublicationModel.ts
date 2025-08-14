@@ -36,6 +36,8 @@ export interface DocumentPublicationIndex {
     doi: string;
     assessedBy?: number[];
     publicationType: string;
+    isApproved: boolean;
+    areFilesValid: boolean;
 }
 
 export enum PublicationType {
@@ -83,9 +85,13 @@ export interface Document {
     doi?: string;
     scopusId?: string;
     openAlexId?: string;
+    webOfScienceId?: string;
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;
+    isMetadataValid?: boolean;
+    areFilesValid?: boolean;
+    isArchived?: boolean;
 }
 
 export interface JournalPublication extends Document {
@@ -244,7 +250,6 @@ export interface Thesis extends Document {
     isOnPublicReviewPause?: boolean;
     topicAcceptanceDate: string;
     thesisDefenceDate: string;
-    isArchived?: boolean;
     eisbn?: string;
     printISBN?: string;
     placeOfKeep?: MultilingualContent[],

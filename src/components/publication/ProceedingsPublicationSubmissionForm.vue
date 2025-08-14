@@ -110,6 +110,16 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="10">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="5">
                             <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
                         </v-col>
@@ -220,6 +230,7 @@ export default defineComponent({
         const endPage = ref("");
         const doi = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const scopus = ref("");
         const articleNumber = ref("");
         const numberOfPages = ref();
@@ -231,7 +242,8 @@ export default defineComponent({
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => (getTypesForGivenLocale() as { title: string; value: ProceedingsPublicationType; }[]));
@@ -343,6 +355,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 scopusId: scopus.value,
                 eventId: selectedEvent.value.value,
                 fileItems: [],
@@ -365,6 +378,7 @@ export default defineComponent({
                     endPage.value = "";
                     doi.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     scopus.value = "";
                     articleNumber.value = "";
                     numberOfPages.value = null;
@@ -400,7 +414,7 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules, submitProceedingsPublication,
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
             searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules,
-            popuateMetadata
+            popuateMetadata, documentWebOfScienceIdValidationRules, webOfScienceId
         };
     }
 });

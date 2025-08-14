@@ -6,8 +6,8 @@ export class DocumentBackupService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async scheduleGeneration(params: string): Promise<AxiosResponse<string>> {
-        return super.sendRequest(axios.post, `document/backup/schedule-generation?${params}`, {}, DocumentBackupService.idempotencyKey);
+    async scheduleGeneration(params: string, recurrence: string): Promise<AxiosResponse<string>> {
+        return super.sendRequest(axios.post, `document/backup/schedule-generation?${params}&recurrence=${recurrence}`, {}, DocumentBackupService.idempotencyKey);
     }
 
     async listBackups(): Promise<AxiosResponse<string[]>> {

@@ -34,6 +34,16 @@
                         <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field
+                            v-model="webOfScienceId"
+                            label="Web of Science ID"
+                            placeholder="Web of Science ID"
+                            :rules="documentWebOfScienceIdValidationRules">
+                        </v-text-field>
+                    </v-col>
+                </v-row>
 
                 <v-row>
                     <v-col>
@@ -151,12 +161,14 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const datasetNumber = ref("");
         const uris = ref<string[]>([]);
 
         const {
             requiredFieldRules, doiValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const submitDataset = (stayOnPage: boolean) => {
@@ -171,6 +183,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -188,6 +201,7 @@ export default defineComponent({
                     publicationYear.value = "";
                     doi.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     datasetNumber.value = "";
                     contributionsRef.value?.clearInput();
 
@@ -245,7 +259,9 @@ export default defineComponent({
             requiredFieldRules, submitDataset,
             doiValidationRules, openAlexId,
             workOpenAlexIdValidationRules,
-            popuateMetadata, PublicationType
+            popuateMetadata, PublicationType,
+            documentWebOfScienceIdValidationRules,
+            webOfScienceId
         };
     }
 });

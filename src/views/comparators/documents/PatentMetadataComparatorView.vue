@@ -180,6 +180,8 @@ export default defineComponent({
             patent2.scopusId = "";
             patent1.openAlexId = patent2.openAlexId;
             patent2.openAlexId = "";
+            patent1.webOfScienceId = patent2.webOfScienceId;
+            patent2.webOfScienceId = "";
             patent1.documentDate = patent2.documentDate;
 
             patent1.eventId = patent2.eventId;
@@ -237,6 +239,7 @@ export default defineComponent({
             leftPatent.value!.publisherId = updatedInfo.publisherId;
             leftPatent.value!.scopusId = updatedInfo.scopusId;
             leftPatent.value!.openAlexId = updatedInfo.openAlexId;
+            leftPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -257,6 +260,7 @@ export default defineComponent({
             rightPatent.value!.publisherId = updatedInfo.publisherId;
             rightPatent.value!.scopusId = updatedInfo.scopusId;
             rightPatent.value!.openAlexId = updatedInfo.openAlexId;
+            rightPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

@@ -40,7 +40,7 @@
                             entity-name="ProceedingsPublication"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || proceedingsPublication?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -73,6 +73,14 @@
                                         {{ returnCurrentLocaleContent(proceedings?.title) }}
                                     </localized-link>
                                 </div>
+                                <div v-if="proceedingsPublication?.documentDate">
+                                    {{ $t("yearOfPublicationLabel") }}:
+                                </div>
+                                <div v-if="proceedingsPublication?.documentDate" class="response">
+                                    {{ localiseDate(proceedingsPublication.documentDate) }}
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
                                 <div v-if="proceedingsPublication?.startPage">
                                     {{ $t("startPageLabel") }}:
                                 </div>
@@ -85,14 +93,12 @@
                                 <div v-if="proceedingsPublication?.endPage" class="response">
                                     {{ proceedingsPublication.endPage }}
                                 </div>
-                                <div v-if="proceedingsPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                <div v-if="proceedingsPublication?.numberOfPages">
+                                    {{ $t("numberOfPagesLabel") }}:
                                 </div>
-                                <div v-if="proceedingsPublication?.documentDate" class="response">
-                                    {{ localiseDate(proceedingsPublication.documentDate) }}
+                                <div v-if="proceedingsPublication?.numberOfPages" class="response">
+                                    {{ proceedingsPublication.numberOfPages }}
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
                                 <div v-if="proceedingsPublication?.scopusId">
                                     Scopus ID:
                                 </div>
@@ -111,17 +117,17 @@
                                 <div v-if="proceedingsPublication?.openAlexId" class="response">
                                     <identifier-link :identifier="proceedingsPublication.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="proceedingsPublication?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="proceedingsPublication?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="proceedingsPublication.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="proceedingsPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.articleNumber" class="response">
                                     {{ proceedingsPublication.articleNumber }}
-                                </div>
-                                <div v-if="proceedingsPublication?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.numberOfPages" class="response">
-                                    {{ proceedingsPublication.numberOfPages }}
                                 </div>
                                 <div v-if="proceedingsPublication?.uris && proceedingsPublication?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -139,7 +145,14 @@
         <document-action-box
             ref="actionsRef"
             :doi="proceedingsPublication?.doi"
+            :can-edit="canEdit && !proceedingsPublication?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="proceedingsPublication?.isMetadataValid"
+            :files-valid="proceedingsPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
+            :document="proceedingsPublication"
+            @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 
         <tab-content-loader v-if="!proceedingsPublication" layout="list" />
@@ -168,18 +181,32 @@
             v-model="currentTab">
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <keyword-list :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []" :can-edit="canEdit" @search-keyword="searchKeyword($event)" @update="updateKeywords"></keyword-list>
+                <keyword-list
+                    :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
-                <description-section :description="proceedingsPublication?.description" :can-edit="canEdit" @update="updateDescription"></description-section>
+                <description-section
+                    :description="proceedingsPublication?.description"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    @update="updateDescription">
+                </description-section>
 
-                <attachment-section :document="proceedingsPublication" :can-edit="canEdit" :proofs="proceedingsPublication?.proofs" :file-items="proceedingsPublication?.fileItems"></attachment-section>    
+                <attachment-section
+                    :document="proceedingsPublication"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    :proofs="proceedingsPublication?.proofs"
+                    :file-items="proceedingsPublication?.fileItems">
+                </attachment-section>    
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="proceedingsPublication?.id"
                     :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || proceedingsPublication?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -229,7 +256,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
@@ -268,6 +295,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -346,7 +374,9 @@ export default defineComponent({
         });
 
         const fetchProceedingsPublication = () => {
-            DocumentPublicationService.readProceedingsPublication(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readProceedingsPublication(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 proceedingsPublication.value = response.data;
 
                 document.title = returnCurrentLocaleContent(proceedingsPublication.value.title) as string;
@@ -362,6 +392,8 @@ export default defineComponent({
                 });
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -411,6 +443,7 @@ export default defineComponent({
             proceedingsPublication.value!.articleNumber = basicInfo.articleNumber;
             proceedingsPublication.value!.proceedingsPublicationType = basicInfo.proceedingsPublicationType;
             proceedingsPublication.value!.openAlexId = basicInfo.openAlexId;
+            proceedingsPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };
@@ -457,6 +490,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, isResearcher,
@@ -468,7 +503,8 @@ export default defineComponent({
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
-            currentRoute, actionsRef, fetchIndicators, createIndicator
+            currentRoute, actionsRef, fetchIndicators, createIndicator,
+            fetchValidationStatus
         };
 }})
 

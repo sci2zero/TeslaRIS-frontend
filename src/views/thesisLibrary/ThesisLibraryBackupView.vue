@@ -10,6 +10,9 @@
         <v-tab value="backupGeneration">
             {{ $t("backupGenerationLabel") }}
         </v-tab>
+        <v-tab value="scheduledBackups">
+            {{ $t("scheduledBackupsLabel") }}
+        </v-tab>
         <v-tab value="generatedBackupList">
             {{ $t("backupListLabel") }}
         </v-tab>
@@ -106,6 +109,17 @@
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
+                    <v-col cols="12" md="4">
+                        <v-select
+                            v-model="selectedRecurrenceType"
+                            :items="recurrenceTypes"
+                            :label="$t('recurrenceTypeLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row justify-center">
                     <v-col cols="3" md="1">
                         <v-btn class="mt-3" :disabled="!isFormValid" @click="generateBackupRequest">
                             {{ $t("generateLabel") }}
@@ -113,6 +127,12 @@
                     </v-col>
                 </v-row>
             </v-form>
+        </v-window-item>
+        <v-window-item value="scheduledBackups">
+            <scheduled-tasks-list
+                :scheduled-tasks="scheduledTasks"
+                @delete="deleteScheduledBackupTask">
+            </scheduled-tasks-list>
         </v-window-item>
         <v-window-item value="generatedBackupList">
             <backup-list backup-type="thesis"></backup-list>
@@ -140,12 +160,16 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import { VForm } from 'vuetify/lib/components/index.mjs';
 import { useUserRole } from '@/composables/useUserRole';
 import BackupList from '../../components/core/BackupList.vue';
-import { ExportFileFormat } from '@/models/Common';
+import { ExportFileFormat, type ScheduledTaskResponse } from '@/models/Common';
+import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from '@/i18n/recurrenceType';
+import { RecurrenceType } from '@/models/LoadModel';
+import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
+import TaskManagerService from '@/services/TaskManagerService';
 
 
 export default defineComponent({
     name: "ThesisLibraryBackupView",
-    components: { Toast, DatePicker, OrganisationUnitAutocompleteSearch, BackupList },
+    components: { Toast, DatePicker, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList },
     setup() {
         const currentTab = ref("backupGeneration");
         const isFormValid = ref(false);
@@ -176,6 +200,11 @@ export default defineComponent({
             "putOnReview"
         ]);
 
+        const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
+        const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
+            {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
+        );
+
         watch(
         () => [
             thesesGroups.value.defended,
@@ -191,6 +220,7 @@ export default defineComponent({
             });
 
             document.title = i18n.t("routeLabel.thesisLibraryBackup");
+            fetchScheduledTasks();
         });
 
         const generateBackupRequest = () => {
@@ -206,12 +236,39 @@ export default defineComponent({
 
             params += `&metadataFormat=${selectedExportFileFormat.value}`;
             
-            ThesisLibraryBackupService.scheduleGeneration(params)
-            .then(response => {
+            ThesisLibraryBackupService.scheduleGeneration(
+                params, selectedRecurrenceType.value.value
+            ).then(response => {
                 snackbar.value = true;
                 message.value = i18n.t("backupGenerationScheduledMessage", [response.data]);
+                fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
+        };
+
+        const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
+        const fetchScheduledTasks = () => {
+            TaskManagerService.listScheduledThesisLibraryBackupTasks().then((response) => {
+                scheduledTasks.value = response.data;
+                scheduledTasks.value.sort((a, b) => {
+                    if(!a.executionTime) {
+                        return 1;
+                    }
+
+                    return a.executionTime.localeCompare(b.executionTime);
+                });
+            });
+        };
+
+        const deleteScheduledBackupTask = (taskId: string) => {
+            TaskManagerService.canceltask(taskId).then(() => {
+                message.value = i18n.t("cancelSuccessMessage");
+                snackbar.value = true;
+                fetchScheduledTasks();
+            }).catch(() => {
+                message.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
             });
         };
@@ -229,7 +286,10 @@ export default defineComponent({
             selectedFileSections,
             isAdmin, currentTab,
             exportFileFormats,
-            selectedExportFileFormat
+            selectedExportFileFormat,
+            recurrenceTypes,
+            selectedRecurrenceType,
+            scheduledTasks, deleteScheduledBackupTask
         };
     }
 });

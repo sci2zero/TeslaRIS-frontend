@@ -126,7 +126,7 @@ export default defineComponent({
         const tableRef = ref<typeof PublicationTableComponent>();
         
         const returnOnlyUnassessedEntities = ref(true);
-        const publicationTypes = computed(() => getPublicationTypesForGivenLocale());
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const { isCommission, isInstitutionalEditor, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();

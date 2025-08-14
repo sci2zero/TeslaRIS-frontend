@@ -134,6 +134,12 @@
                                 <div v-if="proceedings?.openAlexId" class="response">
                                     <identifier-link :identifier="proceedings.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="proceedings?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="proceedings?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="proceedings.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="proceedings?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
                                 </div>
@@ -153,9 +159,17 @@
             </v-col>
         </v-row>
 
-        <publication-badge-section
-            :preloaded-doi="proceedings?.doi"
-            :document-id="proceedings?.id"
+        <document-action-box
+            ref="actionsRef"
+            :doi="proceedings?.doi"
+            :can-edit="canEdit && !proceedings?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="proceedings?.isMetadataValid"
+            :files-valid="proceedings?.areFilesValid"
+            :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(proceedings?.description)"
+            :document="proceedings"
+            :display-citation="false"
         />
 
         <br />
@@ -259,7 +273,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -295,14 +309,14 @@ import { useLoginStore } from '@/stores/loginStore';
 import { useUserRole } from '@/composables/useUserRole';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer },
     setup() {
         const currentTab = ref("");
 
@@ -366,7 +380,9 @@ export default defineComponent({
         });
 
         const fetchProceedings = (uponStartup: boolean) => {
-            ProceedingsService.readProceedings(parseInt(currentRoute.params.id as string)).then((response) => {
+            ProceedingsService.readProceedings(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 proceedings.value = response.data;
 
                 document.title = returnCurrentLocaleContent(proceedings.value.title) as string;
@@ -382,6 +398,8 @@ export default defineComponent({
                         setStartTab();
                     });
                 }
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -462,6 +480,7 @@ export default defineComponent({
             proceedings.value!.publisherId = updatedInfo.publisherId;
             proceedings.value!.scopusId = updatedInfo.scopusId;
             proceedings.value!.openAlexId = updatedInfo.openAlexId;
+            proceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             performUpdate(false);
         };
 

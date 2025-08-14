@@ -146,7 +146,7 @@ import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common'
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
@@ -199,6 +199,7 @@ export default defineComponent({
         const canEdit = ref(false);
 
         const loginStore = useLoginStore();
+        const router = useRouter();
 
         const bookSeriesIndicators = ref<EntityIndicatorResponse[]>([]);
 
@@ -226,7 +227,9 @@ export default defineComponent({
         };
 
         const fetchBookSeries = (uponStartup: boolean) => {
-            BookSeriesService.readBookSeries(parseInt(currentRoute.params.id as string)).then((response) => {
+            BookSeriesService.readBookSeries(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 bookSeries.value = response.data;
 
                 document.title = returnCurrentLocaleContent(bookSeries.value.title) as string;
@@ -240,6 +243,8 @@ export default defineComponent({
                 }
 
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

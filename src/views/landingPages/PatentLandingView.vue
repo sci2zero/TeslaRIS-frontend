@@ -40,7 +40,7 @@
                             entity-name="Patent"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || patent?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -91,6 +91,12 @@
                                 <div v-if="patent?.openAlexId" class="response">
                                     <identifier-link :identifier="patent.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="patent?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="patent?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="patent.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="patent?.uris && patent?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -107,12 +113,14 @@
         <document-action-box
             ref="actionsRef"
             :doi="patent?.doi"
+            :can-edit="canEdit && !patent?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="patent?.isMetadataValid"
+            :files-valid="patent?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
-        />
-
-        <publication-badge-section
-            :preloaded-doi="patent?.doi"
-            :document-id="patent?.id"
+            :description="returnCurrentLocaleContent(patent?.description)"
+            :document="patent"
+            @update="fetchValidationStatus(patent?.id as number, patent as _Document)"
         />
 
         <tab-content-loader v-if="!patent" layout="sections" />
@@ -144,7 +152,7 @@
                 <person-document-contribution-tabs
                     :document-id="patent?.id"
                     :contribution-list="patent?.contributions ? patent?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || patent?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -152,7 +160,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="patent?.keywords ? patent.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !patent?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -160,13 +168,13 @@
                 <!-- Description -->
                 <description-section
                     :description="patent?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !patent?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="patent"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !patent?.isArchived"
                     :proofs="patent?.proofs"
                     :file-items="patent?.fileItems">
                 </attachment-section>
@@ -210,7 +218,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Patent } from '@/models/PublicationModel';
@@ -242,14 +250,14 @@ import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, PublicationBadgeSection, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
     setup() {
         const currentTab = ref("contributions");
 
@@ -305,7 +313,9 @@ export default defineComponent({
         });
 
         const fetchPatent = () => {
-            DocumentPublicationService.readPatent(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readPatent(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 patent.value = response.data;
 
                 document.title = returnCurrentLocaleContent(patent.value.title) as string;
@@ -319,6 +329,8 @@ export default defineComponent({
                 }
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -376,6 +388,7 @@ export default defineComponent({
             patent.value!.publisherId = basicInfo.publisherId;
             patent.value!.number = basicInfo.number;
             patent.value!.openAlexId = basicInfo.openAlexId;
+            patent.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };
@@ -412,6 +425,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             patent, icon, publisher, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, PatentUpdateForm, canClassify,
@@ -420,7 +435,7 @@ export default defineComponent({
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
-            createIndicator, fetchIndicators
+            createIndicator, fetchIndicators, fetchValidationStatus
         };
 }})
 

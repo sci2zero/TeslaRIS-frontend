@@ -43,6 +43,16 @@
                         </v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field
+                            v-model="webOfScienceId"
+                            label="Web of Science ID"
+                            placeholder="Web of Science ID"
+                            :rules="documentWebOfScienceIdValidationRules">
+                        </v-text-field>
+                    </v-col>
+                </v-row>
 
                 <v-row>
                     <v-col>
@@ -153,12 +163,14 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const softwareNumber = ref("");
         const uris = ref<string[]>([]);
 
         const {
             requiredFieldRules, doiValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const submitSoftware = (stayOnPage: boolean) => {
@@ -173,6 +185,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -189,6 +202,7 @@ export default defineComponent({
                     publicationYear.value = "";
                     doi.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     softwareNumber.value = "";
                     contributionsRef.value?.clearInput();
 
@@ -232,10 +246,8 @@ export default defineComponent({
 
         return {
             isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
-            subtitle, subtitleRef,
+            additionalFields, snackbar, error,
+            title, titleRef, subtitle, subtitleRef,
             publicationYear, doi, PublicationType,
             publisherAutocompleteRef, popuateMetadata,
             selectedPublisher, softwareNumber, openAlexId,
@@ -243,7 +255,8 @@ export default defineComponent({
             keywords, keywordsRef, uris, urisRef,
             contributions, contributionsRef, errorMessage,
             requiredFieldRules, submitSoftware,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules, webOfScienceId,
+            documentWebOfScienceIdValidationRules
         };
     }
 });

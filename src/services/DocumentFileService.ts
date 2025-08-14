@@ -109,6 +109,10 @@ export class DocumentFileService extends BaseService {
     async deletePrizeProof(proofId: number, prizeId: number, personId: number): Promise<void> {
         return super.sendRequest(axios.delete, `prize/${personId}/${prizeId}/${proofId}`);
     }
+
+    async makeThesisPreprintOfficial(thesisId: number, documentFileId: number): Promise<void> {
+        return super.sendRequest(axios.patch, `thesis/make-official/${thesisId}/${documentFileId}`);
+    }
 }
 
 export default new DocumentFileService();

@@ -154,6 +154,12 @@
                                 <div v-if="thesis?.openAlexId" class="response">
                                     <identifier-link :identifier="thesis.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="thesis?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="thesis?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="thesis.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="thesis?.udc">
                                     {{ $t("udcLabel") }}:
                                 </div>
@@ -327,7 +333,13 @@
         <document-action-box
             ref="actionsRef"
             :doi="thesis?.doi"
+            :can-edit="canEdit"
+            :metadata-valid="thesis?.isMetadataValid"
+            :files-valid="thesis?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(thesis?.description)"
+            :display-archive-actions="false"
+            @update="fetchValidationStatus(thesis?.id as number, thesis as _Document)"
         />
 
         <tab-content-loader v-if="!thesis" layout="sections" />
@@ -410,6 +422,7 @@
                     :preliminary-supplements="thesis?.preliminarySupplements"
                     :commission-reports="thesis?.commissionReports"
                     :is-on-public-review="thesis?.isOnPublicReview"
+                    @update="fetchThesis"
                 ></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchOutput">
@@ -473,7 +486,7 @@ import { watch } from 'vue';
 import { ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Thesis } from '@/models/PublicationModel';
+import type { Document as _Document, Thesis } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -516,6 +529,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -596,7 +610,9 @@ export default defineComponent({
         });
 
         const fetchThesis = () => {
-            DocumentPublicationService.readThesis(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readThesis(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 thesis.value = response.data;
                 if (thesis.value.isArchived) {
                     canEdit.value = false;
@@ -627,6 +643,8 @@ export default defineComponent({
                 canBePutOnPublicReview.value = thesis.value.thesisType === ThesisType.PHD || thesis.value.thesisType === ThesisType.PHD_ART_PROJECT;
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -720,6 +738,7 @@ export default defineComponent({
             thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
             thesis.value!.thesisType = basicInfo.thesisType;
             thesis.value!.openAlexId = basicInfo.openAlexId;
+            thesis.value!.webOfScienceId = basicInfo.webOfScienceId;
             thesis.value!.scientificArea = basicInfo.scientificArea;
             thesis.value!.scientificSubArea = basicInfo.scientificSubArea;
             thesis.value!.eisbn = basicInfo.eisbn;
@@ -873,6 +892,8 @@ export default defineComponent({
             }
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
@@ -888,7 +909,8 @@ export default defineComponent({
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
-            RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry
+            RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
+            fetchValidationStatus, fetchThesis
         };
 }})
 

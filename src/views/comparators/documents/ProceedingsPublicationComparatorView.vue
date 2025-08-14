@@ -180,6 +180,8 @@ export default defineComponent({
             proceedingsPublication2.scopusId = "";
             proceedingsPublication1.openAlexId = proceedingsPublication2.openAlexId;
             proceedingsPublication2.openAlexId = "";
+            proceedingsPublication1.webOfScienceId = proceedingsPublication2.webOfScienceId;
+            proceedingsPublication2.webOfScienceId = "";
             proceedingsPublication1.documentDate = proceedingsPublication2.documentDate;
             proceedingsPublication1.startPage = proceedingsPublication2.startPage;
             proceedingsPublication2.startPage = "";
@@ -247,6 +249,7 @@ export default defineComponent({
             leftProceedingsPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             leftProceedingsPublication.value!.scopusId = updatedInfo.scopusId;
             leftProceedingsPublication.value!.openAlexId = updatedInfo.openAlexId;
+            leftProceedingsPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -271,6 +274,7 @@ export default defineComponent({
             rightProceedingsPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             rightProceedingsPublication.value!.scopusId = updatedInfo.scopusId;
             rightProceedingsPublication.value!.openAlexId = updatedInfo.openAlexId;
+            rightProceedingsPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

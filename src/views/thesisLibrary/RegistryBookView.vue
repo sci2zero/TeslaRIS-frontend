@@ -17,6 +17,9 @@
             <v-tab value="promoted">
                 {{ $t("promotedLabel") }}
             </v-tab>
+            <v-tab value="scheduledTasks">
+                {{ $t("scheduleTasksLabel") }}
+            </v-tab>
             <v-tab value="reports">
                 {{ $t("generatedRegistryBooksLabel") }}
             </v-tab>
@@ -125,6 +128,17 @@
                             return-object>
                         </v-select>
                     </v-col>
+                    <v-col
+                        v-if="tableStates.promoted.entries.length > 0" 
+                        cols="4" md="2">
+                        <v-select
+                            v-model="selectedRecurrenceType"
+                            :items="recurrenceTypes"
+                            :label="$t('recurrenceTypeLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object>
+                        </v-select>
+                    </v-col>
                     <v-col v-if="tableStates.promoted.entries.length > 0">
                         <v-btn
                             density="compact" class="mt-3"
@@ -143,6 +157,13 @@
                     @switch-page="(args: any[]) => switchPage('promoted', ...(args as [number, number, string, string]))"
                     @entry-added-to-promotion="fetchAllTables"
                 />
+            </v-window-item>
+            <v-window-item value="scheduledTasks">
+                <scheduled-tasks-list
+                    class="mt-10"
+                    :scheduled-tasks="scheduledTasks"
+                    @delete="deleteScheduledTask">
+                </scheduled-tasks-list>
             </v-window-item>
             <v-window-item value="reports">
                 <v-row class="justify-start mt-3">
@@ -178,7 +199,7 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, watch } from 'vue';
+import { defineComponent, ref, reactive, onMounted, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
@@ -198,6 +219,11 @@ import { getLangItems } from '@/i18n/languages';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import PersistentTableDialog from './PersistentTableDialog.vue';
 import lodash, { type DebouncedFunc } from 'lodash';
+import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from '@/i18n/recurrenceType';
+import { RecurrenceType } from '@/models/LoadModel';
+import TaskManagerService from '@/services/TaskManagerService';
+import { type ScheduledTaskResponse } from '@/models/Common';
+import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -214,7 +240,7 @@ interface EntryTableState {
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
@@ -243,6 +269,11 @@ export default defineComponent({
         const authorFullName = ref("");
         const authorAcquiredTitle = ref("");
         const reportCounts = ref<InstitutionPromotionCountsReport[]>([]);
+
+        const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
+        const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
+            {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
+        );
 
         watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle, selectedPromotion], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
@@ -362,6 +393,7 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("registryBookLabel");
             fetchPromotions();
+            fetchScheduledTasks();
         });
 
         const promotionPreviewRef = ref<typeof PersistentTableDialog>();
@@ -406,12 +438,39 @@ export default defineComponent({
             const to = toDate.value ? toDate.value.split("T")[0] : "";
 
             RegistryBookReportService.scheduleReportGeneration(
-                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&authorName=${authorFullName.value}&authorTitle=${authorAcquiredTitle.value}&lang=${selectedLang.value.value}`
+                `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&authorName=${authorFullName.value}&authorTitle=${authorAcquiredTitle.value}&lang=${selectedLang.value.value}`,
+                selectedRecurrenceType.value.value
             ).then((response) => {
                 message.value = i18n.t("reportGenerationScheduledMessage", [response.data]);
                 snackbar.value = true;
+                fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
+        };
+
+        const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
+        const fetchScheduledTasks = () => {
+            TaskManagerService.listScheduledRegistryBookGenerationTasks().then((response) => {
+                scheduledTasks.value = response.data;
+                scheduledTasks.value.sort((a, b) => {
+                    if(!a.executionTime) {
+                        return 1;
+                    }
+
+                    return a.executionTime.localeCompare(b.executionTime);
+                });
+            });
+        };
+
+        const deleteScheduledTask = (taskId: string) => {
+            TaskManagerService.canceltask(taskId).then(() => {
+                message.value = i18n.t("cancelSuccessMessage");
+                snackbar.value = true;
+                fetchScheduledTasks();
+            }).catch(() => {
+                message.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
             });
         };
@@ -427,7 +486,9 @@ export default defineComponent({
             selectedLang, requiredSelectionRules,
             promotionPreview, previewPromotion,
             promotionPreviewRef, authorFullName,
-            authorAcquiredTitle
+            authorAcquiredTitle, recurrenceTypes,
+            selectedRecurrenceType, deleteScheduledTask,
+            scheduledTasks
         };
     }
 });

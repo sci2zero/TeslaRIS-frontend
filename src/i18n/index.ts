@@ -1,6 +1,7 @@
-import { createI18n, type I18n } from 'vue-i18n';
+import { type Composer, createI18n, type I18n } from 'vue-i18n';
 import en from "./en";
 import sr from "./sr";
+import srCyrOverrides from "./sr-cyr";
 import { toCyrillic } from './serbianTransliteration';
 
 
@@ -40,9 +41,13 @@ function setup(options = { locale: defaultLocale }) {
         messages: {
             en: en,
             sr: sr,
-            "sr-cyr": transliterateMessages(sr)
+            "sr-cyr": {
+                ...transliterateMessages(sr),
+                ...srCyrOverrides
+            }
         },
-    })
+    });
+
     setLocale(options.locale);
     return _i18n;
 }
@@ -52,16 +57,16 @@ function setLocale(newLocale: string) {
 }
 
 function translationExists(key: string) {
-    const translated = _i18n.global.t(key);
+    const translated = (_i18n.global as Composer).t(key);
     return translated !== key;
 }
 
 export function getErrorMessageForErrorKey(key: string): string {
     if (translationExists(key)) {
-        return _i18n.global.t(key);
+        return (_i18n.global as Composer).t(key);
     }
 
-    return _i18n.global.t("genericErrorMessage");
+    return (_i18n.global as Composer).t("genericErrorMessage");
 }
 
 export default {

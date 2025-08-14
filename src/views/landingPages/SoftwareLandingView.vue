@@ -40,7 +40,7 @@
                             entity-name="Software"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || software?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -91,6 +91,12 @@
                                 <div v-if="software?.openAlexId" class="response">
                                     <identifier-link :identifier="software.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="software?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="software?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="software.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="software?.uris && software?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -107,7 +113,14 @@
         <document-action-box
             ref="actionsRef"
             :doi="software?.doi"
+            :can-edit="canEdit && !software?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="software?.isMetadataValid"
+            :files-valid="software?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(software?.description)"
+            :document="software"
+            @update="fetchValidationStatus(software?.id as number, software as _Document)"
         />
 
         <tab-content-loader v-if="!software" layout="sections" />
@@ -138,7 +151,7 @@
                 <person-document-contribution-tabs
                     :document-id="software?.id"
                     :contribution-list="software?.contributions ? software?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || software?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -146,7 +159,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="software?.keywords ? software.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !software?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -154,13 +167,13 @@
                 <!-- Description -->
                 <description-section
                     :description="software?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !software?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="software"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !software?.isArchived"
                     :proofs="software?.proofs"
                     :file-items="software?.fileItems">
                 </attachment-section>
@@ -217,7 +230,7 @@ import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Software } from '@/models/PublicationModel';
+import type { Document as _Document, Software } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -247,6 +260,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -313,7 +327,9 @@ export default defineComponent({
         });
 
         const fetchSoftware = () => {
-            DocumentPublicationService.readSoftware(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readSoftware(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 software.value = response.data;
 
                 document.title = returnCurrentLocaleContent(software.value.title) as string;
@@ -327,6 +343,8 @@ export default defineComponent({
                 }
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -384,6 +402,7 @@ export default defineComponent({
             software.value!.publisherId = basicInfo.publisherId;
             software.value!.internalNumber = basicInfo.internalNumber;
             software.value!.openAlexId = basicInfo.openAlexId;
+            software.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };
@@ -414,6 +433,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             software, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
@@ -424,7 +445,8 @@ export default defineComponent({
             handleResearcherUnbind, documentIndicators,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
-            fetchIndicators, createIndicator, PublicationType
+            fetchIndicators, createIndicator, PublicationType,
+            fetchSoftware, fetchValidationStatus
         };
 }})
 

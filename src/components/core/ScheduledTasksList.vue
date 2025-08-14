@@ -11,6 +11,7 @@
                     <tr>
                         <td>{{ row.item.taskId }}</td>
                         <td>{{ `${localiseDate(row.item.executionTime.split("T")[0])} ${$t("inLabel")} ${row.item.executionTime.split("T")[1]}` }}</td>
+                        <td>{{ getRecurrenceTypeTitleFromValueAutoLocale(row.item.recurrenceType) }}</td>
                         <td>
                             <v-btn v-if="!isDateTimeInPast(row.item.executionTime)" @click="deleteScheduledLoadTask(row.item.taskId)">
                                 {{ $t("cancelLabel") }}
@@ -31,6 +32,7 @@ import { computed, defineComponent } from "vue";
 import { type ScheduledTaskResponse } from "@/models/Common";
 import { useI18n } from "vue-i18n";
 import { localiseDate } from "@/i18n/dateLocalisation";
+import { getRecurrenceTypeTitleFromValueAutoLocale } from "@/i18n/recurrenceType";
 
 
 export default defineComponent({
@@ -58,16 +60,20 @@ export default defineComponent({
 
         const dateLabel = computed(() => i18n.t("dateLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
+        const recurrenceTypeLabel = computed(() => i18n.t("recurrenceTypeLabel"));
+
         const headers = [
           { title: "Task ID", align: "start", sortable: false, key: "taskId"},
           { title: dateLabel, align: "start", sortable: false, key: "executionTime"},
+          { title: recurrenceTypeLabel, align: "start", sortable: false, key: "recurrenceType"},
           { title: actionLabel, align: "start", sortable: false}
         ];
 
         return {
             deleteScheduledLoadTask,
             isDateTimeInPast,
-            localiseDate, headers
+            localiseDate, headers,
+            getRecurrenceTypeTitleFromValueAutoLocale
         };
     },
 });

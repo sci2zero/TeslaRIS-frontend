@@ -88,7 +88,7 @@
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
-            :supports-force-delete="isAdmin"
+            :supports-force-delete="(isAdmin as boolean)"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -188,6 +188,8 @@ export default defineComponent({
             monograph2.scopusId = "";
             monograph1.openAlexId = monograph2.openAlexId;
             monograph2.openAlexId = "";
+            monograph1.webOfScienceId = monograph2.webOfScienceId;
+            monograph2.webOfScienceId = "";
             monograph1.documentDate = monograph2.documentDate;
             monograph1.volume = monograph2.volume;
             monograph2.volume = "";
@@ -263,6 +265,7 @@ export default defineComponent({
             leftMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             leftMonograph.value!.scopusId = updatedInfo.scopusId;
             leftMonograph.value!.openAlexId = updatedInfo.openAlexId;
+            leftMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -289,6 +292,7 @@ export default defineComponent({
             rightMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             rightMonograph.value!.scopusId = updatedInfo.scopusId;
             rightMonograph.value!.openAlexId = updatedInfo.openAlexId;
+            rightMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

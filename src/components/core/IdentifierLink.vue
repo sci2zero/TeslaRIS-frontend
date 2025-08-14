@@ -45,6 +45,10 @@ export default defineComponent({
                     return "https://openalex.org/";
                 case "ror":
                     return "https://ror.org/";
+                case "researcher_id":
+                    return "http://www.researcherid.com/rid/";
+                case "web_of_science":
+                    return "https://www.webofscience.com/api/gateway?GWVersion=2&SrcApp=teslaris&SrcAuth=WosAPI&DestLinkType=FullRecord&DestApp=WOS_CPL&KeyUT=WOS:";
             }
 
             return "https://doi.org/";

@@ -106,6 +106,13 @@
                                         {{ $t("notYetSetMessage") }}
                                     </span>
                                 </div>
+                                <div>ResearcherID (WoS):</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.webOfScienceResearcherId" :identifier="personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber">
@@ -502,7 +509,9 @@ export default defineComponent({
         };
 
         const fetchPerson = (switchTab: boolean = false) => {
-            PersonService.readPerson(parseInt(currentRoute.params.id as string)).then((response) => {
+            PersonService.readPerson(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 person.value = response.data;
 
                 document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
@@ -541,6 +550,8 @@ export default defineComponent({
 
                 fetchPublications(switchTab);                
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 

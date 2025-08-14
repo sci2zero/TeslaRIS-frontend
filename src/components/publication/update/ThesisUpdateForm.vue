@@ -2,7 +2,12 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col v-if="!enterExternalOU" cols="11">
-                <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model:model-value="selectedOrganisationUnit" :readonly="isInstitutionalLibrarian" required></organisation-unit-autocomplete-search>
+                <organisation-unit-autocomplete-search
+                    ref="ouAutocompleteRef"
+                    v-model:model-value="selectedOrganisationUnit"
+                    :readonly="isInstitutionalLibrarian"
+                    required
+                />
             </v-col>
             <v-col v-else>
                 <multilingual-text-input
@@ -101,6 +106,16 @@
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -381,6 +396,7 @@ export default defineComponent({
         const publicationYear = ref(props.presetThesis?.documentDate);
         const doi = ref(props.presetThesis?.doi);
         const openAlexId = ref(props.presetThesis?.openAlexId);
+        const webOfScienceId = ref(props.presetThesis?.webOfScienceId)
         const numberOfPages = ref(props.presetThesis?.numberOfPages);
         const uris = ref<string[]>(props.presetThesis?.uris as string[]);
         const topicAcceptanceDate = ref(props.presetThesis?.topicAcceptanceDate as string);
@@ -404,7 +420,7 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules
+            udcValidationRules, documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
@@ -415,7 +431,8 @@ export default defineComponent({
                 const { duplicateFound } = await checkIdentifiers(
                     [
                         { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                     ],
                     props.presetThesis?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -448,6 +465,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 languageId: selectedLanguage.value,
                 writingLanguageTagId: selectedWritingLanguage.value?.value as number,
@@ -499,6 +517,7 @@ export default defineComponent({
             publicationYear.value = props.presetThesis?.documentDate;
             doi.value = props.presetThesis?.doi;
             openAlexId.value = props.presetThesis?.openAlexId;
+            webOfScienceId.value = props.presetThesis?.webOfScienceId;
             topicAcceptanceDate.value = props.presetThesis?.topicAcceptanceDate as string;
             thesisDefenceDate.value = props.presetThesis?.thesisDefenceDate as string;
             printIsbn.value = props.presetThesis?.printISBN as string;
@@ -536,6 +555,7 @@ export default defineComponent({
             udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
             numberOfChapters, numberOfReferences, numberOfTables,
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
+            documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
             scientificSubAreaRef, placeOfKeepRef, typeOfTitleRef
         };

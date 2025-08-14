@@ -9,14 +9,14 @@ export function useUserRole() {
     const userRole = ref<string | undefined>(UserService.provideUserRole());
     const isUserBoundToOU = computed(() => userRole.value && userRole.value !== "ADMIN" && userRole.value !== "RESEARCHER");
     
-    const isAdmin = computed(() => userRole.value === "ADMIN");
-    const isResearcher = computed(() => userRole.value === "RESEARCHER");
-    const isCommission = computed(() => userRole.value === "COMMISSION");
-    const isInstitutionalEditor = computed(() => userRole.value === "INSTITUTIONAL_EDITOR");
-    const isViceDeanForScience = computed(() => userRole.value === "VICE_DEAN_FOR_SCIENCE");
-    const isInstitutionalLibrarian = computed(() => userRole.value === "INSTITUTIONAL_LIBRARIAN");
-    const isHeadOfLibrary = computed(() => userRole.value === "HEAD_OF_LIBRARY");
-    const isPromotionRegistryAdministrator = computed(() => userRole.value === "PROMOTION_REGISTRY_ADMINISTRATOR");
+    const isAdmin = computed(() => Boolean(userRole.value && userRole.value === "ADMIN"));
+    const isResearcher = computed(() => Boolean(userRole.value && userRole.value === "RESEARCHER"));
+    const isCommission = computed(() => Boolean(userRole.value && userRole.value === "COMMISSION"));
+    const isInstitutionalEditor = computed(() => Boolean(userRole.value && userRole.value === "INSTITUTIONAL_EDITOR"));
+    const isViceDeanForScience = computed(() => Boolean(userRole.value && userRole.value === "VICE_DEAN_FOR_SCIENCE"));
+    const isInstitutionalLibrarian = computed(() => Boolean(userRole.value && userRole.value === "INSTITUTIONAL_LIBRARIAN"));
+    const isHeadOfLibrary = computed(() => Boolean(userRole.value && userRole.value === "HEAD_OF_LIBRARY"));
+    const isPromotionRegistryAdministrator = computed(() => Boolean(userRole.value && userRole.value === "PROMOTION_REGISTRY_ADMINISTRATOR"));
 
     const canUserAddPersons = computed(() => isAdmin.value || isInstitutionalEditor.value);
     const canAddSerialEvents = computed(() => isAdmin.value || isInstitutionalEditor.value);

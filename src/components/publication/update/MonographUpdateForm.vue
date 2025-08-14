@@ -72,12 +72,20 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="6">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -258,13 +266,15 @@ export default defineComponent({
         const doi = ref(props.presetMonograph?.doi);
         const scopus = ref(props.presetMonograph?.scopusId);
         const openAlexId = ref(props.presetMonograph?.openAlexId);
+        const webOfScienceId = ref(props.presetMonograph?.webOfScienceId);
         const number = ref(props.presetMonograph?.number);
         const volume = ref(props.presetMonograph?.volume);
 
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
-            isbnValidationRules, workOpenAlexIdValidationRules
+            isbnValidationRules, workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -288,7 +298,8 @@ export default defineComponent({
                         { value: printIsbn.value as string, error: "printIsbnExistsError" },
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: scopus.value as string, error: "scopusIdExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                     ],
                     props.presetMonograph?.id as number,
                     (id, docId) => DocumentPublicationService.checkMonographIdentifierUsage(id, docId)
@@ -314,6 +325,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 eisbn: eIsbn.value,
                 eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 languageTagIds: selectedLanguages.value,
@@ -348,6 +360,7 @@ export default defineComponent({
             doi.value = props.presetMonograph?.doi;
             scopus.value = props.presetMonograph?.scopusId;
             openAlexId.value = props.presetMonograph?.openAlexId;
+            webOfScienceId.value = props.presetMonograph?.webOfScienceId;
             volume.value = props.presetMonograph?.volume;
             number.value = props.presetMonograph?.number;
             selectedMonographType.value = {title: props.presetMonograph?.monographType ? getMonographTypeTitleFromValueAutoLocale(props.presetMonograph?.monographType as MonographType) as string : "", value: props.presetMonograph?.monographType ? props.presetMonograph?.monographType as MonographType : null};
@@ -376,7 +389,8 @@ export default defineComponent({
             scopusIdValidationRules, titleRef,
             subtitleRef, refreshForm, urisRef,
             isbnValidationRules, snackbar, message,
-            openAlexId, workOpenAlexIdValidationRules
+            openAlexId, workOpenAlexIdValidationRules,
+            webOfScienceId, documentWebOfScienceIdValidationRules
         };
     }
 });

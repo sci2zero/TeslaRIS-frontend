@@ -92,6 +92,12 @@
                                 <div v-if="dataset?.openAlexId" class="response">
                                     <identifier-link :identifier="dataset.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="dataset?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="dataset?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="dataset.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="dataset?.uris && dataset?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
@@ -108,7 +114,14 @@
         <document-action-box
             ref="actionsRef"
             :doi="dataset?.doi"
+            :can-edit="canEdit && !dataset?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="dataset?.isMetadataValid"
+            :files-valid="dataset?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(dataset?.description)"
+            :document="dataset"
+            @update="fetchValidationStatus(dataset?.id as number, dataset as _Document)"
         />
 
         <tab-content-loader v-if="!dataset" layout="sections" />
@@ -148,7 +161,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="dataset?.keywords ? dataset.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !dataset?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -156,13 +169,13 @@
                 <!-- Description -->
                 <description-section
                     :description="dataset?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !dataset?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="dataset"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !dataset?.isArchived"
                     :proofs="dataset?.proofs"
                     :file-items="dataset?.fileItems">
                 </attachment-section>
@@ -210,7 +223,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Dataset } from '@/models/PublicationModel';
@@ -245,6 +258,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -304,7 +318,9 @@ export default defineComponent({
         });
 
         const fetchDataset = () => {
-            DocumentPublicationService.readDataset(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readDataset(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 dataset.value = response.data;
 
                 document.title = returnCurrentLocaleContent(dataset.value.title) as string;
@@ -318,6 +334,8 @@ export default defineComponent({
                 }
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -375,6 +393,7 @@ export default defineComponent({
             dataset.value!.publisherId = basicInfo.publisherId;
             dataset.value!.internalNumber = basicInfo.internalNumber;
             dataset.value!.openAlexId = basicInfo.openAlexId;
+            dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };
@@ -411,6 +430,8 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
             dataset, icon, publisher, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -421,7 +442,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, localiseDate,
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
-            createIndicator, fetchIndicators
+            createIndicator, fetchIndicators, fetchValidationStatus
         };
 }})
 

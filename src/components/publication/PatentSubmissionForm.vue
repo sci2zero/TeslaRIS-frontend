@@ -43,6 +43,16 @@
                         </v-text-field>
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="10">
+                        <v-text-field
+                            v-model="webOfScienceId"
+                            label="Web of Science ID"
+                            placeholder="Web of Science ID"
+                            :rules="documentWebOfScienceIdValidationRules">
+                        </v-text-field>
+                    </v-col>
+                </v-row>
 
                 <v-row>
                     <v-col>
@@ -161,12 +171,14 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
 
         const {
             requiredFieldRules, doiValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const submitPatent = (stayOnPage: boolean) => {
@@ -181,6 +193,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: openAlexId.value,
                 publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
@@ -198,6 +211,7 @@ export default defineComponent({
                     publicationYear.value = "";
                     doi.value = "";
                     openAlexId.value = "";
+                    webOfScienceId.value = "";
                     patentNumber.value = "";
                     contributionsRef.value?.clearInput();
 
@@ -255,7 +269,9 @@ export default defineComponent({
             requiredFieldRules, submitPatent,
             doiValidationRules, openAlexId,
             workOpenAlexIdValidationRules,
-            PublicationType, popuateMetadata
+            PublicationType, popuateMetadata,
+            documentWebOfScienceIdValidationRules,
+            webOfScienceId
         };
     }
 });

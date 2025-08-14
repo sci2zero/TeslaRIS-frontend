@@ -40,7 +40,7 @@
                             entity-name="JournalPublication"
                             is-update
                             is-section-update
-                            :read-only="!canEdit"
+                            :read-only="!canEdit || journalPublication?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -123,6 +123,12 @@
                                 <div v-if="journalPublication?.openAlexId" class="response">
                                     <identifier-link :identifier="journalPublication.openAlexId" type="open_alex"></identifier-link>
                                 </div>
+                                <div v-if="journalPublication?.webOfScienceId">
+                                    Web of Science ID:
+                                </div>
+                                <div v-if="journalPublication?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="journalPublication.webOfScienceId" type="web_of_science"></identifier-link>
+                                </div>
                                 <div v-if="journalPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
@@ -151,7 +157,14 @@
         <document-action-box
             ref="actionsRef"
             :doi="journalPublication?.doi"
+            :can-edit="canEdit && !journalPublication?.isArchived"
+            :could-archive="canEdit"
+            :metadata-valid="journalPublication?.isMetadataValid"
+            :files-valid="journalPublication?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
+            :description="returnCurrentLocaleContent(journalPublication?.description)"
+            :document="journalPublication"
+            @update="fetchValidationStatus(journalPublication?.id as number, journalPublication as _Document)"
         />
 
         <tab-content-loader v-if="!journalPublication" layout="sections" />
@@ -183,7 +196,7 @@
                 <person-document-contribution-tabs
                     :document-id="journalPublication?.id"
                     :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || journalPublication?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -191,7 +204,7 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="journalPublication?.keywords ? journalPublication.keywords : []"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
@@ -199,13 +212,13 @@
                 <!-- Description -->
                 <description-section
                     :description="journalPublication?.description"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <attachment-section
                     :document="journalPublication"
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
                     :proofs="journalPublication?.proofs"
                     :file-items="journalPublication?.fileItems">
                 </attachment-section>
@@ -256,7 +269,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
@@ -295,6 +308,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 
 
 export default defineComponent({
@@ -372,7 +386,9 @@ export default defineComponent({
         });
 
         const fetchJournalPublication = () => {
-            DocumentPublicationService.readJournalPublication(parseInt(currentRoute.params.id as string)).then((response) => {
+            DocumentPublicationService.readJournalPublication(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
                 journalPublication.value = response.data;
 
                 document.title = returnCurrentLocaleContent(journalPublication.value.title) as string;
@@ -390,6 +406,8 @@ export default defineComponent({
                 });
     
                 populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
             });
         };
 
@@ -442,6 +460,7 @@ export default defineComponent({
             journalPublication.value!.articleNumber = basicInfo.articleNumber;
             journalPublication.value!.journalPublicationType = basicInfo.journalPublicationType;
             journalPublication.value!.openAlexId = basicInfo.openAlexId;
+            journalPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             performUpdate(true);
         };
@@ -488,8 +507,10 @@ export default defineComponent({
             createDocumentIndicator(documentIndicator, () => fetchIndicators());
         };
 
+        const { fetchValidationStatus } = useTrustConfigurationActions();
+
         return {
-            journalPublication, icon, canClassify,
+            journalPublication, icon, canClassify, fetchJournalPublication,
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, journal, JournalPublicationUpdateForm,
@@ -499,7 +520,8 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
-            createClassification, fetchClassifications, currentRoute
+            createClassification, fetchClassifications, currentRoute,
+            fetchValidationStatus
         };
 }})
 

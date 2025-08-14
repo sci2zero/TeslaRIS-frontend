@@ -261,6 +261,14 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.patch, `thesis/unarchive/${thesisId}`);
   }
 
+  async archiveDocument(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document/archive/${thesisId}`);
+  }
+
+  async unarchiveDocument(thesisId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document/unarchive/${thesisId}`);
+  }
+
   async getThesisLibraryFormats(thesisId: number): Promise<AxiosResponse<ThesisLibraryFormatsResponse>> {
     return super.sendRequest(axios.get, `thesis/library-formats/${thesisId}`);
   }

@@ -41,12 +41,20 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="5">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -175,6 +183,7 @@ export default defineComponent({
         const doi = ref(props.presetMonographPublication?.doi);
         const scopus = ref(props.presetMonographPublication?.scopusId);
         const openAlexId = ref(props.presetMonographPublication?.openAlexId);
+        const webOfScienceId = ref(props.presetMonographPublication?.webOfScienceId);
         const articleNumber = ref(props.presetMonographPublication?.articleNumber);
         const numberOfPages = ref(props.presetMonographPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetMonographPublication?.uris as string[]);
@@ -182,7 +191,8 @@ export default defineComponent({
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
         
         const publicationTypes = computed(() => getMonographPublicationTypesForGivenLocale());
@@ -194,7 +204,8 @@ export default defineComponent({
                     [
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: scopus.value as string, error: "scopusIdExistsError"},
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"}
+                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
                     ],
                     props.presetMonographPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -220,6 +231,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 monographId: selectedMonograph.value.value,
                 eventId: selectedEvent.value.value,
                 monographPublicationType: selectedpublicationType.value.value as MonographPublicationType,
@@ -245,6 +257,7 @@ export default defineComponent({
             doi.value = props.presetMonographPublication?.doi;
             scopus.value = props.presetMonographPublication?.scopusId;
             openAlexId.value = props.presetMonographPublication?.openAlexId;
+            webOfScienceId.value = props.presetMonographPublication?.webOfScienceId;
             articleNumber.value = props.presetMonographPublication?.articleNumber;
 
             selectedpublicationType.value = {title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType ? props.presetMonographPublication?.monographPublicationType as MonographPublicationType : null};
@@ -267,8 +280,9 @@ export default defineComponent({
             languageTags, startPage, endPage, refreshForm,
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
-            urisRef, requiredSelectionRules,
-            workOpenAlexIdValidationRules
+            urisRef, requiredSelectionRules, webOfScienceId,
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         };
     }
 });

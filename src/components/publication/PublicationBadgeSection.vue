@@ -31,7 +31,19 @@
                     PlumX Metrics
                 </a>
             </div>
-            <div ref="openCitationsContainer" class="openCitationsContainer ml-5"></div>
+            <div
+                ref="openCitationsContainer"
+                class="openCitationsContainer
+                ml-5">
+            </div>
+            <div 
+                v-if="description"
+                style="z-index: 5;"
+                class="sdg-wheel"
+                data-wheel-height="70"
+                data-model="aurora-sdg-multi"
+                :data-text="description.substring(0, (description.length > 1000 ? 1000 : description.length))">
+            </div>
             <div
                 v-if="oaStatus !== null"
                 :class="[
@@ -64,6 +76,10 @@ export default defineComponent({
         documentId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        description: {
+            type: Object as PropType<string | null>,
+            default: undefined
         }
     },
     setup(props) {
@@ -73,19 +89,19 @@ export default defineComponent({
 
         const unpaywallEmail = import.meta.env.VITE_UNPAYWALL_EMAIL as string;
 
-        const initBadges = (configuration: ExternalIndicatorConfiguration) => {
+        const initBadges = async (configuration: ExternalIndicatorConfiguration) => {
             if (configuration.showAltmetric && (typeof window) !== "undefined" && ((window as any)._altmetric_embed_init)) {
                 (window as any)._altmetric_embed_init();
                 fixLinkToSource("altmetric-embed");
                 setTimeout(() => fixLinkToSource("altmetric-embed"), 1000);
             }
 
-            if (configuration.showDimensions && (typeof window) !== "undefined" && ((window as any).__dimensions_embed.addBadges)) {
+            if (configuration.showDimensions && (typeof window) !== "undefined" && (window as any).__dimensions_embed && ((window as any).__dimensions_embed.addBadges)) {
                 (window as any).__dimensions_embed.addBadges();
                 fixLinkToSource("__dimensions_badge_embed__");
             }
 
-            if (configuration.showPlumX && (typeof window) !== "undefined" && ((window as any).__plumX.widgets.init)) {
+            if (configuration.showPlumX && (typeof window) !== "undefined" && (window as any).__plumX && ((window as any).__plumX.widgets.init)) {
                 (window as any).__plumX.widgets.init();
             }
         };
@@ -133,6 +149,29 @@ export default defineComponent({
                 }
             }
         );
+
+        watch(() => props.description, async () => {
+            if (props.description) {
+                await loadScript("/src/utils/SdgWheel.js");
+                if ((typeof window) !== "undefined" && (window as any)._init_sdg_badge) {
+                    (window as any)._init_sdg_badge();
+                }
+            }
+        });
+
+        const loadScript = (src: string) => {
+            return new Promise<any>((resolve, reject) => {
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve(null);
+                    return;
+                }
+                const script = document.createElement("script");
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        };
 
         const fetchUnpaywall = () => {
             fetch(

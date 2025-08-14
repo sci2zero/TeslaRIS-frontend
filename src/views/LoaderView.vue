@@ -28,8 +28,14 @@
         
         <v-btn
             class="load-action mb-5"
-            @click="skipDocument">
+            @click="skipDocument(false)">
             {{ $t('skipDocumentLabel') }}
+        </v-btn>
+        <v-btn
+            v-if="isResearcher"
+            class="load-action mb-5 same-line"
+            @click="skipDocument(true)">
+            {{ $t('notMyPublicationLabel') }}
         </v-btn>
         <v-btn
             class="load-action mb-5 same-line"
@@ -307,13 +313,14 @@ export default defineComponent({
             });
         };
 
-        const skipDocument = () => {
+        const skipDocument = (removeFromRecord: boolean) => {
             const shouldToggleSmartLoading = smartLoading.value;
             smartLoading.value = false;
             currentSmartSkipRunId.value = crypto.randomUUID();
 
             ImportService.skipWizard(
-                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
+                removeFromRecord
             ).then(() => {
                 stepperValue.value = shouldToggleSmartLoading ? 0 : 1;
                 importAuthorsRef.value = [];
@@ -563,7 +570,9 @@ export default defineComponent({
                     documentDate: currentLoadRecord.value!.documentDate,
                     scopusId: currentLoadRecord.value!.scopusId,
                     doi: currentLoadRecord.value!.doi,
-                    eventId: undefined, // is this ok?
+                    openAlexId: currentLoadRecord.value?.openAlexId,
+                    webOfScienceId: currentLoadRecord.value?.webOfScienceId,
+                    eventId: undefined,
                     fileItems: [],
                     proofs: []
                 };
@@ -600,6 +609,8 @@ export default defineComponent({
                     documentDate: currentLoadRecord.value!.documentDate,
                     scopusId: currentLoadRecord.value!.scopusId,
                     doi: currentLoadRecord.value!.doi,
+                    openAlexId: currentLoadRecord.value?.openAlexId,
+                    webOfScienceId: currentLoadRecord.value?.webOfScienceId,
                     eventId: proceedingsImportRef.value!.selectedEvent.databaseId,
                     proceedingsId: proceedingsImportRef.value!.selectedProceedings.id,
                     fileItems: [],
@@ -686,7 +697,7 @@ export default defineComponent({
             loadingJournalPublication, updateRecord,
             loadingProceedingsPublication, finishLoad,
             journalImportRef, journalPublicationDetailsRef,
-            deduplicate, proceedingsImportRef,
+            deduplicate, proceedingsImportRef, isResearcher,
             proceedingsPublicationDetailsRef, deduplicatorRef,
             noRecordsRemaining, toggleSmartLoading,
             smartLoading, resumeImport, loading,

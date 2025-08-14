@@ -246,6 +246,7 @@ export default defineComponent({
             leftMonographPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             leftMonographPublication.value!.scopusId = updatedInfo.scopusId;
             leftMonographPublication.value!.openAlexId = updatedInfo.openAlexId;
+            leftMonographPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -270,6 +271,7 @@ export default defineComponent({
             rightMonographPublication.value!.numberOfPages = updatedInfo.numberOfPages;
             rightMonographPublication.value!.scopusId = updatedInfo.scopusId;
             rightMonographPublication.value!.openAlexId = updatedInfo.openAlexId;
+            rightMonographPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

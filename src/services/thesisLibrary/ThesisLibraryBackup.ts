@@ -6,8 +6,8 @@ export class ThesisLibraryBackupService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async scheduleGeneration(params: string): Promise<AxiosResponse<string>> {
-        return super.sendRequest(axios.post, `thesis-library/backup/schedule-generation?${params}`, {}, ThesisLibraryBackupService.idempotencyKey);
+    async scheduleGeneration(params: string, recurrence: string): Promise<AxiosResponse<string>> {
+        return super.sendRequest(axios.post, `thesis-library/backup/schedule-generation?${params}&recurrence=${recurrence}`, {}, ThesisLibraryBackupService.idempotencyKey);
     }
 
     async listBackups(): Promise<AxiosResponse<string[]>> {

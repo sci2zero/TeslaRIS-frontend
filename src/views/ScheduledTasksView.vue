@@ -127,6 +127,15 @@
             <v-col cols="12" sm="3" md="1">
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
+            <v-col v-if="taskReindexing || reportGeneration" cols="12" sm="3" md="2">
+                <v-select
+                    v-model="selectedRecurrenceType"
+                    :items="recurrenceTypes"
+                    :label="$t('recurrenceTypeLabel') + '*'"
+                    :rules="requiredSelectionRules"
+                    return-object>
+                </v-select>
+            </v-col>
             <v-col cols="12" sm="3" md="1">
                 <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
                     {{ $t("scheduleLabel") }}
@@ -167,6 +176,8 @@ import EventAutocompleteSearch from "@/components/event/EventAutocompleteSearch.
 import { PublicationType } from "@/models/PublicationModel";
 import { getReportTypesForGivenLocale } from "@/i18n/reportType";
 import { useInterval } from "@/composables/useInterval";
+import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from "@/i18n/recurrenceType";
+import { RecurrenceType } from "@/models/LoadModel";
 
 
 export default defineComponent({
@@ -226,6 +237,11 @@ export default defineComponent({
         const selectedPersons = ref<{title: string, value: number}[]>([]);
         const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
         const selectedCommissions = ref<{title: string, value: number}[]>([]);
+
+        const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
+        const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
+            {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
+        );
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -320,7 +336,8 @@ export default defineComponent({
                 case ScheduledTaskType.REINDEXING:
                     scheduleTask(() => 
                         TaskManagerService.scheduleDatabaseReindexing(
-                            timestamp, selectedEntityTypes.value.map(entityType => entityType.value)
+                            timestamp, selectedEntityTypes.value.map(entityType => entityType.value),
+                            selectedRecurrenceType.value.value
                         )
                     );
                     break;
@@ -369,7 +386,8 @@ export default defineComponent({
                         TaskManagerService.scheduleReportGeneration(
                             timestamp, selectedReportType.value,
                             selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? selectedCommissions.value.map(commission => commission.value) : [selectedCommission.value.value],
-                            selectedYears.value, (selectedOUs.value as {title: string, value: number}).value, "sr"
+                            selectedYears.value, (selectedOUs.value as {title: string, value: number}).value, "sr",
+                            selectedRecurrenceType.value.value
                         )
                     );
                     break;
@@ -443,7 +461,8 @@ export default defineComponent({
             proceedingsPublicationsAssessment,
             selectedEvents, selectedReportType,
             isTopLevelReport, isSummaryReport,
-            selectedCommissions
+            selectedCommissions, recurrenceTypes,
+            selectedRecurrenceType
         };
     },
 });

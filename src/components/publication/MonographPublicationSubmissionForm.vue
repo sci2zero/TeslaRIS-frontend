@@ -83,6 +83,16 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="10">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="5">
                             <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
                         </v-col>
@@ -188,6 +198,7 @@ export default defineComponent({
         const doi = ref("");
         const scopus = ref("");
         const openAlexId = ref("");
+        const webOfScienceId = ref("");
         const articleNumber = ref("");
         const numberOfPages = ref();
         const uris = ref<string[]>([]);
@@ -198,7 +209,8 @@ export default defineComponent({
         const { 
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
-            workOpenAlexIdValidationRules
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => (getMonographPublicationTypesForGivenLocale() as { title: string; value: MonographPublicationType; }[]));
@@ -236,6 +248,7 @@ export default defineComponent({
                 contributions: contributions.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                webOfScienceId: webOfScienceId.value,
                 scopusId: scopus.value,
                 fileItems: [],
                 proofs: []
@@ -258,6 +271,7 @@ export default defineComponent({
                     scopus.value = "";
                     openAlexId.value = "";
                     articleNumber.value = "";
+                    webOfScienceId.value = "";
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
 
@@ -312,10 +326,11 @@ export default defineComponent({
             description, descriptionRef, keywords, keywordsRef,
             uris, urisRef, myPublications, doiValidationRules, openAlexId,
             selectedMonograph, monographAutocompleteRef, listPublications,
-            publicationTypes, selectedpublicationType, isResearcher,
+            publicationTypes, selectedpublicationType, isResearcher, webOfScienceId,
             contributions, contributionsRef, scopusIdValidationRules, popuateMetadata,
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
-            availableMonograph, errorMessage, workOpenAlexIdValidationRules
+            availableMonograph, errorMessage, workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         };
     }
 });

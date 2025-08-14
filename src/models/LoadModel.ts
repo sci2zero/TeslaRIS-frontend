@@ -12,6 +12,7 @@ interface DocumentLoadDTO {
     doi: string;
     scopusId: string;
     openAlexId: string;
+    webOfScienceId: string;
     eventId: number | null;
 }
 
@@ -66,6 +67,7 @@ export interface PersonLoad {
     orcid: string;
     scopusAuthorId: string;
     openAlexId: string;
+    webOfScienceResearcherId: string;
     importId: string;
 }
 
@@ -92,4 +94,13 @@ export interface AuthorCentricInstitutionHarvestRequest {
     institutionId: number;
     allAuthors: boolean;
     authorIds: number[]
+}
+
+export enum RecurrenceType {
+    ONCE = "ONCE",
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    MONTHLY = "MONTHLY",
+    THREE_MONTHLY = "THREE_MONTHLY",
+    YEARLY = "YEARLY"
 }

@@ -17,7 +17,7 @@ export const returnCurrentLocaleContent = (multilingualContentList: Multilingual
 
     if (!selectedContent) {
         multilingualContentList.forEach((multilingualContent) => {
-            if (multilingualContent.languageTag.startsWith(currentLocale)) {
+            if (currentLocale.includes("-") && currentLocale.startsWith(multilingualContent.languageTag)) {
                 selectedContent = multilingualContent;
             }
         });

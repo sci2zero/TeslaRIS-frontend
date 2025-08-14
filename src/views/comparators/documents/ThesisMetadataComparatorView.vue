@@ -211,6 +211,8 @@ export default defineComponent({
             thesis2.doi = "";
             thesis1.openAlexId = thesis2.openAlexId;
             thesis2.openAlexId = "";
+            thesis1.webOfScienceId = thesis2.webOfScienceId;
+            thesis2.webOfScienceId = "";
             thesis1.scopusId = thesis2.scopusId;
             thesis2.scopusId = "";
             thesis1.documentDate = thesis2.documentDate;
@@ -272,6 +274,7 @@ export default defineComponent({
             leftThesis.value!.documentDate = updatedInfo.documentDate;
             leftThesis.value!.doi = updatedInfo.doi;
             leftThesis.value!.openAlexId = updatedInfo.openAlexId;
+            leftThesis.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftThesis.value!.numberOfPages = updatedInfo.numberOfPages;
             leftThesis.value!.numberOfChapters = updatedInfo.numberOfChapters;
             leftThesis.value!.numberOfReferences = updatedInfo.numberOfReferences;
@@ -308,6 +311,7 @@ export default defineComponent({
             rightThesis.value!.documentDate = updatedInfo.documentDate;
             rightThesis.value!.doi = updatedInfo.doi;
             rightThesis.value!.openAlexId = updatedInfo.openAlexId;
+            rightThesis.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightThesis.value!.numberOfPages = updatedInfo.numberOfPages;
             rightThesis.value!.numberOfChapters = updatedInfo.numberOfChapters;
             rightThesis.value!.numberOfReferences = updatedInfo.numberOfReferences;
