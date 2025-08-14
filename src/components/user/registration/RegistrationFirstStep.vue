@@ -3,7 +3,7 @@
         <div>
             <v-text-field
                 v-model="firstName"
-                :label="$t('nameLabel')"
+                :label="$t('firstNameLabel')"
                 :rules="requiredFieldRules"
                 @input="updatedFirstName"
             ></v-text-field>

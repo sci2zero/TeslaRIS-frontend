@@ -1,6 +1,6 @@
 <template>
     <v-container ma-0 pa-0 fill-height>
-        <div id="registerStepper">
+        <div v-if="!oauthRegistration" id="registerStepper">
             <h2 class="register-title">
                 {{ $t("registerLabel") }}
             </h2>
@@ -44,30 +44,42 @@
                 </template>
             </v-stepper>
         </div>
+
+        <div v-else id="oauthRegistration">
+            <o-auth-registration-form
+                :new-researcher-creation-allowed="newResearcherCreationAllowed"
+            />
+        </div>
     </v-container>
 </template>
 
 <script lang="ts">
+import OAuthRegistrationForm from '@/components/user/registration/OAuthRegistrationForm.vue';
 import RegistrationFirstStep from '@/components/user/registration/RegistrationFirstStep.vue';
 import RegistrationSecondStep from '@/components/user/registration/RegistrationSecondStep.vue';
 import UserService from '@/services/UserService';
 import { defineComponent, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 
 
 export default defineComponent({
     name: "RegisterView",
-    components: { RegistrationFirstStep, RegistrationSecondStep },
+    components: { RegistrationFirstStep, RegistrationSecondStep, OAuthRegistrationForm },
 
     setup() {
         const stepperValue = ref(1);
         const canAdvance = ref(false);
         const newResearcherCreationAllowed = ref(false);
+        const oauthRegistration = ref(false);
 
+        const route = useRoute();
         const i18n = useI18n();
 
         onMounted(() => {
             document.title = i18n.t("registerLabel");
+
+            oauthRegistration.value = Boolean(route.query.oauth as string);
 
             UserService.isRegisterResearcherCreationAllowed().then(response => {
                 newResearcherCreationAllowed.value = response.data;
@@ -109,7 +121,8 @@ export default defineComponent({
             stepperValue, nextStep,
             userDetails, previousStep,
             checkForNextStep, canAdvance,
-            newResearcherCreationAllowed
+            newResearcherCreationAllowed,
+            oauthRegistration
         }
     }
 });

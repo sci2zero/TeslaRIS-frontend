@@ -3,17 +3,22 @@
         <v-form v-model="isFormValid" @submit.prevent>
             <v-text-field
                 v-model="firstName"
-                label="First Name"
+                :label="$t('firstNameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             ></v-text-field>
             <v-text-field
                 v-model="lastName"
-                label="Last Name"
+                :label="$t('surnameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             ></v-text-field>
-            <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" :disabled="isPersonSelected()" required></organisation-unit-autocomplete-search>
+            <organisation-unit-autocomplete-search
+                ref="ouAutocompleteRef"
+                v-model="selectedOrganisationUnit"
+                :disabled="isPersonSelected()"
+                required>
+            </organisation-unit-autocomplete-search>
             <v-select
                 v-model="selectedLanguage"
                 :label="$t('preferredLanguageLabel') + '*'"
@@ -21,10 +26,14 @@
             ></v-select>
             <v-text-field
                 v-model="email"
-                label="Email"
+                :label="$t('emailLabel') + '*'"
                 :rules="emailFieldRules"
             ></v-text-field>
-            <password-input-with-meter :label="$t('newPasswordLabel')" @password-change="setNewPassword($event)" @show-repeated-password="true"></password-input-with-meter>
+            <password-input-with-meter
+                :label="$t('newPasswordLabel') + '*'"
+                @password-change="setNewPassword($event)"
+                @show-repeated-password="true">
+            </password-input-with-meter>
         </v-form>
 
         <v-btn block color="blue darken-1 large" :disabled="!isFormValid" @click="register">

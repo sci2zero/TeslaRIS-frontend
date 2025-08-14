@@ -1012,6 +1012,10 @@ export default {
     pleaseWaitLabel: "Molimo Vas, sačekajte",
     redirectingLabel: "Redirektovanje...",
     orcidNotLinked: "Vaš ORCID ID nije specificiran ni u jednom profilu istraživača.",
+    accountNotActivated: "Vaš nalog nije aktiviran.",
     enterYourNameLabel: "Unesite vaše ime",
-    noneOfTheOfferedLabel: "Nijedan od ponuđenih"
+    noneOfTheOfferedLabel: "Nijedan od ponuđenih",
+    addNewResearcherLabel: "Dodaj novog istraživača",
+    showAllLabel: "Prikaži sve",
+    showForInstitutionLabel: "Prikaži za instituciju"
 }

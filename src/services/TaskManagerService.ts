@@ -5,6 +5,7 @@ import { type ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
 import { EntityClassificationSource, ReportType, type PublicationAssessmentRequest } from "@/models/AssessmentModel";
 import { PublicationType } from "@/models/PublicationModel";
+import { toUtcLocalDateTimeString } from "@/utils/DateUtil";
 
 export class TaskSchedulingService extends BaseService {
 
@@ -35,33 +36,31 @@ export class TaskSchedulingService extends BaseService {
     }
 
     async scheduleIndicatorLoadingTask(timestamp: string, source: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-load?timestamp=${timestamp}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-load?timestamp=${toUtcLocalDateTimeString(timestamp)}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleIF5RankComputationTask(timestamp: string, years: number[]): Promise<AxiosResponse<void>> {
-        
-
-        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-compute?timestamp=${timestamp}${this.createNumericalParameter("classificationYears", years)}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-compute?timestamp=${toUtcLocalDateTimeString(timestamp)}${this.createNumericalParameter("classificationYears", years)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[], journalIds: number[]): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${timestamp}&commissionId=${commissionId}${this.createNumericalParameter("classificationYears", years)}${this.createNumericalParameter("journalIds", journalIds)}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification?timestamp=${toUtcLocalDateTimeString(timestamp)}&commissionId=${commissionId}${this.createNumericalParameter("classificationYears", years)}${this.createNumericalParameter("journalIds", journalIds)}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleClassificationLoadTask(timestamp: string, source: EntityClassificationSource, commissionId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${timestamp}&source=${source}&commissionId=${commissionId}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${toUtcLocalDateTimeString(timestamp)}&source=${source}&commissionId=${commissionId}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[], recurrence: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `reindex/schedule?timestamp=${timestamp}&recurrence=${recurrence}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `reindex/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
     }
 
     async schedulePublicationAssessment(timestamp: string, dateFrom: string, body: PublicationAssessmentRequest, type: PublicationType): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${timestamp}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${toUtcLocalDateTimeString(timestamp)}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleReportGeneration(timestamp: string, reportType: ReportType, commissionIds: number[], year: number[] | number, topLevelInstitutionId: number | undefined, lang: string, recurrence: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}&timestamp=${timestamp}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
+        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}&timestamp=${toUtcLocalDateTimeString(timestamp)}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     private createNumericalParameter(paramName: string, values: number[]): string {

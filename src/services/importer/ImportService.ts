@@ -9,6 +9,7 @@ import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 import type { PersonResponse } from "@/models/PersonModel";
 import i18n from "@/i18n";
+import { toUtcLocalDateTimeString } from "@/utils/DateUtil";
 
 
 export class ImportService extends BaseService {
@@ -24,7 +25,7 @@ export class ImportService extends BaseService {
     }
 
     async scheduleHarvest(timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string, institutionId: number = 0): Promise<AxiosResponse<number>> {
-        return super.sendRequest(axios.post, `import-common/schedule/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}&timestamp=${timestamp}&recurrence=${recurrence}`);
+        return super.sendRequest(axios.post, `import-common/schedule/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`);
     }
 
     async startAuthorCentricInstitutionHarvest(dateFrom: string, dateTo: string, request: AuthorCentricInstitutionHarvestRequest): Promise<AxiosResponse<number>> {
@@ -32,7 +33,7 @@ export class ImportService extends BaseService {
     }
 
     async scheduleAuthorCentricInstitutionHarvest(timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string, request: AuthorCentricInstitutionHarvestRequest): Promise<AxiosResponse<number>> {
-        return super.sendRequest(axios.post, `import-common/author-centric-for-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&timestamp=${timestamp}&recurrence=${recurrence}`, request);
+        return super.sendRequest(axios.post, `import-common/author-centric-for-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, request);
     }
 
     async uploadBibiographicFiles(files: File[]): Promise<AxiosResponse<number>> {
@@ -141,7 +142,7 @@ export class ImportService extends BaseService {
     }
 
     async scheduleOAIPMHHarvest(sourceName: string, timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string): Promise<AxiosResponse<string[]>> {
-        return super.sendRequest(axios.get, `oai-harvest/schedule?sourceName=${sourceName}&from=${dateFrom}&until=${dateTo}&timestamp=${timestamp}&recurrence=${recurrence}`);
+        return super.sendRequest(axios.get, `oai-harvest/schedule?sourceName=${sourceName}&from=${dateFrom}&until=${dateTo}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`);
     }
 }
   

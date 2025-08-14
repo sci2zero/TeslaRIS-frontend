@@ -987,6 +987,10 @@ export default {
     pleaseWaitLabel: "Please wait",
     redirectingLabel: "Redirecting...",
     orcidNotLinked: "Your ORCID ID is not specified in any researcher profile.",
+    accountNotActivated: "Your account is not activated.",
     enterYourNameLabel: "Enter your name",
-    noneOfTheOfferedLabel: "None of the offered"
+    noneOfTheOfferedLabel: "None of the offered",
+    addNewResearcherLabel: "Add new researcher",
+    showAllLabel: "Show all",
+    showForInstitutionLabel: "Show for institution"
 }

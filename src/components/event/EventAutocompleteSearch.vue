@@ -5,7 +5,7 @@
                 v-model="selectedEvent"
                 :readonly="readOnly"
                 :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
-                :items="events"
+                :items="readOnly ? [] : events"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"

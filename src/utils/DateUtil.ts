@@ -1,4 +1,6 @@
 import { RecurrenceType } from "@/models/LoadModel";
+import { DateTime } from "luxon";
+
 
 export const localiseDate = (iso8601DateString: string | undefined) => {
     if(!iso8601DateString) {
@@ -179,4 +181,35 @@ export const computeRelativeDate = (dateString: string): string => {
     }
 
     return date.toISOString();
+};
+
+export const toUtcLocalDateTimeString = (localTimestamp: string): string => {
+    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
+
+    const localDateTime = DateTime.fromISO(localTimestamp, { setZone: true });
+    if (!localDateTime.isValid) {
+        throw new Error(`Invalid datetime string: ${localTimestamp}`);
+    }
+
+    const serverDateTime = serverTz === "UTC"
+        ? localDateTime.toUTC()
+        : localDateTime.setZone(serverTz);
+
+    return serverDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
+};
+
+export const serverTimeToLocal = (serverTimeString: string): string => {
+    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
+
+    const serverDateTime = DateTime.fromFormat(serverTimeString, "yyyy-MM-dd'T'HH:mm:ss", {
+        zone: serverTz
+    });
+
+    if (!serverDateTime.isValid) {
+        throw new Error(`Invalid server datetime: ${serverTimeString}`);
+    }
+
+    const localDateTime = serverDateTime.setZone('local');
+
+    return localDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 };

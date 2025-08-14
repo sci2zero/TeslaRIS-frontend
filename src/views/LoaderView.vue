@@ -3,7 +3,7 @@
         v-if="isAdmin"
         class="d-flex flex-row justify-center"
     >
-        <v-col cols="8">
+        <v-col v-if="!showAll" cols="8">
             <organisation-unit-autocomplete-search
                 v-model:model-value="selectedOrganisationUnit"
                 required
@@ -12,8 +12,15 @@
                 :label="$t('institutionLabel')"
             ></organisation-unit-autocomplete-search>
         </v-col>
+        <v-col cols="1">
+            <v-btn
+                class="mt-3"
+                @click="showAll = !showAll">
+                {{ showAll ? $t("showForInstitutionLabel") : $t("showAllLabel") }}
+            </v-btn>
+        </v-col>
     </v-row>
-    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && selectedOrganisationUnit.value > 0)">
+    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && (selectedOrganisationUnit.value > 0 || showAll))">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
@@ -149,7 +156,7 @@
 
         <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
-    <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0">
+    <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0 && !showAll">
         <h1 class="d-flex flex-row justify-center">
             {{ $t("selectInstitutionMessage") }}
         </h1>
@@ -194,6 +201,8 @@ export default defineComponent({
     setup() {
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const { isAdmin, isResearcher } = useUserRole();
+
+        const showAll = ref(false);
 
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();
@@ -250,25 +259,35 @@ export default defineComponent({
             });
         });
 
-        const startLoadingProcess = () => {
-            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0) {
+        const startLoadingProcess = async () => {
+            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0 && !showAll.value) {
                 return;
             }
 
-            LoadingConfigurationService.fetchLoadingConfiguration(
-                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
-            )
-            .then(response => {
+            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0 && showAll.value) {
+                unmanagedImport.value = true;
+            } else {
+                const loadingConfiguration = await LoadingConfigurationService.fetchLoadingConfiguration(
+                    selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+                );
+
                 if (isResearcher.value) {
-                    smartLoading.value = response.data.smartLoadingByDefault;
+                    smartLoading.value = loadingConfiguration.data.smartLoadingByDefault;
                 }
 
-                unmanagedImport.value = response.data.loadedEntitiesAreUnmanaged;
-                fetchNextRecordForLoading();
-            });
+                unmanagedImport.value = loadingConfiguration.data.loadedEntitiesAreUnmanaged;
+            }
+
+            fetchNextRecordForLoading();
         };
 
-        watch(selectedOrganisationUnit, () => {
+        watch(showAll, () => {
+            if (showAll.value) {
+                selectedOrganisationUnit.value = {title: "", value: -1};
+            }
+        });
+
+        watch([selectedOrganisationUnit], () => {
             smartLoading.value = false;
             currentSmartSkipRunId.value = crypto.randomUUID();
             noRecordsRemaining.value = false;
@@ -700,7 +719,7 @@ export default defineComponent({
         return {
             isFormValid, snackbar, isAdmin,
             errorMessage, currentLoadRecord,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, showAll,
             localiseDate, stepperValue, steps,
             nextStep, previousStep, canAdvance,
             skipDocument, importAuthorsRef, smartSkip,
@@ -740,6 +759,10 @@ export default defineComponent({
 .metadata-import {
     max-width: 1200px;
     margin: auto;
+}
+
+:deep(.v-btn__content) {
+    white-space: pre-wrap;
 }
 
 </style>
