@@ -26,7 +26,7 @@ import { defineComponent, onMounted } from 'vue';
 import { ref } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({

@@ -87,7 +87,7 @@ import { useI18n } from 'vue-i18n';
 import ApiKeyService from '@/services/ApiKeyService';
 import ApiKeyForm from './ApiKeyForm.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({

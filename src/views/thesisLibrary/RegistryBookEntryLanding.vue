@@ -294,7 +294,7 @@ import { useRoute } from 'vue-router';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import Toast from '@/components/core/Toast.vue';

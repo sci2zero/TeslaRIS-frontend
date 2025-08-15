@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedDocumentPublication"
                 :label="$t('documentLabel')"
-                :items="documentPublications"
+                :items="readonly ? [] : documentPublications"
                 :custom-filter="((): boolean => true)"
                 :no-data-text="$t('noDataMessage')"
                 :rules="required ? requiredSelectionRules : []"
@@ -46,6 +46,10 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],

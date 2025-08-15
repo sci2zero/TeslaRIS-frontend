@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedOrganisationUnit"
                 :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
-                :items="organisationUnits"
+                :items="readonly ? [] : organisationUnits"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
                 :no-data-text="$t('noDataMessage')"

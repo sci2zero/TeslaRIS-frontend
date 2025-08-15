@@ -121,6 +121,8 @@ export interface OrganisationUnitImportSource {
     importScopus: boolean;
     importOpenAlex: boolean;
     importWebOfScience: boolean;
+    scopusConfigured?: boolean;
+    webOfScienceConfigured?: boolean;
 }
 
 export interface InstitutionDefaultSubmissionContent {

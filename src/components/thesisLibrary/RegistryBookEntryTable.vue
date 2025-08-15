@@ -79,7 +79,7 @@
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RegistryBookEntry } from '@/models/ThesisLibraryModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import PromotionSelectorForm from './PromotionSelectorForm.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';

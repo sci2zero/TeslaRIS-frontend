@@ -5,7 +5,7 @@
                 v-model="selectedCommission"
                 :readonly="readOnly"
                 :label="(multiple ? $t('commissionListLabel') : $t('commissionLabel')) + (required ? '*' : '')"
-                :items="commissions"
+                :items="readOnly ? [] : commissions"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :auto-select-first="true"

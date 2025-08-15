@@ -1,6 +1,6 @@
 <template>
     <div justify="start">
-        <v-dialog v-model="dialog" persistent class="narrow">
+        <v-dialog v-model="dialog" class="narrow">
             <template #activator="scope">
                 <v-btn
                     color="primary"

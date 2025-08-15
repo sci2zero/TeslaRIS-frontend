@@ -102,7 +102,8 @@ export default {
         emailChangeConfirmation: "Email confirmation change",
         contact: "Contact",
         publicDissertationsReport: "Disertations on public review",
-        publicationsValidation: "Validation of publications"
+        publicationsValidation: "Validation of publications",
+        oauth2: "External authorization"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -975,5 +976,22 @@ export default {
     harvestDisabledMessage: "Source scanning is disabled.",
     updateOrganisationUnitImportSourceLabel: "Data sources",
     notMyPublicationLabel: "Not my publication",
+    oaiSourcesLabel: "OAI-PMH sources",
+    oaiSourceLabel: "OAI-PMH source",
+    dayLabel: "Day",
+    monthLabel: "Month",
+    yearLabel: "Year",
+    taskExecutionPeriodPreviewMessage: "Example of next executions:",
+    signInWithOrcidLabel: "Sign in with ORCID",
+    authorizingLabel: "Authorizing {name}",
+    pleaseWaitLabel: "Please wait",
+    redirectingLabel: "Redirecting...",
+    orcidNotLinked: "Your ORCID ID is not specified in any researcher profile.",
+    accountNotActivated: "Your account is not activated.",
+    enterYourNameLabel: "Enter your name",
+    noneOfTheOfferedLabel: "None of the offered",
+    addNewResearcherLabel: "Add new researcher",
+    showAllLabel: "Show all",
+    showForInstitutionLabel: "Show for institution",
     updateInstitutionDefaultSubmissionContentLabel: "Default submission content"
 }

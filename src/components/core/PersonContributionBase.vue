@@ -127,7 +127,7 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/Mult
 import { onMounted } from "vue";
 import LanguageService from "@/services/LanguageService";
 import InvolvementService from "@/services/InvolvementService";
-import { localiseDate } from "@/i18n/dateLocalisation";
+import { localiseDate } from "@/utils/DateUtil";
 import { removeTrailingPipeRegex } from "@/utils/StringUtil";
 import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";

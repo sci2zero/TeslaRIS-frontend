@@ -5,7 +5,7 @@
                 v-model="selectedMonograph"
                 :readonly="readOnly"
                 :label="$t('monographLabel') + (required ? '*' : '')"
-                :items="monographs"
+                :items="readOnly ? [] : monographs"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"

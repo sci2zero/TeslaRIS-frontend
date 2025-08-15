@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedUser"
                 :label="(label ? $t(label) : (multiple ? $t('userListLabel') : $t('userLabel'))) + (required ? '*' : '')"
-                :items="users"
+                :items="readOnly ? [] : users"
                 :custom-filter="((): boolean => true)"
                 :rules="requiredSelectionRules"
                 :no-data-text="$t('noDataMessage')"

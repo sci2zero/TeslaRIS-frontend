@@ -18,7 +18,9 @@
                             @click="login">
                             {{ $t("loginLabel") }}
                         </v-btn>
-                        <br />
+
+                        <o-auth2-buttons-section />
+                        
                         <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
                     </div>
                     <div v-else>
@@ -55,7 +57,7 @@
             </div>
         </div>
 
-        <toast v-model="snackbar" :message="$t('emailOrPasswordIncorrectError')" />
+        <toast v-model="snackbar" :message="message" />
     </v-container>
 </template>
 
@@ -74,19 +76,22 @@ import { useValidationUtils } from "@/utils/ValidationUtils";
 import Toast from "@/components/core/Toast.vue";
 import UserService from "@/services/UserService";
 import { useInterval } from "@/composables/useInterval";
+import OAuth2ButtonsSection from "@/components/user/oauth2/OAuth2ButtonsSection.vue";
 
 
 export default defineComponent(
     {
         name: "LoginView",
-        components: { LocalizedLink, Toast },
+        components: { LocalizedLink, Toast, OAuth2ButtonsSection },
         setup() {
             const route = useRoute();
             const router = useRouter();
 
             const isFormValid = ref(false);
+            
             const snackbar = ref(false);
-            const timeout = 5000;
+            const message = ref<string>("");
+
             const email = ref(route.query.email || '');
             const password = ref();
             const loginStore = useLoginStore();
@@ -105,6 +110,12 @@ export default defineComponent(
             
             onMounted(() => {
                 document.title = i18n.t("loginLabel");
+
+                const error = route.query.error as string;
+                if (error) {
+                    message.value = i18n.t(error);
+                    snackbar.value = true;
+                }
             });
 
             const startCooldown = () => {
@@ -165,6 +176,7 @@ export default defineComponent(
 
                     router.push({ name: "home", params: { locale: preferredUILanguage } });
                 }).catch(() => {
+                    message.value = i18n.t('emailOrPasswordIncorrectError');
                     snackbar.value = true;
                 });
             };
@@ -176,18 +188,20 @@ export default defineComponent(
                 startCooldown();
             };
 
-            return {email, emailFieldRules, 
-                    password, passwordFieldRules, 
-                    snackbar, timeout, isFormValid, login,
-                    forgotPasswordForm, forgotPassword,
-                    forgotPasswordSubmissionSent, progress, cooldown
-                };
+            return {
+                email, emailFieldRules, 
+                password, passwordFieldRules, 
+                snackbar, message, isFormValid, login,
+                forgotPasswordForm, forgotPassword,
+                forgotPasswordSubmissionSent, progress, cooldown
+            };
         }
     }
 );
 </script>
 
 <style>
+
     #login-page {
         width: 100%;
 

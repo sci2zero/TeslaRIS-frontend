@@ -78,7 +78,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import type { AssessmentMeasure } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentMeasureForm from './AssessmentMeasureForm.vue';
 

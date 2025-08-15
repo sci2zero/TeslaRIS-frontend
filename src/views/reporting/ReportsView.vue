@@ -43,13 +43,25 @@
                             :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
                     </v-col>
                     <v-col cols="12" sm="3" md="2">
-                        <v-select
+                        <v-text-field
                             v-model="selectedYear"
-                            :items="years"
+                            type="number"
+                            :max="(new Date()).getFullYear()"
                             :label="$t('reportYearLabel') + '*'"
-                            :rules="requiredSelectionRules"
-                            :class="isSummaryReport() ? 'comfortable' : ''">
-                        </v-select>
+                            :placeholder="$t('reportYearLabel') + '*'"
+                            :rules="requiredNumericFieldRules"
+                            :class="isSummaryReport() ? 'comfortable' : ''"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row
+                    v-if="selectedRecurrenceType.value != RecurrenceType.ONCE"
+                    class="d-flex flex-row justify-center bg-grey-lighten-5">
+                    <v-col cols="12" md="4">
+                        <relative-date-preview
+                            :start-year="selectedYear"
+                            :recurrence-period="selectedRecurrenceType.value"
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center bg-grey-lighten-5">
@@ -142,11 +154,12 @@ import { ReportType } from '@/models/AssessmentModel';
 import { useInterval } from '@/composables/useInterval';
 import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from '@/i18n/recurrenceType';
 import { RecurrenceType } from '@/models/LoadModel';
+import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
 
 
 export default defineComponent({
     name: "ViewIndicatorsComponent",
-    components: { CommissionAutocompleteSearch, OrganisationUnitAutocompleteSearch, ScheduledTasksList, Toast },
+    components: { CommissionAutocompleteSearch, OrganisationUnitAutocompleteSearch, ScheduledTasksList, Toast, RelativeDatePreview },
     setup() {
         const currentTab = ref("scheduling");
 
@@ -162,7 +175,6 @@ export default defineComponent({
         const selectedCommissions = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
         const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
 
-        const years = ref<number[]>([]);
         const selectedYear = ref<number>((new Date()).getFullYear());
 
         const generatedReports = ref<{name: string, value: number}[]>([]);
@@ -182,10 +194,6 @@ export default defineComponent({
             const now = new Date();
             const secondsUntilNextMinute = 60 - now.getSeconds();
             const millisecondsUntilNextMinute = secondsUntilNextMinute * 1000;
-
-            for(let i = 1999; i <= now.getFullYear(); i++) {
-                years.value.push(i);
-            }
 
             document.title = `TeslaRIS - ${i18n.t("routeLabel.reporting")}}`;
 
@@ -250,7 +258,10 @@ export default defineComponent({
             reportTypes.value = getReportTypesForGivenLocale();
         };
 
-        const { requiredSelectionRules } = useValidationUtils();
+        const {
+            requiredSelectionRules,
+            requiredNumericFieldRules
+        } = useValidationUtils();
 
         const isTopLevelReport = () => {
             if (
@@ -311,7 +322,8 @@ export default defineComponent({
             selectedCommissions, reportTypes,
             selectedReportType, selectedOUs,
             isTopLevelReport, isSummaryReport,
-            requiredSelectionRules, years,
+            requiredSelectionRules, RecurrenceType,
+            requiredNumericFieldRules,
             selectedYear, scheduleReportGeneration,
             isFormValid, generatedReports,
             downloadReport, scheduledTasks,

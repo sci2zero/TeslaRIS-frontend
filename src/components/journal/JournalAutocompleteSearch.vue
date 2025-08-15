@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedJournal"
                 :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
-                :items="journals"
+                :items="readonly ? [] : journals"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
                 :no-data-text="$t('noDataMessage')"
@@ -74,6 +74,10 @@ export default defineComponent({
             default: () => ({ passed: true, message: "" })
         },
         disableSubmission: {
+            type: Boolean,
+            default: false
+        },
+        readonly: {
             type: Boolean,
             default: false
         }

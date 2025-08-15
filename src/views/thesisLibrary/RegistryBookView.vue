@@ -79,21 +79,23 @@
             </v-window-item>
             <v-window-item value="promoted">
                 <v-row class="justify-start mt-3">
-                    <v-col cols="6" md="3" lg="1">
-                        <date-picker
+                    <v-col cols="6" md="4" lg="3">
+                        <date-picker-split
                             v-model="fromDate"
                             class="input-component"
                             :label="$t('fromLabel')"
                             color="primary"
-                        ></date-picker>
+                        ></date-picker-split>
                     </v-col>
-                    <v-col cols="6" md="3" lg="1">
-                        <date-picker
+                    <v-col cols="6" md="4" lg="3">
+                        <date-picker-split
                             v-model="toDate"
                             :label="$t('toLabel')"
                             color="primary"
-                        ></date-picker>
+                        ></date-picker-split>
                     </v-col>
+                </v-row>
+                <v-row class="justify-start mb-5">
                     <v-col cols="12" sm="6" md="5" lg="3">
                         <organisation-unit-autocomplete-search
                             v-model:model-value="selectedInstitution"
@@ -147,16 +149,29 @@
                         </v-btn>
                     </v-col>
                 </v-row>
-                <registry-book-entry-table
-                    class="mt-10"
-                    :entries="tableStates.promoted.entries"
-                    :total-entries="tableStates.promoted.totalEntries"
-                    disable-actions
-                    promoted-entries-view
-                    disable-bulk-actions
-                    @switch-page="(args: any[]) => switchPage('promoted', ...(args as [number, number, string, string]))"
-                    @entry-added-to-promotion="fetchAllTables"
-                />
+                <v-row
+                    v-if="selectedRecurrenceType.value != RecurrenceType.ONCE"
+                    class="d-flex flex-row justify-start bg-grey-lighten-5">
+                    <v-col cols="12" md="4">
+                        <relative-date-preview
+                            :start-date="fromDate ? fromDate : (new Date('1000-01-01T00:00:00').toLocaleDateString('sr'))"
+                            :end-date="toDate ? toDate : (new Date().toLocaleDateString('sr'))"
+                            :recurrence-period="selectedRecurrenceType.value"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <registry-book-entry-table
+                        class="mt-15"
+                        :entries="tableStates.promoted.entries"
+                        :total-entries="tableStates.promoted.totalEntries"
+                        disable-actions
+                        promoted-entries-view
+                        disable-bulk-actions
+                        @switch-page="(args: any[]) => switchPage('promoted', ...(args as [number, number, string, string]))"
+                        @entry-added-to-promotion="fetchAllTables"
+                    />
+                </v-row>
             </v-window-item>
             <v-window-item value="scheduledTasks">
                 <scheduled-tasks-list
@@ -206,7 +221,7 @@ import PromotionService from '@/services/thesisLibrary/PromotionService';
 import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
 import PromotionPrintedLists from '@/components/thesisLibrary/PromotionPrintedLists.vue';
 import type { InstitutionPromotionCountsReport, RegistryBookEntry } from '@/models/ThesisLibraryModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { computeRelativeDate, localiseDate } from '@/utils/DateUtil';
 import Toast from '@/components/core/Toast.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
@@ -224,6 +239,8 @@ import { RecurrenceType } from '@/models/LoadModel';
 import TaskManagerService from '@/services/TaskManagerService';
 import { type ScheduledTaskResponse } from '@/models/Common';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
+import DatePickerSplit from '@/components/core/DatePickerSplit.vue';
+import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -240,7 +257,7 @@ interface EntryTableState {
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList, DatePickerSplit, RelativeDatePreview },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
@@ -335,6 +352,12 @@ export default defineComponent({
                         return;
                     }
 
+                    if (fromDate.value.includes("%7C")) {
+                        fromDate.value = computeRelativeDate(fromDate.value);
+                    } else if (toDate.value.includes("%7C")) {
+                        toDate.value = computeRelativeDate(toDate.value);
+                    }
+
                     const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}${tableStates.promoted.sort ? `&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}` : ""}`;
                     const response = await RegistryBookService.getPromoted(
                         selectedInstitution.value.value,
@@ -345,6 +368,11 @@ export default defineComponent({
                     );
                     tableStates.promoted.entries = response.data.content;
                     tableStates.promoted.totalEntries = response.data.totalElements;
+
+                    selectedRecurrenceType.value = {
+                        title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string,
+                        value: RecurrenceType.ONCE
+                    };
                 }, 300)
             }
         });
@@ -434,8 +462,16 @@ export default defineComponent({
         };
 
         const generateRegistryBookReport = () => {
-            const from = fromDate.value ? fromDate.value.split("T")[0] : "";
-            const to = toDate.value ? toDate.value.split("T")[0] : "";
+            if (fromDate.value.includes("%7C")) {
+                fromDate.value = computeRelativeDate(fromDate.value);
+            } else if (toDate.value.includes("%7C")) {
+                toDate.value = computeRelativeDate(toDate.value);
+            }
+
+            const from = fromDate.value ? 
+                fromDate.value.split("T")[0] : (new Date('1000-01-01T00:00:00').toISOString()).split("T")[0];
+            const to = toDate.value ?
+                toDate.value.split("T")[0] : (new Date().toISOString()).split("T")[0];
 
             RegistryBookReportService.scheduleReportGeneration(
                 `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&authorName=${authorFullName.value}&authorTitle=${authorAcquiredTitle.value}&lang=${selectedLang.value.value}`,
@@ -488,7 +524,7 @@ export default defineComponent({
             promotionPreviewRef, authorFullName,
             authorAcquiredTitle, recurrenceTypes,
             selectedRecurrenceType, deleteScheduledTask,
-            scheduledTasks
+            scheduledTasks, RecurrenceType
         };
     }
 });

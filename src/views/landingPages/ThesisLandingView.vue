@@ -472,6 +472,13 @@
             @continue="commitThesisStatusChange">
         </persistent-question-dialog>
 
+        <share-buttons
+            v-if="thesis && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(thesis.title) as string)"
+            :document-id="(thesis.id as number)"
+            :document-type="PublicationType.THESIS"
+        />
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
@@ -483,7 +490,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import { ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, Thesis } from '@/models/PublicationModel';
@@ -500,7 +507,7 @@ import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
@@ -530,11 +537,12 @@ import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmen
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -910,7 +918,7 @@ export default defineComponent({
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
-            fetchValidationStatus, fetchThesis
+            fetchValidationStatus, fetchThesis, PublicationType
         };
 }})
 

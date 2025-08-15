@@ -26,7 +26,7 @@ export class TableExportService extends BaseService {
     }
 
     async downloadExportFile(response: AxiosResponse<any, any>, fileType: ExportFileFormat) {
-        const extension = fileType === ExportFileFormat.CSV ? ".csv" : ".xsl";
+        const extension = fileType === ExportFileFormat.CSV ? ".csv" : ".xlsx";
         this.initialzeDownload(response, `report${extension}`, extension);
     }
 }

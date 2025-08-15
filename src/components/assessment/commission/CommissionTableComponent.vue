@@ -69,7 +69,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import type { Commission, CommissionResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import CommissionService from '@/services/assessment/CommissionService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from './CommissionForm.vue';

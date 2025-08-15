@@ -264,6 +264,13 @@
         </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <share-buttons
+            v-if="proceedings && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(proceedings.title) as string)"
+            :document-id="(proceedings.id as number)"
+            :document-type="PublicationType.PROCEEDINGS"
+        />
     </v-container>
 </template>
 
@@ -273,7 +280,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -297,7 +304,7 @@ import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
@@ -312,11 +319,12 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import ShareButtons from '@/components/core/ShareButtons.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons },
     setup() {
         const currentTab = ref("");
 
@@ -543,7 +551,7 @@ export default defineComponent({
         };
 
         return {
-            proceedings, icon, fetchIndicators,
+            proceedings, icon, fetchIndicators, PublicationType,
             publications, event, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseDate,

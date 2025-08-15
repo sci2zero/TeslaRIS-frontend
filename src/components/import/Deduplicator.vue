@@ -74,6 +74,11 @@ export default defineComponent({
 
                 parameters.value += 
                     `doi=${props.publicationForLoading.doi}&scopusId=${props.publicationForLoading.scopusId}&openAlexId=${props.publicationForLoading.openAlexId}&webOfScienceId=${props.publicationForLoading.webOfScienceId}`;
+                
+                props.publicationForLoading.internalIdentifiers.forEach(identifier => {
+                    parameters.value += `&internalIdentifiers=${identifier}`;
+                });
+                
                 fetchPotentialMatches();
             }
         });

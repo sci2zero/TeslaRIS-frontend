@@ -9,9 +9,12 @@ export interface AuthenticationResponse {
 }
 
 export interface ResearcherRegistrationRequest {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
     preferredLanguageId: number;
+    organisationUnitId: number;
     personId?: number;
 }
 
