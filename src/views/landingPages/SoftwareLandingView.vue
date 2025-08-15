@@ -212,6 +212,7 @@
 
         <share-buttons
             v-if="software && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(software.title) as string)"
             :document-id="(software.id as number)"
             :document-type="PublicationType.SOFTWARE"
         />

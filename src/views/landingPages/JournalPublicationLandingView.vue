@@ -259,6 +259,13 @@
         </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <share-buttons
+            v-if="journalPublication && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(journalPublication.title) as string)"
+            :document-id="(journalPublication.id as number)"
+            :document-type="PublicationType.JOURNAL_PUBLICATION"
+        />
     </v-container>
 </template>
 
@@ -269,7 +276,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
@@ -309,11 +316,12 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -521,7 +529,7 @@ export default defineComponent({
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute,
-            fetchValidationStatus
+            fetchValidationStatus, PublicationType
         };
 }})
 

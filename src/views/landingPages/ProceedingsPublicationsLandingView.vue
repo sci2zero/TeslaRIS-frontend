@@ -245,6 +245,13 @@
             @unbind="handleResearcherUnbind">
         </publication-unbind-button>
 
+        <share-buttons
+            v-if="proceedingsPublication && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(proceedingsPublication.title) as string)"
+            :document-id="(proceedingsPublication.id as number)"
+            :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+        />
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
@@ -256,7 +263,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution, type ProceedingsPublicationType } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
@@ -296,11 +303,12 @@ import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmen
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -504,7 +512,7 @@ export default defineComponent({
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
-            fetchValidationStatus
+            fetchValidationStatus, PublicationType
         };
 }})
 

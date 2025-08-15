@@ -213,6 +213,13 @@
         </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <share-buttons
+            v-if="dataset && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(dataset.title) as string)"
+            :document-id="(dataset.id as number)"
+            :document-type="PublicationType.DATASET"
+        />
     </v-container>
 </template>
 
@@ -223,7 +230,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Dataset } from '@/models/PublicationModel';
@@ -259,11 +266,12 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -439,7 +447,7 @@ export default defineComponent({
             addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, DatasetUpdateForm,
-            StatisticsType, documentIndicators, localiseDate,
+            StatisticsType, documentIndicators, localiseDate, PublicationType,
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
             createIndicator, fetchIndicators, fetchValidationStatus
