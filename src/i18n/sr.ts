@@ -1017,5 +1017,6 @@ export default {
     noneOfTheOfferedLabel: "Nijedan od ponuđenih",
     addNewResearcherLabel: "Dodaj novog istraživača",
     showAllLabel: "Prikaži sve",
-    showForInstitutionLabel: "Prikaži za instituciju"
+    showForInstitutionLabel: "Prikaži za instituciju",
+    updateInstitutionDefaultSubmissionContentLabel: "Podrazumevani sadržaj za unos"
 }

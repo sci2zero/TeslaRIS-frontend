@@ -170,24 +170,28 @@ export default defineComponent({
             mergeMultilingualContentField(thesis1.description, thesis2.description);
             thesis2.description = [];
 
+            mergeMultilingualContentField(thesis1.scientificArea, thesis2.scientificArea);
+            thesis2.scientificArea = [];
+
+            mergeMultilingualContentField(thesis1.scientificSubArea, thesis2.scientificSubArea);
+            thesis2.scientificSubArea = [];
+
+            mergeMultilingualContentField(thesis1.typeOfTitle, thesis2.typeOfTitle);
+            thesis2.typeOfTitle = [];
+
+            mergeMultilingualContentField(thesis1.placeOfKeep, thesis2.placeOfKeep);
+            thesis2.placeOfKeep = [];
+
             mergeDocumentAttachments(thesis1, thesis2);
 
             thesis1.organisationUnitId = thesis2.organisationUnitId;
             thesis1.thesisType = thesis2.thesisType;
-            thesis1.scientificArea = thesis2.scientificArea;
-            thesis2.scientificArea = "";
-            thesis1.scientificSubArea = thesis2.scientificSubArea;
-            thesis2.scientificSubArea = "";
             thesis1.printISBN = thesis2.printISBN;
             thesis2.printISBN = "";
             thesis1.eisbn = thesis2.eisbn;
             thesis2.eisbn = "";
-            thesis1.placeOfKeep = thesis2.placeOfKeep;
-            thesis2.placeOfKeep = "";
             thesis1.udc = thesis2.udc;
             thesis2.udc = "";
-            thesis1.typeOfTitle = thesis2.typeOfTitle;
-            thesis2.typeOfTitle = "";
 
             thesis1.numberOfPages = thesis2.numberOfPages;
             thesis2.numberOfPages = 0;

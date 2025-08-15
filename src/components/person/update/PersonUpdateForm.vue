@@ -202,7 +202,7 @@ export default defineComponent({
         const apvnt = ref(props.presetPerson?.personalInfo.apvnt);
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
         const openAlex = ref(props.presetPerson?.personalInfo.openAlexId);
-        const webOfScienceId = ref(props.presetPerson?.personalInfo.webOfScienceId);
+        const webOfScienceId = ref(props.presetPerson?.personalInfo.webOfScienceResearcherId);
 
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>();
@@ -266,7 +266,7 @@ export default defineComponent({
                 },
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
-                webOfScienceId: webOfScienceId.value,
+                webOfScienceResearcherId: webOfScienceId.value,
                 uris: uris.value,
                 displayTitle: displayTitle.value
             };
@@ -297,7 +297,7 @@ export default defineComponent({
             apvnt.value = props.presetPerson?.personalInfo.apvnt;
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
             openAlex.value = props.presetPerson?.personalInfo.openAlexId;
-            webOfScienceId.value = props.presetPerson?.personalInfo.webOfScienceId;
+            webOfScienceId.value = props.presetPerson?.personalInfo.webOfScienceResearcherId;
             urisRef.value?.refreshModelValue(uris.value);
 
             cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));

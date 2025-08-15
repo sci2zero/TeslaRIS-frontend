@@ -124,3 +124,8 @@ export interface OrganisationUnitImportSource {
     scopusConfigured?: boolean;
     webOfScienceConfigured?: boolean;
 }
+
+export interface InstitutionDefaultSubmissionContent {
+    placeOfKeep: MultilingualContent[];
+    typeOfTitle: MultilingualContent[];
+}

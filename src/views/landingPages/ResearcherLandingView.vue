@@ -108,7 +108,7 @@
                                 </div>
                                 <div>ResearcherID (WoS):</div>
                                 <div class="response">
-                                    <identifier-link v-if="personalInfo.webOfScienceId" :identifier="personalInfo.webOfScienceId" type="researcher_id"></identifier-link>
+                                    <identifier-link v-if="personalInfo.webOfScienceResearcherId" :identifier="personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>

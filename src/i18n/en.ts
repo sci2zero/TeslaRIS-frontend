@@ -992,5 +992,6 @@ export default {
     noneOfTheOfferedLabel: "None of the offered",
     addNewResearcherLabel: "Add new researcher",
     showAllLabel: "Show all",
-    showForInstitutionLabel: "Show for institution"
+    showForInstitutionLabel: "Show for institution",
+    updateInstitutionDefaultSubmissionContentLabel: "Default submission content"
 }

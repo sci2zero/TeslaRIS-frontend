@@ -12,7 +12,8 @@ const employmentTitlesEn = [
     { title: "Senior scientific collaborator", value: EmploymentTitle.SENIOR_SCIENTIFIC_COLLABORATOR },
     { title: "Scientific advisor", value: EmploymentTitle.SCIENTIFIC_ADVISOR },
     { title: "Retired professor", value: EmploymentTitle.RETIRED_PROFESSOR },
-    { title: "Professor engineer habilitated", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED }
+    { title: "Professor engineer habilitated", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED },
+    { title: "Academician", value: EmploymentTitle.ACADEMICIAN }
 ];
 
 const employmentTitlesSr = [
@@ -24,7 +25,8 @@ const employmentTitlesSr = [
     { title: "Stariji naučni saradnik", value: EmploymentTitle.SENIOR_SCIENTIFIC_COLLABORATOR },
     { title: "Naučni savetnik", value: EmploymentTitle.SCIENTIFIC_ADVISOR },
     { title: "Profesor u penziji", value: EmploymentTitle.RETIRED_PROFESSOR },
-    { title: "Profesor inženjer habilitovan", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED }
+    { title: "Profesor inženjer habilitovan", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED },
+    { title: "Akademik", value: EmploymentTitle.ACADEMICIAN }
 ];
 
 export const getEmploymentTitleFromValueAutoLocale = (value: EmploymentTitle) => {
