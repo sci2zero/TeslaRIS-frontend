@@ -160,7 +160,7 @@ export interface SearchFieldsResponse {
 
 export enum ExportFileFormat {
     CSV = "CSV",
-    XLS = "XLS"
+    XLSX = "XLSX"
 }
 
 export enum ExportEntity {

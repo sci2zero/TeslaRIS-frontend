@@ -201,7 +201,7 @@ export default defineComponent({
         
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
-        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLS]);
+        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLSX]);
         const selectedExportFileFormat = ref<ExportFileFormat>(ExportFileFormat.CSV);
 
         const { requiredSelectionRules, atLeastOneTrueRule } = useValidationUtils();
