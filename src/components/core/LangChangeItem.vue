@@ -8,7 +8,9 @@
             <template #activator="{ props }">
                 <v-btn
                     v-bind="props"
-                    icon="mdi-translate"
+                    icon="mdi-web"
+                    variant="text"
+                    color="#fff"
                 >
                 </v-btn>
             </template>

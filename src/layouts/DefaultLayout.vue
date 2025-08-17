@@ -4,8 +4,8 @@
         <SideBar class="h-full" />
         <v-main class="ml-24 flex flex-col h-full">
             <div class="flex-1">
-                <navbar v-if="!hideLayout" />
-                <breadcrumbs v-if="!hideLayout" />
+                <!-- <navbar v-if="!hideLayout" /> -->
+                <!-- <breadcrumbs v-if="!hideLayout" /> -->
                 <router-view />
                 <cookie-consent v-if="!hideLayout" />
             </div>

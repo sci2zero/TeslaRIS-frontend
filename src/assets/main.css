@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
 @layer base {
   @import "./reset.scss";
   @import "./base.css";
@@ -45,7 +47,6 @@ input {
     display: block;
     width: 100%;
     padding: 0.4em;
-    border: 1px solid #bcbcbc;
     border-radius: 0.25em;
 }
 

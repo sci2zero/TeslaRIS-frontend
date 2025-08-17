@@ -1,21 +1,33 @@
 <template>
-    <v-card
-        class="mx-auto"
-        color="grey-lighten-3"
-        max-width="400">
-        <v-text-field
-            v-model="searchInput"
-            density="compact"
-            variant="solo"
-            class="pa-3"
-            :label="$t('searchBarPlaceholder')"
-            append-inner-icon="mdi-magnify"
-            single-line
-            hide-details
-            @click:append-inner="onSearch"
-            @keydown.enter="onSearch"
-        ></v-text-field>
-    </v-card>
+    <div class="search-container">
+        <div class="search-card" :class="{ 'search-card--light': !dark }">
+            <div class="search-input-wrapper">
+                <v-text-field
+                    v-model="searchInput"
+                    density="comfortable"
+                    variant="outlined"
+                    class="search-input"
+                    :class="{ 'search-input--light': !dark }"
+                    :label="$t('searchBarPlaceholder')"
+                    single-line
+                    hide-details
+                    :color="dark ? 'white' : 'black'"
+                    @keydown.enter="onSearch"
+                >
+                    <template v-slot:append-inner>
+                        <v-icon 
+                            icon="mdi-magnify" 
+                            :color="dark ? 'white' : 'black'" 
+                            size="28"
+                            class="search-icon"
+                            :class="{ 'search-icon--light': !dark }"
+                            @click="onSearch"
+                        ></v-icon>
+                    </template>
+                </v-text-field>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -32,6 +44,10 @@ export default defineComponent(
             presetSearchInput: {
                 type: String,
                 default: ""
+            },
+            dark: {
+                type: Boolean,
+                default: false
             }
         },
         emits: ["search"],
@@ -89,3 +105,197 @@ export default defineComponent(
         }
     });
 </script>
+
+<style scoped>
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.search-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 4px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.search-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 25px;
+    z-index: -1;
+}
+
+.search-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.4);
+    transform: translateY(-3px);
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+}
+
+.search-input :deep(.v-field) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.search-input :deep(.v-field__outline) {
+    --v-field-border-opacity: 0 !important;
+    border: none !important;
+}
+
+.search-input :deep(.v-field__outline__start) {
+    border: none !important;
+}
+
+.search-input :deep(.v-field__outline__end) {
+    border: none !important;
+}
+
+.search-input :deep(.v-field__outline__notch) {
+    border: none !important;
+}
+
+.search-input :deep(.v-label) {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.5px;
+}
+
+.search-input :deep(.v-field__input) {
+    color: white !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 20px 24px !important;
+    letter-spacing: 0.5px;
+}
+
+.search-input :deep(.v-field__input::placeholder) {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.search-icon {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 12px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.search-icon:hover {
+    transform: scale(1.15);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* Focus states - completely remove borders */
+.search-input :deep(.v-field--focused .v-field__outline) {
+    --v-field-border-opacity: 0 !important;
+}
+
+.search-input :deep(.v-field--focused .v-label) {
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.search-input :deep(.v-field--focused .v-field__outline__start),
+.search-input :deep(.v-field--focused .v-field__outline__end),
+.search-input :deep(.v-field--focused .v-field__outline__notch) {
+    border: none !important;
+}
+
+/* Remove any remaining borders when typing */
+.search-input :deep(.v-field--variant-outlined .v-field__outline) {
+    --v-field-border-opacity: 0 !important;
+}
+
+.search-input :deep(.v-field--variant-outlined .v-field__outline__start),
+.search-input :deep(.v-field--variant-outlined .v-field__outline__end),
+.search-input :deep(.v-field--variant-outlined .v-field__outline__notch) {
+    border: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .search-container {
+        max-width: 95%;
+        padding: 0 16px;
+    }
+    
+    .search-card {
+        border-radius: 20px;
+        padding: 10px;
+    }
+    
+    .search-input :deep(.v-field__input) {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+    }
+    
+    .search-input :deep(.v-label) {
+        font-size: 16px !important;
+    }
+}
+
+/* Light theme styles when dark is false */
+.search-card--light {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.search-card--light::before {
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02));
+}
+
+.search-card--light:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.15);
+}
+
+.search-input--light :deep(.v-label) {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.search-input--light :deep(.v-field__input) {
+    color: black !important;
+}
+
+.search-input--light :deep(.v-field__input::placeholder) {
+    color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.search-input--light :deep(.v-field--focused .v-label) {
+    color: rgba(0, 0, 0, 1) !important;
+}
+
+.search-icon--light {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.search-icon--light:hover {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+</style>

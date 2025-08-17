@@ -8,6 +8,8 @@
             <template #activator="{ props }">
                 <v-btn
                     v-bind="props"
+                    color="white"
+                    variant="text"
                     icon="mdi-translate"
                 >
                     <v-badge
