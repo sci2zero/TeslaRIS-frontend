@@ -5,7 +5,7 @@
         <router-link to="/"
             class="group relative flex flex-col items-center justify-center rounded-xl p-3 hover:bg-gray-800 transition-colors"
             aria-label="Logo">
-            <img src="/public/logov1.svg" alt="Logo">
+            <img src="/logov1.svg" alt="Logo">
             <!-- <span class="mdi mdi-flash text-4xl text-rose-400"></span> -->
                           <span
                 class="mt-2 px-2 py-1 text-xs text-white text-center font-medium">TeslaRIS</span>
