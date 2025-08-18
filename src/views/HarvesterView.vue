@@ -102,8 +102,8 @@
                                 ></date-picker-split>
                                 <date-picker
                                     v-else
-                                    v-model="endDate"
-                                    :label="$t('endDateLabel')"
+                                    v-model="startDate"
+                                    :label="$t('startDateLabel')"
                                     color="primary"
                                     required
                                 ></date-picker>
