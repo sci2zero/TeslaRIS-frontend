@@ -292,7 +292,6 @@ export default {
     basicInfoLabel: "Osnovni podaci",
     relationsLabel: "Organizaciona struktura",
     isSerialEventMessage: "Ovo je serijski događaj.",
-    isOneTimeEventMessage: "Ovaj događaj se održao jedanput.",
     journalPublicationLabel: "Rad u časopisu",
     softwareLabel: "Softver",
     addProofLabel: "Dodaj dokaz",

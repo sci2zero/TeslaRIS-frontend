@@ -538,6 +538,8 @@ import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import ShareButtons from '@/components/core/ShareButtons.vue';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 
 export default defineComponent({
@@ -625,6 +627,8 @@ export default defineComponent({
                 if (thesis.value.isArchived) {
                     canEdit.value = false;
                 }
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(thesis.value.title) as string;
 

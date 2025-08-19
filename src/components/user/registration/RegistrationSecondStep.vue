@@ -110,7 +110,6 @@ export default defineComponent({
         });
 
         const register = () => {
-            console.log(registerStore.registerPersonData)
             const requestBody: ResearcherRegistrationRequest = {
                 firstName: firstName.value,
                 lastName: lastName.value,

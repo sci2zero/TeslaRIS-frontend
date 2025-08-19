@@ -248,6 +248,10 @@
             v-model="currentTab"
         >
             <v-tabs-window-item value="publications">
+                <search-bar-component
+                    class="mt-5"
+                    @search="clearSortAndPerformPublicationSearch($event)"
+                />
                 <div class="mb-5 mt-5">
                     <add-publication-menu compact />
                     <v-btn
@@ -257,12 +261,27 @@
                         {{ $t("importerLabel") }}
                     </v-btn>
                 </div>
+                <v-select
+                    v-model="selectedPublicationTypes"
+                    :items="publicationTypes"
+                    :label="$t('typeOfPublicationLabel')"
+                    return-object
+                    class="publication-type-select mt-3"
+                    multiple
+                ></v-select>
                 <publication-table-component
+                    ref="publicationsRef"
                     :publications="publications"
                     :total-publications="totalPublications"
                     enable-export
                     :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
-                    :endpoint-token-parameters="[`${person?.id}`]"
+                    :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
+                    :endpoint-body-parameters="
+                        {
+                            allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
+                            personId: person.id,
+                            commissionId: null
+                        }"
                     @switch-page="switchPage">
                 </publication-table-component>
             </v-tabs-window-item>
@@ -362,7 +381,12 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="dialogMessage" @continue="performMigrationToUnmanaged"></persistent-question-dialog>
+        <persistent-question-dialog
+            ref="dialogRef"
+            :title="$t('areYouSureLabel')"
+            :message="dialogMessage"
+            @continue="performMigrationToUnmanaged">
+        </persistent-question-dialog>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -379,7 +403,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { PersonResponse, ExpertiseOrSkillResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import InvolvementService from '@/services/InvolvementService';
 import type { Employment, Education, Membership } from '@/models/InvolvementModel';
@@ -418,11 +442,13 @@ import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employment
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
+import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -444,6 +470,10 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+        const publicationSearchParams = ref("tokens=*");
+        const publicationsRef = ref<typeof PublicationTableComponent>();
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
+        const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const i18n = useI18n();
 
@@ -486,6 +516,13 @@ export default defineComponent({
             
             fetchIndicators();
             fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
+
+            selectedPublicationTypes.value.splice(0);
+            publicationTypes.value?.forEach(publicationType => {
+                selectedPublicationTypes.value.push(
+                    {title: publicationType.title, value: publicationType.value}
+                );
+            });
         });
 
         watch(i18n.locale, () => {
@@ -597,14 +634,19 @@ export default defineComponent({
                 return;
             }
 
-            DocumentPublicationService.findResearcherPublications(person.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((publicationResponse) => {
-                publications.value = publicationResponse.data.content;
-                totalPublications.value = publicationResponse.data.totalElements;
+            DocumentPublicationService.findResearcherPublications(
+                person.value?.id as number,
+                selectedPublicationTypes.value.map(publicationType => publicationType.value),
+                `${publicationSearchParams.value}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+                .then((publicationResponse) => {
+                    publications.value = publicationResponse.data.content;
+                    totalPublications.value = publicationResponse.data.totalElements;
 
-                if (switchTab && totalPublications.value > 0) {
-                    currentTab.value = "publications";
+                    if (switchTab && totalPublications.value > 0) {
+                        currentTab.value = "publications";
+                    }
                 }
-            });
+            );
         };
 
         const searchKeyword = (keyword: string) => {
@@ -742,6 +784,19 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
+        const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
+            publicationSearchParams.value = tokenParams;
+            publicationsRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            fetchPublications();
+        };
+
+        watch(selectedPublicationTypes, () => {
+            fetchPublications();
+        });
+
         return {
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword,
@@ -752,13 +807,15 @@ export default defineComponent({
             currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
-            ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType,
-            getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators
+            ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
+            getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
+            publicationSearchParams, publicationTypes, selectedPublicationTypes
         };
 }});
 </script>
 
 <style scoped>
+
     #researcher .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
@@ -784,4 +841,9 @@ export default defineComponent({
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
     }
+
+    .publication-type-select {
+        max-width: 500px;
+    }
+
 </style>

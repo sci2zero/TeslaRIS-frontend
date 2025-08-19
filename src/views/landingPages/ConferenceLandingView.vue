@@ -102,8 +102,8 @@
                                     <uri-list :uris="conference?.uris"></uri-list>
                                 </div>
                                 <br />
-                                <div>
-                                    <h2>{{ conference?.serialEvent ? $t("isSerialEventMessage") : $t("isOneTimeEventMessage") }}</h2>
+                                <div v-if="conference?.serialEvent">
+                                    <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
                             </v-col>
                         </v-row>

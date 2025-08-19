@@ -370,7 +370,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -477,7 +477,7 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, loggedInUser } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
@@ -769,6 +769,10 @@ export default defineComponent({
             });
         };
 
+        watch(selectedPublicationTypes, () => {
+            fetchPublications();
+        });
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
@@ -792,7 +796,7 @@ export default defineComponent({
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
-            fetchPublicReviewPageContent,
+            fetchPublicReviewPageContent, isInstitutionalLibrarian,
             OrganisationUnitTrustConfigurationForm,
             OrganisationUnitImportSourceForm,
             InstitutionDefaultSubmissionContentForm, loggedInUser

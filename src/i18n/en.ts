@@ -292,7 +292,6 @@ export default {
     basicInfoLabel: "Basic Info",
     relationsLabel: "Organisation structure",
     isSerialEventMessage: "This is a serial event.",
-    isOneTimeEventMessage: "This is a one time event.",
     journalPublicationLabel: "Journal Publication",
     softwareLabel: "Software",
     addProofLabel: "Add Proof",

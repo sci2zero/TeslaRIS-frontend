@@ -265,6 +265,8 @@ import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmen
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import ShareButtons from '@/components/core/ShareButtons.vue';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
 
 
 export default defineComponent({
@@ -329,6 +331,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 patent.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(patent.value.title) as string;
 
