@@ -1,29 +1,56 @@
 <template>
-    <div id="navbar">
+    <div id="navbar" :class="navbarClasses">
             <div class="wide-container flex-wrap toolbar-container px-4">
                 <div class="flex">
                     <v-btn
-                        icon="mdi-menu"
+                        :icon="sidebarStore.isVisible ? 'mdi-menu-open' : 'mdi-menu'"
                         variant="text"
-                        color="#fff"
-                        class="mr-4"
+                        :color="variant === 'general' ? '#000' : '#fff'"
+                        class="mr-4 hover:bg-gray-100 transition-colors"
                         aria-label="Toggle menu"
+                        @click="toggleSidebar"
                     >
                     </v-btn>
                 </div>
 
                 <v-spacer></v-spacer>
 
-                <div class="flex items-center">
+                <div class="flex items-center gap-1">
                     <template v-for="(item, index) in menuItems">
                         <template v-if="item.type == 'divider'">
-                            <v-divider :key="index" inset class="ms-2 me-2" vertical color="white"></v-divider>
+                            <v-divider :key="index" inset class="ms-2" vertical :color="variant === 'general' ? '#000' : 'white'"></v-divider>
                         </template>
                         <template v-else-if="item.type == 'lang_component'">
-                            <component :is="item.component" :key="index"></component>
+                            <component :is="item.component" :key="index" :variant="variant"></component>
                         </template>
                         <template v-else-if="item.type == 'notification_component' && item.condition">
-                            <component :is="item.component" :key="index"></component>
+                            <component :is="item.component" :key="index" :variant="variant"></component>
+                        </template>
+                        <template v-else-if="item.type == 'user_profile'">
+                            <router-link v-if="item.condition" :key="'user-profile'"
+                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                                :class="[
+                                    'user-profile-link flex items-center px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer',
+                                    variant === 'general' 
+                                        ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100' 
+                                        : 'text-white hover:text-gray-200 hover:bg-white/10'
+                                ]">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <v-avatar size="32" color="primary" class="text-white">
+                                            <v-icon size="20">{{ item.icon }}</v-icon>
+                                        </v-avatar>
+                                    </div>
+                                    <div class="hidden sm:flex flex-col min-w-0">
+                                        <span class="text-sm font-medium truncate">
+                                            {{ userName }}
+                                        </span>
+                                        <span class="text-xs opacity-75 truncate">
+                                            {{ userRole ? getTitleFromValueAutoLocale(userRole as string) : 'User' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </router-link>
                         </template>
                         <template v-else-if="item.type == 'icon'">
                             <v-btn
@@ -31,11 +58,12 @@
                                 :key="item.title"
                                 size="small"
                                 :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
-                                :variant="item.variant" :color="item.color" class="no-uppercase"
+                                :variant="item.variant" :color="variant === 'general' ? '#222' : '#fff'" class="no-uppercase"
                                 :icon="item.type == 'icon'"
+                                @click="item.click"
                                 exact
                             >
-                                <v-icon v-if="item.icon" left dark>
+                                <v-icon v-if="item.icon" left :class="variant === 'general' ? 'text-dark' : 'dark'">
                                     {{ item.icon }}
                                 </v-icon>
                                 <template v-if="item.type != 'icon'">
@@ -49,10 +77,15 @@
                                 :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
                                 variant="text"
                                 
-                                :class="'text-white hover:text-gray-200 cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center'"
+                                :class="[
+                                    'hover:text-gray-200 cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center',
+                                    variant === 'general' 
+                                        ? 'text-dark hover:text-gray-700' 
+                                        : 'text-white hover:text-gray-200'
+                                ]"
                                 @click="item.click">
                                 <v-badge :content="item.badge" :model-value="false">
-                                    <v-icon left class="text-white">
+                                    <v-icon left :class="variant === 'general' ? 'text-dark' : 'text-white'">
                                         {{ item.icon }}
                                     </v-icon>
                                 </v-badge>
@@ -87,6 +120,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { useBrandingStore } from '@/stores/brandingStore';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 interface MenuItem {
     title?: ComputedRef<string> | string | undefined;
@@ -103,9 +137,27 @@ interface MenuItem {
     dynamicValue?: ComputedRef;
 }
 
+interface Props {
+    variant?: 'general' | 'home';
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    variant: 'home'
+});
+
+const appTitle = ref("");
+
+const navbarClasses = computed(() => {
+    return {
+        'navbar-general': props.variant === 'general',
+        'navbar-home': props.variant === 'home'
+    };
+});
 
 const langChangeItem = shallowRef(LangChangeItem);
 const notificationItem = shallowRef(NotificationItem);
+
+const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 
 const i18n = useI18n();
 const personId = ref(-1);
@@ -116,43 +168,10 @@ const institutionId = ref(-1);
 
 const loginTitle = computed(() => i18n.t("loginLabel"));
 
-const personListLabel = computed(() => i18n.t("personListLabel"));
-const ouListLabel = computed(() => i18n.t("ouListLabel"));
-const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
-const userPageLabel = computed(() => i18n.t("userPageLabel"));
-const eventListLabel = computed(() => i18n.t("eventListLabel"));
-const journalListLabel = computed(() => i18n.t("journalListLabel"));
-const bookSeriesListLabel = computed(() => i18n.t("bookSeriesListLabel"));
-const publisherListLabel = computed(() => i18n.t("publisherListLabel"));
-const importerLabel = computed(() => i18n.t("importerLabel"));
-const researcherProfileLabel = computed(() => i18n.t("researcherProfileLabel"));
-const commissionProfileLabel = computed(() => i18n.t("commissionProfileLabel"));
-const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
-const countryListLabel = computed(() => i18n.t("countryListLabel"));
-const researchAreaListLabel = computed(() => i18n.t("researchAreaListLabel"));
-const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
-const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
-const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
-const commissionsLabel = computed(() => i18n.t("commissionListLabel"));
-const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
-const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
-const reportingLabel = computed(() => i18n.t("reportingLabel"));
-const mServiceLabel = computed(() => i18n.t("mServiceLabel"));
-const brandingLabel = computed(() => i18n.t("brandingLabel"));
-const apiKeyManagementLabel = computed(() => i18n.t("apiKeyManagementLabel"));
-const institutionProfileLabel = computed(() => i18n.t("institutionProfileLabel"));
-const thesisLibraryLabel = computed(() => i18n.t("thesisLibraryLabel"));
-const promotionListLabel = computed(() => i18n.t("promotionListLabel"));
-const registryBookLabel = computed(() => i18n.t("registryBookLabel"));
-const healthCheckLabel = computed(() => i18n.t("routeLabel.healthCheck"));
-const backupLabel = computed(() => i18n.t("backupLabel"));
-const publicReviewDissertationsLabel = computed(() => i18n.t("publicReviewDissertationsLabel"));
-const thesesLabel = computed(() => i18n.t("thesesLabel"));
-const publicationsValidationLabel = computed(() => i18n.t("routeLabel.publicationsValidation"));
 
 const brandingStore = useBrandingStore();
 const loginStore = useLoginStore();
+const sidebarStore = useSidebarStore();
 const userName = ref("");
 const router = useRouter();
 
@@ -181,9 +200,13 @@ const logout = () => {
     router.push({ name: "login" });
 };
 
+const toggleSidebar = () => {
+    sidebarStore.toggle();
+};
+
 watch(() => brandingStore.rebranded, () => {
     if (brandingStore.rebranded) {
-        appTitle.value = brandingStore.newTitle;
+        appTitle.value = returnCurrentLocaleContent(brandingStore.newTitle) as string;
         brandingStore.rebrandingHandled();
     }
 });
@@ -203,7 +226,7 @@ watch(() => loginStore.reloadUserName, () => {
 
 onMounted(() => {
     BrandingService.fetchBrandingInfo().then((response) => {
-        appTitle.value = response.data.title;
+        appTitle.value = returnCurrentLocaleContent(response.data.title) as string;
     });
 
     if (AuthenticationService.userLoggedIn()) {
@@ -216,13 +239,15 @@ const menuItems = ref<MenuItem[]>([
     { type: 'divider' },
     { title: undefined, type: 'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
     // { title: registerLabel, type: 'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
-    { title: loginTitle, type: 'icon-link', pathName: `login`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color: 'primary' },
-    { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value as string) + ")"), type: 'icon-link', pathName: 'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color: 'primary' },
-    { title: undefined, type: 'icon', click: logout, icon: 'mdi-logout' }
+    { title: loginTitle.value, type: 'icon-link', pathName: `login`, icon: 'mdi-login', condition: !loginStore.userLoggedIn, variant: 'outlined', color: 'primary' },
+    { type: 'user_profile', pathName: 'user-profile', icon: 'mdi-account', condition: loginStore.userLoggedIn },
+    { title: undefined, type: 'icon', variant: 'text', click: logout, icon: 'mdi-logout', condition: loginStore.userLoggedIn }
 ]);
 </script>
 
 <style scoped>
+@reference "@/assets/main.css";
+
 .app-title {
     cursor: pointer;
 }
@@ -233,5 +258,18 @@ const menuItems = ref<MenuItem[]>([
 
 .lowered {
     margin-top: 10px;
+}
+
+.navbar-general {
+    @apply bg-white text-black shadow-sm border-b border-gray-200;
+}
+
+.navbar-home {
+    /* Keep current styling */
+}
+
+
+.user-profile-link:hover {
+    transform: translateY(-1px);
 }
 </style>

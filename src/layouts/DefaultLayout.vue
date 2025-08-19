@@ -2,9 +2,9 @@
 
     <v-app>
         <SideBar class="h-full" />
-        <v-main class="ml-24 flex flex-col h-full">
+        <v-main :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
             <div class="flex-1">
-                <!-- <navbar v-if="!hideLayout" /> -->
+                <navbar variant="general" v-if="!hideLayout" />
                 <!-- <breadcrumbs v-if="!hideLayout" /> -->
                 <router-view />
                 <cookie-consent v-if="!hideLayout" />
@@ -24,17 +24,18 @@ import Footerbar from "@/components/core/FooterBar.vue";
 import SideBar from "@/components/core/SideBar.vue";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
+import { useSidebarStore } from "@/stores/sidebarStore";
 //   import Navbar from "@/components/Navbar.vue"
 //   import Sidebar from "@/components/Sidebar.vue"
 
 const route = useRoute();
-
+const sidebarStore = useSidebarStore();
 
 const hideLayout = computed(() => {
     return (
         route.name === "publicDissertationsReport" &&
         route.query.embed === "true"
-    );
+    ) || route.name === "home";
 });
 
 </script>
@@ -44,5 +45,12 @@ const hideLayout = computed(() => {
     display: flex;
     flex-direction: column;
     height: 100vh;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .v-main {
+        margin-left: 0 !important;
+    }
 }
 </style>

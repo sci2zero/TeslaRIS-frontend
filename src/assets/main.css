@@ -170,3 +170,7 @@ label {
 .move-up {
     margin-top: -30px;
 }
+
+.serif {
+    font-family: 'Libre Baskerville', serif;
+}

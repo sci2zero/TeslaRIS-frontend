@@ -1,17 +1,29 @@
 <template>
-    <aside
-        class="fixed z-40 h-screen w-24 bg-gray-900 text-white flex flex-col items-center py-6 border-r border-gray-800">
-        <!-- Logo -->
-        <router-link to="/"
-            class="group relative flex flex-col items-center justify-center rounded-xl p-3 hover:bg-gray-800 transition-colors"
-            aria-label="Logo">
-            <img src="/logov1.svg" alt="Logo">
-            <!-- <span class="mdi mdi-flash text-4xl text-rose-400"></span> -->
-                          <span
-                class="mt-2 px-2 py-1 text-xs text-white text-center font-medium">TeslaRIS</span>
-        </router-link>
+            <!-- Mobile backdrop overlay -->
+        <div 
+            v-if="sidebarStore.isMobile && sidebarStore.isVisible"
+            class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 cursor-pointer"
+            @click="sidebarStore.close()"
+        ></div>
+    
+            <aside
+            :class="[
+                'fixed w-24 z-40 h-screen bg-gray-900 text-white flex flex-col items-center py-6 border-r border-gray-800 transition-all duration-300 shadow-lg',
+                sidebarStore.isVisible ? 'translate-x-0' : '-translate-x-full'
+            ]">
+        
+        <div class="flex items-center justify-center w-full">
+            <router-link to="/"
+                class="group relative flex flex-col items-center justify-center rounded-xl p-3 hover:bg-gray-800 transition-colors"
+                aria-label="Logo">
+                <img src="/logov1.svg" alt="Logo" class="size-10">
+                <span
+                    class="mt-2 px-2 py-1 text-xs text-white text-center font-medium">TeslaRIS</span>
+            </router-link>
+            
+        </div>
 
-        <div class="mt-6 h-px w-12 bg-gray-800"></div>
+        <div class="mt-3 h-px w-12 bg-gray-800"></div>
 
         <!-- Scroll up button -->
         <button
@@ -27,7 +39,7 @@
         <nav class="side-menu mt-4 flex flex-1 flex-col items-center gap-4 relative min-h-0">
             <div 
                 ref="scrollContainer"
-                class="flex flex-col items-center gap-2 overflow-y-auto scrollbar-hide w-full"
+                class="flex flex-col items-center gap-2 overflow-y-auto scrollbar-hide w-full px-2"
                 @scroll="handleScroll"
                 style="height: calc(100vh - 280px);"
             >
@@ -98,7 +110,8 @@
 <script setup lang="ts">
 import { useUserRole } from '@/composables/useUserRole';
 import { useLoginStore } from '@/stores/loginStore';
-import { computed, reactive, ref, onMounted, nextTick } from 'vue';
+import { useSidebarStore } from '@/stores/sidebarStore';
+import { computed, reactive, ref, onMounted, nextTick, onUnmounted } from 'vue';
 import type { Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
@@ -107,6 +120,7 @@ const route = useRoute();
 const i18n = useI18n();
 const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 const loginStore = useLoginStore();
+const sidebarStore = useSidebarStore();
 const personId = ref(-1);
 const commissionId = ref(-1);
 const institutionId = ref(-1);
@@ -158,6 +172,30 @@ onMounted(() => {
             resizeObserver.observe(scrollContainer.value);
         }
     });
+
+    // Check initial screen size
+    checkScreenSize();
+    
+    // Add resize listener for responsive behavior
+    window.addEventListener('resize', checkScreenSize);
+});
+
+// Check screen size and update mobile state
+const checkScreenSize = () => {
+    const isMobileView = window.innerWidth < 768;
+    const isVerySmall = window.innerWidth < 640;
+    
+    sidebarStore.setMobile(isMobileView);
+    
+    // Auto-hide sidebar on very small screens
+    if (isVerySmall && sidebarStore.isVisible) {
+        sidebarStore.close();
+    }
+};
+
+// Cleanup resize listener
+onUnmounted(() => {
+    window.removeEventListener('resize', checkScreenSize);
 });
 
 
@@ -174,7 +212,8 @@ type MenuItem = {
 const resourcesMenu = ref<MenuItem[]>([
     { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple' },
     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building' },
-    { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' }
+    { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' },
+    { key: 'scientific-results-validation', label: computed(() => i18n.t('publicationsValidationLabel')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
 ]);
 
 const manageMenu = ref<MenuItem[]>([
@@ -190,7 +229,7 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'api-key-management', label: computed(() => i18n.t('apiKeyManagementLabel')), to: '/api-key-management', icon: 'mdi-key' },
     { key: 'health-check', label: computed(() => i18n.t('healthCheckLabel')), to: '/health-check', icon: 'mdi-heart-pulse' },
     { key: 'scheduled-tasks', label: computed(() => i18n.t('scheduleTasksLabel')), to: '/scheduled-tasks', icon: 'mdi-clock-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-    { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value || isInstitutionalEditor.value)) },
+    { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) },
     { key: 'importer', label: computed(() => i18n.t('importerLabel')), to: '/importer', icon: 'mdi-import', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) }
 ]);
 
@@ -208,10 +247,12 @@ const thesisLibraryMenu = ref<MenuItem[]>([
     { key: 'promotions', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
     { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
     { key: 'public-dissertations', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document' },
-    { key: 'theses', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => (isInstitutionalLibrarian.value)) }
+    { key: 'theses', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => (isInstitutionalLibrarian.value)) },
+    { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) }
 ]);
 
 const menuItems: MenuItem[] = reactive([
+    // { key: 'home', label: computed(() => i18n.t('homeLabel')), to: '/', icon: 'mdi-home' },
     { 
         key: 'resources', 
         label: computed(() => i18n.t('resources')), 
@@ -239,6 +280,7 @@ const menuItems: MenuItem[] = reactive([
         subItems: assessmentsMenu.value,
         condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
     },
+    { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isInstitutionalEditor.value)) },
     { 
         key: 'thesis-library', 
         label: computed(() => i18n.t('thesisLibraryLabel')), 
@@ -249,8 +291,7 @@ const menuItems: MenuItem[] = reactive([
     { key: 'events', label: computed(() => i18n.t('eventListLabel')), to: '/events', icon: 'mdi-calendar', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
-    { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
-    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-cog-outline', condition: true }
+    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: true }
 ]);
 
 const filteredMenuItems = computed(() => {
@@ -314,6 +355,18 @@ nav {
 .scrollbar-hide {
     min-height: 0;
     flex: 1;
+}
+
+
+.side-menu button,
+.side-menu a {
+    transition: all 0.2s ease-in-out;
+}
+
+
+.side-menu a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 </style>
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-slate-100 rounded-[20px] p-4 md:p-6 lg:p-8 shadow-lg border border-slate-200 transition-all duration-300 relative overflow-hidden flex flex-col hover:shadow-2xl hover:border-blue-400/30">
+    <div class="bg-gray-100 rounded-[20px] p-4 md:p-6 lg:p-8 shadow-lg border border-slate-200 transition-all duration-300 relative overflow-hidden flex flex-col hover:shadow-2xl hover:border-blue-400/30">
         <div class="container mx-auto px-4 py-16">
             <div class="text-center mb-12">
                 <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 bg-clip-text">Istraživanja i publikacije</h3>

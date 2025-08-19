@@ -2,7 +2,7 @@
     <div>
         <!-- Hero section with background image covering navbar and content -->
         <div class="hero-section-bg">
-            <Navbar />
+            <Navbar variant="home" />
             <div class="py-16">
                 <div class="text-center text-white hero-text-container">
                     <div class="container mx-auto px-4">
@@ -22,22 +22,22 @@
                 </div>
             </div>
             <div class="max-w-5xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 px-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 py-8 pb-12 px-8">
                     <!-- Cards -->
-                    <div v-for="(item, index) in cardsData" :key="index" class="my-6">
+                    <div v-for="(item, index) in cardsData" :key="index" class="">
                         <div class="frosted-glass-card cursor-pointer hover:scale-105 transition-all duration-300"
                             @click="item.path !== undefined ? $router.push('/' + $i18n.locale + '/' + item.path) : undefined">
-                            <div class="text-center mb-4">
+                            <div class="text-center mb-3 sm:mb-4">
                                 <div class="icon-wrapper">
-                                    <v-icon :icon="item.icon" class="w-12 h-12 text-white" size="48"></v-icon>
+                                    <v-icon :icon="item.icon" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" :size="$vuetify.display.xs ? '32' : $vuetify.display.sm ? '40' : '48'"></v-icon>
                                 </div>
                             </div>
-                            <h3 class="text-center text-base font-medium mb-3 text-white">
+                            <h3 class="text-center text-sm sm:text-base font-medium mb-2 sm:mb-3 text-white px-2">
                                 {{ item.name }}
                             </h3>
                             <div class="text-center">
                                 <div>
-                                    <span class="frosted-number">
+                                    <span class="frosted-number text-lg sm:text-xl md:text-2xl">
                                         {{ item.value }}
                                     </span>
                                 </div>

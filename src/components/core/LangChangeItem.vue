@@ -10,7 +10,7 @@
                     v-bind="props"
                     icon="mdi-web"
                     variant="text"
-                    color="#fff"
+                    :color="variant === 'general' ? '#222' : '#fff'"
                 >
                 </v-btn>
             </template>
@@ -41,10 +41,19 @@ import { useRoute, useRouter } from 'vue-router';
 import { supportedLocales, defaultLocale } from '../../i18n'
 import { getLangItems } from '@/i18n/languages';
 
+interface Props {
+    variant?: 'general' | 'home';
+}
 
-  export default defineComponent({
+export default defineComponent({
     name: "LangChangeItem",
-    setup() {
+    props: {
+        variant: {
+            type: String as () => 'general' | 'home',
+            default: 'home'
+        }
+    },
+    setup(props: Props) {
         const currentRoute = useRoute();
         const router = useRouter();
 
@@ -90,7 +99,8 @@ import { getLangItems } from '@/i18n/languages';
             selectedLocale,
             langItems, fav,
             menu, message,
-            hints
+            hints,
+            variant: props.variant
         };
     }
   });

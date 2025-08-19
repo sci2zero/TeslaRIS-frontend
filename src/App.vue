@@ -1,6 +1,6 @@
 <template>
-    <v-app>
-        <v-main>
+    <v-app class="bg-slate-100">
+        <v-main class="bg-slate-100">
             <!-- <navbar
                 v-if="!hideLayout"
             />
