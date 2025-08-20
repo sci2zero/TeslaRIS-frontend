@@ -157,10 +157,10 @@
                                 <div class="response">
                                     <uri-list :uris="person?.personalInfo.uris"></uri-list>
                                 </div>
-                                <div v-if="employments.length > 0">
+                                <div v-if="activeEmployments.length > 0">
                                     {{ $t("employmentsLabel") }}:
                                 </div>
-                                <div v-for="employment in employments.slice(0, 3)" :key="employment.id" class="response">
+                                <div v-for="employment in activeEmployments.slice(0, 3)" :key="employment.id" class="response">
                                     <localized-link
                                         v-if="employment.organisationUnitId"
                                         :to="'organisation-units/' + employment.organisationUnitId">
@@ -487,6 +487,7 @@ export default defineComponent({
         const biography = ref<MultilingualContent[]>([]);
 
         const employments = ref<Employment[]>([]);
+        const activeEmployments = ref<Employment[]>([]);
         const education = ref<Education[]>([]);
         const memberships = ref<Membership[]>([]);
 
@@ -564,10 +565,14 @@ export default defineComponent({
                 keywords.value = person.value.keyword;
                 biography.value = person.value.biography;
 
-                employments.value = [];
+                employments.value.splice(0);
+                activeEmployments.value.splice(0);
                 response.data.employmentIds.forEach(employmentId => {
                     InvolvementService.getEmployment(employmentId).then(response => {
                         employments.value.push(response.data);
+                        if (!response.data.dateTo) {
+                            activeEmployments.value.push(response.data);
+                        }
                     });
                 });
 
@@ -809,7 +814,7 @@ export default defineComponent({
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
-            publicationSearchParams, publicationTypes, selectedPublicationTypes
+            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments
         };
 }});
 </script>

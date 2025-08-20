@@ -44,11 +44,20 @@ export const injectFairSignposting = (headers: AxiosResponseHeaders) => {
         return;
     }
 
+    useHead({
+        link: [
+            {
+                rel: "type",
+                href: "https://schema.org/AboutPage"
+            }
+        ]
+    });
+    
     links.forEach(link => {
         if (!link) {
             return;
         }
-
+        
         useHead({
             link: [
                 {

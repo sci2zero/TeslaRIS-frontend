@@ -1017,5 +1017,10 @@ export default {
     addNewResearcherLabel: "Dodaj novog istraživača",
     showAllLabel: "Prikaži sve",
     showForInstitutionLabel: "Prikaži za instituciju",
-    updateInstitutionDefaultSubmissionContentLabel: "Podrazumevani sadržaj za unos"
+    updateInstitutionDefaultSubmissionContentLabel: "Podrazumevani sadržaj za unos",
+    updateOrganisationUnitOutputConfigurationLabel: "Konfiguracija rezultata",
+    showOutputsLabel: "Prikaži rezultate",
+    showBySpecifiedAffiliationLabel: "Prikaži sa ručno uvezanim afilijacijama",
+    showByPublicationYearEmploymentsLabel: "Prikaži od zaposlenih u godini izdanja rada",
+    showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih"
 }
