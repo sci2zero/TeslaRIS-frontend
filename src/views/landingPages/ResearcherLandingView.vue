@@ -15,7 +15,7 @@
                                 Biografija
                             </h3>
                             <v-menu>
-                                <template v-slot:activator="{ props }">
+                                <template #activator="{ props }">
                                     <v-btn
                                         v-bind="props"
                                         icon="mdi-dots-vertical"
@@ -76,7 +76,6 @@
                         </div>
 
                         <div class="flex flex-wrap gap-2">
-
                             <span 
                                 v-for="(keyword, index) in getKeywordsAsArray(person?.keyword)" 
                                 :key="index"
@@ -84,8 +83,6 @@
                             >
                                 {{ keyword.trim() }}
                             </span>
-                            
-                            
                         </div>
                     </div>
                 </div>
@@ -142,8 +139,12 @@
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span class="mdi mdi-file-document text-2xl text-slate-400"></span>
                     </div>
-                    <h4 class="text-lg font-medium text-slate-600 mb-2">Nema publikacija</h4>
-                    <p class="text-slate-500 text-sm">Dodajte svoju prvu publikaciju da počnete</p>
+                    <h4 class="text-lg font-medium text-slate-600 mb-2">
+                        Nema publikacija
+                    </h4>
+                    <p class="text-slate-500 text-sm">
+                        Dodajte svoju prvu publikaciju da počnete
+                    </p>
                 </div>
             </div>
         </div>
@@ -154,7 +155,7 @@
 import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
 import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
+import { type MultilingualContent, ExportableEndpointType } from '@/models/Common';
 
 import { ref } from 'vue';
 
@@ -166,19 +167,17 @@ const switchPage = (page: number) => {
 
 
 
-import { ref, computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import PersonService from '@/services/PersonService';
 import InvolvementService from '@/services/InvolvementService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import type { Employment } from '@/models/InvolvementModel';
 import type { PersonResponse } from '@/models/PersonModel';
 
 const route = useRoute();
 const router = useRouter();
-const { t } = useI18n();
+
 
 const person = ref<PersonResponse>();
 const researcherName = ref("");

@@ -1,24 +1,20 @@
 <template>
-
     <v-app>
         <SideBar class="h-full" />
         <v-main :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
             <div class="flex-1">
-                <navbar variant="general" v-if="!hideLayout" />
+                <navbar v-if="!hideLayout && !hideNavbar" variant="general" />
                 <!-- <breadcrumbs v-if="!hideLayout" /> -->
                 <router-view />
                 <cookie-consent v-if="!hideLayout" />
             </div>
             <footerbar v-if="!hideLayout" />
         </v-main>
-
     </v-app>
-
 </template>
 
 <script setup>
-import Navbar from "@/components/core/Navbar.vue";
-import Breadcrumbs from "@/components/core/Breadcrumbs.vue";
+import Navbar from "@/components/core/MainNavbar.vue";
 import CookieConsent from "@/components/core/CookieConsent.vue";
 import Footerbar from "@/components/core/FooterBar.vue";
 import SideBar from "@/components/core/SideBar.vue";
@@ -35,7 +31,11 @@ const hideLayout = computed(() => {
     return (
         route.name === "publicDissertationsReport" &&
         route.query.embed === "true"
-    ) || route.name === "home";
+    );
+});
+
+const hideNavbar = computed(() => {
+    return route.name === "home";
 });
 
 </script>

@@ -46,11 +46,17 @@
                         <span class="mdi mdi-file-document text-white text-xl"></span>
                     </div>
                     <div class="text-right">
-                        <div class="text-xs text-blue-600 font-medium uppercase tracking-wide">Ukupno</div>
+                        <div class="text-xs text-blue-600 font-medium uppercase tracking-wide">
+                            Ukupno
+                        </div>
                     </div>
                 </div>
-                <div class="text-3xl lg:text-4xl font-bold text-blue-800 mb-1">125</div>
-                <div class="text-sm text-blue-600 font-medium">Publikacija</div>
+                <div class="text-3xl lg:text-4xl font-bold text-blue-800 mb-1">
+                    125
+                </div>
+                <div class="text-sm text-blue-600 font-medium">
+                    Publikacija
+                </div>
             </div>
 
             <!-- H-Index -->
@@ -60,11 +66,17 @@
                         <span class="mdi mdi-chart-line text-white text-xl"></span>
                     </div>
                     <div class="text-right">
-                        <div class="text-xs text-emerald-600 font-medium uppercase tracking-wide">H-Index</div>
+                        <div class="text-xs text-emerald-600 font-medium uppercase tracking-wide">
+                            H-Index
+                        </div>
                     </div>
                 </div>
-                <div class="text-3xl lg:text-4xl font-bold text-emerald-800 mb-1">26</div>
-                <div class="text-sm text-emerald-600 font-medium">Hirsch indeks</div>
+                <div class="text-3xl lg:text-4xl font-bold text-emerald-800 mb-1">
+                    26
+                </div>
+                <div class="text-sm text-emerald-600 font-medium">
+                    Hirsch indeks
+                </div>
             </div>
 
             <!-- Citations -->
@@ -74,10 +86,14 @@
                         <span class="mdi mdi-format-quote-close text-white text-xl"></span>
                     </div>
                     <div class="text-right">
-                        <div class="text-xs text-amber-600 font-medium uppercase tracking-wide">Citata</div>
+                        <div class="text-xs text-amber-600 font-medium uppercase tracking-wide">
+                            Citata
+                        </div>
                     </div>
                 </div>
-                <div class="text-3xl lg:text-4xl font-bold text-amber-800 mb-1">1,232</div>
+                <div class="text-3xl lg:text-4xl font-bold text-amber-800 mb-1">
+                    1,232
+                </div>
                 <div class="flex items-center gap-2 text-sm text-amber-600 font-medium">
                     <span class="mdi mdi-trending-up text-base"></span>
                     +33 ove godine
@@ -89,20 +105,36 @@
         <div class="mt-6 pt-6 border-t border-slate-200">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div class="text-center">
-                    <div class="text-lg font-bold text-slate-800">89</div>
-                    <div class="text-xs text-slate-500 uppercase tracking-wide">Radovi u časopisu</div>
+                    <div class="text-lg font-bold text-slate-800">
+                        89
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wide">
+                        Radovi u časopisu
+                    </div>
                 </div>
                 <div class="text-center">
-                    <div class="text-lg font-bold text-slate-800">23</div>
-                    <div class="text-xs text-slate-500 uppercase tracking-wide">Konferencije</div>
+                    <div class="text-lg font-bold text-slate-800">
+                        23
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wide">
+                        Konferencije
+                    </div>
                 </div>
                 <div class="text-center">
-                    <div class="text-lg font-bold text-slate-800">12</div>
-                    <div class="text-xs text-slate-500 uppercase tracking-wide">Knjige</div>
+                    <div class="text-lg font-bold text-slate-800">
+                        12
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wide">
+                        Knjige
+                    </div>
                 </div>
                 <div class="text-center">
-                    <div class="text-lg font-bold text-slate-800">1</div>
-                    <div class="text-xs text-slate-500 uppercase tracking-wide">Monografije</div>
+                    <div class="text-lg font-bold text-slate-800">
+                        1
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-wide">
+                        Monografije
+                    </div>
                 </div>
             </div>
         </div>

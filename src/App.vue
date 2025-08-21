@@ -1,14 +1,6 @@
 <template>
     <v-app class="bg-slate-100">
         <v-main class="bg-slate-100">
-            <!-- <navbar
-                v-if="!hideLayout"
-            />
-            
-            <breadcrumbs
-                v-if="!hideLayout"
-            /> -->
-            
             <router-view
                 :key="$route.fullPath"
             />
@@ -17,15 +9,11 @@
                 v-if="!hideLayout"
             />
         </v-main>
-        <!-- <footerbar
-            v-if="!hideLayout"
-        /> -->
     </v-app>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted } from "vue";
-import navbar from "@/components/core/Navbar.vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRoute, useRouter } from "vue-router";
@@ -33,15 +21,13 @@ import { useLoginStore } from '@/stores/loginStore';
 import { jwtDecode } from "jwt-decode";
 import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
-import footerbar from "./components/core/FooterBar.vue";
-import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 import CookieConsent from "./components/core/CookieConsent.vue";
 import { useScriptLoader } from "./composables/useScriptLoader";
 
 
 export default defineComponent({
     name: "App",
-    components: { navbar, footerbar, Breadcrumbs, CookieConsent },
+    components: { CookieConsent },
     setup() {
         const route = useRoute();
 

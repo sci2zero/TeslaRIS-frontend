@@ -6,7 +6,9 @@
             <div class="py-16">
                 <div class="text-center text-white hero-text-container">
                     <div class="container mx-auto px-4">
-                        <h2 class="hero-title">{{ returnCurrentLocaleContent(title) }}</h2>
+                        <h2 class="hero-title">
+                            {{ returnCurrentLocaleContent(title) }}
+                        </h2>
                         <p class="text-base md:text-lg lg:text-xl px-3 md:px-6 lg:px-8  max-w-4xl text-justify mx-auto font-normal text-white text-shadow-sm leading-relaxed">
                             {{ returnCurrentLocaleContent(description) }}
                         </p>
@@ -25,7 +27,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 py-8 pb-12 px-8">
                     <!-- Cards -->
                     <div v-for="(item, index) in cardsData" :key="index" class="">
-                        <div class="frosted-glass-card cursor-pointer hover:scale-105 transition-all duration-300"
+                        <div
+                            class="frosted-glass-card cursor-pointer hover:scale-105 transition-all duration-300"
                             @click="item.path !== undefined ? $router.push('/' + $i18n.locale + '/' + item.path) : undefined">
                             <div class="text-center mb-3 sm:mb-4">
                                 <div class="icon-wrapper">
@@ -50,7 +53,6 @@
 
         <!-- Features Section -->
         <landing-features />
-        
     </div>
 </template>
 
@@ -67,7 +69,7 @@ import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import BrandingService from "@/services/BrandingService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
-import Navbar from "@/components/core/Navbar.vue";
+import Navbar from "@/components/core/MainNavbar.vue";
 import LandingFeatures from "@/components/landing/LandingFeatures.vue";
 
 

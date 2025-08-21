@@ -1,33 +1,37 @@
 <template>
     <div id="navbar" :class="navbarClasses">
-            <div class="wide-container flex-wrap toolbar-container px-4">
-                <div class="flex">
-                    <v-btn
-                        :icon="sidebarStore.isVisible ? 'mdi-menu-open' : 'mdi-menu'"
-                        variant="text"
-                        :color="variant === 'general' ? '#000' : '#fff'"
-                        class="mr-4 hover:bg-gray-100 transition-colors"
-                        aria-label="Toggle menu"
-                        @click="toggleSidebar"
-                    >
-                    </v-btn>
-                </div>
+        <div class="wide-container flex-wrap toolbar-container px-4">
+            <div class="flex">
+                <v-btn
+                    :icon="sidebarStore.isVisible ? 'mdi-menu-open' : 'mdi-menu'"
+                    variant="text"
+                    :color="variant === 'general' ? '#000' : '#fff'"
+                    class="mr-4 hover:bg-gray-100 transition-colors"
+                    aria-label="Toggle menu"
+                    @click="toggleSidebar"
+                >
+                </v-btn>
+            </div>
 
-                <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
 
-                <div class="flex items-center gap-1">
-                    <template v-for="(item, index) in menuItems">
-                        <template v-if="item.type == 'divider'">
-                            <v-divider :key="index" inset class="ms-2" vertical :color="variant === 'general' ? '#000' : 'white'"></v-divider>
-                        </template>
-                        <template v-else-if="item.type == 'lang_component'">
-                            <component :is="item.component" :key="index" :variant="variant"></component>
-                        </template>
-                        <template v-else-if="item.type == 'notification_component' && item.condition">
-                            <component :is="item.component" :key="index" :variant="variant"></component>
-                        </template>
-                        <template v-else-if="item.type == 'user_profile'">
-                            <router-link v-if="item.condition" :key="'user-profile'"
+            <div class="flex items-center gap-1">
+                <template v-for="(item, index) in menuItems">
+                    <template v-if="item.type == 'divider'">
+                        <v-divider
+                            :key="index" inset class="ms-2" vertical
+                            :color="variant === 'general' ? '#000' : 'white'"></v-divider>
+                    </template>
+                    <template v-else-if="item.type == 'lang_component'">
+                        <component :is="item.component" :key="index" :variant="variant"></component>
+                    </template>
+                    <template v-else-if="item.type == 'notification_component' && item.condition">
+                        <component :is="item.component" :key="index" :variant="variant"></component>
+                    </template>
+                    <template v-else-if="item.type == 'user_profile'">
+                        <span :key="index">
+                            <router-link
+                                v-if="item.condition"
                                 :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
                                 :class="[
                                     'user-profile-link flex items-center px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer',
@@ -38,7 +42,9 @@
                                 <div class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <v-avatar size="32" color="primary" class="text-white">
-                                            <v-icon size="20">{{ item.icon }}</v-icon>
+                                            <v-icon size="20">
+                                                {{ item.icon }}
+                                            </v-icon>
                                         </v-avatar>
                                     </div>
                                     <div class="hidden sm:flex flex-col min-w-0">
@@ -51,52 +57,54 @@
                                     </div>
                                 </div>
                             </router-link>
-                        </template>
-                        <template v-else-if="item.type == 'icon'">
-                            <v-btn
-                                v-if="item.condition == undefined || item.condition"
-                                :key="item.title"
-                                size="small"
-                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
-                                :variant="item.variant" :color="variant === 'general' ? '#222' : '#fff'" class="no-uppercase"
-                                :icon="item.type == 'icon'"
-                                @click="item.click"
-                                exact
-                            >
-                                <v-icon v-if="item.icon" left :class="variant === 'general' ? 'text-dark' : 'dark'">
+                        </span>
+                    </template>
+                    <template v-else-if="item.type == 'icon'">
+                        <v-btn
+                            v-if="item.condition == undefined || item.condition"
+                            :key="index"
+                            size="small"
+                            :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                            :variant="item.variant" :color="variant === 'general' ? '#222' : '#fff'" class="no-uppercase"
+                            :icon="item.type == 'icon'"
+                            exact
+                            @click="item.click"
+                        >
+                            <v-icon v-if="item.icon" left :class="variant === 'general' ? 'text-dark' : 'dark'">
+                                {{ item.icon }}
+                            </v-icon>
+                            <template v-if="item.type != 'icon'">
+                                {{ item.title }}
+                            </template>
+                        </v-btn>
+                    </template>
+                            
+                    <template v-else>
+                        <router-link
+                            v-if="item.condition" :key="index"
+                            :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                            variant="text"
+                                
+                            :class="[
+                                'hover:text-gray-200 cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center',
+                                variant === 'general' 
+                                    ? 'text-dark hover:text-gray-700' 
+                                    : 'text-white hover:text-gray-200'
+                            ]"
+                            @click="item.click">
+                            <v-badge :content="item.badge" :model-value="false">
+                                <v-icon left :class="variant === 'general' ? 'text-dark' : 'text-white'">
                                     {{ item.icon }}
                                 </v-icon>
-                                <template v-if="item.type != 'icon'">
-                                    {{ item.title }}
-                                </template>
-                            </v-btn>
-                        </template>
-                            
-                        <template v-else>
-                            <router-link v-if="item.condition" :key="item.title"
-                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
-                                variant="text"
-                                
-                                :class="[
-                                    'hover:text-gray-200 cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center',
-                                    variant === 'general' 
-                                        ? 'text-dark hover:text-gray-700' 
-                                        : 'text-white hover:text-gray-200'
-                                ]"
-                                @click="item.click">
-                                <v-badge :content="item.badge" :model-value="false">
-                                    <v-icon left :class="variant === 'general' ? 'text-dark' : 'text-white'">
-                                        {{ item.icon }}
-                                    </v-icon>
-                                </v-badge>
-                                <span v-if="item.type != 'icon'" class="d-none d-md-flex ml-2">
-                                    {{ item.title }}
-                                </span>
-                            </router-link>
-                        </template>
+                            </v-badge>
+                            <span v-if="item.type != 'icon'" class="d-none d-md-flex ml-2">
+                                {{ item.title }}
+                            </span>
+                        </router-link>
                     </template>
-                </div>
+                </template>
             </div>
+        </div>
     </div>
 </template>
 
@@ -119,7 +127,7 @@ import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { useBrandingStore } from '@/stores/brandingStore';
-import { useDisplay } from 'vuetify/lib/framework.mjs';
+
 import { useSidebarStore } from '@/stores/sidebarStore';
 
 interface MenuItem {
@@ -157,7 +165,7 @@ const navbarClasses = computed(() => {
 const langChangeItem = shallowRef(LangChangeItem);
 const notificationItem = shallowRef(NotificationItem);
 
-const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
+const { isCommission, isUserBoundToOU } = useUserRole();
 
 const i18n = useI18n();
 const personId = ref(-1);

@@ -35,9 +35,7 @@ import NotificationList from './NotificationList.vue';
 import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { useInterval } from '@/composables/useInterval';
 
-interface Props {
-    variant?: 'general' | 'home';
-}
+
 
 export default defineComponent({
     name: "NotificationItem",
@@ -48,7 +46,7 @@ export default defineComponent({
             default: 'home'
         }
     },
-    setup(props: Props) {
+    setup() {
         const notificationCountStore = useNotificationCountStore();
 
         onMounted(() => {
@@ -66,8 +64,7 @@ export default defineComponent({
         const { startInterval } = useInterval(fetchCount, 1000 * 30);
 
         return {
-            notificationCountStore,
-            variant: props.variant
+            notificationCountStore
         };
     },
     data: () => ({

@@ -41,9 +41,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { supportedLocales, defaultLocale } from '../../i18n'
 import { getLangItems } from '@/i18n/languages';
 
-interface Props {
-    variant?: 'general' | 'home';
-}
 
 export default defineComponent({
     name: "LangChangeItem",
@@ -53,7 +50,7 @@ export default defineComponent({
             default: 'home'
         }
     },
-    setup(props: Props) {
+    setup() {
         const currentRoute = useRoute();
         const router = useRouter();
 
@@ -99,8 +96,7 @@ export default defineComponent({
             selectedLocale,
             langItems, fav,
             menu, message,
-            hints,
-            variant: props.variant
+            hints
         };
     }
   });

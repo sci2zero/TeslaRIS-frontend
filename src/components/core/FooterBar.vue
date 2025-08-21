@@ -10,7 +10,9 @@
                         <div class="col-span-1 md:col-span-2">
                             <div class="text-white">
                                 <img src="/logov1.svg" alt="CRIS UNS Logo" class="mx-auto md:mx-0 h-12 md:h-16 w-auto brightness-0 invert opacity-90 mb-4" />
-                                <h3 class="text-3xl font-bold text-white mb-3 text-shadow-2xs">{{ returnCurrentLocaleContent(title) }} </h3>
+                                <h3 class="text-3xl font-bold text-white mb-3 text-shadow-2xs">
+                                    {{ returnCurrentLocaleContent(title) }}
+                                </h3>
                                 <p class="text-white/90 leading-relaxed text-xs md:text-sm">
                                     {{ returnCurrentLocaleContent(description) }}
                                 </p>
@@ -19,19 +21,21 @@
 
                         <!-- Quick Links -->
                         <div class="col-span-1">
-                            <h4 class="text-lg font-semibold text-white text-shadow-xs mb-4">Brzi linkovi</h4>
+                            <h4 class="text-lg font-semibold text-white text-shadow-xs mb-4">
+                                Brzi linkovi
+                            </h4>
                             <ul class="list-none p-0 m-0">
                                 <li v-for="link in quickLinks" :key="link.title" class="mb-2">
                                     <router-link 
-                                        :to="'/' + $i18n.locale + '/' + link.path" 
-                                        class="text-white/80 no-underline block py-1 transition-all duration-300 ease-in-out hover:text-white hover:translate-x-1 hover:text-shadow-2xs"
-                                        v-if="link.path !== ''">
+                                        v-if="link.path !== ''" 
+                                        :to="'/' + $i18n.locale + '/' + link.path"
+                                        class="text-white/80 no-underline block py-1 transition-all duration-300 ease-in-out hover:text-white hover:translate-x-1 hover:text-shadow-2xs">
                                         {{ link.title }}
                                     </router-link>
                                     <router-link 
-                                        :to="'/' + $i18n.locale" 
-                                        class="text-white/80 no-underline block py-1 transition-all duration-300 ease-in-out hover:text-white hover:translate-x-1 hover:text-shadow-2xs"
-                                        v-else>
+                                        v-else 
+                                        :to="'/' + $i18n.locale"
+                                        class="text-white/80 no-underline block py-1 transition-all duration-300 ease-in-out hover:text-white hover:translate-x-1 hover:text-shadow-2xs">
                                         {{ link.title }}
                                     </router-link>
                                 </li>
@@ -40,7 +44,9 @@
 
                         <!-- Contact & Info -->
                         <div class="col-span-1">
-                            <h4 class="text-lg font-semibold text-white text-shadow-xs mb-4">Kontakt</h4>
+                            <h4 class="text-lg font-semibold text-white text-shadow-xs mb-4">
+                                Kontakt
+                            </h4>
                             <div class="footer-contact">
                                 <p class="text-white/80 text-sm flex items-center mb-2">
                                     <v-icon icon="mdi-map-marker" class="mr-2" size="16"></v-icon>
@@ -89,7 +95,7 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import BrandingService from '@/services/BrandingService';
 
 
-    const appVersion = import.meta.env.VITE_APP_VERSION;
+
 
     const i18n = useI18n();
     const homeLabel = computed(() => i18n.t("homeLabel"));

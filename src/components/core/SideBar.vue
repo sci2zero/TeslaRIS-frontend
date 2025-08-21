@@ -1,26 +1,25 @@
 <template>
-            <!-- Mobile backdrop overlay -->
-        <div 
-            v-if="sidebarStore.isMobile && sidebarStore.isVisible"
-            class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 cursor-pointer"
-            @click="sidebarStore.close()"
-        ></div>
+    <!-- Mobile backdrop overlay -->
+    <div 
+        v-if="sidebarStore.isMobile && sidebarStore.isVisible"
+        class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 cursor-pointer"
+        @click="sidebarStore.close()"
+    ></div>
     
-            <aside
-            :class="[
-                'fixed w-24 z-40 h-screen bg-gray-900 text-white flex flex-col items-center py-6 border-r border-gray-800 transition-all duration-300 shadow-lg',
-                sidebarStore.isVisible ? 'translate-x-0' : '-translate-x-full'
-            ]">
-        
+    <aside
+        :class="[
+            'fixed w-24 z-40 h-screen bg-gray-900 text-white flex flex-col items-center py-6 border-r border-gray-800 transition-all duration-300 shadow-lg',
+            sidebarStore.isVisible ? 'translate-x-0' : '-translate-x-full'
+        ]">
         <div class="flex items-center justify-center w-full">
-            <router-link to="/"
+            <router-link
+                to="/"
                 class="group relative flex flex-col items-center justify-center rounded-xl p-3 hover:bg-gray-800 transition-colors"
                 aria-label="Logo">
                 <img src="/logov1.svg" alt="Logo" class="size-10">
                 <span
                     class="mt-2 px-2 py-1 text-xs text-white text-center font-medium">TeslaRIS</span>
             </router-link>
-            
         </div>
 
         <div class="mt-3 h-px w-12 bg-gray-800"></div>
@@ -28,9 +27,9 @@
         <!-- Scroll up button -->
         <button
             v-show="canScrollUp"
-            @click="scrollUp"
             class="mt-4 p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
             aria-label="Scroll up"
+            @click="scrollUp"
         >
             <span class="mdi mdi-chevron-up text-sm"></span>
         </button>
@@ -40,8 +39,8 @@
             <div 
                 ref="scrollContainer"
                 class="flex flex-col items-center gap-2 overflow-y-auto scrollbar-hide w-full px-2"
-                @scroll="handleScroll"
                 style="height: calc(100vh - 280px);"
+                @scroll="handleScroll"
             >
                 <div v-for="item in filteredMenuItems" :key="item.key" class="relative">
                     <template v-if="!item.condition || item.condition">
@@ -52,7 +51,7 @@
                             offset="8"
                             open-delay="100"
                         >
-                            <template v-slot:activator="{ props }">
+                            <template #activator="{ props }">
                                 <div
                                     v-bind="props"
                                     class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20 cursor-pointer"
@@ -67,15 +66,17 @@
                             <v-list class="sidebar-menu-list" color="rgb(31, 41, 55)">
                                 <v-list-item
                                     v-for="subItem in item.subItems"
+                                    v-show="!subItem.condition || subItem.condition"
                                     :key="subItem.key"
                                     :to="{path: '/' + $i18n.locale + subItem.to}"
                                     class="sidebar-menu-list-item"
-                                    v-show="!subItem.condition || subItem.condition"
                                 >
-                                    <template v-slot:prepend>
+                                    <template #prepend>
                                         <v-icon :icon="subItem.icon" class="text-gray-300"></v-icon>
                                     </template>
-                                    <v-list-item-title class="text-sm">{{ subItem.label }}</v-list-item-title>
+                                    <v-list-item-title class="text-sm">
+                                        {{ subItem.label }}
+                                    </v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -98,9 +99,9 @@
         <!-- Scroll down button -->
         <button
             v-show="canScrollDown"
-            @click="scrollDown"
             class="mb-4 p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
             aria-label="Scroll down"
+            @click="scrollDown"
         >
             <span class="mdi mdi-chevron-down text-sm"></span>
         </button>
@@ -118,7 +119,7 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const i18n = useI18n();
-const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
+const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
 const personId = ref(-1);

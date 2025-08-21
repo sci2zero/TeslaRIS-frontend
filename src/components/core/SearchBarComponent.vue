@@ -14,7 +14,7 @@
                     :color="dark ? 'white' : 'black'"
                     @keydown.enter="onSearch"
                 >
-                    <template v-slot:append-inner>
+                    <template #append-inner>
                         <v-icon 
                             icon="mdi-magnify" 
                             :color="dark ? 'white' : 'black'" 

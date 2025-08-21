@@ -5,7 +5,8 @@
             <div class="flex-shrink-0 mb-8 lg:mb-0 lg:mr-12">
                 <div class="relative">
                     <div class="w-32 h-32 sm:size-48 lg:size-64 rounded-full overflow-hidden shadow-2xl border-4 border-white ring-4 ring-slate-100">
-                        <img src="https://media.licdn.com/dms/image/v2/C5603AQGxtzCVK6GaHA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1563263024808?e=2147483647&v=beta&t=RMkrpatN3DzSBMhrc7DVkuG98ug5ixG-bwYh5yO-bd0"
+                        <img
+                            src="https://media.licdn.com/dms/image/v2/C5603AQGxtzCVK6GaHA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1563263024808?e=2147483647&v=beta&t=RMkrpatN3DzSBMhrc7DVkuG98ug5ixG-bwYh5yO-bd0"
                             alt="Researcher Profile" class="w-full h-full object-cover" />
                     </div>
                     <!-- Academic Status Badge -->
@@ -72,7 +73,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                    <button @click="showDetails = !showDetails" class="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <button class="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5" @click="showDetails = !showDetails">
                         <span class="mdi mr-2" :class="showDetails ? 'mdi-chevron-up' : 'mdi-account-details'"></span>
                         {{ showDetails ? 'Sakrij detalje' : 'Svi detalji' }}
                     </button>
@@ -94,13 +95,13 @@
                         <button 
                             v-for="tab in tabs" 
                             :key="tab.id"
-                            @click="activeTab = tab.id"
                             :class="[
                                 'py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
                                 activeTab === tab.id
                                     ? 'border-blue-500 text-blue-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
+                            @click="activeTab = tab.id"
                         >
                             {{ tab.name }}
                         </button>
@@ -109,7 +110,7 @@
                     <!-- Mobile Dropdown -->
                     <div class="md:hidden px-6 py-4">
                         <v-menu>
-                            <template v-slot:activator="{ props }">
+                            <template #activator="{ props }">
                                 <button
                                     v-bind="props"
                                     class="w-full flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -122,8 +123,8 @@
                                 <v-list-item
                                     v-for="tab in tabs"
                                     :key="tab.id"
-                                    @click="activeTab = tab.id"
                                     :class="activeTab === tab.id ? 'bg-blue-50 text-blue-600' : ''"
+                                    @click="activeTab = tab.id"
                                 >
                                     <v-list-item-title>{{ tab.name }}</v-list-item-title>
                                 </v-list-item>
@@ -144,27 +145,39 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Ime</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ person?.personName?.firstname }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ person?.personName?.firstname }}
+                                    </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Srednje ime</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ person?.personName?.otherName || 'Nije uneto' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ person?.personName?.otherName || 'Nije uneto' }}
+                                    </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Prezime</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ person?.personName?.lastname }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ person?.personName?.lastname }}
+                                    </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Datum rođenja</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ formatDate(person?.personalInfo?.localBirthDate) }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ formatDate(person?.personalInfo?.localBirthDate) }}
+                                    </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Mesto rođenja</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ person?.personalInfo?.placeOfBirth || 'Nije uneto' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ person?.personalInfo?.placeOfBirth || 'Nije uneto' }}
+                                    </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Pol</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ formatSex(person?.personalInfo?.sex) }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ formatSex(person?.personalInfo?.sex) }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -177,11 +190,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Email</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ person.personalInfo.contact.contactEmail }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ person.personalInfo.contact.contactEmail }}
+                                    </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Telefon</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ person.personalInfo.contact.phoneNumber || 'Nije uneto' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ person.personalInfo.contact.phoneNumber || 'Nije uneto' }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -197,19 +214,27 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div v-if="person?.personalInfo?.orcid">
                                     <label class="block text-sm font-medium text-gray-700">ORCID</label>
-                                    <p class="mt-1 text-sm text-gray-900 font-mono">{{ person.personalInfo.orcid }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 font-mono">
+                                        {{ person.personalInfo.orcid }}
+                                    </p>
                                 </div>
                                 <div v-if="person?.personalInfo?.scopusAuthorId">
                                     <label class="block text-sm font-medium text-gray-700">Scopus Author ID</label>
-                                    <p class="mt-1 text-sm text-gray-900 font-mono">{{ person.personalInfo.scopusAuthorId }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 font-mono">
+                                        {{ person.personalInfo.scopusAuthorId }}
+                                    </p>
                                 </div>
                                 <div v-if="person?.personalInfo?.openAlexId">
                                     <label class="block text-sm font-medium text-gray-700">OpenAlex ID</label>
-                                    <p class="mt-1 text-sm text-gray-900 font-mono">{{ person.personalInfo.openAlexId }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 font-mono">
+                                        {{ person.personalInfo.openAlexId }}
+                                    </p>
                                 </div>
                                 <div v-if="person?.personalInfo?.webOfScienceResearcherId">
                                     <label class="block text-sm font-medium text-gray-700">Web of Science Researcher ID</label>
-                                    <p class="mt-1 text-sm text-gray-900 font-mono">{{ person.personalInfo.webOfScienceResearcherId }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 font-mono">
+                                        {{ person.personalInfo.webOfScienceResearcherId }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -249,7 +274,8 @@
                                 <span class="mdi mdi-text mr-2 text-indigo-600"></span>
                                 Biografija
                             </h3>
-                            <div class="prose prose-sm max-w-none bg-white p-4 rounded text-justify leading-relaxed" v-html="returnCurrentLocaleContent(person.biography)"></div>
+                            <rich-text-editor v-model="person.biography" :editable="false"></rich-text-editor>
+                            <!-- <div class="prose prose-sm max-w-none bg-white p-4 rounded text-justify leading-relaxed" v-html="returnCurrentLocaleContent(person.biography)"></div> -->
                         </div>
 
                         <div v-if="person?.keyword && person.keyword.length > 0" class="bg-gray-50 p-6 rounded-lg">
@@ -280,13 +306,19 @@
                             </h3>
                             <div class="space-y-6">
                                 <div v-for="expertise in person.expertisesOrSkills" :key="expertise.id" class="border-l-4 border-orange-500 pl-4 bg-white p-4 rounded">
-                                    <h4 class="text-lg font-medium text-gray-900 mb-3">{{ returnCurrentLocaleContent(expertise.name) }}</h4>
+                                    <h4 class="text-lg font-medium text-gray-900 mb-3">
+                                        {{ returnCurrentLocaleContent(expertise.name) }}
+                                    </h4>
                                     
-                                    <p class="text-sm text-gray-700 mb-3">{{ returnCurrentLocaleContent(expertise.description) }}</p>
+                                    <p class="text-sm text-gray-700 mb-3">
+                                        {{ returnCurrentLocaleContent(expertise.description) }}
+                                    </p>
 
                                     <!-- Proofs -->
                                     <div v-if="expertise.proofs && expertise.proofs.length > 0" class="mt-4 pt-3 border-t border-gray-200">
-                                        <h5 class="text-sm font-medium text-gray-700 mb-2">Dokazi:</h5>
+                                        <h5 class="text-sm font-medium text-gray-700 mb-2">
+                                            Dokazi:
+                                        </h5>
                                         <div class="space-y-2">
                                             <div v-for="proof in expertise.proofs" :key="proof.id" class="flex items-center space-x-2 text-sm">
                                                 <span class="mdi mdi-file-document text-blue-500"></span>
@@ -311,7 +343,9 @@
                                 <div v-for="prize in person.prizes" :key="prize.id" class="border-l-4 border-amber-500 pl-4 bg-white p-4 rounded">
                                     <div v-for="title in prize.title" :key="`${prize.id}-title-${title.languageTagId}`" class="mb-3">
                                         <div class="flex gap-2 items-center mb-2">
-                                            <h4 class="text-lg font-medium text-gray-900">{{ title.content }}</h4>
+                                            <h4 class="text-lg font-medium text-gray-900">
+                                                {{ title.content }}
+                                            </h4>
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
                                                 {{ title.languageTag }}
                                             </span>
@@ -320,7 +354,9 @@
                                     
                                     <div v-for="desc in prize.description" :key="`${prize.id}-desc-${desc.languageTagId}`" class="mb-3">
                                         <div class="flex gap-2 items-center mb-2">
-                                            <p class="text-sm text-gray-700">{{ desc.content }}</p>
+                                            <p class="text-sm text-gray-700">
+                                                {{ desc.content }}
+                                            </p>
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                 {{ desc.languageTag }}
                                             </span>
@@ -336,7 +372,9 @@
 
                                     <!-- Proofs -->
                                     <div v-if="prize.proofs && prize.proofs.length > 0" class="pt-3 border-t border-gray-200">
-                                        <h5 class="text-sm font-medium text-gray-700 mb-2">Dokazi:</h5>
+                                        <h5 class="text-sm font-medium text-gray-700 mb-2">
+                                            Dokazi:
+                                        </h5>
                                         <div class="space-y-2">
                                             <div v-for="proof in prize.proofs" :key="proof.id" class="flex items-center space-x-2 text-sm">
                                                 <span class="mdi mdi-file-document text-blue-500"></span>
@@ -359,7 +397,7 @@
 
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+
 import PersonService from '@/services/PersonService';
 import InvolvementService from '@/services/InvolvementService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -371,7 +409,7 @@ import type { MultilingualContent } from '@/models/Common';
 
 const route = useRoute();
 const router = useRouter();
-const { t } = useI18n();
+
 
 const person = ref<PersonResponse>();
 const researcherName = ref("");
