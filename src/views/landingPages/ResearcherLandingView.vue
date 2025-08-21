@@ -101,41 +101,130 @@
                 </div>
 
                 <!-- Publication Type Filters -->
-                <div class="flex flex-wrap gap-2 mb-8">
-                    <button class="px-6 py-3 bg-slate-800 text-white rounded-lg text-sm font-medium shadow-md">
-                        Sve publikacije
-                    </button>
-                    <button class="px-6 py-3 bg-slate-50 text-slate-700 text-sm font-medium border border-slate-200 hover:bg-slate-100 transition-colors rounded-lg">
-                        Radovi u časopisu
-                    </button>
-                    <button class="px-6 py-3 bg-slate-50 text-slate-700 text-sm font-medium border border-slate-200 hover:bg-slate-100 transition-colors rounded-lg">
-                        Knjige
-                    </button>
-                    <button class="px-6 py-3 bg-slate-50 text-slate-700 text-sm font-medium border border-slate-200 hover:bg-slate-100 transition-colors rounded-lg">
-                        Monografije
-                    </button>
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="relative">
+                            <button 
+                                @click="toggleFilterDropdown"
+                                class="flex items-center gap-3 px-4 py-2.5 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md min-w-[200px]"
+                            >
+                                <span class="mdi mdi-filter-variant text-lg text-slate-500"></span>
+                                <span class="text-sm font-medium flex-1 text-left">
+                                    {{ selectedPublicationTypes.length === 0 ? 'Svi tipovi publikacija' : `${selectedPublicationTypes.length} tip odabran` }}
+                                </span>
+                                <span class="mdi mdi-chevron-down text-sm text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': isFilterDropdownOpen }"></span>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div v-show="isFilterDropdownOpen" class="absolute right-0 top-full mt-1 w-80 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
+                                <!-- Header -->
+                                <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50 rounded-t-lg">
+                                    <span class="text-sm font-semibold text-slate-700">Tipovi publikacija</span>
+                                    <div class="flex gap-2">
+                                        <button 
+                                            @click="selectAllPublicationTypes"
+                                            class="text-xs px-2 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors duration-200"
+                                        >
+                                            Sve
+                                        </button>
+                                        <button 
+                                            @click="clearAllPublicationTypes"
+                                            class="text-xs px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors duration-200"
+                                        >
+                                            Očisti
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Filter Options -->
+                                <div class="p-4 max-h-64 overflow-y-auto">
+                                    <div class="space-y-1">
+                                        <label 
+                                            v-for="type in publicationTypeSr" 
+                                            :key="type.value"
+                                            class="flex items-center w-full p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer transition-all duration-200 group border border-transparent hover:border-slate-200"
+                                        >
+                                            <div class="flex items-center justify-center w-5 h-5 mr-3">
+                                                <input 
+                                                    type="checkbox" 
+                                                    :value="type"
+                                                    v-model="selectedPublicationTypes"
+                                                    class="w-4 h-4 text-blue-600 border-2 border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 transition-colors duration-200"
+                                                />
+                                            </div>
+                                            <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 flex-1">{{ type.title }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div class="p-3 border-t border-slate-200 bg-slate-50 rounded-b-lg">
+                                    <div class="text-xs text-slate-500 text-center">
+                                        {{ selectedPublicationTypes.length }} od {{ publicationTypeSr.length }} tipova odabrano
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Filters Display -->
+                    <div v-if="selectedPublicationTypes.length > 0" class="flex flex-wrap gap-2">
+                        <span 
+                            v-for="type in selectedPublicationTypes" 
+                            :key="type.value"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200"
+                        >
+                            <span class="mdi mdi-check-circle text-sm"></span>
+                            {{ type.title }}
+                            <button 
+                                @click="removePublicationType(type.value)"
+                                class="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors duration-200 group"
+                                title="Ukloni filter"
+                            >
+                                <span class="mdi mdi-close text-xs group-hover:text-blue-800"></span>
+                            </button>
+                        </span>
+                    </div>
                 </div>
 
-                <!-- Publications Placeholder -->
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Pretraži publikacije..."
+                            class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            @input="handleSearch"
+                        />
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                            <span class="mdi mdi-magnify text-xl"></span>
+                        </span>
+                    </div>
+                </div>
 
-                <publication-table-component
-                    ref="publicationsRef"
-                    :publications="publications"
-                    :total-publications="totalPublications"
-                    enable-export
-                    :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
-                    :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
-                    :endpoint-body-parameters="
-                        {
-                            allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
-                            personId: person.id,
-                            commissionId: null
-                        }"
-                    @switch-page="switchPage">
-                </publication-table-component>
+                <!-- Publications Table -->
+                <div v-if="publications.length > 0">
+                    <publication-table-component
+                        ref="publicationsRef"
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        enable-export
+                        :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
+                        :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
+                        :endpoint-body-parameters="
+                            {
+                                allowedTypes: selectedPublicationTypes.length > 0 
+                                    ? selectedPublicationTypes.map(publicationType => publicationType.value)
+                                    : publicationTypeSr.map(type => type.value),
+                                personId: person?.id || 0,
+                                commissionId: null
+                            }"
+                        @switch-page="switchPage">
+                    </publication-table-component>
+                </div>
 
-                
-                <div class="text-center py-12">
+                <!-- Empty State -->
+                <div v-else class="text-center py-12">
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span class="mdi mdi-file-document text-2xl text-slate-400"></span>
                     </div>
@@ -156,18 +245,11 @@ import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherL
 import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { type MultilingualContent, ExportableEndpointType } from '@/models/Common';
+import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
+import DocumentPublicationService from "@/services/DocumentPublicationService";
+import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 
-import { ref } from 'vue';
-
-const publications = ref([]);
-const totalPublications = ref(0);
-const switchPage = (page: number) => {
-    console.log(`Switching to page ${page}`);
-};
-
-
-
-import { onMounted } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PersonService from '@/services/PersonService';
 import InvolvementService from '@/services/InvolvementService';
@@ -178,14 +260,51 @@ import type { PersonResponse } from '@/models/PersonModel';
 const route = useRoute();
 const router = useRouter();
 
-
 const person = ref<PersonResponse>();
 const researcherName = ref("");
 const employments = ref<Employment[]>([]);
 
+// Publication state
+const publications = ref<DocumentPublicationIndex[]>([]);
+const totalPublications = ref(0);
+const page = ref(0);
+const size = ref(10);
+const sort = ref("");
+const direction = ref("");
+const publicationSearchParams = ref("tokens=*");
+const publicationsRef = ref<typeof PublicationTableComponent>();
+const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
+const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
+
+// Filter dropdown state
+const isFilterDropdownOpen = ref(false);
+
+// Serbian publication types
+const publicationTypeSr = [
+    { title: "Rad u časopisu", value: PublicationType.JOURNAL_PUBLICATION },
+    { title: "Rad sa konferencije", value: PublicationType.PROCEEDINGS_PUBLICATION },
+    { title: "Patent", value: PublicationType.PATENT },
+    { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
+    { title: "Skup podataka", value: PublicationType.DATASET },
+    { title: "Softver", value: PublicationType.SOFTWARE },
+    { title: "Monografija", value: PublicationType.MONOGRAPH },
+    { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION },
+    { title: "Završni rad", value: PublicationType.THESIS }
+];
 
 onMounted(() => {
     fetchPerson();
+    
+    // Start with no filters selected (show all publications)
+    selectedPublicationTypes.value = [];
+    
+    // Add click outside handler for dropdown
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    // Clean up event listener
+    document.removeEventListener('click', handleClickOutside);
 });
 
 const fetchPerson = async () => {
@@ -219,12 +338,118 @@ const fetchPerson = async () => {
             employments.value = employmentResponses.map(response => response.data);
         }
 
+        // Fetch publications after person data is loaded
+        fetchPublications();
+
     } catch (error) {
         console.error('Error fetching person:', error);
         router.push({ name: "notFound" });
     }
 };
 
+const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+    page.value = nextPage;
+    size.value = pageSize;
+    sort.value = sortField;
+    direction.value = sortDir;
+    fetchPublications();
+};
+
+const fetchPublications = async () => {
+    if (!person.value?.id) {
+        return;
+    }
+
+    try {
+        // If no filters selected, show all publications
+        const allowedTypes = selectedPublicationTypes.value.length > 0 
+            ? selectedPublicationTypes.value.map(publicationType => publicationType.value)
+            : publicationTypeSr.map(type => type.value);
+
+        const publicationResponse = await DocumentPublicationService.findResearcherPublications(
+            person.value.id as number,
+            allowedTypes,
+            `${publicationSearchParams.value}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+        );
+        
+        publications.value = publicationResponse.data.content;
+        totalPublications.value = publicationResponse.data.totalElements;
+    } catch (error) {
+        console.error('Error fetching publications:', error);
+        publications.value = [];
+        totalPublications.value = 0;
+    }
+};
+
+const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
+    publicationSearchParams.value = tokenParams;
+    publicationsRef.value?.setSortAndPageOption([], 1);
+    page.value = 0;
+    sort.value = "";
+    direction.value = "";
+    fetchPublications();
+};
+
+const handleSearch = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const searchTerm = target.value.trim();
+    
+    if (searchTerm === '') {
+        publicationSearchParams.value = "tokens=*";
+    } else {
+        publicationSearchParams.value = `tokens=${encodeURIComponent(searchTerm)}`;
+    }
+    
+    // Reset pagination and fetch new results
+    page.value = 0;
+    sort.value = "";
+    direction.value = "";
+    fetchPublications();
+};
+
+const togglePublicationType = (type: { title: string, value: PublicationType }) => {
+    const index = selectedPublicationTypes.value.findIndex(t => t.value === type.value);
+    if (index > -1) {
+        selectedPublicationTypes.value.splice(index, 1);
+    } else {
+        selectedPublicationTypes.value.push(type);
+    }
+};
+
+const isPublicationTypeSelected = (typeValue: PublicationType): boolean => {
+    return selectedPublicationTypes.value.some(t => t.value === typeValue);
+};
+
+const toggleFilterDropdown = () => {
+    isFilterDropdownOpen.value = !isFilterDropdownOpen.value;
+};
+
+const selectAllPublicationTypes = () => {
+    selectedPublicationTypes.value = [...publicationTypeSr];
+};
+
+const clearAllPublicationTypes = () => {
+    selectedPublicationTypes.value = [];
+};
+
+const removePublicationType = (typeValue: PublicationType) => {
+    const index = selectedPublicationTypes.value.findIndex(t => t.value === typeValue);
+    if (index > -1) {
+        selectedPublicationTypes.value.splice(index, 1);
+    }
+};
+
+const handleClickOutside = (event: Event) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+        isFilterDropdownOpen.value = false;
+    }
+};
+
+// Watch for publication type changes
+watch(selectedPublicationTypes, () => {
+    fetchPublications();
+});
 
 const getKeywordsAsArray = (keywords: MultilingualContent[] | undefined): string[] => {
     if (!keywords || keywords.length === 0) return [];
@@ -234,7 +459,6 @@ const getKeywordsAsArray = (keywords: MultilingualContent[] | undefined): string
     
     return content.split('\n').filter(keyword => keyword.trim().length > 0);
 };
-
 </script>
 
 <style scoped>
@@ -252,5 +476,65 @@ const getKeywordsAsArray = (keywords: MultilingualContent[] | undefined): string
 
 .prose p:last-child {
     margin-bottom: 0;
+}
+
+/* Responsive publication type filters */
+@media (max-width: 640px) {
+    .flex.flex-wrap.gap-2 {
+        gap: 0.5rem;
+    }
+    
+    .flex.flex-wrap.gap-2 button {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .flex.flex-wrap.gap-2 {
+        gap: 0.25rem;
+    }
+    
+    .flex.flex-wrap.gap-2 button {
+        font-size: 0.7rem;
+        padding: 0.375rem 0.5rem;
+        min-width: fit-content;
+    }
+}
+
+/* Dropdown positioning and styling */
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.z-50 {
+    z-index: 50;
+}
+
+/* Ensure dropdown appears above other content */
+.absolute.top-full {
+    z-index: 9999;
+}
+
+/* Smooth transitions for dropdown */
+.transition-all {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover effects for better interactivity */
+.hover\:bg-slate-50:hover {
+    background-color: #f8fafc;
+}
+
+.hover\:bg-blue-50:hover {
+    background-color: #eff6ff;
+}
+
+.hover\:bg-red-50:hover {
+    background-color: #fef2f2;
 }
 </style>
