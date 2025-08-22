@@ -160,7 +160,25 @@ export interface SearchFieldsResponse {
 
 export enum ExportFileFormat {
     CSV = "CSV",
-    XLSX = "XLSX"
+    XLSX = "XLSX",
+    BIB = "BIB",
+    RIS = "RIS",
+    ENW = "ENW"
+}
+
+export const getExtensionForExportFileFormat = (format: ExportFileFormat): string => {
+    switch (format) {
+        case ExportFileFormat.CSV:
+            return ".csv";
+        case ExportFileFormat.XLSX:
+            return ".xlsx";
+        case ExportFileFormat.BIB:
+            return ".bib";
+        case ExportFileFormat.RIS:
+            return ".ris";
+        case ExportFileFormat.ENW:
+            return ".enw";
+    }
 }
 
 export enum ExportEntity {
@@ -182,7 +200,7 @@ export enum ExportableEndpointType {
     THESIS_ADVANCED_SEARCH = "THESIS_ADVANCED_SEARCH"
 }
 
-export interface CSVExportRequest {
+export interface TableExportRequest {
     columns: string[];
     exportEntityIds: number[];
     exportMaxPossibleAmount: boolean;
@@ -194,7 +212,7 @@ export interface CSVExportRequest {
 }
 
 
-export interface DocumentCSVExportRequest extends CSVExportRequest {
+export interface DocumentTableExportRequest extends TableExportRequest {
     apa: boolean;
     mla: boolean;
     harvard: boolean;

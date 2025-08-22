@@ -1022,5 +1022,6 @@ export default {
     showOutputsLabel: "Prikaži rezultate",
     showBySpecifiedAffiliationLabel: "Prikaži sa ručno uvezanim afilijacijama",
     showByPublicationYearEmploymentsLabel: "Prikaži od zaposlenih u godini izdanja rada",
-    showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih"
+    showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
+    creatingExportLabel: "Izvoz podataka u toku..."
 }

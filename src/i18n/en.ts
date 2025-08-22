@@ -992,5 +992,6 @@ export default {
     addNewResearcherLabel: "Add new researcher",
     showAllLabel: "Show all",
     showForInstitutionLabel: "Show for institution",
-    updateInstitutionDefaultSubmissionContentLabel: "Default submission content"
+    updateInstitutionDefaultSubmissionContentLabel: "Default submission content",
+    creatingExportLabel: "Data export in progress..."
 }

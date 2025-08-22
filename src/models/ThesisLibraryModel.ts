@@ -1,4 +1,4 @@
-import { type DocumentCSVExportRequest, type MultilingualContent } from "./Common";
+import { type DocumentTableExportRequest, type MultilingualContent } from "./Common";
 import type { Contact, PersonName, PostalAddress } from "./PersonModel";
 import { ThesisType } from "./PublicationModel"
 
@@ -39,7 +39,7 @@ export interface ThesisSearchRequest {
     dateTo: string;
 }
 
-export interface ThesisCSVExportRequest extends DocumentCSVExportRequest {
+export interface ThesisTableExportRequest extends DocumentTableExportRequest {
     thesisSearchRequest: ThesisSearchRequest
 }
 
