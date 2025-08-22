@@ -253,7 +253,7 @@
                     @search="clearSortAndPerformPublicationSearch($event)"
                 />
                 <div class="mb-5 mt-5">
-                    <add-publication-menu compact />
+                    <add-publication-menu v-if="canEdit" compact />
                     <v-btn
                         v-if="isResearcher && canEdit"
                         class="ml-2" color="primary" density="compact"
