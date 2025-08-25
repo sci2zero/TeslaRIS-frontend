@@ -429,6 +429,8 @@ import OrganisationUnitImportSourceForm from '@/components/organisationUnit/Orga
 import InstitutionDefaultSubmissionContentForm from '@/components/organisationUnit/InstitutionDefaultSubmissionContentForm.vue';
 import OrganisationUnitOutputConfigurationForm from '@/components/organisationUnit/OrganisationUnitOutputConfigurationForm.vue';
 import OrganisationUnitOutputConfigurationService from '@/services/OrganisationUnitOutputConfigurationService';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 
 export default defineComponent({
@@ -532,6 +534,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 showOutputs.value = response.data.showOutputs;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 OrganisationUnitService.readOU(
                     parseInt(currentRoute.params.id as string)

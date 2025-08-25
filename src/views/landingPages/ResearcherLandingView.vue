@@ -444,6 +444,8 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
 
 
 export default defineComponent({
@@ -551,6 +553,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 person.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
 
