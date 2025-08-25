@@ -117,10 +117,19 @@ export interface OrganisationUnitTrustConfiguration {
     trustNewDocumentFiles: boolean;
 }
 
+export interface OrganisationUnitOutputConfiguration {
+    showOutputs: boolean;
+    showBySpecifiedAffiliation: boolean;
+    showByPublicationYearEmployments: boolean;
+    showByCurrentEmployments: boolean;
+}
+
 export interface OrganisationUnitImportSource {
     importScopus: boolean;
     importOpenAlex: boolean;
     importWebOfScience: boolean;
+    scopusConfigured?: boolean;
+    webOfScienceConfigured?: boolean;
 }
 
 export interface InstitutionDefaultSubmissionContent {

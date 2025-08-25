@@ -1,10 +1,11 @@
 <template>
-    <div v-show="preloadedDoi" class="pr-4">
+    <div v-show="preloadedDoi || description" class="pr-4">
         <div class="d-sr-only text-subtitle-1 font-weight-medium mb-3">
             {{ $t("externalMetricsLabel") }}
         </div>
         <div class="d-flex flex-row justify-end flex-wrap gap-2">
             <div
+                v-show="preloadedDoi"
                 class="altmetric-embed"
                 data-badge-type="donut"
                 data-badge-popover="left"
@@ -13,12 +14,15 @@
                 :data-doi="preloadedDoi">
             </div>
             <span
+                v-show="preloadedDoi"
                 class="__dimensions_badge_embed__ ml-5"
                 data-style="small_circle"
                 data-hide-zero-citations="true"
                 :data-doi="preloadedDoi">
             </span>
-            <div class="ml-5">
+            <div
+                v-show="preloadedDoi"
+                class="ml-5">
                 <a
                     class="plumx-plum-print-popup plum-bigben-theme"
                     :href="`https://plu.mx/plum/a/?doi=${preloadedDoi}`"
@@ -32,6 +36,7 @@
                 </a>
             </div>
             <div
+                v-show="preloadedDoi"
                 ref="openCitationsContainer"
                 class="openCitationsContainer
                 ml-5">
@@ -45,7 +50,7 @@
                 :data-text="description.substring(0, (description.length > 1000 ? 1000 : description.length))">
             </div>
             <div
-                v-if="oaStatus !== null"
+                v-if="preloadedDoi && oaStatus !== null"
                 :class="[
                     'unpaywall-badge',
                     'ml-5',

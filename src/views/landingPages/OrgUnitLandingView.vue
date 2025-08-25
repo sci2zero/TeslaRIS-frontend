@@ -129,7 +129,7 @@
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("additionalActionsLabel") }}
             </div>
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row flex-wrap">
                 <generic-crud-modal
                     v-if="canEdit"
                     class="ml-2" 
@@ -190,6 +190,17 @@
                     :read-only="false"
                     @update="updateSuccess()"
                 />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="OrganisationUnitOutputConfigurationForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="OrganisationUnitOutputConfiguration"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="outputConfigurationUpdated"
+                />
             </div>
         </div>
 
@@ -209,7 +220,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab value="publications">
+            <v-tab v-show="showOutputs" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="employees">
@@ -370,7 +381,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -416,6 +427,10 @@ import PublicReviewPageConfigurationService from '@/services/thesisLibrary/Publi
 import OrganisationUnitTrustConfigurationForm from '@/components/organisationUnit/OrganisationUnitTrustConfigurationForm.vue';
 import OrganisationUnitImportSourceForm from '@/components/organisationUnit/OrganisationUnitImportSourceForm.vue';
 import InstitutionDefaultSubmissionContentForm from '@/components/organisationUnit/InstitutionDefaultSubmissionContentForm.vue';
+import OrganisationUnitOutputConfigurationForm from '@/components/organisationUnit/OrganisationUnitOutputConfigurationForm.vue';
+import OrganisationUnitOutputConfigurationService from '@/services/OrganisationUnitOutputConfigurationService';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 
 export default defineComponent({
@@ -477,13 +492,15 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, loggedInUser } = useUserRole();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const employeesRef = ref<typeof PersonTableComponent>();
         const alumniRef = ref<typeof PersonTableComponent>();
         const publicationsRef = ref<typeof PublicationTableComponent>();
+
+        const showOutputs = ref(false);
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -513,22 +530,35 @@ export default defineComponent({
         });
 
         const fetchOU = (uponStartup: boolean) => {
-            OrganisationUnitService.readOU(
+            OrganisationUnitOutputConfigurationService.fetchConfigurationForOrganisationUnit(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
-                organisationUnit.value = response.data;
+                showOutputs.value = response.data.showOutputs;
 
-                document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
-                
-                if(uponStartup) {
-                    Promise.all([fetchPublications(), fetchEmployees(false), fetchEmployees(true)]).then(() => {
-                        setStartTab();
-                    });
-                }
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
-                fetchSubUnits();
-            }).catch(() => {
-                router.push({ name: "notFound" });
+                OrganisationUnitService.readOU(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    organisationUnit.value = response.data;
+
+                    document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
+                    
+                    if(uponStartup) {
+                        const operations = [fetchEmployees(false), fetchEmployees(true)];
+                        if (showOutputs.value) {
+                            operations.push(fetchPublications());
+                        }
+
+                        Promise.all(operations).then(() => {
+                            setStartTab();
+                        });
+                    }
+
+                    fetchSubUnits();
+                }).catch(() => {
+                    router.push({ name: "notFound" });
+                });
             });
         };
 
@@ -751,6 +781,16 @@ export default defineComponent({
             snackbar.value = true;
         };
 
+        const outputConfigurationUpdated = (shouldShowOutputs: boolean) => {
+            showOutputs.value = shouldShowOutputs;
+            
+            if (shouldShowOutputs) {
+                clearSortAndPerformPublicationSearch(publicationSearchParams.value);
+            }
+            
+            updateSuccess();
+        }
+
         const performNavigation = (pageName: string) => {
             router.push({name: pageName});
         };
@@ -769,6 +809,10 @@ export default defineComponent({
             });
         };
 
+        watch(selectedPublicationTypes, () => {
+            fetchPublications();
+        });
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
@@ -776,26 +820,27 @@ export default defineComponent({
             switchPublicationsPage, publicationTypes,
             switchEmployeesPage, isAdmin, performNavigation,
             searchKeyword, relationChain, selectedPublicationTypes,
-            returnCurrentLocaleContent, canEdit,
+            returnCurrentLocaleContent, canEdit, switchAlumniPage,
             updateKeywords, updateBasicInfo, navigateToPublicTheses,
-            snackbar, snackbarMessage, relations,
+            snackbar, snackbarMessage, relations, totalAlumni,
             updateRelations, graphRef, updateResearchAreas,
             subUnits, totalSubUnits, switchSubUnitsPage,
-            alumni, totalAlumni, switchAlumniPage,
             OrganisationUnitUpdateForm, fetchEmployees,
             ouIndicators, StatisticsType, loginStore,
             ExportableEndpointType, updateSuccess,
             ExternalIndicatorsConfigurationForm,
             ApplicableEntityType, fetchIndicators,
-            clearSortAndPerformPersonSearch,
+            clearSortAndPerformPersonSearch, alumni,
             clearSortAndPerformPublicationSearch,
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
-            fetchPublicReviewPageContent,
+            fetchPublicReviewPageContent, isInstitutionalLibrarian,
             OrganisationUnitTrustConfigurationForm,
-            OrganisationUnitImportSourceForm,
-            InstitutionDefaultSubmissionContentForm, loggedInUser
+            OrganisationUnitImportSourceForm, showOutputs,
+            OrganisationUnitOutputConfigurationForm,
+            InstitutionDefaultSubmissionContentForm,
+            outputConfigurationUpdated, loggedInUser
         };
 }})
 

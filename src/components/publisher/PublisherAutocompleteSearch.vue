@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedPublisher"
                 :label="$t('publisherLabel')"
-                :items="publishers"
+                :items="readonly ? [] : publishers"
                 :custom-filter="((): boolean => true)"
                 :no-data-text="$t('noDataMessage')"
                 return-object
@@ -47,6 +47,10 @@ export default defineComponent({
     components: { GenericCrudModal },
     props: {
         allowManualClearing: {
+            type: Boolean,
+            default: false
+        },
+        readonly: {
             type: Boolean,
             default: false
         },

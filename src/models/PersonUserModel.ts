@@ -111,6 +111,7 @@ export interface PersonResponse {
 
 
 export interface PersonUserResponse {
+    personId: number;
     personName: PersonName;
     personOtherNames: PersonName[];
     personalInfo: PersonalInfo;

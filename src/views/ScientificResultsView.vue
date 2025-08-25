@@ -73,7 +73,7 @@
             :publications="publications"
             :total-publications="totalPublications"
             enable-export
-            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
+            :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
             :endpoint-body-parameters="
@@ -165,7 +165,7 @@ export default defineComponent({
 
             searchParams.value = tokenParams;
             previousFilterValues.value.publicationTypes = publicationTypes;
-            previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
+            previousFilterValues.value.selectOnlyUnassessed = !!selectOnlyUnassessed; 
 
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
@@ -181,7 +181,7 @@ export default defineComponent({
             serviceMethod(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 organisationUnitId,
-                selectOnlyUnassessed,
+                !!selectOnlyUnassessed,
                 publicationTypes
             ).then((response) => {
                 publications.value = response.data.content;

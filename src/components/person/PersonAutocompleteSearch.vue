@@ -4,12 +4,13 @@
             <v-autocomplete
                 v-model="selectedPerson"
                 :label="(label ? $t(label) : (multiple ? $t('personListLabel') : $t('personLabel'))) + (required ? '*' : '')"
-                :items="persons"
+                :items="readOnly ? [] : persons"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
                 :no-data-text="$t('noDataMessage')"
                 :multiple="multiple"
                 return-object
+                :readonly="readOnly"
                 @update:search="searchPersons($event)"
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
@@ -41,7 +42,7 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { removeTrailingPipeRegex } from '@/utils/StringUtil';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PersonSubmissionForm from './PersonSubmissionForm.vue';
 
@@ -87,6 +88,10 @@ export default defineComponent({
         onlyHarvestable: {
             type: Boolean,
             default: false
+        },
+        noOrcid: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -122,7 +127,8 @@ export default defineComponent({
                 PersonService.searchResearchersFromInstitution(
                     params, false,
                     props.institutionId,
-                    props.onlyHarvestable
+                    props.onlyHarvestable,
+                    props.noOrcid
                 ).then((response) => {
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {

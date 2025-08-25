@@ -205,7 +205,18 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(patent?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <publication-unbind-button
+            v-if="canEdit && isResearcher"
+            :document-id="(patent?.id as number)"
+            @unbind="handleResearcherUnbind">
+        </publication-unbind-button>
+
+        <share-buttons
+            v-if="patent && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(patent.title) as string)"
+            :document-id="(patent.id as number)"
+            :document-type="PublicationType.PATENT"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -218,7 +229,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Patent } from '@/models/PublicationModel';
@@ -253,11 +264,14 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -317,6 +331,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 patent.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(patent.value.title) as string;
 
@@ -435,7 +451,8 @@ export default defineComponent({
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
-            createIndicator, fetchIndicators, fetchValidationStatus
+            createIndicator, fetchIndicators, fetchValidationStatus,
+            PublicationType
         };
 }})
 

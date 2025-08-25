@@ -3,7 +3,7 @@
         v-if="isAdmin"
         class="d-flex flex-row justify-center"
     >
-        <v-col cols="8">
+        <v-col v-if="!showAll" cols="8">
             <organisation-unit-autocomplete-search
                 v-model:model-value="selectedOrganisationUnit"
                 required
@@ -12,8 +12,15 @@
                 :label="$t('institutionLabel')"
             ></organisation-unit-autocomplete-search>
         </v-col>
+        <v-col cols="1">
+            <v-btn
+                class="mt-3"
+                @click="showAll = !showAll">
+                {{ showAll ? $t("showForInstitutionLabel") : $t("showAllLabel") }}
+            </v-btn>
+        </v-col>
     </v-row>
-    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && selectedOrganisationUnit.value > 0)">
+    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && (selectedOrganisationUnit.value > 0 || showAll))">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
@@ -149,7 +156,7 @@
 
         <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
-    <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0">
+    <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0 && !showAll">
         <h1 class="d-flex flex-row justify-center">
             {{ $t("selectInstitutionMessage") }}
         </h1>
@@ -163,7 +170,7 @@
 
 <script lang="ts">
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
-import { localiseDate } from "@/i18n/dateLocalisation";
+import { localiseDate } from "@/utils/DateUtil";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import ImportService from "@/services/importer/ImportService";
 import { ref, watch } from "vue";
@@ -185,6 +192,7 @@ import LoadingConfigurationService from "@/services/importer/LoadingConfiguratio
 import LanguageService from "@/services/LanguageService";
 import { type LanguageTagResponse } from "@/models/Common";
 import AuthorshipSelectionModal from "@/components/import/AuthorshipSelectionModal.vue";
+import { getErrorMessageForErrorKey } from "@/i18n";
 
 
 export default defineComponent({
@@ -193,6 +201,8 @@ export default defineComponent({
     setup() {
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const { isAdmin, isResearcher } = useUserRole();
+
+        const showAll = ref(false);
 
         const importAuthorsRef = ref<any[]>([]);
         const journalImportRef = ref<typeof ImportJournal>();
@@ -249,25 +259,35 @@ export default defineComponent({
             });
         });
 
-        const startLoadingProcess = () => {
-            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0) {
+        const startLoadingProcess = async () => {
+            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0 && !showAll.value) {
                 return;
             }
 
-            LoadingConfigurationService.fetchLoadingConfiguration(
-                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
-            )
-            .then(response => {
+            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0 && showAll.value) {
+                unmanagedImport.value = true;
+            } else {
+                const loadingConfiguration = await LoadingConfigurationService.fetchLoadingConfiguration(
+                    selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+                );
+
                 if (isResearcher.value) {
-                    smartLoading.value = response.data.smartLoadingByDefault;
+                    smartLoading.value = loadingConfiguration.data.smartLoadingByDefault;
                 }
 
-                unmanagedImport.value = response.data.loadedEntitiesAreUnmanaged;
-                fetchNextRecordForLoading();
-            });
+                unmanagedImport.value = loadingConfiguration.data.loadedEntitiesAreUnmanaged;
+            }
+
+            fetchNextRecordForLoading();
         };
 
-        watch(selectedOrganisationUnit, () => {
+        watch(showAll, () => {
+            if (showAll.value) {
+                selectedOrganisationUnit.value = {title: "", value: -1};
+            }
+        });
+
+        watch([selectedOrganisationUnit], () => {
             smartLoading.value = false;
             currentSmartSkipRunId.value = crypto.randomUUID();
             noRecordsRemaining.value = false;
@@ -580,8 +600,8 @@ export default defineComponent({
                 DocumentPublicationService.createJournalPublication(
                     newJournalPublication,
                     self.crypto.randomUUID()
-                ).then(() => {
-                    fetchNextAfterLoading();
+                ).then((response) => {
+                    fetchNextAfterLoading(response.data.id as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -589,6 +609,10 @@ export default defineComponent({
                         authorshipSelectionRef.value!.show();
                     } else if (error.response.data.message === "unauthorizedPublicationEditAttemptByEmployeeMessage") {
                         errorMessage.value = i18n.t("allAuthorsUnmanagedMessage");
+                        snackbar.value = true;
+                        loading.value = false;
+                    } else {
+                        errorMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                         snackbar.value = true;
                         loading.value = false;
                     }
@@ -619,8 +643,8 @@ export default defineComponent({
 
                 DocumentPublicationService.createProceedingsPublication(
                     newProceedingsPublication, self.crypto.randomUUID()
-                ).then(() => {
-                    fetchNextAfterLoading();
+                ).then((response) => {
+                    fetchNextAfterLoading(response.data.id as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -630,13 +654,17 @@ export default defineComponent({
                         errorMessage.value = i18n.t("allAuthorsUnmanagedMessage");
                         snackbar.value = true;
                         loading.value = false;
+                    } else {
+                        errorMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                        snackbar.value = true;
+                        loading.value = false;
                     }
                 });
             }
         };
 
-        const fetchNextAfterLoading = () => {
-            markAsLoadedAndFetchNext(documentIdToDelete.value, documentIdToDelete.value !== null);
+        const fetchNextAfterLoading = (newDocumentId: number) => {
+            markAsLoadedAndFetchNext(newDocumentId, documentIdToDelete.value, documentIdToDelete.value !== null);
             loading.value = false;
             documentIdToDelete.value = null;
         };
@@ -651,17 +679,18 @@ export default defineComponent({
                     finishLoad();
                 });
             } else {
-                markAsLoadedAndFetchNext(oldDocumentId, deleteOldDocument);
+                markAsLoadedAndFetchNext(null, oldDocumentId, deleteOldDocument);
             }
         };
 
-        const markAsLoadedAndFetchNext = (oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
+        const markAsLoadedAndFetchNext = (newDocumentId: number | null = null, oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
             ImportService.markCurrentAsLoaded(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
                 oldDocumentId,
-                deleteOldDocument
+                deleteOldDocument,
+                newDocumentId
             ).then(() => {
                 stepperValue.value = smartLoading.value ? 0 : 1;
                 fetchNextRecordForLoading();
@@ -690,7 +719,7 @@ export default defineComponent({
         return {
             isFormValid, snackbar, isAdmin,
             errorMessage, currentLoadRecord,
-            returnCurrentLocaleContent,
+            returnCurrentLocaleContent, showAll,
             localiseDate, stepperValue, steps,
             nextStep, previousStep, canAdvance,
             skipDocument, importAuthorsRef, smartSkip,
@@ -730,6 +759,10 @@ export default defineComponent({
 .metadata-import {
     max-width: 1200px;
     margin: auto;
+}
+
+:deep(.v-btn__content) {
+    white-space: pre-wrap;
 }
 
 </style>

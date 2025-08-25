@@ -105,6 +105,7 @@ import EmailUpdateConfirmationView from "@/views/EmailUpdateConfirmationView.vue
 import FeedbackForm from "@/components/core/FeedbackForm.vue";
 import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDissertationsView.vue";
 import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
+import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
 
 
 const roles = {
@@ -183,6 +184,16 @@ const router = createRouter({
                     path: "login",
                     name: "login",
                     component: LoginView,
+                    meta: {
+                        authenticated: false,
+                        authorities: [],
+                    },
+                    props: true,
+                },
+                {
+                    path: "oauth2",
+                    name: "oauth2",
+                    component: OAuth2Redirector,
                     meta: {
                         authenticated: false,
                         authorities: [],

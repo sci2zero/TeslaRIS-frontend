@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedBookSeries"
                 :label="$t('bookSeriesLabel') + (required ? '*' : '')"
-                :items="bookSeries"
+                :items="readonly ? [] : bookSeries"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
                 :no-data-text="$t('noDataMessage')"
@@ -66,6 +66,10 @@ export default defineComponent({
         externalValidation: {
             type: Object as PropType<{ passed: boolean, message: string } | undefined>,
             default: () => ({ passed: true, message: "" })
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],

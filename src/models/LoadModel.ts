@@ -1,7 +1,7 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentContributionType, JournalPublicationType, ProceedingsPublicationType } from "./PublicationModel";
 
-interface DocumentLoadDTO {
+interface DocumentLoad {
     title: MultilingualContent[];
     subTitle: MultilingualContent[];
     description: MultilingualContent[];
@@ -14,9 +14,10 @@ interface DocumentLoadDTO {
     openAlexId: string;
     webOfScienceId: string;
     eventId: number | null;
+    internalIdentifiers: string[];
 }
 
-export interface ProceedingsPublicationLoad extends DocumentLoadDTO {
+export interface ProceedingsPublicationLoad extends DocumentLoad {
     proceedingsPublicationType: ProceedingsPublicationType;
     startPage: string;
     endPage: string;
@@ -32,7 +33,7 @@ export interface ProceedingsPublicationLoad extends DocumentLoadDTO {
     confId: string;
 }
 
-export interface JournalPublicationLoad extends DocumentLoadDTO {
+export interface JournalPublicationLoad extends DocumentLoad {
     journalPublicationType: JournalPublicationType;
     startPage: string;
     endPage: string;
