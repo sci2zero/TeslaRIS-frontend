@@ -385,7 +385,7 @@ import { computed, onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType, ThesisType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
@@ -507,10 +507,10 @@ export default defineComponent({
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
-
-                StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             }
 
+            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
+            
             fetchOU(true);
             fetchIndicators();
             fetchRelations();
@@ -690,6 +690,7 @@ export default defineComponent({
             organisationUnit.value!.openAlexId = basicInfo.openAlexId;
             organisationUnit.value!.ror = basicInfo.ror;
             organisationUnit.value!.uris = basicInfo.uris;
+            organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
             performUpdate(false);
         };
 
@@ -733,7 +734,8 @@ export default defineComponent({
                 researchAreasId: researchAreaIds,
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
-                uris: organisationUnit.value?.uris as string[]
+                uris: organisationUnit.value?.uris as string[],
+                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[]
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -755,7 +757,8 @@ export default defineComponent({
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
                 scopusAfid: organisationUnit.value?.scopusAfid,
-                uris: organisationUnit.value?.uris as string[]
+                uris: organisationUnit.value?.uris as string[],
+                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[]
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {

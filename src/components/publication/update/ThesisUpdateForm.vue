@@ -1,12 +1,24 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedThesisType"
+                    :label="$t('thesisTypeLabel') + '*'"
+                    :items="publicationTypes"
+                    :rules="requiredSelectionRules"
+                    return-object
+                ></v-select>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col v-if="!enterExternalOU" cols="11">
                 <organisation-unit-autocomplete-search
                     ref="ouAutocompleteRef"
                     v-model:model-value="selectedOrganisationUnit"
                     :readonly="isInstitutionalLibrarian"
                     required
+                    :allowed-thesis-type="selectedThesisType.value"
                 />
             </v-col>
             <v-col v-else>
@@ -37,17 +49,6 @@
                     :label="$t('subtitleLabel')"
                     :initial-value="toMultilingualTextInput(presetThesis?.subTitle, languageTags)">
                 </multilingual-text-input>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <v-select
-                    v-model="selectedThesisType"
-                    :label="$t('thesisTypeLabel') + '*'"
-                    :items="publicationTypes"
-                    :rules="requiredSelectionRules"
-                    return-object
-                ></v-select>
             </v-col>
         </v-row>
         <v-row>

@@ -1023,5 +1023,6 @@ export default {
     showBySpecifiedAffiliationLabel: "Prikaži sa ručno uvezanim afilijacijama",
     showByPublicationYearEmploymentsLabel: "Prikaži od zaposlenih u godini izdanja rada",
     showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
-    creatingExportLabel: "Izvoz podataka u toku..."
+    creatingExportLabel: "Izvoz podataka u toku...",
+    thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju."
 }

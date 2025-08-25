@@ -50,6 +50,18 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col>
+                            <v-select
+                                v-model="selectedThesisType"
+                                :label="$t('thesisTypeLabel') + '*'"
+                                :items="thesisTypes"
+                                :rules="requiredSelectionRules"
+                                multiple
+                                return-object
+                            ></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="12">
                             <open-layers-map ref="mapRef" :read-only="false"></open-layers-map>
                         </v-col>
@@ -85,6 +97,8 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import type { MultilingualContent } from '@/models/Common';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
+import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { ThesisType } from '@/models/PublicationModel';
 
 
 export default defineComponent({
@@ -125,6 +139,9 @@ export default defineComponent({
         const keywords = ref([]);
         const uris = ref<string[]>([]);
 
+        const thesisTypes = getThesisTypesForGivenLocale();
+        const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>([{ title: "", value: null }]);
+
         const { languageTags } = useLanguageTags();
         const { loggedInUser } = useUserRole();
         watch(() => languageTags.value, () => {
@@ -149,7 +166,8 @@ export default defineComponent({
         const {
             requiredFieldRules, scopusAfidValidationRules,
             nonMandatoryEmailFieldRules, rorValidationRules,
-            institutionOpenAlexIdValidationRules
+            institutionOpenAlexIdValidationRules,
+            requiredSelectionRules
         } = useValidationUtils();
 
         const submit = (stayOnPage: boolean) => {
@@ -163,7 +181,8 @@ export default defineComponent({
                 scopusAfid: scopusAfid.value,
                 openAlexId: openAlexId.value,
                 ror: ror.value,
-                uris: uris.value
+                uris: uris.value,
+                allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[]
             };
 
             OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
@@ -181,6 +200,7 @@ export default defineComponent({
                     scopusAfid.value = "";
                     openAlexId.value = "";
                     ror.value = "";
+                    selectedThesisType.value = [];
                     mapRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage");
@@ -208,7 +228,9 @@ export default defineComponent({
             scopusAfidValidationRules,
             nonMandatoryEmailFieldRules,
             openAlexId, rorValidationRules, ror,
-            institutionOpenAlexIdValidationRules
+            institutionOpenAlexIdValidationRules,
+            thesisTypes, selectedThesisType,
+            requiredSelectionRules
         };
     }
 });

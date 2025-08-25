@@ -203,6 +203,8 @@ export default defineComponent({
             organisationUnit2.openAlexId = "";
             organisationUnit1.ror = organisationUnit2.ror;
             organisationUnit2.ror = "";
+            organisationUnit1.allowedThesisTypes = organisationUnit2.allowedThesisTypes;
+            organisationUnit2.allowedThesisTypes = [];
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
             organisationUnit1.contact!.phoneNumber = organisationUnit2.contact?.phoneNumber as string;
@@ -261,6 +263,7 @@ export default defineComponent({
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
             leftOrganisationUnit.value!.uris = updatedData.uris;
+            leftOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
 
             leftUpdateRequest.value = updatedData;
             
@@ -280,6 +283,7 @@ export default defineComponent({
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
             rightOrganisationUnit.value!.uris = updatedData.uris;
+            rightOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
 
             rightUpdateRequest.value = updatedData;
             
