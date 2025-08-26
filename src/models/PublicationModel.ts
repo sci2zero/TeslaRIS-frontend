@@ -177,6 +177,7 @@ export interface Monograph extends Document {
     publicationSeriesId?: number;
     languageTagIds?: number[];
     researchAreaId?: number;
+    publisherId?: number;
 }
 
 export enum MonographPublicationType {

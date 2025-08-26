@@ -4,7 +4,7 @@
             <v-autocomplete
                 v-model="selectedOrganisationUnit"
                 :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
-                :items="organisationUnits"
+                :items="readonly ? [] : organisationUnits"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
                 :no-data-text="$t('noDataMessage')"
@@ -32,6 +32,9 @@
             </v-btn>
         </v-col>
     </v-row>
+    <p v-if="showThesisTypeError" class="text-red">
+        {{ $t("thesisTypeNotAllowedMessage") }}
+    </p>
 </template>
 
 <script lang="ts">
@@ -45,6 +48,7 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import OrganisationUnitSubmissionForm from './OrganisationUnitSubmissionForm.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { ThesisType } from '@/models/PublicationModel';
 
 
 export default defineComponent({
@@ -100,12 +104,19 @@ export default defineComponent({
         onlyIndependentInstitutions: {
             type: Boolean,
             default: false
+        },
+        allowedThesisType: {
+            type: Object as PropType<ThesisType | null>,
+            default: null
         }
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
         const i18n = useI18n();
         const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
+
+        const showThesisTypeError = ref(false);
+        const recentlySearched = ref(new Map<number, ThesisType[]>());
         
         const organisationUnits = ref<{ title: string, value: number }[]>([]);
         const searchPlaceholder = props.multiple ? [] : { title: '', value: -1 };
@@ -127,6 +138,8 @@ export default defineComponent({
                 selectedOrganisationUnit.value = props.modelValue;
             }
             sendContentToParent();
+
+            checkCompatibility();
         });
 
         watch(() => props.modelValue, () => {
@@ -134,6 +147,29 @@ export default defineComponent({
                 selectedOrganisationUnit.value = props.modelValue;
             }
         });
+
+        watch([selectedOrganisationUnit, () => props.allowedThesisType], () => {
+            checkCompatibility();
+        });
+
+        const checkCompatibility = () => {
+            if (!props.allowedThesisType ||
+                !selectedOrganisationUnit.value ||
+                (selectedOrganisationUnit.value as {title: string, value: number}).value < 0
+            ) {
+                return;
+            }
+
+            const response = recentlySearched.value.get(
+                (selectedOrganisationUnit.value as {title: string, value: number}).value
+            );
+            
+            if (!response || !response.includes(props.allowedThesisType as ThesisType)) {
+                showThesisTypeError.value = true;
+            } else {
+                showThesisTypeError.value = false;
+            }
+        };
 
         const searchOUs = lodash.debounce((input: string) => {
             if (!input || input.includes("|")) {
@@ -152,12 +188,17 @@ export default defineComponent({
                         props.forPersonId,
                         props.topLevelInstitutionId,
                         props.onlyHarvestableInstitutions,
-                        props.onlyIndependentInstitutions
+                        props.onlyIndependentInstitutions,
+                        props.allowedThesisType
                     ).then((response) => {
+                        recentlySearched.value.clear();
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
                             title: i18n.locale.value.startsWith("sr") ? organisationUnit.nameSr : organisationUnit.nameOther,
                             value: organisationUnit.databaseId,
                         }));
+                        response.data.content.forEach(index => {
+                            recentlySearched.value.set(index.databaseId, index.allowedThesisTypes);
+                        });
                     }
                 );
             }
@@ -194,13 +235,17 @@ export default defineComponent({
                 selectedOrganisationUnit.value = toSelect;
             }
             sendContentToParent();
+
+            recentlySearched.value.set(organisationUnit.id, organisationUnit.allowedThesisTypes);
+            checkCompatibility();
         };
 
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs,
             requiredSelectionRules, calculateAutocompleteWidth, lastSearchInput,
             sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
-            selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules
+            selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules,
+            showThesisTypeError
         };
     }
 });

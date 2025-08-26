@@ -119,7 +119,7 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { AssessmentMeasure, AssessmentRulebook, AssessmentRulebookResponse } from '@/models/AssessmentModel';
 import AssessmentRulebookService from '@/services/assessment/AssessmentRulebookService';
 import type { DocumentFile } from '@/models/DocumentFileModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import DocumentFileService from '@/services/DocumentFileService';
 import AssessmentRulebookForm from '@/components/assessment/assessmentRulebook/AssessmentRulebookForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';

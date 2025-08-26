@@ -92,7 +92,10 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                            <publisher-autocomplete-search
+                                ref="publisherAutocompleteRef"
+                                v-model="selectedPublisher">
+                            </publisher-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>

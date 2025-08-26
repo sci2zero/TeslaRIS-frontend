@@ -17,6 +17,8 @@
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
+                        {{ returnCurrentLocaleContent(bookSeries?.subtitle) }}
+                        <br v-if="bookSeries?.subtitle && bookSeries.subtitle.length > 0" />
                         {{ $t("bookSeriesLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -279,6 +281,7 @@ export default defineComponent({
             bookSeries.value!.openAlexId = updatedBookSeries.openAlexId;
             bookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
             bookSeries.value!.uris = updatedBookSeries.uris;
+            bookSeries.value!.subtitle = updatedBookSeries.subtitle;
 
             performUpdate(false);
         };

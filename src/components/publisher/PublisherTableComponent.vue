@@ -197,7 +197,8 @@ export default defineComponent({
                 ) &&
                 page == tableOptions.value.page
             ) {
-                return
+                tableOptions.value.sortBy.splice(0);
+                return;
             }
 
             tableOptions.value.initialCustomConfiguration = true;

@@ -121,8 +121,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}?${pageable}`);
   }
 
-  async findResearcherPublications(researcherId: number, tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `document/for-researcher/${researcherId}?${tokens}`);
+  async findResearcherPublications(researcherId: number, allowedTypes: PublicationType[], tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    let allowedTypesParam= "";
+    allowedTypes.forEach(allowedType => {
+      allowedTypesParam += `&allowedTypes=${allowedType}`;
+    });
+
+    return super.sendRequest(axios.get, `document/for-researcher/${researcherId}?${tokens}${allowedTypesParam}`);
   }
 
   async findResearchOutputIds(documentId: number): Promise<AxiosResponse<number[]>> {
@@ -278,7 +283,7 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async getWordcloudForSingleDocument(documentId: number): Promise<AxiosResponse<TermFrequency[]>> {
-    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?foreignLanguage=${!i18n.vueI18n.global.locale.toString().startsWith('sr')}`);
+    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?language=${i18n.vueI18n.global.locale.toString()}`);
   }
 }
 

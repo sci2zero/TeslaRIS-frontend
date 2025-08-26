@@ -67,7 +67,7 @@ export default defineComponent({
         });
 
         const drawMap = (position: number[]) => {
-            if(position[0] === null || position[1] === null) {
+            if(!position || position[0] === null || position[1] === null) {
                 return;
             }
 

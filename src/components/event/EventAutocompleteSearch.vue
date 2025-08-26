@@ -5,7 +5,7 @@
                 v-model="selectedEvent"
                 :readonly="readOnly"
                 :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
-                :items="events"
+                :items="readOnly ? [] : events"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
@@ -42,7 +42,7 @@ import { useI18n } from 'vue-i18n';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ConferenceSubmissionForm from './ConferenceSubmissionForm.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({

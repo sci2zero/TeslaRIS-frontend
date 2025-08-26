@@ -19,6 +19,10 @@ class AuthenticationService extends BaseService {
     return super.sendRequest(axios.post, "user/register-researcher", registrationRequest, AuthenticationService.idempotencyKey);
   }
 
+  async registerResearcherOAuth(registrationRequest: ResearcherRegistrationRequest, provider: string, identifier: string): Promise<AxiosResponse<UserResponse>> {
+    return super.sendRequest(axios.post, `user/register-researcher-oauth?provider=${provider.toUpperCase()}&identifier=${identifier}`, registrationRequest, AuthenticationService.idempotencyKey);
+  }
+
   async registerEmployee(registrationRequest: EmployeeRegistrationRequest, employmentPosition: string): Promise<AxiosResponse<UserResponse>> {
     return super.sendRequest(axios.post, `user/register-employee/${employmentPosition}`, registrationRequest, AuthenticationService.idempotencyKey);
   }
@@ -33,6 +37,10 @@ class AuthenticationService extends BaseService {
 
   async resetPassword(body: ResetPasswordRequest): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, "user/reset-password", body, AuthenticationService.idempotencyKey);
+  }
+
+  async finishOAuth2Workflow(code: string, identifier: string): Promise<AxiosResponse<AuthenticationResponse>> {
+    return super.sendRequest(axios.get, `oauth2/finish-workflow?code=${code}&identifier=${identifier}`);
   }
 
   userLoggedIn() {

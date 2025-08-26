@@ -11,12 +11,24 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="11">
+                        <v-select
+                            v-model="selectedThesisType"
+                            :label="$t('thesisTypeLabel') + '*'"
+                            :items="thesisTypes"
+                            :rules="requiredSelectionRules"
+                            return-object
+                        ></v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col v-if="!enterExternalOU" cols="12">
                         <organisation-unit-autocomplete-search
                             ref="ouAutocompleteRef"
                             v-model:model-value="selectedOrganisationUnit"
                             :readonly="isInstitutionalLibrarian"
-                            required>
+                            required
+                            :allowed-thesis-type="selectedThesisType.value">
                         </organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
@@ -42,17 +54,6 @@
                             ref="titleRef" v-model="title"
                             :rules="requiredFieldRules" :label="$t('titleLabel') + '*'">
                         </multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-select
-                            v-model="selectedThesisType"
-                            :label="$t('thesisTypeLabel') + '*'"
-                            :items="thesisTypes"
-                            :rules="requiredSelectionRules"
-                            return-object
-                        ></v-select>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -312,7 +313,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { type PersonDocumentContribution, PublicationType, type Thesis, type ThesisType } from "@/models/PublicationModel";
+import { type PersonDocumentContribution, PublicationType, type Thesis, ThesisType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -321,7 +322,7 @@ import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import OrganisationUnitAutocompleteSearch from '../organisationUnit/OrganisationUnitAutocompleteSearch.vue';
-import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
@@ -453,7 +454,9 @@ export default defineComponent({
         const typeOfTitle = ref<any[]>([]);
 
         const thesisTypes = getThesisTypesForGivenLocale();
-        const selectedThesisType = ref<{title: string, value: ThesisType | null}>({ title: "", value: null });
+        const selectedThesisType = ref<{title: string, value: ThesisType | null}>(
+            { title: getThesisTitleFromValueAutoLocale(ThesisType.PHD) as string, value: ThesisType.PHD }
+        );
 
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});

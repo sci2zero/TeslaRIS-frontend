@@ -86,7 +86,7 @@ import { watch } from 'vue';
 import { getDocumentLandingPageBasePath } from '@/utils/PathResolutionUtil';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import type { ThesisPublicReviewResponse } from '@/models/ThesisLibraryModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import PublicationFileDownloadModal from '../publication/PublicationFileDownloadModal.vue';
 
 

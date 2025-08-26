@@ -1,6 +1,9 @@
 <template>
     <div justify="start">
-        <v-dialog v-model="dialog" persistent max-width="850px">
+        <v-dialog
+            v-model="dialog"
+            :persistent="!readOnly"
+            max-width="850px">
             <template #activator="scope">
                 <v-btn
                     color="primary" dark
@@ -160,9 +163,11 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return { dialog, isFormValid, requiredFieldRules,
-                addOtherName, otherNames, removeOtherName,
-                update, selectOtherName, primaryName };
+        return { 
+            dialog, isFormValid, requiredFieldRules,
+            addOtherName, otherNames, removeOtherName,
+            update, selectOtherName, primaryName
+        };
     }
 });
 </script>

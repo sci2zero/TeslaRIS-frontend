@@ -98,6 +98,10 @@ export class UserService extends BaseService {
   async migrateUserData(newUserId: number, oldUserId: number): Promise<AxiosResponse> {
     return super.sendRequest(axios.delete, `user/migrate/${oldUserId}/${newUserId}`);
   }
+
+  async isRegisterResearcherCreationAllowed(): Promise<AxiosResponse> {
+    return super.sendRequest(axios.get, "user/register-researcher-creation-allowed");
+  }
 }
 
 export default new UserService();

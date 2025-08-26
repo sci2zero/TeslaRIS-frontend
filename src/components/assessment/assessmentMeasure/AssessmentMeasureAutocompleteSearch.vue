@@ -5,7 +5,7 @@
                 v-model="selectedAssessmentMeasure"
                 :readonly="readOnly"
                 :label="$t('assessmentMeasureLabel') + (required ? '*' : '')"
-                :items="assessmentMeasures"
+                :items="readOnly ? [] : assessmentMeasures"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :auto-select-first="true"

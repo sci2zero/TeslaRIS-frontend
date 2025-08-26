@@ -199,6 +199,7 @@ export default defineComponent({
             monograph1.eventId = monograph2.eventId;
             monograph1.publicationSeriesId = monograph2.publicationSeriesId;
             monograph1.researchAreaId = monograph2.researchAreaId;
+            monograph1.publisherId = monograph2.publisherId;
 
             monograph2.languageTagIds!.forEach(languageTagId => {
                 if (!monograph1.languageTagIds!.includes(languageTagId)) {
@@ -266,6 +267,7 @@ export default defineComponent({
             leftMonograph.value!.scopusId = updatedInfo.scopusId;
             leftMonograph.value!.openAlexId = updatedInfo.openAlexId;
             leftMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            leftMonograph.value!.publisherId = updatedInfo.publisherId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -293,6 +295,7 @@ export default defineComponent({
             rightMonograph.value!.scopusId = updatedInfo.scopusId;
             rightMonograph.value!.openAlexId = updatedInfo.openAlexId;
             rightMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            rightMonograph.value!.publisherId = updatedInfo.publisherId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

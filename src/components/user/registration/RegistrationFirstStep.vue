@@ -3,21 +3,21 @@
         <div>
             <v-text-field
                 v-model="firstName"
-                label="Ime"
-                :rules="firstNameRules"
+                :label="$t('firstNameLabel')"
+                :rules="requiredFieldRules"
                 @input="updatedFirstName"
             ></v-text-field>
             <v-text-field
                 v-model="lastName"
-                label="Prezime"
-                :rules="lastNameRules"
+                :label="$t('surnameLabel')"
+                :rules="requiredFieldRules"
                 @input="updatedLastName"
             ></v-text-field>
         </div>
 
 
         <template v-if="isEmptyData">
-            <h2>Unesite vaše ime</h2>
+            <h2>{{ $t("enterYourNameLabel") }}</h2>
         </template>
         <template v-else>
             <div class="select-user my-2">
@@ -34,61 +34,69 @@
                 </div>
 
                 <v-card
+                    v-if="newResearcherCreationAllowed"
                     class="mx-auto"
-                    title="Nijedan od ponuđenih"
+                    :title="$t('noneOfTheOfferedLabel')"
                     :subtitle="newFirstNameTitle"
                     link
                     @click="registrationNextStep"
                 ></v-card>
             </div>
         </template>
+
+        <toast v-model="snackbar" :message="message" />
     </div>
 </template>
 
 <script lang="ts">
 import { useI18n } from "vue-i18n";
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import lodash from "lodash";
 import PersonService from "@/services/PersonService";
 import { useRouter } from "vue-router";
 import { useRegisterStore } from '@/stores/registerStore';
 import { watch } from "vue";
 import { type PersonIndex } from "@/models/PersonModel";
+import { useValidationUtils } from "@/utils/ValidationUtils";
+import UserService from "@/services/UserService";
 
 
 export default defineComponent({
     name: "RegistrationFirstStep",
     emits: ["registration-next-step", "field-update"],
     setup(_, { emit }) {
+        const message = ref("");
+        const snackbar = ref(false);
+        
         const i18n = useI18n();
         const router = useRouter();
-        const firstName = ref("")
-        const lastName = ref("")
+        
+        const firstName = ref("");
+        const lastName = ref("");
+
+        const newResearcherCreationAllowed = ref(false);
 
         const registerStore = useRegisterStore();
         const suggestions = ref<PersonIndex[]>([]);
 
-        const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
-        const firstNameRules = [
-            (value: string) => {
-                if (!value) return requiredFieldMessage.value;
-                return true;
-            }
-        ];
-        const lastNameRules = firstNameRules
+        const { requiredFieldRules } = useValidationUtils();
         
         const isEmptyData = computed(() => firstName.value == "" && lastName.value == "");
         const newFirstNameTitle = computed(() => i18n.t("createNewAccount") + " " + firstName.value + " " + lastName.value);
 
-        // METHODS 
+        onMounted(() => {
+            UserService.isRegisterResearcherCreationAllowed().then(response => {
+                newResearcherCreationAllowed.value = response.data;
+            });
+        });
 
         const updatedFirstName = () => {
             updatedData();
-        }
+        };
 
         const updatedLastName = () => {
             updatedData();
-        }
+        };
 
         watch([firstName, lastName], () => {
             emit("field-update", firstName.value, lastName.value)
@@ -119,16 +127,27 @@ export default defineComponent({
                     router.push({name:"login", path:'/login/', query: { "email": email }})
                 } else {
                     registerStore.setRegisterPersonData(response.data);
-                    emit("registration-next-step", {});
+                    emit("registration-next-step", 
+                        {
+                            firstName: response.data.personName.firstname,
+                            lastName: response.data.personName.lastname
+                        }
+                    );
                 }
             }).catch(() => {
-                // TODO: Improve this      
-            })
+                message.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;  
+            });
         };
 
-        return {firstNameRules, lastNameRules, firstName, lastName,
-            updatedFirstName, updatedLastName, suggestions, isEmptyData,
-            newFirstNameTitle, registrationNextStep, personClick}
+        return {
+            requiredFieldRules, firstName, lastName,
+            updatedFirstName, updatedLastName,
+            suggestions, isEmptyData, message,
+            newFirstNameTitle, registrationNextStep,
+            personClick, newResearcherCreationAllowed,
+            snackbar
+        }
     }
 })
 </script>

@@ -107,6 +107,14 @@
                 <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <publisher-autocomplete-search
+                    ref="publisherAutocompleteRef"
+                    v-model="selectedPublisher">
+                </publisher-autocomplete-search>
+            </v-col>
+        </v-row>
         <!-- <v-row>
             <v-col cols="12">
                 <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
@@ -149,11 +157,13 @@ import BookSeriesService from '@/services/BookSeriesService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import PublisherService from '@/services/PublisherService';
+import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "MonographUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, PublisherAutocompleteSearch},
     props: {
         presetMonograph: {
             type: Object as PropType<Monograph | undefined>,
@@ -222,7 +232,16 @@ export default defineComponent({
                             selectedBookSeries.value = {title: returnCurrentLocaleContent(bookSeriesResponse.data.title) as string, value: bookSeriesResponse.data.id as number};
                         });
                     });
-                }              
+                }
+                
+                if(props.presetMonograph?.publisherId) {
+                    PublisherService.readPublisher(props.presetMonograph.publisherId).then((response) => {
+                        const publisher = response.data;
+                        selectedPublisher.value = {
+                            title: returnCurrentLocaleContent(publisher.name) as string, value: publisher.id as number
+                        };
+                    });
+                }
             }
         };
 
@@ -254,7 +273,8 @@ export default defineComponent({
         const allResearchAreas = ref<ResearchArea[]>([]);
         const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
-
+        const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
+        
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const contributions = ref([]);
@@ -337,6 +357,7 @@ export default defineComponent({
                 number: number.value,
                 volume: volume.value,
                 researchAreaId: selectedResearchArea.value?.value as number,
+                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -390,7 +411,8 @@ export default defineComponent({
             subtitleRef, refreshForm, urisRef,
             isbnValidationRules, snackbar, message,
             openAlexId, workOpenAlexIdValidationRules,
-            webOfScienceId, documentWebOfScienceIdValidationRules
+            webOfScienceId, documentWebOfScienceIdValidationRules,
+            selectedPublisher
         };
     }
 });

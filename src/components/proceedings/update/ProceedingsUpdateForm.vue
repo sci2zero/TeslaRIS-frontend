@@ -31,6 +31,11 @@
                 </v-row>
                 <v-row>
                     <v-col>
+                        <multilingual-text-input ref="acronymRef" v-model="acronym" :label="$t('nameAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetProceedings?.acronym, languageTags)"></multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
                         <uri-input ref="urisRef" v-model="uris"></uri-input>
                     </v-col>
                 </v-row>
@@ -222,9 +227,11 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const acronymRef = ref<typeof MultilingualTextInput>();
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
+        const acronym = ref<any>([]);
         const uris = ref(props.presetProceedings?.uris as string[]);
         const eIsbn = ref(props.presetProceedings?.eISBN);
         const printIsbn = ref(props.presetProceedings?.printISBN);
@@ -325,6 +332,9 @@ export default defineComponent({
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetProceedings?.subTitle as MultilingualContent[];
 
+            acronymRef.value?.clearInput();
+            acronym.value = props.presetProceedings?.acronym as MultilingualContent[];
+
             selectedLanguages.value = props.presetProceedings?.languageTagIds as number[];
             uris.value = props.presetProceedings?.uris as string[];
             eIsbn.value = props.presetProceedings?.eISBN;
@@ -348,9 +358,9 @@ export default defineComponent({
             isFormValid, isbnValidationRules, openAlexId,
             title, subtitle, selectedEvent, selectedJournal, uris,
             eIsbn, printIsbn, languageList, selectedLanguages,
-            languageTags, publicationYear, doi, scopus, numberOfPages,
+            languageTags, publicationYear, doi, scopus, numberOfPages, acronymRef,
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
-            selectedPublisher, selectedBookSeries, doiValidationRules,
+            selectedPublisher, selectedBookSeries, doiValidationRules, acronym,
             requiredFieldRules, validatePublicationSeriesSelection, webOfScienceId,
             publicationSeriesExternalValidation, submit, snackbar, message,
             scopusIdValidationRules, refreshForm, titleRef, subtitleRef,

@@ -66,7 +66,7 @@ import AttachmentList from '@/components/core/AttachmentList.vue';
 import PrizeModal from './PrizeModal.vue';
 import { ref } from 'vue';
 import PrizeService from '@/services/PrizeService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
 
 

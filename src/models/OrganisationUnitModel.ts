@@ -1,5 +1,6 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { ThesisType } from "./PublicationModel";
 
 export interface OrganisationUnitIndex {
     id: string;
@@ -19,6 +20,7 @@ export interface OrganisationUnitIndex {
     superOUNameSrSortable: string;
     superOUNameOther: string;
     superOUNameOtherSortable: string;
+    allowedThesisTypes: ThesisType[];
 }
 
 export interface OrganisationUnitRequest {
@@ -32,6 +34,7 @@ export interface OrganisationUnitRequest {
     openAlexId?: string;
     ror? : string;
     uris: string[];
+    allowedThesisTypes: ThesisType[];
 }
 
 export interface OrganisationUnitResponse {
@@ -48,6 +51,7 @@ export interface OrganisationUnitResponse {
     uris: string[];
     logoServerFilename?: string;
     logoBackgroundHex: string;
+    allowedThesisTypes: ThesisType[];
 }
 
 export enum OrganisationUnitsRelationType {
@@ -117,10 +121,19 @@ export interface OrganisationUnitTrustConfiguration {
     trustNewDocumentFiles: boolean;
 }
 
+export interface OrganisationUnitOutputConfiguration {
+    showOutputs: boolean;
+    showBySpecifiedAffiliation: boolean;
+    showByPublicationYearEmployments: boolean;
+    showByCurrentEmployments: boolean;
+}
+
 export interface OrganisationUnitImportSource {
     importScopus: boolean;
     importOpenAlex: boolean;
     importWebOfScience: boolean;
+    scopusConfigured?: boolean;
+    webOfScienceConfigured?: boolean;
 }
 
 export interface InstitutionDefaultSubmissionContent {

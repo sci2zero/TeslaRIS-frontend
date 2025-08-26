@@ -93,6 +93,14 @@
                                 <div v-if="monograph?.number" class="response">
                                     {{ monograph.number }}
                                 </div>
+                                <div v-if="monograph?.publisherId">
+                                    {{ $t("publisherLabel") }}:
+                                </div>
+                                <div v-if="monograph?.publisherId" class="response">
+                                    <localized-link :to="'publishers/' + monograph?.publisherId">
+                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
                                 <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
@@ -295,6 +303,13 @@
         </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <share-buttons
+            v-if="monograph && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(monograph.title) as string)"
+            :document-id="(monograph.id as number)"
+            :document-type="PublicationType.MONOGRAPH"
+        />
     </v-container>
 </template>
 
@@ -305,7 +320,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
@@ -349,11 +364,16 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import PublisherService from '@/services/PublisherService';
+import { type Publisher } from '@/models/PublisherModel';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -365,6 +385,7 @@ export default defineComponent({
 
         const monograph = ref<Monograph>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const publisher = ref<Publisher>();
 
         const { isResearcher } = useUserRole();
         const canEdit = ref(false);
@@ -431,6 +452,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 monograph.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(monograph.value.title) as string;
 
@@ -502,6 +525,12 @@ export default defineComponent({
                     });
                 });
             }
+
+            if(monograph.value?.publisherId) {
+                PublisherService.readPublisher(monograph.value.publisherId).then(response => {
+                    publisher.value = response.data;
+                });
+            }
         };
 
         const searchKeyword = (keyword: string) => {
@@ -550,6 +579,7 @@ export default defineComponent({
             monograph.value!.printISBN = basicInfo.printISBN;
             monograph.value!.openAlexId = basicInfo.openAlexId;
             monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
+            monograph.value!.publisherId = basicInfo.publisherId;
 
             performUpdate(true);
         };
@@ -608,7 +638,8 @@ export default defineComponent({
             createIndicator, fetchIndicators,
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
-            fetchValidationStatus
+            fetchValidationStatus, PublicationType,
+            publisher
         };
 }})
 

@@ -19,9 +19,11 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
+import lodash from "lodash";
+
 
 export default defineComponent(
     {
@@ -41,6 +43,12 @@ export default defineComponent(
                     onSearch();
                 }
             });
+
+            watch(searchInput, lodash.debounce(
+                () => {
+                    onSearch();
+                }, 300)
+            );
 
             const onSearch = () => {
                 if(searchInput.value === undefined) {

@@ -212,6 +212,7 @@
 
         <share-buttons
             v-if="software && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(software.title) as string)"
             :document-id="(software.id as number)"
             :document-type="PublicationType.SOFTWARE"
         />
@@ -261,6 +262,8 @@ import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmen
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
 
 
 export default defineComponent({
@@ -331,6 +334,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 software.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(software.value.title) as string;
 

@@ -45,6 +45,18 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col>
+                        <v-select
+                            v-model="selectedThesisType"
+                            :label="$t('thesisTypeLabel') + '*'"
+                            :items="thesisTypes"
+                            :rules="requiredSelectionRules"
+                            multiple
+                            return-object
+                        ></v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="12">
                         <open-layers-map ref="mapRef" :read-only="false" :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]"></open-layers-map>
                     </v-col>
@@ -76,6 +88,8 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import Toast from '@/components/core/Toast.vue';
 import { useI18n } from 'vue-i18n';
+import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { ThesisType } from '@/models/PublicationModel';
 
 
 export default defineComponent({
@@ -120,9 +134,18 @@ export default defineComponent({
         const ror = ref(props.presetOU?.ror);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
+        const thesisTypes = getThesisTypesForGivenLocale();
+        const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>(
+            props.presetOU ?props.presetOU?.allowedThesisTypes.map(type => {
+                return {title: getThesisTitleFromValueAutoLocale(type) as string, value: type};
+            })
+            : [{ title: "", value: null }]
+        );
+
         const {
             requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
-            nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules
+            nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
+            requiredSelectionRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -154,7 +177,8 @@ export default defineComponent({
                 scopusAfid: scopusAfid.value,
                 openAlexId: openAlexId.value,
                 ror: ror.value,
-                uris: uris.value
+                uris: uris.value,
+                allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[]
             };
 
             emit("update", updatedOU);
@@ -172,6 +196,11 @@ export default defineComponent({
             openAlexId.value = props.presetOU?.openAlexId;
             ror.value = props.presetOU?.ror;
             urisRef.value?.refreshModelValue(uris.value);
+            
+            selectedThesisType.value.splice(0);
+            props.presetOU?.allowedThesisTypes.forEach(type => {
+                selectedThesisType.value.push({title: getThesisTitleFromValueAutoLocale(type) as string, value: type});
+            });
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
         };
@@ -185,7 +214,8 @@ export default defineComponent({
             scopusAfidValidationRules, nameRef, uris,
             nonMandatoryEmailFieldRules, snackbar, ror,
             openAlexId, institutionOpenAlexIdValidationRules,
-            rorValidationRules
+            rorValidationRules, thesisTypes, selectedThesisType,
+            requiredSelectionRules
         };
     }
 });
