@@ -1024,5 +1024,6 @@ export default {
     showByPublicationYearEmploymentsLabel: "Prikaži od zaposlenih u godini izdanja rada",
     showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
     creatingExportLabel: "Izvoz podataka u toku...",
-    thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju."
+    thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju.",
+    visualizationsLabel: "Vizualizacije"
 }

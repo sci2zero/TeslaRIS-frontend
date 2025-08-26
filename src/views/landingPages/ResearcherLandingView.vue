@@ -241,6 +241,9 @@
             <v-tab v-if="personAssessments?.length > 0" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -379,6 +382,11 @@
                     @fetch="fetchAssessment">
                 </person-assessments-view>
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <person-visualizations
+                    :person-id="(person.id as number)"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <persistent-question-dialog
@@ -446,11 +454,12 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
+import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations },
     setup() {
         const currentTab = ref("additionalInfo");
 

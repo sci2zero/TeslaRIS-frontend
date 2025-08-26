@@ -994,5 +994,6 @@ export default {
     showForInstitutionLabel: "Show for institution",
     updateInstitutionDefaultSubmissionContentLabel: "Default submission content",
     creatingExportLabel: "Data export in progress...",
-    thesisTypeNotAllowedMessage: "This thesis type is not allowed for this institution."
+    thesisTypeNotAllowedMessage: "This thesis type is not allowed for this institution.",
+    visualizationsLabel: "Visualizations"
 }

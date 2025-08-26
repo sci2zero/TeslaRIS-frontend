@@ -259,3 +259,8 @@ export interface ContactFormData {
 export interface NotificationActionResult {
     value: string
 }
+
+export interface YearlyCounts {
+    year: number,
+    countsByCategory: Record<string, number>
+}
