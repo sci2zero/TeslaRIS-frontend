@@ -93,6 +93,14 @@
                                 <div v-if="monograph?.number" class="response">
                                     {{ monograph.number }}
                                 </div>
+                                <div v-if="monograph?.publisherId">
+                                    {{ $t("publisherLabel") }}:
+                                </div>
+                                <div v-if="monograph?.publisherId" class="response">
+                                    <localized-link :to="'publishers/' + monograph?.publisherId">
+                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
                                 <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
@@ -359,6 +367,8 @@ import { useTrustConfigurationActions } from '@/composables/useTrustConfiguratio
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import PublisherService from '@/services/PublisherService';
+import { type Publisher } from '@/models/PublisherModel';
 
 
 export default defineComponent({
@@ -375,6 +385,7 @@ export default defineComponent({
 
         const monograph = ref<Monograph>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const publisher = ref<Publisher>();
 
         const { isResearcher } = useUserRole();
         const canEdit = ref(false);
@@ -514,6 +525,12 @@ export default defineComponent({
                     });
                 });
             }
+
+            if(monograph.value?.publisherId) {
+                PublisherService.readPublisher(monograph.value.publisherId).then(response => {
+                    publisher.value = response.data;
+                });
+            }
         };
 
         const searchKeyword = (keyword: string) => {
@@ -562,6 +579,7 @@ export default defineComponent({
             monograph.value!.printISBN = basicInfo.printISBN;
             monograph.value!.openAlexId = basicInfo.openAlexId;
             monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
+            monograph.value!.publisherId = basicInfo.publisherId;
 
             performUpdate(true);
         };
@@ -620,7 +638,8 @@ export default defineComponent({
             createIndicator, fetchIndicators,
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
-            fetchValidationStatus, PublicationType
+            fetchValidationStatus, PublicationType,
+            publisher
         };
 }})
 

@@ -172,6 +172,9 @@ export default defineComponent({
             mergeMultilingualContentField(proceedings1.description, proceedings2.description);
             proceedings2.description = [];
 
+            mergeMultilingualContentField(proceedings1.acronym, proceedings2.acronym);
+            proceedings2.acronym = [];
+
             mergeDocumentAttachments(proceedings1, proceedings2);
 
             proceedings1.eISBN = proceedings2.eISBN;
@@ -264,6 +267,7 @@ export default defineComponent({
             leftProceedings.value!.scopusId = updatedInfo.scopusId;
             leftProceedings.value!.openAlexId = updatedInfo.openAlexId;
             leftProceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            leftProceedings.value!.acronym = updatedInfo.acronym;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -291,6 +295,7 @@ export default defineComponent({
             rightProceedings.value!.scopusId = updatedInfo.scopusId;
             rightProceedings.value!.openAlexId = updatedInfo.openAlexId;
             rightProceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            rightProceedings.value!.acronym = updatedInfo.acronym;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

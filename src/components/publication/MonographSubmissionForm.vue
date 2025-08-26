@@ -212,6 +212,14 @@
                             </event-autocomplete-search>
                         </v-col>
                     </v-row> -->
+                    <v-row>
+                        <v-col cols="10">
+                            <publisher-autocomplete-search
+                                ref="publisherAutocompleteRef"
+                                v-model="selectedPublisher">
+                            </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -254,11 +262,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
+import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator},
+    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch},
     props: {
         inModal: {
             type: Boolean,
@@ -321,6 +330,7 @@ export default defineComponent({
         const urisRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
 
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
         const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
@@ -337,6 +347,7 @@ export default defineComponent({
         const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
 
         const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
+        const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any[]>([]);
         const subtitle = ref([]);
@@ -417,6 +428,7 @@ export default defineComponent({
                 number: number.value,
                 volume: volume.value,
                 researchAreaId: selectedResearchArea.value?.value as number,
+                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
                 fileItems: [],
                 proofs: []
             };
@@ -444,6 +456,7 @@ export default defineComponent({
                     printIsbn.value = "";
                     publicationYear.value = "";
                     contributionsRef.value?.clearInput();
+                    publisherAutocompleteRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -499,7 +512,8 @@ export default defineComponent({
             languageTags, contributionsRef, contributions,
             isbnValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules, popuateMetadata,
-            documentWebOfScienceIdValidationRules, webOfScienceId
+            documentWebOfScienceIdValidationRules, webOfScienceId,
+            publisherAutocompleteRef, selectedPublisher
         };
     }
 });

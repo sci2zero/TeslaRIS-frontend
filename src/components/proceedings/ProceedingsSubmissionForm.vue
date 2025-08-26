@@ -50,6 +50,11 @@
                     </v-row>
                     <v-row>
                         <v-col>
+                            <multilingual-text-input ref="acronymRef" v-model="acronym" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
                             <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
                         </v-col>
                     </v-row>
@@ -213,6 +218,7 @@ export default defineComponent({
         const urisRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const acronymRef = ref<typeof MultilingualTextInput>();
 
         const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
@@ -227,6 +233,7 @@ export default defineComponent({
 
         const title = ref<any[]>([]);
         const subtitle = ref([]);
+        const acronym = ref([]);
         const uris = ref<string[]>([]);
         const keywords = ref([]);
         const description = ref([]);
@@ -299,6 +306,7 @@ export default defineComponent({
                 publicationSeriesVolume: publicationSeriesVolume.value,
                 publisherId: selectedPublisher.value?.value !== -1 ? selectedPublisher.value?.value : undefined,
                 scopusId: scopus.value,
+                acronym: acronym.value,
                 fileItems: [],
                 proofs: []
             };
@@ -324,6 +332,7 @@ export default defineComponent({
                     eIsbn.value = "";
                     printIsbn.value = "";
                     publicationYear.value = "";
+                    acronymRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage")
                     snackbar.value = true;
@@ -355,7 +364,7 @@ export default defineComponent({
 
         return {
             isFormValid, additionalFields, popuateMetadata,
-            snackbar, message, isbnValidationRules,
+            snackbar, message, isbnValidationRules, acronym,
             title, titleRef, subtitle, subtitleRef, PublicationType,
             eventAutocompleteRef, selectedEvent, openAlexId,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
@@ -367,7 +376,7 @@ export default defineComponent({
             publisherAutocompleteRef, selectedPublisher,
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, submit,
+            publicationSeriesExternalValidation, submit, acronymRef,
             scopusIdValidationRules, workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules, webOfScienceId
         };

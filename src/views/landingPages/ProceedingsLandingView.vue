@@ -17,6 +17,8 @@
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
+                        {{ returnCurrentLocaleContent(proceedings?.acronym) }}
+                        <br v-if="proceedings?.acronym && proceedings?.acronym.length > 0" />
                         {{ returnCurrentLocaleContent(proceedings?.subTitle) }}
                         <br />
                         {{ $t("proceedingsLabel") }}
@@ -493,6 +495,7 @@ export default defineComponent({
             proceedings.value!.scopusId = updatedInfo.scopusId;
             proceedings.value!.openAlexId = updatedInfo.openAlexId;
             proceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            proceedings.value!.acronym = updatedInfo.acronym;
             performUpdate(false);
         };
 

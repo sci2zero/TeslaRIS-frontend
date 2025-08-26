@@ -10,6 +10,7 @@ export interface Proceedings extends Document {
     publicationSeriesId?: number;
     publicationSeriesVolume?: string;
     publicationSeriesIssue?: string;
+    acronym?: MultilingualContent[];
 }
 
 export interface ProceedingsResponse extends Proceedings {
