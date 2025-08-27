@@ -1025,5 +1025,19 @@ export default {
     showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
     creatingExportLabel: "Izvoz podataka u toku...",
     thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju.",
-    visualizationsLabel: "Vizualizacije"
+    visualizationsLabel: "Vizuelizacije",
+    totalPublicationsLabel: "Ukupan broj publikacija",
+    numberOfPublicationsYearlyLabel: "Broj publikacija po godinama",
+    numberOfPublicationsByTypeAndYearLabel: "Broj publikacija po tipu, po godinama",
+    publicationTypesLabel: "Tipovi publikacija",
+    statisticsLabel: "Statistika",
+    viewsByCountryLabel: "Pregledi po zemljama",
+    globalTrafficOverviewLabel: "Globalni pregled",
+    highLabel: "Visok",
+    lowLabel: "Nizak",
+    viewsLabel: "Ukupan broj pregleda",
+    publicationTypeRatioLabel: "Odnos tipova publikacija",
+    countLabel: "Broj",
+    fromTotalLabel: "Od ukupno",
+    noCountryViews: "Pregledi za koje ne postoji informacija odakle su"
 }

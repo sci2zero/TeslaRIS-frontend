@@ -995,5 +995,15 @@ export default {
     updateInstitutionDefaultSubmissionContentLabel: "Default submission content",
     creatingExportLabel: "Data export in progress...",
     thesisTypeNotAllowedMessage: "This thesis type is not allowed for this institution.",
-    visualizationsLabel: "Visualizations"
+    visualizationsLabel: "Visualizations",
+    totalPublicationsLabel: "Total publication count",
+    numberOfPublicationsYearlyLabel: "Publication count by year",
+    numberOfPublicationsByTypeAndYearLabel: "Publication count by year and type",
+    publicationTypesLabel: "Publication types",
+    statisticsLabel: "Statistics",
+    viewsByCountryLabel: "Views by country",
+    globalTrafficOverviewLabel: "Global overview",
+    highLabel: "High",
+    lowLabel: "Low",
+    viewsLabel: "Total number of views"
 }

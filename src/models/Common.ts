@@ -249,18 +249,24 @@ export interface PrepopulatedMetadata {
 }
 
 export interface ContactFormData {
-    name: string,
-    senderEmail: string,
-    subject: string,
-    message: string,
-    captchaToken: string
+    name: string;
+    senderEmail: string;
+    subject: string;
+    message: string;
+    captchaToken: string;
 }
 
 export interface NotificationActionResult {
-    value: string
+    value: string;
 }
 
 export interface YearlyCounts {
-    year: number,
-    countsByCategory: Record<string, number>
+    year: number;
+    countsByCategory: Record<string, number>;
+}
+
+export interface StatisticsByCountry {
+    countryCode: string;
+    countryName: string;
+    value: number;
 }

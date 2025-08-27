@@ -45,7 +45,7 @@ const props = defineProps({
         type: Object as PropType<{
             categories: string[];
             series: StackedBarSeries[];
-        }>,
+        } | undefined>,
         required: true
     },
     title: {
@@ -106,14 +106,18 @@ const i18n = useI18n();
 const totalLabel = computed(() => i18n.t("totalLabel"));
 
 const categoryTotals = computed(() => {
-    return props.data.categories.map((_, index) => {
-        return props.data.series.reduce((sum, series) => sum + series.data[index], 0);
+    return props.data?.categories.map((_, index) => {
+        return props.data?.series.reduce((sum, series) => sum + series.data[index], 0);
     });
 });
 
 const options = computed(() => {
+    if (!props.data) {
+        return {};
+    }
+
     const isHorizontal = props.horizontal;
-    const showTrendLine = props.trendLine.show !== false && categoryTotals.value.length > 0;
+    const showTrendLine = props.trendLine.show !== false && categoryTotals.value && categoryTotals.value.length > 0;
   
     const series: any[] = [
         ...props.data.series.map((series, index) => ({
@@ -122,7 +126,7 @@ const options = computed(() => {
             stack: props.stackName,
             data: series.data.map((value, i) => ({
                 value,
-                total: categoryTotals.value[i]
+                total: categoryTotals.value![i]
             })),
             itemStyle: {
                 color: series.color

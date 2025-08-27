@@ -1,5 +1,12 @@
 <template>
-    <div ref="chartRef" :style="{ width: width, height: height }"></div>
+    <div v-if="!loading" ref="chartRef" :style="{ width: width, height: height }"></div>
+    <div v-else class="d-flex flex-row justify-center mt-10">
+        <v-progress-circular
+            color="primary"
+            indeterminate
+            size="128" 
+        />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -28,6 +35,10 @@ const props = defineProps({
     initOptions: {
         type: Object,
         default: () => ({})
+    },
+    loading: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -35,6 +46,10 @@ const chartRef = ref<HTMLElement>();
 let chart: echarts.ECharts | null = null;
 
 onMounted(async () => {
+    initialise();
+});
+
+const initialise = async () => {
     if (chartRef.value) {
         chart = echarts.init(chartRef.value, props.theme, props.initOptions);
         chart.setOption(props.options);
@@ -50,6 +65,10 @@ onMounted(async () => {
             chart?.dispose();
         });
     }
+};
+
+watch(chartRef, () => {
+    initialise();
 });
 
 watch(() => props.options, (newOptions) => {
