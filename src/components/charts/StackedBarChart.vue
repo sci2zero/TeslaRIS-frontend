@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue";
+import { computed, ref, watch, type PropType } from "vue";
 import BaseChart from "./BaseChart.vue";
 import type { EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
@@ -72,10 +72,6 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
-    loading: {
-        type: Boolean,
-        default: false
-    },
     showLegend: {
         type: Boolean,
         default: true
@@ -109,6 +105,14 @@ const categoryTotals = computed(() => {
     return props.data?.categories.map((_, index) => {
         return props.data?.series.reduce((sum, series) => sum + series.data[index], 0);
     });
+});
+
+const loading = ref(true);
+
+watch(() => props.data, () => {
+    if(props.data) {
+        loading.value = false;
+    }
 });
 
 const options = computed(() => {
@@ -246,7 +250,7 @@ const options = computed(() => {
                 rotate: isHorizontal ? 0 : undefined
             },
             ...(!isHorizontal && {
-                interval: 1,
+                interval: 50,
                 minInterval: 1,
                 axisTick: {
                     interval: 1

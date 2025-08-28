@@ -54,26 +54,19 @@
     >
         <v-tabs-window-item value="publicationCount">
             <v-row class="mt-10">
-                <v-col class="d-flex justify-center align-center">
-                    <v-card
-                        class="rounded-xl pa-6 text-center total-count-card"
-                        elevation="6">
-                        <v-card-title class="justify-center text-h6">
-                            {{ $t("totalPublicationsLabel") }}
-                        </v-card-title>
-                        <v-card-text class="d-flex flex-column align-center justify-center">
-                            <h1 class="text-h2 font-weight-bold">
-                                {{ totalPublicationCount }}
-                            </h1>
-                        </v-card-text>
-                    </v-card>
+                <v-col
+                    cols="12" md="6"
+                    class="d-flex justify-center align-center">
+                    <display-card
+                        :display-value="totalPublicationCount"
+                        :label="$t('totalPublicationsLabel')"
+                    />
                 </v-col>
-                <v-col>
+                <v-col cols="12" md="6">
                     <simple-bar-chart
                         :data="publicationsYearData"
                         :title="$t('numberOfPublicationsYearlyLabel')"
                         :y-label="$t('countLabel')"
-                        :loading="loading"
                     />
                 </v-col>
             </v-row>
@@ -83,7 +76,16 @@
                         :data="publicationsYearTypeData"
                         :title="$t('numberOfPublicationsByTypeAndYearLabel')"
                         :y-label="$t('countLabel')"
-                        :loading="loading"
+                    />
+                </v-col>
+            </v-row>
+            <v-row v-for="mCategoryCounts in commissionsYearMCategoryData" :key="mCategoryCounts.commissionName">
+                <v-col>
+                    <stacked-bar-chart
+                        :data="{categories: mCategoryCounts.categories, series: mCategoryCounts.series}"
+                        :title="$t('numberOfPublicationsByMCategoryAndYearLabel')"
+                        :subtitle="$t('commissionLabel') + ': ' + mCategoryCounts.commissionName"
+                        :y-label="$t('countLabel')"
                     />
                 </v-col>
             </v-row>
@@ -92,32 +94,56 @@
             <v-row class="mt-10 d-flex justify-center">
                 <v-col cols="12" md="8">
                     <pie-chart
-                        v-if="publicationTypeRatioData"
                         :data="publicationTypeRatioData"
                         :title="$t('publicationTypeRatioLabel')"
                         :donut="true"
                         :show-percentage="true"
-                        :loading="loading"
+                    />
+                </v-col>
+            </v-row>
+            <v-row
+                v-for="mCategoryRatio in commissionMCategoryRatios"
+                :key="mCategoryRatio.commissionName"
+                class="mt-10 d-flex justify-center">
+                <v-col cols="12" md="8">
+                    <pie-chart
+                        :data="mCategoryRatio.data"
+                        :title="$t('publicationMCategoryRatioLabel')"
+                        :subtitle="$t('commissionLabel') + ': ' + mCategoryRatio.commissionName"
+                        :donut="true"
+                        :show-percentage="true"
                     />
                 </v-col>
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
+            <v-row class="d-flex flex-row text-center mt-10">
+                <v-col
+                    cols="12" md="6"
+                    class="d-flex justify-center align-center">
+                    <display-card
+                        :display-value="viewsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
+                        :label="$t('totalViewsLabel')"
+                    />
+                </v-col>
+                <v-col cols="12" md="6">
+                    <simple-bar-chart
+                        :data="viewsMonthly"
+                        :title="$t('numberOfViewsMonthlyLabel')"
+                        :y-label="$t('countLabel')"
+                        show-trend-line
+                    />
+                </v-col>
+            </v-row>
             <v-row class="mt-10 d-flex justify-center">
                 <v-col cols="12" md="8">
                     <WorldMapChart
                         :data="viewsByCountry"
                         :title="$t('viewsByCountryLabel')"
                         :subtitle="$t('globalTrafficOverviewLabel')"
-                        :series-name="$t('viewsLabel')"
-                        :loading="loading"
+                        :series-name="$t('totalViewsLabel')"
                         height="600px"
                     />
-                </v-col>
-            </v-row>
-            <v-row class="d-flex flex-row text-center">
-                <v-col>
-                    <h3>{{ $t("viewsLabel") }}: {{ viewsByCountry.reduce((sum, entry) => sum += entry.value, 0) }}</h3>
                 </v-col>
             </v-row>
             <v-row class="d-flex flex-row text-center">
@@ -133,7 +159,7 @@
 import { onMounted, ref, watch } from 'vue';
 import StackedBarChart, { type StackedBarSeries } from '../charts/StackedBarChart.vue';
 import PersonVisualizationService from '@/services/visualization/PersonVisualizationService';
-import type { YearlyCounts } from '@/models/Common';
+import { MCategory, type YearlyCounts } from '@/models/Common';
 import { PublicationType } from '@/models/PublicationModel';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import PieChart, { type PieDataItem } from '../charts/PieChart.vue';
@@ -141,7 +167,8 @@ import SimpleBarChart, { type BarSeries } from '../charts/SimpleBarChart.vue';
 import { useI18n } from 'vue-i18n';
 import WorldMapChart from '../charts/WorldMapChart.vue';
 import type { CountryStatisticsData } from '../charts/WorldMapChart.vue';
-import { StatisticsType } from '@/models/AssessmentModel';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import DisplayCard from '../charts/DisplayCard.vue';
 
 
 const props = defineProps({
@@ -155,9 +182,12 @@ const publicationsYearTypeData = ref<{ categories: string[]; series: StackedBarS
 const publicationsYearData = ref<{ categories: string[]; series: BarSeries[]; }>();
 const publicationTypeRatioData = ref<PieDataItem[]>([]);
 const totalPublicationCount = ref<number>(0);
+
+const viewsMonthly = ref<{ categories: string[]; series: BarSeries[]; }>();
 const viewsByCountry = ref<CountryStatisticsData[]>([]);
 
-const loading = ref(false);
+const commissionMCategoryRatios = ref<{commissionName: string, data: PieDataItem[]}[]>([]);
+const commissionsYearMCategoryData = ref<{commissionName: string, categories: string[]; series: StackedBarSeries[]; }[]>([]);
 
 const i18n = useI18n();
 const currentTab = ref("publicationCount");
@@ -190,10 +220,11 @@ const fetchVisualizationsData = () => {
 };
 
 const getPersonPublicationCounts = (personId: number) => {
-    loading.value = true;
     PersonVisualizationService.getPersonPublicationCountsByYear(personId)
     .then(async response => {
         const yearlyCounts: YearlyCounts[] = response.data;
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         const categories = yearlyCounts.map(yc => String(yc.year));
 
@@ -235,22 +266,67 @@ const getPersonPublicationCounts = (personId: number) => {
 
         publicationsYearTypeData.value = { categories, series: typeSeries };
         publicationsYearData.value = { categories, series: totalSeries };
-    })
-    .finally(() => {
-        loading.value = false;
+
+        if (totalPublicationCount.value > 0) {
+            getMCategoryCounts(personId);
+        }
     });
 };
 
 const getPersonStatistics = (personId: number) => {
-    loading.value = true;
-    PersonVisualizationService.getPersonStatisticsByCountry(
-        personId,
-        StatisticsType.VIEW
+    PersonVisualizationService.getPersonViewsByCountry(
+        personId
     ).then(response => {
         viewsByCountry.value = response.data;
-    })
-    .finally(() => {
-        loading.value = false;
+    });
+
+    PersonVisualizationService.getMonthlyViewsForPerson(personId).then(response => {
+        const categories: string[] = [];
+        const series: number[] = [];
+        
+        Object.entries(response.data).forEach(pair => {
+            categories.push(pair[0]);
+            series.push(pair[1]);
+        });
+
+        viewsMonthly.value = {
+            categories: categories, series: [
+                {name: i18n.t("viewsLabel"), data: series}
+            ]
+        };
+    });
+};
+
+const getMCategoryCounts = (personId: number) => {
+    PersonVisualizationService.getPersonMCategories(personId).then((response) => {
+        commissionMCategoryRatios.value.splice(0);
+        response.data.forEach(commissionCount => {
+            const commissionName = returnCurrentLocaleContent(commissionCount.commissionName) as string;
+            const data: PieDataItem[] = [];
+
+            Object.entries(commissionCount.countsByCategory).forEach((pair) => {
+                data.push({name: pair[0] === "NONE" ? i18n.t("notClassifiedLabel") : pair[0], value: pair[1]});
+            });
+
+            commissionMCategoryRatios.value.push({commissionName: commissionName, data: data });
+        });
+    });
+
+    PersonVisualizationService.getPersonMCategoryCounts(personId).then((response) => {
+        commissionsYearMCategoryData.value.splice(0);
+        response.data.forEach(commissionCount => {
+            const commissionName = returnCurrentLocaleContent(commissionCount.commissionName) as string;
+            const yearlyCounts: YearlyCounts[] = commissionCount.yearlyCounts;
+
+            const categories = yearlyCounts.map(yc => String(yc.year));
+
+            const typeSeries: any[] = Object.values(MCategory).map(mCategory => ({
+                name: mCategory === "NONE" ? i18n.t("notClassifiedLabel") : mCategory,
+                data: yearlyCounts.map(yc => yc.countsByCategory[mCategory] ?? 0)
+            }));
+
+            commissionsYearMCategoryData.value.push({commissionName: commissionName, categories, series: typeSeries });
+        });
     });
 };
 

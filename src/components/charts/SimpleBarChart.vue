@@ -10,10 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue";
+import { computed, ref, watch, type PropType } from "vue";
 import BaseChart from "./BaseChart.vue";
 import type { EChartsOption } from "echarts";
-
 
 export interface BarSeries {
     name: string;
@@ -53,10 +52,6 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
-    loading: {
-        type: Boolean,
-        default: false
-    },
     showLegend: {
         type: Boolean,
         default: true
@@ -68,6 +63,25 @@ const props = defineProps({
     yLabel: {
         type: String,
         default: "Value"
+    },
+    showTrendLine: {
+        type: Boolean,
+        default: false
+    }
+});
+
+const categoryTotals = computed(() => {
+    if (!props.data) return [];
+    return props.data.categories.map((_, index) => {
+        return props.data!.series.reduce((sum, series) => sum + (series.data[index] || 0), 0);
+    });
+});
+
+const loading = ref(true);
+
+watch(() => props.data, () => {
+    if(props.data) {
+        loading.value = false;
     }
 });
 
@@ -77,10 +91,11 @@ const options = computed(() => {
     }
 
     const isHorizontal = props.horizontal;
-    
-    const series = props.data.series.map((series, index) => ({
+    const showTrendLine = props.showTrendLine && categoryTotals.value && categoryTotals.value.length > 0;
+
+    const barSeries = props.data.series.map((series, index) => ({
         name: series.name,
-        type: "bar",
+        type: "bar" as const,
         data: series.data,
         itemStyle: {
             color: series.color
@@ -98,6 +113,32 @@ const options = computed(() => {
         animationEasing: "elasticOut",
         animationDelay: index * 100
     }));
+
+    // Create trend line series if enabled
+    const trendSeries = showTrendLine ? [{
+        name: "",
+        type: "line" as const,
+        data: categoryTotals.value,
+        smooth: true,
+        symbol: "circle",
+        symbolSize: 8,
+        lineStyle: {
+            color: "blue",
+            width: 3,
+            type: "solid"
+        },
+        itemStyle: {
+            color: "blue",
+            borderColor: "#ffffff",
+            borderWidth: 2,
+        },
+        zlevel: 1,
+        animation: true,
+        animationDuration: 1500,
+        animationEasing: "cubicOut"
+    }] : [];
+
+    const allSeries = [...barSeries, ...trendSeries];
 
     return {
         title: {
@@ -118,6 +159,10 @@ const options = computed(() => {
                 let html = `<div style="font-weight: bold; margin-bottom: 5px;">${category}</div>`;
                 
                 params.forEach((param: any) => {
+                    if (param.seriesType === "line") {
+                        return;
+                    }
+
                     const value = param.value;
                     const seriesName = param.seriesName;
                     const color = param.color;
@@ -135,7 +180,7 @@ const options = computed(() => {
             }
         },
         legend: props.showLegend ? {
-            data: props.data.series.map(s => s.name),
+            data: [...props.data.series.map(s => s.name), ...(showTrendLine ? ["Trend Line"] : [])],
             bottom: 0,
             type: "scroll"
         } : undefined,
@@ -162,14 +207,14 @@ const options = computed(() => {
                 rotate: isHorizontal ? 0 : undefined
             },
             ...(!isHorizontal && {
-                interval: 1,
+                interval: 50,
                 minInterval: 1,
                 axisTick: {
                     interval: 1
                 }
             })
         },
-        series: series
+        series: allSeries
     };
 });
 </script>

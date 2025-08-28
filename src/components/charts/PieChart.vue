@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue";
+import { computed, ref, watch, type PropType } from "vue";
 import BaseChart from "./BaseChart.vue";
 import type { EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
@@ -51,10 +51,6 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
-    loading: {
-        type: Boolean,
-        default: false
-    },
     showLegend: {
         type: Boolean,
         default: true
@@ -69,13 +65,21 @@ const props = defineProps({
     }
 });
 
+const loading = ref(true);
+
+watch(() => props.data, () => {
+    if(props.data && props.data.length > 0) {
+        loading.value = false;
+    }
+});
+
 const i18n = useI18n();
 const totalValue = computed(() => {
     return props.data.reduce((sum, item) => sum + item.value, 0);
 });
 
 const options = computed(() => {
-    if (!props.data) {
+    if (!props.data || props.data.length === 0) {
         return {};
     }
 
@@ -128,7 +132,7 @@ const options = computed(() => {
             type: "pie",
             radius: props.donut ? ["40%", "70%"] : "70%",
             center: props.showLegend ? ["40%", "50%"] : ["50%", "50%"],
-            data: seriesData, // Already filtered
+            data: seriesData,
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,

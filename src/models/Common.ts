@@ -270,3 +270,26 @@ export interface StatisticsByCountry {
     countryName: string;
     value: number;
 }
+
+export interface MCategoryCounts {
+    commissionName: MultilingualContent[];
+    countsByCategory: Record<string, number>
+}
+
+export interface CommissionYearlyCounts {
+    commissionName: MultilingualContent[];
+    yearlyCounts: YearlyCounts[];
+}
+
+export enum MCategory {
+    M10 = "M10",
+    M20 = "M20",
+    M30 = "M30",
+    M40 = "M40",
+    M50 = "M50",
+    M60 = "M60",
+    M70 = "M70",
+    M80 = "M80",
+    M90 = "M90",
+    NONE = "NONE"
+}

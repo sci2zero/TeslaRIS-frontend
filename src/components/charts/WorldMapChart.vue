@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, type PropType, ref } from "vue";
+import { computed, onMounted, type PropType, ref, watch } from "vue";
 import BaseChart from "./BaseChart.vue";
 import type { EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
@@ -59,10 +59,6 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
-    loading: {
-        type: Boolean,
-        default: false
-    },
     showLegend: {
         type: Boolean,
         default: true
@@ -84,6 +80,13 @@ const props = defineProps({
 const i18n = useI18n();
 const mapRegistered = ref(false);
 
+const loading = ref(true);
+
+watch(() => props.data, () => {
+    if(props.data && props.data.length > 0) {
+        loading.value = false;
+    }
+});
 
 onMounted(async () => {
     if (typeof window !== 'undefined' && !mapRegistered.value) {
@@ -92,7 +95,7 @@ onMounted(async () => {
             echarts.registerMap('world', world);
             mapRegistered.value = true;
         } catch (_ignored) {
-            console.log('World map already registered or error loading map data.');
+            console.error('World map already registered or error loading map data.');
         }
     }
 });

@@ -1,8 +1,7 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
-import type { StatisticsByCountry, YearlyCounts } from "@/models/Common";
+import type { CommissionYearlyCounts, MCategoryCounts, StatisticsByCountry, YearlyCounts } from "@/models/Common";
 import { BaseService } from "../BaseService";
-import { StatisticsType } from "@/models/AssessmentModel";
 
 
 export class PersonVisualizationService extends BaseService {
@@ -11,8 +10,20 @@ export class PersonVisualizationService extends BaseService {
         return super.sendRequest(axios.get, `visualization-data/person/publication-count/${personId}`);
     }
 
-    async getPersonStatisticsByCountry(personId: number, type: StatisticsType): Promise<AxiosResponse<StatisticsByCountry[]>> {
-        return super.sendRequest(axios.get, `visualization-data/person/statistics/${type}/${personId}`);
+    async getPersonViewsByCountry(personId: number): Promise<AxiosResponse<StatisticsByCountry[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/statistics/${personId}`);
+    }
+
+    async getMonthlyViewsForPerson(personId: number): Promise<AxiosResponse<Record<string, number>>> {
+        return super.sendRequest(axios.get, `visualization-data/person/monthly-statistics/${personId}`);
+    }
+
+    async getPersonMCategories(personId: number): Promise<AxiosResponse<MCategoryCounts[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/m-category/${personId}`);
+    }
+
+    async getPersonMCategoryCounts(personId: number): Promise<AxiosResponse<CommissionYearlyCounts[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/m-category-count/${personId}`);
     }
 }
 

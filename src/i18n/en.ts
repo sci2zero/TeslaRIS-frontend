@@ -1005,5 +1005,14 @@ export default {
     globalTrafficOverviewLabel: "Global overview",
     highLabel: "High",
     lowLabel: "Low",
-    viewsLabel: "Total number of views"
+    totalViewsLabel: "Total number of views",
+    publicationTypeRatioLabel: "Publication type ratio",
+    countLabel: "Count",
+    fromTotalLabel: "From total",
+    noCountryViews: "Views for which there is no country information",
+    publicationMCategoryRatioLabel: "M category ration",
+    numberOfPublicationsByMCategoryAndYearLabel: "Publication count by year and M category",
+    notClassifiedLabel: "Not classified",
+    viewsLabel: "Views",
+    numberOfViewsMonthlyLabel: "Number of monthly views"
 }

@@ -1035,9 +1035,14 @@ export default {
     globalTrafficOverviewLabel: "Globalni pregled",
     highLabel: "Visok",
     lowLabel: "Nizak",
-    viewsLabel: "Ukupan broj pregleda",
+    totalViewsLabel: "Ukupan broj pregleda",
     publicationTypeRatioLabel: "Odnos tipova publikacija",
     countLabel: "Broj",
     fromTotalLabel: "Od ukupno",
-    noCountryViews: "Pregledi za koje ne postoji informacija odakle su"
+    noCountryViews: "Pregledi za koje ne postoji informacija odakle su",
+    publicationMCategoryRatioLabel: "Odnos broja publikacija po M kategoriji",
+    numberOfPublicationsByMCategoryAndYearLabel: "Broj publikacija po M kategoriji, po godinama",
+    notClassifiedLabel: "Neklasifikovane",
+    viewsLabel: "Pregledi",
+    numberOfViewsMonthlyLabel: "Broj pregleda po mesecima"
 }
