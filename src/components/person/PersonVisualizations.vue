@@ -308,7 +308,10 @@ const fetchVisualizationsData = () => {
     if (currentTab.value !== "statistics" && totalPublicationCount.value === 0) {
         getPersonPublicationCounts(props.personId);
     } else if (currentTab.value === "statistics" && viewsByCountry.value.length === 0) {
-        getPersonStatistics(props.personId);
+        getPersonStatistics(
+            props.personId,
+            startDate.value.split("T")[0],
+            endDate.value.split("T")[0]);
     }
 };
 
