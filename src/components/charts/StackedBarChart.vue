@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, type PropType } from "vue";
+import { computed, onMounted, ref, watch, type PropType } from "vue";
 import BaseChart from "./BaseChart.vue";
 import type { EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
@@ -109,11 +109,19 @@ const categoryTotals = computed(() => {
 
 const loading = ref(true);
 
+onMounted(() => {
+    shouldBeLoading();
+});
+
 watch(() => props.data, () => {
+    shouldBeLoading();
+});
+
+const shouldBeLoading = () => {
     if(props.data) {
         loading.value = false;
     }
-});
+};
 
 const options = computed(() => {
     if (!props.data) {

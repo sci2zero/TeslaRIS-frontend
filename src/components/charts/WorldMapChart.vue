@@ -1,6 +1,6 @@
 <template>
     <BaseChart
-        v-if="mapRegistered"
+        v-if="mapRegistered && props.data && props.data.length > 0"
         :options="(options as EChartsOption)"
         :width="width"
         :height="height"
@@ -83,10 +83,14 @@ const mapRegistered = ref(false);
 const loading = ref(true);
 
 watch(() => props.data, () => {
+    shouldBeLoading();
+});
+
+const shouldBeLoading = () => {
     if(props.data && props.data.length > 0) {
         loading.value = false;
     }
-});
+};
 
 onMounted(async () => {
     if (typeof window !== 'undefined' && !mapRegistered.value) {
@@ -98,6 +102,8 @@ onMounted(async () => {
             console.error('World map already registered or error loading map data.');
         }
     }
+
+    shouldBeLoading();
 });
 
 const buildNameMap = () => {

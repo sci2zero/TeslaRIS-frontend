@@ -19,6 +19,11 @@ export const localiseDate = (iso8601DateString: string | undefined) => {
 
     const year = dateParts[0];
     const month = dateParts[1];
+
+    if (dateParts.length == 2) {
+        return `${month}.${year}.`;
+    }
+    
     const day = dateParts[2];
 
     if (!month || !day) {

@@ -13,6 +13,7 @@
 import { ref, onMounted, onUnmounted, watch, type PropType, nextTick } from "vue";
 import * as echarts from "echarts";
 import { type EChartsOption } from "echarts";
+import { debounce } from "lodash";
 
 
 const props = defineProps({
@@ -49,20 +50,29 @@ onMounted(async () => {
     initialise();
 });
 
+let resizeObserver: ResizeObserver | null = null;
+
 const initialise = async () => {
     if (chartRef.value) {
         chart = echarts.init(chartRef.value, props.theme, props.initOptions);
         chart.setOption(props.options);
-        
-        const resizeChart = () => chart?.resize();
-        window.addEventListener("resize", resizeChart);
+
+        const debouncedResize = debounce(async () => {
+            await nextTick();
+            chart?.resize();
+        }, 150);
+
+        resizeObserver = new ResizeObserver(debouncedResize);
+
+        resizeObserver.observe(chartRef.value);
 
         await nextTick();
         chart.resize();
-        
+
         onUnmounted(() => {
-            window.removeEventListener("resize", resizeChart);
+            resizeObserver?.disconnect();
             chart?.dispose();
+            debouncedResize.cancel();
         });
     }
 };

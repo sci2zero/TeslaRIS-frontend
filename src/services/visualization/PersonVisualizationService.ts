@@ -6,24 +6,24 @@ import { BaseService } from "../BaseService";
 
 export class PersonVisualizationService extends BaseService {
 
-    async getPersonPublicationCountsByYear(personId: number): Promise<AxiosResponse<YearlyCounts[]>> {
-        return super.sendRequest(axios.get, `visualization-data/person/publication-count/${personId}`);
+    async getPersonPublicationCountsByYear(personId: number, from: number | null = null, to: number | null = null): Promise<AxiosResponse<YearlyCounts[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/publication-count/${personId}?from=${from ?? ''}&to=${to ?? ''}`);
     }
 
-    async getPersonViewsByCountry(personId: number): Promise<AxiosResponse<StatisticsByCountry[]>> {
-        return super.sendRequest(axios.get, `visualization-data/person/statistics/${personId}`);
+    async getPersonMCategories(personId: number, from: number, to: number): Promise<AxiosResponse<MCategoryCounts[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/m-category/${personId}?from=${from}&to=${to}`);
     }
 
-    async getMonthlyViewsForPerson(personId: number): Promise<AxiosResponse<Record<string, number>>> {
-        return super.sendRequest(axios.get, `visualization-data/person/monthly-statistics/${personId}`);
+    async getPersonMCategoryCounts(personId: number, from: number, to: number): Promise<AxiosResponse<CommissionYearlyCounts[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/m-category-count/${personId}?from=${from}&to=${to}`);
     }
 
-    async getPersonMCategories(personId: number): Promise<AxiosResponse<MCategoryCounts[]>> {
-        return super.sendRequest(axios.get, `visualization-data/person/m-category/${personId}`);
+    async getPersonViewsByCountry(personId: number, startDate: string, endDate: string): Promise<AxiosResponse<StatisticsByCountry[]>> {
+        return super.sendRequest(axios.get, `visualization-data/person/statistics/${personId}?startDate=${startDate}&endDate=${endDate}`);
     }
 
-    async getPersonMCategoryCounts(personId: number): Promise<AxiosResponse<CommissionYearlyCounts[]>> {
-        return super.sendRequest(axios.get, `visualization-data/person/m-category-count/${personId}`);
+    async getMonthlyViewsForPerson(personId: number, startDate: string, endDate: string): Promise<AxiosResponse<Record<string, number>>> {
+        return super.sendRequest(axios.get, `visualization-data/person/monthly-statistics/${personId}?startDate=${startDate}&endDate=${endDate}`);
     }
 }
 

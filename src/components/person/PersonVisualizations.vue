@@ -14,10 +14,9 @@
                 :label="$t('fromLabel')"
                 class="mr-2"
                 :min="minYear"
-                :max="maxYear"
+                :max="min([maxYear, toYear])"
             ></v-text-field>
         </v-col>
-
         <v-col cols="5">
             <v-text-field
                 v-model="toYear"
@@ -26,11 +25,35 @@
                 variant="outlined"
                 hide-details
                 :label="$t('toLabel')"
-                :min="minYear"
+                :min="max([minYear, fromYear])"
                 :max="maxYear"
             ></v-text-field>
         </v-col>
     </v-row>
+    <v-row
+        v-else-if="initialDatesSet && currentTab === 'statistics'"
+        class="align-center mt-2"
+        style="max-width: 300px;">
+        <v-col cols="6">
+            <date-picker
+                v-model="startDate"
+                :label="$t('startDateLabel') + '*'"
+                color="primary"
+                required
+                :allow-deletion="false"
+            />
+        </v-col>
+        <v-col cols="6">
+            <date-picker
+                v-model="endDate"
+                :label="$t('endDateLabel') + '*'"
+                color="primary"
+                required
+                :allow-deletion="false"
+            />
+        </v-col>
+    </v-row>
+
     <v-tabs
         v-if="personId"
         v-model="currentTab"
@@ -148,7 +171,10 @@
             </v-row>
             <v-row class="d-flex flex-row text-center">
                 <v-col>
-                    <h3>{{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}</h3>
+                    <h3
+                        v-if="viewsByCountry && viewsByCountry.length > 0">
+                        {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
+                    </h3>
                 </v-col>
             </v-row>
         </v-tabs-window-item>
@@ -169,6 +195,9 @@ import WorldMapChart from '../charts/WorldMapChart.vue';
 import type { CountryStatisticsData } from '../charts/WorldMapChart.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DisplayCard from '../charts/DisplayCard.vue';
+import { max, min } from 'lodash';
+import DatePicker from '../core/DatePicker.vue';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 const props = defineProps({
@@ -181,7 +210,7 @@ const props = defineProps({
 const publicationsYearTypeData = ref<{ categories: string[]; series: StackedBarSeries[]; }>();
 const publicationsYearData = ref<{ categories: string[]; series: BarSeries[]; }>();
 const publicationTypeRatioData = ref<PieDataItem[]>([]);
-const totalPublicationCount = ref<number>(0);
+const totalPublicationCount = ref<number>(-1);
 
 const viewsMonthly = ref<{ categories: string[]; series: BarSeries[]; }>();
 const viewsByCountry = ref<CountryStatisticsData[]>([]);
@@ -193,14 +222,78 @@ const i18n = useI18n();
 const currentTab = ref("publicationCount");
 
 const initialDatesSet = ref(false);
-const fromYear = ref(0);
-const toYear = ref(0);
+const watchDates = ref(false);
+const fromYear = ref<number>(0);
+const toYear = ref<number>(0);
 const minYear = ref(0);
 const maxYear = ref(0);
 
+const startDate = ref<string>("");
+const endDate = ref<string>("");
+
+watch([fromYear, toYear], () => {
+    if (watchDates.value) {
+        if (fromYear.value < minYear.value) {
+            fromYear.value = minYear.value;
+        } else if (fromYear.value > maxYear.value) {
+            fromYear.value = maxYear.value;
+        }
+
+        if (toYear.value < minYear.value) {
+            toYear.value = minYear.value;
+        } else if (toYear.value > maxYear.value) {
+            toYear.value = maxYear.value;
+        }
+        
+        if (fromYear.value > toYear.value) {
+            fromYear.value = toYear.value;
+        }
+
+        if (toYear.value < fromYear.value) {
+            toYear.value = fromYear.value;
+        }
+
+        getPersonPublicationCounts(props.personId, fromYear.value, toYear.value);
+    } else if(initialDatesSet.value) {
+        watchDates.value = true;
+    }
+});
+
+watch([startDate, endDate], () => {
+    if (!startDate.value || !endDate.value) {
+        return;
+    }
+
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+
+    if (end < start) {
+        console.warn("End date is before start date. Swapping values.");
+
+        const newStart = end.toISOString();
+        const newEnd = start.toISOString();
+
+        startDate.value = newStart;
+        endDate.value = newEnd;
+
+        return;
+    }
+
+    getPersonStatistics(
+        props.personId,
+        start.toISOString().split("T")[0],
+        end.toISOString().split("T")[0]
+    );
+});
+
 onMounted(() => {
     getPersonPublicationCounts(props.personId);
-    getPersonStatistics(props.personId);
+
+    endDate.value = (new Date()).toISOString().split("T")[0];
+
+    const currentDate = new Date();
+    currentDate.setFullYear((new Date()).getFullYear() - 1);
+    startDate.value = currentDate.toISOString().split("T")[0];
 });
 
 watch(currentTab, () => {
@@ -219,16 +312,14 @@ const fetchVisualizationsData = () => {
     }
 };
 
-const getPersonPublicationCounts = (personId: number) => {
-    PersonVisualizationService.getPersonPublicationCountsByYear(personId)
+const getPersonPublicationCounts = (personId: number, from: number | null = null, to: number | null = null) => {
+    PersonVisualizationService.getPersonPublicationCountsByYear(personId, from, to)
     .then(async response => {
         const yearlyCounts: YearlyCounts[] = response.data;
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
         const categories = yearlyCounts.map(yc => String(yc.year));
 
-        if(categories.length > 0) {
+        if(categories.length > 0 && !initialDatesSet.value) {
             minYear.value = parseInt(categories[0]);
             maxYear.value = parseInt(categories[categories.length - 1]);
             initialDatesSet.value = true;
@@ -273,19 +364,21 @@ const getPersonPublicationCounts = (personId: number) => {
     });
 };
 
-const getPersonStatistics = (personId: number) => {
+const getPersonStatistics = (personId: number, startDate: string, endDate: string) => {
     PersonVisualizationService.getPersonViewsByCountry(
-        personId
+        personId, startDate, endDate
     ).then(response => {
         viewsByCountry.value = response.data;
     });
 
-    PersonVisualizationService.getMonthlyViewsForPerson(personId).then(response => {
+    PersonVisualizationService.getMonthlyViewsForPerson(
+        personId, startDate, endDate
+    ).then(response => {
         const categories: string[] = [];
         const series: number[] = [];
         
         Object.entries(response.data).forEach(pair => {
-            categories.push(pair[0]);
+            categories.push(localiseDate(pair[0]));
             series.push(pair[1]);
         });
 
@@ -298,7 +391,7 @@ const getPersonStatistics = (personId: number) => {
 };
 
 const getMCategoryCounts = (personId: number) => {
-    PersonVisualizationService.getPersonMCategories(personId).then((response) => {
+    PersonVisualizationService.getPersonMCategories(personId, fromYear.value, toYear.value).then((response) => {
         commissionMCategoryRatios.value.splice(0);
         response.data.forEach(commissionCount => {
             const commissionName = returnCurrentLocaleContent(commissionCount.commissionName) as string;
@@ -312,7 +405,7 @@ const getMCategoryCounts = (personId: number) => {
         });
     });
 
-    PersonVisualizationService.getPersonMCategoryCounts(personId).then((response) => {
+    PersonVisualizationService.getPersonMCategoryCounts(personId, fromYear.value, toYear.value).then((response) => {
         commissionsYearMCategoryData.value.splice(0);
         response.data.forEach(commissionCount => {
             const commissionName = returnCurrentLocaleContent(commissionCount.commissionName) as string;

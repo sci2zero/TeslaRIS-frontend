@@ -6,7 +6,7 @@
             {{ label }}
         </v-card-title>
         <v-card-text class="d-flex flex-column align-center justify-center">
-            <h1 v-if="displayValue" class="text-h2 font-weight-bold">
+            <h1 v-if="displayValue >= 0" class="text-h2 font-weight-bold">
                 {{ displayValue }}
             </h1>
             <v-progress-circular
