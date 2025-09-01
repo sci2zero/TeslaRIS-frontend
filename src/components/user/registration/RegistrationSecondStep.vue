@@ -100,14 +100,22 @@ export default defineComponent({
             password.value = newPassword;
         };
 
+        onMounted(() => {
+            prepopulateNameData();
+        });
+
         watch([
             () => props.firstname,
             () => props.lastname,
             registerStore
         ], () => {
+            prepopulateNameData();
+        });
+
+        const prepopulateNameData = () => {
             firstName.value = props.firstname || registerStore.registerPersonData?.personName.firstname;
             lastName.value = props.lastname || registerStore.registerPersonData?.personName.lastname;
-        });
+        };
 
         const register = () => {
             const requestBody: ResearcherRegistrationRequest = {

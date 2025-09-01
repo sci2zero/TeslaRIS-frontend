@@ -1,6 +1,8 @@
 <template>
     <v-container>
-        <h1>{{ $t("accountActivationInProgressMessage") }}</h1>
+        <h1 v-if="!accountSuccessfullyActivated && !accountActivationFailed">
+            {{ $t("accountActivationInProgressMessage") }}
+        </h1>
         <h1 v-if="accountSuccessfullyActivated">
             {{ $t("accountActivationSuccessMessage") }}
         </h1>
