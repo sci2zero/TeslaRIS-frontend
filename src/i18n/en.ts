@@ -994,5 +994,6 @@ export default {
     showForInstitutionLabel: "Show for institution",
     updateInstitutionDefaultSubmissionContentLabel: "Default submission content",
     creatingExportLabel: "Data export in progress...",
-    thesisTypeNotAllowedMessage: "This thesis type is not allowed for this institution."
+    thesisTypeNotAllowedMessage: "This thesis type is not allowed for this institution.",
+    mServiceDescriptionLabel: "On this service, you can check the category of a paper that has been published or is planned for publication in a journal, as well as a paper that has been presented or is planned for presentation at a conference."
 }

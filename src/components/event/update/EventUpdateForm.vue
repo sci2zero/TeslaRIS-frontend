@@ -74,19 +74,19 @@
                         <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="!serialEvent">
                     <v-col cols="5">
                         <v-text-field
                             v-model="conferenceNumber"
                             :label="$t('conferenceNumberLabel')"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                    <!-- <v-col cols="5">
                         <v-text-field
                             v-model="entryFee"
                             :label="$t('entryFeeLabel')"
                         ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                 </v-row>
                 <v-row v-if="!inComparator">
                     <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>

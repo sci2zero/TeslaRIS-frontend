@@ -63,7 +63,10 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <open-layers-map ref="mapRef" :read-only="false"></open-layers-map>
+                            <open-layers-map
+                                ref="mapRef"
+                                :read-only="false">
+                            </open-layers-map>
                         </v-col>
                     </v-row>
                 </v-container>

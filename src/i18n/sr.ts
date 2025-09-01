@@ -234,7 +234,7 @@ export default {
     createNewJournalLabel: "Dodaj časopis",
     addJournalPublicationLabel: "Rad u časopisu",
     volumeLabel: "Sveska",
-    issueLabel: "Izdanje",
+    issueLabel: "Broj",
     startPageLabel: "Početna stranica",
     endPageLabel: "Poslednja stranica",
     articleNumberLabel: "Broj članka",
@@ -529,7 +529,7 @@ export default {
     addEmployeeLabel: "Dodaj zaposlenog",
     alumniLabel: "Alumni",
     descriptionLabel: "Opis",
-    superResearchAreaLabel: "Sadržajna oblast istraživanja",
+    superResearchAreaLabel: "Krovna oblast istraživanja",
     researchAreaListLabel: "Oblasti istraživanja",
     updateResearchAreaLabel: "Ažuriraj oblast istraživanja",
     createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja",
@@ -1024,5 +1024,6 @@ export default {
     showByPublicationYearEmploymentsLabel: "Prikaži od zaposlenih u godini izdanja rada",
     showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
     creatingExportLabel: "Izvoz podataka u toku...",
-    thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju."
+    thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju.",
+    mServiceDescriptionLabel: "Na ovom servisu možete proveriti kategoriju rada objavljenog ili planiranog za objavljivanje u časopisu, kao i rada prezentovanog ili planiranog za prezentovanje na konferenciji."
 }

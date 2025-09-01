@@ -58,7 +58,12 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <open-layers-map ref="mapRef" :read-only="false" :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]"></open-layers-map>
+                        <open-layers-map
+                            ref="mapRef"
+                            :read-only="false"
+                            :init-address="presetOU?.location?.address"
+                            :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]">
+                        </open-layers-map>
                     </v-col>
                 </v-row>
             </v-col>

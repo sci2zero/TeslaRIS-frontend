@@ -49,7 +49,7 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.eISSN) }}
+                    {{ displayTextOrPlaceholder(row.item.eissn) }}
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(row.item.printISSN) }}

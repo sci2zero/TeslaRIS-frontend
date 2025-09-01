@@ -91,7 +91,7 @@
                             <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Conf ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row v-if="!serialEvent">
                         <v-col cols="10">
                             <v-text-field
                                 v-model="conferenceNumber"

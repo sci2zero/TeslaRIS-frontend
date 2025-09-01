@@ -3,7 +3,11 @@
         <h1>{{ $t("simpleSearchLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component :preset-search-input="searchParams" @search="search"></search-bar-component>
+        <search-bar-component
+            :preset-search-input="searchParams"
+            focus-automatically
+            @search="search"
+        />
         <br />
         <br />
         <br />
