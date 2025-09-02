@@ -136,15 +136,16 @@ export default defineComponent({
         onMounted(() => {
             if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
+                checkCompatibility();
             }
-            sendContentToParent();
 
-            checkCompatibility();
+            sendContentToParent();
         });
 
         watch(() => props.modelValue, () => {
             if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
+                checkCompatibility();
             }
         });
 
@@ -160,11 +161,15 @@ export default defineComponent({
                 return;
             }
 
-            const response = recentlySearched.value.get(
-                (selectedOrganisationUnit.value as {title: string, value: number}).value
-            );
+            const organisationUnitId = (selectedOrganisationUnit.value as {title: string, value: number}).value;
+            const response = recentlySearched.value.get(organisationUnitId);
             
-            if (!response || !response.includes(props.allowedThesisType as ThesisType)) {
+            if (!response) {
+                OrganisationUnitService.readOU(organisationUnitId).then(response => {
+                    showThesisTypeError.value = !response.data.allowedThesisTypes.includes(props.allowedThesisType as ThesisType);
+                    recentlySearched.value.set(response.data.id, response.data.allowedThesisTypes);
+                });
+            } else if (!response.includes(props.allowedThesisType as ThesisType)) {
                 showThesisTypeError.value = true;
             } else {
                 showThesisTypeError.value = false;

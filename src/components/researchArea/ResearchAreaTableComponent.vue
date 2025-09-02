@@ -2,14 +2,19 @@
     <v-row class="align-center">
         <v-col cols="auto">
             <v-btn
-                density="compact" class="bottom-spacer" :disabled="selectedResearchAreas.length === 0"
+                density="compact"
+                class="bottom-spacer"
+                :disabled="selectedResearchAreas.length === 0"
                 @click="deleteSelection">
                 {{ $t("deleteLabel") }}
             </v-btn>
         </v-col>
 
         <v-col cols="auto">
-            <research-area-modal :preset-research-area="undefined" @submit="createNewResearchArea"></research-area-modal>
+            <research-area-modal
+                :preset-research-area="undefined"
+                @submit="createNewResearchArea">
+            </research-area-modal>
             <generic-crud-modal
                 :form-component="ResearchAreaForm"
                 :form-props="{ presetResearchArea: undefined }"
@@ -44,7 +49,13 @@
                     />
                 </td>
                 <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
-                <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.description) as string) }}</td>
+                <td>
+                    <rich-text-editor
+                        v-model="row.item.displayDescription"
+                        :editable="false"
+                        :limit-display="100">
+                    </rich-text-editor>
+                </td>
                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superResearchAreaName) as string) }}</td>
                 <td>
                     <generic-crud-modal
@@ -53,7 +64,7 @@
                         :form-props="{ presetResearchArea: row.item }"
                         entity-name="ResearchArea"
                         is-update
-                        @update="updateResearchArea(row.item.id, $event)"
+                        @update="updateResearchArea(row.item.id as number, $event)"
                     />
                 </td>
             </tr>
@@ -85,11 +96,12 @@ import ResearchAreaService from '@/services/ResearchAreaService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ResearchAreaForm from './ResearchAreaForm.vue';
 import { isEqual } from 'lodash';
+import RichTextEditor from '../core/RichTextEditor.vue';
 
 
 export default defineComponent({
     name: "ResearchAreaTableComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, RichTextEditor },
     props: {
         researchAreas: {
             type: Array<ResearchAreaResponse>,

@@ -23,8 +23,12 @@
             </v-col>
             <v-col v-else>
                 <multilingual-text-input
-                    ref="externalOUNameRef" v-model="externalOUName" :rules="requiredFieldRules" :label="$t('externalOUNameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"></multilingual-text-input>
+                    ref="externalOUNameRef"
+                    v-model="externalOUName"
+                    :rules="requiredFieldRules"
+                    :label="$t('externalOUNameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row v-if="!isInstitutionalLibrarian">
@@ -326,7 +330,9 @@ export default defineComponent({
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
                 response.data.forEach((language: LanguageResponse) => {
-                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
                 });
             });
             
@@ -375,7 +381,8 @@ export default defineComponent({
             }
 
             if (!selectedWritingLanguage.value && props.presetThesis?.writingLanguageTagId) {
-                selectedWritingLanguage.value = languageTagsList.value.find(tag => tag.value === props.presetThesis?.writingLanguageTagId);
+                selectedWritingLanguage.value =
+                    languageTagsList.value.find(tag => tag.value === props.presetThesis?.writingLanguageTagId);
             }
         });
 

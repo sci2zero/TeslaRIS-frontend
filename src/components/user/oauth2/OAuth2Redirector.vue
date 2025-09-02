@@ -58,7 +58,7 @@ import { useRoute, useRouter } from 'vue-router';
         const registrationId = ref<string>("");
 
         onMounted(async () => {
-            await router.isReady()
+            await router.isReady();
             
             name.value = currentRoute.query.name as string;
             registrationId.value = currentRoute.query.registrationId as string;

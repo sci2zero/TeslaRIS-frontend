@@ -84,6 +84,7 @@ export interface ResearchAreaResponse {
     description: MultilingualContent[];
     superResearchAreaId?: number;
     superResearchAreaName?: MultilingualContent[];
+    displayDescription?: string;
 }
 
 export interface ResearchAreaRequest {

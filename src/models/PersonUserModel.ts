@@ -119,6 +119,8 @@ export interface PersonUserResponse {
     keyword: MultilingualContent[];
     approveStatus: ApproveStatus;
     user: UserResponse;
+    employmentInstitutionName?: MultilingualContent[];
+    employmentInstitutionId?: number;
 }
 
 interface PersonalInfo {

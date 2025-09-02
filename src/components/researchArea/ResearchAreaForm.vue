@@ -11,8 +11,11 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :label="$t('descriptionLabel')"
-                    :initial-value="toMultilingualTextInput(presetResearchArea?.description, languageTags)">
+                    ref="descriptionRef"
+                    v-model="description"
+                    :label="$t('descriptionLabel')"
+                    :initial-value="toMultilingualTextInput(presetResearchArea?.description, languageTags)"
+                    is-rich is-area>
                 </multilingual-text-input>
             </v-col>
         </v-row>

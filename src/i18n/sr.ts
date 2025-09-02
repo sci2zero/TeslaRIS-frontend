@@ -1025,5 +1025,7 @@ export default {
     showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
     creatingExportLabel: "Izvoz podataka u toku...",
     thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju.",
-    mServiceDescriptionLabel: "Na ovom servisu možete proveriti kategoriju rada objavljenog ili planiranog za objavljivanje u časopisu, kao i rada prezentovanog ili planiranog za prezentovanje na konferenciji."
+    mServiceDescriptionLabel: "Na ovom servisu možete proveriti kategoriju rada objavljenog ili planiranog za objavljivanje u časopisu, kao i rada prezentovanog ili planiranog za prezentovanje na konferenciji.",
+    readMoreLabel: "Vidi još",
+    readLessLabel: "Vidi manje"
 }

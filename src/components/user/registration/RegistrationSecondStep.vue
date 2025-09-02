@@ -59,6 +59,7 @@ import { getErrorMessageForErrorKey } from "@/i18n";
 import { useRouter } from "vue-router";
 import Toast from "@/components/core/Toast.vue";
 import { type ResearcherRegistrationRequest } from "@/models/AuthenticationModel";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
 export default defineComponent({
@@ -115,6 +116,12 @@ export default defineComponent({
         const prepopulateNameData = () => {
             firstName.value = props.firstname || registerStore.registerPersonData?.personName.firstname;
             lastName.value = props.lastname || registerStore.registerPersonData?.personName.lastname;
+            if (registerStore.registerPersonData?.employmentInstitutionId) {
+                selectedOrganisationUnit.value = {
+                    title: returnCurrentLocaleContent(registerStore.registerPersonData?.employmentInstitutionName) as string,
+                    value: registerStore.registerPersonData?.employmentInstitutionId
+                };
+            }
         };
 
         const register = () => {

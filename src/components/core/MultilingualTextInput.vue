@@ -9,7 +9,12 @@
                 v-if="isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
                 :rules="rules" @input="sendContentToParent"></v-textarea>
-            <rich-text-editor v-if="isRich" ref="richEditorRef" v-model="input.text" @input="sendContentToParent"></rich-text-editor>
+            <rich-text-editor
+                v-if="isRich"
+                ref="richEditorRef"
+                v-model="input.text"
+                @input="sendContentToParent">
+            </rich-text-editor>
         </v-col>
         <v-col cols="3">
             <v-select

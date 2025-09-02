@@ -180,6 +180,11 @@ export default defineComponent({
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
+                case EntityType.PUBLISHER:
+                    router.push({name: "publisherMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
             }
         };
 
