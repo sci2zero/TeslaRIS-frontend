@@ -308,7 +308,6 @@
                         :persons="alumni"
                         :total-persons="totalAlumni"
                         is-alumni-table
-                        :employment-institution-id="organisationUnit?.id"
                         enable-export
                         :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                         :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
@@ -633,7 +632,7 @@ export default defineComponent({
         const fetchEmployees = (fetchAlumni: boolean) => {
             return PersonService.findEmployeesForOU(
                 parseInt(currentRoute.params.id as string),
-                `${personSearchParams.value}&page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`,
+                `${personSearchParams.value}&page=${fetchAlumni ? alumniPage.value : employeesPage.value}&size=${fetchAlumni ? alumniSize.value : employeesSize.value}&sort=${fetchAlumni ? alumniSort.value : employeesSort.value},${fetchAlumni ? alumniDirection.value : employeesDirection.value}`,
                 fetchAlumni
             ).then((response) => {
                 if (fetchAlumni) {
@@ -691,6 +690,10 @@ export default defineComponent({
             organisationUnit.value!.ror = basicInfo.ror;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
+            organisationUnit.value!.clientInstitution = basicInfo.clientInstitution;
+            organisationUnit.value!.validatingEmailDomain = basicInfo.validatingEmailDomain;
+            organisationUnit.value!.allowingSubdomains = basicInfo.allowingSubdomains;
+            organisationUnit.value!.institutionEmailDomain = basicInfo.institutionEmailDomain;
             performUpdate(false);
         };
 
@@ -735,7 +738,11 @@ export default defineComponent({
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
                 uris: organisationUnit.value?.uris as string[],
-                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[]
+                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
+                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
+                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
+                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -758,7 +765,11 @@ export default defineComponent({
                 contact: organisationUnit.value?.contact,
                 scopusAfid: organisationUnit.value?.scopusAfid,
                 uris: organisationUnit.value?.uris as string[],
-                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[]
+                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
+                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
+                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
+                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {

@@ -75,5 +75,8 @@ export default {
     webOfScienceIdExistsError: "WoS ID је већ у употреби.",
     oaiSourcesLabel: "OAI-PMH извори",
     oaiSourceLabel: "OAI-PMH извор",
-    signInWithOrcidLabel: "Улогуј се путем ORCID-а"
+    signInWithOrcidLabel: "Улогуј се путем ORCID-а",
+    validatingEmailDomainLabel: "Валидирај домен адресе е-поште",
+    institutionEmailDomainLabel: "Домен институционалне адресе е-поште",
+    emailDomainErrorMessage: "Морате се регистровати са адресом е-поште ваше институције."
 };

@@ -37,7 +37,7 @@
                     <td v-else>
                         {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
                     </td>
-                    <td>{{ displayTextOrPlaceholder(row.item.birthdate) }}</td>
+                    <td>{{ displayTextOrPlaceholder(localiseDate(row.item.birthdate)) }}</td>
                     <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
                     <td>
                         <publications-dialog
@@ -89,6 +89,7 @@ import { watch } from "vue";
 import ImportAffiliation from "./ImportAffiliation.vue";
 import ImportService from "@/services/importer/ImportService";
 import { useUserRole } from "@/composables/useUserRole";
+import { localiseDate } from "@/utils/DateUtil";
 
 
 export default defineComponent({
@@ -356,7 +357,7 @@ export default defineComponent({
             selectedResearcher, researcherBinded, 
             showTable, selectManually, addNew,
             hadToBeCreated, importAffiliationsRef,
-            isHandled, isReady,
+            isHandled, isReady, localiseDate,
             notifyParentIfAllHandled
         };
     },

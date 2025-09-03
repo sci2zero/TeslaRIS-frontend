@@ -108,6 +108,10 @@ export default defineComponent({
         allowedThesisType: {
             type: Object as PropType<ThesisType | null>,
             default: null
+        },
+        onlyClientInstitutions: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -194,7 +198,8 @@ export default defineComponent({
                         props.topLevelInstitutionId,
                         props.onlyHarvestableInstitutions,
                         props.onlyIndependentInstitutions,
-                        props.allowedThesisType
+                        props.allowedThesisType,
+                        props.onlyClientInstitutions
                     ).then((response) => {
                         recentlySearched.value.clear();
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({

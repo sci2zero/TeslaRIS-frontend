@@ -49,6 +49,10 @@ export default defineComponent({
         const { doiValidationRules } = useValidationUtils();
 
         watch(doi, async () => {
+            if (doi.value.startsWith("https://doi.org/")) {
+                doi.value = doi.value.replace("https://doi.org/", "");
+            }
+
             errorMessage.value = "";
             if (doi.value && doiValidationRules[0](doi.value) === true) {
                 const isDoiInUse = await DocumentPublicationService.checkDoiUsage(doi.value);

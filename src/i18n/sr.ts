@@ -1027,5 +1027,11 @@ export default {
     thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju.",
     mServiceDescriptionLabel: "Na ovom servisu možete proveriti kategoriju rada objavljenog ili planiranog za objavljivanje u časopisu, kao i rada prezentovanog ili planiranog za prezentovanje na konferenciji.",
     readMoreLabel: "Vidi još",
-    readLessLabel: "Vidi manje"
+    readLessLabel: "Vidi manje",
+    nobodyLabel: "Nijedan",
+    clientInstitutionLabel: "Klijentska institucija",
+    validatingEmailDomainLabel: "Validiraj domen email adrese",
+    allowingSubdomainsLabel: "Dozvoli upotrebu pod-domena",
+    institutionEmailDomainLabel: "Domen institucionalne email adrese",
+    emailDomainErrorMessage: "Morate se registrovati sa email adresom vaše institucije."
 }

@@ -17,7 +17,8 @@
                 ref="ouAutocompleteRef"
                 v-model="selectedOrganisationUnit"
                 :disabled="isPersonSelected()"
-                required>
+                required
+                only-client-institutions>
             </organisation-unit-autocomplete-search>
             <v-select
                 v-model="selectedLanguage"
