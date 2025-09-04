@@ -112,7 +112,10 @@ export default defineComponent({
             }
 
             if (input.length >= 3) {
-                lastSearchInput.value = input;
+                if (!input.startsWith(i18n.t("notInListLabel", []).slice(0, -3))) {
+                    lastSearchInput.value = input;
+                }
+
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
