@@ -1054,5 +1054,9 @@ export default {
     validatingEmailDomainLabel: "Validiraj domen email adrese",
     allowingSubdomainsLabel: "Dozvoli upotrebu pod-domena",
     institutionEmailDomainLabel: "Domen institucionalne email adrese",
-    emailDomainErrorMessage: "Morate se registrovati sa email adresom vaše institucije."
+    emailDomainErrorMessage: "Morate se registrovati sa email adresom vaše institucije.",
+    downloadsByCountryLabel: "Preuzimanja po zemljama",
+    totalDownloadsLabel: "Ukupan broj preuzimanja",
+    numberOfDownloadsMonthlyLabel: "Broj preuzimanja po mesecima",
+    noCountryDownloads: "Preuzimanja za koje ne postoji informacija odakle su"
 }

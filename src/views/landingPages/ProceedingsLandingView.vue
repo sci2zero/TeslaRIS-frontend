@@ -194,6 +194,9 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -255,6 +258,11 @@
                     :has-attached-files="proceedings?.fileItems && proceedings?.fileItems.length > 0"
                     @create="createIndicator"
                     @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(proceedings?.id as number)"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -324,11 +332,12 @@ import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("");
 

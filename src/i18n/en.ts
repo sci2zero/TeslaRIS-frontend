@@ -1024,5 +1024,9 @@ export default {
     validatingEmailDomainLabel: "Validate email address domain",
     allowingSubdomainsLabel: "Allow subdomain usage",
     institutionEmailDomainLabel: "Institutional email address domain",
-    emailDomainErrorMessage: "You have to register with your institution's email address"
+    emailDomainErrorMessage: "You have to register with your institution's email address",
+    downloadsByCountryLabel: "Downloads by country",
+    totalDownloadsLabel: "Total number of downloads",
+    numberOfDownloadsMonthlyLabel: "Number of monthly downloads",
+    noCountryDownloads: "Downloads for which there is no country information"
 }

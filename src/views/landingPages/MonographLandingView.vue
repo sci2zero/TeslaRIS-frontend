@@ -199,6 +199,9 @@
             <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -294,6 +297,11 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(monograph?.id as number)"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <publication-unbind-button
@@ -369,11 +377,12 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import PublisherService from '@/services/PublisherService';
 import { type Publisher } from '@/models/PublisherModel';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 

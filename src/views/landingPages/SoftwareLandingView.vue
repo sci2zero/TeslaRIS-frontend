@@ -142,6 +142,9 @@
             <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -200,6 +203,11 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
                     @create="createClassification"
                     @update="fetchClassifications"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(software?.id as number)"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -264,11 +272,12 @@ import ShareButtons from '@/components/core/ShareButtons.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 

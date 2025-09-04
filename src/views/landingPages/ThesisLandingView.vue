@@ -366,6 +366,9 @@
             <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -457,6 +460,11 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(thesis?.id as number)"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <publication-unbind-button
@@ -540,11 +548,12 @@ import { useTrustConfigurationActions } from '@/composables/useTrustConfiguratio
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 

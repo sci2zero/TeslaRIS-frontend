@@ -268,8 +268,6 @@ watch([startDate, endDate], () => {
     const end = new Date(endDate.value);
 
     if (end < start) {
-        console.warn("End date is before start date. Swapping values.");
-
         const newStart = end.toISOString();
         const newEnd = start.toISOString();
 
