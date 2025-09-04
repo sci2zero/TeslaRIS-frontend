@@ -32,8 +32,10 @@ on:
 
 env:
   VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
-  VITE_RECAPTCHA_SITE_KEY: ${{ inputs.site_key || vars.SITE_KEY  }}
+  VITE_RECAPTCHA_SITE_KEY: ${{ vars.SITE_KEY  }}
   VITE_APP_VERSION: ${{ inputs.version }}
+  VITE_UNPAYWALL_EMAIL: ${{ vars.UNPAYWALL_EMAIL }}
+  VITE_SERVER_TIMEZONE: ${{ vars.SERVER_TIMEZONE }}
 
 jobs:
   build-frontend:
