@@ -89,7 +89,10 @@ export default defineComponent({
             }
 
             if (input.length >= 3) {
-                lastSearchInput.value = input;
+                if (!input.startsWith(i18n.t("notInListLabel", []).slice(0, -3))) {
+                    lastSearchInput.value = input;
+                }
+                
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
