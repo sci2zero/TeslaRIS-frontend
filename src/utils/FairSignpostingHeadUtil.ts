@@ -78,25 +78,20 @@ export const injectFairSignposting = (headers: AxiosResponseHeaders) => {
 };
 
 const cleanupFairSignposting = () => {
-    const currentLinks = Array.from(document.head.querySelectorAll<HTMLLinkElement>('link'));
-    const filteredLinks = currentLinks
-        .filter(link =>
-            !link.rel ||
-            (link.rel !== 'type' &&
-            !link.rel.includes('describedby') &&
-            !link.rel.includes('item') &&
-            !link.rel.includes('collection') &&
-            !link.rel.includes('license') &&
-            !link.rel.includes('cite-as'))
-        )
-        .map(link => ({
-            rel: link.rel,
-            href: link.href,
-            type: link.type || undefined,
-        }));
-
-    document.querySelectorAll<HTMLLinkElement>('head link').forEach(link => link.remove());
-    useHead({
-        link: filteredLinks,
+    document
+    .querySelectorAll<HTMLLinkElement>('head link')
+    .forEach(link => {
+        if (
+            link.rel === 'type' ||
+            link.rel.includes('describedby') ||
+            link.rel.includes('item') ||
+            link.rel.includes('identifier') ||
+            link.rel.includes('collection') ||
+            link.rel.includes('license') ||
+            link.rel.includes('suthor') ||
+            link.rel.includes('cite-as')
+        ) {
+            link.remove();
+        }
     });
 };
