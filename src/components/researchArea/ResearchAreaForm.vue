@@ -4,19 +4,28 @@
             <v-col>
                 <multilingual-text-input
                     ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetResearchArea?.name, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetResearchArea?.name, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :label="$t('descriptionLabel')"
-                    :initial-value="toMultilingualTextInput(presetResearchArea?.description, languageTags)"></multilingual-text-input>
+                    ref="descriptionRef"
+                    v-model="description"
+                    :label="$t('descriptionLabel')"
+                    :initial-value="toMultilingualTextInput(presetResearchArea?.description, languageTags)"
+                    is-rich is-area>
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <research-area-autocomplete-search v-model="selectedResearchArea" allow-manual-clearing></research-area-autocomplete-search>
+                <research-area-autocomplete-search
+                    v-model="selectedResearchArea"
+                    :label="$t('superResearchAreaLabel')"
+                    allow-manual-clearing
+                />
             </v-col>
         </v-row>
 

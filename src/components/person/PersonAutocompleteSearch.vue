@@ -17,6 +17,7 @@
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="PersonSubmissionForm"
                 entity-name="Person"
                 is-submission
@@ -99,6 +100,8 @@ export default defineComponent({
         const i18n = useI18n();
         const searchPlaceholder = props.multiple ? [] : {title: "", value: -1};
 
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
+
         const persons = ref<{ title: string; value: number; date?: string }[]>([]);
         const selectedPerson = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
@@ -137,11 +140,31 @@ export default defineComponent({
                         } else {
                             listOfPersons.push({title: removeTrailingPipeRegex(`${person.name} | ${person.birthdate ? localiseDate(person.birthdate) : i18n.t("unknownBirthdateMessage")} | ${person.employmentsOther}`), value: person.databaseId});
                         }
-                    })
+                    });
+
+                    if (!props.multiple && !props.disableSubmission && !modalRef.value!.dialog) {
+                        listOfPersons.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0
+                        });
+                    }
+
                     persons.value = listOfPersons;
                 });
             }
         }, 300);
+
+        watch(selectedPerson, () => {
+            if (
+                !props.multiple &&
+                selectedPerson.value &&
+                (selectedPerson.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedPerson.value as { title: string; value: number; }).title = "";
+                (selectedPerson.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const sendContentToParent = () => {
             emit("update:modelValue", selectedPerson.value);
@@ -178,7 +201,8 @@ export default defineComponent({
             persons, selectedPerson, searchPersons,
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedPerson, hasSelection,
-            PersonSubmissionForm, requiredMultiSelectionRules
+            PersonSubmissionForm, requiredMultiSelectionRules,
+            modalRef
         };
     }
 });

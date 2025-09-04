@@ -119,14 +119,14 @@ export default defineComponent({
         };
 
         const fetchLeftPublications = () => {
-            DocumentPublicationService.findResearcherPublications(parseInt(currentRoute.params.leftId as string), `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`).then((publicationResponse) => {
+            DocumentPublicationService.findResearcherPublications(parseInt(currentRoute.params.leftId as string), [], `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`).then((publicationResponse) => {
                 leftPublications.value = publicationResponse.data.content;
                 leftTotalPublications.value = publicationResponse.data.totalElements
             });
         };
 
         const fetchRightPublications = () => {
-            DocumentPublicationService.findResearcherPublications(parseInt(currentRoute.params.rightId as string), `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`).then((publicationResponse) => {
+            DocumentPublicationService.findResearcherPublications(parseInt(currentRoute.params.rightId as string), [], `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`).then((publicationResponse) => {
                 rightPublications.value = publicationResponse.data.content;
                 rightTotalPublications.value = publicationResponse.data.totalElements
             });

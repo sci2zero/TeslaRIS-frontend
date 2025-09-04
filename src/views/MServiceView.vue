@@ -3,6 +3,11 @@
         <h1 class="d-flex justify-center text-center">
             {{ $t("mServiceLabel") }}
         </h1>
+        <div class="d-flex justify-center text-center mb-5">
+            <h3 class="description">
+                {{ $t("mServiceDescriptionLabel") }}
+            </h3>
+        </div>
   
         <v-form v-model="isFormValid" @submit.prevent>
             <v-row justify="center" class="mt-5">
@@ -387,3 +392,11 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+
+.description {
+    max-width: 950px;
+}
+
+</style>

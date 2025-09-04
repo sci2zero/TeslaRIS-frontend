@@ -33,6 +33,8 @@ import type { ResearchAreaResponse } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -73,6 +75,10 @@ export default defineComponent({
             searchParams.value = tokenParams;
             ResearchAreaService.searchResearchAreas(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
             .then((response) => {
+                response.data.content.forEach(researchArea => {
+                    researchArea.displayDescription = displayTextOrPlaceholder((returnCurrentLocaleContent(researchArea.description) as string));
+                });
+                
                 researchAreas.value = response.data.content;
                 totalCountries.value = response.data.totalElements;
             })

@@ -61,9 +61,39 @@
                             ></v-select>
                         </v-col>
                     </v-row>
+                    <v-row v-if="isAdmin">
+                        <v-checkbox
+                            v-model="clientInstitution"
+                            :label="$t('clientInstitutionLabel')"
+                        ></v-checkbox>
+                    </v-row>
+                    <v-row v-if="isAdmin && clientInstitution">
+                        <v-checkbox
+                            v-model="validatingEmailDomain"
+                            :label="$t('validatingEmailDomainLabel')"
+                        ></v-checkbox>
+                        <v-checkbox
+                            v-if="validatingEmailDomain"
+                            v-model="allowingSubdomains"
+                            :label="$t('allowingSubdomainsLabel')"
+                        ></v-checkbox>
+                    </v-row>
+                    <v-row v-if="isAdmin && clientInstitution && validatingEmailDomain">
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="institutionEmailDomain"
+                                :label="$t('institutionEmailDomainLabel') + '*'"
+                                :placeholder="$t('institutionEmailDomainLabel') + '*'"
+                                :rules="requiredFieldRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <open-layers-map ref="mapRef" :read-only="false"></open-layers-map>
+                            <open-layers-map
+                                ref="mapRef"
+                                :read-only="false">
+                            </open-layers-map>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -139,11 +169,17 @@ export default defineComponent({
         const keywords = ref([]);
         const uris = ref<string[]>([]);
 
+        const clientInstitution = ref(false);
+        const validatingEmailDomain = ref(false);
+        const allowingSubdomains = ref(false);
+        const institutionEmailDomain = ref("");
+
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>([{ title: "", value: null }]);
 
         const { languageTags } = useLanguageTags();
-        const { loggedInUser } = useUserRole();
+        const { loggedInUser, isAdmin } = useUserRole();
+
         watch(() => languageTags.value, () => {
             presetName();
         });
@@ -182,7 +218,11 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 ror: ror.value,
                 uris: uris.value,
-                allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[]
+                allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
+                clientInstitution: clientInstitution.value,
+                validatingEmailDomain: validatingEmailDomain.value,
+                allowingSubdomains: allowingSubdomains.value,
+                institutionEmailDomain: institutionEmailDomain.value
             };
 
             OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
@@ -202,6 +242,10 @@ export default defineComponent({
                     ror.value = "";
                     selectedThesisType.value = [];
                     mapRef.value?.clearInput();
+                    clientInstitution.value = false;
+                    validatingEmailDomain.value = false;
+                    allowingSubdomains.value = false;
+                    institutionEmailDomain.value = "";
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -216,21 +260,18 @@ export default defineComponent({
 
         return {
             isFormValid, 
-            additionalFields,
-            snackbar, message,
-            name, nameRef,
-            nameAbbreviation,
-            email, phoneNumber,
-            keywords, keywordsRef,
-            requiredFieldRules,
-            submit, mapRef,
-            scopusAfid, uris,
+            additionalFields, snackbar, message,
+            name, nameRef, nameAbbreviation,
+            email, phoneNumber, keywords, keywordsRef,
+            requiredFieldRules, clientInstitution,
+            submit, mapRef, scopusAfid, uris,
             scopusAfidValidationRules,
             nonMandatoryEmailFieldRules,
             openAlexId, rorValidationRules, ror,
             institutionOpenAlexIdValidationRules,
-            thesisTypes, selectedThesisType,
-            requiredSelectionRules
+            thesisTypes, selectedThesisType, isAdmin,
+            requiredSelectionRules, allowingSubdomains,
+            validatingEmailDomain, institutionEmailDomain
         };
     }
 });

@@ -502,6 +502,10 @@ export default defineComponent({
         };
 
         const fetchScheduledTasks = () => {
+            if (isResearcher.value) {
+                return;
+            }
+
             TaskManagerService.listScheduledHarvestTasks().then((response) => {
                 scheduledTasks.value = response.data;
                 scheduledTasks.value.sort((a, b) => {

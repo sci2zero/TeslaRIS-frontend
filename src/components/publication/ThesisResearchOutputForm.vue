@@ -103,6 +103,7 @@ export default defineComponent({
 
                 DocumentPublicationService.findResearcherPublications(
                     props.researcherId as number,
+                    [],
                     `page=${page.value}&size=${size.value}&sort=${sort.value}${ignore}`
                 ).then((publicationResponse) => {
                     personPublications.value = publicationResponse.data.content;

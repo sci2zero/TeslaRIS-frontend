@@ -6,10 +6,22 @@
         @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" elementk :to="'persons/' + contribution.personId">
-                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + displayContributionType(contribution) }}</strong></h4>
+                <h4>
+                    <strong>
+                        {{ contribution.personName?.firstname }}
+                        {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
+                        {{ ' ' + contribution.personName?.lastname }}
+                        {{ displayContributionType(contribution) }}
+                    </strong>
+                </h4>
             </localized-link>
             <h4 v-else>
-                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + displayContributionType(contribution) }}</strong>
+                <strong>
+                    {{ contribution.personName?.firstname }}
+                    {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
+                    {{ ' ' + contribution.personName?.lastname }}
+                    {{ displayContributionType(contribution) }}
+                </strong>
             </h4>
             <div v-if="contribution.institutionIds?.length === 0">
                 <em>

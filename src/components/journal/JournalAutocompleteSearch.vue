@@ -16,6 +16,7 @@
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="PublicationSeriesSubmissionForm"
                 :form-props="{inputType: inputType, presetName: lastSearchInput}"
                 entity-name="Journal"
@@ -86,6 +87,8 @@ export default defineComponent({
     setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
 
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
+
         const inputType = PublicationSeriesType.JOURNAL.toString();
 
         const journals = ref<{ title: string; value: number; }[]>([]);
@@ -137,7 +140,8 @@ export default defineComponent({
             }
             
             if (input.length >= 3) {
-                lastSearchInput.value = input
+                lastSearchInput.value = input;
+
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
@@ -152,11 +156,31 @@ export default defineComponent({
                         } else {
                             listOfJournals.push({title: journal.titleOther, value: journal.databaseId});
                         }
-                    })
+                    });
+
+                    if (!props.multiple && !props.disableSubmission && !modalRef.value!.dialog) {
+                        listOfJournals.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0
+                        });
+                    }
+
                     journals.value = listOfJournals;
                 });
             }
         }, 300);
+
+        watch(selectedJournal, () => {
+            if (
+                !props.multiple &&
+                selectedJournal.value &&
+                (selectedJournal.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedJournal.value as { title: string; value: number; }).title = "";
+                (selectedJournal.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const sendContentToParent = () => {
             emit("update:modelValue", selectedJournal.value);
@@ -188,7 +212,7 @@ export default defineComponent({
             journals, selectedJournal, searchJournals,
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
-            selectNewlyAddedJournal, hasSelection,
+            selectNewlyAddedJournal, hasSelection, modalRef,
             PublicationSeriesSubmissionForm, lastSearchInput
         };
     }

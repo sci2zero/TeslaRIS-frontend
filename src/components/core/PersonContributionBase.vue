@@ -9,6 +9,7 @@
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
                 return-object
+                :readonly="lockSearchField"
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
                 @blur="onAutocompleteBlur"
@@ -162,6 +163,10 @@ export default defineComponent({
         isUpdate: {
             type: Boolean,
             default: false
+        },
+        lockSearchField: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],
@@ -216,7 +221,7 @@ export default defineComponent({
         });
 
         const searchPersons = lodash.debounce((input: string) => {
-            if (!input || input.includes("|") || selectedPerson.value.value === 0) {
+            if (props.lockSearchField || !input || input.includes("|") || selectedPerson.value.value === 0) {
                 return;
             }
             if (input.length >= 3) {

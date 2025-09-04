@@ -291,7 +291,9 @@ export default defineComponent({
                 contributions: [],
                 languageTagIds: [],
                 eISBN: props.publicationForLoading.isbn
-            }).then(() => {
+            }).then((response) => {
+                selectedProceedings.value = {} as ProceedingsResponse;
+                selectedProceedings.value.id = response.data.id
                 hadToBeCreated.value = true;
                 proceedingsBinded.value = true;
                 automaticProcessCompleted.value = true;

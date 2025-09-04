@@ -12,8 +12,9 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1">
+        <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="PublisherSubmissionForm"
                 :form-props="{presetName: lastSearchInput}"
                 entity-name="Publisher"
@@ -54,6 +55,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        disableSubmission: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
@@ -63,6 +68,8 @@ export default defineComponent({
     setup(props, {emit}) {
         const i18n = useI18n();
         const searchPlaceholder = {title: "", value: -1};
+
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
 
         const publishers = ref<{ title: string; value: number; }[]>([]);
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -97,11 +104,30 @@ export default defineComponent({
                         } else {
                             listOfPublishers.push({title: publisher.nameOther, value: publisher.databaseId});
                         }
-                    })
+                    });
+
+                    if (!props.disableSubmission && !modalRef.value!.dialog) {
+                        listOfPublishers.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0
+                        });
+                    }
+
                     publishers.value = listOfPublishers;
                 });
             }
         }, 300);
+
+        watch(selectedPublisher, () => {
+            if (
+                selectedPublisher.value &&
+                (selectedPublisher.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedPublisher.value as { title: string; value: number; }).title = "";
+                (selectedPublisher.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const sendContentToParent = () => {
             emit("update:modelValue", selectedPublisher.value);
@@ -138,7 +164,7 @@ export default defineComponent({
         return {
             publishers, selectedPublisher, searchPublishers,
             sendContentToParent, clearInput, selectNewlyAddedPublisher,
-            PublisherSubmissionForm, lastSearchInput
+            PublisherSubmissionForm, lastSearchInput, modalRef
         };
     }
 });

@@ -18,6 +18,7 @@
         </v-col>
         <v-col v-if="!disableSubmission && isAdmin" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="OrganisationUnitSubmissionForm"
                 :form-props="{ presetName: lastSearchInput }"
                 entity-name="OU"
@@ -108,12 +109,18 @@ export default defineComponent({
         allowedThesisType: {
             type: Object as PropType<ThesisType | null>,
             default: null
+        },
+        onlyClientInstitutions: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
         const i18n = useI18n();
         const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
+
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
 
         const showThesisTypeError = ref(false);
         const recentlySearched = ref(new Map<number, ThesisType[]>());
@@ -136,15 +143,16 @@ export default defineComponent({
         onMounted(() => {
             if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
+                checkCompatibility();
             }
-            sendContentToParent();
 
-            checkCompatibility();
+            sendContentToParent();
         });
 
         watch(() => props.modelValue, () => {
             if (props.modelValue) {
                 selectedOrganisationUnit.value = props.modelValue;
+                checkCompatibility();
             }
         });
 
@@ -160,11 +168,15 @@ export default defineComponent({
                 return;
             }
 
-            const response = recentlySearched.value.get(
-                (selectedOrganisationUnit.value as {title: string, value: number}).value
-            );
+            const organisationUnitId = (selectedOrganisationUnit.value as {title: string, value: number}).value;
+            const response = recentlySearched.value.get(organisationUnitId);
             
-            if (!response || !response.includes(props.allowedThesisType as ThesisType)) {
+            if (!response) {
+                OrganisationUnitService.readOU(organisationUnitId).then(response => {
+                    showThesisTypeError.value = !response.data.allowedThesisTypes.includes(props.allowedThesisType as ThesisType);
+                    recentlySearched.value.set(response.data.id, response.data.allowedThesisTypes);
+                });
+            } else if (!response.includes(props.allowedThesisType as ThesisType)) {
                 showThesisTypeError.value = true;
             } else {
                 showThesisTypeError.value = false;
@@ -189,7 +201,8 @@ export default defineComponent({
                         props.topLevelInstitutionId,
                         props.onlyHarvestableInstitutions,
                         props.onlyIndependentInstitutions,
-                        props.allowedThesisType
+                        props.allowedThesisType,
+                        props.onlyClientInstitutions
                     ).then((response) => {
                         recentlySearched.value.clear();
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({
@@ -199,6 +212,13 @@ export default defineComponent({
                         response.data.content.forEach(index => {
                             recentlySearched.value.set(index.databaseId, index.allowedThesisTypes);
                         });
+
+                        if (!props.multiple && !props.disableSubmission && isAdmin.value && !modalRef.value!.dialog) {
+                            organisationUnits.value.push({
+                                title: i18n.t("notInListLabel", [input]),
+                                value: 0
+                            });
+                        }
                     }
                 );
             }
@@ -207,6 +227,18 @@ export default defineComponent({
         const sendContentToParent = () => {
             emit("update:modelValue", selectedOrganisationUnit.value);
         };
+
+        watch(selectedOrganisationUnit, () => {
+            if (
+                !props.multiple &&
+                selectedOrganisationUnit.value &&
+                (selectedOrganisationUnit.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedOrganisationUnit.value as { title: string; value: number; }).title = "";
+                (selectedOrganisationUnit.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const clearInput = () => {
             selectedOrganisationUnit.value = searchPlaceholder;
@@ -241,7 +273,7 @@ export default defineComponent({
         };
 
         return {
-            organisationUnits, selectedOrganisationUnit, searchOUs,
+            organisationUnits, selectedOrganisationUnit, searchOUs, modalRef,
             requiredSelectionRules, calculateAutocompleteWidth, lastSearchInput,
             sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules,

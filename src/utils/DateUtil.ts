@@ -74,48 +74,54 @@ export const localiseTime = (timeString: string | undefined) => {
 
 export const computeNextDates = (day: number, month: number, year: number, recurrence: RecurrenceType): Date[] => {
     const results: Date[] = [];
-    const baseDate = new Date();
+    const occurrenceDate = new Date();
 
     for (let i = 0; i < 3; i++) {
-        const newDate = new Date(baseDate);
+        const newDate = new Date(occurrenceDate);
 
-        if (day > 0) {
-            newDate.setDate(day);
-        } else if (day < 0) {
-            newDate.setDate(newDate.getDate() + day);
-        }
-
-        if (month > 0) {
-            newDate.setMonth(month - 1);
-        } else if (month < 0) {
-            newDate.setMonth(newDate.getMonth() + month);
-        }
-
-        if (year > 0) {
+        if (year === 0) {
+            newDate.setFullYear(occurrenceDate.getFullYear());
+        } else if (year > 0) {
             newDate.setFullYear(year);
-        } else if (year < 0) {
-            newDate.setFullYear(newDate.getFullYear() + year);
+        } else {
+            newDate.setFullYear(occurrenceDate.getFullYear() + year);
         }
 
-        switch (recurrence) {
-            case RecurrenceType.DAILY:
-                newDate.setDate(newDate.getDate() + i);
-                break;
-            case RecurrenceType.WEEKLY:
-                newDate.setDate(newDate.getDate() + i * 7);
-                break;
-            case RecurrenceType.MONTHLY:
-                newDate.setMonth(newDate.getMonth() + i);
-                break;
-            case RecurrenceType.THREE_MONTHLY:
-                newDate.setMonth(newDate.getMonth() + i * 3);
-                break;
-            case RecurrenceType.YEARLY:
-                newDate.setFullYear(newDate.getFullYear() + i);
-                break;
+        if (month === 0) {
+            newDate.setMonth(occurrenceDate.getMonth());
+        } else if (month > 0) {
+            newDate.setMonth(month - 1); // JS months are 0-based
+        } else {
+            newDate.setMonth(occurrenceDate.getMonth() + month);
+        }
+
+        if (day === 0) {
+            newDate.setDate(occurrenceDate.getDate());
+        } else if (day > 0) {
+            newDate.setDate(day);
+        } else {
+            newDate.setDate(occurrenceDate.getDate() + day);
         }
 
         results.push(newDate);
+
+        switch (recurrence) {
+            case RecurrenceType.DAILY:
+                occurrenceDate.setDate(occurrenceDate.getDate() + 1);
+                break;
+            case RecurrenceType.WEEKLY:
+                occurrenceDate.setDate(occurrenceDate.getDate() + 7);
+                break;
+            case RecurrenceType.MONTHLY:
+                occurrenceDate.setMonth(occurrenceDate.getMonth() + 1);
+                break;
+            case RecurrenceType.THREE_MONTHLY:
+                occurrenceDate.setMonth(occurrenceDate.getMonth() + 3);
+                break;
+            case RecurrenceType.YEARLY:
+                occurrenceDate.setFullYear(occurrenceDate.getFullYear() + 1);
+                break;
+        }
     }
 
     return results;

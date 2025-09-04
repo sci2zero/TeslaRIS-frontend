@@ -17,6 +17,7 @@
         </v-col>
         <v-col v-if="!disableSubmission && !readOnly" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="ConferenceSubmissionForm"
                 :form-props="{readOnly: readOnly, presetName: lastSearchInput}"
                 entity-name="Conference"
@@ -86,6 +87,8 @@ export default defineComponent({
     setup(props, { emit }) {
         const i18n = useI18n();
         const searchPlaceholder = props.multiple ? [] : { title: "", value: -1 };
+
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
         
         const events = ref<{ title: string; value: number; date?: string }[]>([]);
         const selectedEvent = ref(
@@ -117,9 +120,29 @@ export default defineComponent({
                         value: conference.databaseId,
                         date: conference.dateFromTo
                     }));
+
+                    if (!props.multiple && !props.disableSubmission && !props.readOnly && !modalRef.value!.dialog) {
+                        events.value.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0,
+                            date: undefined
+                        });
+                    }
                 });
             }
         }, 300);
+
+        watch(selectedEvent, () => {
+            if (
+                !props.multiple &&
+                selectedEvent.value &&
+                (selectedEvent.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedEvent.value as { title: string; value: number; }).title = "";
+                (selectedEvent.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const sendContentToParent = () => {
             emit("update:modelValue", selectedEvent.value);
@@ -181,7 +204,7 @@ export default defineComponent({
             events, selectedEvent, searchEvents,
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedEvent, hasSelection,
-            ConferenceSubmissionForm, lastSearchInput
+            ConferenceSubmissionForm, lastSearchInput, modalRef
         };
     }
 });

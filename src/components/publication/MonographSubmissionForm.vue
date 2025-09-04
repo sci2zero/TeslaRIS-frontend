@@ -1,9 +1,9 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col :cols="inModal ? 12 : 8">
+            <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="10">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.MONOGRAPH"
                             @metadata-fetched="popuateMetadata"
@@ -21,7 +21,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="10">
                         <v-text-field
                             v-model="publicationYear"
                             :rules="requiredFieldRules"
@@ -31,7 +31,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
+                    <v-col cols="10">
                         <v-select
                             v-model="selectedMonographType"
                             :label="$t('monographTypeLabel') + '*'"
@@ -43,7 +43,7 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="6">
+                    <v-col cols="5">
                         <v-text-field
                             v-model="eIsbn"
                             label="E-ISBN"
@@ -51,7 +51,7 @@
                             :rules="isbnValidationRules">
                         </v-text-field>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col cols="5">
                         <v-text-field
                             v-model="printIsbn"
                             label="Print ISBN"
@@ -62,7 +62,7 @@
                 </v-row>
 
                 <v-row>
-                    <v-col>
+                    <v-col cols="12">
                         <h2>{{ $t("authorsLabel") }}</h2>
                         <person-publication-contribution
                             ref="contributionsRef"
@@ -112,7 +112,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col cols="10">
                             <v-select
                                 v-model="selectedResearchArea"
                                 :label="$t('researchAreaLabel')"
@@ -123,7 +123,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col>
+                        <v-col cols="10">
                             <v-select
                                 v-model="selectedLanguages"
                                 :label="$t('languageLabel')"
@@ -133,7 +133,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <v-text-field
                                 v-model="numberOfPages"
                                 type="number"
@@ -143,7 +143,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="4">
+                        <v-col cols="3">
                             <v-text-field
                                 v-model="scopus"
                                 label="Scopus ID"
@@ -159,7 +159,7 @@
                                 :rules="workOpenAlexIdValidationRules">
                             </v-text-field>
                         </v-col>
-                        <v-col cols="4">
+                        <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
@@ -169,7 +169,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <journal-autocomplete-search
                                 ref="journalAutocompleteRef"
                                 v-model="selectedJournal"
@@ -179,7 +179,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <book-series-autocomplete-search
                                 ref="bookSeriesAutocompleteRef"
                                 v-model="selectedBookSeries"
@@ -189,14 +189,14 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
+                        <v-col cols="5">
                             <v-text-field
                                 v-model="number"
                                 :label="$t('numberLabel')"
                                 :placeholder="$t('numberLabel')">
                             </v-text-field>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="5">
                             <v-text-field
                                 v-model="volume"
                                 :label="$t('volumeLabel')"
@@ -205,7 +205,7 @@
                         </v-col>
                     </v-row>
                     <!-- <v-row>
-                        <v-col cols="12">
+                        <v-col cols="10">
                             <event-autocomplete-search
                                 ref="eventAutocompleteRef"
                                 v-model="selectedEvent">
@@ -225,9 +225,11 @@
         </v-row>
 
         <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
+            <v-col cols="10">
+                <p class="required-fields-message">
+                    {{ $t("requiredFieldsMessage") }}
+                </p>
+            </v-col>
         </v-row>
     </v-form>
     
@@ -241,7 +243,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import type { LanguageTagResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { LanguageTagResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -263,6 +265,7 @@ import Toast from '../core/Toast.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -272,6 +275,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: false
+        },
+        presetName: {
+            type: String,
+            default: ""
         }
     },
     emits: ["create"],
@@ -291,6 +298,8 @@ export default defineComponent({
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>([]);
 
+        const { loggedInUser } = useUserRole();
+
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 response.data.forEach((languageTag: LanguageTagResponse) => {
@@ -300,6 +309,8 @@ export default defineComponent({
                         selectedLanguages.value.push(languageTag.id);
                     }
                 })
+
+                presetName();
             });
 
             ResearchAreaService.listAllResearchAreas().then(response => {
@@ -314,8 +325,32 @@ export default defineComponent({
                     title: getMonographTypeTitleFromValueAutoLocale(MonographType.BOOK) as string,
                     value: MonographType.BOOK
                 };
+            } else {
+                selectedMonographType.value = {
+                    title: getMonographTypeTitleFromValueAutoLocale(MonographType.RESEARCH_MONOGRAPH) as string,
+                    value: MonographType.RESEARCH_MONOGRAPH
+                };
             }
         });
+
+        watch(() => props.presetName, () => {
+            presetName();
+        });
+
+        const presetName = async () => {
+            if (props.presetName) {
+                const tag = languageTags.value.find(
+                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                );
+                if (tag) {
+                    const mc: MultilingualContent[] = [
+                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                    ];
+                    title.value = mc;
+                    titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
+                }
+            }
+        };
 
         const populateSelectionData = () => {
             researchAreasSelectable.value = [];

@@ -91,7 +91,7 @@
                             <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Conf ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row v-if="!serialEvent">
                         <v-col cols="10">
                             <v-text-field
                                 v-model="conferenceNumber"
@@ -243,7 +243,13 @@ export default defineComponent({
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
         const dateRangeError = ref(false);
 
-        watch([dateFrom, dateTo], () => {
+        watch([dateFrom, dateTo, eventYear], () => {
+            if(eventYear.value && !timePeriodInput.value) {
+                dateRangeError.value = false;
+                manualValidationsPassed.value = true;
+                return;
+            }
+            
             const from = dateFrom.value;
             const to = dateTo.value;
 

@@ -246,6 +246,7 @@ export default {
     mainContributorLabel: "Main Contributor",
     correspondingContributorLabel: "Corresponding Author",
     authorsLabel: "Authors",
+    authorLabel: "Author",
     editorsLabel: "Editors",
     reviewersLabel: "Reviewers",
     advisorsLabel: "Advisors",
@@ -1014,5 +1015,14 @@ export default {
     numberOfPublicationsByMCategoryAndYearLabel: "Publication count by year and M category",
     notClassifiedLabel: "Not classified",
     viewsLabel: "Views",
-    numberOfViewsMonthlyLabel: "Number of monthly views"
+    numberOfViewsMonthlyLabel: "Number of monthly views",
+    mServiceDescriptionLabel: "On this service, you can check the category of a paper that has been published or is planned for publication in a journal, as well as a paper that has been presented or is planned for presentation at a conference.",
+    readMoreLabel: "Read more",
+    readLessLabel: "Read less",
+    nobodyLabel: "Nobody",
+    clientInstitutionLabel: "Client institution",
+    validatingEmailDomainLabel: "Validate email address domain",
+    allowingSubdomainsLabel: "Allow subdomain usage",
+    institutionEmailDomainLabel: "Institutional email address domain",
+    emailDomainErrorMessage: "You have to register with your institution's email address"
 }

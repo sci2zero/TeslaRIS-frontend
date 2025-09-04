@@ -10,7 +10,7 @@
             />
             
             <router-view
-                :key="$route.fullPath"
+                :key="$route.path"
             />
             
             <cookie-consent

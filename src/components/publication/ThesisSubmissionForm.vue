@@ -68,11 +68,12 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <h2>{{ $t("authorsLabel") }}</h2>
+                        <h2>{{ $t("authorLabel") }}</h2>
                         <person-publication-contribution
                             ref="contributionsRef"
-                            basic
-                            limit-one :allow-external-associate="false"
+                            limit-one basic
+                            :lock-search-field="isResearcher"
+                            :allow-external-associate="false"
                             @set-input="contributions = $event">
                         </person-publication-contribution>
                     </v-col>
@@ -313,7 +314,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { type PersonDocumentContribution, PublicationType, type Thesis, ThesisType } from "@/models/PublicationModel";
+import { DocumentContributionType, type PersonDocumentContribution, PublicationType, type Thesis, ThesisType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -330,6 +331,8 @@ import DatePicker from '../core/DatePicker.vue';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDefaultSubmissionContentService';
 import type { InstitutionDefaultSubmissionContent } from '@/models/OrganisationUnitModel';
+import UserService from '@/services/UserService';
+import PersonService from '@/services/PersonService';
 
 
 export default defineComponent({
@@ -347,7 +350,7 @@ export default defineComponent({
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
         const router = useRouter();
-        const { isAdmin, isInstitutionalLibrarian, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalLibrarian, isResearcher, loggedInUser } = useUserRole();
         const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
         const { languageTags } = useLanguageTags();
@@ -371,6 +374,10 @@ export default defineComponent({
             });
 
             fetchDefaultContent();
+
+            if (isResearcher.value) {
+                populateSinglePossibleAuthor();
+            }
         });
 
         const fetchDefaultContent = () => {
@@ -576,6 +583,31 @@ export default defineComponent({
             }
         };
 
+        const populateSinglePossibleAuthor = async () => {
+            const userResponse = await UserService.getLoggedInUser();
+
+            const personResponse = await PersonService.readPerson(userResponse.data.personId);
+
+            contributions.value = [
+                {
+                    contributionType: DocumentContributionType.AUTHOR,
+                    isMainContributor: true,
+                    isCorrespondingContributor: true,
+                    isBoardPresident: false,
+                    personId: personResponse.data.id as number,
+                    contributionDescription: [],
+                    orderNumber: 1,
+                    displayAffiliationStatement: [],
+                    personName: personResponse.data.personName
+                }
+            ];
+            contributionsRef.value?.fillDummyAuthors(contributions.value.length);
+
+            await nextTick();
+
+            contributionsRef.value?.fillInputs(contributions.value, true);
+        };
+
         return {
             isFormValid, PublicationType, popuateMetadata,
             additionalFields, snackbar, error, title, titleRef,
@@ -598,7 +630,7 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             typeOfTitle, scientificAreaRef, scientificSubAreaRef,
             placeOfKeepRef, typeOfTitleRef, presetContent,
-            toMultilingualTextInput
+            toMultilingualTextInput, isResearcher
         };
     }
 });

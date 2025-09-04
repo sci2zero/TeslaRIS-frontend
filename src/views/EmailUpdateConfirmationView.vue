@@ -40,7 +40,8 @@ export default defineComponent({
                 loginStore.explicitlyLogout();
             }
 
-            await router.isReady()
+            await router.isReady();
+            
             const confirmationToken = currentRoute.params.confirmationToken as string;
             
             UserService.confirmEmailChange(
