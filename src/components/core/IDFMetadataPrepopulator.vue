@@ -1,7 +1,13 @@
 <template>
     <v-row>
         <v-col cols="11">
-            <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+            <v-text-field
+                ref="doiInputRef"
+                v-model="doi"
+                label="DOI"
+                placeholder="DOI"
+                :rules="doiValidationRules">
+            </v-text-field>
             <p v-if="errorMessage" class="text-red">
                 {{ errorMessage }} {{ harvestedDocumentType }}
             </p>
@@ -22,8 +28,9 @@ import { PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import MetadataPrepopulationService from '@/services/MetadataPrepopulationService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { computed, defineComponent, type PropType, ref, watch } from 'vue';
+import { computed, defineComponent, nextTick, onMounted, type PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { VTextField } from 'vuetify/lib/components/index.mjs';
 
 
 export default defineComponent({
@@ -32,11 +39,17 @@ export default defineComponent({
         documentType: {
             type: Object as PropType<PublicationType>,
             required: true
+        },
+        autoFocus: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["metadataFetched"],
     setup(props, { emit }) {
         const doi = ref("");
+
+        const doiInputRef = ref<InstanceType<typeof VTextField> | null>(null);
 
         const i18n = useI18n();
         const mismatchedTypesMessage = computed(() => i18n.t("mismatchedPublicationTypesMessage"));
@@ -47,6 +60,14 @@ export default defineComponent({
         const isLoading = ref(false);
 
         const { doiValidationRules } = useValidationUtils();
+
+        onMounted(() => {
+            nextTick(() => {
+                if (doiInputRef.value && props.autoFocus) {
+                    doiInputRef.value.focus();
+                }
+            });
+        });
 
         watch(doi, async () => {
             if (doi.value.startsWith("https://doi.org/")) {
@@ -83,7 +104,7 @@ export default defineComponent({
         return {
             doi, errorMessage,
             doiValidationRules,
-            isLoading,
+            isLoading, doiInputRef,
             harvestedDocumentType
         };
     }

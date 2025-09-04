@@ -13,8 +13,9 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1">
+        <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="PublicationSeriesSubmissionForm"
                 :form-props="{inputType: inputType}"
                 entity-name="BookSeries"
@@ -70,11 +71,17 @@ export default defineComponent({
         readonly: {
             type: Boolean,
             default: false
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
     setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
+
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
         
         const inputType = PublicationSeriesType.BOOK_SERIES.toString();
 
@@ -133,11 +140,30 @@ export default defineComponent({
                         } else {
                             listOfBookSeries.push({title: bookSeries.titleOther, value: bookSeries.databaseId});
                         }
-                    })
+                    });
+
+                    if (!props.disableSubmission && !modalRef.value!.dialog) {
+                        listOfBookSeries.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0
+                        });
+                    }
+
                     bookSeries.value = listOfBookSeries;
                 });
             }
         }, 300);
+
+        watch(selectedBookSeries, () => {
+            if (
+                selectedBookSeries.value &&
+                (selectedBookSeries.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedBookSeries.value as { title: string; value: number; }).title = "";
+                (selectedBookSeries.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const sendContentToParent = () => {
             emit("update:modelValue", selectedBookSeries.value);
@@ -169,7 +195,7 @@ export default defineComponent({
             bookSeries, selectedBookSeries, searchBookSeries,
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
-            selectNewlyAddedBookSeries,
+            selectNewlyAddedBookSeries, modalRef,
             PublicationSeriesSubmissionForm
         };
     }

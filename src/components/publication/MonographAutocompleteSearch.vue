@@ -14,10 +14,11 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1">
+        <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="MonographSubmissionForm"
-                :form-props="{readOnly: readOnly, inModal: true}"
+                :form-props="{readOnly: readOnly, inModal: true, presetName: lastSearchInput}"
                 entity-name="Monograph"
                 is-submission
                 :read-only="false"
@@ -63,6 +64,10 @@ export default defineComponent({
         onlyBooks: {
             type: Boolean,
             default: false
+        },
+        disableSubmission: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -70,8 +75,12 @@ export default defineComponent({
         const i18n = useI18n();
         const searchPlaceholder = {title: "", value: -1};
 
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
+
         const monographs = ref<{ title: string; value: number; date?: string }[]>([]);
         const selectedMonograph = ref<{ title: string, value: number }>(searchPlaceholder);
+
+        const lastSearchInput = ref("");
 
         onMounted(() => {
             if(props.modelValue && props.modelValue.value !== -1) {
@@ -83,10 +92,15 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
 
         const searchMonographs = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
+            if (!input || input.includes("|")) {
                 return;
             }
+
             if (input.length >= 3) {
+                if (!input.startsWith(i18n.t("notInListLabel", []).slice(0, -3))) {
+                    lastSearchInput.value = input;
+                }
+
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
@@ -101,11 +115,30 @@ export default defineComponent({
                         } else {
                             listOfMonographs.push({title: `${monograph.titleOther} | ${monograph.year !== -1 ? monograph.year : i18n.t("unknownDateMessage")}`, value: monograph.databaseId as number});
                         }
-                    })
+                    });
+
+                    if (!props.disableSubmission && !modalRef.value!.dialog) {
+                        listOfMonographs.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0
+                        });
+                    }
+
                     monographs.value = listOfMonographs;
                 });
             }
         }, 300);
+
+        watch(selectedMonograph, () => {
+            if (
+                selectedMonograph.value &&
+                (selectedMonograph.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedMonograph.value as { title: string; value: number; }).title = "";
+                (selectedMonograph.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const sendContentToParent = () => {
             emit("update:modelValue", selectedMonograph.value);
@@ -144,8 +177,8 @@ export default defineComponent({
         return {
             monographs, selectedMonograph, searchMonographs,
             requiredSelectionRules, MonographSubmissionForm,
-            sendContentToParent, clearInput,
-            selectNewlyAddedMonograph
+            sendContentToParent, clearInput, modalRef,
+            selectNewlyAddedMonograph, lastSearchInput
         };
     }
 });

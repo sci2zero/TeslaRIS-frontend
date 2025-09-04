@@ -18,6 +18,7 @@
         </v-col>
         <v-col v-if="!disableSubmission && isAdmin" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="OrganisationUnitSubmissionForm"
                 :form-props="{ presetName: lastSearchInput }"
                 entity-name="OU"
@@ -119,6 +120,8 @@ export default defineComponent({
         const i18n = useI18n();
         const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
+
         const showThesisTypeError = ref(false);
         const recentlySearched = ref(new Map<number, ThesisType[]>());
         
@@ -209,6 +212,13 @@ export default defineComponent({
                         response.data.content.forEach(index => {
                             recentlySearched.value.set(index.databaseId, index.allowedThesisTypes);
                         });
+
+                        if (!props.multiple && !props.disableSubmission && isAdmin.value && !modalRef.value!.dialog) {
+                            organisationUnits.value.push({
+                                title: i18n.t("notInListLabel", [input]),
+                                value: 0
+                            });
+                        }
                     }
                 );
             }
@@ -217,6 +227,18 @@ export default defineComponent({
         const sendContentToParent = () => {
             emit("update:modelValue", selectedOrganisationUnit.value);
         };
+
+        watch(selectedOrganisationUnit, () => {
+            if (
+                !props.multiple &&
+                selectedOrganisationUnit.value &&
+                (selectedOrganisationUnit.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedOrganisationUnit.value as { title: string; value: number; }).title = "";
+                (selectedOrganisationUnit.value as { title: string; value: number; }).value = -1;
+            }
+        });
 
         const clearInput = () => {
             selectedOrganisationUnit.value = searchPlaceholder;
@@ -251,7 +273,7 @@ export default defineComponent({
         };
 
         return {
-            organisationUnits, selectedOrganisationUnit, searchOUs,
+            organisationUnits, selectedOrganisationUnit, searchOUs, modalRef,
             requiredSelectionRules, calculateAutocompleteWidth, lastSearchInput,
             sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules,

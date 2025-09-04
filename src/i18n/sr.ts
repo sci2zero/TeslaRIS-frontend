@@ -246,6 +246,7 @@ export default {
     mainContributorLabel: "Glavni kontributor",
     correspondingContributorLabel: "Autor za korespondenciju",
     authorsLabel: "Autori",
+    authorLabel: "Autor",
     editorsLabel: "Urednici",
     reviewersLabel: "Recenzenti",
     advisorsLabel: "Savetnici",

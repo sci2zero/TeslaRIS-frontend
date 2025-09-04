@@ -27,20 +27,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="5">
-                        <v-text-field v-model="datasetNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
                     <v-col cols="10">
                         <v-text-field
-                            v-model="webOfScienceId"
-                            label="Web of Science ID"
-                            placeholder="Web of Science ID"
-                            :rules="documentWebOfScienceIdValidationRules">
+                            v-model="datasetNumber"
+                            :label="$t('internalNumberLabel')"
+                            :placeholder="$t('internalNumberLabel')">
                         </v-text-field>
                     </v-col>
                 </v-row>
@@ -56,6 +47,24 @@
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
+                    <v-row>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col>
                             <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>

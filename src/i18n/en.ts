@@ -246,6 +246,7 @@ export default {
     mainContributorLabel: "Main Contributor",
     correspondingContributorLabel: "Corresponding Author",
     authorsLabel: "Authors",
+    authorLabel: "Author",
     editorsLabel: "Editors",
     reviewersLabel: "Reviewers",
     advisorsLabel: "Advisors",

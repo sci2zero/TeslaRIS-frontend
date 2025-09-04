@@ -201,6 +201,13 @@
                     :read-only="!canEdit"
                     @update="outputConfigurationUpdated"
                 />
+                <v-btn
+                    v-if="isInstitutionalEditor && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('importer')">
+                    {{ $t("importerLabel") }}
+                </v-btn>
             </div>
         </div>
 

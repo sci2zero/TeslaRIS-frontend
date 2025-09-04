@@ -9,7 +9,9 @@
                     :preset-contribution-value="input.contribution"
                     :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
                     :is-update="isUpdate"
-                    @set-input="input.contribution = $event; sendContentToParent();" />
+                    :lock-search-field="lockSearchField"
+                    @set-input="input.contribution = $event; sendContentToParent();"
+                />
             </v-col>
             <v-col cols="2">
                 <v-col>
@@ -122,6 +124,10 @@ export default defineComponent({
         boardMemberIds: {
             type: Array<number>,
             default: []
+        },
+        lockSearchField: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["setInput"],
