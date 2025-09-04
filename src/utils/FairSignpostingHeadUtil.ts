@@ -84,6 +84,7 @@ const cleanupFairSignposting = () => {
         if (
             link.rel === 'type' ||
             link.rel.includes('describedby') ||
+            link.rel.includes('describes') ||
             link.rel.includes('item') ||
             link.rel.includes('identifier') ||
             link.rel.includes('collection') ||
