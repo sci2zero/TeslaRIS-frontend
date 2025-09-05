@@ -100,9 +100,6 @@ export default defineComponent({
             document.title = i18n.t("routeLabel.publicationsValidation");
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
-                selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
-            });
         });
 
         watch([

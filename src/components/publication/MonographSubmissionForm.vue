@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.MONOGRAPH"
                             @metadata-fetched="popuateMetadata"
@@ -191,16 +191,16 @@
                     <v-row>
                         <v-col cols="5">
                             <v-text-field
-                                v-model="number"
-                                :label="$t('numberLabel')"
-                                :placeholder="$t('numberLabel')">
+                                v-model="volume"
+                                :label="$t('volumeLabel')"
+                                :placeholder="$t('volumeLabel')">
                             </v-text-field>
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
-                                v-model="volume"
-                                :label="$t('volumeLabel')"
-                                :placeholder="$t('volumeLabel')">
+                                v-model="number"
+                                :label="$t('numberLabel')"
+                                :placeholder="$t('numberLabel')">
                             </v-text-field>
                         </v-col>
                     </v-row>

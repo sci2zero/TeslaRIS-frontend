@@ -526,11 +526,6 @@ export default defineComponent({
             });
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
-                selectedPublicationTypes.value.push(
-                    {title: publicationType.title, value: publicationType.value}
-                );
-            });
 
             fetchPublicReviewPageContent();
         });

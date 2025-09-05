@@ -78,5 +78,7 @@ export default {
     signInWithOrcidLabel: "Улогуј се путем ORCID-а",
     validatingEmailDomainLabel: "Валидирај домен адресе е-поште",
     institutionEmailDomainLabel: "Домен институционалне адресе е-поште",
-    emailDomainErrorMessage: "Морате се регистровати са адресом е-поште ваше институције."
+    emailDomainErrorMessage: "Морате се регистровати са адресом е-поште ваше институције.",
+    volumeLabel: "Свеска (Volume)",
+    issueLabel: "Број (Issue)",
 };

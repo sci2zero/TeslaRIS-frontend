@@ -101,10 +101,10 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="number" :label="$t('numberLabel')" :placeholder="$t('numberLabel')"></v-text-field>
+                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                <v-text-field v-model="number" :label="$t('numberLabel')" :placeholder="$t('numberLabel')"></v-text-field>
             </v-col>
         </v-row>
         <v-row>

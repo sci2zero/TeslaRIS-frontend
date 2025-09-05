@@ -140,10 +140,6 @@ export default defineComponent({
             selectedPublicationTypes.value.splice(0);
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
-            } else {
-                publicationTypes.value?.forEach(publicationType => {
-                    selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
-                });
             }
 
             DocumentPublicationService.getSearchFields(false).then(response => {
