@@ -242,6 +242,9 @@
             <v-tab v-if="ouIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -380,6 +383,11 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <organisation-unit-visualizations
+                    :organisation-unit-id="(organisationUnit.id as number)"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -437,11 +445,12 @@ import OrganisationUnitOutputConfigurationForm from '@/components/organisationUn
 import OrganisationUnitOutputConfigurationService from '@/services/OrganisationUnitOutputConfigurationService';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import OrganisationUnitVisualizations from '@/components/organisationUnit/OrganisationUnitVisualizations.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations },
     setup() {
         const currentTab = ref("relations");
 
