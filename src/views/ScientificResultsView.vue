@@ -41,7 +41,7 @@
             :items="publicationTypes"
             :label="$t('typeOfPublicationLabel')"
             return-object
-            class="publication-type-select mt-3"
+            class="publication-type-select no-empty-outline mt-3"
             multiple
         ></v-select>
 
@@ -230,6 +230,14 @@ export default defineComponent({
 
 .publication-type-select {
     max-width: 700px;
+}
+
+.no-empty-outline :deep(.v-field__outline) {
+  opacity: 0;
+}
+
+.no-empty-outline:deep(.v-select--focused .v-field__outline) {
+  opacity: 1;
 }
 
 </style>

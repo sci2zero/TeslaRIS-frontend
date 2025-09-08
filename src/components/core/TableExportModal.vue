@@ -78,12 +78,6 @@
                                         <v-row>
                                             <v-col cols="3" sm="2">
                                                 <v-checkbox
-                                                    v-model="apa"
-                                                    label="APA"
-                                                ></v-checkbox>
-                                            </v-col>
-                                            <v-col cols="3" sm="2">
-                                                <v-checkbox
                                                     v-model="mla"
                                                     label="MLA"
                                                 ></v-checkbox>
@@ -104,6 +98,12 @@
                                                 <v-checkbox
                                                     v-model="vancouver"
                                                     label="Vancouver"
+                                                ></v-checkbox>
+                                            </v-col>
+                                            <v-col cols="3" sm="2">
+                                                <v-checkbox
+                                                    v-model="apa"
+                                                    label="APA"
                                                 ></v-checkbox>
                                             </v-col>
                                         </v-row>
