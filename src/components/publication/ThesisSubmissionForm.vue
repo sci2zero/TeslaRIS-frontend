@@ -586,7 +586,7 @@ export default defineComponent({
         const populateSinglePossibleAuthor = async () => {
             const userResponse = await UserService.getLoggedInUser();
 
-            const personResponse = await PersonService.readPerson(userResponse.data.personId);
+            const personResponse = await PersonService.getPersonWithUser(userResponse.data.personId);
 
             contributions.value = [
                 {
@@ -594,7 +594,7 @@ export default defineComponent({
                     isMainContributor: true,
                     isCorrespondingContributor: true,
                     isBoardPresident: false,
-                    personId: personResponse.data.id as number,
+                    personId: userResponse.data.personId as number,
                     contributionDescription: [],
                     orderNumber: 1,
                     displayAffiliationStatement: [],

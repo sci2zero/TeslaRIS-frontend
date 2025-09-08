@@ -39,6 +39,7 @@ export interface OrganisationUnitRequest {
     institutionEmailDomain: string;
     validatingEmailDomain: boolean;
     allowingSubdomains: boolean;
+    legalEntity: boolean;
 }
 
 export interface OrganisationUnitResponse {
@@ -60,6 +61,7 @@ export interface OrganisationUnitResponse {
     institutionEmailDomain: string;
     validatingEmailDomain: boolean;
     allowingSubdomains: boolean;
+    legalEntity: boolean;
 }
 
 export enum OrganisationUnitsRelationType {

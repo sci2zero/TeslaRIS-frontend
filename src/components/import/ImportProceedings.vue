@@ -165,6 +165,23 @@ export default defineComponent({
                 if(response.data) {
                     if (response.data.totalElements === 0) {
                         addNew();
+                    } else if (response.data.totalElements === 1) {
+                        potentialMatches.value = response.data.content;
+                        const nameSufficientlyMatches = props.publicationForLoading.conferenceName.some(
+                            name => name.content.toLowerCase() === potentialMatches.value[0].nameSr.toLowerCase() ||
+                                name.content.toLowerCase() === potentialMatches.value[0].nameOther.toLowerCase()
+                            );
+
+                        let date = potentialMatches.value[0].dateFromTo;
+                        date = date.includes("-") ? date.substring(6, 10) : date.substring(0, 4);
+                        
+                        if (nameSufficientlyMatches && props.publicationForLoading.documentDate === date) {
+                            selectManually(potentialMatches.value[0]);
+                        } else {
+                            showTable.value = true;
+                            automaticProcessCompleted.value = true;
+                            waitingOnUserInput.value = true;
+                        }
                     } else {
                         potentialMatches.value = response.data.content;
                         showTable.value = true;

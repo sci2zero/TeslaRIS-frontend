@@ -114,7 +114,7 @@ export default defineComponent({
                 searchTokens += `tokens=${token}&`;
             });
 
-            const params = `tokens=${searchTokens}page=0&size=7`;
+            const params = `${searchTokens}page=0&size=7`;
             PersonService.searchResearchers(params, false, null).then((response) => {
                 suggestions.value = response.data.content;
             });

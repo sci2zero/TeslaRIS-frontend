@@ -5,7 +5,7 @@
         :readonly="readOnly"
         :label="$t('addressLabel')"
         :placeholder="$t('addressLabel')"
-        @update:focused="onAddressChange">
+        @update:model-value="onAddressChange">
     </v-text-field>
     <div
         v-show="address"

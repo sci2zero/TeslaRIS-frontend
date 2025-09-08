@@ -303,6 +303,7 @@ import { useLoginStore } from "@/stores/loginStore";
 import OrganisationUnitImportSourceService from "@/services/importer/OrganisationUnitImportSourceService";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import DatePickerSplit from "@/components/core/DatePickerSplit.vue";
+import UserService from "@/services/UserService";
 
 
 export default defineComponent({
@@ -347,6 +348,12 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
+
+            if (isInstitutionalEditor.value) {
+                UserService.getLoggedInUser().then(response => {
+                    selectedOrganisationUnit.value.value = response.data.organisationUnitId as number;
+                });
+            }
 
             fetchNumberOfHarvestedDocuments(true);
 

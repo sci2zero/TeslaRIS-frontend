@@ -127,7 +127,6 @@ export default defineComponent({
                     automaticProcessCompleted.value = true;
                 } else {
                     showTable.value = true;
-                    searchPotentialMatches();
                 }
             });
         };
@@ -154,6 +153,17 @@ export default defineComponent({
                 if (page.value === 0 && !automaticProcessCompleted.value) {
                     if (totalJournals.value === 0) {
                         addNew();
+                    } else if (totalJournals.value === 1) {
+                        const nameSufficientlyMatches = props.publicationForLoading.journalName.some(
+                            name => name.content.toLowerCase() === potentialMatches.value[0].titleSr.toLowerCase() ||
+                                name.content.toLowerCase() === potentialMatches.value[0].titleOther.toLowerCase()
+                            );
+                        if (nameSufficientlyMatches) {
+                            selectManually(potentialMatches.value[0]);
+                        } else {
+                            automaticProcessCompleted.value = true;
+                            waitingOnUserInput.value = true;
+                        }
                     } else {
                         automaticProcessCompleted.value = true;
                         waitingOnUserInput.value = true;

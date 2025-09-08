@@ -214,6 +214,7 @@ export default defineComponent({
             organisationUnit2.allowingSubdomains = false;
             organisationUnit1.institutionEmailDomain = organisationUnit2.institutionEmailDomain;
             organisationUnit2.institutionEmailDomain = "";
+            organisationUnit1.legalEntity = organisationUnit2.legalEntity;
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
             organisationUnit1.contact!.phoneNumber = organisationUnit2.contact?.phoneNumber as string;
@@ -277,6 +278,7 @@ export default defineComponent({
             leftOrganisationUnit.value!.validatingEmailDomain = updatedData.validatingEmailDomain;
             leftOrganisationUnit.value!.allowingSubdomains = updatedData.allowingSubdomains;
             leftOrganisationUnit.value!.institutionEmailDomain = updatedData.institutionEmailDomain;
+            leftOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             leftUpdateRequest.value = updatedData;
             
@@ -301,6 +303,7 @@ export default defineComponent({
             rightOrganisationUnit.value!.validatingEmailDomain = updatedData.validatingEmailDomain;
             rightOrganisationUnit.value!.allowingSubdomains = updatedData.allowingSubdomains;
             rightOrganisationUnit.value!.institutionEmailDomain = updatedData.institutionEmailDomain;
+            rightOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             rightUpdateRequest.value = updatedData;
             

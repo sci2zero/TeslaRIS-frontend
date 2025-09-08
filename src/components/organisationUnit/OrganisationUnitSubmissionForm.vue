@@ -62,21 +62,33 @@
                         </v-col>
                     </v-row>
                     <v-row v-if="isAdmin">
-                        <v-checkbox
-                            v-model="clientInstitution"
-                            :label="$t('clientInstitutionLabel')"
-                        ></v-checkbox>
+                        <v-col>
+                            <v-checkbox
+                                v-model="legalEntity"
+                                :label="$t('legalEntityLabel')"
+                            ></v-checkbox>
+                        </v-col>
+                        <v-col>
+                            <v-checkbox
+                                v-model="clientInstitution"
+                                :label="$t('clientInstitutionLabel')"
+                            ></v-checkbox>
+                        </v-col>
                     </v-row>
                     <v-row v-if="isAdmin && clientInstitution">
-                        <v-checkbox
-                            v-model="validatingEmailDomain"
-                            :label="$t('validatingEmailDomainLabel')"
-                        ></v-checkbox>
-                        <v-checkbox
-                            v-if="validatingEmailDomain"
-                            v-model="allowingSubdomains"
-                            :label="$t('allowingSubdomainsLabel')"
-                        ></v-checkbox>
+                        <v-col>
+                            <v-checkbox
+                                v-model="validatingEmailDomain"
+                                :label="$t('validatingEmailDomainLabel')"
+                            ></v-checkbox>
+                        </v-col>
+                        <v-col>
+                            <v-checkbox
+                                v-if="validatingEmailDomain"
+                                v-model="allowingSubdomains"
+                                :label="$t('allowingSubdomainsLabel')"
+                            ></v-checkbox>
+                        </v-col>
                     </v-row>
                     <v-row v-if="isAdmin && clientInstitution && validatingEmailDomain">
                         <v-col cols="12">
@@ -173,6 +185,7 @@ export default defineComponent({
         const validatingEmailDomain = ref(false);
         const allowingSubdomains = ref(false);
         const institutionEmailDomain = ref("");
+        const legalEntity = ref(false);
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>([{ title: "", value: null }]);
@@ -222,7 +235,8 @@ export default defineComponent({
                 clientInstitution: clientInstitution.value,
                 validatingEmailDomain: validatingEmailDomain.value,
                 allowingSubdomains: allowingSubdomains.value,
-                institutionEmailDomain: institutionEmailDomain.value
+                institutionEmailDomain: institutionEmailDomain.value,
+                legalEntity: legalEntity.value
             };
 
             OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
@@ -246,6 +260,7 @@ export default defineComponent({
                     validatingEmailDomain.value = false;
                     allowingSubdomains.value = false;
                     institutionEmailDomain.value = "";
+                    legalEntity.value = false;
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -265,7 +280,7 @@ export default defineComponent({
             email, phoneNumber, keywords, keywordsRef,
             requiredFieldRules, clientInstitution,
             submit, mapRef, scopusAfid, uris,
-            scopusAfidValidationRules,
+            scopusAfidValidationRules, legalEntity,
             nonMandatoryEmailFieldRules,
             openAlexId, rorValidationRules, ror,
             institutionOpenAlexIdValidationRules,

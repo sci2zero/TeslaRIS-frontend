@@ -57,6 +57,12 @@
                         />
                         <v-row v-else>
                             <v-col cols="6">
+                                <div v-if="isAdmin && organisationUnit?.clientInstitution" class="response">
+                                    {{ $t("clientInstitutionLabel") }}
+                                </div>
+                                <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
+                                    {{ $t("legalEntityLabel") }}
+                                </div>
                                 <div>
                                     {{ $t("addressLabel") }}:
                                 </div>
@@ -112,11 +118,14 @@
                                     <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
                             </v-col>
-                            <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
-                                <div>
+                            <v-col cols="6">
+                                <div v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit.location?.address">
                                     <open-layers-map
-                                        ref="mapRef" height="250px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
-                                        :show-input="false"></open-layers-map>
+                                        ref="mapRef" height="250px"
+                                        :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
+                                        :read-only="true"
+                                        :show-input="false">
+                                    </open-layers-map>
                                 </div>
                             </v-col>
                         </v-row>
@@ -207,6 +216,13 @@
                     variant="outlined"
                     @click="performNavigation('importer')">
                     {{ $t("importerLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="isInstitutionalEditor && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="navigateToBackupPage">
+                    {{ $t("backupLabel") }}
                 </v-btn>
             </div>
         </div>
@@ -696,6 +712,7 @@ export default defineComponent({
             organisationUnit.value!.validatingEmailDomain = basicInfo.validatingEmailDomain;
             organisationUnit.value!.allowingSubdomains = basicInfo.allowingSubdomains;
             organisationUnit.value!.institutionEmailDomain = basicInfo.institutionEmailDomain;
+            organisationUnit.value!.legalEntity = basicInfo.legalEntity;
             performUpdate(false);
         };
 
@@ -744,7 +761,8 @@ export default defineComponent({
                 clientInstitution: organisationUnit.value?.clientInstitution as boolean,
                 validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
                 allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -771,7 +789,8 @@ export default defineComponent({
                 clientInstitution: organisationUnit.value?.clientInstitution as boolean,
                 validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
                 allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -815,6 +834,10 @@ export default defineComponent({
             router.push({name: "publicDissertationsReport", query: {institutionId: organisationUnit.value?.id as number}});
         };
 
+        const navigateToBackupPage = () => {
+            router.push({name: "documentBackup", query: {institutionId: organisationUnit.value?.id as number}});
+        };
+
         const publicReviewPageContent = ref<PublicReviewPageContent[]>([]);
         const fetchPublicReviewPageContent = () => {
             publicReviewPageContent.value.splice(0);
@@ -856,7 +879,8 @@ export default defineComponent({
             OrganisationUnitImportSourceForm, showOutputs,
             OrganisationUnitOutputConfigurationForm,
             InstitutionDefaultSubmissionContentForm,
-            outputConfigurationUpdated, loggedInUser
+            outputConfigurationUpdated, loggedInUser,
+            navigateToBackupPage
         };
 }})
 

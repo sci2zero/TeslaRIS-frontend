@@ -1034,5 +1034,6 @@ export default {
     validatingEmailDomainLabel: "Validiraj domen email adrese",
     allowingSubdomainsLabel: "Dozvoli upotrebu pod-domena",
     institutionEmailDomainLabel: "Domen institucionalne email adrese",
-    emailDomainErrorMessage: "Morate se registrovati sa email adresom vaše institucije."
+    emailDomainErrorMessage: "Morate se registrovati sa email adresom vaše institucije.",
+    legalEntityLabel: "Pravno lice"
 }
