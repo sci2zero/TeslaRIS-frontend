@@ -13,11 +13,6 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
-                    </v-col>
-                </v-row>
-                <v-row>
                     <v-col cols="6">
                         <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
                     </v-col>
@@ -25,15 +20,29 @@
                         <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
-                    </v-col>
-                </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="sourceOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col>
                             <v-select

@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="11">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.PROCEEDINGS"
                             @metadata-fetched="popuateMetadata"
