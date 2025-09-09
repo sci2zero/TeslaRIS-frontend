@@ -12,7 +12,12 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -67,17 +72,31 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="descriptionRef"
+                                v-model="description"
+                                is-area
+                                :label="$t('abstractLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="keywordsRef"
+                                v-model="keywords"
+                                :label="$t('keywordsLabel')"
+                                is-area>
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -87,7 +106,11 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                            <publisher-autocomplete-search
+                                ref="publisherAutocompleteRef"
+                                v-model="selectedPublisher"
+                                allow-author-reprint>
+                            </publisher-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -186,7 +209,8 @@ export default defineComponent({
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: []
             };

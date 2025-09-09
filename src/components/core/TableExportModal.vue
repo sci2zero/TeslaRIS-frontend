@@ -198,7 +198,7 @@ export default defineComponent({
         const fieldData = ref<SearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
         const selectedFields = ref<string[]>([]);
-        const exportAll = ref(false);
+        const exportAll = ref(props.potentialMaxAmountRequested ? true : false);
         const exportPageOffset = ref(1);
 
         const langItems = getLangItems();

@@ -111,7 +111,8 @@
             <v-col>
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
-                    v-model="selectedPublisher">
+                    v-model="selectedPublisher"
+                    allow-author-reprint>
                 </publisher-autocomplete-search>
             </v-col>
         </v-row>
@@ -241,6 +242,8 @@ export default defineComponent({
                             title: returnCurrentLocaleContent(publisher.name) as string, value: publisher.id as number
                         };
                     });
+                } else if (props.presetMonograph?.authorReprint) {
+                    selectedPublisher.value = {title: "", value: -2};
                 }
             }
         };
@@ -357,7 +360,8 @@ export default defineComponent({
                 number: number.value,
                 volume: volume.value,
                 researchAreaId: selectedResearchArea.value?.value as number,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: []
             };

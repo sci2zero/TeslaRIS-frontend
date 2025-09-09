@@ -6,7 +6,7 @@
         <search-bar-component
             :preset-search-input="searchParams"
             focus-automatically
-            @search="search"
+            @search="clearSortAndPerformSearch"
         />
         <br />
         <br />
@@ -31,16 +31,46 @@
   
             <v-card-text>
                 <v-window v-model="currentTab">
-                    <v-window-item value="persons">
-                        <person-table-component :persons="persons" :total-persons="totalPersons" @switch-page="switchPage"></person-table-component>
+                    <v-window-item value="persons" eager>
+                        <person-table-component
+                            ref="parsonTableRef"
+                            :persons="persons"
+                            :total-persons="totalPersons"
+                            enable-export
+                            :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
+                            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+                            @switch-page="switchPage">
+                        </person-table-component>
                     </v-window-item>
   
-                    <v-window-item value="organisationUnits">
-                        <organisation-unit-table-component :organisation-units="organisationUnits" :total-o-us="totalOUs" @switch-page="switchPage"></organisation-unit-table-component>
+                    <v-window-item value="organisationUnits" eager>
+                        <organisation-unit-table-component
+                            ref="ouTableRef"
+                            :organisation-units="organisationUnits"
+                            :total-o-us="totalOUs"
+                            enable-export
+                            :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
+                            :endpoint-token-parameters="[searchParams, 'null']"
+                            @switch-page="switchPage">
+                        </organisation-unit-table-component>
                     </v-window-item>
   
-                    <v-window-item value="publications">
-                        <publication-table-component :publications="publications" :total-publications="totalPublications" @switch-page="switchPage"></publication-table-component>
+                    <v-window-item value="publications" eager>
+                        <publication-table-component
+                            ref="docTableRef"
+                            :publications="publications"
+                            :total-publications="totalPublications"
+                            enable-export
+                            :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
+                            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+                            :endpoint-body-parameters="
+                                {
+                                    allowedTypes: [],
+                                    institutionId: null,
+                                    commissionId: null
+                                }"
+                            @switch-page="switchPage">
+                        </publication-table-component>
                     </v-window-item>
                 </v-window>
             </v-card-text>
@@ -64,6 +94,7 @@ import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { ExportableEndpointType } from "@/models/Common";
 
 
 export default defineComponent({
@@ -75,7 +106,7 @@ export default defineComponent({
         const router = useRouter();
         const currentTab = ref("persons");
 
-        const searchParams = ref(route.query.searchQuery as string);
+        const searchParams = ref(route.query.searchQuery ? route.query.searchQuery as string : "");
 
         const organisationUnits = ref<OrganisationUnitIndex[]>([]);
         const persons = ref<PersonIndex[]>([]);
@@ -92,6 +123,10 @@ export default defineComponent({
         const sortOU = ref("");
         const sortPublication = ref("");
         const direction = ref("");
+
+        const parsonTableRef = ref<typeof PersonTableComponent>();
+        const ouTableRef = ref<typeof OrganisationUnitTableComponent>();
+        const docTableRef = ref<typeof PublicationTableComponent>();
 
         onMounted(() => {
             currentTab.value = route.query.tab as string;
@@ -149,6 +184,21 @@ export default defineComponent({
             }
         };
 
+        const clearSortAndPerformSearch = (tokenParams: string) => {
+            parsonTableRef.value?.setSortAndPageOption([], 1);
+            ouTableRef.value?.setSortAndPageOption([], 1);
+            docTableRef.value?.setSortAndPageOption([], 1);
+            
+            page.value = 0;
+
+            sortPerson.value = "";
+            sortOU.value = "";
+            sortPublication.value = "";
+            
+            direction.value = "";
+            search(tokenParams);
+        };
+
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
             page.value = nextPage;
             size.value = pageSize;
@@ -167,7 +217,14 @@ export default defineComponent({
             search(searchParams.value as string);
         };
 
-        return {currentTab, persons, organisationUnits, publications, totalPersons, totalOUs, totalPublications, search, switchPage, searchParams};
+        return {
+            currentTab, persons, organisationUnits,
+            publications, totalPersons, totalOUs,
+            totalPublications, search, switchPage,
+            searchParams, ExportableEndpointType,
+            clearSortAndPerformSearch, ouTableRef,
+            parsonTableRef, docTableRef
+        };
     }
 });
 </script>

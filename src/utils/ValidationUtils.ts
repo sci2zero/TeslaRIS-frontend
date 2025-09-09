@@ -261,11 +261,11 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
     const emailFieldRules = [
         (value: string) => {
             if (!value) return requiredFieldMessage.value;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) return emailFormatMessage.value;
+            if (!emailPattern.test(value)) return emailFormatMessage.value;
             return true;
         }
     ];

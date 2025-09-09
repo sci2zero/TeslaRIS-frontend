@@ -200,6 +200,7 @@ export default defineComponent({
             proceedings1.eventId = proceedings2.eventId;
             proceedings1.publicationSeriesId = proceedings2.publicationSeriesId;
             proceedings1.publisherId = proceedings2.publisherId;
+            proceedings1.authorReprint = proceedings2.authorReprint;
 
             proceedings2.languageTagIds!.forEach(languageTagId => {
                 if (!proceedings1.languageTagIds!.includes(languageTagId)) {
@@ -268,6 +269,7 @@ export default defineComponent({
             leftProceedings.value!.openAlexId = updatedInfo.openAlexId;
             leftProceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftProceedings.value!.acronym = updatedInfo.acronym;
+            leftProceedings.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -296,6 +298,7 @@ export default defineComponent({
             rightProceedings.value!.openAlexId = updatedInfo.openAlexId;
             rightProceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightProceedings.value!.acronym = updatedInfo.acronym;
+            rightProceedings.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

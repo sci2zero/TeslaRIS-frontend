@@ -63,13 +63,16 @@
                                 <div v-if="patent?.documentDate" class="response">
                                     {{ patent.documentDate }}
                                 </div>
-                                <div v-if="patent?.publisherId">
+                                <div v-if="patent?.publisherId || patent?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="patent?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + patent?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else-if="patent?.authorReprint" class="response">
+                                    {{ $t("authorReprintLabel") }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -405,6 +408,7 @@ export default defineComponent({
             patent.value!.number = basicInfo.number;
             patent.value!.openAlexId = basicInfo.openAlexId;
             patent.value!.webOfScienceId = basicInfo.webOfScienceId;
+            patent.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };

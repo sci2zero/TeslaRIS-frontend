@@ -321,7 +321,7 @@
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true)">
+                    @delete="fetchEmployees(true); fetchEmployees(false);">
                 </person-table-component>
 
                 <div v-if="totalAlumni > 0">
@@ -498,7 +498,7 @@ export default defineComponent({
         const personSearchParams = ref("tokens=*");
 
         const subUnitsPage = ref(0);
-        const subUnitsSize = ref(1);
+        const subUnitsSize = ref(10);
         const subUnitsSort = ref("");
         const subUnitsDirection = ref("");
 

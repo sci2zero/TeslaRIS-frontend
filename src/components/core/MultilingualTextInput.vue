@@ -13,6 +13,7 @@
                 v-if="isRich"
                 ref="richEditorRef"
                 v-model="input.text"
+                :default-placeholder="placeholderLabel"
                 @input="sendContentToParent">
             </rich-text-editor>
         </v-col>
@@ -82,6 +83,10 @@ export default defineComponent({
             default: undefined
         },
         defaultPlaceholder: {
+            type: String,
+            default: ""
+        },
+        placeholderLabel: {
             type: String,
             default: ""
         }

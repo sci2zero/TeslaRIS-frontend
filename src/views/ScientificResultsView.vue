@@ -29,12 +29,20 @@
                 </query-input-component>
             </v-tabs-window-item>
         </v-tabs-window>
-        <br />
-        <span
-            v-if="canUserAddPublications"
-            :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-            <add-publication-menu></add-publication-menu>
-        </span>
+        <div class="d-flex flex-row justify-start mt-10">
+            <span
+                v-if="canUserAddPublications"
+                :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
+                <add-publication-menu></add-publication-menu>
+            </span>
+            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
+                <v-btn
+                    color="primary" density="default"
+                    @click="navigateToValidationPage">
+                    {{ $t("routeLabel.publicationsValidation") }}
+                </v-btn>
+            </span>
+        </div>
 
         <v-select
             v-model="selectedPublicationTypes"
@@ -103,6 +111,7 @@ import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Comm
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -111,6 +120,8 @@ export default defineComponent({
     setup() {
         const currentTab = ref("simpleSearch");
         const loading = ref(false);
+
+        const router = useRouter();
 
         const searchParams = ref("tokens=");
         const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
@@ -129,7 +140,12 @@ export default defineComponent({
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
-        const { isCommission, isInstitutionalEditor, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+        const {
+            isCommission, isAdmin, isInstitutionalEditor,
+            canUserAddPublications, isUserBoundToOU,
+            returnOnlyInstitutionRelatedEntities, loggedInUser,
+            isInstitutionalLibrarian, isHeadOfLibrary
+        } = useUserRole();
 
         const searchFields = ref<SearchFieldsResponse[]>([]);
 
@@ -211,16 +227,21 @@ export default defineComponent({
             clearSortAndPerformSearch("tokens=*");
         };
 
+        const navigateToValidationPage = () => {
+            router.push({name: "publicationsValidation"});
+        };
+
         return {
             search, publications, totalPublications,
-            switchPage, isInstitutionalEditor,
+            switchPage, isInstitutionalEditor, isAdmin,
             tableRef, clearSortAndPerformSearch, searchFields,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
-            resetFiltersAndSearch, loggedInUser, loading
+            resetFiltersAndSearch, loggedInUser, loading,
+            navigateToValidationPage
         };
     }
 });

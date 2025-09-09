@@ -137,14 +137,14 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { PublicationType, type DocumentPublicationIndex, type MonographPublicationType } from "@/models/PublicationModel";
+import { MonographPublicationType, PublicationType, type DocumentPublicationIndex } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { MonographPublication, PersonDocumentContribution } from "@/models/PublicationModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { getMonographPublicationTypesForGivenLocale } from "@/i18n/monographPublicationType";
+import { getMonographPublicationTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/monographPublicationType";
 import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
@@ -214,7 +214,12 @@ export default defineComponent({
         } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => (getMonographPublicationTypesForGivenLocale() as { title: string; value: MonographPublicationType; }[]));
-        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
+        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>(
+            {
+                title: getTitleFromValueAutoLocale(MonographPublicationType.RESEARCH_ARTICLE) as string,
+                value: MonographPublicationType.RESEARCH_ARTICLE
+            }
+        );
 
         const listPublications = (monograph: { title: string, value: number }) => {
             if (monograph.value > 0) {

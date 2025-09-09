@@ -80,6 +80,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.delete, `organisation-unit-relation/${relationId}`);
   }
 
+  async deleteOURelationByIdPair(sourceId: number, targetId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `organisation-unit-relation/delete/${sourceId}/${targetId}`);
+  }
+
   async checkIdentifierUsage(identifier: string, organisationUnitId: number): Promise<AxiosResponse<boolean>> {
     return super.sendRequest(axios.get, `organisation-unit/identifier-usage/${organisationUnitId}?identifier=${encodeURIComponent(identifier)}`);
   }

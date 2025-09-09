@@ -28,7 +28,7 @@
             <!-- eslint-enable vue/no-v-html -->
             <editor-content
                 v-if="!isTruncated"
-                style="height: 100%;"
+                :style="`height: 100%; ${editable ? 'min-height: 300px;' : ''}`"
                 :editor="editor"
             />
             
@@ -71,12 +71,16 @@ export default defineComponent({
         limitDisplay: {
             type: Number,
             default: 0
+        },
+        defaultPlaceholder: {
+            type: String,
+            default: undefined
         }
     },
     emits: ["update:modelValue", "input"],
     setup(props, { emit }) {
         const i18n = useI18n();
-        const placeholder = computed(() => i18n.t("writeSomethingPlaceholder"));
+        const placeholder = computed(() => props.defaultPlaceholder ? i18n.t(props.defaultPlaceholder) : i18n.t("writeSomethingPlaceholder"));
         const isExpanded = ref(false);
         const truncatedHtml = ref("");
         const lastKeyCode = ref("");
@@ -430,6 +434,11 @@ export default defineComponent({
 .link-style-btn:hover {
     background-color: transparent !important;
     text-decoration: underline;
+}
+
+.ProseMirror-focused {
+  border: none !important;
+  outline: none !important;
 }
 
 </style>

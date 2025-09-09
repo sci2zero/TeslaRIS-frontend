@@ -93,13 +93,16 @@
                                 <div v-if="monograph?.number" class="response">
                                     {{ monograph.number }}
                                 </div>
-                                <div v-if="monograph?.publisherId">
+                                <div v-if="monograph?.publisherId || monograph?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="monograph?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + monograph?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else-if="monograph?.authorReprint" class="response">
+                                    {{ $t("authorReprintLabel") }}
                                 </div>
                                 <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
@@ -580,6 +583,7 @@ export default defineComponent({
             monograph.value!.openAlexId = basicInfo.openAlexId;
             monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
             monograph.value!.publisherId = basicInfo.publisherId;
+            monograph.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };

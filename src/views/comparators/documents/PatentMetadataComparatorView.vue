@@ -186,6 +186,7 @@ export default defineComponent({
 
             patent1.eventId = patent2.eventId;
             patent1.publisherId = patent2.publisherId;
+            patent1.authorReprint = patent2.authorReprint;
 
             patent2.uris!.forEach(uri => {
                 if (!patent1.uris!.includes(uri)) {
@@ -240,6 +241,7 @@ export default defineComponent({
             leftPatent.value!.scopusId = updatedInfo.scopusId;
             leftPatent.value!.openAlexId = updatedInfo.openAlexId;
             leftPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            leftPatent.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -261,6 +263,7 @@ export default defineComponent({
             rightPatent.value!.scopusId = updatedInfo.scopusId;
             rightPatent.value!.openAlexId = updatedInfo.openAlexId;
             rightPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            rightPatent.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

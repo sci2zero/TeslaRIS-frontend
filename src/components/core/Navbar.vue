@@ -374,8 +374,7 @@ export default defineComponent(
             const resourcesMenu = ref<MenuItem[]>([
                 { title: personListLabel, type:'icon-link', pathName: 'persons' },
                 { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' },
-                { title: publicationsValidationLabel, type:'icon-link', pathName: 'scientific-results/validation', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
             ]);
 
             const manageMenu = ref<MenuItem[]>([
@@ -392,7 +391,8 @@ export default defineComponent(
                 { title: healthCheckLabel, type:'icon-link', pathName: "health-check"},
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: backupLabel, type:'icon-link', pathName: 'document-backup', condition: computed(() => (isAdmin.value)) },
-                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) }
+                { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) },
+                { title: publicationsValidationLabel, type:'icon-link', pathName: 'scientific-results/validation', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([

@@ -30,6 +30,7 @@ export interface DocumentPublicationIndex {
     publicationSeriesId: number | null;
     eventId: number | null;
     publisherId: number | null;
+    authorReprint?: boolean;
     journalId: number | null;
     monographId: number | null;
     databaseId: number | null;
@@ -178,6 +179,7 @@ export interface Monograph extends Document {
     languageTagIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export enum MonographPublicationType {
@@ -201,16 +203,19 @@ export interface MonographPublication extends Document {
 export interface Patent extends Document {
     number: string;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export interface Software extends Document {
     internalNumber: string;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export interface DeduplicationSuggestion {
@@ -241,6 +246,7 @@ export interface Thesis extends Document {
     scientificArea?: MultilingualContent[];
     scientificSubArea?: MultilingualContent[];
     publisherId?: number;
+    authorReprint?: boolean;
     languageCode?: string;
     preliminaryFiles?: DocumentFileResponse[];
     preliminarySupplements?: DocumentFileResponse[];

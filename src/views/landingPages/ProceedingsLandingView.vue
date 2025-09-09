@@ -62,13 +62,16 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                                <div v-if="proceedings?.publisherId">
+                                <div v-if="proceedings?.publisherId || proceedings?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="proceedings?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + proceedings?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else-if="proceedings?.authorReprint" class="response">
+                                    {{ $t("authorReprintLabel") }}
                                 </div>
                                 <div v-if="proceedings?.publicationSeriesId">
                                     {{ $t("publicationSeriesLabel") }}:
@@ -496,6 +499,7 @@ export default defineComponent({
             proceedings.value!.openAlexId = updatedInfo.openAlexId;
             proceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             proceedings.value!.acronym = updatedInfo.acronym;
+            proceedings.value!.authorReprint = updatedInfo.authorReprint;
             performUpdate(false);
         };
 

@@ -64,13 +64,16 @@
                                 <div v-if="dataset?.documentDate" class="response">
                                     {{ localiseDate(dataset.documentDate) }}
                                 </div>
-                                <div v-if="dataset?.publisherId">
+                                <div v-if="dataset?.publisherId || dataset?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="dataset?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + dataset?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else-if="dataset?.authorReprint" class="response">
+                                    {{ $t("authorReprintLabel") }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -406,6 +409,7 @@ export default defineComponent({
             dataset.value!.internalNumber = basicInfo.internalNumber;
             dataset.value!.openAlexId = basicInfo.openAlexId;
             dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
+            dataset.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };

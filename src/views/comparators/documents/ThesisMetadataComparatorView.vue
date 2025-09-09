@@ -219,6 +219,7 @@ export default defineComponent({
 
             thesis1.eventId = thesis2.eventId;
             thesis1.publisherId = thesis2.publisherId;
+            thesis1.authorReprint = thesis2.authorReprint;
 
             thesis2.uris!.forEach(uri => {
                 if (!thesis1.uris!.includes(uri)) {
@@ -295,6 +296,7 @@ export default defineComponent({
             leftThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
             leftThesis.value!.udc = updatedInfo.udc;
             leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
+            leftThesis.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -332,6 +334,7 @@ export default defineComponent({
             rightThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
             rightThesis.value!.udc = updatedInfo.udc;
             rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
+            rightThesis.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

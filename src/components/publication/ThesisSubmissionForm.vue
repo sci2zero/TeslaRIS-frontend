@@ -44,7 +44,7 @@
                 <v-row v-if="!isInstitutionalLibrarian">
                     <v-col>
                         <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
-                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalThesisOULabel") }}
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -288,7 +288,8 @@
                         <v-col cols="12">
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
-                                v-model="selectedPublisher">
+                                v-model="selectedPublisher"
+                                allow-author-reprint>
                             </publisher-autocomplete-search>
                         </v-col>
                     </v-row>
@@ -499,7 +500,8 @@ export default defineComponent({
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 scientificArea: scientificArea.value,
                 scientificSubArea: scientificSubArea.value,
                 fileItems: [],

@@ -155,7 +155,7 @@ export default defineComponent({
         const organisationUnitSuggestionsPage = ref(0);
         const publisherSuggestionsPage = ref(0);
         
-        const globalPageSize = ref(5);
+        const globalPageSize = ref(10);
 
         const i18n = useI18n();
 

@@ -537,7 +537,8 @@ export default {
     createNewResearchAreaLabel: "Create New Research Area",
     searchInSystemLabel: "Search in system",
     enterExternalOULabel: "Enter affiliation that is not in list",
-    externalOUNameLabel: "External affiliation name",
+    enterExternalThesisOULabel: "Doctorate in external institution",
+    externalOUNameLabel: "External institution name",
     boundToUserLabel: "(Bound to user)",
     forceDeleteLabel: "Force Delete",
     inLabel: "in",
@@ -1005,5 +1006,10 @@ export default {
     allowingSubdomainsLabel: "Allow subdomain usage",
     institutionEmailDomainLabel: "Institutional email address domain",
     emailDomainErrorMessage: "You have to register with your institution's email address",
-    legalEntityLabel: "Legal entity"
+    legalEntityLabel: "Legal entity",
+    authorReprintLabel: "Author reprint",
+    terminationSuccessNotification: "Connection between organisation unit and person is removed.",
+    terminationFailedNotification: "Deletion is not successfull. Deletion is possible only from organisation unit where employee is originally.",
+    ouTerminationSuccessNotification: "Connection between organisation units is removed.",
+    ouTerminationFailedNotification: "Deletion is not successfull."
 }

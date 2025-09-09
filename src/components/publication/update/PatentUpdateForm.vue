@@ -56,7 +56,11 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                <publisher-autocomplete-search
+                    ref="publisherAutocompleteRef"
+                    v-model="selectedPublisher"
+                    allow-author-reprint>
+                </publisher-autocomplete-search>
             </v-col>
         </v-row>
         
@@ -122,6 +126,8 @@ export default defineComponent({
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
+            } else if (props.presetPatent?.authorReprint) {
+                selectedPublisher.value = {title: "", value: -2};
             }
         };
 
@@ -182,7 +188,8 @@ export default defineComponent({
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: []
             };

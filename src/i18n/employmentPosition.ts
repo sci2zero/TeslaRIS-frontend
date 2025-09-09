@@ -4,6 +4,7 @@ import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 const employmentPositionsEn = [
+    { title: "Associate without academic title", value: EmploymentPosition.ASSOCIATE_WITHOUT_TITLE },
     { title: "Collaborator", value: EmploymentPosition.COLLABORATOR },
     { title: "Assistant Trainee", value: EmploymentPosition.ASSISTANT_TRAINEE },
     { title: "Teaching Associate", value: EmploymentPosition.TEACHING_ASSOCIATE },
@@ -26,7 +27,7 @@ const employmentPositionsEn = [
     { title: "Scientific Advisor", value: EmploymentPosition.SCIENTIFIC_ADVISOR },
     { title: "Expert Associate", value: EmploymentPosition.EXPERT_ASSOCIATE },
     { title: "Senior Expert Associate", value: EmploymentPosition.SENIOR_EXPERT_ASSOCIATE },
-    { title: "Expert Advisor", value: EmploymentPosition.EXPERT_ADVISOR },
+    { title: "Expert Advisor", value: EmploymentPosition.EXPERT_ADVISOR }
 
     // { title: "Assistant", value: EmploymentPosition.ASSISTANT },
     // { title: "Instructor", value: EmploymentPosition.INSTRUCTOR },
@@ -38,6 +39,7 @@ const employmentPositionsEn = [
 ];
 
 const employmentPositionsSr = [
+    { title: "Saradnik bez saradničkog zvanja", value: EmploymentPosition.ASSOCIATE_WITHOUT_TITLE },
     { title: "Saradnik", value: EmploymentPosition.COLLABORATOR },
     { title: "Saradnik Praktikant", value: EmploymentPosition.ASSISTANT_TRAINEE },
     { title: "Saradnik u nastavi", value: EmploymentPosition.TEACHING_ASSOCIATE },

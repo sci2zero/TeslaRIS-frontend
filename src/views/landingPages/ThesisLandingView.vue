@@ -100,13 +100,16 @@
                                 <div v-else class="response">
                                     {{ returnCurrentLocaleContent(thesis?.externalOrganisationUnitName) }}
                                 </div>
-                                <div v-if="thesis?.publisherId">
+                                <div v-if="thesis?.publisherId || thesis?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="thesis?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + thesis?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else-if="thesis?.authorReprint" class="response">
+                                    {{ $t("authorReprintLabel") }}
                                 </div>
                                 <div v-if="thesis?.eventId">
                                     {{ $t("conferenceLabel") }}:
@@ -759,6 +762,7 @@ export default defineComponent({
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
             thesis.value!.typeOfTitle = basicInfo.typeOfTitle;
+            thesis.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };

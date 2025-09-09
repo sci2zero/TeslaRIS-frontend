@@ -536,7 +536,8 @@ export default {
     createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja",
     searchInSystemLabel: "Pretraži u sistemu",
     enterExternalOULabel: "Unesi afilijaciju koja nije u listi",
-    externalOUNameLabel: "Naziv spoljne afilijacije",
+    enterExternalThesisOULabel: "Doktorat u spoljnoj instituciji",
+    externalOUNameLabel: "Naziv spoljne institucije",
     boundToUserLabel: "(Vezan za korisnika)",
     forceDeleteLabel: "Forsirano brisanje",
     inLabel: "u",
@@ -1035,5 +1036,10 @@ export default {
     allowingSubdomainsLabel: "Dozvoli upotrebu pod-domena",
     institutionEmailDomainLabel: "Domen institucionalne email adrese",
     emailDomainErrorMessage: "Morate se registrovati sa email adresom vaše institucije.",
-    legalEntityLabel: "Pravno lice"
+    legalEntityLabel: "Pravno lice",
+    authorReprintLabel: "Autorski reprint",
+    terminationSuccessNotification: "Veza između organizacione jedinice i osobe je uklonjena.",
+    terminationFailedNotification: "Brisanje nije uspelo. Brisanje je moguće samo sa organizacione jedinice na kojoj je zaposleni.",
+    ouTerminationSuccessNotification: "Veza između organizacionih jedinica je uklonjena.",
+    ouTerminationFailedNotification: "Brisanje nije uspelo."
 }

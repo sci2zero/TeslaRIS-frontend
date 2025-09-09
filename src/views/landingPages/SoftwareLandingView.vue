@@ -63,13 +63,16 @@
                                 <div v-if="software?.documentDate" class="response">
                                     {{ software.documentDate }}
                                 </div>
-                                <div v-if="software?.publisherId">
+                                <div v-if="software?.publisherId || software?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="software?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + software?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
+                                </div>
+                                <div v-else-if="software?.authorReprint" class="response">
+                                    {{ $t("authorReprintLabel") }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -408,6 +411,7 @@ export default defineComponent({
             software.value!.internalNumber = basicInfo.internalNumber;
             software.value!.openAlexId = basicInfo.openAlexId;
             software.value!.webOfScienceId = basicInfo.webOfScienceId;
+            software.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };
