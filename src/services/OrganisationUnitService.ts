@@ -37,6 +37,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${onlyHarvestableInstitutions ? ("&onlyReturnOnesWhichCanHarvest=" + onlyHarvestableInstitutions) : ""}${onlyIndependentInstitutions ? ("&onlyIndependent=" + onlyIndependentInstitutions) : ""}${allowedThesisType ? ("&allowedThesisType=" + allowedThesisType) : ""}${onlyClientInstitutions ? ("&onlyClients=" + onlyClientInstitutions) : ""}`);
   }
 
+  async searchOUsAdvanced(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/advanced-search?${tokens}`);
+  }
+
   async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
     if (idempotencyKey) {
       return super.sendRequest(axios.post, "organisation-unit", body, idempotencyKey);

@@ -1,64 +1,13 @@
 <template>
     <v-container>
-        <h1>{{ $t("scientificResultsListLabel") }}</h1>
-        <br />
-        <br />
-        <v-tabs
-            v-model="currentTab"
-            bg-color="blue-grey-lighten-5"
-            color="deep-purple-accent-4"
-            align-tabs="center"
-        >
-            <v-tab value="simpleSearch">
-                {{ $t("simpleSearchLabel") }}
-            </v-tab>
-            <v-tab value="advancedSearch">
-                {{ $t("advancedSearchLabel") }}
-            </v-tab>
-        </v-tabs>
-
-        <v-tabs-window v-model="currentTab">
-            <v-tabs-window-item value="simpleSearch">
-                <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="advancedSearch">
-                <query-input-component
-                    :search-fields="searchFields"
-                    @search="clearSortAndPerformSearch($event)"
-                    @reset="resetFiltersAndSearch">
-                </query-input-component>
-            </v-tabs-window-item>
-        </v-tabs-window>
-        <div class="d-flex flex-row justify-start mt-10">
-            <span
-                v-if="canUserAddPublications"
-                :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-                <add-publication-menu></add-publication-menu>
-            </span>
-            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
-                <v-btn
-                    color="primary" density="default"
-                    @click="performNavigation('publicationsValidation')">
-                    {{ $t("routeLabel.publicationsValidation") }}
-                </v-btn>
-            </span>
-            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
-                <v-btn
-                    color="primary" density="default"
-                    @click="performNavigation('authorReprints')">
-                    {{ $t("routeLabel.authorReprints") }}
-                </v-btn>
-            </span>
+        <h1>{{ $t("authorReprintResultsListLabel") }}</h1>
+        
+        <div class="d-flex flex-row justify-space-between mt-15 mb-15">
+            <search-bar-component
+                class="search-bar"
+                @search="clearSortAndPerformSearch($event)">
+            </search-bar-component>
         </div>
-
-        <v-select
-            v-model="selectedPublicationTypes"
-            :items="publicationTypes"
-            :label="$t('typeOfPublicationLabel')"
-            return-object
-            class="publication-type-select no-empty-outline mt-3"
-            multiple
-        ></v-select>
 
         <span class="d-flex align-center">
             <v-checkbox
@@ -76,6 +25,15 @@
             ></v-checkbox>
         </span>
 
+        <v-select
+            v-model="selectedPublicationTypes"
+            :items="publicationTypes"
+            :label="$t('typeOfPublicationLabel')"
+            return-object
+            class="publication-type-select no-empty-outline mt-3"
+            multiple
+        ></v-select>
+
         <tab-content-loader
             v-if="loading"
             button-header
@@ -89,13 +47,13 @@
             :total-publications="totalPublications"
             enable-export
             :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
-            :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
+            :endpoint-type="ExportableEndpointType.AUTHOR_REPRINT_DOCUMENTS_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
             :endpoint-body-parameters="
                 {
                     allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
-                    institutionId: returnOnlyInstitutionRelatedEntities ? loggedInUser?.organisationUnitId as number : null,
-                    commissionId: isCommission && returnOnlyUnassessedEntities ? loggedInUser?.commissionId as number : null
+                    institutionId: null,
+                    commissionId: null
                 }"
             @switch-page="switchPage">
         </publication-table-component>
@@ -114,18 +72,15 @@ import { computed } from 'vue';
 import { onMounted } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Common';
-import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
-import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
+import { ExportableEndpointType } from '@/models/Common';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
     name: "ScientificResultsListView",
-    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu, TabContentLoader },
+    components: { SearchBarComponent, PublicationTableComponent, TabContentLoader },
     setup() {
-        const currentTab = ref("simpleSearch");
         const loading = ref(false);
 
         const router = useRouter();
@@ -142,19 +97,18 @@ export default defineComponent({
 
         const i18n = useI18n();
         const tableRef = ref<typeof PublicationTableComponent>();
-        
+
         const returnOnlyUnassessedEntities = ref(true);
+        
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
         const {
-            isCommission, isAdmin, isInstitutionalEditor,
+            isAdmin, isInstitutionalEditor, isCommission,
             canUserAddPublications, isUserBoundToOU,
-            returnOnlyInstitutionRelatedEntities, loggedInUser,
+            loggedInUser, returnOnlyInstitutionRelatedEntities,
             isInstitutionalLibrarian, isHeadOfLibrary
         } = useUserRole();
-
-        const searchFields = ref<SearchFieldsResponse[]>([]);
 
         onMounted(() => {
             loading.value = true;
@@ -164,10 +118,6 @@ export default defineComponent({
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
             }
-
-            DocumentPublicationService.getSearchFields(false).then(response => {
-                searchFields.value = response.data;
-            });
         });
 
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities, selectedPublicationTypes], () => {
@@ -184,24 +134,18 @@ export default defineComponent({
 
             searchParams.value = tokenParams;
             previousFilterValues.value.publicationTypes = publicationTypes;
-            previousFilterValues.value.selectOnlyUnassessed = !!selectOnlyUnassessed; 
-
-            const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
-            const serviceMethod = isSimpleSearch
-                ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes)
-                : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes);
+            previousFilterValues.value.selectOnlyUnassessed = !!selectOnlyUnassessed;
 
             const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
                 ? (loggedInUser.value?.organisationUnitId as number)
                 : null;
 
-            serviceMethod(
+            DocumentPublicationService.searchDocumentPublications(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 organisationUnitId,
                 !!selectOnlyUnassessed,
-                publicationTypes
+                publicationTypes,
+                true
             ).then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
@@ -230,25 +174,21 @@ export default defineComponent({
             search(searchParams.value);
         };
 
-        const resetFiltersAndSearch = () => {
-            clearSortAndPerformSearch("tokens=*");
-        };
-
-        const performNavigation = (pageName: string) => {
-            router.push({name: pageName});
+        const navigateToValidationPage = () => {
+            router.push({name: "publicationsValidation"});
         };
 
         return {
-            search, publications, totalPublications,
-            switchPage, isInstitutionalEditor, isAdmin,
-            tableRef, clearSortAndPerformSearch, searchFields,
+            search, publications, searchParams,
+            switchPage, isAdmin, totalPublications,
+            tableRef, clearSortAndPerformSearch,
             canUserAddPublications, isUserBoundToOU,
-            returnOnlyInstitutionRelatedEntities,
-            isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
-            ExportableEndpointType, searchParams, currentTab,
-            resetFiltersAndSearch, loggedInUser, loading,
-            performNavigation
+            ExportableEndpointType, loggedInUser,
+            loading, navigateToValidationPage,
+            returnOnlyInstitutionRelatedEntities,
+            returnOnlyUnassessedEntities,
+            isInstitutionalEditor, isCommission
         };
     }
 });
@@ -261,11 +201,15 @@ export default defineComponent({
 }
 
 .no-empty-outline :deep(.v-field__outline) {
-  opacity: 0;
+    opacity: 0;
 }
 
 .no-empty-outline:deep(.v-select--focused .v-field__outline) {
-  opacity: 1;
+    opacity: 1;
+}
+
+.search-bar {
+    min-width: 450px;
 }
 
 </style>

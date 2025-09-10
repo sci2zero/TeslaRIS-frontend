@@ -43,7 +43,7 @@ export default defineComponent({
     },
     emits: ["search"],
     setup(props, { emit }) {
-        const searchInput = ref(props.presetSearchInput);
+        const searchInput = ref("");
         const searchField = ref();
 
         const onSearch = () => {
@@ -97,6 +97,12 @@ export default defineComponent({
             }
         });
 
+        watch(() => props.presetSearchInput, () => {
+            if (props.presetSearchInput !== "" && props.presetSearchInput !== "*") {
+                searchInput.value = props.presetSearchInput;
+            }
+        });
+
         watch(
             searchInput,
             lodash.debounce(() => {
@@ -104,7 +110,14 @@ export default defineComponent({
             }, props.longerDelay ? 500 : 300)
         );
 
-        return { searchInput, onSearch, searchField };
+        const clearInput = () => {
+            searchInput.value = "";
+        };
+
+        return {
+            searchInput, onSearch,
+            searchField, clearInput
+        };
     }
 });
 </script>

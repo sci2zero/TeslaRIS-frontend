@@ -22,6 +22,10 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
   }
 
+  async searchResearchersAdvanced(tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/advanced-search?${tokens}`);
+  }
+
   async searchResearchersFromInstitution(tokens: string, strict: boolean, institutionId: number, harvestable: boolean, noOrcid: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
     return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}&institutionId=${institutionId}&harvestable=${harvestable}&noOrcid=${noOrcid}`);
   }

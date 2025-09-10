@@ -227,7 +227,7 @@ export default defineComponent({
                 }
 
                 for (const proceedings of response.data) {
-                    if (proceedings.eISBN === props.publicationForLoading.isbn) {
+                    if (proceedings.eISBN === props.publicationForLoading.isbn || proceedings.printISBN === props.publicationForLoading.isbn) {
                         selectedProceedings.value = proceedings;
                         proceedingsBinded.value = true;
                         automaticProcessCompleted.value = true;

@@ -103,7 +103,8 @@ export default {
         contact: "Kontakt",
         publicDissertationsReport: "Disertacije na javnom uvidu",
         publicationsValidation: "Validacija publikacija",
-        oauth2: "Eksterna autorizacija"
+        oauth2: "Eksterna autorizacija",
+        authorReprints: "Autorski reprinti"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1041,5 +1042,6 @@ export default {
     terminationSuccessNotification: "Veza između organizacione jedinice i osobe je uklonjena.",
     terminationFailedNotification: "Brisanje nije uspelo. Brisanje je moguće samo sa organizacione jedinice na kojoj je zaposleni.",
     ouTerminationSuccessNotification: "Veza između organizacionih jedinica je uklonjena.",
-    ouTerminationFailedNotification: "Brisanje nije uspelo."
+    ouTerminationFailedNotification: "Brisanje nije uspelo.",
+    authorReprintResultsListLabel: "Lista radova koji su autorski reprint"
 }

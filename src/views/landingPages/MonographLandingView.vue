@@ -102,7 +102,9 @@
                                     </localized-link>
                                 </div>
                                 <div v-else-if="monograph?.authorReprint" class="response">
-                                    {{ $t("authorReprintLabel") }}
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
+                                    </localized-link>
                                 </div>
                                 <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
@@ -426,7 +428,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;

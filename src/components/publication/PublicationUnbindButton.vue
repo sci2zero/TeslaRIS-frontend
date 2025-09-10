@@ -1,5 +1,9 @@
 <template>
-    <v-btn density="compact" class="mt-5" color="blue darken-1" @click="unbindResearcherFromDocument">
+    <v-btn
+        density="compact"
+        class="mt-5"
+        color="blue darken-1"
+        @click="unbindResearcherFromDocument">
         {{ $t("removeFromPublicationLabel") }}
     </v-btn>
 
@@ -26,7 +30,9 @@ export default defineComponent({
         const dialogRef = ref<typeof PersistentQuestionDialog>();
 
         const performUnbinding = () => {
-            DocumentPublicationService.unbindPersonFromPublication(props.documentId).then(() => {
+            DocumentPublicationService.unbindPersonFromPublication(
+                props.documentId
+            ).then(() => {
                 emit("unbind");
             });
         };

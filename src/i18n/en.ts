@@ -103,7 +103,8 @@ export default {
         contact: "Contact",
         publicDissertationsReport: "Disertations on public review",
         publicationsValidation: "Validation of publications",
-        oauth2: "External authorization"
+        oauth2: "External authorization",
+        authorReprints: "Author reprints"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1011,5 +1012,6 @@ export default {
     terminationSuccessNotification: "Connection between organisation unit and person is removed.",
     terminationFailedNotification: "Deletion is not successfull. Deletion is possible only from organisation unit where employee is originally.",
     ouTerminationSuccessNotification: "Connection between organisation units is removed.",
-    ouTerminationFailedNotification: "Deletion is not successfull."
+    ouTerminationFailedNotification: "Deletion is not successfull.",
+    authorReprintResultsListLabel: "List of author reprint publications"
 }

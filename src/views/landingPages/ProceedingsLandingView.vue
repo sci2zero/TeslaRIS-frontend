@@ -71,7 +71,9 @@
                                     </localized-link>
                                 </div>
                                 <div v-else-if="proceedings?.authorReprint" class="response">
-                                    {{ $t("authorReprintLabel") }}
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
+                                    </localized-link>
                                 </div>
                                 <div v-if="proceedings?.publicationSeriesId">
                                     {{ $t("publicationSeriesLabel") }}:
@@ -376,7 +378,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
             }
 
             fetchProceedings(true);
