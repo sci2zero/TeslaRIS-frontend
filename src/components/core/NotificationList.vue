@@ -126,6 +126,9 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("importer");
             } else if (action === NotificationAction.GO_TO_VALIDATION_PAGE) {
                 decrementCounterAndNavigateToPage("publicationsValidation");
+            } else if (action === NotificationAction.GO_TO_UNBINDED_PUBLICATIONS_PAGE) {
+                notificationCountStore.decrementCounter();
+                router.push({name: "scientificResults", query: {unmanaged: "true"}});
             }
         };
 

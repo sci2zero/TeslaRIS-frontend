@@ -3,6 +3,7 @@
         <v-col :cols="calculateAutocompleteWidth()">
             <v-autocomplete
                 v-model="selectedOrganisationUnit"
+                v-model:search="searchInput"
                 :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
                 :items="readonly ? [] : organisationUnits"
                 :custom-filter="((): boolean => true)"
@@ -131,6 +132,7 @@ export default defineComponent({
         const selectedOrganisationUnit = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         const { isAdmin } = useUserRole();
         
@@ -228,6 +230,10 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+            
             emit("update:modelValue", selectedOrganisationUnit.value);
         };
 
@@ -280,7 +286,7 @@ export default defineComponent({
             requiredSelectionRules, calculateAutocompleteWidth, lastSearchInput,
             sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules,
-            showThesisTypeError
+            showThesisTypeError, searchInput
         };
     }
 });

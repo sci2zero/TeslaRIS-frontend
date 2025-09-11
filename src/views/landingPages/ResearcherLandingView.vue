@@ -282,6 +282,7 @@
                             personId: person.id,
                             commissionId: null
                         }"
+                    :allow-researcher-unbinding="canEdit && isResearcher"
                     @switch-page="switchPage">
                 </publication-table-component>
             </v-tabs-window-item>

@@ -153,6 +153,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monographPublication?.description)"
             :document="monographPublication"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(monographPublication?.id as number, monographPublication as _Document)"
         />
 
@@ -238,12 +239,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(monographPublication?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
 
         <share-buttons
@@ -284,7 +279,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -308,7 +302,7 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 

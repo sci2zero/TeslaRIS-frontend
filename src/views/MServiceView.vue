@@ -281,7 +281,7 @@ export default defineComponent({
                     commissions.value.push(
                         { title: returnCurrentLocaleContent(commission.description) as string, value: commission.id }
                     );
-                })
+                });
                 CommissionService.getDefaultCommissionId().then(resp => {
                     if (resp.data > 0) {
                         selectedCommission.value = commissions.value.find(

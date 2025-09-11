@@ -125,6 +125,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(patent?.description)"
             :document="patent"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(patent?.id as number, patent as _Document)"
         />
 
@@ -210,12 +211,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(patent?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <share-buttons
             v-if="patent && isResearcher && canEdit"
             :title="(returnCurrentLocaleContent(patent.title) as string)"
@@ -251,7 +246,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -276,7 +270,7 @@ import { type AxiosResponseHeaders } from 'axios';
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 

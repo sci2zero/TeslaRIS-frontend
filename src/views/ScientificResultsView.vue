@@ -74,6 +74,13 @@
                 :label="$t('showUnassessedLabel')"
                 class="ml-4 mt-3"
             ></v-checkbox>
+
+            <v-checkbox
+                v-if="isAdmin"
+                v-model="returnOnlyUnmanagedPublications"
+                :label="$t('showOnlyUnmanagedLabel')"
+                class="ml-4 mt-3"
+            ></v-checkbox>
         </span>
 
         <tab-content-loader
@@ -95,7 +102,8 @@
                 {
                     allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
                     institutionId: returnOnlyInstitutionRelatedEntities ? loggedInUser?.organisationUnitId as number : null,
-                    commissionId: isCommission && returnOnlyUnassessedEntities ? loggedInUser?.commissionId as number : null
+                    commissionId: isCommission && returnOnlyUnassessedEntities ? loggedInUser?.commissionId as number : null,
+                    onlyUnmanaged: returnOnlyUnmanagedPublications
                 }"
             @switch-page="switchPage">
         </publication-table-component>
@@ -118,7 +126,7 @@ import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Comm
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -129,6 +137,7 @@ export default defineComponent({
         const loading = ref(false);
 
         const router = useRouter();
+        const route = useRoute();
 
         const searchParams = ref("tokens=");
         const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
@@ -146,6 +155,7 @@ export default defineComponent({
         const returnOnlyUnassessedEntities = ref(true);
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
+        const returnOnlyUnmanagedPublications = ref(false);
 
         const {
             isCommission, isAdmin, isInstitutionalEditor,
@@ -168,9 +178,16 @@ export default defineComponent({
             DocumentPublicationService.getSearchFields(false).then(response => {
                 searchFields.value = response.data;
             });
+
+            if ((route.query.unmanaged as string) === "true") {
+                returnOnlyUnmanagedPublications.value = true;
+            }
         });
 
-        watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities, selectedPublicationTypes], () => {
+        watch([
+            loggedInUser, returnOnlyInstitutionRelatedEntities,
+            returnOnlyUnassessedEntities, selectedPublicationTypes,
+            returnOnlyUnmanagedPublications], () => {
             search(searchParams.value);
         });
 
@@ -189,7 +206,7 @@ export default defineComponent({
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
                 ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes)
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value)
                 : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
                     DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes);
 
@@ -248,7 +265,7 @@ export default defineComponent({
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
             resetFiltersAndSearch, loggedInUser, loading,
-            performNavigation
+            performNavigation, returnOnlyUnmanagedPublications
         };
     }
 });

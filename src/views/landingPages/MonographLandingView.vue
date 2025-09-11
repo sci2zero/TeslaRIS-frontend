@@ -179,6 +179,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monograph?.description)"
             :document="monograph"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(monograph?.id as number, monograph as _Document)"
         />
 
@@ -301,12 +302,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(monograph?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
 
         <share-buttons
@@ -351,7 +346,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse, type EntityClassificationResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -378,7 +372,7 @@ import { type Publisher } from '@/models/PublisherModel';
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 

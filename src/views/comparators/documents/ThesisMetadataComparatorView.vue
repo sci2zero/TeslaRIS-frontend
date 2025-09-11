@@ -297,6 +297,7 @@ export default defineComponent({
             leftThesis.value!.udc = updatedInfo.udc;
             leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             leftThesis.value!.authorReprint = updatedInfo.authorReprint;
+            leftThesis.value!.scopusId = updatedInfo.scopusId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -335,6 +336,7 @@ export default defineComponent({
             rightThesis.value!.udc = updatedInfo.udc;
             rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             rightThesis.value!.authorReprint = updatedInfo.authorReprint;
+            rightThesis.value!.scopusId = updatedInfo.scopusId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

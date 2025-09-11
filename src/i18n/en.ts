@@ -564,7 +564,7 @@ export default {
     writeSomethingPlaceholder: "Write something...",
     researcherBindedMessage: "It is not possible to migrate this researcher as it is bound to a user.",
     removeFromPublicationLabel: "Remove me from publication",
-    unbindSuccessfullMessage: "Zou are successfullz removed from this publication.",
+    unbindSuccessfullMessage: "You are successfully removed from this publication.",
     researcherUnbindWarning: "This publication will be removed from your results list.",
     createNewAssessmentRulebookLabel: "Create New Rulebook",
     updateAssessmentRulebookLabel: "Update Rulebook",
@@ -1013,5 +1013,8 @@ export default {
     terminationFailedNotification: "Deletion is not successfull. Deletion is possible only from organisation unit where employee is originally.",
     ouTerminationSuccessNotification: "Connection between organisation units is removed.",
     ouTerminationFailedNotification: "Deletion is not successfull.",
-    authorReprintResultsListLabel: "List of author reprint publications"
+    authorReprintResultsListLabel: "List of author reprint publications",
+    massUnbindSuccessfullMessage: "You are successfully removed from publication: {name}",
+    unbindFailedMessage: "Unbinding from '{name}' failed.",
+    showOnlyUnmanagedLabel: "Show only with all unmanaged authors"
 }

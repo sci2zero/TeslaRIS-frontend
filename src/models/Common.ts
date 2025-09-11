@@ -69,7 +69,8 @@ export enum NotificationAction {
     GO_TO_PROMOTIONS_PAGE = "GO_TO_PROMOTIONS_PAGE",
     GO_TO_HARVESTER_PAGE = "GO_TO_HARVESTER_PAGE",
     NAVIGATE_TO_URL = "NAVIGATE_TO_URL",
-    GO_TO_VALIDATION_PAGE = "GO_TO_VALIDATION_PAGE"
+    GO_TO_VALIDATION_PAGE = "GO_TO_VALIDATION_PAGE",
+    GO_TO_UNBINDED_PUBLICATIONS_PAGE = "GO_TO_UNBINDED_PUBLICATIONS_PAGE"
 }
 
 export interface Notification {
@@ -225,6 +226,7 @@ export interface DocumentTableExportRequest extends TableExportRequest {
     allowedTypes: PublicationType[];
     institutionId: number;
     commissionId: number;
+    onlyUnmanaged: boolean;
 }
 
 export interface EntityNavigationDetails {

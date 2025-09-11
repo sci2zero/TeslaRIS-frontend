@@ -307,6 +307,7 @@ export default defineComponent({
                     (exportRequest as DocumentTableExportRequest).allowedTypes = props.endpointBodyParameters.allowedTypes;
                     (exportRequest as DocumentTableExportRequest).institutionId = props.endpointBodyParameters.institutionId;
                     (exportRequest as DocumentTableExportRequest).commissionId = props.endpointBodyParameters.commissionId;
+                    (exportRequest as DocumentTableExportRequest).onlyUnmanaged = props.endpointBodyParameters.onlyUnmanaged;
 
                     TableExportService.exportDocumentTable(
                         exportRequest as DocumentTableExportRequest

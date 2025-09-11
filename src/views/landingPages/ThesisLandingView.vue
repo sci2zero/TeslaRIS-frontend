@@ -344,6 +344,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(thesis?.description)"
             :display-archive-actions="false"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(thesis?.id as number, thesis as _Document)"
         />
 
@@ -464,12 +465,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher && !thesis?.isOnPublicReview"
-            :document-id="(thesis?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <persistent-question-dialog
             ref="publicDialogRef"
             :title="$t('areYouSureLabel')"
@@ -518,7 +513,6 @@ import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -549,7 +543,7 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 

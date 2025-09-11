@@ -72,6 +72,7 @@ export enum JournalPublicationType {
     LEXICOGRAPHIC_UNIT,
     POLEMICS,
     SCIENTIFIC_CRITIC,
+    EDITORIAL
 }
 
 export interface Document {

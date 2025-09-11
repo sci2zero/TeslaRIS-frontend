@@ -28,25 +28,7 @@
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
             <v-col cols="5">
-                <v-text-field
-                    v-model="openAlexId"
-                    label="Open Alex ID"
-                    placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="5">
                 <v-text-field v-model="patentNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
-            </v-col>
-            <v-col cols="5">
-                <v-text-field
-                    v-model="webOfScienceId"
-                    label="Web of Science ID"
-                    placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -61,6 +43,32 @@
                     v-model="selectedPublisher"
                     allow-author-reprint>
                 </publisher-autocomplete-search>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         
@@ -152,11 +160,13 @@ export default defineComponent({
         const webOfScienceId = ref(props.presetPatent?.webOfScienceId);
         const patentNumber = ref(props.presetPatent?.number);
         const uris = ref<string[]>(props.presetPatent?.uris as string[]);
+        const scopus = ref(props.presetPatent?.scopusId);
 
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -165,7 +175,8 @@ export default defineComponent({
                     [
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
+                        { value: scopus.value as string, error: "scopusIdExistsError"}
                     ],
                     props.presetPatent?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -186,6 +197,7 @@ export default defineComponent({
                 contributions: props.presetPatent?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
@@ -210,6 +222,7 @@ export default defineComponent({
             doi.value = props.presetPatent?.doi;
             openAlexId.value = props.presetPatent?.openAlexId;
             webOfScienceId.value = props.presetPatent?.webOfScienceId;
+            scopus.value = props.presetPatent?.scopusId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -219,9 +232,9 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title,
-            subtitle, doi,
+            isFormValid, title,
+            scopusIdValidationRules,
+            subtitle, doi, scopus,
             publicationYear, 
             selectedPublisher, 
             patentNumber, uris, 

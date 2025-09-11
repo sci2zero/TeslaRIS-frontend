@@ -1,8 +1,8 @@
 <template>
     <v-btn
         density="compact"
-        class="mt-5"
-        color="blue darken-1"
+        class="ml-2"
+        color="primary"
         @click="unbindResearcherFromDocument">
         {{ $t("removeFromPublicationLabel") }}
     </v-btn>

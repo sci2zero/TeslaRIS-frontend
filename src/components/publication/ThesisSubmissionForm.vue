@@ -144,24 +144,6 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="6">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="numberOfPages" type="number"
@@ -291,6 +273,32 @@
                                 v-model="selectedPublisher"
                                 allow-author-reprint>
                             </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules"
+                            />
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -445,6 +453,7 @@ export default defineComponent({
         const doi = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
+        const scopus = ref("");
         const numberOfPages = ref<number|null>();
         const numberOfChapters = ref<number|null>();
         const numberOfReferences = ref<number|null>();
@@ -473,7 +482,8 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, workOpenAlexIdValidationRules,
             isbnValidationRules, udcValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
@@ -499,6 +509,7 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                scopusId: scopus.value,
                 webOfScienceId: webOfScienceId.value,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
@@ -547,6 +558,7 @@ export default defineComponent({
                     printIsbn.value = "";
                     placeOfKeepRef.value?.clearInput();
                     udc.value = "";
+                    scopus.value = "";
                     typeOfTitleRef.value?.clearInput();
 
                     error.value = false;
@@ -632,7 +644,8 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             typeOfTitle, scientificAreaRef, scientificSubAreaRef,
             placeOfKeepRef, typeOfTitleRef, presetContent,
-            toMultilingualTextInput, isResearcher
+            toMultilingualTextInput, isResearcher, scopus,
+            scopusIdValidationRules
         };
     }
 });

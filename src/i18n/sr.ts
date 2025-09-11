@@ -1043,5 +1043,8 @@ export default {
     terminationFailedNotification: "Brisanje nije uspelo. Brisanje je moguće samo sa organizacione jedinice na kojoj je zaposleni.",
     ouTerminationSuccessNotification: "Veza između organizacionih jedinica je uklonjena.",
     ouTerminationFailedNotification: "Brisanje nije uspelo.",
-    authorReprintResultsListLabel: "Lista radova koji su autorski reprint"
+    authorReprintResultsListLabel: "Lista radova koji su autorski reprint",
+    massUnbindSuccessfullMessage: "Uspešno ste uklonjeni sa publikacije: {name}",
+    unbindFailedMessage: "Uklanjanje sa publikacije '{name}' nije uspelo.",
+    showOnlyUnmanagedLabel: "Prikaži samo bez uvezanih autora"
 }

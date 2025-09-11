@@ -143,32 +143,6 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="scopus"
-                                label="Scopus ID"
-                                placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="4">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col cols="10">
                             <journal-autocomplete-search
                                 ref="journalAutocompleteRef"
@@ -199,8 +173,8 @@
                         <v-col cols="5">
                             <v-text-field
                                 v-model="number"
-                                :label="$t('numberLabel')"
-                                :placeholder="$t('numberLabel')">
+                                :label="$t('issueLabel')"
+                                :placeholder="$t('issueLabel')">
                             </v-text-field>
                         </v-col>
                     </v-row>
@@ -219,6 +193,32 @@
                                 v-model="selectedPublisher"
                                 allow-author-reprint>
                             </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>

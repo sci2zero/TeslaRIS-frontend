@@ -126,6 +126,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(dataset?.description)"
             :document="dataset"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(dataset?.id as number, dataset as _Document)"
         />
 
@@ -211,12 +212,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(dataset?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
 
         <share-buttons
@@ -253,7 +248,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -278,7 +272,7 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -412,7 +406,7 @@ export default defineComponent({
             dataset.value!.openAlexId = basicInfo.openAlexId;
             dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
             dataset.value!.authorReprint = basicInfo.authorReprint;
-
+            
             performUpdate(true);
         };
 

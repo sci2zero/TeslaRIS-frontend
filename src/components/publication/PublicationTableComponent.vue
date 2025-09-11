@@ -1,6 +1,6 @@
 <template>
     <v-btn
-        v-if="(isAdmin || allowComparison)"
+        v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
         density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
@@ -301,6 +301,10 @@ export default defineComponent({
         validationView: {
             type: Boolean,
             default: false
+        },
+        allowResearcherUnbinding: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -402,7 +406,25 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
-                if (publication.type === PublicationType.MONOGRAPH) {
+                if (props.allowResearcherUnbinding) {
+                    return DocumentPublicationService.unbindPersonFromPublication(
+                        publication.databaseId as number
+                    ).then(() => {
+                        if (i18n.locale.value.startsWith("sr")) {
+                            addNotification(i18n.t("massUnbindSuccessfullMessage", { name: publication.titleSr }));
+                        } else {
+                            addNotification(i18n.t("massUnbindSuccessfullMessage", { name: publication.titleOther }));
+                        }
+                    })
+                    .catch(() => {
+                        if (i18n.locale.value.startsWith("sr")) {
+                            addNotification(i18n.t("unbindFailedMessage", { name: publication.titleSr }));
+                        } else {
+                            addNotification(i18n.t("unbindFailedMessage", { name: publication.titleOther }));
+                        }
+                        return publication;
+                    });
+                } else if (publication.type === PublicationType.MONOGRAPH) {
                     return DocumentPublicationService.deleteMonograph(publication.databaseId as number)
                         .then(() => {
                             if (i18n.locale.value.startsWith("sr")) {
@@ -419,24 +441,24 @@ export default defineComponent({
                             }
                             return publication;
                     });
+                } else {
+                    return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
+                        .then(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
+                            }
+                        })
+                        .catch(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
+                            }
+                            return publication;
+                    });
                 }
-                
-                return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
-                    .then(() => {
-                        if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
-                        } else {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
-                        }
-                    })
-                    .catch(() => {
-                        if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
-                        } else {
-                            addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
-                        }
-                        return publication;
-                });
             })).then((failedDeletions) => {
                 selectedPublications.value = selectedPublications.value.filter((publication) => failedDeletions.includes(publication));
                 refreshTable(tableOptions.value);

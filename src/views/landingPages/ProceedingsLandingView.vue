@@ -176,6 +176,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(proceedings?.description)"
             :document="proceedings"
+            :handle-researcher-unbind="handleResearcherUnbind"
             :display-citation="false"
         />
 
@@ -264,12 +265,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(proceedings?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
 
         <share-buttons
@@ -314,7 +309,6 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import { localiseDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
@@ -333,7 +327,7 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons },
     setup() {
         const currentTab = ref("");
 
