@@ -10,6 +10,8 @@
                     :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
                     :is-update="isUpdate"
                     :lock-search-field="lockSearchField"
+                    show-top-suggestions
+                    :suggestion-display-check="checkWhetherCurrentUserShouldBeDisplayed"
                     @set-input="input.contribution = $event; sendContentToParent();"
                 />
             </v-col>
@@ -83,6 +85,7 @@ import { getPersonalTitlesForGivenLocale } from "@/i18n/personalTitle";
 import { EmploymentTitle, PersonalTitle } from "@/models/InvolvementModel";
 import InvolvementService from "@/services/InvolvementService";
 import { useI18n } from "vue-i18n";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -152,9 +155,23 @@ export default defineComponent({
 
         const i18n = useI18n();
 
+        const { isResearcher } = useUserRole();
+
         onMounted(() => {
             populateFormData();
         });
+
+        const checkWhetherCurrentUserShouldBeDisplayed = (personId: number): boolean => {
+            if (isResearcher.value && inputs.value && inputs.value.length > 0) {
+                if (inputs.value.find(c => c.contribution && c.contribution.personId === personId) === undefined) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            return false;
+        };
 
         const populateFormData = () => {
             if(props.presetContributions && props.presetContributions.length > 0) {
@@ -309,6 +326,7 @@ export default defineComponent({
                     returnObject.push(boardMemberContribution);
                 }
             });
+
             emit("setInput", returnObject);
         };
 
@@ -335,8 +353,8 @@ export default defineComponent({
             contributionTypes, sendContentToParent,
             baseContributionRef, clearInput,
             employmentTitles, personalTitles,
-            populateFormData, fillInputs,
-            fillDummyAuthors,
+            populateFormData, fillInputs, fillDummyAuthors,
+            checkWhetherCurrentUserShouldBeDisplayed,
             shouldDiplayBoardPresidentBox,
             shouldDisplayAlsoBoardMemberBox
         }

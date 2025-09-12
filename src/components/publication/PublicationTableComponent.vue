@@ -359,7 +359,13 @@ export default defineComponent({
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
 
-        const { isAdmin, isCommission, isInstitutionalLibrarian, isHeadOfLibrary, loggedInUser, isUserLoggedIn } = useUserRole();
+        const {
+            isAdmin, isCommission,
+            isInstitutionalEditor,
+            isInstitutionalLibrarian,
+            isHeadOfLibrary, loggedInUser,
+            isUserLoggedIn
+        } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
@@ -407,13 +413,21 @@ export default defineComponent({
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
                 if (props.allowResearcherUnbinding) {
-                    return DocumentPublicationService.unbindPersonFromPublication(
+                    const serviceMethod = isInstitutionalEditor.value ?
+                        (documentId: number) => DocumentPublicationService.unbindInstitutionResearchersFromPublication(documentId) :
+                        (documentId: number) => DocumentPublicationService.unbindPersonFromPublication(documentId);
+
+                    const sucessMessage =
+                        isInstitutionalEditor.value ?
+                            "massInstitutionUnbindSuccessfullMessage" : "massUnbindSuccessfullMessage";
+
+                    return serviceMethod(
                         publication.databaseId as number
                     ).then(() => {
                         if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("massUnbindSuccessfullMessage", { name: publication.titleSr }));
+                            addNotification(i18n.t(sucessMessage, { name: publication.titleSr }));
                         } else {
-                            addNotification(i18n.t("massUnbindSuccessfullMessage", { name: publication.titleOther }));
+                            addNotification(i18n.t(sucessMessage, { name: publication.titleOther }));
                         }
                     })
                     .catch(() => {

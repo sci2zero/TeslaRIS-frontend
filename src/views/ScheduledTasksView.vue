@@ -14,7 +14,7 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration" cols="12" sm="3" md="2">
+            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -127,7 +127,7 @@
             <v-col cols="12" sm="3" md="1">
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
-            <v-col v-if="taskReindexing || reportGeneration" cols="12" sm="3" md="2">
+            <v-col v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedRecurrenceType"
                     :items="recurrenceTypes"
@@ -213,6 +213,7 @@ export default defineComponent({
         const selectedReportType = ref<ReportType>(ReportType.TABLE_63);
 
         const taskReindexing = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REINDEXING);
+        const taskUnmanagedDocumentsDeletion = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION);
         const taskIndicatorLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.INDICATOR_LOAD);
         const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_COMPUTATION);
         const taskClassificationComputation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_COMPUTATION);
@@ -392,6 +393,14 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION:
+                    scheduleTask(() => 
+                        TaskManagerService.scheduleUnmanagedDocumentsDeletion(
+                            timestamp, selectedRecurrenceType.value.value
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -462,7 +471,8 @@ export default defineComponent({
             selectedEvents, selectedReportType,
             isTopLevelReport, isSummaryReport,
             selectedCommissions, recurrenceTypes,
-            selectedRecurrenceType
+            selectedRecurrenceType,
+            taskUnmanagedDocumentsDeletion
         };
     },
 });

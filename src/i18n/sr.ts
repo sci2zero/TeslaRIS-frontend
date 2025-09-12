@@ -1045,6 +1045,8 @@ export default {
     ouTerminationFailedNotification: "Brisanje nije uspelo.",
     authorReprintResultsListLabel: "Lista radova koji su autorski reprint",
     massUnbindSuccessfullMessage: "Uspešno ste uklonjeni sa publikacije: {name}",
+    massInstitutionUnbindSuccessfullMessage: "Uspešno ste uklonili istraživače sa publikacije: {name}",
     unbindFailedMessage: "Uklanjanje sa publikacije '{name}' nije uspelo.",
-    showOnlyUnmanagedLabel: "Prikaži samo bez uvezanih autora"
+    showOnlyUnmanagedLabel: "Prikaži samo bez uvezanih autora",
+    meLabel: "Ja"
 }

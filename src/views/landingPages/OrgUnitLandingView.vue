@@ -302,6 +302,7 @@
                             institutionId: organisationUnit.id,
                             commissionId: null
                         }"
+                    :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
                     @switch-page="switchPublicationsPage">
                 </publication-table-component>
             </v-tabs-window-item>

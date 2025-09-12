@@ -219,3 +219,25 @@ export const serverTimeToLocal = (serverTimeString: string): string => {
 
     return localDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 };
+
+export const serverTimeToLocalTime = (serverTimeString: string): string => {
+    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
+
+    let serverDateTime = DateTime.fromFormat(serverTimeString, "HH:mm:ss", {
+        zone: serverTz
+    });
+
+    if (!serverDateTime.isValid) {
+        serverDateTime = DateTime.fromFormat(serverTimeString, "HH:mm", {
+            zone: serverTz
+        });
+    }
+
+    if (!serverDateTime.isValid) {
+        throw new Error(`Invalid server time: ${serverTimeString}`);
+    }
+
+    const localDateTime = serverDateTime.setZone('local');
+    
+    return localDateTime.toFormat("HH:mm");
+};

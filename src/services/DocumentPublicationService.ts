@@ -226,6 +226,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.patch, `document/unbind-researcher/${documentId}`);
   }
 
+  async unbindInstitutionResearchersFromPublication(documentId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document/unbind-institution-researchers/${documentId}`);
+  }
+
   async fetchCitations(documentId: number): Promise<AxiosResponse<CitationResponse>> {
     return super.sendRequest(axios.get, `document/${documentId}/cite?lang=${i18n.vueI18n.global.locale}`);
   }

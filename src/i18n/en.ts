@@ -1016,5 +1016,6 @@ export default {
     authorReprintResultsListLabel: "List of author reprint publications",
     massUnbindSuccessfullMessage: "You are successfully removed from publication: {name}",
     unbindFailedMessage: "Unbinding from '{name}' failed.",
-    showOnlyUnmanagedLabel: "Show only with all unmanaged authors"
+    showOnlyUnmanagedLabel: "Show only with all unmanaged authors",
+    meLabel: "Me"
 }

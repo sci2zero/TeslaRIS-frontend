@@ -162,6 +162,7 @@ import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
 import { useRoute } from 'vue-router';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { serverTimeToLocalTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -237,7 +238,7 @@ export default defineComponent({
                 params, selectedRecurrenceType.value.value
             ).then(response => {
                 snackbar.value = true;
-                message.value = i18n.t("backupGenerationScheduledMessage", [response.data]);
+                message.value = i18n.t("backupGenerationScheduledMessage", [serverTimeToLocalTime(response.data)]);
                 fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
