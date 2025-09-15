@@ -1,6 +1,6 @@
 <template>
     <div justify="start">
-        <v-dialog v-model="dialog" persistent class="narrow">
+        <v-dialog v-model="dialog" :persistent="persistent" class="narrow">
             <template #activator="scope">
                 <v-list-item
                     v-bind="scope.props"
@@ -20,7 +20,8 @@
                         :proofs="document?.proofs"
                         :preliminary-files="(showThesisSections && document) ? (document as Thesis).preliminaryFiles : []"
                         :preliminary-supplements="(showThesisSections && document) ? (document as Thesis).preliminarySupplements : []"
-                        :commission-reports="(showThesisSections && document) ? (document as Thesis).commissionReports : []">
+                        :commission-reports="(showThesisSections && document) ? (document as Thesis).commissionReports : []"
+                        :hide-empty-sections="hideEmptySections">
                     </attachment-section>
                 </v-card-text>
                 <v-card-actions>
@@ -52,6 +53,14 @@ export default defineComponent({
             required: true
         },
         showThesisSections: {
+            type: Boolean,
+            default: false
+        },
+        persistent: {
+            type: Boolean,
+            default: true
+        },
+        hideEmptySections: {
             type: Boolean,
             default: false
         }

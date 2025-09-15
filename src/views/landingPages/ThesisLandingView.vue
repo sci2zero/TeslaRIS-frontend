@@ -266,7 +266,7 @@
             </v-col>
         </v-row>
 
-        <div v-if="isAdmin || isHeadOfLibrary || userCanPutOnPublicReview" class="actions-box pa-4">
+        <div v-if="isAdmin || isHeadOfLibrary || (userCanPutOnPublicReview && !thesis?.isArchived)" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
@@ -598,6 +598,9 @@ export default defineComponent({
                 RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
                     canCreateRegistryBookEntry.value = response.data ? false : true;
                     registryBookEntryId.value = response.data;
+                }).catch(() => {
+                    canCreateRegistryBookEntry.value = false;
+                    registryBookEntryId.value = -1;
                 });
 
                 fetchClassifications();

@@ -251,6 +251,7 @@ export default {
     editorsLabel: "Urednici",
     reviewersLabel: "Recenzenti",
     advisorsLabel: "Savetnici",
+    mentorsLabel: "Mentori",
     proceedingsLabel: "Zbornik radova",
     createNewProceedingsLabel: "Zbornik radova",
     publicationSeriesLabel: "Serija publikacija",
@@ -1048,5 +1049,6 @@ export default {
     massInstitutionUnbindSuccessfullMessage: "Uspešno ste uklonili istraživače sa publikacije: {name}",
     unbindFailedMessage: "Uklanjanje sa publikacije '{name}' nije uspelo.",
     showOnlyUnmanagedLabel: "Prikaži samo bez uvezanih autora",
-    meLabel: "Ja"
+    meLabel: "Ja",
+    conferencePublicationsLabel: "Radovi sa konferencije"
 }

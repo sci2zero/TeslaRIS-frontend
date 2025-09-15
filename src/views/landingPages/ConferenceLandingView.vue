@@ -119,16 +119,19 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="!conference?.serialEvent" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>    
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="eventIndicators?.length > 0 || canClassify" value="indicators">
+            <v-tab v-show="eventIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="eventClassifications?.length > 0 || canClassify" value="classifications">
+            <v-tab v-show="eventClassifications?.length > 0 || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -137,6 +140,18 @@
             v-show="conference"
             v-model="currentTab"
         >
+            <v-tabs-window-item value="publications">
+                <div class="mt-10">
+                    <h2 class="mb-5">
+                        {{ $t("conferencePublicationsLabel") }}
+                    </h2>
+                    <publication-table-component
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        @switch-page="switchPublicationsPage">
+                    </publication-table-component>
+                </div>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list
                     :keywords="conference?.keywords ? conference?.keywords : []"
@@ -157,16 +172,6 @@
 
                 <div class="mt-10">
                     <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
-                </div>
-
-                <!-- Publication Table -->
-                <div v-if="!conference?.serialEvent" class="mt-10">
-                    <h2>{{ $t("publicationsLabel") }}</h2>
-                    <publication-table-component
-                        :publications="publications"
-                        :total-publications="totalPublications"
-                        @switch-page="switchPublicationsPage">
-                    </publication-table-component>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
@@ -315,6 +320,8 @@ export default defineComponent({
 
                 fetchPublications();
                 fetchDetails();
+
+                currentTab.value = !conference.value?.serialEvent ? "publications" : "contributions";
             }).catch(() => {
                 router.push({ name: "notFound" });
             });

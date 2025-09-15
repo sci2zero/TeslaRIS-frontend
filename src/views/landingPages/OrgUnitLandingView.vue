@@ -294,6 +294,7 @@
                     :publications="publications"
                     :total-publications="totalPublications"
                     enable-export
+                    :allow-comparison="isInstitutionalEditor && canEdit"
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, publicationSearchParams]"
                     :endpoint-body-parameters="

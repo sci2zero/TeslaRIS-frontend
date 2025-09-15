@@ -238,6 +238,10 @@ export default defineComponent({
             });
 
 
+            displayTopCollaboratorPicks();
+        });
+
+        const displayTopCollaboratorPicks = async () => {
             if (isResearcher.value && props.showTopSuggestions) {
                 topContributors.value.splice(0);
 
@@ -259,12 +263,13 @@ export default defineComponent({
                     });
                 });
             }
-        });
+        };
 
         const searchPersons = lodash.debounce((input: string) => {
-            if (props.lockSearchField || !input || input.includes("|") || selectedPerson.value.value === 0) {
+            if (props.lockSearchField || !input || input.includes("|") || (selectedPerson.value && selectedPerson.value.value === 0)) {
                 return;
             }
+
             if (input.length >= 3) {
                 lastSearchInput.value = `(${input.replaceAll('(', '').replaceAll(')', '')})`;
                 
@@ -601,12 +606,10 @@ export default defineComponent({
         };
 
         return {
-                firstName, middleName, lastName,
-                selectedPerson, customNameInput,
-                searchPersons, filterPersons, persons,
-                requiredFieldRules, requiredSelectionRules,
-                contributionDescription, affiliationStatement,
-                sendContentToParent, clearInput, onPersonSelect,
+                firstName, middleName, lastName, selectedPerson, customNameInput,
+                searchPersons, filterPersons, persons, requiredFieldRules,
+                requiredSelectionRules, contributionDescription, affiliationStatement,
+                sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
                 descriptionRef, affiliationStatementRef, toggleExternalSelection,
                 personOtherNames, selectedOtherName, selectExternalAssociate,
                 selectNewlyAddedPerson, toMultilingualTextInput, topContributors,

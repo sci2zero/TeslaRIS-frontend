@@ -33,8 +33,8 @@ export class ThesisLibraryReportingService extends BaseService {
         this.initialzeDownload(response, "report.docx", ".docx");
     }
 
-    async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {
-        return super.sendRequest(axios.get, `thesis-library/dissertation-report?notDefendedOnly=${notDefendedOnly}${institutionId ? ("&institutionId=" + institutionId) : ""}${year ? ("&year=" + year) : ""}${pageable}`);
+    async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string, forMyInstitution: boolean): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {
+        return super.sendRequest(axios.get, `thesis-library/dissertation-report?notDefendedOnly=${notDefendedOnly}${institutionId ? ("&institutionId=" + institutionId) : ""}${year ? ("&year=" + year) : ""}${forMyInstitution ? ("&forMyInstitution=" + forMyInstitution) : ""}${pageable}`);
     }
 }
 

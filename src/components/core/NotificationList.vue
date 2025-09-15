@@ -38,6 +38,9 @@
                                 <v-icon v-else-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
                                     mdi-content-duplicate
                                 </v-icon>
+                                <v-icon v-else-if="notificationAction.toString() === 'RETURN_TO_PUBLICATION'">
+                                    mdi-restart
+                                </v-icon>
                                 <v-icon v-else>
                                     mdi-eye-outline
                                 </v-icon>

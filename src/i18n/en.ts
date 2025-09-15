@@ -251,6 +251,7 @@ export default {
     editorsLabel: "Editors",
     reviewersLabel: "Reviewers",
     advisorsLabel: "Advisors",
+    mentorsLabel: "Advisors",
     proceedingsLabel: "Proceedings",
     createNewProceedingsLabel: "Proceedings",
     publicationSeriesLabel: "Publication Series",
@@ -1017,5 +1018,6 @@ export default {
     massUnbindSuccessfullMessage: "You are successfully removed from publication: {name}",
     unbindFailedMessage: "Unbinding from '{name}' failed.",
     showOnlyUnmanagedLabel: "Show only with all unmanaged authors",
-    meLabel: "Me"
+    meLabel: "Me",
+    conferencePublicationsLabel: "Conference publications"
 }

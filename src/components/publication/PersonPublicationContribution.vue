@@ -205,9 +205,9 @@ export default defineComponent({
                             title: getTitleFromValueAutoLocale(contribution.contributionType),
                             value: contribution.contributionType
                         }, 
-                        isMainContributor: contribution.isMainContributor, 
+                        isMainContributor: contribution.isMainContributor,
                         isCorrespondingContributor: contribution.isCorrespondingContributor,
-                        isBoardPresident: contribution.isBoardPresident,
+                        isBoardPresident: contribution.isBoardPresident ?? false,
                         employmentTitle: contribution.employmentTitle,
                         personalTitle: contribution.personalTitle,
                         id: contribution.id
@@ -238,10 +238,13 @@ export default defineComponent({
         });
 
         const addInput = () => {
+            const contributionType =
+                props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR;
+                
             inputs.value.push({
                 contributionType: {
-                    title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR),
-                    value: props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR
+                    title: getTitleFromValueAutoLocale(contributionType),
+                    value: contributionType
                 },
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
@@ -284,6 +287,10 @@ export default defineComponent({
         const sendContentToParent = () => {
             const returnObject: PersonDocumentContribution[] = [];
             inputs.value.forEach((input, index) => {
+                if (!input.contribution) {
+                    return;
+                }
+                
                 let personName = undefined;
                 if (input.contribution.selectedOtherName) {
                     personName = {firstname: input.contribution.selectedOtherName[0], 
@@ -325,6 +332,12 @@ export default defineComponent({
                     boardMemberContribution.contributionType = DocumentContributionType.BOARD_MEMBER;
                     returnObject.push(boardMemberContribution);
                 }
+            });
+
+            baseContributionRef.value
+            .filter((ref: any) => ref)
+            .forEach((ref: typeof PersonContributionBase) => {
+                ref.displayTopCollaboratorPicks();
             });
 
             emit("setInput", returnObject);

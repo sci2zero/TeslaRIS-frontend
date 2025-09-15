@@ -241,7 +241,6 @@ export default defineComponent({
                 message.value = i18n.t("backupGenerationScheduledMessage", [serverTimeToLocalTime(response.data)]);
                 fetchScheduledTasks();
             }).catch((error) => {
-                console.log(error)
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
             });

@@ -93,6 +93,15 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="alternateTitleRef"
+                                v-model="alternateTitle"
+                                :label="$t('alternateTitleLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="6">
                             <date-picker
                                 v-model="topicAcceptanceDate"
@@ -116,7 +125,7 @@
                                 :items="languageList"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" md="6">
+                        <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)" cols="12" md="6">
                             <v-select
                                 v-model="selectedWritingLanguage"
                                 :label="$t('writingLanguageLabel')"
@@ -365,7 +374,10 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
         const languageTagsList = ref<any[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
+        
         const selectedLanguage = ref<number>();
+        const languagesWithMoreWritingSystems = ref<number[]>([]);
+
         const selectedWritingLanguage = ref<{title: string, value: number}>();
         const languages = ref<LanguageResponse[]>();
 
@@ -374,10 +386,14 @@ export default defineComponent({
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
+                languagesWithMoreWritingSystems.value.splice(0);
                 response.data.forEach((language: LanguageResponse) => {
                     languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                     if (i18n.locale.value.toUpperCase() === language.languageCode) {
                         selectedLanguage.value = language.id;
+                    }
+                    if (language.languageCode === "SR") {
+                        languagesWithMoreWritingSystems.value.push(language.id);
                     }
                 })
             });
@@ -428,6 +444,7 @@ export default defineComponent({
         const scientificSubArea = ref<any[]>([]);
 
         const titleRef = ref<typeof MultilingualTextInput>();
+        const alternateTitleRef = ref<typeof MultilingualTextInput>();
         const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
@@ -444,6 +461,7 @@ export default defineComponent({
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any[]>([]);
+        const alternateTitle = ref<any[]>([]);
         const externalOUName = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
@@ -504,6 +522,7 @@ export default defineComponent({
                 description: description.value,
                 keywords: keywords.value,
                 subTitle: subtitle.value,
+                alternateTitle: alternateTitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
@@ -531,6 +550,7 @@ export default defineComponent({
                     titleRef.value?.clearInput();
                     externalOUNameRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
+                    alternateTitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
@@ -645,7 +665,8 @@ export default defineComponent({
             typeOfTitle, scientificAreaRef, scientificSubAreaRef,
             placeOfKeepRef, typeOfTitleRef, presetContent,
             toMultilingualTextInput, isResearcher, scopus,
-            scopusIdValidationRules
+            scopusIdValidationRules, languagesWithMoreWritingSystems,
+            alternateTitleRef, alternateTitle
         };
     }
 });
