@@ -139,6 +139,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -162,6 +165,14 @@
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="patent"
+                    :can-edit="canEdit && !patent?.isArchived"
+                    :proofs="patent?.proofs"
+                    :file-items="patent?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -177,13 +188,6 @@
                     :can-edit="canEdit && !patent?.isArchived"
                     @update="updateDescription">
                 </description-section>
-
-                <attachment-section
-                    :document="patent"
-                    :can-edit="canEdit && !patent?.isArchived"
-                    :proofs="patent?.proofs"
-                    :file-items="patent?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

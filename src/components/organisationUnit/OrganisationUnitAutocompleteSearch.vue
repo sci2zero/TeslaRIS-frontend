@@ -203,7 +203,7 @@ export default defineComponent({
                 OrganisationUnitService.searchOUs(
                         params,
                         props.forPersonId,
-                        props.topLevelInstitutionId,
+                        (props.topLevelInstitutionId && props.topLevelInstitutionId > 0) ? props.topLevelInstitutionId : null,
                         props.onlyHarvestableInstitutions,
                         props.onlyIndependentInstitutions,
                         props.allowedThesisType,

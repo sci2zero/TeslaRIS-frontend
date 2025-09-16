@@ -166,6 +166,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -194,14 +197,7 @@
                     :description="proceedingsPublication?.description"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     @update="updateDescription">
-                </description-section>
-
-                <attachment-section
-                    :document="proceedingsPublication"
-                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    :proofs="proceedingsPublication?.proofs"
-                    :file-items="proceedingsPublication?.fileItems">
-                </attachment-section>    
+                </description-section>  
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -210,6 +206,14 @@
                     :read-only="!canEdit || proceedingsPublication?.isArchived"
                     @update="updateContributions"
                 />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="proceedingsPublication"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    :proofs="proceedingsPublication?.proofs"
+                    :file-items="proceedingsPublication?.fileItems">
+                </attachment-section>  
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

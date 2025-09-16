@@ -266,8 +266,8 @@ export default defineComponent(
             const institutionId = ref(-1);
 
             // const homeLabel = computed(() => i18n.t("homeLabel"));
+            // const resourcesLabel = computed(() => i18n.t("resources"));
             
-            const resourcesLabel = computed(() => i18n.t("resources"));
             const manageLabel = computed(() => i18n.t("manage"));
 
             const personListLabel = computed(() => i18n.t("personListLabel"));
@@ -372,12 +372,6 @@ export default defineComponent(
                 }
             });
 
-            const resourcesMenu = ref<MenuItem[]>([
-                { title: personListLabel, type:'icon-link', pathName: 'persons' },
-                { title: ouListLabel, type:'icon-link', pathName: 'organisation-units' },
-                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results' }
-            ]);
-
             const manageMenu = ref<MenuItem[]>([
                 { title: userPageLabel, type:'icon-link', pathName: 'users', condition: computed(() => (isAdmin.value))},
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => (isAdmin.value))},
@@ -416,22 +410,24 @@ export default defineComponent(
 
             const leftMenuItems = ref<MenuItem[]>([
                 // { title: homeLabel, type: 'icon-link', pathName:"" },
-                { title: thesesLabel, type:'icon-link', pathName: 'scientific-results', condition: computed(() => loginStore.userLoggedIn && isHeadOfLibrary.value) },
-                { title: resourcesLabel, type: 'menu', subItems: resourcesMenu, condition: computed(() => !isHeadOfLibrary.value) },
-                { title: publicReviewDissertationsLabel, type:'icon-link', pathName: 'thesis-library/public-dissertations', condition: computed(() => loginStore.userLoggedIn && isHeadOfLibrary.value) },
-                { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search', condition: computed(() => !isHeadOfLibrary.value) },
-                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search', condition: computed(() => loginStore.userLoggedIn && isHeadOfLibrary.value) },
-                { title: backupLabel, type:'icon-link', pathName: 'thesis-library-backup', condition: computed(() => (loginStore.userLoggedIn && isHeadOfLibrary.value)) },
+                { title: personListLabel, type:'icon-link', pathName: 'persons', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value) },
+                { title: ouListLabel, type:'icon-link', pathName: 'organisation-units', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value) },
+                { title: scientificResultsListLabel, type:'icon-link', pathName: 'scientific-results', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value) },
+                { title: thesesLabel, type:'icon-link', pathName: 'scientific-results', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+                { title: publicReviewDissertationsLabel, type:'icon-link', pathName: 'thesis-library/public-dissertations', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+                { title: simpleSearchLabel, type: 'icon-link', pathName: 'advanced-search', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value) },
+                { title: simpleSearchLabel, type:'icon-link', pathName: 'thesis-library-search', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+                { title: backupLabel, type:'icon-link', pathName: 'thesis-library-backup', condition: computed(() => (loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value))) },
                 { title: researcherProfileLabel, type: 'dynamic', pathName: `persons`, dynamicValue: computed(() => personId.value), condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
                 { title: commissionProfileLabel, type: 'dynamic', pathName: `assessment/commissions`, dynamicValue: computed(() => commissionId.value), condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
                 { title: institutionProfileLabel, type: 'dynamic', pathName: `organisation-units`, dynamicValue: computed(() => institutionId.value), condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
                 { title: manageLabel, type: 'menu', subItems: manageMenu, condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) },
                 { title: assessmentLabel, type: 'menu', subItems: assessmentsMenu, condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
-                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => !isHeadOfLibrary.value) },
+                { title: thesisLibraryLabel, type: 'menu', subItems: thesisLibraryMenu, condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value) },
                 { title: eventListLabel, type:'icon-link', pathName: 'events', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: journalListLabel, type:'icon-link', pathName: 'journals', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
                 { title: reportingLabel, type:'icon-link', pathName: 'assessment/reporting', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
-                { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: computed(() => !isHeadOfLibrary.value) }
+                { title: mServiceLabel, type:'icon-link', pathName: 'assessment/m-service', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value) }
             ]);
 
             const menuItems = ref<MenuItem[]>([

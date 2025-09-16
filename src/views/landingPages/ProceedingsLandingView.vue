@@ -197,6 +197,9 @@
             <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -232,14 +235,6 @@
                     :can-edit="canEdit"
                     @update="updateDescription">
                 </description-section>
-
-                <br />
-                <attachment-section
-                    :document="proceedings"
-                    :can-edit="canEdit"
-                    :proofs="proceedings?.proofs"
-                    :file-items="proceedings?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -249,6 +244,14 @@
                     shows-board-and-reviewers
                     @update="updateContributions">
                 </person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="proceedings"
+                    :can-edit="canEdit"
+                    :proofs="proceedings?.proofs"
+                    :file-items="proceedings?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

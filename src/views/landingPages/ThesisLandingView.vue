@@ -358,6 +358,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -388,6 +391,20 @@
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section 
+                    :document="thesis"
+                    :can-edit="canEdit && !thesis?.isOnPublicReview"
+                    :proofs="thesis?.proofs"
+                    :file-items="thesis?.fileItems"
+                    is-thesis-section
+                    :preliminary-files="thesis?.preliminaryFiles"
+                    :preliminary-supplements="thesis?.preliminarySupplements"
+                    :commission-reports="thesis?.commissionReports"
+                    :is-on-public-review="thesis?.isOnPublicReview"
+                    @update="fetchThesis"
+                ></attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -417,19 +434,6 @@
                         @update="updateRemark"
                     />
                 </div>
-
-                <attachment-section 
-                    :document="thesis"
-                    :can-edit="canEdit && !thesis?.isOnPublicReview"
-                    :proofs="thesis?.proofs"
-                    :file-items="thesis?.fileItems"
-                    is-thesis-section
-                    :preliminary-files="thesis?.preliminaryFiles"
-                    :preliminary-supplements="thesis?.preliminarySupplements"
-                    :commission-reports="thesis?.commissionReports"
-                    :is-on-public-review="thesis?.isOnPublicReview"
-                    @update="fetchThesis"
-                ></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchOutput">
                 <thesis-research-output-section

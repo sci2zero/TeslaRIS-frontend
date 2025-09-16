@@ -140,6 +140,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -163,6 +166,14 @@
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="dataset"
+                    :can-edit="canEdit && !dataset?.isArchived"
+                    :proofs="dataset?.proofs"
+                    :file-items="dataset?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -178,13 +189,6 @@
                     :can-edit="canEdit && !dataset?.isArchived"
                     @update="updateDescription">
                 </description-section>
-
-                <attachment-section
-                    :document="dataset"
-                    :can-edit="canEdit && !dataset?.isArchived"
-                    :proofs="dataset?.proofs"
-                    :file-items="dataset?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

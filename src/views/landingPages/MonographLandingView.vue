@@ -193,6 +193,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -218,6 +221,14 @@
                     :read-only="!canEdit || monograph?.isArchived"
                     @update="updateContributions">
                 </person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="monograph"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    :proofs="monograph?.proofs"
+                    :file-items="monograph?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -248,13 +259,6 @@
                         </publication-table-component>
                     </v-col>
                 </v-row>
-
-                <attachment-section
-                    :document="monograph"
-                    :can-edit="canEdit && !monograph?.isArchived"
-                    :proofs="monograph?.proofs"
-                    :file-items="monograph?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>

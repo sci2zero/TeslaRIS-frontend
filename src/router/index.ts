@@ -816,7 +816,11 @@ const router = createRouter({
                                     component: SubmitThesisView,
                                     meta: {
                                         authenticated: true,
-                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.institutionalLibrarian],
+                                        authorities: [
+                                            roles.admin, roles.institutionalEditor,
+                                            roles.headOfLibrary, roles.researcher,
+                                            roles.institutionalLibrarian
+                                        ],
                                     },
                                 },
                                 {

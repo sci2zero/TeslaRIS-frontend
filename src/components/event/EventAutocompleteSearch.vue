@@ -121,7 +121,7 @@ export default defineComponent({
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
-                        title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} | ${conference.dateFromTo}`,
+                        title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} ${conference.dateFromTo ? ("| " + conference.dateFromTo) : ""}`,
                         value: conference.databaseId,
                         date: conference.dateFromTo
                     }));

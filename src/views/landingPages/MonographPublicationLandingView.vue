@@ -167,6 +167,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -190,6 +193,14 @@
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="monographPublication"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
+                    :proofs="monographPublication?.proofs"
+                    :file-items="monographPublication?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -205,13 +216,6 @@
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
-
-                <attachment-section
-                    :document="monographPublication"
-                    :can-edit="canEdit && !monographPublication?.isArchived"
-                    :proofs="monographPublication?.proofs"
-                    :file-items="monographPublication?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

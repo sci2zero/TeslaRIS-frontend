@@ -158,7 +158,7 @@ export default {
     deleteSuccessNotification: "Successfully deleted: {name}.",
     deleteFailedNotification: "Could not delete: {name}, object allready in use or is allready deleted.",
     compareLabel: "Compare",
-    ouListLabel: "Organisation Units",
+    ouListLabel: "Org. Units",
     nameLabel: "Name",
     nameAbbreviationLabel: "Name Abbreviation",
     keywordsLabel: "Keywords",

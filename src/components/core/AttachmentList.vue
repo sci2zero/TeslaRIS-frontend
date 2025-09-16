@@ -43,7 +43,7 @@
                                     :license="attachment.license.toLowerCase()"
                                 />
                                 <v-row v-if="canEdit">
-                                    <v-col v-if="!disableUpdates || isAdmin || isHeadOfLibrary">
+                                    <v-col v-if="!disableUpdates || isInstitutionalLibrarian || isAdmin || isHeadOfLibrary">
                                         <v-btn
                                             icon variant="outlined" size="x-small" color="primary"
                                             class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">

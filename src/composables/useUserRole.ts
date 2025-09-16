@@ -21,7 +21,7 @@ export function useUserRole() {
     const canUserAddPersons = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian);
     const canAddSerialEvents = computed(() => isAdmin.value || isInstitutionalEditor.value);
 
-    const canUserAddPublications = computed(() => userRole.value && userRole.value !== 'COMMISSION' && userRole.value !== 'VICE_DEAN_FOR_SCIENCE' && userRole.value !== 'HEAD_OF_LIBRARY');
+    const canUserAddPublications = computed(() => userRole.value && userRole.value !== 'COMMISSION' && userRole.value !== 'VICE_DEAN_FOR_SCIENCE');
     const returnOnlyInstitutionRelatedEntities = ref(isUserBoundToOU.value);
     const loggedInUser = ref<UserResponse | null>(null);
     const isUserLoggedIn = computed(() => loggedInUser.value !== null);

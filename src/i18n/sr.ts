@@ -158,7 +158,7 @@ export default {
     deleteSuccessNotification: "Uspešno obrisao: {name}.",
     deleteFailedNotification: "Nije moguće obrisati: {name}, objekat je u upotrebi ili je već obrisan.",
     compareLabel: "Uporedi",
-    ouListLabel: "Organizacione Jedinice",
+    ouListLabel: "Org. Jedinice",
     nameLabel: "Naziv",
     nameAbbreviationLabel: "Skraćenica Imena",
     keywordsLabel: "Ključne reči",

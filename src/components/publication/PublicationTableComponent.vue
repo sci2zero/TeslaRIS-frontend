@@ -1,7 +1,8 @@
 <template>
     <v-btn
         v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
-        density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
+        density="compact" class="bottom-spacer"
+        :disabled="selectedPublications.length === 0 || !(allowResearcherUnbinding && canPerformUnbinding())"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
@@ -595,6 +596,18 @@ export default defineComponent({
             refreshTable(tableOptions);
         };
 
+        const canPerformUnbinding = (): boolean => {
+            if (isAdmin.value) {
+                return true;
+            }
+            
+            if (isInstitutionalEditor.value) {
+                return selectedPublications.value.find(pub => pub.type === PublicationType.THESIS) === undefined;
+            }
+
+            return false;
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -605,7 +618,7 @@ export default defineComponent({
             declinePublicationClaim, loggedInUser, documentClassified,
             ApplicableEntityType, removeResearchOutputs, ExportEntity,
             getConcretePublicationType, isUserLoggedIn, validateSection,
-            validateSectionForAll
+            validateSectionForAll, canPerformUnbinding
         };
     }
 });

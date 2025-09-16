@@ -26,7 +26,7 @@
                         <organisation-unit-autocomplete-search
                             ref="ouAutocompleteRef"
                             v-model:model-value="selectedOrganisationUnit"
-                            :readonly="isInstitutionalLibrarian"
+                            :top-level-institution-id="topLevelInstitutionId"
                             required
                             :allowed-thesis-type="selectedThesisType.value">
                         </organisation-unit-autocomplete-search>
@@ -41,7 +41,7 @@
                         </multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row v-if="!isInstitutionalLibrarian">
+                <v-row v-if="!isInstitutionalLibrarian && !isHeadOfLibrary">
                     <v-col>
                         <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
                             {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalThesisOULabel") }}
@@ -368,8 +368,14 @@ export default defineComponent({
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
         const router = useRouter();
-        const { isAdmin, isInstitutionalLibrarian, isResearcher, loggedInUser } = useUserRole();
-        const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
+        const {
+            isAdmin, isInstitutionalLibrarian,
+            isHeadOfLibrary, isResearcher,
+            loggedInUser
+        } = useUserRole();
+        const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
+
+        const topLevelInstitutionId = ref(-1);
 
         const { languageTags } = useLanguageTags();
         const languageTagsList = ref<any[]>([]);
@@ -432,11 +438,13 @@ export default defineComponent({
         });
 
         const presetOU = () => {
-            if (isInstitutionalLibrarian.value) {
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedOrganisationUnit.value = {
                     title: returnCurrentLocaleContent(loggedInUser.value?.organisationUnitName) as string,
                     value: loggedInUser.value?.organisationUnitId as number
                 };
+
+                topLevelInstitutionId.value = loggedInUser.value?.organisationUnitId as number;
             }
         };
 
@@ -666,7 +674,8 @@ export default defineComponent({
             placeOfKeepRef, typeOfTitleRef, presetContent,
             toMultilingualTextInput, isResearcher, scopus,
             scopusIdValidationRules, languagesWithMoreWritingSystems,
-            alternateTitleRef, alternateTitle
+            alternateTitleRef, alternateTitle, isHeadOfLibrary,
+            topLevelInstitutionId
         };
     }
 });

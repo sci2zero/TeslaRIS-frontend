@@ -33,7 +33,7 @@
             <span
                 v-if="canUserAddPublications"
                 :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-                <add-publication-menu></add-publication-menu>
+                <add-publication-menu />
             </span>
             <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
                 <v-btn

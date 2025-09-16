@@ -105,8 +105,8 @@ export default defineComponent({
 
         const {
             isAdmin, isInstitutionalEditor, isCommission,
-            canUserAddPublications, isUserBoundToOU,
-            loggedInUser, returnOnlyInstitutionRelatedEntities,
+            isUserBoundToOU, loggedInUser,
+            returnOnlyInstitutionRelatedEntities,
             isInstitutionalLibrarian, isHeadOfLibrary
         } = useUserRole();
 
@@ -182,13 +182,13 @@ export default defineComponent({
             search, publications, searchParams,
             switchPage, isAdmin, totalPublications,
             tableRef, clearSortAndPerformSearch,
-            canUserAddPublications, isUserBoundToOU,
+            isUserBoundToOU, isCommission,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, loggedInUser,
             loading, navigateToValidationPage,
             returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities,
-            isInstitutionalEditor, isCommission
+            isInstitutionalEditor
         };
     }
 });

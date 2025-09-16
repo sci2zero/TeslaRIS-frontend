@@ -54,9 +54,9 @@
                 :attachments="fileItems ? fileItems : []"
                 :can-edit="canEdit"
                 :in-comparator="inComparator"
-                @create="addAttachment($event, false, document); notifyAboutSectionChange();"
-                @delete="deleteAttachment($event, false, document); notifyAboutSectionChange();"
-                @update="updateAttachment($event, false, document); notifyAboutSectionChange();"
+                @create="addAttachment($event, false, document);"
+                @delete="deleteAttachment($event, false, document);"
+                @update="updateAttachment($event, false, document);"
             />
         </v-col>
     </v-row>
@@ -68,9 +68,9 @@
                 :can-edit="canEdit"
                 is-proof
                 :in-comparator="inComparator"
-                @create="addAttachment($event, true, document); notifyAboutSectionChange();"
-                @delete="deleteAttachment($event, true, document); notifyAboutSectionChange();"
-                @update="updateAttachment($event, true, document); notifyAboutSectionChange();"
+                @create="addAttachment($event, true, document);"
+                @delete="deleteAttachment($event, true, document);"
+                @update="updateAttachment($event, true, document);"
             />
         </v-col>
     </v-row>

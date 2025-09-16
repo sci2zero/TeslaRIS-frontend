@@ -38,11 +38,12 @@ export default defineComponent({
     },
     setup() {
         const router = useRouter();
-        const { isInstitutionalLibrarian } = useUserRole();
+        const { isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
 
         onMounted(() => {
-            if (isInstitutionalLibrarian.value) {
-                submissionMenuItems.value = submissionMenuItems.value.filter(item => item.value === "submitThesis");
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
+                submissionMenuItems.value =
+                    submissionMenuItems.value.filter(item => item.value === "submitThesis");
             }
         });
 

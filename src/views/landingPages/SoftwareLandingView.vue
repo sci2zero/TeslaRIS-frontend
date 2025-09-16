@@ -139,6 +139,9 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -160,6 +163,14 @@
                     :read-only="!canEdit || software?.isArchived"
                     @update="updateContributions"
                 />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="software"
+                    :can-edit="canEdit && !software?.isArchived"
+                    :proofs="software?.proofs"
+                    :file-items="software?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
