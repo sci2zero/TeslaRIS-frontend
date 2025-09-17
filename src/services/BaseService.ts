@@ -19,11 +19,18 @@ export class BaseService {
     const blob = new Blob([blobData.data], {
         type: "application/" + extension,
     });
+    const blobUrl = window.URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = documentName;
-    link.click();
-    URL.revokeObjectURL(link.href);
+      link.href = blobUrl;
+      link.download = documentName.endsWith(`.${extension}`)
+        ? documentName
+        : `${documentName}.${extension}`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
   }
 
   async fetchImageForDisplay(personId: number, fullSize: boolean): Promise<[string | null, string | null]> {

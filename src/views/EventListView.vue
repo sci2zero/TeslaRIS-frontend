@@ -3,7 +3,10 @@
         <h1>{{ $t("eventListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component :preset-search-input="presetSearchParams" @search="clearSortAndPerformSearch"></search-bar-component>
+        <search-bar-component
+            :preset-search-input="presetSearchParams"
+            @search="clearSortAndPerformSearch">
+        </search-bar-component>
         <br />
         <span class="d-flex align-center">
             <v-btn v-if="isAdmin" color="primary" @click="addConference">

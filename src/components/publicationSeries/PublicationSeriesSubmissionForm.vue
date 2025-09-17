@@ -20,15 +20,29 @@
                         <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
-                    </v-col>
-                </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                 </v-btn>
                 <v-container v-if="additionalFields">
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="sourceOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col>
                             <v-select
@@ -146,11 +160,13 @@ export default defineComponent({
         };
 
         const titleRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
         const abbreviationsRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof MultilingualTextInput>();
 
         const title = ref<any[]>([]);
         const nameAbbreviations = ref([]);
+        const subtitle = ref<any[]>([]);
         const eIssn = ref("");
         const printIssn = ref("");
         const openAlexId = ref("");
@@ -170,7 +186,8 @@ export default defineComponent({
                 nameAbbreviation: nameAbbreviations.value,
                 contributions: [],
                 openAlexId: openAlexId.value,
-                uris: uris.value
+                uris: uris.value,
+                subtitle: subtitle.value
             };
 
             switch(props.inputType) {
@@ -183,6 +200,7 @@ export default defineComponent({
 
                         if (stayOnPage) {
                             titleRef.value?.clearInput();
+                            subtitleRef.value?.clearInput();
                             abbreviationsRef.value?.clearInput();
                             eIssn.value = "";
                             printIssn.value = "";
@@ -208,6 +226,7 @@ export default defineComponent({
                         
                         if (stayOnPage) {
                             titleRef.value?.clearInput();
+                            subtitleRef.value?.clearInput();
                             abbreviationsRef.value?.clearInput();
                             eIssn.value = "";
                             printIssn.value = "";
@@ -231,9 +250,9 @@ export default defineComponent({
             snackbar, message, printIssnValidationRules,
             title, titleRef, eIssnValidationRules,
             eIssn, printIssn, languageList, selectedLanguages,
-            nameAbbreviations, abbreviationsRef,
+            nameAbbreviations, abbreviationsRef, subtitle,
             requiredFieldRules, uris, urisRef, openAlexId,
-            sourceOpenAlexIdValidationRules
+            sourceOpenAlexIdValidationRules, subtitleRef
         };
     }
 });

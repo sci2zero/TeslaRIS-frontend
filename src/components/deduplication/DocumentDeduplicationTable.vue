@@ -180,6 +180,11 @@ export default defineComponent({
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
+                case EntityType.PUBLISHER:
+                    router.push({name: "publisherMetadataComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
             }
         };
 
@@ -215,6 +220,11 @@ export default defineComponent({
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
+                case EntityType.PUBLISHER:
+                    router.push({name: "publisherPublicationsComparator", params: {
+                        leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
+                    }});
+                    break;
             }
         };
 
@@ -227,6 +237,7 @@ export default defineComponent({
                 case EntityType.EVENT:
                 case EntityType.PERSON:
                 case EntityType.ORGANISATION_UNIT:
+                case EntityType.PUBLISHER:
                     return true;
             }
         };
@@ -245,6 +256,8 @@ export default defineComponent({
                     return "persons/";
                 case EntityType.ORGANISATION_UNIT:
                     return "organisation-units/";
+                case EntityType.PUBLISHER:
+                    return "publichers/";
             }
         };
 
@@ -254,6 +267,7 @@ export default defineComponent({
                 case EntityType.PERSON:
                 case EntityType.BOOK_SERIES:
                 case EntityType.JOURNAL:
+                case EntityType.PUBLISHER:
                     return i18n.t("comparePublicationsLabel");
                 case EntityType.EVENT:
                     return i18n.t("compareProceedingsLabel");

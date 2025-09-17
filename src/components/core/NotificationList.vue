@@ -32,11 +32,14 @@
                                 <v-icon v-if="notificationAction.toString() === 'APPROVE'">
                                     mdi-check
                                 </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION'">
+                                <v-icon v-else-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION' || notificationAction.toString() === 'REMOVE_EMPLOYEES_FROM_PUBLICATION'">
                                     mdi-file-remove-outline
                                 </v-icon>
                                 <v-icon v-else-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
                                     mdi-content-duplicate
+                                </v-icon>
+                                <v-icon v-else-if="notificationAction.toString() === 'RETURN_TO_PUBLICATION'">
+                                    mdi-restart
                                 </v-icon>
                                 <v-icon v-else>
                                     mdi-eye-outline
@@ -126,6 +129,9 @@ export default defineComponent({
                 decrementCounterAndNavigateToPage("importer");
             } else if (action === NotificationAction.GO_TO_VALIDATION_PAGE) {
                 decrementCounterAndNavigateToPage("publicationsValidation");
+            } else if (action === NotificationAction.GO_TO_UNBINDED_PUBLICATIONS_PAGE) {
+                notificationCountStore.decrementCounter();
+                router.push({name: "scientificResults", query: {unmanaged: "true"}});
             }
         };
 

@@ -1,5 +1,6 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { ThesisType } from "./PublicationModel";
 
 export interface OrganisationUnitIndex {
     id: string;
@@ -19,6 +20,7 @@ export interface OrganisationUnitIndex {
     superOUNameSrSortable: string;
     superOUNameOther: string;
     superOUNameOtherSortable: string;
+    allowedThesisTypes: ThesisType[];
 }
 
 export interface OrganisationUnitRequest {
@@ -32,6 +34,12 @@ export interface OrganisationUnitRequest {
     openAlexId?: string;
     ror? : string;
     uris: string[];
+    allowedThesisTypes: ThesisType[];
+    clientInstitution: boolean;
+    institutionEmailDomain: string;
+    validatingEmailDomain: boolean;
+    allowingSubdomains: boolean;
+    legalEntity: boolean;
 }
 
 export interface OrganisationUnitResponse {
@@ -48,6 +56,12 @@ export interface OrganisationUnitResponse {
     uris: string[];
     logoServerFilename?: string;
     logoBackgroundHex: string;
+    allowedThesisTypes: ThesisType[];
+    clientInstitution: boolean;
+    institutionEmailDomain: string;
+    validatingEmailDomain: boolean;
+    allowingSubdomains: boolean;
+    legalEntity: boolean;
 }
 
 export enum OrganisationUnitsRelationType {

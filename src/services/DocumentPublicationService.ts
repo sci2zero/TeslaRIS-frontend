@@ -18,13 +18,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}`);
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}`);
   }
 
   async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
@@ -226,6 +226,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.patch, `document/unbind-researcher/${documentId}`);
   }
 
+  async unbindInstitutionResearchersFromPublication(documentId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `document/unbind-institution-researchers/${documentId}`);
+  }
+
   async fetchCitations(documentId: number): Promise<AxiosResponse<CitationResponse>> {
     return super.sendRequest(axios.get, `document/${documentId}/cite?lang=${i18n.vueI18n.global.locale}`);
   }
@@ -283,7 +287,7 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async getWordcloudForSingleDocument(documentId: number): Promise<AxiosResponse<TermFrequency[]>> {
-    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?foreignLanguage=${!i18n.vueI18n.global.locale.toString().startsWith('sr')}`);
+    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?language=${i18n.vueI18n.global.locale.toString()}`);
   }
 }
 

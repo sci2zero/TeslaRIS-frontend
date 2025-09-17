@@ -121,8 +121,17 @@ export default defineComponent({
             while (token.includes(prefix)) {
                 token = token.replace(prefix, "");
             }
-
-            router.push({ name: "advancedSearch", query: { searchQuery: token } });
+            
+            router.push(
+                {
+                    name:"advancedSearch",
+                    query: {
+                        searchQuery: token,
+                        tab: "publications",
+                        search: "simple" 
+                    }
+                }
+            );     
         }
 
         return {

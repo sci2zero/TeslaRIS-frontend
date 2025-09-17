@@ -30,6 +30,7 @@ export interface DocumentPublicationIndex {
     publicationSeriesId: number | null;
     eventId: number | null;
     publisherId: number | null;
+    authorReprint?: boolean;
     journalId: number | null;
     monographId: number | null;
     databaseId: number | null;
@@ -38,6 +39,7 @@ export interface DocumentPublicationIndex {
     publicationType: string;
     isApproved: boolean;
     areFilesValid: boolean;
+    apa: string;
 }
 
 export enum PublicationType {
@@ -71,6 +73,7 @@ export enum JournalPublicationType {
     LEXICOGRAPHIC_UNIT,
     POLEMICS,
     SCIENTIFIC_CRITIC,
+    EDITORIAL
 }
 
 export interface Document {
@@ -92,6 +95,7 @@ export interface Document {
     isMetadataValid?: boolean;
     areFilesValid?: boolean;
     isArchived?: boolean;
+    remark?: MultilingualContent[];
 }
 
 export interface JournalPublication extends Document {
@@ -177,6 +181,8 @@ export interface Monograph extends Document {
     publicationSeriesId?: number;
     languageTagIds?: number[];
     researchAreaId?: number;
+    publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export enum MonographPublicationType {
@@ -200,16 +206,19 @@ export interface MonographPublication extends Document {
 export interface Patent extends Document {
     number: string;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export interface Software extends Document {
     internalNumber: string;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
+    authorReprint?: boolean;
 }
 
 export interface DeduplicationSuggestion {
@@ -240,6 +249,7 @@ export interface Thesis extends Document {
     scientificArea?: MultilingualContent[];
     scientificSubArea?: MultilingualContent[];
     publisherId?: number;
+    authorReprint?: boolean;
     languageCode?: string;
     preliminaryFiles?: DocumentFileResponse[];
     preliminarySupplements?: DocumentFileResponse[];
@@ -256,7 +266,6 @@ export interface Thesis extends Document {
     udc?: string;
     typeOfTitle?: MultilingualContent[];
     extendedAbstract?: MultilingualContent[];
-    remark?: MultilingualContent[];
     alternateTitle?: MultilingualContent[];
     publicReviewCompleted?: boolean;
 }

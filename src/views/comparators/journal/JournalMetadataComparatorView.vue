@@ -152,6 +152,19 @@ export default defineComponent({
                 }
             });
 
+            journal2.subtitle?.forEach(subtitle => {
+                let merged = false;
+                journal1.subtitle?.forEach(currentTitle => {
+                    if (currentTitle.languageTag === subtitle.languageTag) {
+                        currentTitle.content += " | " + subtitle.content;
+                        merged = true;
+                    }
+                });
+                if (!merged) {
+                    journal1.title.push(subtitle);
+                }
+            });
+
             journal2.nameAbbreviation.forEach(nameAbbreviation => {
                 let merged = false;
                 journal1.nameAbbreviation.forEach(currentNameAbbreviation => {
@@ -216,6 +229,7 @@ export default defineComponent({
             leftJournal.value!.printISSN = updatedJournal.printISSN;
             leftJournal.value!.languageTagIds = updatedJournal.languageTagIds;
             leftJournal.value!.uris = updatedJournal.uris;
+            leftJournal.value!.subtitle = updatedJournal.subtitle;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -230,6 +244,7 @@ export default defineComponent({
             rightJournal.value!.printISSN = updatedJournal.printISSN;
             rightJournal.value!.languageTagIds = updatedJournal.languageTagIds;
             rightJournal.value!.uris = updatedJournal.uris;
+            rightJournal.value!.subtitle = updatedJournal.subtitle;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

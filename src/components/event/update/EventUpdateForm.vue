@@ -48,6 +48,9 @@
                 <p v-show="dateRangeError" class="mb-2 text-red">
                     {{ dateRangeFormatError }}
                 </p>
+                <v-row v-if="!inComparator" class="mt-2">
+                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
+                </v-row>
                 <v-row>
                     <v-col>
                         <v-select
@@ -74,22 +77,19 @@
                         <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row v-if="!serialEvent">
                     <v-col cols="5">
                         <v-text-field
                             v-model="conferenceNumber"
                             :label="$t('conferenceNumberLabel')"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                    <!-- <v-col cols="5">
                         <v-text-field
                             v-model="entryFee"
                             :label="$t('entryFeeLabel')"
                         ></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row v-if="!inComparator">
-                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
+                    </v-col> -->
                 </v-row>
                 <v-row>
                     <v-col>
@@ -160,6 +160,7 @@ export default defineComponent({
 
         onMounted(() => {
             fetchCountries();
+            validateEventPeriod();
         });
 
         const fetchCountries = () => {
@@ -225,7 +226,17 @@ export default defineComponent({
 
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
         const dateRangeError = ref(false);
-        watch([dateFrom, dateTo], () => {
+        watch([dateFrom, dateTo, eventYear], () => {
+            validateEventPeriod();
+        });
+
+        const validateEventPeriod = () => {
+            if(eventYear.value && !timePeriodInput.value) {
+                dateRangeError.value = false;
+                manualValidationsPassed.value = true;
+                return;
+            }
+
             const from = dateFrom.value;
             const to = dateTo.value;
 
@@ -242,7 +253,7 @@ export default defineComponent({
 
             dateRangeError.value = false;
             manualValidationsPassed.value = true;
-        });
+        };
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         

@@ -63,12 +63,17 @@
                                 <div v-if="software?.documentDate" class="response">
                                     {{ software.documentDate }}
                                 </div>
-                                <div v-if="software?.publisherId">
+                                <div v-if="software?.publisherId || software?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="software?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + software?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="software?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                             </v-col>
@@ -120,6 +125,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(software?.description)"
             :document="software"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(software?.id as number, software as _Document)"
         />
 
@@ -132,6 +138,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -155,6 +164,14 @@
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="software"
+                    :can-edit="canEdit && !software?.isArchived"
+                    :proofs="software?.proofs"
+                    :file-items="software?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -171,12 +188,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="software"
+                <description-section
+                    :description="software?.remark"
                     :can-edit="canEdit && !software?.isArchived"
-                    :proofs="software?.proofs"
-                    :file-items="software?.fileItems">
-                </attachment-section>
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -203,12 +220,6 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(software?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
 
         <share-buttons
             v-if="software && isResearcher && canEdit"
@@ -244,7 +255,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -268,7 +278,7 @@ import { type AxiosResponseHeaders } from 'axios';
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -311,7 +321,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -408,6 +418,7 @@ export default defineComponent({
             software.value!.internalNumber = basicInfo.internalNumber;
             software.value!.openAlexId = basicInfo.openAlexId;
             software.value!.webOfScienceId = basicInfo.webOfScienceId;
+            software.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };
@@ -440,6 +451,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            software.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             software, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
@@ -451,7 +467,7 @@ export default defineComponent({
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
             fetchIndicators, createIndicator, PublicationType,
-            fetchSoftware, fetchValidationStatus
+            fetchSoftware, fetchValidationStatus, updateRemark
         };
 }})
 

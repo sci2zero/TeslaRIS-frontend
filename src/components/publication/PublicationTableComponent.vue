@@ -1,7 +1,8 @@
 <template>
     <v-btn
-        v-if="(isAdmin || allowComparison)"
-        density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
+        v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
+        density="compact" class="bottom-spacer"
+        :disabled="selectedPublications.length === 0 || !(allowResearcherUnbinding && canPerformUnbinding())"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
@@ -301,6 +302,10 @@ export default defineComponent({
         validationView: {
             type: Boolean,
             default: false
+        },
+        allowResearcherUnbinding: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -355,7 +360,13 @@ export default defineComponent({
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
 
-        const { isAdmin, isCommission, isInstitutionalLibrarian, isHeadOfLibrary, loggedInUser, isUserLoggedIn } = useUserRole();
+        const {
+            isAdmin, isCommission,
+            isInstitutionalEditor,
+            isInstitutionalLibrarian,
+            isHeadOfLibrary, loggedInUser,
+            isUserLoggedIn
+        } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
@@ -402,7 +413,33 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedPublications.value.map((publication: DocumentPublicationIndex) => {
-                if (publication.type === PublicationType.MONOGRAPH) {
+                if (props.allowResearcherUnbinding) {
+                    const serviceMethod = isInstitutionalEditor.value ?
+                        (documentId: number) => DocumentPublicationService.unbindInstitutionResearchersFromPublication(documentId) :
+                        (documentId: number) => DocumentPublicationService.unbindPersonFromPublication(documentId);
+
+                    const sucessMessage =
+                        isInstitutionalEditor.value ?
+                            "massInstitutionUnbindSuccessfullMessage" : "massUnbindSuccessfullMessage";
+
+                    return serviceMethod(
+                        publication.databaseId as number
+                    ).then(() => {
+                        if (i18n.locale.value.startsWith("sr")) {
+                            addNotification(i18n.t(sucessMessage, { name: publication.titleSr }));
+                        } else {
+                            addNotification(i18n.t(sucessMessage, { name: publication.titleOther }));
+                        }
+                    })
+                    .catch(() => {
+                        if (i18n.locale.value.startsWith("sr")) {
+                            addNotification(i18n.t("unbindFailedMessage", { name: publication.titleSr }));
+                        } else {
+                            addNotification(i18n.t("unbindFailedMessage", { name: publication.titleOther }));
+                        }
+                        return publication;
+                    });
+                } else if (publication.type === PublicationType.MONOGRAPH) {
                     return DocumentPublicationService.deleteMonograph(publication.databaseId as number)
                         .then(() => {
                             if (i18n.locale.value.startsWith("sr")) {
@@ -419,24 +456,24 @@ export default defineComponent({
                             }
                             return publication;
                     });
+                } else {
+                    return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
+                        .then(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
+                            }
+                        })
+                        .catch(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
+                            } else {
+                                addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
+                            }
+                            return publication;
+                    });
                 }
-                
-                return DocumentPublicationService.deleteDocumentPublication(publication.databaseId as number)
-                    .then(() => {
-                        if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleSr }));
-                        } else {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: publication.titleOther }));
-                        }
-                    })
-                    .catch(() => {
-                        if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("deleteFailedNotification", { name: publication.titleSr }));
-                        } else {
-                            addNotification(i18n.t("deleteFailedNotification", { name: publication.titleOther }));
-                        }
-                        return publication;
-                });
             })).then((failedDeletions) => {
                 selectedPublications.value = selectedPublications.value.filter((publication) => failedDeletions.includes(publication));
                 refreshTable(tableOptions.value);
@@ -559,6 +596,18 @@ export default defineComponent({
             refreshTable(tableOptions);
         };
 
+        const canPerformUnbinding = (): boolean => {
+            if (isAdmin.value) {
+                return true;
+            }
+            
+            if (isInstitutionalEditor.value) {
+                return selectedPublications.value.find(pub => pub.type === PublicationType.THESIS) === undefined;
+            }
+
+            return false;
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -569,7 +618,7 @@ export default defineComponent({
             declinePublicationClaim, loggedInUser, documentClassified,
             ApplicableEntityType, removeResearchOutputs, ExportEntity,
             getConcretePublicationType, isUserLoggedIn, validateSection,
-            validateSectionForAll
+            validateSectionForAll, canPerformUnbinding
         };
     }
 });

@@ -186,6 +186,7 @@ export default defineComponent({
 
             software1.eventId = software2.eventId;
             software1.publisherId = software2.publisherId;
+            software1.authorReprint = software2.authorReprint;
 
             software2.uris!.forEach(uri => {
                 if (!software1.uris!.includes(uri)) {
@@ -240,6 +241,7 @@ export default defineComponent({
             leftSoftware.value!.scopusId = updatedInfo.scopusId;
             leftSoftware.value!.openAlexId = updatedInfo.openAlexId;
             leftSoftware.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            leftSoftware.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -261,6 +263,7 @@ export default defineComponent({
             rightSoftware.value!.scopusId = updatedInfo.scopusId;
             rightSoftware.value!.openAlexId = updatedInfo.openAlexId;
             rightSoftware.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            rightSoftware.value!.authorReprint = updatedInfo.authorReprint;
                         
             if (update.value) {
                 rightUpdateComplete.value = true;

@@ -1,5 +1,7 @@
 <template>
-    <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
+    <v-row
+        v-if="canEditThesisAttachments || isOnPublicReview && (!hideEmptySections || (preliminaryFiles && preliminaryFiles.length > 0))"
+        class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminaryFilesLabel") }}</h2>
             <attachment-list
@@ -15,7 +17,9 @@
             />
         </v-col>
     </v-row>
-    <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
+    <v-row
+        v-if="canEditThesisAttachments || isOnPublicReview && (!hideEmptySections || (preliminarySupplements && preliminarySupplements.length > 0))"
+        class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
             <attachment-list
@@ -29,7 +33,9 @@
             />
         </v-col>
     </v-row>
-    <v-row v-if="canEditThesisAttachments || isOnPublicReview" class="mt-10">
+    <v-row
+        v-if="canEditThesisAttachments || isOnPublicReview && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
+        class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("commissionReportsLabel") }}</h2>
             <attachment-list
@@ -41,20 +47,20 @@
             />
         </v-col>
     </v-row>
-    <v-row class="mt-10">
+    <v-row v-if="!hideEmptySections || (fileItems && fileItems.length > 0)" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <attachment-list
                 :attachments="fileItems ? fileItems : []"
                 :can-edit="canEdit"
                 :in-comparator="inComparator"
-                @create="addAttachment($event, false, document); notifyAboutSectionChange();"
-                @delete="deleteAttachment($event, false, document); notifyAboutSectionChange();"
-                @update="updateAttachment($event, false, document); notifyAboutSectionChange();"
+                @create="addAttachment($event, false, document);"
+                @delete="deleteAttachment($event, false, document);"
+                @update="updateAttachment($event, false, document);"
             />
         </v-col>
     </v-row>
-    <v-row class="mt-10">
+    <v-row v-if="!hideEmptySections || (proofs && proofs.length > 0)" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("proofsLabel") }}</h2>
             <attachment-list
@@ -62,9 +68,9 @@
                 :can-edit="canEdit"
                 is-proof
                 :in-comparator="inComparator"
-                @create="addAttachment($event, true, document); notifyAboutSectionChange();"
-                @delete="deleteAttachment($event, true, document); notifyAboutSectionChange();"
-                @update="updateAttachment($event, true, document); notifyAboutSectionChange();"
+                @create="addAttachment($event, true, document);"
+                @delete="deleteAttachment($event, true, document);"
+                @update="updateAttachment($event, true, document);"
             />
         </v-col>
     </v-row>
@@ -121,6 +127,10 @@ export default defineComponent({
         default: false
     },
     inComparator: {
+        type: Boolean,
+        default: false
+    },
+    hideEmptySections: {
         type: Boolean,
         default: false
     }

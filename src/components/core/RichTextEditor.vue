@@ -17,7 +17,32 @@
                 </button>
             </div>
         </bubble-menu>
-        <editor-content style="height: 100%;" :editor="editor" :class="editable ? 'bordered' : ''" />
+        
+        <div class="content-container" :class="editable ? 'bordered' : ''">
+            <!-- eslint-disable vue/no-v-html -->
+            <div
+                v-show="isTruncated"
+                class="truncated-content"
+                v-html="truncatedHtml">
+            </div>
+            <!-- eslint-enable vue/no-v-html -->
+            <editor-content
+                v-if="!isTruncated"
+                :style="`height: 100%; ${editable ? 'min-height: 300px;' : ''}`"
+                :editor="editor"
+            />
+            
+            <v-btn 
+                v-if="limitDisplay > 0 && modelValue && modelValue.length > limitDisplay"
+                color="primary" 
+                variant="text" 
+                size="small" 
+                class="link-style-btn ml-2"
+                @click="expandContent"
+            >
+                {{ readMoreText }}
+            </v-btn>
+        </div>
     </div>
 </template>
 
@@ -28,6 +53,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import Placeholder from '@tiptap/extension-placeholder'
 import { useI18n } from 'vue-i18n';
 import lodash from "lodash";
+import DOMPurify from "dompurify";
 
 
 export default defineComponent({
@@ -41,18 +67,102 @@ export default defineComponent({
         editable: {
             type: Boolean,
             default: true
+        },
+        limitDisplay: {
+            type: Number,
+            default: 0
+        },
+        defaultPlaceholder: {
+            type: String,
+            default: undefined
         }
     },
     emits: ["update:modelValue", "input"],
     setup(props, { emit }) {
         const i18n = useI18n();
-        const placeholder = computed(() => i18n.t("writeSomethingPlaceholder"));
-
+        const placeholder = computed(() => props.defaultPlaceholder ? i18n.t(props.defaultPlaceholder) : i18n.t("writeSomethingPlaceholder"));
+        const isExpanded = ref(false);
+        const truncatedHtml = ref("");
         const lastKeyCode = ref("");
+
         document.addEventListener('keypress', function (e){
             const nowKeyCode = e.key;
             lastKeyCode.value = nowKeyCode;
         });
+
+        const isTruncated = computed(() => {
+            return props.limitDisplay > 0 && !isExpanded.value && props.modelValue && props.modelValue.length > props.limitDisplay;
+        });
+
+        const readMoreText = computed(() => {
+            return i18n.t(isExpanded.value ? i18n.t("readLessLabel") : i18n.t("readMoreLabel"));
+        });
+
+        const truncateHtml = (html: string, limit: number): string => {
+            if (!html || limit <= 0) return html;
+
+            html = DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const plainText = tempDiv.textContent || '';
+            if (plainText.length <= limit) return html;
+
+            let currentLength = 0;
+            let truncatedNode: Node | null = null;
+            let offset = 0;
+
+            const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+            let node: Node | null = walker.nextNode();
+
+            while (node) {
+                const textContent = node.textContent || '';
+                if (currentLength + textContent.length > limit) {
+                    truncatedNode = node;
+                    offset = limit - currentLength;
+                    break;
+                }
+                currentLength += textContent.length;
+                node = walker.nextNode();
+            }
+
+            if (truncatedNode) {
+                const range = document.createRange();
+                range.setStart(tempDiv, 0);
+                range.setEnd(truncatedNode, offset);
+
+                const extracted = range.extractContents();
+
+                let lastTextNode: Node | null = null;
+                const walker2 = document.createTreeWalker(extracted, NodeFilter.SHOW_TEXT);
+                let n2: Node | null = walker2.nextNode();
+                while (n2) {
+                    lastTextNode = n2;
+                    n2 = walker2.nextNode();
+                }
+
+                if (lastTextNode && lastTextNode.nodeType === Node.TEXT_NODE) {
+                    lastTextNode.textContent = (lastTextNode.textContent || '') + '...';
+                } else {
+                    extracted.appendChild(document.createTextNode('...'));
+                }
+
+                const container = document.createElement('div');
+                container.appendChild(extracted);
+                return container.innerHTML;
+            }
+
+            return tempDiv.innerHTML;
+        };
+
+        watch(() => props.modelValue, (newVal) => {
+            if (props.limitDisplay > 0 && newVal && newVal.length > props.limitDisplay) {
+                truncatedHtml.value = truncateHtml(newVal, props.limitDisplay);
+            } else {
+                truncatedHtml.value = newVal;
+            }
+        }, { immediate: true });
 
         const editor = useEditor({
             content: props.modelValue,
@@ -90,13 +200,12 @@ export default defineComponent({
 
         watch(() => props.modelValue, () => {
             if (!props.editable) {
-                editor.value.chain()
-                .setContent(props.modelValue)
-                .run()
+                editor.value?.chain().setContent(props.modelValue).run();
             } else {
                 const editorInstance = editor.value;
-                const { state } = editorInstance;
+                if (!editorInstance) return;
 
+                const { state } = editorInstance;
                 const { from, to } = state.selection;
 
                 editorInstance.chain()
@@ -109,13 +218,22 @@ export default defineComponent({
             }
         });
 
-        return { editor }
+        const expandContent = () => {
+            isExpanded.value = !isExpanded.value;
+        };
+
+        return { 
+            editor, 
+            isTruncated, 
+            truncatedHtml, 
+            readMoreText, 
+            expandContent 
+        }
     },
 });
 </script>
 
 <style>
-
 .tiptap {
     height: 100%;
     padding: 10px;
@@ -258,6 +376,69 @@ export default defineComponent({
     outline: 1px solid #110F0E;
     background-color: #fafafa !important;
     color: #000000 !important;
+}
+
+.truncated-content {
+    position: relative;
+    height: 100%;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.read-more-btn {
+    background-color: #6A00F5;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.read-more-btn:hover {
+    background-color: #5800CC;
+}
+
+.truncated-content .tiptap {
+    all: unset;
+}
+
+.truncated-content p,
+.truncated-content ul,
+.truncated-content ol,
+.truncated-content h1,
+.truncated-content h2,
+.truncated-content h3,
+.truncated-content h4,
+.truncated-content h5,
+.truncated-content h6 {
+    margin: 0.5rem 0;
+}
+
+.truncated-content ul,
+.truncated-content ol {
+    padding-left: 1.5rem;
+}
+
+.link-style-btn {
+    text-transform: none;
+    text-decoration: underline;
+    font-weight: normal;
+    padding: 0;
+    min-width: auto;
+    height: auto;
+    margin-top: -20px;
+}
+
+.link-style-btn:hover {
+    background-color: transparent !important;
+    text-decoration: underline;
+}
+
+.ProseMirror-focused {
+  border: none !important;
+  outline: none !important;
 }
 
 </style>

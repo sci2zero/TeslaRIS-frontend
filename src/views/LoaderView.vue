@@ -152,6 +152,7 @@
             :contributions="deducedContributions"
             :submission="submissionDTO"
             @select="fetchNextAfterLoading"
+            @unbind="skipDocument(true)"
         />
 
         <toast v-model="snackbar" :message="errorMessage" />

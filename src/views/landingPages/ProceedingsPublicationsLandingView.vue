@@ -152,6 +152,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
             :document="proceedingsPublication"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 
@@ -164,6 +165,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -195,12 +199,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="proceedingsPublication"
+                <description-section
+                    :description="proceedingsPublication?.remark"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    :proofs="proceedingsPublication?.proofs"
-                    :file-items="proceedingsPublication?.fileItems">
-                </attachment-section>    
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -209,6 +213,14 @@
                     :read-only="!canEdit || proceedingsPublication?.isArchived"
                     @update="updateContributions"
                 />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="proceedingsPublication"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    :proofs="proceedingsPublication?.proofs"
+                    :file-items="proceedingsPublication?.fileItems">
+                </attachment-section>  
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -238,12 +250,6 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(proceedingsPublication?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
 
         <share-buttons
             v-if="proceedingsPublication && isResearcher && canEdit"
@@ -285,7 +291,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -310,7 +315,7 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -353,7 +358,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -504,6 +509,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            proceedingsPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, isResearcher,
@@ -516,7 +526,7 @@ export default defineComponent({
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
-            fetchValidationStatus, PublicationType
+            fetchValidationStatus, PublicationType, updateRemark
         };
 }})
 

@@ -2,11 +2,14 @@ import { useHead } from '@vueuse/head'
 import { type AxiosResponseHeaders } from 'axios';
 
 
+let signpostingCount = 0;
+
 export const injectFairSignposting = (headers: AxiosResponseHeaders) => {
     if (!headers) {
         return;
     }
 
+    cleanupFairSignposting();
     const rawLinkHeader = headers['link'] ?? headers['Link'];
 
     const linkHeaders: string[] = Array.isArray(rawLinkHeader)
@@ -27,7 +30,6 @@ export const injectFairSignposting = (headers: AxiosResponseHeaders) => {
                 return null;
             }
 
-            
             if (matchWithType) {
                 const [, href, rel, type] = matchWithType;
                 return { rel, href, type };
@@ -44,16 +46,19 @@ export const injectFairSignposting = (headers: AxiosResponseHeaders) => {
         return;
     }
 
+    signpostingCount++;
+
     useHead({
         link: [
             {
                 rel: "type",
-                href: "https://schema.org/AboutPage"
+                href: "https://schema.org/AboutPage",
+                key: `signposting-type-${signpostingCount}`
             }
         ]
     });
     
-    links.forEach(link => {
+    links.forEach((link, index) => {
         if (!link) {
             return;
         }
@@ -63,9 +68,31 @@ export const injectFairSignposting = (headers: AxiosResponseHeaders) => {
                 {
                     rel: link.rel,
                     href: link.href,
-                    ...(link.type ? { type: link.type } : {})
+                    ...(link.type ? { type: link.type } : {}),
+                    // Add unique key to force re-render
+                    key: `signposting-${index}-${signpostingCount}`
                 }
             ]
         });
+    });
+};
+
+const cleanupFairSignposting = () => {
+    document
+    .querySelectorAll<HTMLLinkElement>('head link')
+    .forEach(link => {
+        if (
+            link.rel === 'type' ||
+            link.rel.includes('describedby') ||
+            link.rel.includes('describes') ||
+            link.rel.includes('item') ||
+            link.rel.includes('identifier') ||
+            link.rel.includes('collection') ||
+            link.rel.includes('license') ||
+            link.rel.includes('suthor') ||
+            link.rel.includes('cite-as')
+        ) {
+            link.remove();
+        }
     });
 };

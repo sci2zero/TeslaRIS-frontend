@@ -2,18 +2,22 @@
     <v-app class="bg-slate-100">
         <v-main class="bg-slate-100">
             <router-view
-                :key="$route.fullPath"
+                :key="$route.path"
             />
             
             <cookie-consent
                 v-if="!hideLayout"
+            />
+
+            <download-progress
+                ref="downloadProgressRef"
             />
         </v-main>
     </v-app>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRoute, useRouter } from "vue-router";
@@ -23,13 +27,18 @@ import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
 import CookieConsent from "./components/core/CookieConsent.vue";
 import { useScriptLoader } from "./composables/useScriptLoader";
+import DownloadProgress from "./components/core/DownloadProgress.vue";
+import { useDownloadStore } from "./stores/downloadStore";
 
 
 export default defineComponent({
     name: "App",
-    components: { CookieConsent },
+    components: { CookieConsent, DownloadProgress },
     setup() {
         const route = useRoute();
+
+        const downloadProgressRef = ref<typeof DownloadProgress>();
+        const downloadStore = useDownloadStore();
 
         const hideLayout = computed(() => {
             return (
@@ -46,10 +55,13 @@ export default defineComponent({
             } catch (e) {
                 console.error('Failed to load static script:', e)
             }
+
+            downloadStore.setGlobalDownloadProgressRef(downloadProgressRef.value as typeof DownloadProgress);
         });
 
         return {
-            hideLayout
+            hideLayout,
+            downloadProgressRef
         };
     },
     beforeMount() {

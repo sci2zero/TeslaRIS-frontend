@@ -104,15 +104,20 @@ export default defineComponent({
 
         const updatedData = () => {
             const token: string = firstName.value + " " + lastName.value;
-            searchResearchers(token)
+            searchResearchers(token);
         };
 
         const searchResearchers = lodash.debounce((input: string) => {
-                const token = input
-                const params = `tokens=${token}&page=0&size=7`
-                PersonService.searchResearchers(params, false, null).then((response) => {
-                    suggestions.value = response.data.content;
-                });
+            const tokens = input.split(" ").filter(t => t !== " " && t !== "");
+            let searchTokens = "";
+            tokens.forEach(token => {
+                searchTokens += `tokens=${token}&`;
+            });
+
+            const params = `${searchTokens}page=0&size=7`;
+            PersonService.searchResearchers(params, false, null).then((response) => {
+                suggestions.value = response.data.content;
+            });
         }, 300);
 
         const registrationNextStep = () => {

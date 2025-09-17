@@ -3,7 +3,8 @@
         <div class="search-card" :class="{ 'search-card--light': !dark }">
             <div class="search-input-wrapper">
                 <v-text-field
-                    v-model="searchInput"
+                    ref="searchField"
+            v-model="searchInput"
                     density="comfortable"
                     variant="outlined"
                     class="search-input"
@@ -31,8 +32,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, watch } from 'vue';
-import { ref } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import { defineComponent } from 'vue';
 import lodash from "lodash";
 
@@ -48,62 +48,95 @@ export default defineComponent(
             dark: {
                 type: Boolean,
                 default: false
+            },
+            longerDelay: {
+                type: Boolean,
+                default: false
+            },
+            focusAutomatically: {
+                type: Boolean,
+                default: false
             }
         },
         emits: ["search"],
-        setup(props, {emit}) {
-            const searchInput = ref(props.presetSearchInput);
-
-            onMounted(() => {
-                if (props.presetSearchInput !== "") {
-                    onSearch();
-                }
-            });
-
-            watch(searchInput, lodash.debounce(
-                () => {
-                    onSearch();
-                }, 300)
-            );
+        setup(props, { emit }) {
+            const searchInput = ref("");
+            const searchField = ref();
 
             const onSearch = () => {
-                if(searchInput.value === undefined) {
+            if (searchInput.value === undefined) {
+                return;
+            }
+
+            let tokens: string[] = searchInput.value.trim().split(" ");
+            if ((tokens.length === 1 && tokens[0] === "")) {
+                tokens = ["*"];
+            }
+
+            let searchParams: string = "";
+            let parsingPhrase = false;
+            let currentToken = "";
+            tokens.forEach(token => {
+                if (token === "") {
                     return;
                 }
 
-                let tokens: string[] = searchInput.value.trim().split(" ");
-                if ((tokens.length === 1 && tokens[0] === "")) {
-                    tokens = ["*"]
+                if (token.startsWith('"')) {
+                    parsingPhrase = true;
+                } else if (token.endsWith('"')) {
+                    parsingPhrase = false;
                 }
-                
-                let searchParams: string = "";
-                let parsingPhrase = false;
-                let currentToken = "";
-                tokens.forEach(token => {
-                    if (token === "") {
-                        return;
-                    }
 
-                    if (token.startsWith('"')) {
-                        parsingPhrase = true;
-                    } else if (token.endsWith('"')) {
-                        parsingPhrase = false;
-                    }
+                currentToken += token;
+                if (!parsingPhrase) {
+                    searchParams += `tokens=${encodeURIComponent(currentToken)}&`;
+                    currentToken = "";
+                } else {
+                    currentToken += " ";
+                }
+            });
+            emit("search", searchParams.slice(0, -1));
+        };
 
-                    currentToken += token;
-                    if (!parsingPhrase) {
-                        searchParams += `tokens=${encodeURIComponent(currentToken)}&`;
-                        currentToken = "";
-                    } else {
-                        currentToken += " ";
-                    }
-                });
-                emit("search", searchParams.slice(0, -1));
-            };
+        onMounted(() => {
+            if (props.presetSearchInput !== "") {
+                onSearch();
+            }
 
-            return {searchInput, onSearch};
-        }
-    });
+            if (props.focusAutomatically && searchField.value?.$el) {
+                const inputEl = searchField.value.$el.querySelector("input");
+                if (inputEl) {
+                    inputEl.focus();
+
+                    const val = inputEl.value;
+                    inputEl.setSelectionRange(val.length, val.length);
+                }
+            }
+        });
+
+        watch(() => props.presetSearchInput, () => {
+            if (props.presetSearchInput !== "" && props.presetSearchInput !== "*") {
+                searchInput.value = props.presetSearchInput;
+            }
+        });
+
+        watch(
+            searchInput,
+            lodash.debounce(() => {
+                onSearch();
+            }, props.longerDelay ? 500 : 300)
+        );
+
+        const clearInput = () => {
+            searchInput.value = "";
+        };
+
+        return {
+            searchInput, onSearch,
+            searchField, clearInput
+        };
+    }
+});
 </script>
 
 <style scoped>

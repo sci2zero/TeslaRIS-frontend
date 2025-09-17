@@ -253,7 +253,7 @@
                     @search="clearSortAndPerformPublicationSearch($event)"
                 />
                 <div class="mb-5 mt-5">
-                    <add-publication-menu compact />
+                    <add-publication-menu v-if="canEdit" compact />
                     <v-btn
                         v-if="isResearcher && canEdit"
                         class="ml-2" color="primary" density="compact"
@@ -282,6 +282,7 @@
                             personId: person.id,
                             commissionId: null
                         }"
+                    :allow-researcher-unbinding="canEdit && isResearcher"
                     @switch-page="switchPage">
                 </publication-table-component>
             </v-tabs-window-item>
@@ -444,6 +445,8 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
 
 
 export default defineComponent({
@@ -519,11 +522,6 @@ export default defineComponent({
             fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
-                selectedPublicationTypes.value.push(
-                    {title: publicationType.title, value: publicationType.value}
-                );
-            });
         });
 
         watch(i18n.locale, () => {
@@ -551,6 +549,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 person.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
 

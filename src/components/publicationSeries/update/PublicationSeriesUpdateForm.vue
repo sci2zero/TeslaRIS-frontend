@@ -15,6 +15,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col>
+                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetPublicationSeries?.subtitle, languageTags)"></multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="6">
                         <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
                     </v-col>
@@ -101,6 +106,8 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const abbreviationsRef = ref<typeof MultilingualTextInput>();
+        const subtitleRef = ref<typeof MultilingualTextInput>();
+        const urisRef = ref<typeof UriInput>();
 
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>(props.presetPublicationSeries?.languageTagIds as number[]);
@@ -123,9 +130,8 @@ export default defineComponent({
             }
         });
 
-        const urisRef = ref<typeof UriInput>();
-
         const title = ref<any[]>([]);
+        const subtitle = ref<any[]>([]);
         const nameAbbreviations = ref<any[]>([]);
         const eIssn = ref(props.presetPublicationSeries?.eissn);
         const printIssn = ref(props.presetPublicationSeries?.printISSN);
@@ -171,7 +177,8 @@ export default defineComponent({
                 nameAbbreviation: nameAbbreviations.value,
                 contributions: [],
                 openAlexId: openAlexId.value,
-                uris: uris.value
+                uris: uris.value,
+                subtitle: subtitle.value
             };
 
             emit("update", updatedPublicationSeries);
@@ -180,6 +187,9 @@ export default defineComponent({
         const refreshForm = () => {
             titleRef.value?.clearInput();
             title.value = props.presetPublicationSeries?.title as MultilingualContent[];
+
+            subtitleRef.value?.clearInput();
+            subtitle.value = props.presetPublicationSeries?.subtitle as MultilingualContent[];
 
             abbreviationsRef.value?.clearInput();
             nameAbbreviations.value = props.presetPublicationSeries?.nameAbbreviation as MultilingualContent[];
@@ -208,7 +218,8 @@ export default defineComponent({
             titleRef, abbreviationsRef,
             refreshForm, uris, urisRef,
             submit, snackbar, message,
-            sourceOpenAlexIdValidationRules
+            sourceOpenAlexIdValidationRules,
+            subtitleRef, subtitle
         };
     }
 });

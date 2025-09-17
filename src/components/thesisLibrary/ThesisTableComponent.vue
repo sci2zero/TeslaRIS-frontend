@@ -30,7 +30,12 @@
                     <td v-if="institutionId === undefined && !$i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameOther }}
                     </td>
-                    <td>{{ row.item.scientificArea }}</td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        {{ row.item.scientificAreaSr }}
+                    </td>
+                    <td v-else>
+                        {{ row.item.scientificAreaOther }}
+                    </td>
                     <td v-if="$i18n.locale.startsWith('sr')">
                         <localized-link
                             :to="'scientific-results/thesis/' + row.item.databaseId"
@@ -45,7 +50,9 @@
                             <rich-title-renderer :title="row.item.titleOther"></rich-title-renderer>
                         </localized-link>
                     </td>
-                    <td>{{ localiseDate(row.item.publicReviewStartDate) }} - {{ showReviewEndDate ? localiseDate(row.item.publicReviewEndDate) : "*" }}</td>
+                    <td>
+                        {{ localiseDate(row.item.publicReviewStartDate) }} - {{ showReviewEndDate ? localiseDate(row.item.publicReviewEndDate) : "*" }}
+                    </td>
                     <td>
                         <v-menu
                             :close-on-content-click="true"
@@ -65,6 +72,8 @@
                                 <publication-file-download-modal
                                     :document-id="(row.item.databaseId as number)"
                                     show-thesis-sections
+                                    hide-empty-sections
+                                    :persistent="false"
                                 />
                             </v-list>
                         </v-menu>

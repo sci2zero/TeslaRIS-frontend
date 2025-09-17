@@ -150,6 +150,19 @@ export default defineComponent({
                 }
             });
 
+            bookSeries2.subtitle?.forEach(subtitle => {
+                let merged = false;
+                bookSeries1.subtitle?.forEach(currentTitle => {
+                    if (currentTitle.languageTag === subtitle.languageTag) {
+                        currentTitle.content += " | " + subtitle.content;
+                        merged = true;
+                    }
+                });
+                if (!merged) {
+                    bookSeries1.title.push(subtitle);
+                }
+            });
+
             bookSeries2.nameAbbreviation.forEach(nameAbbreviation => {
                 let merged = false;
                 bookSeries1.nameAbbreviation.forEach(currentNameAbbreviation => {
@@ -214,6 +227,7 @@ export default defineComponent({
             leftBookSeries.value!.printISSN = updatedBookSeries.printISSN;
             leftBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
             leftBookSeries.value!.uris = updatedBookSeries.uris;
+            leftBookSeries.value!.subtitle = updatedBookSeries.subtitle;
             leftUpdateComplete.value = true;
             
             if (update.value) {
@@ -228,6 +242,7 @@ export default defineComponent({
             rightBookSeries.value!.printISSN = updatedBookSeries.printISSN;
             rightBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
             rightBookSeries.value!.uris = updatedBookSeries.uris;
+            rightBookSeries.value!.subtitle = updatedBookSeries.subtitle;
             rightUpdateComplete.value = true;
             
             if (update.value) {

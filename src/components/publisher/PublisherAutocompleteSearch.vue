@@ -1,5 +1,5 @@
 <template>
-    <v-row>
+    <v-row v-if="!allowAuthorReprint || (allowAuthorReprint && !authorReprint)">
         <v-col :cols="allowManualClearing && selectedPublisher.value !== -1 ? 10 : 11">
             <v-autocomplete
                 v-model="selectedPublisher"
@@ -12,8 +12,9 @@
                 @update:model-value="sendContentToParent"
             ></v-autocomplete>
         </v-col>
-        <v-col cols="1">
+        <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="PublisherSubmissionForm"
                 :form-props="{presetName: lastSearchInput}"
                 entity-name="Publisher"
@@ -22,10 +23,18 @@
                 @create="selectNewlyAddedPublisher"
             />
         </v-col>
-        <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedPublisher.value !== -1" icon @click="clearInput()">
+        <v-col v-if="allowManualClearing && selectedPublisher.value !== -1" cols="1">
+            <v-btn icon @click="clearInput()">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
+        </v-col>
+    </v-row>
+    <v-row v-if="allowAuthorReprint">
+        <v-col cols="12">
+            <v-checkbox
+                v-model="authorReprint"
+                :label="$t('authorReprintLabel')"
+            ></v-checkbox>
         </v-col>
     </v-row>
 </template>
@@ -54,9 +63,17 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        disableSubmission: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
+        },
+        allowAuthorReprint: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -64,10 +81,14 @@ export default defineComponent({
         const i18n = useI18n();
         const searchPlaceholder = {title: "", value: -1};
 
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
+
         const publishers = ref<{ title: string; value: number; }[]>([]);
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const lastSearchInput = ref("");
+
+        const authorReprint = ref(false);
 
         onMounted(() => {
             if(props.modelValue && props.modelValue.value !== -1) {
@@ -82,7 +103,10 @@ export default defineComponent({
             }
 
             if (input.length >= 3) {
-                lastSearchInput.value = input;
+                if (!input.startsWith(i18n.t("notInListLabel", []).slice(0, -3))) {
+                    lastSearchInput.value = input;
+                }
+                
                 let params = "";
                 const tokens = input.split(" ");
                 tokens.forEach((token) => {
@@ -97,24 +121,52 @@ export default defineComponent({
                         } else {
                             listOfPublishers.push({title: publisher.nameOther, value: publisher.databaseId});
                         }
-                    })
+                    });
+
+                    if (!props.disableSubmission && !modalRef.value!.dialog) {
+                        listOfPublishers.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0
+                        });
+                    }
+
                     publishers.value = listOfPublishers;
                 });
             }
         }, 300);
 
+        watch(selectedPublisher, () => {
+            if (
+                selectedPublisher.value &&
+                (selectedPublisher.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedPublisher.value as { title: string; value: number; }).title = "";
+                (selectedPublisher.value as { title: string; value: number; }).value = -1;
+            }
+        });
+
         const sendContentToParent = () => {
-            emit("update:modelValue", selectedPublisher.value);
+            emit("update:modelValue", authorReprint.value ? {title: "", value: -2} : selectedPublisher.value);
         };
+
+        watch(authorReprint, () => {
+            sendContentToParent();
+        });
 
         watch(() => props.modelValue, () => {
             if(props.modelValue && props.modelValue.value !== -1) {
-                selectedPublisher.value = props.modelValue;
+                if (props.modelValue.value === -2) {
+                    authorReprint.value = true;
+                } else {
+                    selectedPublisher.value = props.modelValue;
+                }
             }
         });
 
         const clearInput = () => {
             selectedPublisher.value = searchPlaceholder;
+            authorReprint.value = false;
             sendContentToParent();
         };
 
@@ -138,7 +190,8 @@ export default defineComponent({
         return {
             publishers, selectedPublisher, searchPublishers,
             sendContentToParent, clearInput, selectNewlyAddedPublisher,
-            PublisherSubmissionForm, lastSearchInput
+            PublisherSubmissionForm, lastSearchInput, modalRef,
+            authorReprint
         };
     }
 });

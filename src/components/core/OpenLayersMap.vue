@@ -1,9 +1,18 @@
 <template>
     <v-text-field
         v-if="showInput" 
-        v-model="address" :readonly="readOnly" :label="$t('addressLabel')" :placeholder="$t('addressLabel')"
-        @update:focused="onAddressChange"></v-text-field>
-    <div v-show="address" ref="map" :style="'height: ' + height" class="openlayers-map"></div>
+        v-model="address"
+        :readonly="readOnly"
+        :label="$t('addressLabel')"
+        :placeholder="$t('addressLabel')"
+        @update:model-value="onAddressChange">
+    </v-text-field>
+    <div
+        v-show="address"
+        ref="map"
+        :style="'height: ' + height"
+        class="openlayers-map">
+    </div>
 </template>
 
 <script lang="ts">
@@ -41,6 +50,10 @@ export default defineComponent({
             required: false,
             default: () => {[19.8335, 45.2671]},
         },
+        initAddress: {
+            type: String,
+            default: undefined
+        },
         height: {
             type: String,
             required: false,
@@ -59,15 +72,36 @@ export default defineComponent({
 
         onMounted(() => {
             initializeMap(map.value);
-            drawMap(props.initCoordinates);
+            if (props.initAddress) {
+                drawBasedOnAddress();
+            } else {
+                drawMap(props.initCoordinates);
+            }
         });
 
         watch(() => props.initCoordinates, (position) => {
+            if (props.initAddress) {
+                return;
+            }
+
             drawMap(position);
         });
 
+        watch(() => props.initAddress, () => {
+            drawBasedOnAddress();
+        });
+
+        const drawBasedOnAddress = () => {
+            if (!props.initAddress) {
+                return;
+            }
+            
+            address.value = props.initAddress as string;
+            getCoordsFromAddress(address.value)
+        };
+
         const drawMap = (position: number[]) => {
-            if(position[0] === null || position[1] === null) {
+            if(!position || position[0] === null || position[1] === null) {
                 return;
             }
 
@@ -210,9 +244,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
 .openlayers-map {
-width: 100%;
-height: 400px;
+    width: 100%;
+    height: 400px;
 }
+
 </style>
   

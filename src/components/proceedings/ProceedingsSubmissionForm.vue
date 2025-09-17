@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="11">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.PROCEEDINGS"
                             @metadata-fetched="popuateMetadata"
@@ -12,30 +12,59 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required :read-only="conference.value > 0"></event-autocomplete-search>
+                        <event-autocomplete-search
+                            ref="eventAutocompleteRef"
+                            v-model="selectedEvent"
+                            required
+                            :read-only="conference.value > 0">
+                        </event-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="publicationYear"
+                            :rules="requiredFieldRules"
+                            :label="$t('yearOfPublicationLabel') + '*'"
+                            :placeholder="$t('yearOfPublicationLabel')">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                        <publisher-autocomplete-search
+                            ref="publisherAutocompleteRef"
+                            v-model="selectedPublisher"
+                            allow-author-reprint>
+                        </publisher-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="eIsbn"
+                            label="E-ISBN"
+                            placeholder="E-ISBN"
+                            :rules="isbnValidationRules">
+                        </v-text-field>
                     </v-col>
                     <v-col cols="5">
-                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="printIsbn"
+                            label="Print ISBN"
+                            placeholder="Print ISBN"
+                            :rules="isbnValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
 
@@ -45,17 +74,40 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="acronymRef"
+                                v-model="acronym"
+                                :label="$t('nameAbbreviationLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="descriptionRef"
+                                v-model="description"
+                                is-area
+                                :label="$t('abstractLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="keywordsRef"
+                                v-model="keywords"
+                                :label="$t('keywordsLabel')"
+                                is-area>
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -75,11 +127,52 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                            <v-text-field
+                                v-model="numberOfPages"
+                                type="number"
+                                :label="$t('numberOfPagesLabel')"
+                                :placeholder="$t('numberOfPagesLabel')">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <journal-autocomplete-search
+                                ref="journalAutocompleteRef"
+                                v-model="selectedJournal"
+                                allow-manual-clearing
+                                :external-validation="publicationSeriesExternalValidation">
+                            </journal-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <book-series-autocomplete-search
+                                ref="bookSeriesAutocompleteRef"
+                                v-model="selectedBookSeries"
+                                allow-manual-clearing
+                                :external-validation="publicationSeriesExternalValidation">
+                            </book-series-autocomplete-search>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="5">
+                            <v-text-field
+                                v-model="publicationSeriesVolume"
+                                :label="$t('publicationSeriesVolumeLabel')"
+                                :placeholder="$t('publicationSeriesVolumeLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="publicationSeriesIssue"
+                                :label="$t('publicationSeriesIssueLabel')"
+                                :placeholder="$t('publicationSeriesIssueLabel')">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="3">
                             <v-text-field
                                 v-model="scopus"
                                 label="Scopus ID"
@@ -87,7 +180,7 @@
                                 :rules="scopusIdValidationRules">
                             </v-text-field>
                         </v-col>
-                        <v-col cols="5">
+                        <v-col cols="4">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
@@ -95,33 +188,13 @@
                                 :rules="workOpenAlexIdValidationRules">
                             </v-text-field>
                         </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
+                        <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
                                 :rules="documentWebOfScienceIdValidationRules">
                             </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="publicationSeriesVolume" :label="$t('publicationSeriesVolumeLabel')" :placeholder="$t('publicationSeriesVolumeLabel')"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="publicationSeriesIssue" :label="$t('publicationSeriesIssueLabel')" :placeholder="$t('publicationSeriesIssueLabel')"></v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -213,6 +286,7 @@ export default defineComponent({
         const urisRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const acronymRef = ref<typeof MultilingualTextInput>();
 
         const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
@@ -227,6 +301,7 @@ export default defineComponent({
 
         const title = ref<any[]>([]);
         const subtitle = ref([]);
+        const acronym = ref([]);
         const uris = ref<string[]>([]);
         const keywords = ref([]);
         const description = ref([]);
@@ -297,8 +372,10 @@ export default defineComponent({
                 publicationSeriesId: publicationSeriesId,
                 publicationSeriesIssue: publicationSeriesIssue.value,
                 publicationSeriesVolume: publicationSeriesVolume.value,
-                publisherId: selectedPublisher.value?.value !== -1 ? selectedPublisher.value?.value : undefined,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 scopusId: scopus.value,
+                acronym: acronym.value,
                 fileItems: [],
                 proofs: []
             };
@@ -324,6 +401,7 @@ export default defineComponent({
                     eIsbn.value = "";
                     printIsbn.value = "";
                     publicationYear.value = "";
+                    acronymRef.value?.clearInput();
 
                     message.value = i18n.t("savedMessage")
                     snackbar.value = true;
@@ -355,7 +433,7 @@ export default defineComponent({
 
         return {
             isFormValid, additionalFields, popuateMetadata,
-            snackbar, message, isbnValidationRules,
+            snackbar, message, isbnValidationRules, acronym,
             title, titleRef, subtitle, subtitleRef, PublicationType,
             eventAutocompleteRef, selectedEvent, openAlexId,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
@@ -367,7 +445,7 @@ export default defineComponent({
             publisherAutocompleteRef, selectedPublisher,
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
-            publicationSeriesExternalValidation, submit,
+            publicationSeriesExternalValidation, submit, acronymRef,
             scopusIdValidationRules, workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules, webOfScienceId
         };

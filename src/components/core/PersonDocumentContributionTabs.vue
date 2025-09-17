@@ -35,7 +35,7 @@
                             {{ $t("reviewersLabel") }}
                         </v-tab>
                         <v-tab value="advisors">
-                            {{ $t("advisorsLabel") }}
+                            {{ $t(limitOneAuthor ? "mentorsLabel" : "advisorsLabel") }}
                         </v-tab>
                         <v-tab v-show="boardMembersAllowed" value="boardMembers">
                             {{ $t("boardMembersLabel") }}

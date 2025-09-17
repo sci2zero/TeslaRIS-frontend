@@ -73,7 +73,7 @@ export default defineComponent({
         };
 
         onMounted(async () => {
-            await router.isReady()
+            await router.isReady();
             presetCurrentLocale();
         });
 
