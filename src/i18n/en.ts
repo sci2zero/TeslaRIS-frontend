@@ -1019,5 +1019,8 @@ export default {
     unbindFailedMessage: "Unbinding from '{name}' failed.",
     showOnlyUnmanagedLabel: "Show only with all unmanaged authors",
     meLabel: "Me",
-    conferencePublicationsLabel: "Conference publications"
+    conferencePublicationsLabel: "Conference publications",
+    startingDownloadLabel: "Starting download...",
+    downloadCompleteLabel: "Download complete!",
+    downloadingLabel: "Downloading..."
 }

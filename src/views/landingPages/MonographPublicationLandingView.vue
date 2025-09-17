@@ -216,6 +216,13 @@
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="monographPublication?.remark"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -491,6 +498,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            monographPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -502,7 +514,8 @@ export default defineComponent({
             documentIndicators, StatisticsType, currentTab, currentRoute,
             ApplicableEntityType, canClassify, documentClassifications,
             fetchClassifications, createClassification, fetchIndicators,
-            createIndicator, actionsRef, fetchValidationStatus, PublicationType
+            createIndicator, actionsRef, fetchValidationStatus, PublicationType,
+            updateRemark
         };
 }})
 

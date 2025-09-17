@@ -189,6 +189,13 @@
                     :can-edit="canEdit && !dataset?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="dataset?.remark"
+                    :can-edit="canEdit && !dataset?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -448,6 +455,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            dataset.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             dataset, icon, publisher, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -458,7 +470,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, localiseDate, PublicationType,
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
-            createIndicator, fetchIndicators, fetchValidationStatus
+            createIndicator, fetchIndicators, fetchValidationStatus, updateRemark
         };
 }})
 

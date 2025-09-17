@@ -268,3 +268,9 @@ export interface ContactFormData {
 export interface NotificationActionResult {
     value: string
 }
+
+export interface DownloadState {
+    progress: number
+    fileName: string
+    isDownloading: boolean
+}

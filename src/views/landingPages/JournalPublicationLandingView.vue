@@ -227,6 +227,13 @@
                     :can-edit="canEdit && !journalPublication?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="journalPublication?.remark"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -519,6 +526,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            journalPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             journalPublication, icon, canClassify, fetchJournalPublication,
             publications, event, totalPublications, isResearcher,
@@ -531,7 +543,7 @@ export default defineComponent({
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute,
-            fetchValidationStatus, PublicationType
+            fetchValidationStatus, PublicationType, updateRemark
         };
 }})
 

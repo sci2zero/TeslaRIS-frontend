@@ -145,7 +145,12 @@ export default defineComponent({
         const i18n = useI18n();
 
         const download = (attachment: DocumentFileResponse) => {
-            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string).catch((error) => {
+            DocumentFileService.downloadDocumentFile(
+                attachment.serverFilename,
+                attachment.fileName,
+                attachment.serverFilename.split(".").pop() as string,
+                false
+            ).catch((error) => {
                 if(error.response.status === 451) {
                     errorMessage.value = i18n.t("loginToViewDocumentMessage");
                 } else {

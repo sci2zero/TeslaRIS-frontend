@@ -429,7 +429,7 @@
                     />
                     <description-section
                         :description="thesis?.remark"
-                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview && !thesis?.isArchived"
                         is-remark
                         @update="updateRemark"
                     />

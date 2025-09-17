@@ -4,6 +4,7 @@ import axios from "axios";
 import type { Page } from "@/models/Common";
 import type { ThesisPublicReviewResponse, ThesisReportCounts, ThesisReportRequest } from "@/models/ThesisLibraryModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
+import { useDownloadStore } from "@/stores/downloadStore";
 
 
 export class ThesisLibraryReportingService extends BaseService {
@@ -29,7 +30,24 @@ export class ThesisLibraryReportingService extends BaseService {
     }
 
     async downloadReport(body: ThesisReportRequest, lang: string): Promise<void> {
-        const response = await axios.post(this.basePath + `thesis-library/report/download/${lang}`, body, {responseType: 'blob'})
+        const downloadStore = useDownloadStore();
+        if (downloadStore.isDownloading) {
+            return;
+        }
+
+        const response = await axios.post(this.basePath + `thesis-library/report/download/${lang}`, body, {
+            responseType: 'blob',
+            onDownloadProgress: (progressEvent: any) => {
+                if (progressEvent.total) {
+                    const percent = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    
+                    downloadStore.downloadProgressRef?.updateProgress(percent);
+                }
+            }
+        });
+        
         this.initialzeDownload(response, "report.docx", ".docx");
     }
 

@@ -95,6 +95,7 @@ export interface Document {
     isMetadataValid?: boolean;
     areFilesValid?: boolean;
     isArchived?: boolean;
+    remark?: MultilingualContent[];
 }
 
 export interface JournalPublication extends Document {
@@ -265,7 +266,6 @@ export interface Thesis extends Document {
     udc?: string;
     typeOfTitle?: MultilingualContent[];
     extendedAbstract?: MultilingualContent[];
-    remark?: MultilingualContent[];
     alternateTitle?: MultilingualContent[];
     publicReviewCompleted?: boolean;
 }

@@ -16,6 +16,10 @@
             <cookie-consent
                 v-if="!hideLayout"
             />
+
+            <download-progress
+                ref="downloadProgressRef"
+            />
         </v-main>
         <footerbar
             v-if="!hideLayout"
@@ -24,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import navbar from "@/components/core/Navbar.vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
@@ -37,13 +41,18 @@ import footerbar from "./components/core/FooterBar.vue";
 import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 import CookieConsent from "./components/core/CookieConsent.vue";
 import { useScriptLoader } from "./composables/useScriptLoader";
+import DownloadProgress from "./components/core/DownloadProgress.vue";
+import { useDownloadStore } from "./stores/downloadStore";
 
 
 export default defineComponent({
     name: "App",
-    components: { navbar, footerbar, Breadcrumbs, CookieConsent },
+    components: { navbar, footerbar, Breadcrumbs, CookieConsent, DownloadProgress },
     setup() {
         const route = useRoute();
+
+        const downloadProgressRef = ref<typeof DownloadProgress>();
+        const downloadStore = useDownloadStore();
 
         const hideLayout = computed(() => {
             return (
@@ -60,10 +69,13 @@ export default defineComponent({
             } catch (e) {
                 console.error('Failed to load static script:', e)
             }
+
+            downloadStore.setGlobalDownloadProgressRef(downloadProgressRef.value as typeof DownloadProgress);
         });
 
         return {
-            hideLayout
+            hideLayout,
+            downloadProgressRef
         };
     },
     beforeMount() {

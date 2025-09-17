@@ -188,6 +188,13 @@
                     :can-edit="canEdit && !patent?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="patent?.remark"
+                    :can-edit="canEdit && !patent?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -447,6 +454,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            patent.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             patent, icon, publisher, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, PatentUpdateForm, canClassify,
@@ -456,7 +468,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
             createIndicator, fetchIndicators, fetchValidationStatus,
-            PublicationType
+            PublicationType, updateRemark
         };
 }})
 

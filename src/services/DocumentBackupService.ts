@@ -1,3 +1,4 @@
+import { useDownloadStore } from "@/stores/downloadStore";
 import { BaseService } from "./BaseService";
 import axios, { type AxiosResponse } from "axios";
 
@@ -15,9 +16,25 @@ export class DocumentBackupService extends BaseService {
     }
 
     async downloadBackupFile(backupFileName: string): Promise<void> {
+        const downloadStore = useDownloadStore();
+        if (downloadStore.isDownloading) {
+            return;
+        }
+
+        downloadStore.downloadProgressRef?.startDownload(backupFileName);
         const response = await super.sendRequest(axios.get, `document/backup/download/${backupFileName}`, {
             responseType: 'blob',
+            onDownloadProgress: (progressEvent: any) => {
+                if (progressEvent.total) {
+                    const percent = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    
+                    downloadStore.downloadProgressRef?.updateProgress(percent);
+                }
+            }
         });
+        
         this.initialzeDownload(response, backupFileName, ".zip");
     }
 }

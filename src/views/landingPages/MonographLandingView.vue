@@ -245,6 +245,13 @@
                     :can-edit="canEdit && !monograph?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="monograph?.remark"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
                 
                 <!-- Publications Table -->
                 <v-row>
@@ -622,6 +629,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            monograph.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             monograph, icon, actionsRef,
             returnCurrentLocaleContent,
@@ -643,7 +655,7 @@ export default defineComponent({
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
-            publisher
+            publisher, updateRemark
         };
 }})
 

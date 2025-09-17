@@ -188,12 +188,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="software"
+                <description-section
+                    :description="software?.remark"
                     :can-edit="canEdit && !software?.isArchived"
-                    :proofs="software?.proofs"
-                    :file-items="software?.fileItems">
-                </attachment-section>
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -451,6 +451,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            software.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             software, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
@@ -462,7 +467,7 @@ export default defineComponent({
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
             fetchIndicators, createIndicator, PublicationType,
-            fetchSoftware, fetchValidationStatus
+            fetchSoftware, fetchValidationStatus, updateRemark
         };
 }})
 

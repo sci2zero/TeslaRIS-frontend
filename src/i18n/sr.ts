@@ -1050,5 +1050,8 @@ export default {
     unbindFailedMessage: "Uklanjanje sa publikacije '{name}' nije uspelo.",
     showOnlyUnmanagedLabel: "Prikaži samo bez uvezanih autora",
     meLabel: "Ja",
-    conferencePublicationsLabel: "Radovi sa konferencije"
+    conferencePublicationsLabel: "Radovi sa konferencije",
+    startingDownloadLabel: "Započinjem preuzimanje...",
+    downloadCompleteLabel: "Preuzimanje završeno!",
+    downloadingLabel: "Preuzimanje..."
 }

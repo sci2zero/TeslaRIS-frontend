@@ -1,5 +1,5 @@
 <template>
-    <div class="actions-box pa-4">
+    <div v-if="!(forProceedings && isResearcher && !canEdit)" class="actions-box pa-4">
         <div class="text-subtitle-1 font-weight-medium mb-3">
             {{ $t("additionalActionsLabel") }}
         </div>
@@ -99,6 +99,10 @@ export default defineComponent({
             default: false
         },
         couldArchive: {
+            type: Boolean,
+            default: false
+        },
+        forProceedings: {
             type: Boolean,
             default: false
         },

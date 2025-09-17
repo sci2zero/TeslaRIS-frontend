@@ -178,6 +178,7 @@
             :document="proceedings"
             :handle-researcher-unbind="handleResearcherUnbind"
             :display-citation="false"
+            for-proceedings
         />
 
         <br />
@@ -235,6 +236,13 @@
                     :can-edit="canEdit"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="proceedings?.remark"
+                    :can-edit="canEdit && !proceedings?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -560,6 +568,11 @@ export default defineComponent({
             });
         };
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            proceedings.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             proceedings, icon, fetchIndicators, PublicationType,
             publications, event, currentTab, createIndicator,
@@ -571,7 +584,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
-            documentIndicators, StatisticsType, currentRoute
+            documentIndicators, StatisticsType, currentRoute, updateRemark
         };
 }})
 

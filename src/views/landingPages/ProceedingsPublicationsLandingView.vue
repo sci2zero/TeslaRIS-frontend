@@ -197,7 +197,14 @@
                     :description="proceedingsPublication?.description"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     @update="updateDescription">
-                </description-section>  
+                </description-section>
+
+                <description-section
+                    :description="proceedingsPublication?.remark"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -502,6 +509,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            proceedingsPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, isResearcher,
@@ -514,7 +526,7 @@ export default defineComponent({
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
-            fetchValidationStatus, PublicationType
+            fetchValidationStatus, PublicationType, updateRemark
         };
 }})
 
