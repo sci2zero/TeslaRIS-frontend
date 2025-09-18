@@ -2,7 +2,7 @@
     <v-btn
         v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
         density="compact" class="bottom-spacer"
-        :disabled="selectedPublications.length === 0 || !(allowResearcherUnbinding && canPerformUnbinding())"
+        :disabled="allowResearcherUnbinding ? !canPerformUnbinding() : selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>

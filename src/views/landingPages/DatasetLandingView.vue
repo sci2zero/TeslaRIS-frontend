@@ -83,7 +83,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="dataset?.scopusId" class="response">
-                                    {{ dataset.scopusId }}
+                                    <identifier-link :identifier="dataset.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="dataset?.doi">
                                     DOI:

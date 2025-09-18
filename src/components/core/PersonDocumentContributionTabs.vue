@@ -92,7 +92,7 @@
 
 <script lang="ts">
 import { DocumentContributionType, type PersonDocumentContribution } from '@/models/PublicationModel';
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import PublicationContributionUpdateModal from '@/components/publication/update/PublicationContributionUpdateModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
 import { ref } from 'vue';
@@ -141,17 +141,44 @@ export default defineComponent({
         const advisorList = ref<PersonDocumentContribution[]>([]);
         const boardMemberList = ref<PersonDocumentContribution[]>([]);
 
+        onMounted(() => {
+            if (props.contributionList) {
+                populateLists();
+            }
+        });
+
         watch(() => props.contributionList, () => {
+            if (props.contributionList) {
+                populateLists();
+            }
+        });
+
+        const populateLists = () => {
             localContributions.value = props.contributionList;
 
-            authorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.AUTHOR]);
-            editorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.EDITOR]);
-            reviewerList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.REVIEWER]);
-            advisorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ADVISOR]);
-            boardMemberList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.BOARD_MEMBER]);
+            authorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.AUTHOR]
+                );
+            editorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.EDITOR]
+                );
+            reviewerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.REVIEWER]
+                );
+            advisorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ADVISOR]
+                );
+            boardMemberList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.BOARD_MEMBER]
+                );
 
             selectFirstNonEmptyTab();
-        });
+        };
 
         const sendToParent = (contributions: any[]) => {
             const contributionLists: Record<string, any[]> = {

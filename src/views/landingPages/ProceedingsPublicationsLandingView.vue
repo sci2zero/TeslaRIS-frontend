@@ -103,7 +103,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="proceedingsPublication?.scopusId" class="response">
-                                    {{ proceedingsPublication.scopusId }}
+                                    <identifier-link :identifier="proceedingsPublication.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="proceedingsPublication?.doi">
                                     DOI:
