@@ -12,6 +12,7 @@ const journalPublicationTypeEn = [
     { title: "Comment", value: JournalPublicationType.COMMENT },
     { title: "Preface", value: JournalPublicationType.PREFACE },
     { title: "Correction", value: JournalPublicationType.CORRECTION },
+    { title: "Editorial", value: JournalPublicationType.EDITORIAL }
 ];
 
 const journalPublicationTypeSr = [
@@ -23,6 +24,7 @@ const journalPublicationTypeSr = [
     { title: "Komentar", value: JournalPublicationType.COMMENT },
     { title: "Predgovor", value: JournalPublicationType.PREFACE },
     { title: "Ispravka", value: JournalPublicationType.CORRECTION },
+    { title: "Urednički uvod", value: JournalPublicationType.EDITORIAL }
 ];
 
 export const getTitleFromValue = (value: JournalPublicationType, journalPublicationTypeArray: {title: string, value: JournalPublicationType}[]) => {

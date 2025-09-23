@@ -26,7 +26,7 @@
                         <organisation-unit-autocomplete-search
                             ref="ouAutocompleteRef"
                             v-model:model-value="selectedOrganisationUnit"
-                            :readonly="isInstitutionalLibrarian"
+                            :top-level-institution-id="topLevelInstitutionId"
                             required
                             :allowed-thesis-type="selectedThesisType.value">
                         </organisation-unit-autocomplete-search>
@@ -41,10 +41,10 @@
                         </multilingual-text-input>
                     </v-col>
                 </v-row>
-                <v-row v-if="!isInstitutionalLibrarian">
+                <v-row v-if="!isInstitutionalLibrarian && !isHeadOfLibrary">
                     <v-col>
                         <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
-                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                            {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalThesisOULabel") }}
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -93,6 +93,15 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="alternateTitleRef"
+                                v-model="alternateTitle"
+                                :label="$t('alternateTitleLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="6">
                             <date-picker
                                 v-model="topicAcceptanceDate"
@@ -116,7 +125,7 @@
                                 :items="languageList"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" md="6">
+                        <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)" cols="12" md="6">
                             <v-select
                                 v-model="selectedWritingLanguage"
                                 :label="$t('writingLanguageLabel')"
@@ -141,24 +150,6 @@
                                 v-model="scientificSubArea"
                                 :label="$t('scientificSubAreaLabel')">
                             </multilingual-text-input>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -288,8 +279,35 @@
                         <v-col cols="12">
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
-                                v-model="selectedPublisher">
+                                v-model="selectedPublisher"
+                                allow-author-reprint>
                             </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules"
+                            />
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -350,13 +368,22 @@ export default defineComponent({
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
         const router = useRouter();
-        const { isAdmin, isInstitutionalLibrarian, isResearcher, loggedInUser } = useUserRole();
-        const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
+        const {
+            isAdmin, isInstitutionalLibrarian,
+            isHeadOfLibrary, isResearcher,
+            loggedInUser
+        } = useUserRole();
+        const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
+
+        const topLevelInstitutionId = ref(-1);
 
         const { languageTags } = useLanguageTags();
         const languageTagsList = ref<any[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
+        
         const selectedLanguage = ref<number>();
+        const languagesWithMoreWritingSystems = ref<number[]>([]);
+
         const selectedWritingLanguage = ref<{title: string, value: number}>();
         const languages = ref<LanguageResponse[]>();
 
@@ -365,10 +392,14 @@ export default defineComponent({
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
+                languagesWithMoreWritingSystems.value.splice(0);
                 response.data.forEach((language: LanguageResponse) => {
                     languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                     if (i18n.locale.value.toUpperCase() === language.languageCode) {
                         selectedLanguage.value = language.id;
+                    }
+                    if (language.languageCode === "SR") {
+                        languagesWithMoreWritingSystems.value.push(language.id);
                     }
                 })
             });
@@ -407,11 +438,13 @@ export default defineComponent({
         });
 
         const presetOU = () => {
-            if (isInstitutionalLibrarian.value) {
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedOrganisationUnit.value = {
                     title: returnCurrentLocaleContent(loggedInUser.value?.organisationUnitName) as string,
                     value: loggedInUser.value?.organisationUnitId as number
                 };
+
+                topLevelInstitutionId.value = loggedInUser.value?.organisationUnitId as number;
             }
         };
 
@@ -419,6 +452,7 @@ export default defineComponent({
         const scientificSubArea = ref<any[]>([]);
 
         const titleRef = ref<typeof MultilingualTextInput>();
+        const alternateTitleRef = ref<typeof MultilingualTextInput>();
         const externalOUNameRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
@@ -435,6 +469,7 @@ export default defineComponent({
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any[]>([]);
+        const alternateTitle = ref<any[]>([]);
         const externalOUName = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
@@ -444,6 +479,7 @@ export default defineComponent({
         const doi = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
+        const scopus = ref("");
         const numberOfPages = ref<number|null>();
         const numberOfChapters = ref<number|null>();
         const numberOfReferences = ref<number|null>();
@@ -472,7 +508,8 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, workOpenAlexIdValidationRules,
             isbnValidationRules, udcValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
@@ -493,13 +530,16 @@ export default defineComponent({
                 description: description.value,
                 keywords: keywords.value,
                 subTitle: subtitle.value,
+                alternateTitle: alternateTitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                scopusId: scopus.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 scientificArea: scientificArea.value,
                 scientificSubArea: scientificSubArea.value,
                 fileItems: [],
@@ -518,6 +558,7 @@ export default defineComponent({
                     titleRef.value?.clearInput();
                     externalOUNameRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
+                    alternateTitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
@@ -545,6 +586,7 @@ export default defineComponent({
                     printIsbn.value = "";
                     placeOfKeepRef.value?.clearInput();
                     udc.value = "";
+                    scopus.value = "";
                     typeOfTitleRef.value?.clearInput();
 
                     error.value = false;
@@ -586,7 +628,7 @@ export default defineComponent({
         const populateSinglePossibleAuthor = async () => {
             const userResponse = await UserService.getLoggedInUser();
 
-            const personResponse = await PersonService.readPerson(userResponse.data.personId);
+            const personResponse = await PersonService.getPersonWithUser(userResponse.data.personId);
 
             contributions.value = [
                 {
@@ -594,7 +636,7 @@ export default defineComponent({
                     isMainContributor: true,
                     isCorrespondingContributor: true,
                     isBoardPresident: false,
-                    personId: personResponse.data.id as number,
+                    personId: userResponse.data.personId as number,
                     contributionDescription: [],
                     orderNumber: 1,
                     displayAffiliationStatement: [],
@@ -630,7 +672,10 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             typeOfTitle, scientificAreaRef, scientificSubAreaRef,
             placeOfKeepRef, typeOfTitleRef, presetContent,
-            toMultilingualTextInput, isResearcher
+            toMultilingualTextInput, isResearcher, scopus,
+            scopusIdValidationRules, languagesWithMoreWritingSystems,
+            alternateTitleRef, alternateTitle, isHeadOfLibrary,
+            topLevelInstitutionId
         };
     }
 });

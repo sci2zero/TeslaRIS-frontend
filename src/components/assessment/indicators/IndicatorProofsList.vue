@@ -32,7 +32,12 @@
                         </v-btn>
                     </v-col>
                     <v-col>
-                        <document-file-submission-modal :is-proof="true" edit :preset-document-file="attachment" @update="sendUpdateRequestToParent($event, attachment.id)"></document-file-submission-modal>
+                        <document-file-submission-modal
+                            :is-proof="true"
+                            edit
+                            :preset-document-file="attachment"
+                            @update="sendUpdateRequestToParent($event, attachment.id)">
+                        </document-file-submission-modal>
                     </v-col>
                 </v-row>
             </template>
@@ -74,7 +79,11 @@ export default defineComponent({
         const i18n = useI18n();
 
         const download = (attachment: DocumentFileResponse) => {
-            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string).catch((error) => {
+            DocumentFileService.downloadDocumentFile(
+                attachment.serverFilename,
+                attachment.fileName,
+                attachment.serverFilename.split(".").pop() as string
+            ).catch((error) => {
                 if(error.response.status === 451) {
                     message.value = i18n.t("loginToViewDocumentMessage");
                 } else {

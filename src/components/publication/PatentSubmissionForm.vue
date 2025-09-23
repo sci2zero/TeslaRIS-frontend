@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="11">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.PATENT"
                             @metadata-fetched="popuateMetadata"
@@ -48,36 +48,32 @@
                 </v-btn>
                 <v-container v-if="additionalFields">
                     <v-row>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="subtitleRef"
+                                v-model="subtitle"
+                                :label="$t('subtitleLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="descriptionRef"
+                                v-model="description"
+                                is-area
+                                :label="$t('abstractLabel')">
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="keywordsRef"
+                                v-model="keywords"
+                                :label="$t('keywordsLabel')"
+                                is-area>
+                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -94,8 +90,35 @@
                         <v-col cols="10">
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
-                                v-model="selectedPublisher">
+                                v-model="selectedPublisher"
+                                allow-author-reprint>
                             </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -174,6 +197,7 @@ export default defineComponent({
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
+        const scopus = ref("");
         const webOfScienceId = ref("");
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
@@ -181,7 +205,8 @@ export default defineComponent({
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submitPatent = (stayOnPage: boolean) => {
@@ -196,8 +221,10 @@ export default defineComponent({
                 documentDate: publicationYear.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
+                scopusId: scopus.value,
                 webOfScienceId: openAlexId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: []
             };
@@ -216,6 +243,7 @@ export default defineComponent({
                     openAlexId.value = "";
                     webOfScienceId.value = "";
                     patentNumber.value = "";
+                    scopus.value = "";
                     contributionsRef.value?.clearInput();
 
                     error.value = false;
@@ -274,7 +302,8 @@ export default defineComponent({
             workOpenAlexIdValidationRules,
             PublicationType, popuateMetadata,
             documentWebOfScienceIdValidationRules,
-            webOfScienceId
+            webOfScienceId, scopus,
+            scopusIdValidationRules
         };
     }
 });

@@ -48,6 +48,9 @@
                 <p v-show="dateRangeError" class="mb-2 text-red">
                     {{ dateRangeFormatError }}
                 </p>
+                <v-row v-if="!inComparator" class="mt-2">
+                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
+                </v-row>
                 <v-row>
                     <v-col>
                         <v-select
@@ -87,9 +90,6 @@
                             :label="$t('entryFeeLabel')"
                         ></v-text-field>
                     </v-col> -->
-                </v-row>
-                <v-row v-if="!inComparator">
-                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                 </v-row>
                 <v-row>
                     <v-col>

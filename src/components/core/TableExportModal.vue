@@ -78,12 +78,6 @@
                                         <v-row>
                                             <v-col cols="3" sm="2">
                                                 <v-checkbox
-                                                    v-model="apa"
-                                                    label="APA"
-                                                ></v-checkbox>
-                                            </v-col>
-                                            <v-col cols="3" sm="2">
-                                                <v-checkbox
                                                     v-model="mla"
                                                     label="MLA"
                                                 ></v-checkbox>
@@ -104,6 +98,12 @@
                                                 <v-checkbox
                                                     v-model="vancouver"
                                                     label="Vancouver"
+                                                ></v-checkbox>
+                                            </v-col>
+                                            <v-col cols="3" sm="2">
+                                                <v-checkbox
+                                                    v-model="apa"
+                                                    label="APA"
                                                 ></v-checkbox>
                                             </v-col>
                                         </v-row>
@@ -198,7 +198,7 @@ export default defineComponent({
         const fieldData = ref<SearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
         const selectedFields = ref<string[]>([]);
-        const exportAll = ref(false);
+        const exportAll = ref(props.potentialMaxAmountRequested ? true : false);
         const exportPageOffset = ref(1);
 
         const langItems = getLangItems();
@@ -307,6 +307,7 @@ export default defineComponent({
                     (exportRequest as DocumentTableExportRequest).allowedTypes = props.endpointBodyParameters.allowedTypes;
                     (exportRequest as DocumentTableExportRequest).institutionId = props.endpointBodyParameters.institutionId;
                     (exportRequest as DocumentTableExportRequest).commissionId = props.endpointBodyParameters.commissionId;
+                    (exportRequest as DocumentTableExportRequest).onlyUnmanaged = props.endpointBodyParameters.onlyUnmanaged;
 
                     TableExportService.exportDocumentTable(
                         exportRequest as DocumentTableExportRequest

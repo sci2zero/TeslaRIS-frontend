@@ -108,9 +108,12 @@ export default defineComponent({
         const contributionTypes = computed(() => getTypesForGivenLocale());
 
         const addInput = () => {
+            const contributionType =
+                props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+
             inputs.value.push({eventContributionType: {
-                    title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER), 
-                    value: props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                    title: getTitleFromValueAutoLocale(contributionType), 
+                    value: contributionType
                 }
             });
         };

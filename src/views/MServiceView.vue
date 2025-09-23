@@ -235,6 +235,8 @@ import { useI18n } from 'vue-i18n';
 import { useLoginStore } from '@/stores/loginStore';
 import CommissionService from '@/services/assessment/CommissionService';
 import { useUserRole } from '@/composables/useUserRole';
+import UserService from '@/services/UserService';
+import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
 
 
 export default defineComponent({
@@ -248,7 +250,7 @@ export default defineComponent({
 
         const loginStore = useLoginStore();
 
-        const { isUserLoggedIn } = useUserRole();
+        const { isUserLoggedIn, isResearcher } = useUserRole();
 
         const { researchAreas } = useResearchAreas();
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
@@ -269,9 +271,22 @@ export default defineComponent({
         const i18n = useI18n();
         const locale = computed(() => i18n.locale.value);
 
-        onMounted(() => {
+        onMounted(async () => {
             document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
             fetchCommissions();
+
+            if (isResearcher.value) {
+                const userResponse = await UserService.getLoggedInUser();
+                const researchAreaResponse =
+                    await AssessmentResearchAreaService.readPersonAssessmentResearchArea(userResponse.data.personId);
+
+                if (researchAreaResponse.data) {
+                    selectedResearchArea.value = {
+                        title: returnCurrentLocaleContent(researchAreaResponse.data.name) as string,
+                        value: researchAreaResponse.data.code
+                    };
+                }
+            }
         });
 
         const fetchCommissions = () => {
@@ -281,7 +296,7 @@ export default defineComponent({
                     commissions.value.push(
                         { title: returnCurrentLocaleContent(commission.description) as string, value: commission.id }
                     );
-                })
+                });
                 CommissionService.getDefaultCommissionId().then(resp => {
                     if (resp.data > 0) {
                         selectedCommission.value = commissions.value.find(

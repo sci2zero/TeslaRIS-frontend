@@ -109,7 +109,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="journalPublication?.scopusId" class="response">
-                                    {{ journalPublication.scopusId }}
+                                    <identifier-link :identifier="journalPublication.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="journalPublication?.doi">
                                     DOI:
@@ -164,6 +164,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(journalPublication?.description)"
             :document="journalPublication"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(journalPublication?.id as number, journalPublication as _Document)"
         />
 
@@ -176,6 +177,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -203,6 +207,14 @@
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="journalPublication"
+                    :can-edit="canEdit && !journalPublication?.isArchived"
+                    :proofs="journalPublication?.proofs"
+                    :file-items="journalPublication?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -219,12 +231,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="journalPublication"
+                <description-section
+                    :description="journalPublication?.remark"
                     :can-edit="canEdit && !journalPublication?.isArchived"
-                    :proofs="journalPublication?.proofs"
-                    :file-items="journalPublication?.fileItems">
-                </attachment-section>
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -259,12 +271,6 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(journalPublication?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
 
@@ -306,7 +312,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentAssessmentClassification, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -332,7 +337,7 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -373,7 +378,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -530,6 +535,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            journalPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             journalPublication, icon, canClassify, fetchJournalPublication,
             publications, event, totalPublications, isResearcher,
@@ -542,7 +552,7 @@ export default defineComponent({
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute,
-            fetchValidationStatus, PublicationType
+            fetchValidationStatus, PublicationType, updateRemark
         };
 }})
 

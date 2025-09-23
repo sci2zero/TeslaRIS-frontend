@@ -3,6 +3,7 @@
         <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedPerson"
+                v-model:search="searchInput"
                 :label="(label ? $t(label) : (multiple ? $t('personListLabel') : $t('personLabel'))) + (required ? '*' : '')"
                 :items="readOnly ? [] : persons"
                 :custom-filter="((): boolean => true)"
@@ -106,6 +107,7 @@ export default defineComponent({
         const selectedPerson = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         onMounted(() => {
             if (props.modelValue) {
@@ -167,6 +169,10 @@ export default defineComponent({
         });
 
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+            
             emit("update:modelValue", selectedPerson.value);
         };
 
@@ -202,7 +208,7 @@ export default defineComponent({
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedPerson, hasSelection,
             PersonSubmissionForm, requiredMultiSelectionRules,
-            modalRef
+            modalRef, searchInput
         };
     }
 });

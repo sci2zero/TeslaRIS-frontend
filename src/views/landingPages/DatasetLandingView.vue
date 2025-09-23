@@ -64,12 +64,17 @@
                                 <div v-if="dataset?.documentDate" class="response">
                                     {{ localiseDate(dataset.documentDate) }}
                                 </div>
-                                <div v-if="dataset?.publisherId">
+                                <div v-if="dataset?.publisherId || dataset?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="dataset?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + dataset?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="dataset?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                             </v-col>
@@ -78,7 +83,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="dataset?.scopusId" class="response">
-                                    {{ dataset.scopusId }}
+                                    <identifier-link :identifier="dataset.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="dataset?.doi">
                                     DOI:
@@ -121,6 +126,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(dataset?.description)"
             :document="dataset"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(dataset?.id as number, dataset as _Document)"
         />
 
@@ -133,6 +139,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -160,6 +169,14 @@
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="dataset"
+                    :can-edit="canEdit && !dataset?.isArchived"
+                    :proofs="dataset?.proofs"
+                    :file-items="dataset?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -176,12 +193,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="dataset"
+                <description-section
+                    :description="dataset?.remark"
                     :can-edit="canEdit && !dataset?.isArchived"
-                    :proofs="dataset?.proofs"
-                    :file-items="dataset?.fileItems">
-                </attachment-section>
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -213,12 +230,6 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(dataset?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
 
@@ -256,7 +267,6 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -282,7 +292,7 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -318,7 +328,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -415,7 +425,8 @@ export default defineComponent({
             dataset.value!.internalNumber = basicInfo.internalNumber;
             dataset.value!.openAlexId = basicInfo.openAlexId;
             dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
-
+            dataset.value!.authorReprint = basicInfo.authorReprint;
+            
             performUpdate(true);
         };
 
@@ -453,6 +464,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            dataset.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             dataset, icon, publisher, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -463,7 +479,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, localiseDate, PublicationType,
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
-            createIndicator, fetchIndicators, fetchValidationStatus
+            createIndicator, fetchIndicators, fetchValidationStatus, updateRemark
         };
 }})
 

@@ -3,6 +3,7 @@
         <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedJournal"
+                v-model:search="searchInput"
                 :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
                 :items="readonly ? [] : journals"
                 :custom-filter="((): boolean => true)"
@@ -95,6 +96,7 @@ export default defineComponent({
         const selectedJournal = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         const lastSearchInput = ref("");
 
@@ -185,6 +187,10 @@ export default defineComponent({
         });
 
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+
             emit("update:modelValue", selectedJournal.value);
         };
 
@@ -215,7 +221,8 @@ export default defineComponent({
             requiredSelectionRules, externalValidationRules,
             sendContentToParent, clearInput, inputType,
             selectNewlyAddedJournal, hasSelection, modalRef,
-            PublicationSeriesSubmissionForm, lastSearchInput
+            PublicationSeriesSubmissionForm, lastSearchInput,
+            searchInput
         };
     }
 });

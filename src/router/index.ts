@@ -106,6 +106,7 @@ import FeedbackForm from "@/components/core/FeedbackForm.vue";
 import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDissertationsView.vue";
 import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
+import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView.vue";
 
 
 const roles = {
@@ -408,69 +409,6 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "submit-journal-publication",
-                    name: "submitJournalPublication",
-                    component: SubmitJournalPublicationView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
-                    path: "submit-patent",
-                    name: "submitPatent",
-                    component: SubmitPatentView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
-                    path: "submit-software",
-                    name: "submitSoftware",
-                    component: SubmitSoftwareView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
-                    path: "submit-thesis",
-                    name: "submitThesis",
-                    component: SubmitThesisView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher, roles.institutionalLibrarian],
-                    },
-                },
-                {
-                    path: "submit-monograph",
-                    name: "submitMonograph",
-                    component: SubmitMonographView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
-                    path: "submit-monograph-publication",
-                    name: "submitMonographPublication",
-                    component: SubmitMonographPublicationView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
-                    path: "submit-dataset",
-                    name: "submitDataset",
-                    component: SubmitDatasetView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
                     path: "publishers",
                     name: "publishersParent",
                     children: [
@@ -610,6 +548,15 @@ const router = createRouter({
                             },
                         },
                         {
+                            path: "author-reprints",
+                            name: "authorReprints",
+                            component: AuthorReprintPublicationsView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
                             path: "validation",
                             name: "publicationsValidation",
                             component: PublicationsValidationView,
@@ -628,6 +575,15 @@ const router = createRouter({
                                     meta: {
                                         authenticated: false,
                                         authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-journal-publication",
+                                    name: "submitJournalPublication",
+                                    component: SubmitJournalPublicationView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                                     },
                                 },
                                 {
@@ -654,6 +610,15 @@ const router = createRouter({
                                     },
                                 },
                                 {
+                                    path: "submit-proceedings-publication",
+                                    name: "submitProceedingsPublication",
+                                    component: SubmitProceedingsPublicationView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "proceedingsPublicationMetadataComparator",
                                     component: ProceedingsPublicationComparatorView,
@@ -674,6 +639,15 @@ const router = createRouter({
                                     meta: {
                                         authenticated: false,
                                         authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-software",
+                                    name: "submitSoftware",
+                                    component: SubmitSoftwareView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                                     },
                                 },
                                 {
@@ -700,6 +674,15 @@ const router = createRouter({
                                     },
                                 },
                                 {
+                                    path: "submit-dataset",
+                                    name: "submitDataset",
+                                    component: SubmitDatasetView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "datasetMetadataComparator",
                                     component: DatasetMetadataComparatorView,
@@ -723,6 +706,15 @@ const router = createRouter({
                                     },
                                 },
                                 {
+                                    path: "submit-patent",
+                                    name: "submitPatent",
+                                    component: SubmitPatentView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "patentMetadataComparator",
                                     component: PatentMetadataComparatorView,
@@ -743,6 +735,15 @@ const router = createRouter({
                                     meta: {
                                         authenticated: false,
                                         authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-monograph",
+                                    name: "submitMonograph",
+                                    component: SubmitMonographView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                                     },
                                 },
                                 {
@@ -778,6 +779,15 @@ const router = createRouter({
                                     },
                                 },
                                 {
+                                    path: "submit-monograph-publication",
+                                    name: "submitMonographPublication",
+                                    component: SubmitMonographPublicationView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "monographPublicationMetadataComparator",
                                     component: MonographPublicationMetadataComparatorView,
@@ -801,6 +811,19 @@ const router = createRouter({
                                     },
                                 },
                                 {
+                                    path: "submit-thesis",
+                                    name: "submitThesis",
+                                    component: SubmitThesisView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [
+                                            roles.admin, roles.institutionalEditor,
+                                            roles.headOfLibrary, roles.researcher,
+                                            roles.institutionalLibrarian
+                                        ],
+                                    },
+                                },
+                                {
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "thesisMetadataComparator",
                                     component: ThesisMetadataComparatorView,
@@ -815,15 +838,6 @@ const router = createRouter({
                     
                 },
                 {
-                    path: "submit-proceedings",
-                    name: "submitProceedings",
-                    component: SubmitProceedingsView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
-                },
-                {
                     path: "proceedings",         
                     children: [
                         {
@@ -833,6 +847,15 @@ const router = createRouter({
                             meta: {
                                 authenticated: false,
                                 authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-proceedings",
+                            name: "submitProceedings",
+                            component: SubmitProceedingsView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                             },
                         },
                         {
@@ -854,15 +877,6 @@ const router = createRouter({
                             },
                         },
                     ]
-                },
-                {
-                    path: "submit-proceedings-publication",
-                    name: "submitProceedingsPublication",
-                    component: SubmitProceedingsPublicationView,
-                    meta: {
-                        authenticated: true,
-                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                    },
                 },
                 {
                     path: "advanced-search",

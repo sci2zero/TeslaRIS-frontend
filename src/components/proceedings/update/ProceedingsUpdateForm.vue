@@ -21,7 +21,11 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                        <publisher-autocomplete-search
+                            ref="publisherAutocompleteRef"
+                            v-model="selectedPublisher"
+                            allow-author-reprint>
+                        </publisher-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -63,29 +67,8 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="6">
+                    <v-col cols="12">
                         <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="openAlexId"
-                            label="Open Alex ID"
-                            placeholder="Open Alex ID"
-                            :rules="workOpenAlexIdValidationRules">
-                        </v-text-field>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="webOfScienceId"
-                            label="Web of Science ID"
-                            placeholder="Web of Science ID"
-                            :rules="documentWebOfScienceIdValidationRules">
-                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -106,6 +89,32 @@
                         <v-text-field v-model="publicationSeriesIssue" :label="$t('publicationSeriesIssueLabel')" :placeholder="$t('publicationSeriesIssueLabel')"></v-text-field>
                     </v-col>
                 </v-row>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
 
@@ -200,6 +209,8 @@ export default defineComponent({
                 PublisherService.readPublisher(props.presetProceedings.publisherId).then((response) => {
                     selectedPublisher.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: props.presetProceedings?.publisherId as number};
                 });
+            } else if (props.presetProceedings?.authorReprint) {
+                selectedPublisher.value = {title: "", value: -2};
             }
 
             if(props.presetProceedings?.publicationSeriesId) {
@@ -316,7 +327,8 @@ export default defineComponent({
                 publicationSeriesId: publicationSeriesId,
                 publicationSeriesIssue: publicationSeriesIssue.value,
                 publicationSeriesVolume: publicationSeriesVolume.value,
-                publisherId: selectedPublisher.value?.value !== -1 ? selectedPublisher.value?.value : undefined,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 scopusId: scopus.value,
                 fileItems: [],
                 proofs: []

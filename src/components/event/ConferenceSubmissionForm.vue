@@ -48,7 +48,7 @@
                         {{ dateRangeFormatError }}
                     </p>
                 </div>
-                <v-row v-if="canAddSerialEvents" class="serial-event">
+                <v-row v-if="canAddSerialEvents && !inModal" class="serial-event">
                     <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
                 </v-row>
                 <v-row>
@@ -243,8 +243,8 @@ export default defineComponent({
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
         const dateRangeError = ref(false);
 
-        watch([dateFrom, dateTo, eventYear], () => {
-            if(eventYear.value && !timePeriodInput.value) {
+        watch([dateFrom, dateTo, eventYear, serialEvent], () => {
+            if((eventYear.value && !timePeriodInput.value) || serialEvent.value) {
                 dateRangeError.value = false;
                 manualValidationsPassed.value = true;
                 return;

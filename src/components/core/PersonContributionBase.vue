@@ -26,6 +26,13 @@
             />
         </v-col>
     </v-row>
+    <v-row v-if="showTopSuggestions && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)">
+        <v-chip
+            v-for="contributor in topContributors" :key="contributor.b" class="ml-2" outlined
+            @click="setContributor(contributor)">
+            {{ contributor.a }}
+        </v-chip>
+    </v-row>
     <!-- <v-btn
         v-if="allowExternalAssociate && !selectExternalAssociate"
         color="primary"
@@ -133,6 +140,7 @@ import { removeTrailingPipeRegex } from "@/utils/StringUtil";
 import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
 import { useUserRole } from "@/composables/useUserRole";
+import UserService from "@/services/UserService";
 
 
 export default defineComponent({
@@ -167,11 +175,19 @@ export default defineComponent({
         lockSearchField: {
             type: Boolean,
             default: false
+        },
+        showTopSuggestions: {
+            type: Boolean,
+            default: false
+        },
+        suggestionDisplayCheck: {
+            type: Function as PropType<((personId: number) => boolean)>,
+            default: () => { return true; }
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const { canUserAddPersons } = useUserRole();
+        const { canUserAddPersons, isResearcher } = useUserRole();
 
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
@@ -210,7 +226,9 @@ export default defineComponent({
         const lastSearchInput = ref();
         const presetPersonNameForCreation = ref<PersonName>();
 
-        onMounted(() => {
+        const topContributors = ref<Record<string, number>[]>([]);
+
+        onMounted(async () => {
             if (!props.isUpdate) {
                 valueSet.value = true;
             }
@@ -218,12 +236,40 @@ export default defineComponent({
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
             });
+
+
+            displayTopCollaboratorPicks();
         });
 
+        const displayTopCollaboratorPicks = async () => {
+            if (isResearcher.value && props.showTopSuggestions) {
+                topContributors.value.splice(0);
+
+                const loggedInUser = await UserService.getLoggedInUser();
+                if (props.suggestionDisplayCheck(loggedInUser?.data.personId as number)) {
+                    topContributors.value.push(
+                        {
+                            a: `${loggedInUser?.data.firstname as string} ${loggedInUser?.data.lastName as string} (${i18n.t('meLabel')})`,
+                            b: loggedInUser?.data.personId as number
+                        }
+                    );
+                }
+
+                PersonService.getTopCollaborators().then(response => {
+                    response.data.forEach(collaborator => {
+                        if (props.suggestionDisplayCheck(collaborator.b)) {
+                            topContributors.value.push(collaborator)
+                        }
+                    });
+                });
+            }
+        };
+
         const searchPersons = lodash.debounce((input: string) => {
-            if (props.lockSearchField || !input || input.includes("|") || selectedPerson.value.value === 0) {
+            if (props.lockSearchField || !input || input.includes("|") || (selectedPerson.value && selectedPerson.value.value === 0)) {
                 return;
             }
+
             if (input.length >= 3) {
                 lastSearchInput.value = `(${input.replaceAll('(', '').replaceAll(')', '')})`;
                 
@@ -339,7 +385,9 @@ export default defineComponent({
             }
 
             PersonService.readPerson(selection.value).then((response) => {
-                personOtherNames.value = [{title: selection.title.split("|")[0], value: -1}];
+                personOtherNames.value = [
+                    {title: `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`, value: -1}
+                ];
                 selectedOtherName.value = personOtherNames.value[0];
                 response.data.personOtherNames.forEach((otherName) => {
                     personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName})
@@ -552,20 +600,23 @@ export default defineComponent({
             }, 0);
         };
 
+        const setContributor = (contributor: Record<string, number>) => {
+            selectedPerson.value = {title: `${contributor.a}`, value: contributor.b}
+            onPersonSelect(selectedPerson.value);
+        };
+
         return {
-                firstName, middleName, lastName,
-                selectedPerson, customNameInput,
-                searchPersons, filterPersons, persons,
-                requiredFieldRules, requiredSelectionRules,
-                contributionDescription, affiliationStatement,
-                sendContentToParent, clearInput, onPersonSelect,
+                firstName, middleName, lastName, selectedPerson, customNameInput,
+                searchPersons, filterPersons, persons, requiredFieldRules,
+                requiredSelectionRules, contributionDescription, affiliationStatement,
+                sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
                 descriptionRef, affiliationStatementRef, toggleExternalSelection,
                 personOtherNames, selectedOtherName, selectExternalAssociate,
-                selectNewlyAddedPerson, toMultilingualTextInput,
+                selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
                 PersonSubmissionForm, enterExternalOU, canUserAddPersons,
                 constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation
+                presetPersonNameForCreation, setContributor
             };
     }
 });

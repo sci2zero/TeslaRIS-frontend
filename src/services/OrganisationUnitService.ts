@@ -37,6 +37,10 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${onlyHarvestableInstitutions ? ("&onlyReturnOnesWhichCanHarvest=" + onlyHarvestableInstitutions) : ""}${onlyIndependentInstitutions ? ("&onlyIndependent=" + onlyIndependentInstitutions) : ""}${allowedThesisType ? ("&allowedThesisType=" + allowedThesisType) : ""}${onlyClientInstitutions ? ("&onlyClients=" + onlyClientInstitutions) : ""}`);
   }
 
+  async searchOUsAdvanced(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/advanced-search?${tokens}`);
+  }
+
   async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
     if (idempotencyKey) {
       return super.sendRequest(axios.post, "organisation-unit", body, idempotencyKey);
@@ -78,6 +82,10 @@ export class OrganisationUnitService extends BaseService {
 
   async deleteOURelation(relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `organisation-unit-relation/${relationId}`);
+  }
+
+  async deleteOURelationByIdPair(sourceId: number, targetId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `organisation-unit-relation/delete/${sourceId}/${targetId}`);
   }
 
   async checkIdentifierUsage(identifier: string, organisationUnitId: number): Promise<AxiosResponse<boolean>> {

@@ -285,6 +285,7 @@
                             personId: person.id,
                             commissionId: null
                         }"
+                    :allow-researcher-unbinding="canEdit && isResearcher"
                     @switch-page="switchPage">
                 </publication-table-component>
             </v-tabs-window-item>
@@ -530,11 +531,6 @@ export default defineComponent({
             fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
-                selectedPublicationTypes.value.push(
-                    {title: publicationType.title, value: publicationType.value}
-                );
-            });
         });
 
         watch(i18n.locale, () => {

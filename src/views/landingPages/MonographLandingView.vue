@@ -93,12 +93,17 @@
                                 <div v-if="monograph?.number" class="response">
                                     {{ monograph.number }}
                                 </div>
-                                <div v-if="monograph?.publisherId">
+                                <div v-if="monograph?.publisherId || monograph?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="monograph?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + monograph?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="monograph?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                                 <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
@@ -115,7 +120,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="monograph?.scopusId" class="response">
-                                    {{ monograph.scopusId }}
+                                    <identifier-link :identifier="monograph.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="monograph?.doi">
                                     DOI:
@@ -174,6 +179,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monograph?.description)"
             :document="monograph"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(monograph?.id as number, monograph as _Document)"
         />
 
@@ -186,6 +192,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -216,6 +225,14 @@
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="monograph"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    :proofs="monograph?.proofs"
+                    :file-items="monograph?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -231,6 +248,13 @@
                     :can-edit="canEdit && !monograph?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="monograph?.remark"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
                 
                 <!-- Publications Table -->
                 <v-row>
@@ -245,13 +269,6 @@
                         </publication-table-component>
                     </v-col>
                 </v-row>
-
-                <attachment-section
-                    :document="monograph"
-                    :can-edit="canEdit && !monograph?.isArchived"
-                    :proofs="monograph?.proofs"
-                    :file-items="monograph?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>
@@ -304,12 +321,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(monograph?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
 
         <share-buttons
@@ -354,7 +365,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse, type EntityClassificationResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -382,7 +392,7 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -432,7 +442,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -589,6 +599,7 @@ export default defineComponent({
             monograph.value!.openAlexId = basicInfo.openAlexId;
             monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
             monograph.value!.publisherId = basicInfo.publisherId;
+            monograph.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };
@@ -627,6 +638,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            monograph.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             monograph, icon, actionsRef,
             returnCurrentLocaleContent,
@@ -648,7 +664,7 @@ export default defineComponent({
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
-            publisher
+            publisher, updateRemark
         };
 }})
 

@@ -3,6 +3,7 @@
         <v-col :cols="(hasSelection ? 11 : 12)">
             <v-autocomplete
                 v-model="selectedUser"
+                v-model:search="searchInput"
                 :label="(label ? $t(label) : (multiple ? $t('userListLabel') : $t('userLabel'))) + (required ? '*' : '')"
                 :items="readOnly ? [] : users"
                 :custom-filter="((): boolean => true)"
@@ -66,6 +67,7 @@ export default defineComponent({
         const selectedUser = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         onMounted(() => {
             if (props.modelValue) {
@@ -98,6 +100,10 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+
             emit("update:modelValue", selectedUser.value);
         };
 
@@ -119,7 +125,7 @@ export default defineComponent({
         return {
             users, selectedUser, searchUsers,
             requiredSelectionRules,
-            sendContentToParent,
+            sendContentToParent, searchInput,
             clearInput, hasSelection
         };
     }

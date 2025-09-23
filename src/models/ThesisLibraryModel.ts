@@ -165,7 +165,8 @@ export interface ThesisPublicReviewResponse {
     titleOther: string;
     organisationUnitNameSr: string;
     organisationUnitNameOther: string;
-    scientificArea: string;
+    scientificAreaSr: string;
+    scientificAreaOther: string;
     publicReviewStartDate: string;
     publicReviewEndDate: string;
     databaseId: number;

@@ -5,11 +5,15 @@ import type { MultilingualContent, Page, SearchFieldsResponse } from "@/models/C
 import type { BasicPerson, PersonIndex, PersonName, PersonProfileImageRequest, PersonResponse, PersonalInfo } from "@/models/PersonModel";
 import type { PersonUserResponse } from "@/models/PersonUserModel";
 import type { Involvement } from "@/models/InvolvementModel";
+import { cacheService } from "./CacheService";
 
 export class PersonService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
+  private readonly TOP_COLLABORATORS_CACHE_KEY = 'top-collaborators';
+
+  
   async getResearcherCount(): Promise<AxiosResponse<number>> {
     return super.sendRequest(axios.get, "person/count");
   }
@@ -20,6 +24,10 @@ export class PersonService extends BaseService {
 
   async searchResearchers(tokens: string, strict: boolean, institutionId: number | null): Promise<AxiosResponse<Page<PersonIndex>>> {
     return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
+  }
+
+  async searchResearchersAdvanced(tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {
+    return super.sendRequest(axios.get, `person/advanced-search?${tokens}`);
   }
 
   async searchResearchersFromInstitution(tokens: string, strict: boolean, institutionId: number, harvestable: boolean, noOrcid: boolean): Promise<AxiosResponse<Page<PersonIndex>>> {
@@ -51,6 +59,22 @@ export class PersonService extends BaseService {
 
   async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
     return super.sendRequest(axios.get, `person/${personId}`);
+  }
+
+  async getTopCollaborators(): Promise<AxiosResponse<Record<string, number>[]>> {
+    const cachedData = cacheService.get<AxiosResponse<Record<string, number>[]>>(
+      this.TOP_COLLABORATORS_CACHE_KEY
+    );
+
+    if (cachedData) {
+      return cachedData;
+    }
+
+    const response = await super.sendRequest(axios.get, `person/top-collaborators`);
+    
+    cacheService.set(this.TOP_COLLABORATORS_CACHE_KEY, response, 10 * 60 * 1000);
+    
+    return response;
   }
 
   async canEdit(personId: number): Promise<AxiosResponse<boolean>> {

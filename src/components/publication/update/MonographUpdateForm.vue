@@ -64,29 +64,8 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="6">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="6">
-                <v-text-field
-                    v-model="openAlexId"
-                    label="Open Alex ID"
-                    placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
-            </v-col>
-            <v-col cols="6">
-                <v-text-field
-                    v-model="webOfScienceId"
-                    label="Web of Science ID"
-                    placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -101,17 +80,18 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="number" :label="$t('numberLabel')" :placeholder="$t('numberLabel')"></v-text-field>
+                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                <v-text-field v-model="number" :label="$t('issueLabel')" :placeholder="$t('issueLabel')"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
-                    v-model="selectedPublisher">
+                    v-model="selectedPublisher"
+                    allow-author-reprint>
                 </publisher-autocomplete-search>
             </v-col>
         </v-row>
@@ -120,6 +100,32 @@
                 <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
             </v-col>
         </v-row> -->
+        <v-row>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
 
         <v-row>
             <p class="required-fields-message">
@@ -241,6 +247,8 @@ export default defineComponent({
                             title: returnCurrentLocaleContent(publisher.name) as string, value: publisher.id as number
                         };
                     });
+                } else if (props.presetMonograph?.authorReprint) {
+                    selectedPublisher.value = {title: "", value: -2};
                 }
             }
         };
@@ -357,7 +365,8 @@ export default defineComponent({
                 number: number.value,
                 volume: volume.value,
                 researchAreaId: selectedResearchArea.value?.value as number,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: []
             };

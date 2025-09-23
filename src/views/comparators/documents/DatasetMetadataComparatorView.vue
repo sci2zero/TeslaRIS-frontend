@@ -186,6 +186,7 @@ export default defineComponent({
 
             dataset1.eventId = dataset2.eventId;
             dataset1.publisherId = dataset2.publisherId;
+            dataset1.authorReprint = dataset2.authorReprint;
 
             dataset2.uris!.forEach(uri => {
                 if (!dataset1.uris!.includes(uri)) {
@@ -240,6 +241,7 @@ export default defineComponent({
             leftDataset.value!.scopusId = updatedInfo.scopusId;
             leftDataset.value!.openAlexId = updatedInfo.openAlexId;
             leftDataset.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            leftDataset.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -261,6 +263,7 @@ export default defineComponent({
             rightDataset.value!.scopusId = updatedInfo.scopusId;
             rightDataset.value!.openAlexId = updatedInfo.openAlexId;
             rightDataset.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            rightDataset.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

@@ -31,7 +31,7 @@
             enable-export
             :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
-            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
             @switch-page="switchPage">
         </person-table-component>
     </v-container>

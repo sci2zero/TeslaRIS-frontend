@@ -63,6 +63,10 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}&timestamp=${toUtcLocalDateTimeString(timestamp)}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
+    async scheduleUnmanagedDocumentsDeletion(timestamp: string, recurrence: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `document/schedule-unmanaged-documents-deletion?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
+    }
+
     private createNumericalParameter(paramName: string, values: number[]): string {
         let params = "";
         values.forEach(value => {

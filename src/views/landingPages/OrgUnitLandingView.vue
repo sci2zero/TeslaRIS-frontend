@@ -57,6 +57,12 @@
                         />
                         <v-row v-else>
                             <v-col cols="6">
+                                <div v-if="isAdmin && organisationUnit?.clientInstitution" class="response">
+                                    {{ $t("clientInstitutionLabel") }}
+                                </div>
+                                <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
+                                    {{ $t("legalEntityLabel") }}
+                                </div>
                                 <div>
                                     {{ $t("addressLabel") }}:
                                 </div>
@@ -112,11 +118,14 @@
                                     <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
                             </v-col>
-                            <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
-                                <div>
+                            <v-col cols="6">
+                                <div v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit.location?.address">
                                     <open-layers-map
-                                        ref="mapRef" height="250px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
-                                        :show-input="false"></open-layers-map>
+                                        ref="mapRef" height="250px"
+                                        :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
+                                        :read-only="true"
+                                        :show-input="false">
+                                    </open-layers-map>
                                 </div>
                             </v-col>
                         </v-row>
@@ -208,6 +217,13 @@
                     @click="performNavigation('importer')">
                     {{ $t("importerLabel") }}
                 </v-btn>
+                <v-btn
+                    v-if="isInstitutionalEditor && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="navigateToBackupPage">
+                    {{ $t("backupLabel") }}
+                </v-btn>
             </div>
         </div>
 
@@ -281,6 +297,7 @@
                     :publications="publications"
                     :total-publications="totalPublications"
                     enable-export
+                    :allow-comparison="isInstitutionalEditor && canEdit"
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, publicationSearchParams]"
                     :endpoint-body-parameters="
@@ -289,6 +306,7 @@
                             institutionId: organisationUnit.id,
                             commissionId: null
                         }"
+                    :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
                     @switch-page="switchPublicationsPage">
                 </publication-table-component>
             </v-tabs-window-item>
@@ -308,7 +326,7 @@
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true)">
+                    @delete="fetchEmployees(true); fetchEmployees(false);">
                 </person-table-component>
 
                 <div v-if="totalAlumni > 0">
@@ -432,7 +450,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
-import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
@@ -491,7 +509,7 @@ export default defineComponent({
         const personSearchParams = ref("tokens=*");
 
         const subUnitsPage = ref(0);
-        const subUnitsSize = ref(1);
+        const subUnitsSize = ref(10);
         const subUnitsSort = ref("");
         const subUnitsDirection = ref("");
 
@@ -507,7 +525,13 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian, loggedInUser } = useUserRole();
+        
+        const {
+            isAdmin, isInstitutionalEditor,
+            isInstitutionalLibrarian, isHeadOfLibrary,
+            loggedInUser
+        } = useUserRole();
+        
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
@@ -535,11 +559,14 @@ export default defineComponent({
             });
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedPublicationTypes.value.push(
-                    {title: publicationType.title, value: publicationType.value}
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string,
+                        value: PublicationType.THESIS
+                    }
                 );
-            });
+            }
 
             fetchPublicReviewPageContent();
         });
@@ -638,7 +665,7 @@ export default defineComponent({
             return DocumentPublicationService.findPublicationsForOrganisationUnit(
                 parseInt(currentRoute.params.id as string),
                 selectedPublicationTypes.value.map(publicationType => publicationType.value),
-                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`
+                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value},${publicationsDirection.value}`
             ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements;
@@ -710,6 +737,7 @@ export default defineComponent({
             organisationUnit.value!.validatingEmailDomain = basicInfo.validatingEmailDomain;
             organisationUnit.value!.allowingSubdomains = basicInfo.allowingSubdomains;
             organisationUnit.value!.institutionEmailDomain = basicInfo.institutionEmailDomain;
+            organisationUnit.value!.legalEntity = basicInfo.legalEntity;
             performUpdate(false);
         };
 
@@ -758,7 +786,8 @@ export default defineComponent({
                 clientInstitution: organisationUnit.value?.clientInstitution as boolean,
                 validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
                 allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -785,7 +814,8 @@ export default defineComponent({
                 clientInstitution: organisationUnit.value?.clientInstitution as boolean,
                 validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
                 allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -829,6 +859,10 @@ export default defineComponent({
             router.push({name: "publicDissertationsReport", query: {institutionId: organisationUnit.value?.id as number}});
         };
 
+        const navigateToBackupPage = () => {
+            router.push({name: "documentBackup", query: {institutionId: organisationUnit.value?.id as number}});
+        };
+
         const publicReviewPageContent = ref<PublicReviewPageContent[]>([]);
         const fetchPublicReviewPageContent = () => {
             publicReviewPageContent.value.splice(0);
@@ -870,7 +904,8 @@ export default defineComponent({
             OrganisationUnitImportSourceForm, showOutputs,
             OrganisationUnitOutputConfigurationForm,
             InstitutionDefaultSubmissionContentForm,
-            outputConfigurationUpdated, loggedInUser
+            outputConfigurationUpdated, loggedInUser,
+            navigateToBackupPage
         };
 }})
 

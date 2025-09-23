@@ -31,6 +31,7 @@
                 ref="ouAutocompleteRef"
                 v-model="selectedOrganisationUnit"
                 required
+                only-client-institutions
                 :readonly="disableOUSelection">
             </organisation-unit-autocomplete-search>
             <v-select

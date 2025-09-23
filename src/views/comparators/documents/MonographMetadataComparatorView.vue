@@ -200,6 +200,7 @@ export default defineComponent({
             monograph1.publicationSeriesId = monograph2.publicationSeriesId;
             monograph1.researchAreaId = monograph2.researchAreaId;
             monograph1.publisherId = monograph2.publisherId;
+            monograph1.authorReprint = monograph2.authorReprint;
 
             monograph2.languageTagIds!.forEach(languageTagId => {
                 if (!monograph1.languageTagIds!.includes(languageTagId)) {
@@ -268,6 +269,7 @@ export default defineComponent({
             leftMonograph.value!.openAlexId = updatedInfo.openAlexId;
             leftMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftMonograph.value!.publisherId = updatedInfo.publisherId;
+            leftMonograph.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -296,6 +298,7 @@ export default defineComponent({
             rightMonograph.value!.openAlexId = updatedInfo.openAlexId;
             rightMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightMonograph.value!.publisherId = updatedInfo.publisherId;
+            rightMonograph.value!.authorReprint = updatedInfo.authorReprint;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

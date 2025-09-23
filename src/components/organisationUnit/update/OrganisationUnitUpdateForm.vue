@@ -41,6 +41,10 @@
                 </v-row>
                 <v-row v-if="isAdmin">
                     <v-checkbox
+                        v-model="legalEntity"
+                        :label="$t('legalEntityLabel')"
+                    ></v-checkbox>
+                    <v-checkbox
                         v-model="clientInstitution"
                         :label="$t('clientInstitutionLabel')"
                     ></v-checkbox>
@@ -172,6 +176,7 @@ export default defineComponent({
         const validatingEmailDomain = ref(props.presetOU?.validatingEmailDomain);
         const allowingSubdomains = ref(props.presetOU?.allowingSubdomains);
         const institutionEmailDomain = ref(props.presetOU?.institutionEmailDomain);
+        const legalEntity = ref(props.presetOU?.legalEntity);
 
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>(
@@ -221,7 +226,8 @@ export default defineComponent({
                 clientInstitution: clientInstitution.value as boolean,
                 validatingEmailDomain: validatingEmailDomain.value as boolean,
                 allowingSubdomains: allowingSubdomains.value as boolean,
-                institutionEmailDomain: institutionEmailDomain.value as string
+                institutionEmailDomain: institutionEmailDomain.value as string,
+                legalEntity: legalEntity.value as boolean
             };
 
             emit("update", updatedOU);
@@ -244,6 +250,7 @@ export default defineComponent({
             validatingEmailDomain.value = props.presetOU?.validatingEmailDomain;
             allowingSubdomains.value = props.presetOU?.allowingSubdomains;
             institutionEmailDomain.value = props.presetOU?.institutionEmailDomain;
+            legalEntity.value = props.presetOU?.legalEntity;
             
             selectedThesisType.value.splice(0);
             props.presetOU?.allowedThesisTypes.forEach(type => {
@@ -265,7 +272,7 @@ export default defineComponent({
             rorValidationRules, thesisTypes, selectedThesisType,
             requiredSelectionRules, clientInstitution,
             validatingEmailDomain, allowingSubdomains,
-            institutionEmailDomain, isAdmin
+            institutionEmailDomain, isAdmin, legalEntity
         };
     }
 });

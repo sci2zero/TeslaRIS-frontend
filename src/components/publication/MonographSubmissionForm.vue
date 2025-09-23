@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="11">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.MONOGRAPH"
                             @metadata-fetched="popuateMetadata"
@@ -143,6 +143,59 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="10">
+                            <journal-autocomplete-search
+                                ref="journalAutocompleteRef"
+                                v-model="selectedJournal"
+                                allow-manual-clearing
+                                :external-validation="publicationSeriesExternalValidation">
+                            </journal-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <book-series-autocomplete-search
+                                ref="bookSeriesAutocompleteRef"
+                                v-model="selectedBookSeries"
+                                allow-manual-clearing
+                                :external-validation="publicationSeriesExternalValidation">
+                            </book-series-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="volume"
+                                :label="$t('volumeLabel')"
+                                :placeholder="$t('volumeLabel')">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="5">
+                            <v-text-field
+                                v-model="number"
+                                :label="$t('issueLabel')"
+                                :placeholder="$t('issueLabel')">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <!-- <v-row>
+                        <v-col cols="10">
+                            <event-autocomplete-search
+                                ref="eventAutocompleteRef"
+                                v-model="selectedEvent">
+                            </event-autocomplete-search>
+                        </v-col>
+                    </v-row> -->
+                    <v-row>
+                        <v-col cols="10">
+                            <publisher-autocomplete-search
+                                ref="publisherAutocompleteRef"
+                                v-model="selectedPublisher"
+                                allow-author-reprint>
+                            </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="scopus"
@@ -166,58 +219,6 @@
                                 placeholder="Web of Science ID"
                                 :rules="documentWebOfScienceIdValidationRules">
                             </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <journal-autocomplete-search
-                                ref="journalAutocompleteRef"
-                                v-model="selectedJournal"
-                                allow-manual-clearing
-                                :external-validation="publicationSeriesExternalValidation">
-                            </journal-autocomplete-search>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <book-series-autocomplete-search
-                                ref="bookSeriesAutocompleteRef"
-                                v-model="selectedBookSeries"
-                                allow-manual-clearing
-                                :external-validation="publicationSeriesExternalValidation">
-                            </book-series-autocomplete-search>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="number"
-                                :label="$t('numberLabel')"
-                                :placeholder="$t('numberLabel')">
-                            </v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="volume"
-                                :label="$t('volumeLabel')"
-                                :placeholder="$t('volumeLabel')">
-                            </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <!-- <v-row>
-                        <v-col cols="10">
-                            <event-autocomplete-search
-                                ref="eventAutocompleteRef"
-                                v-model="selectedEvent">
-                            </event-autocomplete-search>
-                        </v-col>
-                    </v-row> -->
-                    <v-row>
-                        <v-col cols="10">
-                            <publisher-autocomplete-search
-                                ref="publisherAutocompleteRef"
-                                v-model="selectedPublisher">
-                            </publisher-autocomplete-search>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -463,7 +464,8 @@ export default defineComponent({
                 number: number.value,
                 volume: volume.value,
                 researchAreaId: selectedResearchArea.value?.value as number,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: []
             };

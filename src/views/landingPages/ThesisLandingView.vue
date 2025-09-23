@@ -100,12 +100,17 @@
                                 <div v-else class="response">
                                     {{ returnCurrentLocaleContent(thesis?.externalOrganisationUnitName) }}
                                 </div>
-                                <div v-if="thesis?.publisherId">
+                                <div v-if="thesis?.publisherId || thesis?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="thesis?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + thesis?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="thesis?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                                 <div v-if="thesis?.eventId">
@@ -261,7 +266,7 @@
             </v-col>
         </v-row>
 
-        <div v-if="isAdmin || isHeadOfLibrary || userCanPutOnPublicReview" class="actions-box pa-4">
+        <div v-if="isAdmin || isHeadOfLibrary || (userCanPutOnPublicReview && !thesis?.isArchived)" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
@@ -339,6 +344,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(thesis?.description)"
             :display-archive-actions="false"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(thesis?.id as number, thesis as _Document)"
         />
 
@@ -351,6 +357,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -385,6 +394,20 @@
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section 
+                    :document="thesis"
+                    :can-edit="canEdit && !thesis?.isOnPublicReview"
+                    :proofs="thesis?.proofs"
+                    :file-items="thesis?.fileItems"
+                    is-thesis-section
+                    :preliminary-files="thesis?.preliminaryFiles"
+                    :preliminary-supplements="thesis?.preliminarySupplements"
+                    :commission-reports="thesis?.commissionReports"
+                    :is-on-public-review="thesis?.isOnPublicReview"
+                    @update="fetchThesis"
+                ></attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -409,24 +432,11 @@
                     />
                     <description-section
                         :description="thesis?.remark"
-                        :can-edit="canEdit && !thesis?.isOnPublicReview"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview && !thesis?.isArchived"
                         is-remark
                         @update="updateRemark"
                     />
                 </div>
-
-                <attachment-section 
-                    :document="thesis"
-                    :can-edit="canEdit && !thesis?.isOnPublicReview"
-                    :proofs="thesis?.proofs"
-                    :file-items="thesis?.fileItems"
-                    is-thesis-section
-                    :preliminary-files="thesis?.preliminaryFiles"
-                    :preliminary-supplements="thesis?.preliminarySupplements"
-                    :commission-reports="thesis?.commissionReports"
-                    :is-on-public-review="thesis?.isOnPublicReview"
-                    @update="fetchThesis"
-                ></attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchOutput">
                 <thesis-research-output-section
@@ -466,12 +476,6 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <publication-unbind-button
-            v-if="canEdit && isResearcher && !thesis?.isOnPublicReview"
-            :document-id="(thesis?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
 
         <persistent-question-dialog
             ref="publicDialogRef"
@@ -521,7 +525,6 @@ import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -553,7 +556,7 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -608,6 +611,9 @@ export default defineComponent({
                 RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
                     canCreateRegistryBookEntry.value = response.data ? false : true;
                     registryBookEntryId.value = response.data;
+                }).catch(() => {
+                    canCreateRegistryBookEntry.value = false;
+                    registryBookEntryId.value = -1;
                 });
 
                 fetchClassifications();
@@ -621,7 +627,7 @@ export default defineComponent({
         const checkIfUserCanEdit = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                 canEdit.value = response.data;
-            });
+            }).catch(() => canEdit.value = false);
         };
 
         watch(i18n.locale, () => {
@@ -768,6 +774,7 @@ export default defineComponent({
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
             thesis.value!.typeOfTitle = basicInfo.typeOfTitle;
+            thesis.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };

@@ -62,12 +62,17 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                                <div v-if="proceedings?.publisherId">
+                                <div v-if="proceedings?.publisherId || proceedings?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="proceedings?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + proceedings?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="proceedings?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                                 <div v-if="proceedings?.publicationSeriesId">
@@ -122,7 +127,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="proceedings?.scopusId" class="response">
-                                    {{ proceedings.scopusId }}
+                                    <identifier-link :identifier="proceedings.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="proceedings?.doi">
                                     DOI:
@@ -171,7 +176,9 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(proceedings?.description)"
             :document="proceedings"
+            :handle-researcher-unbind="handleResearcherUnbind"
             :display-citation="false"
+            for-proceedings
         />
 
         <br />
@@ -190,6 +197,9 @@
             </v-tab>
             <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -230,13 +240,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <br />
-                <attachment-section
-                    :document="proceedings"
-                    :can-edit="canEdit"
-                    :proofs="proceedings?.proofs"
-                    :file-items="proceedings?.fileItems">
-                </attachment-section>
+                <description-section
+                    :description="proceedings?.remark"
+                    :can-edit="canEdit && !proceedings?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -246,6 +255,14 @@
                     shows-board-and-reviewers
                     @update="updateContributions">
                 </person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="proceedings"
+                    :can-edit="canEdit"
+                    :proofs="proceedings?.proofs"
+                    :file-items="proceedings?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -266,12 +283,6 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(proceedings?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
 
@@ -317,7 +328,6 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import { localiseDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } from '@/models/AssessmentModel';
@@ -337,7 +347,7 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("");
 
@@ -382,7 +392,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
             }
 
             fetchProceedings(true);
@@ -505,6 +515,7 @@ export default defineComponent({
             proceedings.value!.openAlexId = updatedInfo.openAlexId;
             proceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             proceedings.value!.acronym = updatedInfo.acronym;
+            proceedings.value!.authorReprint = updatedInfo.authorReprint;
             performUpdate(false);
         };
 
@@ -566,6 +577,11 @@ export default defineComponent({
             });
         };
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            proceedings.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             proceedings, icon, fetchIndicators, PublicationType,
             publications, event, currentTab, createIndicator,
@@ -577,7 +593,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
-            documentIndicators, StatisticsType, currentRoute
+            documentIndicators, StatisticsType, currentRoute, updateRemark
         };
 }})
 

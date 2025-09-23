@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="11">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.MONOGRAPH_PUBLICATION"
                             @metadata-fetched="popuateMetadata"
@@ -76,24 +76,6 @@
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
                             <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
                         </v-col>
                         <v-col cols="5">
@@ -117,6 +99,32 @@
                             <uri-input ref="urisRef" v-model="uris"></uri-input>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -137,14 +145,14 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { PublicationType, type DocumentPublicationIndex, type MonographPublicationType } from "@/models/PublicationModel";
+import { MonographPublicationType, PublicationType, type DocumentPublicationIndex } from "@/models/PublicationModel";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { MonographPublication, PersonDocumentContribution } from "@/models/PublicationModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { getMonographPublicationTypesForGivenLocale } from "@/i18n/monographPublicationType";
+import { getMonographPublicationTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/monographPublicationType";
 import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import MonographAutocompleteSearch from './MonographAutocompleteSearch.vue';
@@ -214,7 +222,12 @@ export default defineComponent({
         } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => (getMonographPublicationTypesForGivenLocale() as { title: string; value: MonographPublicationType; }[]));
-        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>({title: "", value: null});
+        const selectedpublicationType = ref<{ title: string, value: MonographPublicationType | null }>(
+            {
+                title: getTitleFromValueAutoLocale(MonographPublicationType.RESEARCH_ARTICLE) as string,
+                value: MonographPublicationType.RESEARCH_ARTICLE
+            }
+        );
 
         const listPublications = (monograph: { title: string, value: number }) => {
             if (monograph.value > 0) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-10">
+    <div class="mt-3">
         <h4>{{ $t("shareLabel") }}:</h4>
         <div class="d-flex flex-row ga-2">
             <v-btn icon color="blue-darken-4" @click="shareOnFacebook">

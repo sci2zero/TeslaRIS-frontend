@@ -224,3 +224,62 @@ export const serverTimeToLocal = (serverTimeString: string): string => {
 
     return localDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 };
+
+export const serverTimeToLocalTime = (serverTimeString: string): string => {
+    if (!serverTimeString || typeof serverTimeString !== 'string') {
+        throw new Error(`Invalid server time: ${serverTimeString}`);
+    }
+
+    const cleanedTimeString = serverTimeString.replace(/[^0-9:]/g, "");
+    
+    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
+
+    const timeFormats = [
+        "HH:mm:ss",  // 14:45:30
+        "H:mm:ss",   // 8:45:30
+        "HH:mm",     // 14:45
+        "H:mm",      // 8:45
+        "HH",        // 14 (just hours)
+        "H"          // 8 (just hours)
+    ];
+
+    let serverDateTime: DateTime | null = null;
+
+    for (const format of timeFormats) {
+        serverDateTime = DateTime.fromFormat(cleanedTimeString, format, {
+            zone: serverTz
+        });
+
+        if (serverDateTime.isValid) {
+            break;
+        }
+    }
+
+    if (!serverDateTime || !serverDateTime.isValid) {
+        const numbers = cleanedTimeString.split(':').filter(Boolean);
+        
+        if (numbers.length === 0) {
+            throw new Error(`Invalid server time: ${serverTimeString}`);
+        }
+
+        const hours = parseInt(numbers[0]) || 0;
+        const minutes = parseInt(numbers[1]) || 0;
+        const seconds = parseInt(numbers[2]) || 0;
+
+        serverDateTime = DateTime.fromObject({
+            hour: Math.min(23, Math.max(0, hours)),
+            minute: Math.min(59, Math.max(0, minutes)),
+            second: Math.min(59, Math.max(0, seconds))
+        }, {
+            zone: serverTz
+        });
+    }
+
+    if (!serverDateTime.isValid) {
+        throw new Error(`Invalid server time: ${serverTimeString}`);
+    }
+
+    const localDateTime = serverDateTime.setZone('local');
+    
+    return localDateTime.toFormat("HH:mm") + "h";
+};

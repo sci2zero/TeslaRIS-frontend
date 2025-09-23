@@ -159,6 +159,10 @@ import { RecurrenceType } from '@/models/LoadModel';
 import TaskManagerService from '@/services/TaskManagerService';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
 import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
+import { useRoute } from 'vue-router';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { serverTimeToLocalTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -171,6 +175,8 @@ export default defineComponent({
         const snackbar = ref(false);
         const message = ref("");
         const { loggedInUser, isAdmin } = useUserRole();
+
+        const route = useRoute();
 
         const documentTypes = computed(() => getPublicationTypesForGivenLocale());
         const fileSections = computed(() => getDocumentFileSectionsForGivenLocale());
@@ -205,6 +211,14 @@ export default defineComponent({
 
             document.title = i18n.t("routeLabel.documentBackup");
             fetchScheduledTasks();
+
+            if (route.query.institutionId) {
+                OrganisationUnitService.readOU(
+                    parseInt(route.query.institutionId as string)
+                ).then(response => {
+                    selectedOU.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id};
+                });
+            }
         });
 
         const generateBackupRequest = () => {
@@ -224,7 +238,7 @@ export default defineComponent({
                 params, selectedRecurrenceType.value.value
             ).then(response => {
                 snackbar.value = true;
-                message.value = i18n.t("backupGenerationScheduledMessage", [response.data]);
+                message.value = i18n.t("backupGenerationScheduledMessage", [serverTimeToLocalTime(response.data)]);
                 fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);

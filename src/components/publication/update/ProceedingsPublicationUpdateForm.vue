@@ -45,26 +45,8 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="5">
-                <v-text-field
-                    v-model="openAlexId"
-                    label="Open Alex ID"
-                    placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="webOfScienceId"
-                    label="Web of Science ID"
-                    placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -84,11 +66,6 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
-                <v-text-field v-model="scopus" label="Scopus ID" placeholder="Scopus ID" :rules="scopusIdValidationRules"></v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
             <v-col cols="5">
                 <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
             </v-col>
@@ -101,6 +78,32 @@
         <v-row>
             <v-col>
                 <uri-input ref="urisRef" v-model="uris"></uri-input>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
 

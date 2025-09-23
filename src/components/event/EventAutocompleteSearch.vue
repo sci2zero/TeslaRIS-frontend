@@ -3,6 +3,7 @@
         <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + ((disableSubmission || readOnly) ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedEvent"
+                v-model:search="searchInput"
                 :readonly="readOnly"
                 :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
                 :items="readOnly ? [] : events"
@@ -94,6 +95,7 @@ export default defineComponent({
         const selectedEvent = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         const lastSearchInput = ref("");
 
@@ -119,7 +121,7 @@ export default defineComponent({
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
-                        title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} | ${conference.dateFromTo}`,
+                        title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} ${conference.dateFromTo ? ("| " + conference.dateFromTo) : ""}`,
                         value: conference.databaseId,
                         date: conference.dateFromTo
                     }));
@@ -148,6 +150,10 @@ export default defineComponent({
         });
 
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+            
             emit("update:modelValue", selectedEvent.value);
         };
 
@@ -207,7 +213,8 @@ export default defineComponent({
             events, selectedEvent, searchEvents,
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedEvent, hasSelection,
-            ConferenceSubmissionForm, lastSearchInput, modalRef
+            ConferenceSubmissionForm, lastSearchInput, modalRef,
+            searchInput
         };
     }
 });

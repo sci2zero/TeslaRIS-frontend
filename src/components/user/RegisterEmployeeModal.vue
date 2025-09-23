@@ -49,7 +49,9 @@
                                     <organisation-unit-autocomplete-search
                                         ref="ouAutocompleteRef"
                                         v-model="selectedOrganisationUnit"
-                                        required>
+                                        required
+                                        disable-submission
+                                        only-client-institutions>
                                     </organisation-unit-autocomplete-search>
                                 </v-col>
                                 <v-col v-if="registeringCommission" cols="12">
