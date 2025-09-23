@@ -3,8 +3,10 @@
         <v-container>
             <v-row class="mt-10 mb-10">
                 <v-col cols="12" class="text-center">
-                    <!-- Search bar -->
-                    <search-bar-component @search="search"></search-bar-component>
+                    <search-bar-component
+                        :search-when-typing="false"
+                        @search="search">
+                    </search-bar-component>
                 </v-col>
             </v-row>
         </v-container>

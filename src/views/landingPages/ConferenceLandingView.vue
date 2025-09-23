@@ -348,7 +348,9 @@ export default defineComponent({
                 return;
             }
 
-            DocumentPublicationService.findPublicationsInEvent(conference.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((publicationResponse) => {
+            DocumentPublicationService.findPublicationsInEvent(
+                conference.value?.id as number,
+                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
