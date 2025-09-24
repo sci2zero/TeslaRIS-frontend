@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import { PublicationSeriesContributionType, type PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/publicationSeriesContributionType';
 import PublicationSeriesContributionUpdateModal from "@/components/publicationSeries/update/PublicationSeriesContributionUpdateModal.vue"
@@ -116,16 +116,40 @@ export default defineComponent({
         const reviewerList = ref<PersonPublicationSeriesContribution[]>([]);
         const scientificBoardMemberList = ref<PersonPublicationSeriesContribution[]>([]);
 
+        onMounted(() => {
+            if (props.contributionList) {
+                populateLists();
+            }
+        });
+
         watch(() => props.contributionList, () => {
+            if (props.contributionList) {
+                populateLists();
+            }
+        });
+
+        const populateLists = () => {
             localContributions.value = props.contributionList;
 
-            editorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.EDITOR]);
-            associateEditorList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.ASSOCIATE_EDITOR]);
-            reviewerList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.REVIEWER]);
-            scientificBoardMemberList.value = localContributions.value.filter((contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER]);
+            editorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.EDITOR]
+                );
+            associateEditorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.ASSOCIATE_EDITOR]
+                );
+            reviewerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.REVIEWER]
+                );
+            scientificBoardMemberList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER]
+                );
         
             selectFirstNonEmptyTab();
-        });
+        };
 
         const updateOrderInParentList = () => {
             const indexes: number[] = [];

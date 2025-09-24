@@ -28,7 +28,7 @@
             <!-- eslint-enable vue/no-v-html -->
             <editor-content
                 v-if="!isTruncated"
-                :style="`height: 100%; ${editable ? 'min-height: 300px;' : ''}`"
+                :style="`height: 100%; ${editable ? 'min-height: 300px; display: flex;' : ''}`"
                 :editor="editor"
             />
             
@@ -437,8 +437,18 @@ export default defineComponent({
 }
 
 .ProseMirror-focused {
-  border: none !important;
-  outline: none !important;
+  border: none;
+  outline: none;
+  width: auto;
+  height: auto;
+}
+
+.ProseMirror {
+  border: none;
+  outline: none;
+  width: auto;
+  height: auto;
+  flex: 1;
 }
 
 </style>

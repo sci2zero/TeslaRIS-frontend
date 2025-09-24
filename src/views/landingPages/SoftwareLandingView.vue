@@ -82,7 +82,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="software?.scopusId" class="response">
-                                    {{ software.scopusId }}
+                                    <identifier-link :identifier="software.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="software?.doi">
                                     DOI:

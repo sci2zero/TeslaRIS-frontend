@@ -41,6 +41,8 @@ export default defineComponent({
                     return "https://www.scopus.com/authid/detail.uri?authorId=";
                 case "scopus_affiliation":
                     return "https://www.scopus.com/pages/organization/";
+                case "scopus":
+                    return "https://www.scopus.com/pages/publications/"
                 case "open_alex":
                     return "https://openalex.org/";
                 case "ror":
