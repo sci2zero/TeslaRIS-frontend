@@ -1,4 +1,6 @@
 import { RecurrenceType } from "./LoadModel";
+import { type OrganisationUnitIndex } from "./OrganisationUnitModel";
+import { type PersonIndex } from "./PersonModel";
 import type { PersonDocumentContribution, PublicationType } from "./PublicationModel";
 
 export interface Page<Type> {
@@ -307,4 +309,9 @@ export interface DownloadState {
     progress: number
     fileName: string
     isDownloading: boolean
+}
+
+export interface LeaderboardEntry {
+    a: PersonIndex | OrganisationUnitIndex;
+    b: number;
 }

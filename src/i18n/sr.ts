@@ -1077,5 +1077,6 @@ export default {
     conferencePublicationsLabel: "Radovi sa konferencije",
     startingDownloadLabel: "Započinjem preuzimanje...",
     downloadCompleteLabel: "Preuzimanje završeno!",
-    downloadingLabel: "Preuzimanje..."
+    downloadingLabel: "Preuzimanje...",
+    leaderboardsLabel: "Rang liste"
 }

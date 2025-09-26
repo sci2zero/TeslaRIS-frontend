@@ -261,6 +261,9 @@
             <v-tab value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
+            <v-tab value="leaderboards">
+                {{ $t("leaderboardsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -406,6 +409,11 @@
                     :organisation-unit-id="(organisationUnit.id as number)"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="leaderboards">
+                <leaderboard-table
+                    :leaderboard-data="[{a: {name: 'Ivan Mrsulja', databaseId: 1}, b: 10}, {a: {name: 'Milos Popovic', databaseId: 2}, b: 5}, {a: {name: 'Dragan Ivanovic', databaseId: 3}, b: 3}, {a: {name: 'Dusan Nikolic', databaseId: 4}, b: 2}]"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -464,11 +472,12 @@ import OrganisationUnitOutputConfigurationService from '@/services/OrganisationU
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import OrganisationUnitVisualizations from '@/components/organisationUnit/OrganisationUnitVisualizations.vue';
+import LeaderboardTable from '@/components/charts/LeaderboardTable.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, LeaderboardTable },
     setup() {
         const currentTab = ref("relations");
 
