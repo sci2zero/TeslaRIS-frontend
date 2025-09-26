@@ -39,6 +39,10 @@ export default defineComponent({
         focusAutomatically: {
             type: Boolean,
             default: false
+        },
+        searchWhenTyping: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["search"],
@@ -106,6 +110,10 @@ export default defineComponent({
         watch(
             searchInput,
             lodash.debounce(() => {
+                if (!props.searchWhenTyping) {
+                    return;
+                }
+
                 onSearch();
             }, props.longerDelay ? 500 : 300)
         );
