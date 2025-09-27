@@ -174,3 +174,19 @@ label {
 .serif {
     font-family: 'Libre Baskerville', serif;
 }
+
+
+/* Vuetify update */
+
+.v-btn {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.v-btn.v-btn--elevated {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}

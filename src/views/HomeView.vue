@@ -18,7 +18,9 @@
                     <div class="mt-10 mb-10">
                         <div class="text-center">
                             <!-- Search bar -->
-                            <search-bar-component :dark="true" :search-when-typing="false" @search="search"></search-bar-component>
+                            <div class="flex justify-center">
+                                <search-bar-component :dark="true" :search-when-typing="false" @search="search"></search-bar-component>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -234,5 +236,7 @@ export default defineComponent({
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
+
+
 
 </style>

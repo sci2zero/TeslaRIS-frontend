@@ -1,6 +1,10 @@
 <template>
-    <div class="search-container">
-        <div class="search-card" :class="{ 'search-card--light': !dark }">
+        <div class="search-card" :class="{ 
+            'search-card--light': !dark,
+            'search-card--transparent': transparent,
+            'search-card--solid': !transparent,
+            [`search-card--${size}`]: true
+        }">
             <div class="search-input-wrapper">
                 <v-text-field
                     ref="searchField"
@@ -8,7 +12,10 @@
                     density="comfortable"
                     variant="outlined"
                     class="search-input"
-                    :class="{ 'search-input--light': !dark }"
+                    :class="{ 
+                        'search-input--light': !dark,
+                        [`search-input--${size}`]: true
+                    }"
                     :label="$t('searchBarPlaceholder')"
                     single-line
                     hide-details
@@ -28,7 +35,7 @@
                 </v-text-field>
             </div>
         </div>
-    </div>
+
 </template>
 
 <script lang="ts">
@@ -60,6 +67,15 @@ export default defineComponent(
             searchWhenTyping: {
                 type: Boolean,
                 default: true
+            },
+            transparent: {
+                type: Boolean,
+                default: true
+            },
+            size: {
+                type: String,
+                default: "medium",
+                validator: (value: string) => ["small", "medium", "large"].includes(value)
             }
         },
         emits: ["search"],
@@ -148,14 +164,8 @@ export default defineComponent(
 </script>
 
 <style scoped>
-.search-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-}
+@reference "@/assets/main.css";
+
 
 .search-card {
     background: rgba(255, 255, 255, 0.15);
@@ -338,5 +348,102 @@ export default defineComponent(
 
 .search-icon--light:hover {
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Solid (non-transparent) styles */
+.search-card--solid {
+    background: white;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-card--solid::before {
+    display: none;
+}
+
+.search-card--solid:hover {
+    background: white;
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.search-card--solid.search-card--light {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-card--solid.search-card--light:hover {
+    background: white;
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Size variants */
+.search-card--small {
+    @apply max-w-sm rounded-2xl p-0.5;
+}
+
+.search-card--small .search-input :deep(.v-field__input) {
+    @apply px-4 py-2! text-sm;
+}
+
+.search-card--small .search-input :deep(.v-label) {
+    @apply text-sm;
+}
+
+.search-card--small .search-icon {
+    @apply mr-2;
+    width: 20px;
+    height: 20px;
+}
+
+.search-card--medium {
+    @apply max-w-2xl rounded-3xl p-1;
+}
+
+.search-card--large {
+    @apply max-w-4xl rounded-3xl p-1.5;
+}
+
+.search-card--large .search-input :deep(.v-field__input) {
+    @apply px-7 py-6 text-lg;
+}
+
+.search-card--large .search-input :deep(.v-label) {
+    @apply text-lg;
+}
+
+.search-card--large .search-icon {
+    @apply mr-4;
+    width: 32px;
+    height: 32px;
+}
+
+.search-input--small :deep(.v-field__input) {
+    @apply px-4 py-3 text-sm;
+}
+
+.search-input--small :deep(.v-label) {
+    @apply text-sm;
+}
+
+.search-input--medium :deep(.v-field__input) {
+    @apply px-6 py-5 text-base;
+}
+
+.search-input--medium :deep(.v-label) {
+    @apply text-base;
+}
+
+.search-input--large :deep(.v-field__input) {
+    @apply px-7 py-6 text-lg;
+}
+
+.search-input--large :deep(.v-label) {
+    @apply text-lg;
 }
 </style>

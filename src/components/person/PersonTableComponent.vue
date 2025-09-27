@@ -1,44 +1,125 @@
 <template>
-    <v-btn
-        v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
-        @click="deleteSelection">
-        {{ $t("deleteLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="(isAdmin || isCommission) && isCommissionResearchersTable" density="compact" class="bottom-spacer" :disabled="selectedPersons.length === 0"
-        @click="removeSelection">
-        {{ $t("removeResearcherLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
-        @click="startPublicationComparison">
-        {{ $t("comparePublicationsLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable" density="compact" class="compare-button" :disabled="selectedPersons.length !== 2"
-        @click="startMetadataComparison">
-        {{ $t("compareMetadataLabel") }}
-    </v-btn>
+    <!-- Action Menu for Selected Items -->
+    <div class="flex justify-between mb-2">
+        
+        <div class="min-w-96">
+            <slot name="top-left"></slot>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="action-menu-container">
+                <v-menu offset-y>
+                    <template v-slot:activator="{ props }">
+                        <v-btn
+                            v-bind="props"
+                            color="white"
+                            variant="elevated"
+                            prepend-icon="mdi-dots-vertical"
+                            class="action-menu-trigger"
+                        >
+                        {{ $t("actions") }} <template v-if="selectedPersons.length > 0">({{ selectedPersons.length }})</template>
+                        </v-btn>
+                    </template>
+                    
+                    <v-list class="action-menu-list" density="compact">
+                        <!-- Delete Action -->
+                        <v-list-item
+                            v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
+                            @click="deleteSelection"
+                            :disabled="selectedPersons.length <= 0"
+                            class="action-menu-item"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon color="error" size="18">mdi-delete</v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">{{ $t("deleteLabel") }}</v-list-item-title>
+                        </v-list-item>
+                        
+                        <!-- Remove Action -->
+                        <v-list-item
+                            v-if="(isAdmin || isCommission) && isCommissionResearchersTable"
+                            @click="removeSelection"
+                            :disabled="selectedPersons.length <= 0"
+                            class="action-menu-item"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon color="warning" size="18">mdi-account-remove</v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">{{ $t("removeResearcherLabel") }}</v-list-item-title>
+                        </v-list-item>
+                        
+                        <!-- Compare Publications -->
+                        <v-list-item
+                            v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
+                            @click="startPublicationComparison"
+                            :disabled="selectedPersons.length !== 2"
+                            class="action-menu-item"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon color="info" size="18">mdi-file-document-multiple</v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("comparePublicationsLabel") }}
+                                <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
+                            </v-list-item-title>
+                        </v-list-item>
+                        
+                        <!-- Compare Metadata -->
+                        <v-list-item
+                            v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
+                            @click="startMetadataComparison"
+                            :disabled="selectedPersons.length !== 2"
+                            class="action-menu-item"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon color="info" size="18">mdi-database-search</v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("compareMetadataLabel") }}
+                                <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
+                            </v-list-item-title>
+                        </v-list-item>
+                        
+                        <!-- Export Action -->
+                        <v-list-item
+                            v-if="enableExport"
+                            @click="openExportModal"
+                            class="action-menu-item"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon color="success" size="18">mdi-download</v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">{{ $t("exportLabel") }}</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </div>
 
-    <add-employment-modal 
-        v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
-        class="mt-3 mb-1"
-        :institution-id="employmentInstitutionId"
-        @update="notifyUserAndRefreshTable">
-    </add-employment-modal>
+            <add-employment-modal 
+                v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
+                class="mb-4"
+                :institution-id="employmentInstitutionId"
+                @update="notifyUserAndRefreshTable">
+            </add-employment-modal>
+            <slot name="actions"></slot>
+        </div>
+    </div>
+
     
+    <!-- Table Export Modal -->
     <table-export-modal
         v-if="enableExport"
+        ref="exportModal"
         :export-entity="ExportEntity.PERSON"
         :export-ids="(selectedPersons.map(person => person.databaseId) as number[])"
         :disabled="selectedPersons.length === 0"
         :potential-max-amount-requested="selectedPersons.length >= tableOptions.itemsPerPage"
         :total-results="totalPersons"
         :endpoint-type="endpointType"
-        :endpoint-token-parameters="endpointTokenParameters">
+        :endpoint-token-parameters="endpointTokenParameters"
+        :hide-activation-button="true">
     </table-export-modal>
     
-    <div ref="tableWrapper">
+    <div ref="tableWrapper" class="modern-table-container">
         <v-data-table-server
             v-model="selectedPersons"
             :sort-by="tableOptions.sortBy"
@@ -51,62 +132,107 @@
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
             :page="tableOptions.page"
+            class="modern-data-table"
+            :class="{ 'has-selection': selectedPersons.length > 0 }"
             @update:options="refreshTable">
             <template #body="props">
                 <draggable
-                    :list="props.items"
+                    :list="props.items as any"
                     tag="tbody"
                     :disabled="!inComparator"
                     group="persons"
                     handle=".handle"
                     @change="onDropCallback"
                 >
-                    <tr v-if="props.items?.length === 0">
-                        <td colspan="10" class="text-center">
-                            <p>{{ $t("noDataInTableMessage") }}</p>
+                    <tr v-if="props.items?.length === 0" class="empty-state-row">
+                        <td colspan="10" class="text-center py-12">
+                            <div class="empty-state">
+                                <v-icon size="48" color="grey-lighten-1" class="mb-4">mdi-database-search</v-icon>
+                                <p class="text-h6 text-grey-darken-1 mb-2">{{ $t("noDataInTableMessage") }}</p>
+                                <p class="text-body-2 text-grey">{{ $t("tryAdjustingFilters") }}</p>
+                            </div>
                         </td>
                     </tr>
                     <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || enableExport">
+                        <td v-if="isAdmin || enableExport" class="checkbox-column px-2!">
                             <v-checkbox
                                 v-model="selectedPersons"
                                 :value="item"
                                 class="table-checkbox"
                                 hide-details
+                                color="primary"
                             />
                         </td>
-                        <td>
-                            <localized-link :to="'persons/' + item.databaseId">
-                                {{ item.name }}
-                            </localized-link>
+                        <td class="py-2!">
+                            <div class="person-info">
+                                <div class="person-name-section">
+                                    <localized-link :to="'persons/' + item.databaseId" class="person-name">
+                                        <v-avatar size="40" class="profile-avatar modern-avatar">
+                                            <v-icon color="primary">mdi-account</v-icon>
+                                        </v-avatar>
+                                    </localized-link>
+                                    <div class="person-details flex items-center gap-2"><span>
+
+                                        <localized-link :to="'persons/' + item.databaseId" class="person-name">
+                                            {{ item.name }}
+                                        </localized-link>
+                                        <span>,</span>
+                                    </span>
+                                        <span v-if="item.birthdate" class="person-year">{{ extractYear(item.birthdate) }}</span>
+                                    </div>
+                                </div>
+                                
+                            </div>
                         </td>
-                        <td v-if="$i18n.locale.startsWith('sr')">
-                            <span v-if="item.employmentsSr.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
-                                {{ displayTextOrPlaceholder(item.employmentsSr) }}
-                            </span>
-                            <span v-for="(employment, index) in item.employmentsSr.split('; ')" v-else :key="index">
-                                <localized-link
-                                    v-if="item.employmentInstitutionsId[index] !== -1"
-                                    :to="'organisation-units/' + item.employmentInstitutionsId[index]">
-                                    {{ `🏢${employment.trim()}; ` }}
-                                </localized-link>
-                                <span v-else>{{ `${employment.trim()};` }}</span>
-                            </span>
+                        <td class="py-4">
+                            <div class="person-employment" v-if="hasEmployment(item)">
+                                    <div class="employment-item" v-if="$i18n.locale.startsWith('sr')">
+                                        <template v-if="item.employmentsSr.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
+                                            <div v-for="(employment, index) in item.employmentsSr.split('; ')" :key="index" class="employment-entry">
+                                                <v-icon size="16" class="employment-icon">mdi-domain</v-icon>
+                                                <localized-link
+                                                    v-if="item.employmentInstitutionsId[index] !== -1"
+                                                    :to="'organisation-units/' + item.employmentInstitutionsId[index]"
+                                                    class="employment-link">
+                                                    {{ employment.trim() }}
+                                                </localized-link>
+                                                <span v-else class="employment-text">{{ employment.trim() }}</span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="employment-item" v-else>
+                                        <template v-if="item.employmentsOther.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
+                                            <div v-for="(employment, index) in item.employmentsOther.split('; ')" :key="index" class="employment-entry">
+                                                <v-icon size="16" class="employment-icon">mdi-domain</v-icon>
+                                                <localized-link
+                                                    v-if="item.employmentInstitutionsId[index] !== -1"
+                                                    :to="'organisation-units/' + item.employmentInstitutionsId[index]"
+                                                    class="employment-link">
+                                                    {{ employment.trim() }}
+                                                </localized-link>
+                                                <span v-else class="employment-text">{{ employment.trim() }}</span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            <!-- <div class="date-cell">
+                                <v-icon size="16" color="grey-darken-1" class="mr-2">mdi-calendar</v-icon>
+                                <span class="text-body-2">{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</span>
+                            </div> -->
                         </td>
-                        <td v-else>
-                            <span v-if="item.employmentsOther.trim() === '' || !item.employmentInstitutionsId || item.employmentInstitutionsId.length === 0">
-                                {{ displayTextOrPlaceholder(item.employmentsOther) }}
-                            </span>
-                            <localized-link v-for="(employment, index) in item.employmentsOther.split('; ')" v-else :key="index" :to="'organisation-units/' + item.employmentInstitutionsId[index]">
-                                {{ `${employment}; ` }}
-                            </localized-link>
-                        </td>
-                        <td>{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</td>
-                        <td v-if="item.orcid">
-                            <identifier-link :identifier="item.orcid" type="orcid"></identifier-link>
-                        </td>
-                        <td v-else>
-                            {{ displayTextOrPlaceholder(item.orcid) }}
+                        <td class="py-4">
+                            <div v-if="item.orcid || item.scopusAuthorId || item.openAlexId || item.webOfScienceResearcherId" class="identifiers-cell">
+                                <div class="flex flex-wrap gap-2">
+                                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
+                                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
+                                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
+                                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
+                                </div>
+                            </div>
+                            <div v-else class="no-identifiers">
+                                <v-icon size="16" color="grey-lighten-1" class="mr-2">mdi-identifier</v-icon>
+                                <span class="text-body-2 text-grey">{{ displayTextOrPlaceholder(item.orcid) }}</span>
+                            </div>
                         </td>
                     </tr>
                 </draggable>
@@ -140,6 +266,7 @@ import { useRouter } from 'vue-router';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import IdentifierLink from '../core/IdentifierLink.vue';
+import IdentifierMenu from '../core/IdentifierMenu.vue';
 import InvolvementService from '@/services/InvolvementService';
 import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
 import { useUserRole } from '@/composables/useUserRole';
@@ -150,7 +277,7 @@ import { isEqual } from 'lodash';
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal, TableExportModal },
+    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal, TableExportModal, IdentifierMenu },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -217,6 +344,7 @@ export default defineComponent({
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
         const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
+        const identifiers = computed(() => i18n.t("identifiersLabel"));
 
         const { isAdmin, isInstitutionalEditor, isCommission, isUserLoggedIn } = useUserRole();
 
@@ -227,8 +355,7 @@ export default defineComponent({
         const headers = ref<any>([
           { title: fullNameLabel, align: "start", sortable: true, key: "name"},
           { title: organisationUnitLabel, align: "start", sortable: true, key: employmentColumn},
-          { title: birthdateLabel, align: "start", sortable: true, key: "birthdate"},
-          { title: "ORCID", align: "start", sortable: true, key: "orcid"},
+          { title: identifiers, align: "start", sortable: true, key: "orcid"},
         ]);
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -347,15 +474,376 @@ export default defineComponent({
             emit("delete", selectedPersons.value.map(person => person.databaseId));
         };
 
+        const hasEmployment = (item: PersonIndex) => {
+            if (i18n.locale.value.startsWith('sr')) {
+                return item.employmentsSr.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0;
+            } else {
+                return item.employmentsOther.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0;
+            }
+        };
+
+
+        const extractYear = (dateString: string) => {
+            const d = new Date(dateString);
+            if (isNaN(d.getTime())) {
+                return '';
+            }
+            return d.getFullYear();
+        };
+
+        const exportModal = ref<any>(null);
+
+        const openExportModal = () => {
+            if (exportModal.value) {
+                exportModal.value.openModal();
+            }
+        };
+
         return {
             selectedPersons, headers, notifications, isUserLoggedIn,
             refreshTable, isAdmin, deleteSelection, ExportEntity,
             tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
             localiseDate, startPublicationComparison, isCommission,
             startMetadataComparison, onDropCallback, removeSelection,
-            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable
+            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable, hasEmployment, extractYear, openExportModal, exportModal
         };
     }
 });
 </script>
 
+<style scoped>
+
+    /* Action Menu Styling */
+    .action-menu-container {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .action-menu-trigger {
+        /* text-transform: none; */
+        /* font-weight: 500; */
+        /* letter-spacing: 0.5px; */
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+    }
+
+    .action-menu-list {
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .action-menu-item {
+        border-radius: 6px;
+        margin: 2px 4px;
+        transition: all 0.2s ease;
+    }
+
+    .action-menu-item:hover {
+        background-color: rgba(25, 118, 210, 0.08);
+    }
+
+    .selection-indicator {
+        font-size: 0.75rem;
+        color: #666;
+        font-weight: 500;
+        margin-left: 4px;
+    }
+
+    /* Table Container */
+    .modern-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    /* Modern Data Table */
+    .modern-data-table {
+        background: transparent;
+    }
+
+    .modern-data-table :deep(.v-data-table__wrapper) {
+        border-radius: 12px;
+    }
+
+    .modern-data-table :deep(.v-table) {
+        background: transparent;
+    }
+
+    .modern-data-table :deep(.v-table__wrapper) {
+        border-radius: 12px;
+    }
+
+    .modern-data-table :deep(.v-data-table-header) {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-bottom: 2px solid rgba(25, 118, 210, 0.1);
+    }
+
+    .modern-data-table :deep(.v-data-table-header th) {
+        font-weight: 600;
+        color: #424242;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 16px 12px;
+        border-bottom: 2px solid rgba(25, 118, 210, 0.1);
+    }
+
+    .modern-data-table :deep(.v-data-table-header .v-checkbox) {
+        margin: 0;
+    }
+
+    /* Checkbox Column */
+    .checkbox-column {
+        padding-left: 12px;
+        padding-right: 12px;
+        width: 48px;
+    }
+
+    .table-checkbox :deep(.v-selection-control__input) {
+        margin: 0;
+    }
+
+    /* Person Info */
+    .person-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .person-name-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .modern-avatar {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1976d2;
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+    }
+
+    .person-name {
+        font-weight: 600;
+        color: #424242;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .person-name:hover {
+        color: #1976d2;
+        text-decoration: underline;
+    }
+
+    .person-year {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 400;
+    }
+
+    .employment-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .employment-entry {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: #666;
+        padding: 2px 0;
+    }
+
+    .employment-icon {
+        color: #999;
+        flex-shrink: 0;
+    }
+
+    .employment-link {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+
+    .employment-link:hover {
+        color: #1976d2;
+        text-decoration: underline;
+    }
+
+    .employment-text {
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    /* Date Cell */
+    .date-cell {
+        display: flex;
+        align-items: center;
+        color: #666;
+    }
+
+    /* Identifiers Cell */
+    .identifiers-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .no-identifiers {
+        display: flex;
+        align-items: center;
+        color: #999;
+    }
+
+    /* Empty State */
+    .empty-state-row {
+        background: transparent;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 24px;
+    }
+
+    /* Selection State */
+    .modern-data-table.has-selection :deep(.v-data-table-header) {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+        border-bottom: 2px solid rgba(25, 118, 210, 0.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .person-name-section {
+            gap: 8px;
+        }
+        
+        .modern-avatar {
+            width: 32px !important;
+            height: 32px !important;
+        }
+
+        .action-menu-trigger {
+            font-size: 0.8rem;
+            padding: 8px 12px;
+        }
+    }
+
+.orcid-icon-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: all 0.2s ease;
+}
+
+.orcid-icon-link:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.orcid-icon {
+    pointer-events: none;
+}
+
+/* ORCID Menu Styling */
+.orcid-menu-card {
+    min-width: 280px;
+    max-width: 320px;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid rgba(166, 206, 57, 0.2);
+    background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+}
+
+.orcid-menu-title {
+    background: linear-gradient(135deg, #A6CE39 0%, #8BC34A 100%);
+    color: white !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 12px 16px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.orcid-menu-icon {
+    color: white !important;
+    font-size: 1.1rem;
+}
+
+.orcid-menu-content {
+    padding: 16px !important;
+    background: white;
+}
+
+.orcid-id-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.orcid-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.orcid-code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85rem;
+    background: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.orcid-menu-actions {
+    padding: 8px 16px 16px 16px !important;
+    background: #fafafa;
+    border-radius: 0 0 12px 12px;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.orcid-copy-btn {
+    color: #A6CE39 !important;
+    font-weight: 500;
+    font-size: 0.8rem;
+    text-transform: none;
+    min-width: auto;
+    padding: 6px 12px !important;
+}
+
+.orcid-copy-btn:hover {
+    background-color: rgba(166, 206, 57, 0.1) !important;
+}
+
+.orcid-view-btn {
+    color: #1976d2 !important;
+    font-weight: 500;
+    font-size: 0.8rem;
+    text-transform: none;
+    min-width: auto;
+    padding: 6px 12px !important;
+}
+
+.orcid-view-btn:hover {
+    background-color: rgba(25, 118, 210, 0.1) !important;
+}
+
+</style>

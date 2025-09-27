@@ -210,12 +210,12 @@ type MenuItem = {
     condition?: any;
 };
 
-const resourcesMenu = ref<MenuItem[]>([
-    { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple' },
-    { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building' },
-    { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' },
-    { key: 'scientific-results-validation', label: computed(() => i18n.t('publicationsValidationLabel')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
-]);
+// const resourcesMenu = ref<MenuItem[]>([
+//     { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple' },
+//     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building' },
+//     { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' },
+//     { key: 'scientific-results-validation', label: computed(() => i18n.t('publicationsValidationLabel')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
+// ]);
 
 const manageMenu = ref<MenuItem[]>([
     { key: 'users', label: computed(() => i18n.t('userPageLabel')), to: '/users', icon: 'mdi-account-cog' },
@@ -254,13 +254,17 @@ const thesisLibraryMenu = ref<MenuItem[]>([
 
 const menuItems: MenuItem[] = reactive([
     // { key: 'home', label: computed(() => i18n.t('homeLabel')), to: '/', icon: 'mdi-home' },
-    { 
-        key: 'resources', 
-        label: computed(() => i18n.t('resources')), 
-        to: '/resources', 
-        icon: 'mdi-folder-multiple',
-        subItems: resourcesMenu.value
-    },
+    // { 
+    //     key: 'resources', 
+    //     label: computed(() => i18n.t('resources')), 
+    //     to: '/resources', 
+    //     icon: 'mdi-folder-multiple',
+    //     subItems: resourcesMenu.value
+    // },
+    { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple' },
+    { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building' },
+    { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' },
+    { key: 'scientific-results-validation', label: computed(() => i18n.t('publicationsValidationLabel')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) },
     { key: 'advanced-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/advanced-search', icon: 'mdi-magnify' },
     { key: 'researcher-profile', label: computed(() => i18n.t('researcherProfileLabel')), to: `/persons/${personId.value}`, icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
     { key: 'commission-profile', label: computed(() => i18n.t('commissionProfileLabel')), to: `/assessment/commissions/${commissionId.value}`, icon: 'mdi-account-group', condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
