@@ -27,7 +27,7 @@ export class TableExportService extends BaseService {
 
     async downloadExportFile(response: AxiosResponse<any, any>, fileFormat: ExportFileFormat) {
         const extension = getExtensionForExportFileFormat(fileFormat);
-        this.initialzeDownload(response, `report${extension}`, extension);
+        this.initialzeDownload(response, `report${extension}`, "");
     }
 }
 
