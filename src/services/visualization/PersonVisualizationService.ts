@@ -10,6 +10,10 @@ export class PersonVisualizationService extends BaseService {
         return super.sendRequest(axios.get, `visualization-data/person/publication-count/${personId}?from=${from ?? ''}&to=${to ?? ''}`);
     }
 
+    async getPersoncitationCountsByYear(personId: number, from: number | null = null, to: number | null = null): Promise<AxiosResponse<Record<number, number>>> {
+        return super.sendRequest(axios.get, `visualization-data/person/yearly-citations/${personId}?from=${from ?? ''}&to=${to ?? ''}`);
+    }
+
     async getPersonMCategories(personId: number, from: number, to: number): Promise<AxiosResponse<MCategoryCounts[]>> {
         return super.sendRequest(axios.get, `visualization-data/person/m-category/${personId}?from=${from}&to=${to}`);
     }

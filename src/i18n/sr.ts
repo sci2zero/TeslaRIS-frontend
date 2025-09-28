@@ -1078,5 +1078,8 @@ export default {
     startingDownloadLabel: "Započinjem preuzimanje...",
     downloadCompleteLabel: "Preuzimanje završeno!",
     downloadingLabel: "Preuzimanje...",
-    leaderboardsLabel: "Rang liste"
+    leaderboardsLabel: "Rang liste",
+    citationCountLabel: "Broj citata",
+    totalCitationsLabel: "Ukupan broj citata",
+    numberOfCitationsYearlyLabel: "Broj citata po godinama"
 }

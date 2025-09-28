@@ -1047,5 +1047,8 @@ export default {
     startingDownloadLabel: "Starting download...",
     downloadCompleteLabel: "Download complete!",
     downloadingLabel: "Downloading...",
-    leaderboardsLabel: "Leaderboards"
+    leaderboardsLabel: "Leaderboards",
+    citationCountLabel: "Citation count",
+    totalCitationsLabel: "Total citation count",
+    numberOfCitationsYearlyLabel: "Citation count by year"
 }
