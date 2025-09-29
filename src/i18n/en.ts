@@ -1022,5 +1022,6 @@ export default {
     conferencePublicationsLabel: "Conference publications",
     startingDownloadLabel: "Starting download...",
     downloadCompleteLabel: "Download complete!",
-    downloadingLabel: "Downloading..."
+    downloadingLabel: "Downloading...",
+    personAlreadyHasAccountMessage: "Person you have selected is already assigned to a user."
 }

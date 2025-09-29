@@ -1053,5 +1053,6 @@ export default {
     conferencePublicationsLabel: "Radovi sa konferencije",
     startingDownloadLabel: "Započinjem preuzimanje...",
     downloadCompleteLabel: "Preuzimanje završeno!",
-    downloadingLabel: "Preuzimanje..."
+    downloadingLabel: "Preuzimanje...",
+    personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika."
 }

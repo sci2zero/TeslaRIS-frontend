@@ -226,15 +226,6 @@
                 </v-btn>
             </div>
         </div>
-
-        <!-- Keywords -->
-        <keyword-list
-            :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
-            :can-edit="canEdit"
-            @search-keyword="searchKeyword($event)"
-            @update="updateKeywords">
-        </keyword-list>
-
         <br />
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
@@ -373,6 +364,14 @@
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
+                <!-- Keywords -->
+                <keyword-list
+                    :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
+
                 <!-- Research Area -->
                 <v-row>
                     <v-col cols="12">
