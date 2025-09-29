@@ -1,5 +1,9 @@
 <template>
     <div class="leaderboard-container mt-5">
+        <div class="d-block text-center mb-5">
+            <h2>{{ title }}</h2>
+            <h4>{{ subtitle }}</h4>
+        </div>
         <v-card 
             v-for="(item, index) in leaderboardData" 
             :key="item.a.databaseId"
@@ -61,6 +65,14 @@ const props = defineProps({
     valueSuffix: {
         type: String,
         default: ''
+    },
+    title: {
+        type: String,
+        default: ""
+    },
+    subtitle: {
+        type: String,
+        default: ""
     }
 });
 
@@ -104,115 +116,115 @@ const navigateToEntityLandingPage = (index: PersonIndex | OrganisationUnitIndex)
 
 <style scoped>
 .leaderboard-container {
-  max-width: 600px;
-  margin: 0 auto;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .leaderboard-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
 }
 
 .leaderboard-card:hover {
-  transform: translateY(-2px);
+    transform: translateY(-2px);
 }
 
 .card-content {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  min-height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    min-height: 80px;
 }
 
 .trophy-section {
-  width: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 16px;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
 }
 
 .trophy-icon {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .ordinal-number {
-  font-size: 24px;
-  font-weight: bold;
-  color: #666;
-  min-width: 40px;
-  text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #666;
+    min-width: 40px;
+    text-align: center;
 }
 
 .info-section {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .name {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
 }
 
 .value {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1976d2;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1976d2;
 }
 
 .gold-card {
-  background: linear-gradient(135deg, #fff9c4 0%, #ffeb3b 100%);
-  border-left: 4px solid #ffd600;
+    background: linear-gradient(135deg, #fff9c4 0%, #ffeb3b 100%);
+    border-left: 4px solid #ffd600;
 }
 
 .silver-card {
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-  border-left: 4px solid #9e9e9e;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-left: 4px solid #9e9e9e;
 }
 
 .bronze-card {
-  background: linear-gradient(135deg, #ffccbc 0%, #ffab91 100%);
-  border-left: 4px solid #ff7043;
+    background: linear-gradient(135deg, #ffccbc 0%, #ffab91 100%);
+    border-left: 4px solid #ff7043;
 }
 
 .standard-card {
-  background: white;
-  border-left: 4px solid #1976d2;
+    background: white;
+    border-left: 4px solid #1976d2;
 }
 
 @media (max-width: 600px) {
-  .card-content {
-    padding: 12px;
-    min-height: 70px;
-  }
+    .card-content {
+        padding: 12px;
+        min-height: 70px;
+    }
   
-  .trophy-section {
-    width: 50px;
-    margin-right: 12px;
-  }
-  
-  .trophy-icon {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .ordinal-number {
-    font-size: 20px;
-    min-width: 35px;
-  }
-  
-  .name {
-    font-size: 16px;
-  }
-  
-  .value {
-    font-size: 18px;
-  }
+    .trophy-section {
+        width: 50px;
+        margin-right: 12px;
+    }
+    
+    .trophy-icon {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .ordinal-number {
+        font-size: 20px;
+        min-width: 35px;
+    }
+    
+    .name {
+        font-size: 16px;
+    }
+    
+    .value {
+        font-size: 18px;
+    }
 }
 </style>

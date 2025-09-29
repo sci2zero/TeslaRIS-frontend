@@ -410,8 +410,8 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="leaderboards">
-                <leaderboard-table
-                    :leaderboard-data="[{a: {name: 'Ivan Mrsulja', databaseId: 1}, b: 10}, {a: {name: 'Milos Popovic', databaseId: 2}, b: 5}, {a: {name: 'Dragan Ivanovic', databaseId: 3}, b: 3}, {a: {name: 'Dusan Nikolic', databaseId: 4}, b: 2}]"
+                <organisation-unit-leaderboards
+                    :organisation-unit-id="organisationUnit?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -472,12 +472,12 @@ import OrganisationUnitOutputConfigurationService from '@/services/OrganisationU
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import OrganisationUnitVisualizations from '@/components/organisationUnit/OrganisationUnitVisualizations.vue';
-import LeaderboardTable from '@/components/charts/LeaderboardTable.vue';
+import OrganisationUnitLeaderboards from '@/components/organisationUnit/OrganisationUnitLeaderboards.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, LeaderboardTable },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards },
     setup() {
         const currentTab = ref("relations");
 

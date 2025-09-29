@@ -315,3 +315,9 @@ export interface LeaderboardEntry {
     a: PersonIndex | OrganisationUnitIndex;
     b: number;
 }
+
+export interface CommissionAssessmentPointsPersonLeaderboard {
+    commissionId: number;
+    commissionDescription: MultilingualContent[];
+    leaderboardData: LeaderboardEntry[];
+}

@@ -1050,5 +1050,14 @@ export default {
     leaderboardsLabel: "Leaderboards",
     citationCountLabel: "Citation count",
     totalCitationsLabel: "Total citation count",
-    numberOfCitationsYearlyLabel: "Citation count by year"
+    numberOfCitationsYearlyLabel: "Citation count by year",
+    personPublicationCountLeaderboardLabel: "Top researchers by publication count",
+    personCitationCountLeaderboardLabel: "Top researchers by citation count",
+    personAssessmentPointsLeaderboardLabel: "Top researchers by assessment point count",
+    subUnitPublicationCountLeaderboardLabel: "Top sub-units by publication count",
+    subUnitCitationCountLeaderboardLabel: "Top sub-units by citation count",
+    subUnitAssessmentPointsLeaderboardLabel: "Top sub-units by assessment point count",
+    publicationCountLeaderboardLabel: "By publication count",
+    citationCountLeaderboardLabel: "By citation count",
+    assessmentPointsLeaderboardLabel: "By assessment point count"
 }

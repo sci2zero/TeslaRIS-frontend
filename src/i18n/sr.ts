@@ -1081,5 +1081,14 @@ export default {
     leaderboardsLabel: "Rang liste",
     citationCountLabel: "Broj citata",
     totalCitationsLabel: "Ukupan broj citata",
-    numberOfCitationsYearlyLabel: "Broj citata po godinama"
+    numberOfCitationsYearlyLabel: "Broj citata po godinama",
+    personPublicationCountLeaderboardLabel: "Top istraživači po broju publikacija",
+    personCitationCountLeaderboardLabel: "Top istraživači po broju citata",
+    personAssessmentPointsLeaderboardLabel: "Top istraživači po broju M-poena",
+    subUnitPublicationCountLeaderboardLabel: "Top pod-institucije po broju publikacija",
+    subUnitCitationCountLeaderboardLabel: "Top pod-institucije po broju citata",
+    subUnitAssessmentPointsLeaderboardLabel: "Top pod-institucije po broju M-poena",
+    publicationCountLeaderboardLabel: "Po broju publikacija",
+    citationCountLeaderboardLabel: "Po broju citata",
+    assessmentPointsLeaderboardLabel: "Po broju M-poena"
 }
