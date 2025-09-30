@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- Hero section with background image covering navbar and content -->
         <div class="hero-section-bg">
             <Navbar variant="home" />
             <div class="py-16">
@@ -25,7 +24,6 @@
             </div>
             <div class="max-w-5xl mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 py-8 pb-12 px-8">
-                    <!-- Cards -->
                     <div v-for="(item, index) in cardsData" :key="index" class="">
                         <div
                             class="frosted-glass-card cursor-pointer hover:scale-105 transition-all duration-300"
@@ -51,7 +49,6 @@
             </div>
         </div>
 
-        <!-- Features Section -->
         <landing-features />
     </div>
 </template>
@@ -209,7 +206,6 @@ export default defineComponent({
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Hero Text Styling */
 .hero-text-container {
     position: relative;
     z-index: 3;
