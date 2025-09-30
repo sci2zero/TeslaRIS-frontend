@@ -1059,5 +1059,9 @@ export default {
     subUnitAssessmentPointsLeaderboardLabel: "Top sub-units by assessment point count",
     publicationCountLeaderboardLabel: "By publication count",
     citationCountLeaderboardLabel: "By citation count",
-    assessmentPointsLeaderboardLabel: "By assessment point count"
+    assessmentPointsLeaderboardLabel: "By assessment point count",
+    reharvestCitationIndicatorsLabel: "Reharvest citation indicators",
+    mostCitedResearchersLabel: "Most cited researchers (by Open Alex)",
+    mostCitedInstitutionsLabel: "Most cited org. units (by Open Alex)",
+    mostCitedPublicationsLabel: "Most cited publications (by Open Citations)"
 }

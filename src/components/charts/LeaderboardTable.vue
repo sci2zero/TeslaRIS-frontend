@@ -6,10 +6,10 @@
         </div>
         <v-card 
             v-for="(item, index) in leaderboardData" 
-            :key="item.a.databaseId"
+            :key="(item.a.databaseId as number)"
             class="leaderboard-card mb-4"
             :class="getCardClass(index)"
-            @click="navigateToEntityLandingPage(item.a)"
+            @click="navigateToEntityLandingPage((item.a as PersonIndex | OrganisationUnitIndex))"
         >
             <div class="card-content">
                 <div class="trophy-section">
@@ -36,7 +36,7 @@
         
                 <div class="info-section">
                     <div class="name">
-                        {{ getEntityName(item.a) }}
+                        {{ getEntityName((item.a as PersonIndex | OrganisationUnitIndex)) }}
                     </div>
                     <div class="value">
                         {{ formatValue(item.b) }}

@@ -60,6 +60,30 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
     return "";
 };
 
+export const getDocumentLandingPageName = (type: PublicationType): string => {
+    switch (type) {
+        case "JOURNAL_PUBLICATION":
+            return "journalPublicationLandingPage";
+        case "PROCEEDINGS_PUBLICATION":
+            return "proceedingsPublicationLandingPage";
+        case "PATENT":
+            return "patentLandingPage";
+        case "PROCEEDINGS":
+            return "proceedingsLandingPage";
+        case "DATASET":
+            return "datasetLandingPage";
+        case "SOFTWARE":
+            return "softwareLandingPage";
+        case "MONOGRAPH":
+            return "monographLandingPage";
+        case "MONOGRAPH_PUBLICATION":
+            return "monographPublicationLandingPage";
+        case "THESIS":
+            return "thesisLandingPage";
+    }
+    return "";
+};
+
 export const getDocumentLandingPageBasePathBasedOnAssessment = (assessmentCode: string): string => {
     if (assessmentCode.startsWith("M1")) {
         return "scientific-results/monograph/";

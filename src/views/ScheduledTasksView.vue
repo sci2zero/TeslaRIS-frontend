@@ -35,7 +35,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="taskReindexing" cols="12" md="4">
+            <v-col v-if="taskReindexing" cols="8" md="4">
                 <v-select
                     v-model="selectedEntityTypes"
                     :items="entityTypes"
@@ -43,6 +43,13 @@
                     :rules="requiredMultiSelectionRules"
                     multiple>
                 </v-select>
+            </v-col>
+            <v-col v-if="taskReindexing" cols="4" md="2">
+                <v-checkbox
+                    v-model="reharvestCitationIndicators"
+                    class="mt-2"
+                    :label="$t('reharvestCitationIndicatorsLabel')"
+                ></v-checkbox>
             </v-col>
             <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
@@ -244,6 +251,8 @@ export default defineComponent({
             {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
         );
 
+        const reharvestCitationIndicators = ref(false);
+
         onMounted(() => {
             fetchScheduledTasks();
 
@@ -338,7 +347,8 @@ export default defineComponent({
                     scheduleTask(() => 
                         TaskManagerService.scheduleDatabaseReindexing(
                             timestamp, selectedEntityTypes.value.map(entityType => entityType.value),
-                            selectedRecurrenceType.value.value
+                            selectedRecurrenceType.value.value,
+                            reharvestCitationIndicators.value
                         )
                     );
                     break;
@@ -472,6 +482,7 @@ export default defineComponent({
             isTopLevelReport, isSummaryReport,
             selectedCommissions, recurrenceTypes,
             selectedRecurrenceType,
+            reharvestCitationIndicators,
             taskUnmanagedDocumentsDeletion
         };
     },

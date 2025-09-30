@@ -1090,5 +1090,9 @@ export default {
     subUnitAssessmentPointsLeaderboardLabel: "Top pod-institucije po broju M-poena",
     publicationCountLeaderboardLabel: "Po broju publikacija",
     citationCountLeaderboardLabel: "Po broju citata",
-    assessmentPointsLeaderboardLabel: "Po broju M-poena"
+    assessmentPointsLeaderboardLabel: "Po broju M-poena",
+    reharvestCitationIndicatorsLabel: "Ponovo učitaj podatke o citiranosti",
+    mostCitedResearchersLabel: "Najviše citirani istraživači (po Open Alex-u)",
+    mostCitedInstitutionsLabel: "Najviše citirane org. jedinice (po Open Alex-u)",
+    mostCitedPublicationsLabel: "Najviše citirane publikacije (po Open Citations-u)"
 }

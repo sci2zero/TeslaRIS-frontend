@@ -32,12 +32,28 @@
                         <v-card-title class="text-center">
                             {{ item.name }}
                         </v-card-title>
+
                         <v-card-text class="text-center">
                             <div>
                                 <span class="big-number">
                                     {{ item.value }}
                                 </span>
                             </div>
+
+                            <v-list density="compact" class="text-center mt-2">
+                                <v-list-subheader class="d-flex flex-row justify-center">
+                                    {{ item.topResultsTitle }}
+                                </v-list-subheader>
+                                <v-list-item
+                                    v-for="(subItem, idx) in item.topResults"
+                                    :key="idx"
+                                    @click.prevent="navigateToItemPage(subItem.item)"
+                                >
+                                    <v-list-item-title style="white-space: normal; word-wrap: break-word;">
+                                        {{ idx + 1 }}. {{ getItemName(subItem.item) }} ({{ subItem.value }})
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </v-list>
                         </v-card-text>
                     </v-card>
                 </v-col>
@@ -59,6 +75,11 @@ import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import BrandingService from "@/services/BrandingService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import { type PersonIndex } from "@/models/PersonModel";
+import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
+import { type DocumentPublicationIndex } from "@/models/PublicationModel";
+import GlobalLeaderboardService from "@/services/visualization/GlobalLeaderboardService";
+import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 
 
 export default defineComponent({
@@ -79,6 +100,10 @@ export default defineComponent({
         const ouCount = ref(0);
         const publicationCount = ref(0);
 
+        const topResearchers = ref<{item: PersonIndex, value: number}[]>([]);
+        const topInstitutions = ref<{item: OrganisationUnitIndex, value: number}[]>([]);
+        const topPublications = ref<{item: DocumentPublicationIndex, value: number}[]>([]);
+
         onMounted(() => {
             BrandingService.fetchBrandingInfo().then((response) => {
                 title.value = response.data.title;
@@ -89,14 +114,39 @@ export default defineComponent({
             OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data);
             DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data);
 
+            GlobalLeaderboardService.getTopCitedResearchersLeaderboard()
+                .then((response) => topResearchers.value = response.data
+                    .map(le => {
+                        return {item: le.a as PersonIndex, value: le.b};
+                    })
+                );
+            
+            GlobalLeaderboardService.getTopCitedInstitutionsLeaderboard()
+                .then((response) => topInstitutions.value = response.data
+                    .map(le => {
+                        return {item: le.a as OrganisationUnitIndex, value: le.b};
+                    })
+                );
+
+            GlobalLeaderboardService.getTopCitedDocumentsLeaderboard()
+                .then((response) => topPublications.value = response.data
+                    .map(le => {
+                        return {item: le.a as DocumentPublicationIndex, value: le.b};
+                    })
+                );
+
             document.title = `TeslaRIS - ${i18n.t("homeLabel")}`;
         });
 
+        const mostCitedResearchersLabel = computed(() => i18n.t("mostCitedResearchersLabel"));
+        const mostCitedInstitutionsLabel = computed(() => i18n.t("mostCitedInstitutionsLabel"));
+        const mostCitedPublicationsLabel = computed(() => i18n.t("mostCitedPublicationsLabel"));
+
         const cardsData = ref([
-            {name: personListLabel, value: researcherCount, path:'persons'},
-            {name: ouListLabel, value: ouCount, path: 'organisation-units'},
-            {name: scientificResultsListLabel, value: publicationCount, path:'scientific-results'},
-        ])
+            {name: personListLabel, value: researcherCount, topResultsTitle: mostCitedResearchersLabel, topResults: topResearchers, path:'persons'},
+            {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, topResults: topInstitutions, path: 'organisation-units'},
+            {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, topResults: topPublications, path:'scientific-results'},
+        ]);
 
         const search = (tokenParams: string) => {
             let token = tokenParams;
@@ -120,12 +170,38 @@ export default defineComponent({
                     }
                 }
             );     
-        }
+        };
+
+        const getItemName = (item: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex): string => {
+            if ("name" in item) {
+                return (item as PersonIndex).name;
+            } else if ("nameSr" in item) {
+                return (item as OrganisationUnitIndex).nameSr;
+            }
+
+            console.log(item as DocumentPublicationIndex)
+            return (item as DocumentPublicationIndex).apa;
+        };
+
+        const navigateToItemPage = (item: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex) => {
+            let pageName;
+            if ("name" in item) {
+                pageName = "researcherLandingPage";
+            } else if ("nameSr" in item) {
+                pageName = "organisationUnitLandingPage";
+            } else {
+                pageName = getDocumentLandingPageName((item as DocumentPublicationIndex).type);
+            }
+
+            router.push({ name: pageName, params: {id: item.databaseId} });
+        };
 
         return {
             search, cardsData,
             title, description,
-            returnCurrentLocaleContent
+            returnCurrentLocaleContent,
+            navigateToItemPage,
+            getItemName
         };
     },
 });

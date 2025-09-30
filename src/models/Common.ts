@@ -1,7 +1,7 @@
 import { RecurrenceType } from "./LoadModel";
 import { type OrganisationUnitIndex } from "./OrganisationUnitModel";
 import { type PersonIndex } from "./PersonModel";
-import type { PersonDocumentContribution, PublicationType } from "./PublicationModel";
+import type { DocumentPublicationIndex, PersonDocumentContribution, PublicationType } from "./PublicationModel";
 
 export interface Page<Type> {
     content: Type[];
@@ -312,7 +312,7 @@ export interface DownloadState {
 }
 
 export interface LeaderboardEntry {
-    a: PersonIndex | OrganisationUnitIndex;
+    a: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex;
     b: number;
 }
 
