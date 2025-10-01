@@ -126,7 +126,8 @@ const options = computed<EChartsOption>(() => {
                 } else if (params.dataType === "edge") {
                     return `${i18n.t("collaborationLabel")}: ${getAuthorName(params.data.source)} ↔ ${getAuthorName(params.data.target)}<br/>${i18n.t("worksInCommonLabel")}: ${params.data.value}`;
                 }
-                    return params.name;
+                
+                return params.name;
             }
         },
         legend: {
