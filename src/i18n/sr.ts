@@ -1054,5 +1054,6 @@ export default {
     startingDownloadLabel: "Započinjem preuzimanje...",
     downloadCompleteLabel: "Preuzimanje završeno!",
     downloadingLabel: "Preuzimanje...",
-    personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika."
+    personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika.",
+    publicReviewLengthLabel: "Trajanje javnog uvida (u danima)"
 }
