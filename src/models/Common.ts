@@ -321,3 +321,23 @@ export interface CommissionAssessmentPointsPersonLeaderboard {
     commissionDescription: MultilingualContent[];
     leaderboardData: LeaderboardEntry[];
 }
+
+export interface PersonNode {
+    id: string;
+    name: string;
+    symbolSize: number;
+    value: number;
+    category: number;
+}
+
+export interface CollaborationLink {
+    source: string;
+    target: string;
+    value: number;
+    width: number;
+}
+
+export interface CollaborationNetwork {
+    nodes: PersonNode[];
+    links: CollaborationLink[];
+}

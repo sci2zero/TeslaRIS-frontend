@@ -1095,5 +1095,11 @@ export default {
     mostCitedResearchersLabel: "Najviše citirani istraživači (po Open Alex-u)",
     mostCitedInstitutionsLabel: "Najviše citirane org. jedinice (po Open Alex-u)",
     mostCitedPublicationsLabel: "Najviše citirane publikacije (po Open Citations-u)",
-    personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika."
+    personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika.",
+    adjacencyDegreeLabel: "Stepen povezanosti",
+    worksInCommonLabel: "Zajedničkih radova",
+    collaborationNetworkLabel: "Mreža kolaboracije",
+    collaborationLabel: "Kolaboracija",
+    researcherCollaborationNetworkLabel: "Mreža Kolaboracije Istraživača",
+    depthLabel: "Dubina"
 }

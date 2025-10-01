@@ -15,6 +15,7 @@ import * as echarts from "echarts";
 import { type EChartsOption } from "echarts";
 import { debounce } from "lodash";
 
+const emit = defineEmits(["chart-ready"]);
 
 const props = defineProps({
     options: {
@@ -74,6 +75,8 @@ const initialise = async () => {
             chart?.dispose();
             debouncedResize.cancel();
         });
+
+        emit("chart-ready", chart);
     }
 };
 

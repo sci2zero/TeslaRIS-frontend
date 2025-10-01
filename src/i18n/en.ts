@@ -1064,5 +1064,11 @@ export default {
     mostCitedResearchersLabel: "Most cited researchers (by Open Alex)",
     mostCitedInstitutionsLabel: "Most cited org. units (by Open Alex)",
     mostCitedPublicationsLabel: "Most cited publications (by Open Citations)",
-    personAlreadyHasAccountMessage: "Person you have selected is already assigned to a user."
+    personAlreadyHasAccountMessage: "Person you have selected is already assigned to a user.",
+    adjacencyDegreeLabel: "Adjacency degree",
+    worksInCommonLabel: "Works in common",
+    collaborationNetworkLabel: "Collaboration network",
+    collaborationLabel: "Collaboration",
+    researcherCollaborationNetworkLabel: "Researcher Collaboration Network",
+    depthLabel: "Depth"
 }
