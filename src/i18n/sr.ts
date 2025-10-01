@@ -1094,5 +1094,6 @@ export default {
     reharvestCitationIndicatorsLabel: "Ponovo učitaj podatke o citiranosti",
     mostCitedResearchersLabel: "Najviše citirani istraživači (po Open Alex-u)",
     mostCitedInstitutionsLabel: "Najviše citirane org. jedinice (po Open Alex-u)",
-    mostCitedPublicationsLabel: "Najviše citirane publikacije (po Open Citations-u)"
+    mostCitedPublicationsLabel: "Najviše citirane publikacije (po Open Citations-u)",
+    personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika."
 }

@@ -2,7 +2,7 @@
     <v-btn
         v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
         density="compact" class="bottom-spacer"
-        :disabled="allowResearcherUnbinding ? !canPerformUnbinding() : selectedPublications.length === 0"
+        :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
         @click="deleteSelection">
         {{ $t("deleteLabel") }}
     </v-btn>
@@ -365,7 +365,7 @@ export default defineComponent({
             isInstitutionalEditor,
             isInstitutionalLibrarian,
             isHeadOfLibrary, loggedInUser,
-            isUserLoggedIn
+            isUserLoggedIn, isResearcher
         } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
@@ -597,7 +597,7 @@ export default defineComponent({
         };
 
         const canPerformUnbinding = (): boolean => {
-            if (isAdmin.value) {
+            if (isAdmin.value || isResearcher.value) {
                 return true;
             }
             

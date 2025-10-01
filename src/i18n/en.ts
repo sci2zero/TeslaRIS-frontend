@@ -1063,5 +1063,6 @@ export default {
     reharvestCitationIndicatorsLabel: "Reharvest citation indicators",
     mostCitedResearchersLabel: "Most cited researchers (by Open Alex)",
     mostCitedInstitutionsLabel: "Most cited org. units (by Open Alex)",
-    mostCitedPublicationsLabel: "Most cited publications (by Open Citations)"
+    mostCitedPublicationsLabel: "Most cited publications (by Open Citations)",
+    personAlreadyHasAccountMessage: "Person you have selected is already assigned to a user."
 }

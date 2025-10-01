@@ -11,7 +11,7 @@
             <v-progress-circular
                 v-if="progress === 0"
                 :model-value="progress"
-                :size="48"
+                :size="50"
                 :width="4"
                 color="primary"
                 class="mr-3"
@@ -20,7 +20,7 @@
             <v-progress-circular
                 v-else
                 :model-value="progress"
-                :size="46"
+                :size="50"
                 :width="4"
                 color="primary"
                 class="mr-3"
