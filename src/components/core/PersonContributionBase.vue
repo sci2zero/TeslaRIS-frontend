@@ -353,9 +353,11 @@ export default defineComponent({
 
                         if(foundName) {
                             selectedOtherName.value = foundName;
+                            clearCustomNameValues();
                         } else if(selectedPersonName.trim() === "") {
                             customNameInput.value = false;
                             selectedOtherName.value = personOtherNames.value[0];
+                            clearCustomNameValues();
                         } else {
                             customNameInput.value = true;
                         }
@@ -374,7 +376,10 @@ export default defineComponent({
                 firstName.value = firstName.value ? firstName.value : personPrimaryName.value.firstname;
                 lastName.value = lastName.value ? lastName.value : personPrimaryName.value.lastname;
 
-                if (personPrimaryName.value.otherName) {
+                const isCustomName =
+                    firstName.value !== personPrimaryName.value.firstname || lastName.value !== personPrimaryName.value.lastname;
+
+                if (personPrimaryName.value.otherName && !isCustomName) {
                     middleName.value = middleName.value ? middleName.value : personPrimaryName.value.otherName;
                 }
             }
@@ -427,6 +432,12 @@ export default defineComponent({
                     firstName.value = toTitleCase(nameTokens[nameTokens.length - 1]);
                 }
             }
+        };
+
+        const clearCustomNameValues = () => {
+            firstName.value = "";
+            lastName.value = "";
+            middleName.value = "";
         };
 
         const extractTextInParentheses = (input: string) => {
