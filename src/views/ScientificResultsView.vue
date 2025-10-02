@@ -19,7 +19,10 @@
 
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="simpleSearch">
-                <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                <search-bar-component
+                    class="mt-4"
+                    @search="clearSortAndPerformSearch($event)">
+                </search-bar-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="advancedSearch">
                 <query-input-component

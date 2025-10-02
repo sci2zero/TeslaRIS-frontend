@@ -392,9 +392,11 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="collaborationNetwork">
-                <person-collaboration-network
-                    :person-id="(person.id as number)"
-                />
+                <div ref="collaborationNetworkRef">
+                    <person-collaboration-network
+                        :person-id="(person.id as number)"
+                    />
+                </div>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -524,7 +526,15 @@ export default defineComponent({
 
         const assessmentsLoading = ref(false);
 
-        onMounted(() => {
+        const shouldDisplayCollaborationNetworkFirst = ref(false);
+        const collaborationNetworkRef = ref<HTMLElement>();
+
+        onMounted(async () => {
+            if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
+                shouldDisplayCollaborationNetworkFirst.value = true;
+                currentTab.value = "collaborationNetwork";
+            }
+
             if (loginStore.userLoggedIn) {
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
@@ -540,6 +550,20 @@ export default defineComponent({
             fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
 
             selectedPublicationTypes.value.splice(0);
+        });
+
+        watch(collaborationNetworkRef, () => {
+            if (collaborationNetworkRef.value) {
+                console.log(collaborationNetworkRef.value)
+                collaborationNetworkRef.value.scrollIntoView({ behavior: "smooth", block: "end" });
+
+                setTimeout(() => {
+                    window.scrollBy({
+                        top: 500,
+                        behavior: "smooth"
+                    });
+                }, 400);
+            }
         });
 
         watch(i18n.locale, () => {
@@ -665,8 +689,10 @@ export default defineComponent({
                     publications.value = publicationResponse.data.content;
                     totalPublications.value = publicationResponse.data.totalElements;
 
-                    if (switchTab && totalPublications.value > 0) {
+                    if (switchTab && totalPublications.value > 0 && !shouldDisplayCollaborationNetworkFirst.value) {
                         currentTab.value = "publications";
+                    } else if (shouldDisplayCollaborationNetworkFirst.value) {
+                        shouldDisplayCollaborationNetworkFirst.value = false;
                     }
                 }
             );
@@ -832,7 +858,8 @@ export default defineComponent({
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
-            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments
+            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments,
+            collaborationNetworkRef
         };
 }});
 </script>

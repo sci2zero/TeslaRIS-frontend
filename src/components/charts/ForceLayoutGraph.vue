@@ -24,8 +24,13 @@ const props = defineProps({
         type: Object as PropType<{
                 nodes: PersonNode[];
                 links: CollaborationLink[];
+                categories: {name: string}[];
             } | undefined>,
         required: true
+    },
+    categoryResolver: {
+        type: Function,
+        default: () => ({})
     },
     width: {
         type: String,
@@ -44,6 +49,9 @@ const props = defineProps({
         default: () => ({})
     }
 });
+
+const emit = defineEmits(["listPublications"]);
+
 
 const loading = ref(true);
 const chartInstance = ref<ECharts | null>(null);
@@ -65,22 +73,6 @@ const shouldBeLoading = () => {
 
 const i18n = useI18n();
 
-
-const categories = [
-    {
-        name: "0"
-    },
-    {
-        name: "1"
-    },
-    {
-        name: "2"
-    },
-    {
-        name: "3"
-    }
-];
-
 const options = computed<EChartsOption>(() => {
     if (!props.data) return {};
 
@@ -89,11 +81,12 @@ const options = computed<EChartsOption>(() => {
         layout: "force",
         data: props.data.nodes.map(node => ({
             id: node.id,
-            name: node.name,
+            name: node.name.split("; ")[0],
+            otherNames: node.name.split(";").slice(1),
             value: node.value,
-            symbolSize: Math.min(50, node.symbolSize), // node size by degree
+            symbolSize: Math.max(5, Math.min(50, node.symbolSize)), // node size by degree
             draggable: true,
-            category: `${node.category}`
+            category: props.categoryResolver(node.category)
         })),
         links: props.data.links.map(link => ({
             source: link.source,
@@ -110,7 +103,7 @@ const options = computed<EChartsOption>(() => {
             gravity: 0.001,
             edgeLength: 300
         },
-        categories: categories
+        categories: props.data.categories
   };
 
   return {
@@ -122,16 +115,16 @@ const options = computed<EChartsOption>(() => {
         tooltip: {
             formatter: (params: any) => {
                 if (params.dataType === "node") {
-                    return `${i18n.t("fullNameLabel")}: ${params.data.name}<br/>${i18n.t("adjacencyDegreeLabel")}: ${params.data.value}<br/>${i18n.t("depthLabel")}: ${params.data.category}`;
+                    return `${i18n.t("fullNameLabel")}: ${params.data.name}${params.data.otherNames.length > 0 ? ("<br/>" + i18n.t("differentNamesLabel") + ": " + params.data.otherNames) : ""}<br/>${i18n.t("adjacencyDegreeLabel")}: ${params.data.value}<br/>${i18n.t("depthLabel")}: ${params.data.category}`;
                 } else if (params.dataType === "edge") {
-                    return `${i18n.t("collaborationLabel")}: ${getAuthorName(params.data.source)} ↔ ${getAuthorName(params.data.target)}<br/>${i18n.t("worksInCommonLabel")}: ${params.data.value}`;
+                    return `${i18n.t("collaborationLabel")}: ${getCollaborationName(params.data)}<br/>${i18n.t("worksInCommonLabel")}: ${params.data.value}`;
                 }
                 
                 return params.name;
             }
         },
         legend: {
-            data: categories.map(cat => cat.name),
+            data: props.data.categories.map(cat => cat.name),
             selectedMode: true,
             textStyle: {
                 fontSize: 12
@@ -144,16 +137,26 @@ const options = computed<EChartsOption>(() => {
 });
 
 const getAuthorName = (authorId: string): string => {
-    return props.data?.nodes.find(node => node.id === authorId)?.name ?? "";
+    return props.data?.nodes.find(node => node.id === authorId)?.name.split(";")[0] ?? "";
+};
+
+const getCollaborationName = (data: CollaborationLink) => {
+    return `${getAuthorName(data.source)} ↔ ${getAuthorName(data.target)}`;
 };
 
 const onChartReady = (chart: ECharts) => {
     chartInstance.value = chart;
     chart.on("click", (params: any) => {
         if (params.dataType === "node") {
-            router.push({ name: "researcherLandingPage", params: {id: params.data.id} });
+            router.push(
+                { 
+                    name: "researcherLandingPage",
+                    params: {id: params.data.id},
+                    query: {displayCollaborationNetwork: "true"}
+                }
+            );
         } else if (params.dataType === "edge") {
-            console.log("edge", params)
+            emit("listPublications", params.data, getCollaborationName(params.data))
         }
     });
 };

@@ -1097,9 +1097,16 @@ export default {
     mostCitedPublicationsLabel: "Najviše citirane publikacije (po Open Citations-u)",
     personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika.",
     adjacencyDegreeLabel: "Stepen povezanosti",
-    worksInCommonLabel: "Zajedničkih radova",
-    collaborationNetworkLabel: "Mreža kolaboracije",
+    worksInCommonLabel: "Broj kolaboracija",
+    collaborationNetworkLabel: "Mreža saradnje",
     collaborationLabel: "Kolaboracija",
-    researcherCollaborationNetworkLabel: "Mreža Kolaboracije Istraživača",
-    depthLabel: "Dubina"
+    researcherCollaborationNetworkLabel: "Mreža Saradnje Istraživača",
+    depthLabel: "Dubina",
+    differentNamesLabel: "Ostali oblici imena",
+    rootAuthorLabel: "Odabrani autor",
+    level1Label: "Prvi nivo saradnje",
+    level2Label: "Drugi nivo saradnje",
+    level3Label: "Treći nivo saradnje",
+    collaborationTypeLabel: "Tip saradnje",
+    collaborationPublicationsLabel: "Publikacije za saradnju"
 }

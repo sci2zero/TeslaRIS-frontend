@@ -1066,9 +1066,16 @@ export default {
     mostCitedPublicationsLabel: "Most cited publications (by Open Citations)",
     personAlreadyHasAccountMessage: "Person you have selected is already assigned to a user.",
     adjacencyDegreeLabel: "Adjacency degree",
-    worksInCommonLabel: "Works in common",
+    worksInCommonLabel: "Collaboration counts",
     collaborationNetworkLabel: "Collaboration network",
     collaborationLabel: "Collaboration",
     researcherCollaborationNetworkLabel: "Researcher Collaboration Network",
-    depthLabel: "Depth"
+    depthLabel: "Depth",
+    differentNamesLabel: "Other name variants",
+    rootAuthorLabel: "Chosen author",
+    level1Label: "First collaboration level",
+    level2Label: "Second collaboration level",
+    level3Label: "Third collaboration level",
+    collaborationTypeLabel: "Collaboration type",
+    collaborationPublicationsLabel: "Publication for collaboration"
 }
