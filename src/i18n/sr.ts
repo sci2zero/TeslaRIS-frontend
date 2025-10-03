@@ -680,7 +680,7 @@ export default {
     removeFromPublicReviewLabel: "Skloni sa javnog uvida",
     missingAttachmentsMessage: "Broj preliminarnih dokumenata, dodataka i izveštaja sa konferencije nije jednak.",
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
-    noAttachmentsMessage: "Nisu unešeni neophodni podaci i dokumenti za postavljanje na javni uvid. Neophodni podaci su: Naslov, Autor, i Organizaciona jedinica. Neophodni (preliminarni) dokumenti su: disertacija i izveštaj komisije.",
+    noAttachmentsMessage: "Nisu unešeni neophodni podaci i dokumenti za postavljanje na javni uvid. Neophodni podaci su: Naslov, Autor, Naucna ili umetnicka oblast, i Organizaciona jedinica. Neophodni (preliminarni) dokumenti su: disertacija i izveštaj komisije.",
     putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka perioda javnog uvida.",
     removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene nakon čega ćete moći da započnete novi ili nastavite trenutni uvid. Ovo je operacija koju ne bi trebalo koristiti osim u vanrednim situacijama.",
     classifiedByMeLabel: "Klasifikovano od strane mene",
@@ -1055,5 +1055,6 @@ export default {
     downloadCompleteLabel: "Preuzimanje završeno!",
     downloadingLabel: "Preuzimanje...",
     personAlreadyHasAccountMessage: "Osoba koju ste selektovali je već vezana za korisnika.",
-    publicReviewLengthLabel: "Trajanje javnog uvida (u danima)"
+    publicReviewLengthLabel: "Trajanje javnog uvida (u danima)",
+    noFilesForDownloadLabel: "Nema fajlova za preuzimanje."
 }

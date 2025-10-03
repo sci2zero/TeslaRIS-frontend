@@ -23,6 +23,7 @@
                 is-submission
                 :read-only="false"
                 @create="selectNewlyAddedPerson"
+                @selected="selectExistingSelectedPerson"
             />
         </v-col>
     </v-row>
@@ -306,6 +307,12 @@ export default defineComponent({
                             title: i18n.t("notInListLabel", [personName]),
                             value: 0
                         });
+                    } else {
+                        presetPersonNameForCreation.value = {
+                            firstname: tokens[0],
+                            lastname: tokens.length > 1 ? tokens[tokens.length - 1] : "",
+                            otherName: ""
+                        };
                     }
                     
                     persons.value = listOfPersons;
@@ -566,6 +573,15 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectExistingSelectedPerson = (person: PersonIndex) => {
+            const toSelect = {title: person.name, value: person.databaseId as number};
+            persons.value.push(toSelect);
+            selectedPerson.value = toSelect;
+            personOtherNames.value = [{title: selectedPerson.value.title.split("|")[0], value: -1}];
+            selectedOtherName.value = personOtherNames.value[0];
+            sendContentToParent();
+        };
+
         const toggleExternalSelection = () => {
             selectExternalAssociate.value = !selectExternalAssociate.value;
 
@@ -645,7 +661,7 @@ export default defineComponent({
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
                 PersonSubmissionForm, enterExternalOU, canUserAddPersons,
                 constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation, setContributor
+                presetPersonNameForCreation, setContributor, selectExistingSelectedPerson
             };
     }
 });

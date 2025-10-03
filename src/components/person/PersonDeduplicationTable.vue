@@ -26,7 +26,7 @@
                 <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
                 <td>
                     <publications-dialog :button-text="$t('viewPublicationsLabel')" :id-for-fetching="row.item.databaseId" icon="mdi-note" :title="$t('publicationsLabel')"></publications-dialog>
-                    <v-btn size="small" color="primary" @click="navigateToLandingPage(row.item.databaseId)">
+                    <v-btn size="small" color="primary" @click="returnSelected ? navigateToLandingPage(row.item.databaseId) : returnToParent(row.item)">
                         {{ $t("selectLabel") }}
                     </v-btn>
                 </td>
@@ -55,9 +55,14 @@ export default defineComponent({
         personLastName: {
             type: String,
             required: true
+        },
+        returnSelected: {
+            type: Boolean,
+            default: false
         }
     },
-    setup(props) {
+    emits: ["selected"],
+    setup(props, {emit}) {
         const i18n = useI18n();
         const router = useRouter();
 
@@ -145,12 +150,16 @@ export default defineComponent({
             totalPersons.value = 0;
         };
 
+        const returnToParent = (item: PersonIndex) => {
+            emit("selected", item)
+        };
+
         return {
             displayTextOrPlaceholder,
             refreshTable, headers,
             totalPersons, potentialMatches,
             tableOptions, navigateToLandingPage,
-            resetTable
+            resetTable, returnToParent
         };
     },
 });

@@ -13,7 +13,7 @@
                 <v-list
                     :lines="false"
                     density="compact"
-                    class="pa-0"
+                    class="pa-0 overflow-hidden"
                 >
                     <draggable 
                         :list="attachments" item-key="id"

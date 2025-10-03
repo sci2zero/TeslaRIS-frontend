@@ -171,7 +171,7 @@ export default defineComponent({
         };
 
         const navigateToMetadataComparison = () => {
-            router.push({name: "PublisherMetadataComparator", params: {
+            router.push({name: "publisherMetadataComparator", params: {
                 leftId: parseInt(currentRoute.params.leftId as string), rightId: parseInt(currentRoute.params.rightId as string)
             }});
         };
