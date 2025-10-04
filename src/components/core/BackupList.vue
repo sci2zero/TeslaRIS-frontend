@@ -1,24 +1,32 @@
 <template>
-    <v-list
-        v-if="allgeneratedBackups.length > 0"
-        :lines="false"
-        density="comfortable"
-        class="d-flex mt-10 flex-row justify-center bigger-font"
-    >
-        <v-list-item
-            v-for="generatedBackup in allgeneratedBackups" :key="generatedBackup"
-            :value="generatedBackup"
+    <div class="d-flex flex-row justify-center">
+        <v-list
+            v-if="allgeneratedBackups.length > 0"
+            :lines="false"
+            density="comfortable"
+            class="d-block mt-10 flex-col justify-center bigger-font"
         >
-            <v-list-item-title @click="downloadbackup(generatedBackup)">
-                {{ generatedBackup }}
-            </v-list-item-title>
-        </v-list-item>
-    </v-list>
-    <h2 v-else class="d-flex mt-10 flex-row justify-center">
-        {{ $t("nogeneratedBackupsLabel") }}
-    </h2>
+            <v-list-item
+                v-for="generatedBackup in allgeneratedBackups" :key="generatedBackup"
+                :value="generatedBackup"
+                class="mb-2"
+            >
+                <v-list-item-title @click="downloadbackup(generatedBackup)">
+                    {{ generatedBackup }}
+                </v-list-item-title>
+            </v-list-item>
+        </v-list>
+        <h2 v-else class="d-flex mt-10 flex-col justify-center">
+            {{ $t("nogeneratedBackupsLabel") }}
+        </h2>
+    </div>
 
-    <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="$t('backupDownloadWarning')" @continue="finishBackupDownloading"></persistent-question-dialog>
+    <persistent-question-dialog
+        ref="dialogRef"
+        :title="$t('areYouSureLabel')"
+        :message="$t('backupDownloadWarning')"
+        @continue="finishBackupDownloading">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">

@@ -88,7 +88,7 @@ import PromotionService from '@/services/thesisLibrary/PromotionService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PromotionForm from './PromotionForm.vue';
 import type { Promotion } from '@/models/ThesisLibraryModel';
-import { localiseDate, localiseTime } from '@/i18n/dateLocalisation';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
 import { isEqual } from 'lodash';
 
 
@@ -203,7 +203,8 @@ export default defineComponent({
                 ) &&
                 page == tableOptions.value.page
             ) {
-                return
+                tableOptions.value.sortBy.splice(0);
+                return;
             }
 
             tableOptions.value.initialCustomConfiguration = true;

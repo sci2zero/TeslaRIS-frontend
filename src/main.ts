@@ -6,8 +6,10 @@ import { loadFonts } from "./plugins/webfontloader";
 import { createPinia } from "pinia";
 import './assets/main.css';
 import i18n from './i18n';
+import { createHead } from "@vueuse/head";
 
 const pinia = createPinia();
+const head = createHead();
 
 loadFonts();
 i18n.setup();
@@ -17,4 +19,5 @@ createApp(App)
 .use(pinia)
 .use(vuetify)
 .use(i18n.vueI18n)
+.use(head)
 .mount("#app");

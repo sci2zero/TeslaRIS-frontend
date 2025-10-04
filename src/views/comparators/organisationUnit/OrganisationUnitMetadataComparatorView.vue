@@ -203,6 +203,18 @@ export default defineComponent({
             organisationUnit2.openAlexId = "";
             organisationUnit1.ror = organisationUnit2.ror;
             organisationUnit2.ror = "";
+            organisationUnit1.allowedThesisTypes = organisationUnit2.allowedThesisTypes;
+            organisationUnit2.allowedThesisTypes = [];
+
+            organisationUnit1.clientInstitution = organisationUnit2.clientInstitution;
+            organisationUnit2.clientInstitution = false;
+            organisationUnit1.validatingEmailDomain = organisationUnit2.validatingEmailDomain;
+            organisationUnit2.validatingEmailDomain = false;
+            organisationUnit1.allowingSubdomains = organisationUnit2.allowingSubdomains;
+            organisationUnit2.allowingSubdomains = false;
+            organisationUnit1.institutionEmailDomain = organisationUnit2.institutionEmailDomain;
+            organisationUnit2.institutionEmailDomain = "";
+            organisationUnit1.legalEntity = organisationUnit2.legalEntity;
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
             organisationUnit1.contact!.phoneNumber = organisationUnit2.contact?.phoneNumber as string;
@@ -261,6 +273,12 @@ export default defineComponent({
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
             leftOrganisationUnit.value!.uris = updatedData.uris;
+            leftOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
+            leftOrganisationUnit.value!.clientInstitution = updatedData.clientInstitution;
+            leftOrganisationUnit.value!.validatingEmailDomain = updatedData.validatingEmailDomain;
+            leftOrganisationUnit.value!.allowingSubdomains = updatedData.allowingSubdomains;
+            leftOrganisationUnit.value!.institutionEmailDomain = updatedData.institutionEmailDomain;
+            leftOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             leftUpdateRequest.value = updatedData;
             
@@ -280,6 +298,12 @@ export default defineComponent({
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
             rightOrganisationUnit.value!.uris = updatedData.uris;
+            rightOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
+            rightOrganisationUnit.value!.clientInstitution = updatedData.clientInstitution;
+            rightOrganisationUnit.value!.validatingEmailDomain = updatedData.validatingEmailDomain;
+            rightOrganisationUnit.value!.allowingSubdomains = updatedData.allowingSubdomains;
+            rightOrganisationUnit.value!.institutionEmailDomain = updatedData.institutionEmailDomain;
+            rightOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             rightUpdateRequest.value = updatedData;
             

@@ -7,10 +7,22 @@
     >
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" :to="'persons/' + contribution.personId">
-                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + displayContributionType(contribution) }}</strong></h4>
+                <h4>
+                    <strong>
+                        {{ contribution.personName?.firstname }}
+                        {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
+                        {{ ' ' + contribution.personName?.lastname }}
+                        {{ displayContributionType(contribution) }}
+                    </strong>
+                </h4>
             </localized-link>
             <h4 v-else>
-                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + displayContributionType(contribution) }}</strong>
+                <strong>
+                    {{ contribution.personName?.firstname }}
+                    {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
+                    {{ ' ' + contribution.personName?.lastname }}
+                    {{ displayContributionType(contribution) }}
+                </strong>
             </h4>
             
             <p>{{ contribution.dateFrom ? `${localiseDate(contribution.dateFrom)} - ${contribution.dateTo ? localiseDate(contribution.dateTo) : $t("presentLabel")}` : $t("currentLabel") }}</p>
@@ -39,7 +51,7 @@ import { defineComponent, type PropType } from 'vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/publicationSeriesContributionType';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
 import PublicationSeriesService from '@/services/PublicationSeriesService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';

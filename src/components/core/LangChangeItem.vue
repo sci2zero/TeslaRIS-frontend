@@ -65,7 +65,7 @@ import { getLangItems } from '@/i18n/languages';
         };
 
         onMounted(async () => {
-            await router.isReady()
+            await router.isReady();
             presetCurrentLocale();
         });
 

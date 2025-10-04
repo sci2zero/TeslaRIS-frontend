@@ -69,7 +69,10 @@ export enum NotificationAction {
     GO_TO_PROMOTIONS_PAGE = "GO_TO_PROMOTIONS_PAGE",
     GO_TO_HARVESTER_PAGE = "GO_TO_HARVESTER_PAGE",
     NAVIGATE_TO_URL = "NAVIGATE_TO_URL",
-    GO_TO_VALIDATION_PAGE = "GO_TO_VALIDATION_PAGE"
+    GO_TO_VALIDATION_PAGE = "GO_TO_VALIDATION_PAGE",
+    GO_TO_UNBINDED_PUBLICATIONS_PAGE = "GO_TO_UNBINDED_PUBLICATIONS_PAGE",
+    REMOVE_EMPLOYEES_FROM_PUBLICATION = "REMOVE_EMPLOYEES_FROM_PUBLICATION",
+    RETURN_TO_PUBLICATION = "RETURN_TO_PUBLICATION"
 }
 
 export interface Notification {
@@ -84,6 +87,7 @@ export interface ResearchAreaResponse {
     description: MultilingualContent[];
     superResearchAreaId?: number;
     superResearchAreaName?: MultilingualContent[];
+    displayDescription?: string;
 }
 
 export interface ResearchAreaRequest {
@@ -122,7 +126,9 @@ export enum ScheduledTaskType {
     CLASSIFICATION_LOAD = "CLASSIFICATION_LOAD",
     JOURNAL_PUBLICATIONS_ASSESSMENT = "JOURNAL_PUBLICATIONS_ASSESSMENT",
     PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT",
-    REPORT_GENERATION = "REPORT_GENERATION"
+    REPORT_GENERATION = "REPORT_GENERATION",
+    UNMANAGED_DOCUMENTS_DELETION = "UNMANAGED_DOCUMENTS_DELETION",
+    PUBLIC_REVIEW_END_DATE_CHECK = "PUBLIC_REVIEW_END_DATE_CHECK"
 }
 
 export interface BrandingInformation {
@@ -160,7 +166,25 @@ export interface SearchFieldsResponse {
 
 export enum ExportFileFormat {
     CSV = "CSV",
-    XLS = "XLS"
+    XLSX = "XLSX",
+    BIB = "BIB",
+    RIS = "RIS",
+    ENW = "ENW"
+}
+
+export const getExtensionForExportFileFormat = (format: ExportFileFormat): string => {
+    switch (format) {
+        case ExportFileFormat.CSV:
+            return ".csv";
+        case ExportFileFormat.XLSX:
+            return ".xlsx";
+        case ExportFileFormat.BIB:
+            return ".bib";
+        case ExportFileFormat.RIS:
+            return ".ris";
+        case ExportFileFormat.ENW:
+            return ".enw";
+    }
 }
 
 export enum ExportEntity {
@@ -172,17 +196,20 @@ export enum ExportEntity {
 
 export enum ExportableEndpointType {
     PERSON_SEARCH = "PERSON_SEARCH",
+    PERSON_SEARCH_ADVANCED = "PERSON_SEARCH_ADVANCED",
     DOCUMENT_SEARCH = "DOCUMENT_SEARCH",
     DOCUMENT_ADVANCED_SEARCH = "DOCUMENT_ADVANCED_SEARCH",
     ORGANISATION_UNIT_SEARCH = "ORGANISATION_UNIT_SEARCH",
+    ORGANISATION_UNIT_SEARCH_ADVANCED = "ORGANISATION_UNIT_SEARCH_ADVANCED",
     PERSON_OUTPUTS = "PERSON_OUTPUTS",
     ORGANISATION_UNIT_OUTPUTS = "ORGANISATION_UNIT_OUTPUTS",
     ORGANISATION_UNIT_EMPLOYEES = "ORGANISATION_UNIT_EMPLOYEES",
     THESIS_SIMPLE_SEARCH = "THESIS_SIMPLE_SEARCH",
-    THESIS_ADVANCED_SEARCH = "THESIS_ADVANCED_SEARCH"
+    THESIS_ADVANCED_SEARCH = "THESIS_ADVANCED_SEARCH",
+    AUTHOR_REPRINT_DOCUMENTS_SEARCH = "AUTHOR_REPRINT_DOCUMENTS_SEARCH"
 }
 
-export interface CSVExportRequest {
+export interface TableExportRequest {
     columns: string[];
     exportEntityIds: number[];
     exportMaxPossibleAmount: boolean;
@@ -194,7 +221,7 @@ export interface CSVExportRequest {
 }
 
 
-export interface DocumentCSVExportRequest extends CSVExportRequest {
+export interface DocumentTableExportRequest extends TableExportRequest {
     apa: boolean;
     mla: boolean;
     harvard: boolean;
@@ -203,6 +230,7 @@ export interface DocumentCSVExportRequest extends CSVExportRequest {
     allowedTypes: PublicationType[];
     institutionId: number;
     commissionId: number;
+    onlyUnmanaged: boolean;
 }
 
 export interface EntityNavigationDetails {
@@ -240,4 +268,10 @@ export interface ContactFormData {
 
 export interface NotificationActionResult {
     value: string
+}
+
+export interface DownloadState {
+    progress: number
+    fileName: string
+    isDownloading: boolean
 }

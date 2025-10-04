@@ -1,11 +1,18 @@
 <template>
     <v-row>
-        <div class="ml-3">
-            <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
-        </div>
-        <div v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission">
-            <events-relation-submission-modal :source-event="presetEvent" @create="refreshRelationsList"></events-relation-submission-modal>
-        </div>
+        <v-col>
+            <div class="d-flex flex-row justify-start">
+                <div>
+                    <h2>{{ presetEvent?.serialEvent ? $t("serialEventsRelationsLabel") : $t("eventsRelationsLabel") }}</h2>  
+                </div>
+                <div v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission">
+                    <events-relation-submission-modal
+                        :source-event="presetEvent"
+                        @create="refreshRelationsList"
+                    />
+                </div>
+            </div>
+        </v-col>
     </v-row>
     <v-row>
         <v-list lines="two">
@@ -27,7 +34,7 @@
                 </template>
             </v-list-item>
         </v-list>
-        <h3 v-if="relations?.length === 0" class="ml-3">
+        <h3 v-if="relations?.length === 0" class="ml-10 mb-7">
             {{ $t("noAvailableRelationsMessage") }}
         </h3>
     </v-row>

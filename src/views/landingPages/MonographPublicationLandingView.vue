@@ -98,7 +98,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="monographPublication?.scopusId" class="response">
-                                    {{ monographPublication.scopusId }}
+                                    <identifier-link :identifier="monographPublication.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="monographPublication?.doi">
                                     DOI:
@@ -153,6 +153,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monographPublication?.description)"
             :document="monographPublication"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(monographPublication?.id as number, monographPublication as _Document)"
         />
 
@@ -165,6 +166,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -189,6 +193,14 @@
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="monographPublication"
+                    :can-edit="canEdit && !monographPublication?.isArchived"
+                    :proofs="monographPublication?.proofs"
+                    :file-items="monographPublication?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -205,12 +217,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="monographPublication"
+                <description-section
+                    :description="monographPublication?.remark"
                     :can-edit="canEdit && !monographPublication?.isArchived"
-                    :proofs="monographPublication?.proofs"
-                    :file-items="monographPublication?.fileItems">
-                </attachment-section>
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -238,13 +250,14 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(monographPublication?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <share-buttons
+            v-if="monographPublication && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(monographPublication.title) as string)"
+            :document-id="(monographPublication.id as number)"
+            :document-type="PublicationType.MONOGRAPH_PUBLICATION"
+        />
     </v-container>
 </template>
 
@@ -255,7 +268,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MonographPublication } from '@/models/PublicationModel';
@@ -271,13 +284,12 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
 import type { Monograph } from '@/models/PublicationModel';
 import MonographService from '@/services/DocumentPublicationService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -294,11 +306,14 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -339,7 +354,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -362,6 +377,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 monographPublication.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(monographPublication.value.title) as string;
 
@@ -481,6 +498,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            monographPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind,
@@ -492,7 +514,8 @@ export default defineComponent({
             documentIndicators, StatisticsType, currentTab, currentRoute,
             ApplicableEntityType, canClassify, documentClassifications,
             fetchClassifications, createClassification, fetchIndicators,
-            createIndicator, actionsRef, fetchValidationStatus
+            createIndicator, actionsRef, fetchValidationStatus, PublicationType,
+            updateRemark
         };
 }})
 

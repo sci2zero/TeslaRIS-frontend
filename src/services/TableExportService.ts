@@ -1,33 +1,33 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
-import { type CSVExportRequest, type DocumentCSVExportRequest, ExportFileFormat } from "@/models/Common";
+import { type TableExportRequest, type DocumentTableExportRequest, ExportFileFormat, getExtensionForExportFileFormat } from "@/models/Common";
 import { BaseService } from "./BaseService";
 
 
 export class TableExportService extends BaseService {
 
     async getMaxExportsPerPage(): Promise<AxiosResponse<number>> {
-        return super.sendRequest(axios.get, "csv-export/records-per-page");
+        return super.sendRequest(axios.get, "table-export/records-per-page");
     }
 
-    async exportDocumentTable(body: DocumentCSVExportRequest): Promise<void> {
-        const response = await axios.post(this.basePath + "csv-export/documents", body, {responseType: 'blob'});
+    async exportDocumentTable(body: DocumentTableExportRequest): Promise<void> {
+        const response = await axios.post(this.basePath + "table-export/documents", body, {responseType: 'blob'});
         this.downloadExportFile(response, body.exportFileType);
     }
 
-    async exportPersonTable(body: CSVExportRequest): Promise<void> {
-        const response = await axios.post(this.basePath + "csv-export/persons", body, {responseType: 'blob'});
+    async exportPersonTable(body: TableExportRequest): Promise<void> {
+        const response = await axios.post(this.basePath + "table-export/persons", body, {responseType: 'blob'});
         this.downloadExportFile(response, body.exportFileType);
     }
 
-    async exportOrganisationUnitTable(body: CSVExportRequest): Promise<void> {
-        const response = await axios.post(this.basePath + "csv-export/organisation-units", body, {responseType: 'blob'});
+    async exportOrganisationUnitTable(body: TableExportRequest): Promise<void> {
+        const response = await axios.post(this.basePath + "table-export/organisation-units", body, {responseType: 'blob'});
         this.downloadExportFile(response, body.exportFileType);
     }
 
-    async downloadExportFile(response: AxiosResponse<any, any>, fileType: ExportFileFormat) {
-        const extension = fileType === ExportFileFormat.CSV ? ".csv" : ".xsl";
-        this.initialzeDownload(response, `report${extension}`, extension);
+    async downloadExportFile(response: AxiosResponse<any, any>, fileFormat: ExportFileFormat) {
+        const extension = getExtensionForExportFileFormat(fileFormat);
+        this.initialzeDownload(response, `report${extension}`, "");
     }
 }
 

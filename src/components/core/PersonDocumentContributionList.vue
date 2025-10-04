@@ -7,10 +7,10 @@
         @change="reorderContributors">
         <div v-for="(contribution, index) in contributionList" :key="contribution.id" class="py-5">
             <localized-link v-if="contribution.personId" :to="'persons/' + contribution.personId">
-                <h4><strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + displayContributionType(contribution) }}</strong></h4>
+                <h4><strong>{{ contribution.personName?.firstname + (contribution.personName?.otherName ? contribution.personName?.otherName + " " : "") + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + displayContributionType(contribution) }}</strong></h4>
             </localized-link>
             <h4 v-else>
-                <strong>{{ contribution.personName?.firstname + " " + contribution.personName?.otherName + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + displayContributionType(contribution) }}</strong>
+                <strong>{{ contribution.personName?.firstname + (contribution.personName?.otherName ? contribution.personName?.otherName + " " : "") + " " + contribution.personName?.lastname + (contribution.isCorrespondingContributor ? ` (${$t("correspondingContributorLabel")})` : "") + (contribution.isBoardPresident ? ` (${$t("boardPresidentLabel")})` : "") + displayContributionType(contribution) }}</strong>
             </h4>
             <strong v-if="contribution.employmentTitle">{{ getEmploymentTitleFromValueAutoLocale(contribution.employmentTitle) }}</strong>
             <v-icon v-if="contribution.employmentTitle && contribution.personalTitle" icon="mdi-circle-small" />

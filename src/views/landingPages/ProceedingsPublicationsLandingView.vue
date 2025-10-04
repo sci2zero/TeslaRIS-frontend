@@ -103,7 +103,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="proceedingsPublication?.scopusId" class="response">
-                                    {{ proceedingsPublication.scopusId }}
+                                    <identifier-link :identifier="proceedingsPublication.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="proceedingsPublication?.doi">
                                     DOI:
@@ -152,6 +152,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
             :document="proceedingsPublication"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 
@@ -164,6 +165,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -195,12 +199,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="proceedingsPublication"
+                <description-section
+                    :description="proceedingsPublication?.remark"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    :proofs="proceedingsPublication?.proofs"
-                    :file-items="proceedingsPublication?.fileItems">
-                </attachment-section>    
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -209,6 +213,14 @@
                     :read-only="!canEdit || proceedingsPublication?.isArchived"
                     @update="updateContributions"
                 />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="proceedingsPublication"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    :proofs="proceedingsPublication?.proofs"
+                    :file-items="proceedingsPublication?.fileItems">
+                </attachment-section>  
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -239,11 +251,12 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(proceedingsPublication?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
+        <share-buttons
+            v-if="proceedingsPublication && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(proceedingsPublication.title) as string)"
+            :document-id="(proceedingsPublication.id as number)"
+            :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -256,7 +269,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution, ProceedingsPublicationType } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution, type ProceedingsPublicationType } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
@@ -272,13 +285,12 @@ import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -296,11 +308,14 @@ import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmen
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -343,7 +358,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -378,6 +393,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 proceedingsPublication.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(proceedingsPublication.value.title) as string;
 
@@ -492,6 +509,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            proceedingsPublication.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             proceedingsPublication, icon, publications, event,
             totalPublications, returnCurrentLocaleContent, isResearcher,
@@ -504,7 +526,7 @@ export default defineComponent({
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
-            fetchValidationStatus
+            fetchValidationStatus, PublicationType, updateRemark
         };
 }})
 

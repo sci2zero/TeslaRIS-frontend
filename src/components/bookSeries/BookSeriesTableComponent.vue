@@ -49,7 +49,7 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.eISSN) }}
+                    {{ displayTextOrPlaceholder(row.item.eissn) }}
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(row.item.printISSN) }}
@@ -196,7 +196,8 @@ export default defineComponent({
                 ) &&
                 page == tableOptions.value.page
             ) {
-                return
+                tableOptions.value.sortBy.splice(0);
+                return;
             }
 
             tableOptions.value.initialCustomConfiguration = true;

@@ -92,20 +92,29 @@
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
                     <v-col cols="12" sm="6" md="2">
-                        <date-picker
+                        <date-picker-split
                             v-model="dateFrom"
                             :label="$t('fromLabel') + '*'"
                             color="primary"
                             required
-                        ></date-picker>
+                        ></date-picker-split>
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
-                        <date-picker
+                        <date-picker-split
                             v-model="dateTo"
                             :label="$t('toLabel') + '*'"
                             color="primary"
                             required
-                        ></date-picker>
+                        ></date-picker-split>
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row justify-center">
+                    <v-col cols="12" md="4">
+                        <relative-date-preview
+                            :start-date="dateFrom"
+                            :end-date="dateTo"
+                            :recurrence-period="selectedRecurrenceType.value"
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -148,7 +157,6 @@ import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from 
 import { ThesisType } from '@/models/PublicationModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { ThesisFileSection } from '@/models/ThesisLibraryModel';
-import DatePicker from '@/components/core/DatePicker.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -165,11 +173,14 @@ import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLo
 import { RecurrenceType } from '@/models/LoadModel';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
 import TaskManagerService from '@/services/TaskManagerService';
+import DatePickerSplit from '@/components/core/DatePickerSplit.vue';
+import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
+import { serverTimeToLocalTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "ThesisLibraryBackupView",
-    components: { Toast, DatePicker, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList },
+    components: { Toast, DatePickerSplit, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList, RelativeDatePreview },
     setup() {
         const currentTab = ref("backupGeneration");
         const isFormValid = ref(false);
@@ -191,7 +202,7 @@ export default defineComponent({
         
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
-        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLS]);
+        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLSX]);
         const selectedExportFileFormat = ref<ExportFileFormat>(ExportFileFormat.CSV);
 
         const { requiredSelectionRules, atLeastOneTrueRule } = useValidationUtils();
@@ -240,7 +251,7 @@ export default defineComponent({
                 params, selectedRecurrenceType.value.value
             ).then(response => {
                 snackbar.value = true;
-                message.value = i18n.t("backupGenerationScheduledMessage", [response.data]);
+                message.value = i18n.t("backupGenerationScheduledMessage", [serverTimeToLocalTime(response.data)]);
                 fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);

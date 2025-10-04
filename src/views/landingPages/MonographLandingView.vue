@@ -93,6 +93,19 @@
                                 <div v-if="monograph?.number" class="response">
                                     {{ monograph.number }}
                                 </div>
+                                <div v-if="monograph?.publisherId || monograph?.authorReprint">
+                                    {{ $t("publisherLabel") }}:
+                                </div>
+                                <div v-if="monograph?.publisherId" class="response">
+                                    <localized-link :to="'publishers/' + monograph?.publisherId">
+                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="monograph?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
+                                    </localized-link>
+                                </div>
                                 <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
@@ -107,7 +120,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="monograph?.scopusId" class="response">
-                                    {{ monograph.scopusId }}
+                                    <identifier-link :identifier="monograph.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="monograph?.doi">
                                     DOI:
@@ -166,6 +179,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(monograph?.description)"
             :document="monograph"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(monograph?.id as number, monograph as _Document)"
         />
 
@@ -178,6 +192,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -205,6 +222,14 @@
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="monograph"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    :proofs="monograph?.proofs"
+                    :file-items="monograph?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -220,6 +245,13 @@
                     :can-edit="canEdit && !monograph?.isArchived"
                     @update="updateDescription">
                 </description-section>
+
+                <description-section
+                    :description="monograph?.remark"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    is-remark
+                    @update="updateRemark"
+                />
                 
                 <!-- Publications Table -->
                 <v-row>
@@ -234,13 +266,6 @@
                         </publication-table-component>
                     </v-col>
                 </v-row>
-
-                <attachment-section
-                    :document="monograph"
-                    :can-edit="canEdit && !monograph?.isArchived"
-                    :proofs="monograph?.proofs"
-                    :file-items="monograph?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>
@@ -288,13 +313,14 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button
-            v-if="canEdit && isResearcher"
-            :document-id="(monograph?.id as number)"
-            @unbind="handleResearcherUnbind">
-        </publication-unbind-button>
-
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <share-buttons
+            v-if="monograph && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(monograph.title) as string)"
+            :document-id="(monograph.id as number)"
+            :document-type="PublicationType.MONOGRAPH"
+        />
     </v-container>
 </template>
 
@@ -305,7 +331,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, DocumentPublicationIndex, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
@@ -331,7 +357,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse, type EntityClassificationResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -349,11 +374,16 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import PublisherService from '@/services/PublisherService';
+import { type Publisher } from '@/models/PublisherModel';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, PublicationUnbindButton, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -365,6 +395,7 @@ export default defineComponent({
 
         const monograph = ref<Monograph>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const publisher = ref<Publisher>();
 
         const { isResearcher } = useUserRole();
         const canEdit = ref(false);
@@ -402,7 +433,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -431,6 +462,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 monograph.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(monograph.value.title) as string;
 
@@ -502,6 +535,12 @@ export default defineComponent({
                     });
                 });
             }
+
+            if(monograph.value?.publisherId) {
+                PublisherService.readPublisher(monograph.value.publisherId).then(response => {
+                    publisher.value = response.data;
+                });
+            }
         };
 
         const searchKeyword = (keyword: string) => {
@@ -550,6 +589,8 @@ export default defineComponent({
             monograph.value!.printISBN = basicInfo.printISBN;
             monograph.value!.openAlexId = basicInfo.openAlexId;
             monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
+            monograph.value!.publisherId = basicInfo.publisherId;
+            monograph.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };
@@ -588,6 +629,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            monograph.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             monograph, icon, actionsRef,
             returnCurrentLocaleContent,
@@ -608,7 +654,8 @@ export default defineComponent({
             createIndicator, fetchIndicators,
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
-            fetchValidationStatus
+            fetchValidationStatus, PublicationType,
+            publisher, updateRemark
         };
 }})
 

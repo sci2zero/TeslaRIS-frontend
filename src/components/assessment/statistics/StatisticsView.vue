@@ -18,7 +18,7 @@ import type { EntityIndicatorResponse } from '@/models/AssessmentModel';
 import StatisticsService from '@/services/StatisticsService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useI18n } from 'vue-i18n';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({

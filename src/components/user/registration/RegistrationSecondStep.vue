@@ -3,17 +3,23 @@
         <v-form v-model="isFormValid" @submit.prevent>
             <v-text-field
                 v-model="firstName"
-                label="First Name"
+                :label="$t('firstNameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             ></v-text-field>
             <v-text-field
                 v-model="lastName"
-                label="Last Name"
+                :label="$t('surnameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             ></v-text-field>
-            <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" :disabled="isPersonSelected()" required></organisation-unit-autocomplete-search>
+            <organisation-unit-autocomplete-search
+                ref="ouAutocompleteRef"
+                v-model="selectedOrganisationUnit"
+                :disabled="isPersonSelected()"
+                required
+                only-client-institutions>
+            </organisation-unit-autocomplete-search>
             <v-select
                 v-model="selectedLanguage"
                 :label="$t('preferredLanguageLabel') + '*'"
@@ -21,10 +27,14 @@
             ></v-select>
             <v-text-field
                 v-model="email"
-                label="Email"
+                :label="$t('emailLabel') + '*'"
                 :rules="emailFieldRules"
             ></v-text-field>
-            <password-input-with-meter :label="$t('newPasswordLabel')" @password-change="setNewPassword($event)" @show-repeated-password="true"></password-input-with-meter>
+            <password-input-with-meter
+                :label="$t('newPasswordLabel') + '*'"
+                @password-change="setNewPassword($event)"
+                @show-repeated-password="true">
+            </password-input-with-meter>
         </v-form>
 
         <v-btn block color="blue darken-1 large" :disabled="!isFormValid" @click="register">
@@ -37,7 +47,7 @@
 
 <script lang="ts">
 import { useI18n } from "vue-i18n";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import AuthenticationService from "@/services/AuthenticationService";
 import LanguageService from "@/services/LanguageService";
@@ -49,6 +59,8 @@ import { useValidationUtils } from "@/utils/ValidationUtils";
 import { getErrorMessageForErrorKey } from "@/i18n";
 import { useRouter } from "vue-router";
 import Toast from "@/components/core/Toast.vue";
+import { type ResearcherRegistrationRequest } from "@/models/AuthenticationModel";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 
 
 export default defineComponent({
@@ -75,8 +87,8 @@ export default defineComponent({
         const router = useRouter();
 
         const i18n = useI18n();
-        const firstName = ref(props.firstname || registerStore.registerPersonData?.personName.firstname);
-        const lastName = ref(props.lastname || registerStore.registerPersonData?.personName.lastname);
+        const firstName = ref("");
+        const lastName = ref("");
         const email = ref("");
         const password = ref("");
         const languages = ref<{ title: string, value: number }[]>([]);
@@ -90,14 +102,38 @@ export default defineComponent({
             password.value = newPassword;
         };
 
+        onMounted(() => {
+            prepopulateNameData();
+        });
+
+        watch([
+            () => props.firstname,
+            () => props.lastname,
+            registerStore
+        ], () => {
+            prepopulateNameData();
+        });
+
+        const prepopulateNameData = () => {
+            firstName.value = props.firstname || registerStore.registerPersonData?.personName.firstname;
+            lastName.value = props.lastname || registerStore.registerPersonData?.personName.lastname;
+            if (registerStore.registerPersonData?.employmentInstitutionId) {
+                selectedOrganisationUnit.value = {
+                    title: returnCurrentLocaleContent(registerStore.registerPersonData?.employmentInstitutionName) as string,
+                    value: registerStore.registerPersonData?.employmentInstitutionId
+                };
+            }
+        };
+
         const register = () => {
-            const requestBody = {
+            const requestBody: ResearcherRegistrationRequest = {
                 firstName: firstName.value,
                 lastName: lastName.value,
                 email: email.value,
                 password: password.value,
                 preferredLanguageId: selectedLanguage.value as number,
-                organisationUnitId: selectedOrganisationUnit.value.value
+                organisationUnitId: selectedOrganisationUnit.value.value,
+                personId: registerStore.registerPersonData?.personId
             };
 
             AuthenticationService.registerResearcher(requestBody).then(() => {
@@ -130,11 +166,12 @@ export default defineComponent({
            return registerStore.registerPersonData != null
         };
 
-        return {email, emailFieldRules, requiredFieldMessage,
+        return {
+            email, emailFieldRules, requiredFieldMessage,
             register, selectedLanguage, languages, firstName, lastName, 
             selectedOrganisationUnit, setNewPassword, isPersonSelected,
             requiredFieldRules, isFormValid, snackbar, message
-        }
+        };
     }
 })
 </script>

@@ -2,7 +2,12 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <person-autocomplete-search v-model="selectedPerson" required disable-submission :institution-id="institutionId"></person-autocomplete-search>
+                <person-autocomplete-search
+                    v-model="selectedPerson"
+                    required
+                    disable-submission
+                    :institution-id="institutionId">
+                </person-autocomplete-search>
             </v-col>
         </v-row>
 

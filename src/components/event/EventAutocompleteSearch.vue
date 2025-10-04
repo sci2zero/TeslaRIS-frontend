@@ -3,9 +3,10 @@
         <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + ((disableSubmission || readOnly) ? 1 : 0)">
             <v-autocomplete
                 v-model="selectedEvent"
+                v-model:search="searchInput"
                 :readonly="readOnly"
                 :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
-                :items="events"
+                :items="readOnly ? [] : events"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
@@ -17,6 +18,7 @@
         </v-col>
         <v-col v-if="!disableSubmission && !readOnly" cols="1">
             <generic-crud-modal
+                ref="modalRef"
                 :form-component="ConferenceSubmissionForm"
                 :form-props="{readOnly: readOnly, presetName: lastSearchInput}"
                 entity-name="Conference"
@@ -42,7 +44,7 @@ import { useI18n } from 'vue-i18n';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ConferenceSubmissionForm from './ConferenceSubmissionForm.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -86,11 +88,14 @@ export default defineComponent({
     setup(props, { emit }) {
         const i18n = useI18n();
         const searchPlaceholder = props.multiple ? [] : { title: "", value: -1 };
+
+        const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
         
         const events = ref<{ title: string; value: number; date?: string }[]>([]);
         const selectedEvent = ref(
             props.multiple ? (props.modelValue as any[] || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         const lastSearchInput = ref("");
 
@@ -109,19 +114,46 @@ export default defineComponent({
             }
 
             if (input.length >= 3) {
-                lastSearchInput.value = input;
+                if (!input.startsWith(i18n.t("notInListLabel", []).slice(0, -3))) {
+                    lastSearchInput.value = input;
+                }
+
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
                 EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
-                        title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} | ${conference.dateFromTo}`,
+                        title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} ${conference.dateFromTo ? ("| " + conference.dateFromTo) : ""}`,
                         value: conference.databaseId,
                         date: conference.dateFromTo
                     }));
+
+                    if (!props.multiple && !props.disableSubmission && !props.readOnly && !modalRef.value!.dialog) {
+                        events.value.push({
+                            title: i18n.t("notInListLabel", [input]),
+                            value: 0,
+                            date: undefined
+                        });
+                    }
                 });
             }
         }, 300);
 
+        watch(selectedEvent, () => {
+            if (
+                !props.multiple &&
+                selectedEvent.value &&
+                (selectedEvent.value as { title: string; value: number; }).value === 0
+            ) {
+                modalRef.value!.dialog = true;
+                (selectedEvent.value as { title: string; value: number; }).title = "";
+                (selectedEvent.value as { title: string; value: number; }).value = -1;
+            }
+        });
+
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+            
             emit("update:modelValue", selectedEvent.value);
         };
 
@@ -181,7 +213,8 @@ export default defineComponent({
             events, selectedEvent, searchEvents,
             requiredSelectionRules, sendContentToParent,
             clearInput, selectNewlyAddedEvent, hasSelection,
-            ConferenceSubmissionForm, lastSearchInput
+            ConferenceSubmissionForm, lastSearchInput, modalRef,
+            searchInput
         };
     }
 });

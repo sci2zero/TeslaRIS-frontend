@@ -2,6 +2,7 @@ import { AccessRights, ResourceType, ThesisAttachmentType, type DocumentFileResp
 import { BaseService } from "./BaseService";
 import axios, { type AxiosResponse } from "axios";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import { useDownloadStore } from "@/stores/downloadStore";
 
 export class DocumentFileService extends BaseService {
 
@@ -12,8 +13,23 @@ export class DocumentFileService extends BaseService {
             const imagePath = this.basePath + `file/${serverFilename}?inline=true`;
             window.open(imagePath, "_blank");
         } else {
+            const downloadStore = useDownloadStore();
+            if (downloadStore.isDownloading) {
+                return;
+            }
+
+            downloadStore.downloadProgressRef?.startDownload(fileName);
             const response = await super.sendRequest(axios.get, `file/${serverFilename}`, {
                 responseType: "blob",
+                onDownloadProgress: (progressEvent: any) => {
+                    if (progressEvent.total) {
+                        const percent = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        
+                        downloadStore.downloadProgressRef?.updateProgress(percent);
+                    }
+                }
             });
 
             this.initialzeDownload(response, fileName, extension);

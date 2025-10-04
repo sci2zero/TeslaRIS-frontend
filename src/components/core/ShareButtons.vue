@@ -1,17 +1,23 @@
 <template>
-    <div class="mt-10">
+    <div class="mt-3">
         <h4>{{ $t("shareLabel") }}:</h4>
         <div class="d-flex flex-row ga-2">
             <v-btn icon color="blue-darken-4" @click="shareOnFacebook">
                 <v-icon>mdi-facebook</v-icon>
             </v-btn>
 
-            <v-btn icon color="light-blue-darken-3" @click="shareOnTwitter">
-                <v-icon>mdi-twitter</v-icon>
+            <v-btn icon color="light-blue-darken-3" @click="shareOnX">
+                <v-icon size="x-large">
+                    mdi-alpha-x
+                </v-icon>
             </v-btn>
 
             <v-btn icon color="indigo-darken-1" @click="shareOnLinkedIn">
                 <v-icon>mdi-linkedin</v-icon>
+            </v-btn>
+
+            <v-btn icon color="light-blue-darken-3" @click="shareViaEmail">
+                <v-icon>mdi-email</v-icon>
             </v-btn>
         </div>
     </div>
@@ -26,6 +32,10 @@ import { useI18n } from 'vue-i18n';
 export default defineComponent({
     name: "ShareButtons",
     props: {
+        title: {
+            type: String,
+            required: true
+        },
         documentId: {
             type: Number,
             required: true
@@ -39,7 +49,7 @@ export default defineComponent({
     setup(props) {
         const i18n = useI18n();
         const baseServerUrl = import.meta.env.VITE_BASE_URL as string;
-        const url = computed(() => `${baseServerUrl}share/document/${props.documentType}/${props.documentId}?lang=${i18n.locale.value}`);
+        const url = computed(() => `${baseServerUrl}share/document/${props.documentType}/${props.documentId}/${i18n.locale.value}`);
 
         const openPopup = (link: string) => {
             window.open(link, '_blank', 'width=600,height=600');
@@ -50,8 +60,8 @@ export default defineComponent({
             openPopup(link);
         };
 
-        const shareOnTwitter = () => {
-            const link = `https://twitter.com/intent/tweet?url=${url.value}`;
+        const shareOnX = () => {
+            const link = `https://x.com/intent/tweet?title=${props.title}&url=${url.value}`;
             openPopup(link);
         };
 
@@ -60,9 +70,15 @@ export default defineComponent({
             openPopup(link);
         };
 
+        const shareViaEmail = () => {
+            const link = `mailto:?subject=${encodeURIComponent(props.title)}&body=${encodeURIComponent(url.value)}`;
+            openPopup(link);
+        };
+
         return { 
             shareOnFacebook,
-            shareOnTwitter,
+            shareOnX,
+            shareViaEmail,
             shareOnLinkedIn
         };
     },

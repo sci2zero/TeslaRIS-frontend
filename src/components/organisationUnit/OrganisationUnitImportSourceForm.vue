@@ -1,6 +1,6 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
+        <v-row v-if="scopusConfigured">
             <v-col>
                 <v-checkbox
                     v-model="importScopus"
@@ -16,7 +16,7 @@
                 ></v-checkbox>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="webOfScienceConfigured">
             <v-col>
                 <v-checkbox
                     v-model="importWebOfScience"
@@ -46,6 +46,9 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
+        const scopusConfigured = ref(false);
+        const webOfScienceConfigured = ref(false);
+
         onMounted(() => {
             fetchDetails();
         });
@@ -61,6 +64,8 @@ export default defineComponent({
                     importScopus.value = response.data.importScopus;
                     importOpenAlex.value = response.data.importOpenAlex;
                     importWebOfScience.value = response.data.importWebOfScience;
+                    scopusConfigured.value = response.data.scopusConfigured as boolean;
+                    webOfScienceConfigured.value = response.data.webOfScienceConfigured as boolean;
                 });
             }
         };
@@ -86,7 +91,8 @@ export default defineComponent({
         return {
             isFormValid, submit,
             importScopus, importOpenAlex,
-            importWebOfScience
+            importWebOfScience, scopusConfigured,
+            webOfScienceConfigured
         };
     }
 });

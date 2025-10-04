@@ -25,27 +25,18 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="5">
                 <v-text-field
-                    v-model="openAlexId"
-                    label="Open Alex ID"
-                    placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
+                    v-model="doi"
+                    label="DOI"
+                    placeholder="DOI"
+                    :rules="doiValidationRules">
                 </v-text-field>
             </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="5">
-                <v-text-field v-model="datasetNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
-            </v-col>
             <v-col cols="5">
                 <v-text-field
-                    v-model="webOfScienceId"
-                    label="Web of Science ID"
-                    placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
+                    v-model="datasetNumber"
+                    :label="$t('internalNumberLabel')"
+                    :placeholder="$t('internalNumberLabel')">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -56,7 +47,37 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                <publisher-autocomplete-search
+                    ref="publisherAutocompleteRef"
+                    v-model="selectedPublisher"
+                    allow-author-reprint>
+                </publisher-autocomplete-search>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules"
+                />
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         
@@ -123,6 +144,8 @@ export default defineComponent({
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
+            } else if (props.presetDataset?.authorReprint) {
+                selectedPublisher.value = {title: "", value: -2};
             }
         };
 
@@ -147,11 +170,13 @@ export default defineComponent({
         const webOfScienceId = ref(props.presetDataset?.webOfScienceId);
         const datasetNumber = ref(props.presetDataset?.internalNumber);
         const uris = ref<string[]>(props.presetDataset?.uris as string[]);
+        const scopus = ref(props.presetDataset?.scopusId);
 
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -160,7 +185,8 @@ export default defineComponent({
                     [
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
+                        { value: scopus.value as string, error: "scopusIdExistsError"}
                     ],
                     props.presetDataset?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -181,9 +207,11 @@ export default defineComponent({
                 contributions: props.presetDataset?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: []
             };
@@ -204,6 +232,7 @@ export default defineComponent({
             doi.value = props.presetDataset?.doi;
             openAlexId.value = props.presetDataset?.openAlexId;
             webOfScienceId.value = props.presetDataset?.webOfScienceId;
+            scopus.value = props.presetDataset?.scopusId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -213,14 +242,15 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, title, subtitle,
+            isFormValid, title, subtitle, scopus,
             publicationYear, doi, languageTags,
-            selectedPublisher, datasetNumber,
+            selectedPublisher, datasetNumber, refreshForm,
             uris, requiredFieldRules, doiValidationRules,
             submit, toMultilingualTextInput, message,
             titleRef, subtitleRef, urisRef, snackbar,
             workOpenAlexIdValidationRules, openAlexId,
-            webOfScienceId, documentWebOfScienceIdValidationRules
+            webOfScienceId, documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         };
     }
 });

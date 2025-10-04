@@ -1,5 +1,5 @@
 <template>
-    <div class="actions-box pa-4">
+    <div v-if="!(forProceedings && isResearcher && !canEdit)" class="actions-box pa-4">
         <div class="text-subtitle-1 font-weight-medium mb-3">
             {{ $t("additionalActionsLabel") }}
         </div>
@@ -12,6 +12,11 @@
                         ref="citationRef"
                         :document-id="documentId">
                     </citation-selector>
+                    <publication-unbind-button
+                        v-if="canEdit && isResearcher"
+                        :document-id="documentId"
+                        @unbind="handleResearcherUnbind">
+                    </publication-unbind-button>
                     <v-btn
                         v-show="!metadataValid && canEdit && canValidate"
                         class="mb-5 ml-2" color="primary" density="compact"
@@ -66,11 +71,12 @@ import type { Document } from '@/models/PublicationModel';
 import { commitArchiveStateChange } from '@/utils/DocumentUtil';
 import Toast from '../core/Toast.vue';
 import { useRouter } from 'vue-router';
+import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 
 
 export default defineComponent({
     name: "DocumentActionBox",
-    components: { CitationSelector, PublicationBadgeSection, Toast },
+    components: { CitationSelector, PublicationBadgeSection, Toast, PublicationUnbindButton },
     props: {
         documentId: {
             type: Number,
@@ -96,6 +102,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        forProceedings: {
+            type: Boolean,
+            default: false
+        },
         description: {
             type: Object as PropType<string | null>,
             default: undefined
@@ -111,6 +121,10 @@ export default defineComponent({
         displayCitation: {
             type: Boolean,
             default: true
+        },
+        handleResearcherUnbind: {
+            type: Function as PropType<((...args: any[]) => any)>,
+            default: () => {}
         }
     },
     emits: ["update"],
@@ -122,7 +136,10 @@ export default defineComponent({
 
         const citationRef = ref<typeof CitationSelector>();
 
-        const { isAdmin, isInstitutionalEditor, isInstitutionalLibrarian } = useUserRole();
+        const {
+            isAdmin, isInstitutionalEditor,
+            isInstitutionalLibrarian, isResearcher
+        } = useUserRole();
 
         const canValidate = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)
 
@@ -155,13 +172,11 @@ export default defineComponent({
         };
         
         return {
-            fetchCitations,
-            canValidate,
-            validateMetadata,
-            validateUploadedFiles,
+            fetchCitations, canValidate,
+            validateMetadata, validateUploadedFiles,
             isAdmin, isInstitutionalEditor,
             changeArchiveState, snackbar,
-            snackbarMessage
+            snackbarMessage, isResearcher
         };
 }})
 

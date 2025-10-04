@@ -3,8 +3,8 @@
         <v-col :cols="allowManualClearing && selectedResearchArea.value !== -1 ? 10 : 11">
             <v-autocomplete
                 v-model="selectedResearchArea"
-                :label="$t('researchAreaLabel')"
-                :items="researchAreas"
+                :label="label ? label : $t('researchAreaLabel')"
+                :items="readonly ? [] : researchAreas"
                 :custom-filter="((): boolean => true)"
                 :no-data-text="$t('noDataMessage')"
                 return-object
@@ -40,6 +40,14 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
+        },
+        readonly: {
+            type: Boolean,
+            default: false
+        },
+        label: {
+            type: String,
+            default: undefined
         }
     },
     emits: ["update:modelValue"],

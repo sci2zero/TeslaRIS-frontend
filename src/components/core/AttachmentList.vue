@@ -13,7 +13,7 @@
                 <v-list
                     :lines="false"
                     density="compact"
-                    class="pa-0"
+                    class="pa-0 overflow-hidden"
                 >
                     <draggable 
                         :list="attachments" item-key="id"
@@ -43,7 +43,7 @@
                                     :license="attachment.license.toLowerCase()"
                                 />
                                 <v-row v-if="canEdit">
-                                    <v-col v-if="!disableUpdates || isAdmin || isHeadOfLibrary">
+                                    <v-col v-if="!disableUpdates || isInstitutionalLibrarian || isAdmin || isHeadOfLibrary">
                                         <v-btn
                                             icon variant="outlined" size="x-small" color="primary"
                                             class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
@@ -145,7 +145,12 @@ export default defineComponent({
         const i18n = useI18n();
 
         const download = (attachment: DocumentFileResponse) => {
-            DocumentFileService.downloadDocumentFile(attachment.serverFilename, attachment.fileName, attachment.serverFilename.split(".").pop() as string).catch((error) => {
+            DocumentFileService.downloadDocumentFile(
+                attachment.serverFilename,
+                attachment.fileName,
+                attachment.serverFilename.split(".").pop() as string,
+                false
+            ).catch((error) => {
                 if(error.response.status === 451) {
                     errorMessage.value = i18n.t("loginToViewDocumentMessage");
                 } else {

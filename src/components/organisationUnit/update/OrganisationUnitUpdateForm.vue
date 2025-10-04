@@ -39,14 +39,62 @@
                         <v-text-field v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row v-if="isAdmin">
+                    <v-checkbox
+                        v-model="legalEntity"
+                        :label="$t('legalEntityLabel')"
+                    ></v-checkbox>
+                    <v-checkbox
+                        v-model="clientInstitution"
+                        :label="$t('clientInstitutionLabel')"
+                    ></v-checkbox>
+                </v-row>
+                <v-row v-if="clientInstitution">
+                    <v-checkbox
+                        v-model="validatingEmailDomain"
+                        :label="$t('validatingEmailDomainLabel')"
+                    ></v-checkbox>
+                    <v-checkbox
+                        v-if="validatingEmailDomain"
+                        v-model="allowingSubdomains"
+                        :label="$t('allowingSubdomainsLabel')"
+                    ></v-checkbox>
+                </v-row>
+                <v-row v-if="clientInstitution && validatingEmailDomain">
+                    <v-col cols="12">
+                        <v-text-field
+                            v-model="institutionEmailDomain"
+                            :label="$t('institutionEmailDomainLabel') + '*'"
+                            :placeholder="$t('institutionEmailDomainLabel') + '*'"
+                            :rules="requiredFieldRules">
+                        </v-text-field>
+                    </v-col>
+                </v-row>
                 <v-row>
                     <v-col>
                         <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col>
+                        <v-select
+                            v-model="selectedThesisType"
+                            :label="$t('thesisTypeLabel') + '*'"
+                            :items="thesisTypes"
+                            :rules="requiredSelectionRules"
+                            multiple
+                            return-object
+                        ></v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="12">
-                        <open-layers-map ref="mapRef" :read-only="false" :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]"></open-layers-map>
+                        <open-layers-map
+                            ref="mapRef"
+                            :read-only="false"
+                            :init-address="presetOU?.location?.address"
+                            :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]">
+                        </open-layers-map>
                     </v-col>
                 </v-row>
             </v-col>
@@ -76,6 +124,9 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import Toast from '@/components/core/Toast.vue';
 import { useI18n } from 'vue-i18n';
+import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { ThesisType } from '@/models/PublicationModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -96,6 +147,7 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const { languageTags } = useLanguageTags();
+        const { isAdmin } = useUserRole();
 
         const snackbar = ref(false);
         const message = ref("");
@@ -120,9 +172,24 @@ export default defineComponent({
         const ror = ref(props.presetOU?.ror);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
+        const clientInstitution = ref(props.presetOU?.clientInstitution);
+        const validatingEmailDomain = ref(props.presetOU?.validatingEmailDomain);
+        const allowingSubdomains = ref(props.presetOU?.allowingSubdomains);
+        const institutionEmailDomain = ref(props.presetOU?.institutionEmailDomain);
+        const legalEntity = ref(props.presetOU?.legalEntity);
+
+        const thesisTypes = getThesisTypesForGivenLocale();
+        const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>(
+            props.presetOU ?props.presetOU?.allowedThesisTypes.map(type => {
+                return {title: getThesisTitleFromValueAutoLocale(type) as string, value: type};
+            })
+            : [{ title: "", value: null }]
+        );
+
         const {
             requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
-            nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules
+            nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
+            requiredSelectionRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -154,7 +221,13 @@ export default defineComponent({
                 scopusAfid: scopusAfid.value,
                 openAlexId: openAlexId.value,
                 ror: ror.value,
-                uris: uris.value
+                uris: uris.value,
+                allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
+                clientInstitution: clientInstitution.value as boolean,
+                validatingEmailDomain: validatingEmailDomain.value as boolean,
+                allowingSubdomains: allowingSubdomains.value as boolean,
+                institutionEmailDomain: institutionEmailDomain.value as string,
+                legalEntity: legalEntity.value as boolean
             };
 
             emit("update", updatedOU);
@@ -173,6 +246,17 @@ export default defineComponent({
             ror.value = props.presetOU?.ror;
             urisRef.value?.refreshModelValue(uris.value);
 
+            clientInstitution.value = props.presetOU?.clientInstitution;
+            validatingEmailDomain.value = props.presetOU?.validatingEmailDomain;
+            allowingSubdomains.value = props.presetOU?.allowingSubdomains;
+            institutionEmailDomain.value = props.presetOU?.institutionEmailDomain;
+            legalEntity.value = props.presetOU?.legalEntity;
+            
+            selectedThesisType.value.splice(0);
+            props.presetOU?.allowedThesisTypes.forEach(type => {
+                selectedThesisType.value.push({title: getThesisTitleFromValueAutoLocale(type) as string, value: type});
+            });
+
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
         };
 
@@ -185,7 +269,10 @@ export default defineComponent({
             scopusAfidValidationRules, nameRef, uris,
             nonMandatoryEmailFieldRules, snackbar, ror,
             openAlexId, institutionOpenAlexIdValidationRules,
-            rorValidationRules
+            rorValidationRules, thesisTypes, selectedThesisType,
+            requiredSelectionRules, clientInstitution,
+            validatingEmailDomain, allowingSubdomains,
+            institutionEmailDomain, isAdmin, legalEntity
         };
     }
 });

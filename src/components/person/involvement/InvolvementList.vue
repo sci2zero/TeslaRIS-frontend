@@ -80,7 +80,7 @@ import InvolvementService from '@/services/InvolvementService';
 import { ref } from 'vue';
 import { watch } from 'vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 

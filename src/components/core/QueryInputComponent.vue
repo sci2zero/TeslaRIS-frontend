@@ -82,6 +82,10 @@ export default defineComponent({
         searchFields: {
             type: Array<SearchFieldsResponse>,
             required: true
+        },
+        presetSearchInput: {
+            type: String,
+            default: ""
         }
     },
     emits: ["search", "reset"],
@@ -107,6 +111,102 @@ export default defineComponent({
         watch(() => props.searchFields, () => {
             handleSearchFieldsChanged();
         });
+
+        watch(() => props.presetSearchInput, () => {
+            if (!props.presetSearchInput) {
+                return;
+            }
+
+            const tokens = props.presetSearchInput.split("§").filter(t => t);
+
+            if (tokens.length == 1 && tokens[0].trim() === "*") {
+                return;
+            }
+
+            queryClauses.value.splice(0);
+
+            if (tokens.length > 0 && tokens[0].trim() !== '') {
+                const firstToken = tokens[0].trim();
+                const firstFieldValue = firstToken.split(':');
+                
+                if (firstFieldValue.length === 2) {
+                    queryClauses.value.push({
+                        id: self.crypto.randomUUID(),
+                        operation: "AND",
+                        field: firstFieldValue[0].trim(),
+                        value: firstFieldValue[1].trim()
+                    });
+                } else {
+                    queryClauses.value.push({
+                        id: self.crypto.randomUUID(),
+                        operation: "AND",
+                        field: "",
+                        value: firstToken
+                    });
+                }
+            }
+
+            for (let i = 1; i < tokens.length; i++) {
+                const currentToken = tokens[i].trim();
+                if (!currentToken) continue;
+                
+                const isOperator = currentToken.toUpperCase() === "AND" || currentToken.toUpperCase() === "OR";
+                
+                if (isOperator) {
+                    const nextToken = i + 1 < tokens.length ? tokens[i + 1].trim() : "";
+                    
+                    if (nextToken) {
+                        const fieldValueParts = nextToken.split(':');
+                        const operator = currentToken.toUpperCase();
+                        
+                        if (fieldValueParts.length === 2) {
+                            queryClauses.value.push({
+                                id: self.crypto.randomUUID(),
+                                operation: operator,
+                                field: fieldValueParts[0].trim(),
+                                value: fieldValueParts[1].trim()
+                            });
+                        } else {
+                            queryClauses.value.push({
+                                id: self.crypto.randomUUID(),
+                                operation: operator,
+                                field: "",
+                                value: nextToken
+                            });
+                        }
+                        
+                        i++;
+                    } else {
+                        queryClauses.value.push({
+                            id: self.crypto.randomUUID(),
+                            operation: currentToken.toUpperCase(),
+                            field: "",
+                            value: ""
+                        });
+                    }
+                } else {
+                    const fieldValueParts = currentToken.split(':');
+                    
+                    if (fieldValueParts.length === 2) {
+                        queryClauses.value.push({
+                            id: self.crypto.randomUUID(),
+                            operation: "AND",
+                            field: fieldValueParts[0].trim(),
+                            value: fieldValueParts[1].trim()
+                        });
+                    } else {
+                        queryClauses.value.push({
+                            id: self.crypto.randomUUID(),
+                            operation: "AND",
+                            field: "",
+                            value: currentToken
+                        });
+                    }
+                }
+            }
+
+            emitQuery();
+        }, { immediate: true });
 
         const handleSearchFieldsChanged = () => {
             if (props.searchFields) {

@@ -130,7 +130,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { defineComponent, onMounted, type PropType } from 'vue';
 import EventContributionUpdateModal from '../event/update/EventContributionUpdateModal.vue';
 import { EventContributionType, type PersonEventContribution } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/eventContributionType';
@@ -172,21 +172,60 @@ export default defineComponent({
         const audienceList = ref<PersonEventContribution[]>([]);
         const demonstratorList = ref<PersonEventContribution[]>([]);
 
+        onMounted(() => {
+            if (props.contributionList) {
+                populateLists();
+            }
+        });
+
         watch(() => props.contributionList, () => {
+            if (props.contributionList) {
+                populateLists();
+            }
+        });
+
+        const populateLists = () => {
             localContributions.value = props.contributionList;
 
-            orgBoardChairList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_CHAIR]);
-            orgBoardMemberList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_MEMBER]);
-            reviewerList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.REVIEWER]);
-            progBoardMemberList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PROGRAMME_BOARD_MEMBER]);
-            speakerList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.SPEAKER]);
-            panelistList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PANELISTS]);
-            chairList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.CHAIR]);
-            audienceList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.AUDIENCE]);
-            demonstratorList.value = localContributions.value.filter((contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.DEMONSTRATOR]);
+            orgBoardChairList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_CHAIR]
+                );
+            orgBoardMemberList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.ORGANIZATION_BOARD_MEMBER]
+                );
+            reviewerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.REVIEWER]
+                );
+            progBoardMemberList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PROGRAMME_BOARD_MEMBER]
+                );
+            speakerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.SPEAKER]
+                );
+            panelistList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.PANELISTS]
+                );
+            chairList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.CHAIR]
+                );
+            audienceList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.AUDIENCE]
+                );
+            demonstratorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.eventContributionType.toString() == EventContributionType[EventContributionType.DEMONSTRATOR]
+                );
 
             selectFirstNonEmptyTab();
-        });
+        };
         
         const sendToParent = (contributions: any[]) => {
             const contributionLists: Record<string, any[]> = {

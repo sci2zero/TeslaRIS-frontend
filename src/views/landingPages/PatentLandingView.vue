@@ -63,12 +63,17 @@
                                 <div v-if="patent?.documentDate" class="response">
                                     {{ patent.documentDate }}
                                 </div>
-                                <div v-if="patent?.publisherId">
+                                <div v-if="patent?.publisherId || patent?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
                                 <div v-if="patent?.publisherId" class="response">
                                     <localized-link :to="'publishers/' + patent?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
+                                    </localized-link>
+                                </div>
+                                <div v-else-if="patent?.authorReprint" class="response">
+                                    <localized-link to="scientific-results/author-reprints">
+                                        {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                             </v-col>
@@ -77,7 +82,7 @@
                                     Scopus ID:
                                 </div>
                                 <div v-if="patent?.scopusId" class="response">
-                                    {{ patent.scopusId }}
+                                    <identifier-link :identifier="patent.scopusId" type="scopus" />
                                 </div>
                                 <div v-if="patent?.doi">
                                     DOI:
@@ -120,6 +125,7 @@
             :document-id="parseInt(currentRoute.params.id as string)"
             :description="returnCurrentLocaleContent(patent?.description)"
             :document="patent"
+            :handle-researcher-unbind="handleResearcherUnbind"
             @update="fetchValidationStatus(patent?.id as number, patent as _Document)"
         />
 
@@ -132,6 +138,9 @@
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
@@ -156,6 +165,14 @@
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="patent"
+                    :can-edit="canEdit && !patent?.isArchived"
+                    :proofs="patent?.proofs"
+                    :file-items="patent?.fileItems">
+                </attachment-section>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -172,12 +189,12 @@
                     @update="updateDescription">
                 </description-section>
 
-                <attachment-section
-                    :document="patent"
+                <description-section
+                    :description="patent?.remark"
                     :can-edit="canEdit && !patent?.isArchived"
-                    :proofs="patent?.proofs"
-                    :file-items="patent?.fileItems">
-                </attachment-section>
+                    is-remark
+                    @update="updateRemark"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -205,7 +222,12 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-        <publication-unbind-button v-if="canEdit && isResearcher" :document-id="(patent?.id as number)" @unbind="handleResearcherUnbind"></publication-unbind-button>
+        <share-buttons
+            v-if="patent && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(patent.title) as string)"
+            :document-id="(patent.id as number)"
+            :document-type="PublicationType.PATENT"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -218,7 +240,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import type { Document as _Document, PersonDocumentContribution } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Patent } from '@/models/PublicationModel';
@@ -235,7 +257,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type DocumentAssessmentClassification, type EntityClassificationResponse, StatisticsType, type EntityIndicatorResponse, type DocumentIndicator } from '@/models/AssessmentModel';
@@ -253,11 +274,14 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
+import ShareButtons from '@/components/core/ShareButtons.vue';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, PublicationUnbindButton, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
     setup() {
         const currentTab = ref("contributions");
 
@@ -294,7 +318,7 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
-                });
+                }).catch(() => canEdit.value = false);
 
                 EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
@@ -317,6 +341,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 patent.value = response.data;
+
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
                 document.title = returnCurrentLocaleContent(patent.value.title) as string;
 
@@ -389,6 +415,7 @@ export default defineComponent({
             patent.value!.number = basicInfo.number;
             patent.value!.openAlexId = basicInfo.openAlexId;
             patent.value!.webOfScienceId = basicInfo.webOfScienceId;
+            patent.value!.authorReprint = basicInfo.authorReprint;
 
             performUpdate(true);
         };
@@ -427,6 +454,11 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const updateRemark = (remark: MultilingualContent[]) => {
+            patent.value!.remark = remark;
+            performUpdate(true);
+        };
+
         return {
             patent, icon, publisher, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, PatentUpdateForm, canClassify,
@@ -435,7 +467,8 @@ export default defineComponent({
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
-            createIndicator, fetchIndicators, fetchValidationStatus
+            createIndicator, fetchIndicators, fetchValidationStatus,
+            PublicationType, updateRemark
         };
 }})
 

@@ -6,64 +6,66 @@
             </h1>
             <br />
             <div>
-                <v-row
-                    v-if="isAdmin"
-                    class="d-flex flex-row justify-center"
-                >
-                    <v-col cols="8">
-                        <organisation-unit-autocomplete-search
-                            v-model:model-value="selectedOrganisationUnit"
-                            required
-                            disable-submission
-                            :only-harvestable-institutions="searchHarvestableInstitutions"
-                        ></organisation-unit-autocomplete-search>
-                    </v-col>
-                    <v-col cols="2">
-                        <v-checkbox
-                            v-model="searchHarvestableInstitutions"
-                            :label="$t('showOnlyHarvestableLabel')"
-                            hide-details
-                        />
-                    </v-col>
-                </v-row>
-                <loading-configuration-form
-                    v-if="isInstitutionalEditor || (isAdmin && selectedOrganisationUnit.value > 0)"
-                    :top-level-institution-id="selectedOrganisationUnit.value"
-                />
-                <v-row
-                    v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && researcherSelection"
-                    class="d-flex flex-row justify-center"
-                >
-                    <v-col cols="8">
-                        <person-autocomplete-search
-                            v-model="selectedPersons"
-                            required multiple
-                            disable-submission
-                            only-harvestable
-                            :institution-id="selectedOrganisationUnit.value"
-                        />
-                    </v-col>
-                    <v-col cols="2">
-                        <v-btn
-                            density="compact"
-                            class="mt-5"
-                            @click="researcherSelection = false">
-                            {{ $t("importForAllAuthors") }}
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row
-                    v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && !researcherSelection"
-                    class="d-flex flex-row justify-center">
-                    <v-col cols="2">
-                        <v-btn
-                            density="compact"
-                            class="bottom-spacer"
-                            @click="researcherSelection = true">
-                            {{ $t("selectAuthorsForImport") }}
-                        </v-btn>
-                    </v-col>
-                </v-row>
+                <v-section v-if="currentTab === 'externalSources'">
+                    <v-row
+                        v-if="isAdmin"
+                        class="d-flex flex-row justify-center"
+                    >
+                        <v-col cols="12" md="8">
+                            <organisation-unit-autocomplete-search
+                                v-model:model-value="selectedOrganisationUnit"
+                                required
+                                disable-submission
+                                :only-harvestable-institutions="searchHarvestableInstitutions"
+                            ></organisation-unit-autocomplete-search>
+                        </v-col>
+                        <v-col cols="12" md="2">
+                            <v-checkbox
+                                v-model="searchHarvestableInstitutions"
+                                :label="$t('showOnlyHarvestableLabel')"
+                                hide-details
+                            />
+                        </v-col>
+                    </v-row>
+                    <loading-configuration-form
+                        v-if="isInstitutionalEditor || (isAdmin && selectedOrganisationUnit.value > 0)"
+                        :top-level-institution-id="selectedOrganisationUnit.value"
+                    />
+                    <v-row
+                        v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && researcherSelection"
+                        class="d-flex flex-row justify-center"
+                    >
+                        <v-col cols="8">
+                            <person-autocomplete-search
+                                v-model="selectedPersons"
+                                required multiple
+                                disable-submission
+                                only-harvestable
+                                :institution-id="selectedOrganisationUnit.value"
+                            />
+                        </v-col>
+                        <v-col cols="2">
+                            <v-btn
+                                density="compact"
+                                class="mt-5"
+                                @click="researcherSelection = false">
+                                {{ $t("importForAllAuthors") }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row
+                        v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && !researcherSelection"
+                        class="d-flex flex-row justify-center">
+                        <v-col cols="2">
+                            <v-btn
+                                density="compact"
+                                class="bottom-spacer"
+                                @click="researcherSelection = true">
+                                {{ $t("selectAuthorsForImport") }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-section>
 
                 <v-tabs
                     v-model="currentTab"
@@ -73,6 +75,9 @@
                     align-tabs="center">
                     <v-tab value="externalSources">
                         {{ $t("externalSourcesLabel") }}
+                    </v-tab>
+                    <v-tab v-if="isAdmin" value="oaiSources">
+                        {{ $t("oaiSourcesLabel") }}
                     </v-tab>
                     <v-tab v-if="isResearcher" value="files">
                         {{ $t("blibliographisFormatFilesLabel") }}
@@ -85,18 +90,34 @@
                 <v-window
                     v-model="currentTab"
                     class="mt-10">
-                    <v-window-item value="externalSources">
+                    <v-window-item v-if="currentTab === 'externalSources'" value="externalSources">
                         <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
-                            <v-col cols="4">
+                            <v-col cols="12" sm="4">
+                                <date-picker-split
+                                    v-if="isAdmin || isInstitutionalEditor"
+                                    v-model="startDate"
+                                    :label="$t('startDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker-split>
                                 <date-picker
+                                    v-else
                                     v-model="startDate"
                                     :label="$t('startDateLabel')"
                                     color="primary"
                                     required
                                 ></date-picker>
                             </v-col>
-                            <v-col cols="4">
+                            <v-col cols="12" sm="4">
+                                <date-picker-split
+                                    v-if="isAdmin || isInstitutionalEditor"
+                                    v-model="endDate"
+                                    :label="$t('endDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker-split>
                                 <date-picker
+                                    v-else
                                     v-model="endDate"
                                     :label="$t('endDateLabel')"
                                     color="primary"
@@ -115,7 +136,7 @@
                             <v-col cols="auto">
                                 <generic-crud-modal
                                     :form-component="ScheduleHarvestForm"
-                                    :form-props="{}"
+                                    :form-props="{startDate: startDate, endDate: endDate}"
                                     entity-name="ScheduleHarvest"
                                     primary-color
                                     :disabled="!isFormValid"
@@ -126,6 +147,48 @@
                         <h2 v-if="!canPerformHarvest" class="d-flex flex-row justify-center text-center">
                             {{ isInstitutionalEditor ? $t("harvestDisabledMessage") : $t("setupIdentifiersMessage") }}
                         </h2>
+                    </v-window-item>
+                    <v-window-item value="oaiSources">
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="12" sm="8">
+                                <v-select
+                                    v-model="selectedOaiSource"
+                                    :items="oaiSources"
+                                    :label="$t('oaiSourceLabel') + '*'"
+                                    :rules="requiredSelectionRules">
+                                </v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="12" sm="4">
+                                <date-picker-split
+                                    v-model="startDateOai"
+                                    :label="$t('startDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker-split>
+                            </v-col>
+                            <v-col cols="12" sm="4">
+                                <date-picker-split
+                                    v-model="endDateOai"
+                                    :label="$t('endDateLabel')"
+                                    color="primary"
+                                    required
+                                ></date-picker-split>
+                            </v-col>
+                        </v-row>
+                        <v-row class="d-flex flex-row justify-center">
+                            <v-col cols="auto">
+                                <generic-crud-modal
+                                    :form-component="ScheduleHarvestForm"
+                                    :form-props="{startDate: startDateOai, endDate: endDateOai}"
+                                    entity-name="ScheduleHarvest"
+                                    primary-color
+                                    :disabled="!isFormValid"
+                                    @create="scheduleOaiHarvest"
+                                />
+                            </v-col>
+                        </v-row>
                     </v-window-item>
                     <v-window-item value="files">
                         <v-row class="d-flex flex-row justify-center">
@@ -238,11 +301,14 @@ import TaskManagerService from "@/services/TaskManagerService";
 import ScheduledTasksList from "@/components/core/ScheduledTasksList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import OrganisationUnitImportSourceService from "@/services/importer/OrganisationUnitImportSourceService";
+import { useValidationUtils } from "@/utils/ValidationUtils";
+import DatePickerSplit from "@/components/core/DatePickerSplit.vue";
+import UserService from "@/services/UserService";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: { DatePicker, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList },
+    components: { DatePicker, DatePickerSplit, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
@@ -260,6 +326,10 @@ export default defineComponent({
 
         const startDate = ref();
         const endDate = ref();
+
+        const startDateOai = ref();
+        const endDateOai = ref();
+
         const loading = ref(false);
         const harvestComplete = ref(false);
         const numberOfHarvestedDocuments = ref(0);
@@ -269,6 +339,8 @@ export default defineComponent({
         const selectedPersons = ref<{title: string, value: number}[]>([]);
         const { isAdmin, isInstitutionalEditor, isResearcher, loggedInUser } = useUserRole();
 
+        const { requiredSelectionRules } = useValidationUtils();
+
         const requiredFieldsDescription = ref("");
         const supportedFieldsDescription = ref("");
 
@@ -276,6 +348,12 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
+
+            if (isInstitutionalEditor.value) {
+                UserService.getLoggedInUser().then(response => {
+                    selectedOrganisationUnit.value.value = response.data.organisationUnitId as number;
+                });
+            }
 
             fetchNumberOfHarvestedDocuments(true);
 
@@ -294,6 +372,10 @@ export default defineComponent({
 
             startInterval();
             fetchScheduledTasks();
+
+            if (isAdmin.value) {
+                fetchOaiSources();
+            }
         });
 
         watch(selectedOrganisationUnit, () => {
@@ -427,6 +509,10 @@ export default defineComponent({
         };
 
         const fetchScheduledTasks = () => {
+            if (isResearcher.value) {
+                return;
+            }
+
             TaskManagerService.listScheduledHarvestTasks().then((response) => {
                 scheduledTasks.value = response.data;
                 scheduledTasks.value.sort((a, b) => {
@@ -481,6 +567,32 @@ export default defineComponent({
             });
         };
 
+        const oaiSources = ref<string[]>([]);
+        const selectedOaiSource = ref<string>("");
+        const fetchOaiSources = () => {
+            ImportService.fetchOAIPMHSources().then(response => {
+                oaiSources.value = response.data;
+                if (oaiSources.value.length > 0) {
+                    selectedOaiSource.value = oaiSources.value[0];
+                }
+            })
+        };
+
+        const scheduleOaiHarvest = (scheduleParams: any) => {
+            ImportService.scheduleOAIPMHHarvest(
+                selectedOaiSource.value,
+                scheduleParams[0],
+                scheduleParams[1],
+                startDateOai.value.split("T")[0],
+                endDateOai.value.split("T")[0]
+            ).then(() => {
+                fetchScheduledTasks();
+                currentTab.value = "scheduledHarvests";
+            }).catch((error) => {
+                handleError(error.response.status);
+            });
+        };
+
         return {
             startDate, endDate,
             loading, startHarvest,
@@ -494,12 +606,15 @@ export default defineComponent({
             isResearcher, currentTab,
             uploadBibliographicFiles,
             isCSVFileSelected,
+            requiredSelectionRules,
             requiredFieldsDescription,
             supportedFieldsDescription,
             searchHarvestableInstitutions,
             selectedPersons, researcherSelection,
             ScheduleHarvestForm, scheduleHarvest,
-            scheduledTasks, deleteScheduledHarvestTask
+            scheduledTasks, deleteScheduledHarvestTask,
+            oaiSources, selectedOaiSource,
+            scheduleOaiHarvest, startDateOai, endDateOai
         };
     },
 });

@@ -76,20 +76,31 @@
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
                     <v-col cols="12" sm="6" md="2">
-                        <v-select
+                        <v-text-field
                             v-model="startYear"
-                            :items="years"
+                            type="number"
                             :label="$t('fromLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :placeholder="$t('fromLabel') + '*'"
+                            :rules="requiredNumericFieldRules"
+                        ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
-                        <v-select
+                        <v-text-field
                             v-model="endYear"
-                            :items="years"
+                            type="number"
                             :label="$t('toLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :placeholder="$t('toLabel') + '*'"
+                            :rules="requiredNumericFieldRules"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row justify-center">
+                    <v-col cols="12" md="4">
+                        <relative-date-preview
+                            :start-year="startYear"
+                            :end-year="endYear"
+                            :recurrence-period="selectedRecurrenceType.value"
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -147,11 +158,16 @@ import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLo
 import { RecurrenceType } from '@/models/LoadModel';
 import TaskManagerService from '@/services/TaskManagerService';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
+import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
+import { useRoute } from 'vue-router';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { serverTimeToLocalTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "DocumentBackupView",
-    components: { Toast, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList },
+    components: { Toast, OrganisationUnitAutocompleteSearch, BackupList, ScheduledTasksList, RelativeDatePreview },
     setup() {
         const currentTab = ref("backupGeneration");
         const isFormValid = ref(false);
@@ -159,6 +175,8 @@ export default defineComponent({
         const snackbar = ref(false);
         const message = ref("");
         const { loggedInUser, isAdmin } = useUserRole();
+
+        const route = useRoute();
 
         const documentTypes = computed(() => getPublicationTypesForGivenLocale());
         const fileSections = computed(() => getDocumentFileSectionsForGivenLocale());
@@ -170,11 +188,10 @@ export default defineComponent({
                 
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
-        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLS]);
+        const exportFileFormats = ref<ExportFileFormat[]>([ExportFileFormat.CSV, ExportFileFormat.XLSX]);
         const selectedExportFileFormat = ref<ExportFileFormat>(ExportFileFormat.CSV);
 
-        const { requiredSelectionRules } = useValidationUtils();
-        const years = ref<number[]>([]);
+        const { requiredSelectionRules, requiredNumericFieldRules } = useValidationUtils();
 
         const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
         const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
@@ -192,13 +209,16 @@ export default defineComponent({
                 selectedFileSections.value.push(fileSection);
             });
 
-            const now = new Date();
-            for(let i = 1900; i <= now.getFullYear(); i++) {
-                years.value.push(i);
-            }
-
             document.title = i18n.t("routeLabel.documentBackup");
             fetchScheduledTasks();
+
+            if (route.query.institutionId) {
+                OrganisationUnitService.readOU(
+                    parseInt(route.query.institutionId as string)
+                ).then(response => {
+                    selectedOU.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id};
+                });
+            }
         });
 
         const generateBackupRequest = () => {
@@ -218,7 +238,7 @@ export default defineComponent({
                 params, selectedRecurrenceType.value.value
             ).then(response => {
                 snackbar.value = true;
-                message.value = i18n.t("backupGenerationScheduledMessage", [response.data]);
+                message.value = i18n.t("backupGenerationScheduledMessage", [serverTimeToLocalTime(response.data)]);
                 fetchScheduledTasks();
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
@@ -255,7 +275,8 @@ export default defineComponent({
             isFormValid, documentTypes,
             requiredSelectionRules,
             selectedOU, startYear,
-            selectedDocumentTypes, years,
+            selectedDocumentTypes,
+            requiredNumericFieldRules,
             endYear, generateBackupRequest,
             fileSections, langItems, selectedLang,
             snackbar, message, loggedInUser,

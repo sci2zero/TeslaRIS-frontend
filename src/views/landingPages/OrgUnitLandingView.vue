@@ -57,6 +57,12 @@
                         />
                         <v-row v-else>
                             <v-col cols="6">
+                                <div v-if="isAdmin && organisationUnit?.clientInstitution" class="response">
+                                    {{ $t("clientInstitutionLabel") }}
+                                </div>
+                                <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
+                                    {{ $t("legalEntityLabel") }}
+                                </div>
                                 <div>
                                     {{ $t("addressLabel") }}:
                                 </div>
@@ -112,11 +118,14 @@
                                     <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
                             </v-col>
-                            <v-col v-if="organisationUnit?.location?.latitude && organisationUnit?.location?.longitude" cols="6">
-                                <div>
+                            <v-col cols="6">
+                                <div v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit.location?.address">
                                     <open-layers-map
-                                        ref="mapRef" height="250px" :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]" :read-only="true"
-                                        :show-input="false"></open-layers-map>
+                                        ref="mapRef" height="250px"
+                                        :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
+                                        :read-only="true"
+                                        :show-input="false">
+                                    </open-layers-map>
                                 </div>
                             </v-col>
                         </v-row>
@@ -129,7 +138,7 @@
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("additionalActionsLabel") }}
             </div>
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row flex-wrap">
                 <generic-crud-modal
                     v-if="canEdit"
                     class="ml-2" 
@@ -190,17 +199,33 @@
                     :read-only="false"
                     @update="updateSuccess()"
                 />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="OrganisationUnitOutputConfigurationForm"
+                    :form-props="{ institutionId: organisationUnit?.id }"
+                    entity-name="OrganisationUnitOutputConfiguration"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="outputConfigurationUpdated"
+                />
+                <v-btn
+                    v-if="isInstitutionalEditor && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('importer')">
+                    {{ $t("importerLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="isInstitutionalEditor && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="navigateToBackupPage">
+                    {{ $t("backupLabel") }}
+                </v-btn>
             </div>
         </div>
-
-        <!-- Keywords -->
-        <keyword-list
-            :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
-            :can-edit="canEdit"
-            @search-keyword="searchKeyword($event)"
-            @update="updateKeywords">
-        </keyword-list>
-
         <br />
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
@@ -209,7 +234,7 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab value="publications">
+            <v-tab v-show="showOutputs" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="employees">
@@ -260,6 +285,7 @@
                     :publications="publications"
                     :total-publications="totalPublications"
                     enable-export
+                    :allow-comparison="isInstitutionalEditor && canEdit"
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, publicationSearchParams]"
                     :endpoint-body-parameters="
@@ -268,6 +294,7 @@
                             institutionId: organisationUnit.id,
                             commissionId: null
                         }"
+                    :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
                     @switch-page="switchPublicationsPage">
                 </publication-table-component>
             </v-tabs-window-item>
@@ -287,7 +314,7 @@
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true)">
+                    @delete="fetchEmployees(true); fetchEmployees(false);">
                 </person-table-component>
 
                 <div v-if="totalAlumni > 0">
@@ -297,7 +324,6 @@
                         :persons="alumni"
                         :total-persons="totalAlumni"
                         is-alumni-table
-                        :employment-institution-id="organisationUnit?.id"
                         enable-export
                         :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                         :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
@@ -338,6 +364,14 @@
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
+                <!-- Keywords -->
+                <keyword-list
+                    :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
+
                 <!-- Research Area -->
                 <v-row>
                     <v-col cols="12">
@@ -370,11 +404,11 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType, ThesisType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
@@ -407,7 +441,7 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
-import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PublicReviewContentForm from '@/components/thesisLibrary/PublicReviewContentForm.vue';
@@ -416,6 +450,10 @@ import PublicReviewPageConfigurationService from '@/services/thesisLibrary/Publi
 import OrganisationUnitTrustConfigurationForm from '@/components/organisationUnit/OrganisationUnitTrustConfigurationForm.vue';
 import OrganisationUnitImportSourceForm from '@/components/organisationUnit/OrganisationUnitImportSourceForm.vue';
 import InstitutionDefaultSubmissionContentForm from '@/components/organisationUnit/InstitutionDefaultSubmissionContentForm.vue';
+import OrganisationUnitOutputConfigurationForm from '@/components/organisationUnit/OrganisationUnitOutputConfigurationForm.vue';
+import OrganisationUnitOutputConfigurationService from '@/services/OrganisationUnitOutputConfigurationService';
+import { type AxiosResponseHeaders } from 'axios';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 
 
 export default defineComponent({
@@ -461,7 +499,7 @@ export default defineComponent({
         const personSearchParams = ref("tokens=*");
 
         const subUnitsPage = ref(0);
-        const subUnitsSize = ref(1);
+        const subUnitsSize = ref(10);
         const subUnitsSort = ref("");
         const subUnitsDirection = ref("");
 
@@ -477,7 +515,13 @@ export default defineComponent({
         const ouIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore = useLoginStore();
-        const { isAdmin, isInstitutionalEditor, loggedInUser } = useUserRole();
+        
+        const {
+            isAdmin, isInstitutionalEditor,
+            isInstitutionalLibrarian, isHeadOfLibrary,
+            loggedInUser
+        } = useUserRole();
+        
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
@@ -485,15 +529,17 @@ export default defineComponent({
         const alumniRef = ref<typeof PersonTableComponent>();
         const publicationsRef = ref<typeof PublicationTableComponent>();
 
+        const showOutputs = ref(false);
+
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
-
-                StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             }
 
+            StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
+            
             fetchOU(true);
             fetchIndicators();
             fetchRelations();
@@ -503,32 +549,48 @@ export default defineComponent({
             });
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedPublicationTypes.value.push(
-                    {title: publicationType.title, value: publicationType.value}
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string,
+                        value: PublicationType.THESIS
+                    }
                 );
-            });
+            }
 
             fetchPublicReviewPageContent();
         });
 
         const fetchOU = (uponStartup: boolean) => {
-            OrganisationUnitService.readOU(
+            OrganisationUnitOutputConfigurationService.fetchConfigurationForOrganisationUnit(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
-                organisationUnit.value = response.data;
+                showOutputs.value = response.data.showOutputs;
 
-                document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
-                
-                if(uponStartup) {
-                    Promise.all([fetchPublications(), fetchEmployees(false), fetchEmployees(true)]).then(() => {
-                        setStartTab();
-                    });
-                }
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
-                fetchSubUnits();
-            }).catch(() => {
-                router.push({ name: "notFound" });
+                OrganisationUnitService.readOU(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    organisationUnit.value = response.data;
+
+                    document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
+                    
+                    if(uponStartup) {
+                        const operations = [fetchEmployees(false), fetchEmployees(true)];
+                        if (showOutputs.value) {
+                            operations.push(fetchPublications());
+                        }
+
+                        Promise.all(operations).then(() => {
+                            setStartTab();
+                        });
+                    }
+
+                    fetchSubUnits();
+                }).catch(() => {
+                    router.push({ name: "notFound" });
+                });
             });
         };
 
@@ -593,7 +655,7 @@ export default defineComponent({
             return DocumentPublicationService.findPublicationsForOrganisationUnit(
                 parseInt(currentRoute.params.id as string),
                 selectedPublicationTypes.value.map(publicationType => publicationType.value),
-                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value}`
+                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value},${publicationsDirection.value}`
             ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements;
@@ -603,7 +665,7 @@ export default defineComponent({
         const fetchEmployees = (fetchAlumni: boolean) => {
             return PersonService.findEmployeesForOU(
                 parseInt(currentRoute.params.id as string),
-                `${personSearchParams.value}&page=${employeesPage.value}&size=${employeesSize.value}&sort=${employeesSort.value},${employeesDirection.value}`,
+                `${personSearchParams.value}&page=${fetchAlumni ? alumniPage.value : employeesPage.value}&size=${fetchAlumni ? alumniSize.value : employeesSize.value}&sort=${fetchAlumni ? alumniSort.value : employeesSort.value},${fetchAlumni ? alumniDirection.value : employeesDirection.value}`,
                 fetchAlumni
             ).then((response) => {
                 if (fetchAlumni) {
@@ -660,6 +722,12 @@ export default defineComponent({
             organisationUnit.value!.openAlexId = basicInfo.openAlexId;
             organisationUnit.value!.ror = basicInfo.ror;
             organisationUnit.value!.uris = basicInfo.uris;
+            organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
+            organisationUnit.value!.clientInstitution = basicInfo.clientInstitution;
+            organisationUnit.value!.validatingEmailDomain = basicInfo.validatingEmailDomain;
+            organisationUnit.value!.allowingSubdomains = basicInfo.allowingSubdomains;
+            organisationUnit.value!.institutionEmailDomain = basicInfo.institutionEmailDomain;
+            organisationUnit.value!.legalEntity = basicInfo.legalEntity;
             performUpdate(false);
         };
 
@@ -703,7 +771,13 @@ export default defineComponent({
                 researchAreasId: researchAreaIds,
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
-                uris: organisationUnit.value?.uris as string[]
+                uris: organisationUnit.value?.uris as string[],
+                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
+                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
+                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
+                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -725,7 +799,13 @@ export default defineComponent({
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
                 scopusAfid: organisationUnit.value?.scopusAfid,
-                uris: organisationUnit.value?.uris as string[]
+                uris: organisationUnit.value?.uris as string[],
+                allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
+                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
+                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
+                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
+                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -751,12 +831,26 @@ export default defineComponent({
             snackbar.value = true;
         };
 
+        const outputConfigurationUpdated = (shouldShowOutputs: boolean) => {
+            showOutputs.value = shouldShowOutputs;
+            
+            if (shouldShowOutputs) {
+                clearSortAndPerformPublicationSearch(publicationSearchParams.value);
+            }
+            
+            updateSuccess();
+        }
+
         const performNavigation = (pageName: string) => {
             router.push({name: pageName});
         };
 
         const navigateToPublicTheses = () => {
             router.push({name: "publicDissertationsReport", query: {institutionId: organisationUnit.value?.id as number}});
+        };
+
+        const navigateToBackupPage = () => {
+            router.push({name: "documentBackup", query: {institutionId: organisationUnit.value?.id as number}});
         };
 
         const publicReviewPageContent = ref<PublicReviewPageContent[]>([]);
@@ -769,6 +863,10 @@ export default defineComponent({
             });
         };
 
+        watch(selectedPublicationTypes, () => {
+            fetchPublications();
+        });
+
         return {
             organisationUnit, currentTab,
             publications, totalPublications,
@@ -776,26 +874,28 @@ export default defineComponent({
             switchPublicationsPage, publicationTypes,
             switchEmployeesPage, isAdmin, performNavigation,
             searchKeyword, relationChain, selectedPublicationTypes,
-            returnCurrentLocaleContent, canEdit,
+            returnCurrentLocaleContent, canEdit, switchAlumniPage,
             updateKeywords, updateBasicInfo, navigateToPublicTheses,
-            snackbar, snackbarMessage, relations,
+            snackbar, snackbarMessage, relations, totalAlumni,
             updateRelations, graphRef, updateResearchAreas,
             subUnits, totalSubUnits, switchSubUnitsPage,
-            alumni, totalAlumni, switchAlumniPage,
             OrganisationUnitUpdateForm, fetchEmployees,
             ouIndicators, StatisticsType, loginStore,
             ExportableEndpointType, updateSuccess,
             ExternalIndicatorsConfigurationForm,
             ApplicableEntityType, fetchIndicators,
-            clearSortAndPerformPersonSearch,
+            clearSortAndPerformPersonSearch, alumni,
             clearSortAndPerformPublicationSearch,
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
-            fetchPublicReviewPageContent,
+            fetchPublicReviewPageContent, isInstitutionalLibrarian,
             OrganisationUnitTrustConfigurationForm,
-            OrganisationUnitImportSourceForm,
-            InstitutionDefaultSubmissionContentForm, loggedInUser
+            OrganisationUnitImportSourceForm, showOutputs,
+            OrganisationUnitOutputConfigurationForm,
+            InstitutionDefaultSubmissionContentForm,
+            outputConfigurationUpdated, loggedInUser,
+            navigateToBackupPage
         };
 }})
 

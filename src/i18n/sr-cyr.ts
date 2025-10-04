@@ -9,7 +9,7 @@ export default {
     loginToViewCCDocumentMessage: "Документ је под CC лиценцом и није завршни рад, морате се улоговати како бисте га видели.",
     invalidDOIError: "Неисправан DOI формат",
     doiExistsError: "Постоји рад са овим DOI-ем.",
-    invalidUriError: "Неисправан URL формат",
+    invalidUriError: "Неисправан URL формат. Специфицирани URL мора почињати са схемом ('http://' или 'https://').",
     apvntFormatError: "Погрешан формат APVNT-а.",
     eCrisIdFormatError: "Погрешан формат eCRIS ID-а.",
     eNaukaIdFormatError: "Погрешан формат eNauka ID-а.",
@@ -72,5 +72,13 @@ export default {
     openAlexIdExistsError: "OpenAlex ID је већ у употреби.",
     webOfScienceIdFormatError: "Погрешан WOS ID формат.",
     webOfScienceResearcherIdFormatError: "Погрешан Researcher ID формат.",
-    webOfScienceIdExistsError: "WoS ID је већ у употреби."
+    webOfScienceIdExistsError: "WoS ID је већ у употреби.",
+    oaiSourcesLabel: "OAI-PMH извори",
+    oaiSourceLabel: "OAI-PMH извор",
+    signInWithOrcidLabel: "Улогуј се путем ORCID-а",
+    validatingEmailDomainLabel: "Валидирај домен адресе е-поште",
+    institutionEmailDomainLabel: "Домен институционалне адресе е-поште",
+    emailDomainErrorMessage: "Морате се регистровати са адресом е-поште ваше институције.",
+    volumeLabel: "Свеска (Volume)",
+    issueLabel: "Број (Issue)",
 };

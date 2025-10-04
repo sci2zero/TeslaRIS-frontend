@@ -132,9 +132,12 @@ export default defineComponent({
         const contributionTypes = computed(() => getTypesForGivenLocale());
 
         const addInput = () => {
+            const contributionType =
+                props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR;
+                
             inputs.value.push({contributionType: {
-                    title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR), 
-                    value: props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR
+                    title: getTitleFromValueAutoLocale(contributionType), 
+                    value: contributionType
                 }
             });
         };

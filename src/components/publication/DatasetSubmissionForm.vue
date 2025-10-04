@@ -3,7 +3,7 @@
         <v-row>
             <v-col :cols="inModal ? 12 : 10">
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="11">
                         <i-d-f-metadata-prepopulator
                             :document-type="PublicationType.DATASET"
                             @metadata-fetched="popuateMetadata"
@@ -12,7 +12,12 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -27,20 +32,11 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="5">
-                        <v-text-field v-model="datasetNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="workOpenAlexIdValidationRules"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
                     <v-col cols="10">
                         <v-text-field
-                            v-model="webOfScienceId"
-                            label="Web of Science ID"
-                            placeholder="Web of Science ID"
-                            :rules="documentWebOfScienceIdValidationRules">
+                            v-model="datasetNumber"
+                            :label="$t('internalNumberLabel')"
+                            :placeholder="$t('internalNumberLabel')">
                         </v-text-field>
                     </v-col>
                 </v-row>
@@ -48,7 +44,11 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            @set-input="contributions = $event">
+                        </person-publication-contribution>
                     </v-col>
                 </v-row>
 
@@ -83,7 +83,37 @@
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                            <publisher-autocomplete-search
+                                ref="publisherAutocompleteRef"
+                                v-model="selectedPublisher"
+                                allow-author-reprint>
+                            </publisher-autocomplete-search>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="scopus"
+                                label="Scopus ID"
+                                placeholder="Scopus ID"
+                                :rules="scopusIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Open Alex ID"
+                                :rules="workOpenAlexIdValidationRules">
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-text-field
+                                v-model="webOfScienceId"
+                                label="Web of Science ID"
+                                placeholder="Web of Science ID"
+                                :rules="documentWebOfScienceIdValidationRules">
+                            </v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -160,6 +190,7 @@ export default defineComponent({
         const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
+        const scopus = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
         const datasetNumber = ref("");
@@ -168,7 +199,8 @@ export default defineComponent({
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submitDataset = (stayOnPage: boolean) => {
@@ -182,9 +214,11 @@ export default defineComponent({
                 contributions: contributions.value,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: []
             };
@@ -200,6 +234,7 @@ export default defineComponent({
                     publisherAutocompleteRef.value?.clearInput();
                     publicationYear.value = "";
                     doi.value = "";
+                    scopus.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
                     datasetNumber.value = "";
@@ -261,7 +296,8 @@ export default defineComponent({
             workOpenAlexIdValidationRules,
             popuateMetadata, PublicationType,
             documentWebOfScienceIdValidationRules,
-            webOfScienceId
+            webOfScienceId, scopus,
+            scopusIdValidationRules
         };
     }
 });

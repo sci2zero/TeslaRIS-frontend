@@ -2,8 +2,13 @@
     <v-row v-for="(element, index) in uris" :key="index">
         <v-col cols="10">
             <v-text-field
-                v-model="element.value" :label="isWebsite ? $t('websiteLabel') : $t('uriInputLabel')" placeholder="URI" outlined
-                :rules="uriValidationRules" @input="sendContentToParent"></v-text-field>
+                v-model="element.value"
+                :label="isWebsite ? $t('websiteLabel') : $t('uriInputLabel')"
+                placeholder="URI"
+                outlined
+                :rules="uriValidationRules"
+                @input="sendContentToParent">
+            </v-text-field>
         </v-col>
         <v-col cols="2">
             <v-btn v-if="uris.length > 1 || uris[index].value !== ''" icon @click="removeUri(index)">

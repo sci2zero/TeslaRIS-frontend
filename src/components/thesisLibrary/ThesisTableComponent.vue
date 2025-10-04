@@ -30,7 +30,12 @@
                     <td v-if="institutionId === undefined && !$i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameOther }}
                     </td>
-                    <td>{{ row.item.scientificArea }}</td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        {{ row.item.scientificAreaSr }}
+                    </td>
+                    <td v-else>
+                        {{ row.item.scientificAreaOther }}
+                    </td>
                     <td v-if="$i18n.locale.startsWith('sr')">
                         <localized-link
                             :to="'scientific-results/thesis/' + row.item.databaseId"
@@ -45,29 +50,19 @@
                             <rich-title-renderer :title="row.item.titleOther"></rich-title-renderer>
                         </localized-link>
                     </td>
-                    <td>{{ localiseDate(row.item.publicReviewStartDate) }} - {{ showReviewEndDate ? localiseDate(row.item.publicReviewEndDate) : "*" }}</td>
                     <td>
-                        <v-menu
-                            :close-on-content-click="true"
-                            location="bottom"
-                        >
-                            <template #activator="{ props }">
-                                <div class="edit-pen">
-                                    <v-btn
-                                        v-bind="props"
-                                        compact>
-                                        ...
-                                    </v-btn>
-                                </div>
-                            </template>
-
-                            <v-list min-width="150">
-                                <publication-file-download-modal
-                                    :document-id="(row.item.databaseId as number)"
-                                    show-thesis-sections
-                                />
-                            </v-list>
-                        </v-menu>
+                        {{ localiseDate(row.item.publicReviewStartDate) }} - {{ showReviewEndDate ? localiseDate(row.item.publicReviewEndDate) : "*" }}
+                    </td>
+                    <td>
+                        <div class="d-flex flex-row justify-center">
+                            <publication-file-download-modal
+                                :document-id="(row.item.databaseId as number)"
+                                show-thesis-sections
+                                hide-empty-sections
+                                :persistent="false"
+                                :is-list-item="false"
+                            />
+                        </div>
                     </td>
                 </tr>
             </template>
@@ -86,7 +81,7 @@ import { watch } from 'vue';
 import { getDocumentLandingPageBasePath } from '@/utils/PathResolutionUtil';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import type { ThesisPublicReviewResponse } from '@/models/ThesisLibraryModel';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import PublicationFileDownloadModal from '../publication/PublicationFileDownloadModal.vue';
 
 

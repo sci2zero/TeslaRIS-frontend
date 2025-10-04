@@ -3,6 +3,7 @@ import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
 import type { OrganisationUnitRequest, OrganisationUnitIndex, OrganisationUnitResponse, OrganisationUnitRelationResponse, OrganisationUnitRelationRequest, InstitutionLogoRequest } from "@/models/OrganisationUnitModel";
+import { ThesisType } from "@/models/PublicationModel";
 
 export class OrganisationUnitService extends BaseService {
 
@@ -32,8 +33,12 @@ export class OrganisationUnitService extends BaseService {
     return super.sendRequest(axios.get, `organisation-unit-relation/${organisationUnitLeafId}`);
   }
 
-  async searchOUs(tokens: string, forPersonId: number | null, topLevelInstitutionId: number | null, onlyHarvestableInstitutions: boolean | null = null, onlyIndependentInstitutions: boolean | null = null): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
-    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${onlyHarvestableInstitutions ? ("&onlyReturnOnesWhichCanHarvest=" + onlyHarvestableInstitutions) : ""}${onlyIndependentInstitutions ? ("&onlyIndependent=" + onlyIndependentInstitutions) : ""}`);
+  async searchOUs(tokens: string, forPersonId: number | null, topLevelInstitutionId: number | null, onlyHarvestableInstitutions: boolean | null = null, onlyIndependentInstitutions: boolean | null = null, allowedThesisType: ThesisType | null = null, onlyClientInstitutions: boolean | null = null): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/simple-search?${tokens}${forPersonId ? ("&personId=" + forPersonId) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${onlyHarvestableInstitutions ? ("&onlyReturnOnesWhichCanHarvest=" + onlyHarvestableInstitutions) : ""}${onlyIndependentInstitutions ? ("&onlyIndependent=" + onlyIndependentInstitutions) : ""}${allowedThesisType ? ("&allowedThesisType=" + allowedThesisType) : ""}${onlyClientInstitutions ? ("&onlyClients=" + onlyClientInstitutions) : ""}`);
+  }
+
+  async searchOUsAdvanced(tokens: string): Promise<AxiosResponse<Page<OrganisationUnitIndex>>> {
+    return super.sendRequest(axios.get, `organisation-unit/advanced-search?${tokens}`);
   }
 
   async createOrganisationUnit(body: OrganisationUnitRequest, idempotencyKey?: string): Promise<AxiosResponse<OrganisationUnitResponse>> {
@@ -77,6 +82,10 @@ export class OrganisationUnitService extends BaseService {
 
   async deleteOURelation(relationId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `organisation-unit-relation/${relationId}`);
+  }
+
+  async deleteOURelationByIdPair(sourceId: number, targetId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `organisation-unit-relation/delete/${sourceId}/${targetId}`);
   }
 
   async checkIdentifierUsage(identifier: string, organisationUnitId: number): Promise<AxiosResponse<boolean>> {

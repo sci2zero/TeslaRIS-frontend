@@ -1,24 +1,40 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedThesisType"
+                    :label="$t('thesisTypeLabel') + '*'"
+                    :items="publicationTypes"
+                    :rules="requiredSelectionRules"
+                    return-object
+                ></v-select>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col v-if="!enterExternalOU" cols="11">
                 <organisation-unit-autocomplete-search
                     ref="ouAutocompleteRef"
                     v-model:model-value="selectedOrganisationUnit"
                     :readonly="isInstitutionalLibrarian"
                     required
+                    :allowed-thesis-type="selectedThesisType.value"
                 />
             </v-col>
             <v-col v-else>
                 <multilingual-text-input
-                    ref="externalOUNameRef" v-model="externalOUName" :rules="requiredFieldRules" :label="$t('externalOUNameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"></multilingual-text-input>
+                    ref="externalOUNameRef"
+                    v-model="externalOUName"
+                    :rules="requiredFieldRules"
+                    :label="$t('externalOUNameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetThesis?.externalOrganisationUnitName, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row v-if="!isInstitutionalLibrarian">
             <v-col>
                 <v-btn color="blue darken-1" compact @click="enterExternalOU = !enterExternalOU">
-                    {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
+                    {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalThesisOULabel") }}
                 </v-btn>
             </v-col>
         </v-row>
@@ -37,17 +53,6 @@
                     :label="$t('subtitleLabel')"
                     :initial-value="toMultilingualTextInput(presetThesis?.subTitle, languageTags)">
                 </multilingual-text-input>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <v-select
-                    v-model="selectedThesisType"
-                    :label="$t('thesisTypeLabel') + '*'"
-                    :items="publicationTypes"
-                    :rules="requiredSelectionRules"
-                    return-object
-                ></v-select>
             </v-col>
         </v-row>
         <v-row>
@@ -97,26 +102,8 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
-            </v-col>
-            <v-col cols="6">
-                <v-text-field
-                    v-model="openAlexId"
-                    label="Open Alex ID"
-                    placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <v-text-field
-                    v-model="webOfScienceId"
-                    label="Web of Science ID"
-                    placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -207,8 +194,7 @@
                 <v-text-field
                     v-model="udc"
                     :label="$t('udcLabel')"
-                    :placeholder="$t('udcLabel')"
-                    :rules="udcValidationRules">
+                    :placeholder="$t('udcLabel')">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -248,7 +234,37 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
+                <publisher-autocomplete-search
+                    ref="publisherAutocompleteRef"
+                    v-model="selectedPublisher"
+                    allow-author-reprint>
+                </publisher-autocomplete-search>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
 
@@ -325,7 +341,9 @@ export default defineComponent({
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
                 response.data.forEach((language: LanguageResponse) => {
-                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
                 });
             });
             
@@ -348,6 +366,8 @@ export default defineComponent({
                         publisher.value = response.data;
                         selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                     });
+                } else if (props.presetThesis?.authorReprint) {
+                    selectedPublisher.value = {title: "", value: -2};
                 }
             }
         };
@@ -374,7 +394,8 @@ export default defineComponent({
             }
 
             if (!selectedWritingLanguage.value && props.presetThesis?.writingLanguageTagId) {
-                selectedWritingLanguage.value = languageTagsList.value.find(tag => tag.value === props.presetThesis?.writingLanguageTagId);
+                selectedWritingLanguage.value =
+                    languageTagsList.value.find(tag => tag.value === props.presetThesis?.writingLanguageTagId);
             }
         });
 
@@ -414,13 +435,14 @@ export default defineComponent({
         const printIsbn = ref(props.presetThesis?.printISBN as string);
         const placeOfKeep = ref<any>([]);
         const udc = ref(props.presetThesis?.udc as string);
+        const scopus = ref(props.presetThesis?.scopusId as string);
         const typeOfTitle = ref<any>([]);
 
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules, documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
@@ -464,9 +486,11 @@ export default defineComponent({
                 contributions: props.presetThesis?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 languageId: selectedLanguage.value,
                 writingLanguageTagId: selectedWritingLanguage.value?.value as number,
                 fileItems: [],
@@ -523,6 +547,7 @@ export default defineComponent({
             printIsbn.value = props.presetThesis?.printISBN as string;
             eIsbn.value = props.presetThesis?.eisbn as string;
             udc.value = props.presetThesis?.udc as string;
+            scopus.value = props.presetThesis?.scopusId as string;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -552,12 +577,12 @@ export default defineComponent({
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
             topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference,
             openAlexId, workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
+            printIsbn, eIsbn, placeOfKeep, udc, typeOfTitleRef, scopus,
             numberOfChapters, numberOfReferences, numberOfTables,
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
-            scientificSubAreaRef, placeOfKeepRef, typeOfTitleRef
+            scientificSubAreaRef, placeOfKeepRef
         };
     }
 });

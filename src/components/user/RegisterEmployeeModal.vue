@@ -46,10 +46,20 @@
                                     ></v-select>
                                 </v-col>
                                 <v-col cols="12">
-                                    <organisation-unit-autocomplete-search ref="ouAutocompleteRef" v-model="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                                    <organisation-unit-autocomplete-search
+                                        ref="ouAutocompleteRef"
+                                        v-model="selectedOrganisationUnit"
+                                        required
+                                        disable-submission
+                                        only-client-institutions>
+                                    </organisation-unit-autocomplete-search>
                                 </v-col>
                                 <v-col v-if="registeringCommission" cols="12">
-                                    <commission-autocomplete-search ref="commissionAutocompleteRef" v-model="selectedCommission" required></commission-autocomplete-search>
+                                    <commission-autocomplete-search
+                                        ref="commissionAutocompleteRef"
+                                        v-model="selectedCommission"
+                                        required>
+                                    </commission-autocomplete-search>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-textarea
@@ -88,7 +98,7 @@ import LanguageService from "@/services/LanguageService";
 import AuthenticationService from "@/services/AuthenticationService";
 import { onMounted } from "vue";
 import type { AxiosError, AxiosResponse } from "axios";
-import type { LanguageResponse } from "@/models/Common";
+import type { LanguageTagResponse } from "@/models/Common";
 import type { EmployeeRegistrationRequest, CommissionRegistrationRequest } from "@/models/AuthenticationModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
@@ -179,13 +189,13 @@ export default defineComponent({
         };
 
         onMounted(() => {
-            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+            LanguageService.getAllUILanguages().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 const listOfLanguages: { title: string, value: number }[] = [];
-                response.data.forEach((language: LanguageResponse) => {
-                    listOfLanguages.push({title: language.languageCode, value: language.id})
+                response.data.forEach((language: LanguageTagResponse) => {
+                    listOfLanguages.push({title: language.display, value: language.id})
                     languages.value = listOfLanguages;
                     if (language.languageCode === "SR") {
-                        selectedLanguage.value = { title: language.languageCode, value: language.id };
+                        selectedLanguage.value = { title: language.display, value: language.id };
                     }
                 });
             });

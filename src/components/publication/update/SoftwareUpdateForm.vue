@@ -34,7 +34,29 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
+            <v-col>
+                <uri-input ref="urisRef" v-model="uris"></uri-input>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="10">
+                <publisher-autocomplete-search
+                    ref="publisherAutocompleteRef"
+                    v-model="selectedPublisher"
+                    allow-author-reprint>
+                </publisher-autocomplete-search>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="scopus"
+                    label="Scopus ID"
+                    placeholder="Scopus ID"
+                    :rules="scopusIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
@@ -42,23 +64,13 @@
                     :rules="workOpenAlexIdValidationRules">
                 </v-text-field>
             </v-col>
-            <v-col cols="5">
+            <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules">
                 </v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
-                <publisher-autocomplete-search ref="publisherAutocompleteRef" v-model="selectedPublisher"></publisher-autocomplete-search>
             </v-col>
         </v-row>
 
@@ -125,6 +137,8 @@ export default defineComponent({
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
+            } else if (props.presetSoftware?.authorReprint) {
+                selectedPublisher.value = {title: "", value: -2};
             }
         };
 
@@ -149,11 +163,13 @@ export default defineComponent({
         const webOfScienceId = ref(props.presetSoftware?.webOfScienceId);
         const softwareNumber = ref(props.presetSoftware?.internalNumber);
         const uris = ref<string[]>(props.presetSoftware?.uris as string[]);
+        const scopus = ref(props.presetSoftware?.scopusId);
 
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            scopusIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -162,7 +178,8 @@ export default defineComponent({
                     [
                         { value: doi.value as string, error: "doiExistsError" },
                         { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
+                        { value: scopus.value as string, error: "scopusIdExistsError"}
                     ],
                     props.presetSoftware?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -183,9 +200,11 @@ export default defineComponent({
                 contributions: props.presetSoftware?.contributions,
                 documentDate: publicationYear.value,
                 doi: doi.value,
+                scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
-                publisherId: selectedPublisher.value.value === -1 ? undefined : selectedPublisher.value.value,
+                publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
+                authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: []
             };
@@ -206,6 +225,7 @@ export default defineComponent({
             doi.value = props.presetSoftware?.doi;
             openAlexId.value = props.presetSoftware?.openAlexId;
             webOfScienceId.value = props.presetSoftware?.webOfScienceId;
+            scopus.value = props.presetSoftware?.scopusId;
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -223,7 +243,8 @@ export default defineComponent({
             languageTags, doiValidationRules,
             refreshForm, urisRef, subtitleRef,
             openAlexId, workOpenAlexIdValidationRules,
-            webOfScienceId, documentWebOfScienceIdValidationRules
+            webOfScienceId, documentWebOfScienceIdValidationRules,
+            scopus, scopusIdValidationRules
         };
     }
 });

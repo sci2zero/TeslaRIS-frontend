@@ -1,6 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
+import { useDownloadStore } from "@/stores/downloadStore";
 
 
 export class RegistryBookReportService extends BaseService {
@@ -18,7 +19,25 @@ export class RegistryBookReportService extends BaseService {
     }
 
     async downloadReport(reportFileName: string): Promise<void> {
-        const response = await axios.get(this.basePath + `registry-book/report/download/${reportFileName}`, {responseType: 'blob'})
+        const downloadStore = useDownloadStore();
+        if (downloadStore.isDownloading) {
+            return;
+        }
+
+        const response = await axios.get(this.basePath + `registry-book/report/download/${reportFileName}`,
+            {
+                responseType: 'blob',
+                onDownloadProgress: (progressEvent: any) => {
+                    if (progressEvent.total) {
+                        const percent = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        
+                        downloadStore.downloadProgressRef?.updateProgress(percent);
+                    }
+                }
+            }
+        );
         this.initialzeDownload(response, `${reportFileName}.pdf`, ".pdf");
     }
 }

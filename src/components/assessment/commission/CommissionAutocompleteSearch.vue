@@ -3,9 +3,10 @@
         <v-col :cols="allowManualClearing && hasSelection ? 11 : 12">
             <v-autocomplete
                 v-model="selectedCommission"
+                v-model:search="searchInput"
                 :readonly="readOnly"
                 :label="(multiple ? $t('commissionListLabel') : $t('commissionLabel')) + (required ? '*' : '')"
-                :items="commissions"
+                :items="readOnly ? [] : commissions"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :auto-select-first="true"
@@ -85,6 +86,7 @@ export default defineComponent({
         const selectedCommission = ref(
             props.multiple ? (props.modelValue as Array<any> || []) : (props.modelValue || searchPlaceholder)
         );
+        const searchInput = ref("");
 
         const { requiredSelectionRules } = useValidationUtils();
 
@@ -119,6 +121,10 @@ export default defineComponent({
         }, 300);
 
         const sendContentToParent = () => {
+            if (props.multiple) {
+                searchInput.value = "";
+            }
+            
             emit('update:modelValue', selectedCommission.value);
         };
 
@@ -171,7 +177,7 @@ export default defineComponent({
             sendContentToParent,
             clearInput,
             selectNewlyAddedCommission,
-            hasSelection,
+            hasSelection, searchInput
         };
     },
 });

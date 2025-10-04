@@ -12,7 +12,7 @@
         </div>
 
         <div
-            v-if="(isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor"
+            v-if="(isAdmin && selectedOrganisationUnit && selectedOrganisationUnit.value > 0) || isInstitutionalEditor"
             class="mt-15">
             <v-select
                 v-model="selectedPublicationTypes"
@@ -100,9 +100,6 @@ export default defineComponent({
             document.title = i18n.t("routeLabel.publicationsValidation");
 
             selectedPublicationTypes.value.splice(0);
-            publicationTypes.value?.forEach(publicationType => {
-                selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
-            });
         });
 
         watch([

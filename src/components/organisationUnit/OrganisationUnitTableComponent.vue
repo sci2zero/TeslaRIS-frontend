@@ -175,7 +175,7 @@ export default defineComponent({
         }
     },
     emits: ["switchPage"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const selectedOUs = ref<OrganisationUnitIndex[]>([]);
 
         const i18n = useI18n();
@@ -232,22 +232,41 @@ export default defineComponent({
 
         const deleteSelection = () => {
             Promise.all(selectedOUs.value.map((organisationUnit: OrganisationUnitIndex) => {
-                return OrganisationUnitService.deleteOrganisationUnit(organisationUnit.databaseId)
-                    .then(() => {
-                        if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameSr }));
-                        } else {
-                            addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameOther }));
-                        }
-                    })
-                    .catch(() => {
-                        if (i18n.locale.value.startsWith("sr")) {
-                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameSr }));
-                        } else {
-                            addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameOther }));
-                        }
-                        return organisationUnit;
-                    });
+                if (props.topLevelInstitutionId > 0) {
+                    return OrganisationUnitService.deleteOURelationByIdPair(organisationUnit.databaseId, props.topLevelInstitutionId)
+                        .then(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("ouTerminationSuccessNotification", { name: organisationUnit.nameSr }));
+                            } else {
+                                addNotification(i18n.t("ouTerminationSuccessNotification", { name: organisationUnit.nameOther }));
+                            }
+                        })
+                        .catch(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("ouTerminationFailedNotification", { name: organisationUnit.nameSr }));
+                            } else {
+                                addNotification(i18n.t("ouTerminationFailedNotification", { name: organisationUnit.nameOther }));
+                            }
+                            return organisationUnit;
+                        });
+                } else {
+                    return OrganisationUnitService.deleteOrganisationUnit(organisationUnit.databaseId)
+                        .then(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameSr }));
+                            } else {
+                                addNotification(i18n.t("deleteSuccessNotification", { name: organisationUnit.nameOther }));
+                            }
+                        })
+                        .catch(() => {
+                            if (i18n.locale.value.startsWith("sr")) {
+                                addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameSr }));
+                            } else {
+                                addNotification(i18n.t("deleteFailedNotification", { name: organisationUnit.nameOther }));
+                            }
+                            return organisationUnit;
+                        });
+                }
             })).then((failedDeletions) => {
                 selectedOUs.value = selectedOUs.value.filter((organisationUnit) => failedDeletions.includes(organisationUnit));
                 refreshTable(tableOptions.value);
@@ -285,7 +304,8 @@ export default defineComponent({
                 ) &&
                 page == tableOptions.value.page
             ) {
-                return
+                tableOptions.value.sortBy.splice(0);
+                return;
             }
 
             tableOptions.value.initialCustomConfiguration = true;

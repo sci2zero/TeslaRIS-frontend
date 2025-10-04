@@ -36,6 +36,14 @@
                 />
             </v-col>
         </v-row>
+        <v-row>
+            <v-checkbox
+                v-if="!institutionId && isUserBoundToOU"
+                v-model="returnOnlyInstitutionRelatedTheses"
+                :label="$t('showEntitiesForMyInstitutionLabel')"
+                class="ml-4 mt-3"
+            ></v-checkbox>
+        </v-row>
         <v-row v-if="showingNotDefended">
             <v-col>
                 <p>{{ $t("navigateToThesisSearchMessage") }}<a href="#" @click.prevent="navigateToSearch">{{ $t("linkLabel") }}</a></p>
@@ -106,6 +114,7 @@ import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PublicReviewPageContentDisplay from './PublicReviewPageContentDisplay.vue';
 import { ThesisType } from '@/models/PublicationModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -133,8 +142,11 @@ export default defineComponent({
 
         const showingNotDefended = computed(() => (currentRoute.query.notYetDefended as string) === 'true');
 
+        const { isUserBoundToOU } = useUserRole();
+        const returnOnlyInstitutionRelatedTheses = ref(false);
+
         onMounted(() => {
-            document.title = i18n.t("thesisListLabel");
+            document.title = i18n.t("routeLabel.publicDissertationsReport");
             loading.value = true;
 
             const now = new Date();
@@ -157,6 +169,12 @@ export default defineComponent({
                     notYetDefended: "false"
                 }
             });
+
+            fetchPublicReviewTheses();
+        });
+
+        watch(returnOnlyInstitutionRelatedTheses, () => {
+            fetchPublicReviewTheses();
         });
 
         const fetchPublicReviewTheses = () => {
@@ -166,7 +184,8 @@ export default defineComponent({
                 institutionId.value ? parseInt(institutionId.value) : null,
                 selectedYear.value,
                 notDefended ? notDefended === "true" : false,
-                `&page=${page.value}&size=${size.value}`
+                `&page=${page.value}&size=${size.value}`,
+                returnOnlyInstitutionRelatedTheses.value
             ).then(response => {
                 theses.value = response.data.content;
                 totalTheses.value = response.data.totalElements;
@@ -221,7 +240,9 @@ export default defineComponent({
             returnCurrentLocaleContent,
             navigateToSearch, navigateToThisView,
             showingNotDefended, PageContentType,
-            institutionId, ThesisType, getPageType
+            institutionId, ThesisType, getPageType,
+            isUserBoundToOU,
+            returnOnlyInstitutionRelatedTheses
         };
     }
 });

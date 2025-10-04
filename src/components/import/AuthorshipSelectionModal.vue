@@ -21,6 +21,14 @@
                                     {{ authorship.personName?.firstname }} {{ authorship.personName?.lastname }}
                                 </v-list-item-title>
                             </v-list-item>
+
+                            <v-list-item value="nobody" class="mt-4">
+                                <v-list-item-title
+                                    class="text-h6"
+                                    @click="selectAsNotMine">
+                                    {{ $t("nobodyLabel") }}
+                                </v-list-item-title>
+                            </v-list-item>
                         </v-list>
                     </v-container>
                 </v-card-text>
@@ -49,7 +57,7 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ["select"],
+    emits: ["select", "unbind"],
     setup(props, { emit }) {
         const dialog = ref(false);
 
@@ -89,13 +97,19 @@ export default defineComponent({
             });
         };
 
+        const selectAsNotMine = () => {
+            emit("unbind");
+            dialog.value = false;
+        };
+
         const show = () => {
             dialog.value = true;
         };
 
         return { 
             dialog, show,
-            selectYourself
+            selectYourself,
+            selectAsNotMine
         };
     }
 });

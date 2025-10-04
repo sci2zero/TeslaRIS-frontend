@@ -111,6 +111,7 @@ export interface PersonResponse {
 
 
 export interface PersonUserResponse {
+    personId: number;
     personName: PersonName;
     personOtherNames: PersonName[];
     personalInfo: PersonalInfo;
@@ -118,6 +119,8 @@ export interface PersonUserResponse {
     keyword: MultilingualContent[];
     approveStatus: ApproveStatus;
     user: UserResponse;
+    employmentInstitutionName?: MultilingualContent[];
+    employmentInstitutionId?: number;
 }
 
 interface PersonalInfo {

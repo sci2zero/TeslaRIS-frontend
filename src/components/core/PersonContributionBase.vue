@@ -9,6 +9,7 @@
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
                 return-object
+                :readonly="lockSearchField"
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
                 @blur="onAutocompleteBlur"
@@ -22,8 +23,16 @@
                 is-submission
                 :read-only="false"
                 @create="selectNewlyAddedPerson"
+                @selected="selectExistingSelectedPerson"
             />
         </v-col>
+    </v-row>
+    <v-row v-if="showTopSuggestions && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)">
+        <v-chip
+            v-for="contributor in topContributors" :key="contributor.b" class="ml-2" outlined
+            @click="setContributor(contributor)">
+            {{ contributor.a }}
+        </v-chip>
     </v-row>
     <!-- <v-btn
         v-if="allowExternalAssociate && !selectExternalAssociate"
@@ -127,11 +136,12 @@ import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/Mult
 import { onMounted } from "vue";
 import LanguageService from "@/services/LanguageService";
 import InvolvementService from "@/services/InvolvementService";
-import { localiseDate } from "@/i18n/dateLocalisation";
+import { localiseDate } from "@/utils/DateUtil";
 import { removeTrailingPipeRegex } from "@/utils/StringUtil";
 import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
 import { useUserRole } from "@/composables/useUserRole";
+import UserService from "@/services/UserService";
 
 
 export default defineComponent({
@@ -162,11 +172,23 @@ export default defineComponent({
         isUpdate: {
             type: Boolean,
             default: false
+        },
+        lockSearchField: {
+            type: Boolean,
+            default: false
+        },
+        showTopSuggestions: {
+            type: Boolean,
+            default: false
+        },
+        suggestionDisplayCheck: {
+            type: Function as PropType<((personId: number) => boolean)>,
+            default: () => { return true; }
         }
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const { canUserAddPersons } = useUserRole();
+        const { canUserAddPersons, isResearcher } = useUserRole();
 
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
@@ -194,6 +216,7 @@ export default defineComponent({
         const i18n = useI18n();
         const personOtherNamePlaceholder = ref({title: "", value: -1});
 
+        const personPrimaryName = ref<PersonName>();
         const personOtherNames = ref<{ title: string, value: PersonName | number }[]>([]);
         const selectedOtherName = ref<{ title: string, value: PersonName | number }>(personOtherNamePlaceholder.value);
 
@@ -205,7 +228,9 @@ export default defineComponent({
         const lastSearchInput = ref();
         const presetPersonNameForCreation = ref<PersonName>();
 
-        onMounted(() => {
+        const topContributors = ref<Record<string, number>[]>([]);
+
+        onMounted(async () => {
             if (!props.isUpdate) {
                 valueSet.value = true;
             }
@@ -213,12 +238,40 @@ export default defineComponent({
             LanguageService.getAllLanguageTags().then(response => {
                 languageTags.value = response.data;
             });
+
+
+            displayTopCollaboratorPicks();
         });
 
+        const displayTopCollaboratorPicks = async () => {
+            if (isResearcher.value && props.showTopSuggestions) {
+                topContributors.value.splice(0);
+
+                const loggedInUser = await UserService.getLoggedInUser();
+                if (props.suggestionDisplayCheck(loggedInUser?.data.personId as number)) {
+                    topContributors.value.push(
+                        {
+                            a: `${loggedInUser?.data.firstname as string} ${loggedInUser?.data.lastName as string} (${i18n.t('meLabel')})`,
+                            b: loggedInUser?.data.personId as number
+                        }
+                    );
+                }
+
+                PersonService.getTopCollaborators().then(response => {
+                    response.data.forEach(collaborator => {
+                        if (props.suggestionDisplayCheck(collaborator.b)) {
+                            topContributors.value.push(collaborator)
+                        }
+                    });
+                });
+            }
+        };
+
         const searchPersons = lodash.debounce((input: string) => {
-            if (!input || input.includes("|") || selectedPerson.value.value === 0) {
+            if (props.lockSearchField || !input || input.includes("|") || (selectedPerson.value && selectedPerson.value.value === 0)) {
                 return;
             }
+
             if (input.length >= 3) {
                 lastSearchInput.value = `(${input.replaceAll('(', '').replaceAll(')', '')})`;
                 
@@ -254,6 +307,12 @@ export default defineComponent({
                             title: i18n.t("notInListLabel", [personName]),
                             value: 0
                         });
+                    } else {
+                        presetPersonNameForCreation.value = {
+                            firstname: tokens[0],
+                            lastname: tokens.length > 1 ? tokens[tokens.length - 1] : "",
+                            otherName: ""
+                        };
                     }
                     
                     persons.value = listOfPersons;
@@ -282,19 +341,16 @@ export default defineComponent({
 
                 if(props.presetContributionValue.personId) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
+                        personPrimaryName.value = personResponse.data.personName;
                         
-                        if (personResponse.data.personName.otherName && personResponse.data.personName.otherName !== "null") {
-                            selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
-                        } else {
-                            selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
-                        }
+                        selectedPerson.value = {title: `${constructDisplayName(personResponse.data.personName)}`, value: personResponse.data.id as number};
 
                         personOtherNames.value = [{title: selectedPerson.value.title, value: -1}];
                         personResponse.data.personOtherNames.forEach((otherName) => {
-                            if (otherName.dateFrom && otherName.dateTo) {
-                                personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName});
+                            if (otherName.dateFrom) {
+                                personOtherNames.value.push({title: `${constructDisplayName(otherName)} | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}`, value: otherName as PersonName});
                             } else {
-                                personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname}`, value: otherName as PersonName});
+                                personOtherNames.value.push({title: `${constructDisplayName(otherName)}`, value: otherName as PersonName});
                             }
                         });
 
@@ -304,9 +360,11 @@ export default defineComponent({
 
                         if(foundName) {
                             selectedOtherName.value = foundName;
+                            clearCustomNameValues();
                         } else if(selectedPersonName.trim() === "") {
                             customNameInput.value = false;
                             selectedOtherName.value = personOtherNames.value[0];
+                            clearCustomNameValues();
                         } else {
                             customNameInput.value = true;
                         }
@@ -319,6 +377,20 @@ export default defineComponent({
                 }
             }
         }, { deep: true });
+
+        watch(customNameInput, () => {
+            if (customNameInput.value && personPrimaryName.value) {
+                firstName.value = firstName.value ? firstName.value : personPrimaryName.value.firstname;
+                lastName.value = lastName.value ? lastName.value : personPrimaryName.value.lastname;
+
+                const isCustomName =
+                    firstName.value !== personPrimaryName.value.firstname || lastName.value !== personPrimaryName.value.lastname;
+
+                if (personPrimaryName.value.otherName && !isCustomName) {
+                    middleName.value = middleName.value ? middleName.value : personPrimaryName.value.otherName;
+                }
+            }
+        });
 
         const onPersonSelect = (selection: {title: string, value: number}) => {
             if (!selection) {
@@ -334,13 +406,24 @@ export default defineComponent({
             }
 
             PersonService.readPerson(selection.value).then((response) => {
-                personOtherNames.value = [{title: selection.title.split("|")[0], value: -1}];
+                personPrimaryName.value = response.data.personName;
+                personOtherNames.value = [
+                    {title: constructDisplayName(response.data.personName), value: -1}
+                ];
                 selectedOtherName.value = personOtherNames.value[0];
                 response.data.personOtherNames.forEach((otherName) => {
-                    personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName})
+                    personOtherNames.value.push({title: `${constructDisplayName(otherName)}` + (otherName.dateFrom ? ` | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}` : ""), value: otherName as PersonName})
                 });
             });
             sendContentToParent();
+        };
+
+        const constructDisplayName = (name: PersonName): string => {
+            if (name.otherName && name.otherName.trim() !== "") {
+                return `${name.firstname} ${name.otherName} ${name.lastname}`;
+            }
+
+            return `${name.firstname} ${name.lastname}`;
         };
 
         const constructExternalCollaboratorFromInput = (selectionTitle: string) => {
@@ -356,6 +439,12 @@ export default defineComponent({
                     firstName.value = toTitleCase(nameTokens[nameTokens.length - 1]);
                 }
             }
+        };
+
+        const clearCustomNameValues = () => {
+            firstName.value = "";
+            lastName.value = "";
+            middleName.value = "";
         };
 
         const extractTextInParentheses = (input: string) => {
@@ -484,6 +573,15 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectExistingSelectedPerson = (person: PersonIndex) => {
+            const toSelect = {title: person.name, value: person.databaseId as number};
+            persons.value.push(toSelect);
+            selectedPerson.value = toSelect;
+            personOtherNames.value = [{title: selectedPerson.value.title.split("|")[0], value: -1}];
+            selectedOtherName.value = personOtherNames.value[0];
+            sendContentToParent();
+        };
+
         const toggleExternalSelection = () => {
             selectExternalAssociate.value = !selectExternalAssociate.value;
 
@@ -547,20 +645,23 @@ export default defineComponent({
             }, 0);
         };
 
+        const setContributor = (contributor: Record<string, number>) => {
+            selectedPerson.value = {title: `${contributor.a}`, value: contributor.b}
+            onPersonSelect(selectedPerson.value);
+        };
+
         return {
-                firstName, middleName, lastName,
-                selectedPerson, customNameInput,
-                searchPersons, filterPersons, persons,
-                requiredFieldRules, requiredSelectionRules,
-                contributionDescription, affiliationStatement,
-                sendContentToParent, clearInput, onPersonSelect,
+                firstName, middleName, lastName, selectedPerson, customNameInput,
+                searchPersons, filterPersons, persons, requiredFieldRules,
+                requiredSelectionRules, contributionDescription, affiliationStatement,
+                sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
                 descriptionRef, affiliationStatementRef, toggleExternalSelection,
                 personOtherNames, selectedOtherName, selectExternalAssociate,
-                selectNewlyAddedPerson, toMultilingualTextInput,
+                selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
                 PersonSubmissionForm, enterExternalOU, canUserAddPersons,
                 constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation
+                presetPersonNameForCreation, setContributor, selectExistingSelectedPerson
             };
     }
 });

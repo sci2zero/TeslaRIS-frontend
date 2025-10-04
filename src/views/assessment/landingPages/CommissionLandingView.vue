@@ -127,7 +127,7 @@ import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { type CommissionRelationResponse, type Commission, type CommissionResponse, type AssessmentResearchArea } from '@/models/AssessmentModel';
 import CommissionService from '@/services/assessment/CommissionService';
-import { localiseDate } from '@/i18n/dateLocalisation';
+import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from '@/components/assessment/commission/CommissionForm.vue';
 import Toast from '@/components/core/Toast.vue';

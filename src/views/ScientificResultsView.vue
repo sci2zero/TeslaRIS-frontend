@@ -29,19 +29,34 @@
                 </query-input-component>
             </v-tabs-window-item>
         </v-tabs-window>
-        <br />
-        <span
-            v-if="canUserAddPublications"
-            :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-            <add-publication-menu></add-publication-menu>
-        </span>
+        <div class="d-flex flex-row justify-start mt-10">
+            <span
+                v-if="canUserAddPublications"
+                :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
+                <add-publication-menu />
+            </span>
+            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
+                <v-btn
+                    color="primary" density="default"
+                    @click="performNavigation('publicationsValidation')">
+                    {{ $t("routeLabel.publicationsValidation") }}
+                </v-btn>
+            </span>
+            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
+                <v-btn
+                    color="primary" density="default"
+                    @click="performNavigation('authorReprints')">
+                    {{ $t("routeLabel.authorReprints") }}
+                </v-btn>
+            </span>
+        </div>
 
         <v-select
             v-model="selectedPublicationTypes"
             :items="publicationTypes"
             :label="$t('typeOfPublicationLabel')"
             return-object
-            class="publication-type-select mt-3"
+            class="publication-type-select no-empty-outline mt-3"
             multiple
         ></v-select>
 
@@ -59,6 +74,13 @@
                 :label="$t('showUnassessedLabel')"
                 class="ml-4 mt-3"
             ></v-checkbox>
+
+            <v-checkbox
+                v-if="isAdmin"
+                v-model="returnOnlyUnmanagedPublications"
+                :label="$t('showOnlyUnmanagedLabel')"
+                class="ml-4 mt-3"
+            ></v-checkbox>
         </span>
 
         <tab-content-loader
@@ -73,14 +95,15 @@
             :publications="publications"
             :total-publications="totalPublications"
             enable-export
-            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
+            :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
-            :endpoint-token-parameters="searchParams.replaceAll('tokens=', '').split('&')"
+            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
             :endpoint-body-parameters="
                 {
                     allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
                     institutionId: returnOnlyInstitutionRelatedEntities ? loggedInUser?.organisationUnitId as number : null,
-                    commissionId: isCommission && returnOnlyUnassessedEntities ? loggedInUser?.commissionId as number : null
+                    commissionId: isCommission && returnOnlyUnassessedEntities ? loggedInUser?.commissionId as number : null,
+                    onlyUnmanaged: returnOnlyUnmanagedPublications
                 }"
             @switch-page="switchPage">
         </publication-table-component>
@@ -103,6 +126,7 @@ import { ExportableEndpointType, type SearchFieldsResponse } from '@/models/Comm
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import { useRoute, useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -111,6 +135,9 @@ export default defineComponent({
     setup() {
         const currentTab = ref("simpleSearch");
         const loading = ref(false);
+
+        const router = useRouter();
+        const route = useRoute();
 
         const searchParams = ref("tokens=");
         const previousFilterValues = ref<{publicationTypes: string[], selectOnlyUnassessed: boolean}>({publicationTypes: [], selectOnlyUnassessed: false});
@@ -128,8 +155,14 @@ export default defineComponent({
         const returnOnlyUnassessedEntities = ref(true);
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
+        const returnOnlyUnmanagedPublications = ref(false);
 
-        const { isCommission, isInstitutionalEditor, canUserAddPublications, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+        const {
+            isCommission, isAdmin, isInstitutionalEditor,
+            canUserAddPublications, isUserBoundToOU,
+            returnOnlyInstitutionRelatedEntities, loggedInUser,
+            isInstitutionalLibrarian, isHeadOfLibrary
+        } = useUserRole();
 
         const searchFields = ref<SearchFieldsResponse[]>([]);
 
@@ -140,18 +173,21 @@ export default defineComponent({
             selectedPublicationTypes.value.splice(0);
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
                 selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
-            } else {
-                publicationTypes.value?.forEach(publicationType => {
-                    selectedPublicationTypes.value.push({title: publicationType.title, value: publicationType.value});
-                });
             }
 
             DocumentPublicationService.getSearchFields(false).then(response => {
                 searchFields.value = response.data;
             });
+
+            if ((route.query.unmanaged as string) === "true") {
+                returnOnlyUnmanagedPublications.value = true;
+            }
         });
 
-        watch([loggedInUser, returnOnlyInstitutionRelatedEntities, returnOnlyUnassessedEntities, selectedPublicationTypes], () => {
+        watch([
+            loggedInUser, returnOnlyInstitutionRelatedEntities,
+            returnOnlyUnassessedEntities, selectedPublicationTypes,
+            returnOnlyUnmanagedPublications], () => {
             search(searchParams.value);
         });
 
@@ -165,12 +201,12 @@ export default defineComponent({
 
             searchParams.value = tokenParams;
             previousFilterValues.value.publicationTypes = publicationTypes;
-            previousFilterValues.value.selectOnlyUnassessed = selectOnlyUnassessed; 
+            previousFilterValues.value.selectOnlyUnassessed = !!selectOnlyUnassessed; 
 
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
                 ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes)
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value)
                 : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
                     DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes);
 
@@ -181,7 +217,7 @@ export default defineComponent({
             serviceMethod(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 organisationUnitId,
-                selectOnlyUnassessed,
+                !!selectOnlyUnassessed,
                 publicationTypes
             ).then((response) => {
                 publications.value = response.data.content;
@@ -215,16 +251,21 @@ export default defineComponent({
             clearSortAndPerformSearch("tokens=*");
         };
 
+        const performNavigation = (pageName: string) => {
+            router.push({name: pageName});
+        };
+
         return {
             search, publications, totalPublications,
-            switchPage, isInstitutionalEditor,
+            switchPage, isInstitutionalEditor, isAdmin,
             tableRef, clearSortAndPerformSearch, searchFields,
             canUserAddPublications, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
-            resetFiltersAndSearch, loggedInUser, loading
+            resetFiltersAndSearch, loggedInUser, loading,
+            performNavigation, returnOnlyUnmanagedPublications
         };
     }
 });
@@ -234,6 +275,14 @@ export default defineComponent({
 
 .publication-type-select {
     max-width: 700px;
+}
+
+.no-empty-outline :deep(.v-field__outline) {
+  opacity: 0;
+}
+
+.no-empty-outline:deep(.v-select--focused .v-field__outline) {
+  opacity: 1;
 }
 
 </style>

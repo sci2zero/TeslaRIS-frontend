@@ -17,6 +17,8 @@
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
+                        {{ returnCurrentLocaleContent(journal?.subtitle) }}
+                        <br v-if="journal?.subtitle && journal.subtitle.length > 0" />
                         {{ $t("journalLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -312,6 +314,7 @@ export default defineComponent({
             journal.value!.languageTagIds = updatedJournal.languageTagIds;
             journal.value!.openAlexId = updatedJournal.openAlexId;
             journal.value!.uris = updatedJournal.uris;
+            journal.value!.subtitle = updatedJournal.subtitle;
 
             performUpdate(false);
         };
