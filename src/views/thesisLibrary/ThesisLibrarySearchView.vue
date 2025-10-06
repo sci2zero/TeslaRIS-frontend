@@ -81,7 +81,10 @@
             v-if="showWordcloud"
             class="d-flex flex-row justify-center mt-15">
             <v-col cols="12" sm="10">
-                <wordcloud :wordcloud-frequencies="wordcloudFrequencies" />
+                <wordcloud
+                    :wordcloud-frequencies="wordcloudFrequencies"
+                    :document-type="PublicationType.THESIS"
+                />
             </v-col>
         </v-row>
     </section>
@@ -90,7 +93,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
-import { type DocumentPublicationIndex, ThesisType } from '@/models/PublicationModel';
+import { type DocumentPublicationIndex, PublicationType, ThesisType } from '@/models/PublicationModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { type ThesisSearchRequest, type ThesisReportRequest } from '@/models/ThesisLibraryModel';
 import { onMounted } from 'vue';
@@ -247,7 +250,7 @@ export default defineComponent({
             lastSearchRequest, ExportEntity,
             resetFiltersAndSearch,
             sectionTableRef, searchFields,
-            wordcloudFrequencies,
+            wordcloudFrequencies, PublicationType,
             showWordcloud, loading
         };
     }

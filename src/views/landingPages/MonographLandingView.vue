@@ -29,7 +29,12 @@
                 <v-icon v-if="!monograph" size="x-large" class="large-monograph-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="monograph?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="monograph?.id"
+                    :document-type="PublicationType.MONOGRAPH"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">

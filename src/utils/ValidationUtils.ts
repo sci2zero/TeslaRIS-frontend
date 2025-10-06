@@ -273,8 +273,7 @@ export const useValidationUtils = () => {
     const nonMandatoryEmailFieldRules = [
         (value: string) => {
             if (!value) return true;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) return emailFormatMessage.value;
+            if (!emailPattern.test(value)) return emailFormatMessage.value;
             return true;
         }
     ];

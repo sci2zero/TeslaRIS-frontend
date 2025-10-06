@@ -29,7 +29,12 @@
                 <v-icon v-if="!dataset" size="x-large" class="large-dataset-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="dataset?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="dataset?.id"
+                    :document-type="PublicationType.DATASET"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">

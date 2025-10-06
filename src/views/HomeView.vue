@@ -40,7 +40,7 @@
                                 </span>
                             </div>
 
-                            <v-list density="compact" class="text-center mt-2">
+                            <v-list v-if="item.topResults?.length > 0" density="compact" class="text-center mt-2">
                                 <v-list-subheader class="d-flex flex-row justify-center">
                                     {{ item.topResultsTitle }}
                                 </v-list-subheader>

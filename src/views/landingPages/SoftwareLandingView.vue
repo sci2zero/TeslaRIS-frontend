@@ -29,7 +29,12 @@
                 <v-icon v-if="!software" size="x-large" class="large-software-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="software?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="software?.id"
+                    :document-type="PublicationType.SOFTWARE"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">

@@ -371,7 +371,17 @@ export default defineComponent({
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
         const tableOptions = ref<any>(
-            {initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]}
+            {
+                initialCustomConfiguration: true,
+                page: 1,
+                itemsPerPage: 10,
+                sortBy:[
+                    {
+                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn),
+                        order: "asc"
+                    }
+                ]
+            }
         );
 
         const headers = ref<any>([
@@ -510,7 +520,7 @@ export default defineComponent({
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             if (
                 (
-                    isEqual([{key: titleColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+                    isEqual([{key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn.value), order: "asc"}], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0
                 ) &&
                 page == tableOptions.value.page

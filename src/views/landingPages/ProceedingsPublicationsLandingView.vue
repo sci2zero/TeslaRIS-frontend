@@ -29,7 +29,12 @@
                 <v-icon v-if="!proceedingsPublication" size="x-large" class="large-proceedingsPublication-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="proceedingsPublication?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="proceedingsPublication?.id"
+                    :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">

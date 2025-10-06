@@ -205,10 +205,12 @@
                 {{ $t("noAssessmentForSelectionMessage") }}
             </h3>
 
-            <i-f-table-component
-                v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
-                class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="(yearOfPublication as number) - 2" :preset-to-year="(yearOfPublication as number)"
-                @years-updated="fetchIFTableData"></i-f-table-component>
+            <div ref="assessmentSectionRef">
+                <i-f-table-component
+                    v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
+                    class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="(yearOfPublication as number) - 2" :preset-to-year="(yearOfPublication as number)"
+                    @years-updated="fetchIFTableData"></i-f-table-component>
+            </div>
         </v-form>
     </v-container>
 </template>
@@ -270,6 +272,8 @@ export default defineComponent({
         const vueRecaptcha = ref<typeof VueRecaptcha>();
         const i18n = useI18n();
         const locale = computed(() => i18n.locale.value);
+
+        const assessmentSectionRef = ref<HTMLElement | null>(null);
 
         onMounted(async () => {
             document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
@@ -360,6 +364,7 @@ export default defineComponent({
                     assessmentResponse.value = response.data;
                     token.value = "";
                     vueRecaptcha.value?.reset();
+                    assessmentSectionRef.value?.scrollIntoView({ behavior: 'smooth' });
                 });
 
                 fetchIFTableData((yearOfPublication.value as number) - 2, yearOfPublication.value as number);
@@ -368,6 +373,7 @@ export default defineComponent({
                     assessmentResponse.value = response.data;
                     token.value = "";
                     vueRecaptcha.value?.reset();
+                    assessmentSectionRef.value?.scrollIntoView({ behavior: 'smooth' });
                 });
             }
         };
@@ -402,7 +408,7 @@ export default defineComponent({
             proceedingsPublicationTypes, selectedJournalPublicationType,
             selectedProceedingsPublicationType, resetChallenge,
             handleVerifyCallback, vueRecaptcha, token, siteKey,
-            isUserLoggedIn, commissions
+            isUserLoggedIn, commissions, assessmentSectionRef
         };
     }
 });

@@ -54,29 +54,15 @@
                         {{ localiseDate(row.item.publicReviewStartDate) }} - {{ showReviewEndDate ? localiseDate(row.item.publicReviewEndDate) : "*" }}
                     </td>
                     <td>
-                        <v-menu
-                            :close-on-content-click="true"
-                            location="bottom"
-                        >
-                            <template #activator="{ props }">
-                                <div class="edit-pen">
-                                    <v-btn
-                                        v-bind="props"
-                                        compact>
-                                        ...
-                                    </v-btn>
-                                </div>
-                            </template>
-
-                            <v-list min-width="150">
-                                <publication-file-download-modal
-                                    :document-id="(row.item.databaseId as number)"
-                                    show-thesis-sections
-                                    hide-empty-sections
-                                    :persistent="false"
-                                />
-                            </v-list>
-                        </v-menu>
+                        <div class="d-flex flex-row justify-center">
+                            <publication-file-download-modal
+                                :document-id="(row.item.databaseId as number)"
+                                show-thesis-sections
+                                hide-empty-sections
+                                :persistent="false"
+                                :is-list-item="false"
+                            />
+                        </div>
                     </td>
                 </tr>
             </template>

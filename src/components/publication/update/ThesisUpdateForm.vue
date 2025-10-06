@@ -194,8 +194,7 @@
                 <v-text-field
                     v-model="udc"
                     :label="$t('udcLabel')"
-                    :placeholder="$t('udcLabel')"
-                    :rules="udcValidationRules">
+                    :placeholder="$t('udcLabel')">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -443,7 +442,7 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules, documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
@@ -578,12 +577,12 @@ export default defineComponent({
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
             topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference,
             openAlexId, workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
+            printIsbn, eIsbn, placeOfKeep, udc, typeOfTitleRef, scopus,
             numberOfChapters, numberOfReferences, numberOfTables,
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
-            scientificSubAreaRef, placeOfKeepRef, typeOfTitleRef, scopus
+            scientificSubAreaRef, placeOfKeepRef
         };
     }
 });

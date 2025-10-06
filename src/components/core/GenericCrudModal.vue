@@ -42,6 +42,7 @@
                             @create="emitToParent"
                             @update="emitToParent"
                             @update-persist="emitToParentAndPersist"
+                            @selected="emitSelectionToParent"
                         />
                     </v-container>
                 </v-card-text>
@@ -126,7 +127,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ["create", "update", "updatePersist"],
+    emits: ["create", "update", "updatePersist", "selected"],
     setup(props, { emit }) {
         const dialog = ref(false);
         const formRef = ref<InstanceType<typeof props.formComponent>>();
@@ -139,15 +140,21 @@ export default defineComponent({
             }
             
             dialog.value = false;
-        }
+        };
+
+        const emitSelectionToParent = (formData: any) => {
+            emit("selected", formData);
+            dialog.value = false;
+        };
 
         const emitToParentAndPersist = (formData: any) => {
             emit("updatePersist", formData);
-        }
+        };
 
         return { 
             dialog, formRef, emitToParent,
-            emitToParentAndPersist
+            emitToParentAndPersist,
+            emitSelectionToParent
         };
     }
 });

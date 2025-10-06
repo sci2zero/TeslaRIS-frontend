@@ -344,17 +344,32 @@
                                     <h3>{{ $t("employmentsLabel") }}</h3>
                                 </div>
                                 <br />
-                                <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <involvement-list
+                                    :involvements="employments"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                                 <div v-if="education.length > 0">
                                     <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
                                 </div>
                                 <br />
-                                <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <involvement-list
+                                    :involvements="education"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                                 <div v-if="memberships.length > 0">
                                     <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
                                 </div>
                                 <br />
-                                <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <involvement-list
+                                    :involvements="memberships"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                             </v-card-text>
                         </v-card>
                     </v-col>

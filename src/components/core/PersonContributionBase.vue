@@ -23,6 +23,7 @@
                 is-submission
                 :read-only="false"
                 @create="selectNewlyAddedPerson"
+                @selected="selectExistingSelectedPerson"
             />
         </v-col>
     </v-row>
@@ -306,6 +307,12 @@ export default defineComponent({
                             title: i18n.t("notInListLabel", [personName]),
                             value: 0
                         });
+                    } else {
+                        presetPersonNameForCreation.value = {
+                            firstname: tokens[0],
+                            lastname: tokens.length > 1 ? tokens[tokens.length - 1] : "",
+                            otherName: ""
+                        };
                     }
                     
                     persons.value = listOfPersons;
@@ -353,9 +360,11 @@ export default defineComponent({
 
                         if(foundName) {
                             selectedOtherName.value = foundName;
+                            clearCustomNameValues();
                         } else if(selectedPersonName.trim() === "") {
                             customNameInput.value = false;
                             selectedOtherName.value = personOtherNames.value[0];
+                            clearCustomNameValues();
                         } else {
                             customNameInput.value = true;
                         }
@@ -374,7 +383,10 @@ export default defineComponent({
                 firstName.value = firstName.value ? firstName.value : personPrimaryName.value.firstname;
                 lastName.value = lastName.value ? lastName.value : personPrimaryName.value.lastname;
 
-                if (personPrimaryName.value.otherName) {
+                const isCustomName =
+                    firstName.value !== personPrimaryName.value.firstname || lastName.value !== personPrimaryName.value.lastname;
+
+                if (personPrimaryName.value.otherName && !isCustomName) {
                     middleName.value = middleName.value ? middleName.value : personPrimaryName.value.otherName;
                 }
             }
@@ -427,6 +439,12 @@ export default defineComponent({
                     firstName.value = toTitleCase(nameTokens[nameTokens.length - 1]);
                 }
             }
+        };
+
+        const clearCustomNameValues = () => {
+            firstName.value = "";
+            lastName.value = "";
+            middleName.value = "";
         };
 
         const extractTextInParentheses = (input: string) => {
@@ -555,6 +573,15 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectExistingSelectedPerson = (person: PersonIndex) => {
+            const toSelect = {title: person.name, value: person.databaseId as number};
+            persons.value.push(toSelect);
+            selectedPerson.value = toSelect;
+            personOtherNames.value = [{title: selectedPerson.value.title.split("|")[0], value: -1}];
+            selectedOtherName.value = personOtherNames.value[0];
+            sendContentToParent();
+        };
+
         const toggleExternalSelection = () => {
             selectExternalAssociate.value = !selectExternalAssociate.value;
 
@@ -634,7 +661,7 @@ export default defineComponent({
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
                 PersonSubmissionForm, enterExternalOU, canUserAddPersons,
                 constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation, setContributor
+                presetPersonNameForCreation, setContributor, selectExistingSelectedPerson
             };
     }
 });
