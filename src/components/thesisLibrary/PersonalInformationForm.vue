@@ -55,43 +55,50 @@
                     :rules="requiredFieldRules"
                 />
             </v-col>
-            <v-col cols="12" sm="6">
-                <v-text-field
-                    ref="fatherNameRef"
-                    v-model="formValue.fatherName"
-                    :label="$t('fatherNameLabel') + '*'"
-                    :rules="conditionalRule"
-                />
-            </v-col>
-            <v-col cols="12" sm="6">
-                <v-text-field
-                    v-model="formValue.fatherSurname"
-                    :label="$t('fatherSurnameLabel')"
-                />
-            </v-col>
-            <v-col cols="12" sm="6">
-                <v-text-field
-                    ref="motherNameRef"
-                    v-model="formValue.motherName"
-                    :label="$t('motherNameLabel') + '*'"
-                    :rules="conditionalRule"
-                />
-            </v-col>
-            <v-col cols="12" sm="6">
-                <v-text-field
-                    v-model="formValue.motherSurname"
-                    :label="$t('motherSurnameLabel')"
-                />
-            </v-col>
-            <v-col cols="12">
-                <v-text-field
-                    ref="guardianNameRef"
-                    v-model="formValue.guardianNameAndSurname"
-                    :label="$t('guardianNameAndSurnameLabel') + '*'"
-                    :rules="conditionalRule"
-                />
-            </v-col>
         </v-row>
+        <div class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("enterOneOfThreeLabel") }}
+            </div>
+            <v-row>
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        ref="fatherNameRef"
+                        v-model="formValue.fatherName"
+                        :label="$t('fatherNameLabel')"
+                        :rules="conditionalRule"
+                    />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="formValue.fatherSurname"
+                        :label="$t('fatherSurnameLabel')"
+                    />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        ref="motherNameRef"
+                        v-model="formValue.motherName"
+                        :label="$t('motherNameLabel')"
+                        :rules="conditionalRule"
+                    />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="formValue.motherSurname"
+                        :label="$t('motherSurnameLabel')"
+                    />
+                </v-col>
+                <v-col cols="12">
+                    <v-text-field
+                        ref="guardianNameRef"
+                        v-model="formValue.guardianNameAndSurname"
+                        :label="$t('guardianNameAndSurnameLabel')"
+                        :rules="conditionalRule"
+                    />
+                </v-col>
+            </v-row>
+        </div>
     </v-form>
 </template>
   

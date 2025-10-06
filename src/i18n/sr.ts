@@ -1114,5 +1114,7 @@ export default {
     collaborationPublicationsLabel: "Publikacije za saradnju",
     publicReviewLengthLabel: "Trajanje javnog uvida (u danima)",
     noFilesForDownloadLabel: "Nema fajlova za preuzimanje.",
-    eventDescriptionLabel: "Opis događaja"
+    eventDescriptionLabel: "Opis događaja",
+    enterOneOfTwoLabel: "Unesite bar jedno od ova dva polja",
+    enterOneOfThreeLabel: "Unesite bar jedno od ova tri polja"
 }

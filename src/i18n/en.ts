@@ -1108,5 +1108,7 @@ export default {
     collaborationPublicationsLabel: "Publication for collaboration",
     publicReviewLengthLabel: "Public review length (days)",
     noFilesForDownloadLabel: "No files for download.",
-    eventDescriptionLabel: "Event description"
+    eventDescriptionLabel: "Event description",
+    enterOneOfTwoLabel: "Enter at least one of two",
+    enterOneOfThreeLabel: "Enter at least one of three"
 }
