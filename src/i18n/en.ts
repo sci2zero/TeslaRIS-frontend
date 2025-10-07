@@ -1110,5 +1110,7 @@ export default {
     noFilesForDownloadLabel: "No files for download.",
     eventDescriptionLabel: "Event description",
     enterOneOfTwoLabel: "Enter at least one of two",
-    enterOneOfThreeLabel: "Enter at least one of three"
+    enterOneOfThreeLabel: "Enter at least one of three",
+    updateChartDisplayConfigurationLabel: "Visualizations display",
+    spanWholeRowLabel: "Span whole row"
 }

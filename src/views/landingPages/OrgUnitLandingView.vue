@@ -210,6 +210,16 @@
                     :read-only="!canEdit"
                     @update="outputConfigurationUpdated"
                 />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="ChartDisplayConfigurationForm"
+                    :form-props="{ organisationUnitId: organisationUnit?.id }"
+                    entity-name="ChartDisplayConfiguration"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                />
                 <v-btn
                     v-if="isInstitutionalEditor && canEdit"
                     class="mb-5 ml-2" color="primary" density="compact"
@@ -472,6 +482,7 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import OrganisationUnitVisualizations from '@/components/organisationUnit/OrganisationUnitVisualizations.vue';
 import OrganisationUnitLeaderboards from '@/components/organisationUnit/OrganisationUnitLeaderboards.vue';
+import ChartDisplayConfigurationForm from '@/components/organisationUnit/ChartDisplayConfigurationForm.vue';
 
 
 export default defineComponent({
@@ -913,7 +924,7 @@ export default defineComponent({
             OrganisationUnitOutputConfigurationForm,
             InstitutionDefaultSubmissionContentForm,
             outputConfigurationUpdated, loggedInUser,
-            navigateToBackupPage
+            navigateToBackupPage, ChartDisplayConfigurationForm
         };
 }})
 

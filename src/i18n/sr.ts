@@ -1116,5 +1116,7 @@ export default {
     noFilesForDownloadLabel: "Nema fajlova za preuzimanje.",
     eventDescriptionLabel: "Opis događaja",
     enterOneOfTwoLabel: "Unesite bar jedno od ova dva polja",
-    enterOneOfThreeLabel: "Unesite bar jedno od ova tri polja"
+    enterOneOfThreeLabel: "Unesite bar jedno od ova tri polja",
+    updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
+    spanWholeRowLabel: "Raspon na celi red"
 }
