@@ -4,47 +4,48 @@
             <h2>{{ title }}</h2>
             <h4>{{ subtitle }}</h4>
         </div>
-        <v-card
-            v-if="leaderboardData.length > 0"
-            v-for="(item, index) in leaderboardData" 
-            :key="(item.a.databaseId as number)"
-            class="leaderboard-card mb-4"
-            :class="getCardClass(index)"
-            @click="navigateToEntityLandingPage((item.a as PersonIndex | OrganisationUnitIndex))"
-        >
-            <div class="card-content">
-                <div class="trophy-section">
-                    <img 
-                        v-if="index === 0" 
-                        src="@/assets/gold-trophy.png" 
-                        alt="Gold Trophy" 
-                        class="trophy-icon"
-                    />
-                    <img 
-                        v-else-if="index === 1" 
-                        src="@/assets/silver-trophy.png" 
-                        alt="Silver Trophy" 
-                        class="trophy-icon"
-                    />
-                    <img 
-                        v-else-if="index === 2" 
-                        src="@/assets/bronze-trophy.png" 
-                        alt="Bronze Trophy" 
-                        class="trophy-icon"
-                    />
-                    <span v-else class="ordinal-number">{{ index + 1 }}</span>
-                </div>
+        <div v-if="leaderboardData.length > 0">
+            <v-card
+                v-for="(item, index) in leaderboardData"
+                :key="(item.a.databaseId as number)"
+                class="leaderboard-card mb-4"
+                :class="getCardClass(index)"
+                @click="navigateToEntityLandingPage((item.a as PersonIndex | OrganisationUnitIndex))"
+            >
+                <div class="card-content">
+                    <div class="trophy-section">
+                        <img 
+                            v-if="index === 0" 
+                            src="@/assets/gold-trophy.png" 
+                            alt="Gold Trophy" 
+                            class="trophy-icon"
+                        />
+                        <img 
+                            v-else-if="index === 1" 
+                            src="@/assets/silver-trophy.png" 
+                            alt="Silver Trophy" 
+                            class="trophy-icon"
+                        />
+                        <img 
+                            v-else-if="index === 2" 
+                            src="@/assets/bronze-trophy.png" 
+                            alt="Bronze Trophy" 
+                            class="trophy-icon"
+                        />
+                        <span v-else class="ordinal-number">{{ index + 1 }}</span>
+                    </div>
         
-                <div class="info-section">
-                    <div class="name">
-                        {{ getEntityName((item.a as PersonIndex | OrganisationUnitIndex)) }}
-                    </div>
-                    <div class="value">
-                        {{ formatValue(item.b) }}
+                    <div class="info-section">
+                        <div class="name">
+                            {{ getEntityName((item.a as PersonIndex | OrganisationUnitIndex)) }}
+                        </div>
+                        <div class="value">
+                            {{ formatValue(item.b) }}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </v-card>
+            </v-card>
+        </div>
         <h5
             v-else
             class="d-flex flex-row text-center">
