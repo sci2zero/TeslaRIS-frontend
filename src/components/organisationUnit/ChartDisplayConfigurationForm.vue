@@ -1,5 +1,5 @@
 <template>
-    <v-form @submit.prevent>
+    <v-form v-if="isFormValid" @submit.prevent>
         <v-tabs
             v-if="displaySettings"
             v-model="currentTab"
@@ -441,6 +441,8 @@
                 </v-row>
             </v-tabs-window-item>
         </v-tabs-window>
+
+        <toast v-model="snackbar" :message="message" />
     </v-form>
 </template>
 
@@ -448,6 +450,10 @@
 import { onMounted, ref } from 'vue';
 import type { DocumentChartDisplaySettings, FullChartDisplaySettings, OUChartDisplaySettings, PersonChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 import ChartDisplayConfigurationService from '@/services/visualization/ChartDisplayConfigurationService';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import Toast from '../core/Toast.vue';
+import { useI18n } from 'vue-i18n';
+
 
 const props = defineProps({
     organisationUnitId: {
@@ -456,6 +462,14 @@ const props = defineProps({
     }
 });
 
+
+const emit = defineEmits(["updatePersist"]);
+
+const snackbar = ref(false);
+const message = ref("");
+const i18n = useI18n();
+
+const isFormValid = ref(true);
 const currentTab = ref("personConfig");
 const displaySettings = ref<FullChartDisplaySettings>();
 
@@ -473,4 +487,29 @@ onMounted(() => {
         documentSettings.value = displaySettings.value.documentChartDisplaySettings;
     });
 });
+
+const submit = () => {
+    ChartDisplayConfigurationService.saveFullChartDisplaySettings(
+        props.organisationUnitId,
+        {
+            documentChartDisplaySettings: documentSettings.value as DocumentChartDisplaySettings,
+            personChartDisplaySettings: personSettings.value as PersonChartDisplaySettings,
+            ouChartDisplaySettings: ouSettings.value as OUChartDisplaySettings
+        }
+    ).then(() => {
+        message.value = i18n.t("updatedSuccessMessage");
+        snackbar.value = true;
+
+        emit("updatePersist");
+    }).catch((error) => {
+        message.value = getErrorMessageForErrorKey(error.response.data.message);
+        snackbar.value = true;
+    });
+};
+
+defineExpose({
+    isFormValid,
+    submit
+});
+
 </script>

@@ -60,13 +60,13 @@
         color="deep-purple-accent-4"
         align-tabs="start"
     >
-        <v-tab value="publicationCount">
+        <v-tab v-show="displayPublicationsTab" value="publicationCount">
             {{ $t("numberOfPublicationsLabel") }}
         </v-tab>
-        <v-tab value="publicationType">
+        <v-tab v-show="displayTypeRatiosTab" value="publicationType">
             {{ $t("publicationTypesLabel") }}
         </v-tab>
-        <v-tab value="statistics">
+        <v-tab v-show="displayStatisticsTab" value="statistics">
             {{ $t("statisticsLabel") }}
         </v-tab>
     </v-tabs>
@@ -78,14 +78,17 @@
         <v-tabs-window-item value="publicationCount">
             <v-row class="mt-10">
                 <v-col
-                    cols="12" md="6"
+                    v-if="displaySettings?.publicationCountTotal.display"
+                    cols="12" :md="displaySettings?.publicationCountTotal.spanWholeRow ? 12 : 6"
                     class="d-flex justify-center align-center">
                     <display-card
                         :display-value="totalPublicationCount"
                         :label="$t('totalPublicationsLabel')"
                     />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                    v-if="displaySettings?.publicationCountByYear.display"
+                    cols="12" :md="displaySettings?.publicationCountByYear.spanWholeRow ? 12 : 6">
                     <simple-bar-chart
                         :data="publicationsYearData"
                         :title="$t('numberOfPublicationsYearlyLabel')"
@@ -94,7 +97,9 @@
                 </v-col>
             </v-row>
             <v-row>
-                <v-col>
+                <v-col
+                    v-if="displaySettings?.publicationTypeByYear.display"
+                    cols="12" :md="displaySettings?.publicationTypeByYear.spanWholeRow ? 12 : 6">
                     <stacked-bar-chart
                         :data="publicationsYearTypeData"
                         :title="$t('numberOfPublicationsByTypeAndYearLabel')"
@@ -103,7 +108,9 @@
                 </v-col>
             </v-row>
             <v-row v-for="mCategoryCounts in commissionsYearMCategoryData" :key="mCategoryCounts.commissionName">
-                <v-col>
+                <v-col
+                    v-if="displaySettings?.publicationCategoryByYear.display"
+                    cols="12" :md="displaySettings?.publicationCategoryByYear.spanWholeRow ? 12 : 6">
                     <stacked-bar-chart
                         :data="{categories: mCategoryCounts.categories, series: mCategoryCounts.series}"
                         :title="$t('numberOfPublicationsByMCategoryAndYearLabel')"
@@ -115,7 +122,9 @@
         </v-tabs-window-item>
         <v-tabs-window-item value="publicationType">
             <v-row class="mt-10 d-flex justify-center">
-                <v-col cols="12" md="8">
+                <v-col
+                    v-if="displaySettings?.publicationTypeRatio.display"
+                    cols="12" :md="displaySettings?.publicationTypeRatio.spanWholeRow ? 8 : 6">
                     <pie-chart
                         :data="publicationTypeRatioData"
                         :title="$t('publicationTypeRatioLabel')"
@@ -128,7 +137,9 @@
                 v-for="mCategoryRatio in commissionMCategoryRatios"
                 :key="mCategoryRatio.commissionName"
                 class="mt-10 d-flex justify-center">
-                <v-col cols="12" md="8">
+                <v-col
+                    v-if="displaySettings?.publicationCategoryRatio.display"
+                    cols="12" :md="displaySettings?.publicationCategoryRatio.spanWholeRow ? 8 : 6">
                     <pie-chart
                         :data="mCategoryRatio.data"
                         :title="$t('publicationMCategoryRatioLabel')"
@@ -142,14 +153,17 @@
         <v-tabs-window-item value="statistics">
             <v-row class="d-flex flex-row text-center mt-10">
                 <v-col
-                    cols="12" md="6"
+                    v-if="displaySettings?.viewCountTotal.display"
+                    cols="12" :md="displaySettings?.viewCountTotal.spanWholeRow ? 12 : 6"
                     class="d-flex justify-center align-center">
                     <display-card
                         :display-value="viewsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
                         :label="$t('totalViewsLabel')"
                     />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                    v-if="displaySettings?.viewCountByMonth.display"
+                    cols="12" :md="displaySettings?.viewCountByMonth.spanWholeRow ? 8 : 6">
                     <simple-bar-chart
                         :data="viewsMonthly"
                         :title="$t('numberOfViewsMonthlyLabel')"
@@ -159,22 +173,22 @@
                 </v-col>
             </v-row>
             <v-row class="mt-10 d-flex justify-center">
-                <v-col cols="12" md="8">
-                    <WorldMapChart
-                        :data="viewsByCountry"
-                        :title="$t('viewsByCountryLabel')"
-                        :subtitle="$t('globalTrafficOverviewLabel')"
-                        :series-name="$t('totalViewsLabel')"
-                        height="600px"
-                    />
-                </v-col>
-            </v-row>
-            <v-row class="d-flex flex-row text-center">
-                <v-col>
-                    <h3
-                        v-if="viewsByCountry && viewsByCountry.length > 0">
-                        {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
-                    </h3>
+                <v-col
+                    v-if="displaySettings?.viewCountByCountry.display"
+                    cols="12" :md="displaySettings?.viewCountByCountry.spanWholeRow ? 8 : 6">
+                    <div class="d-block text-center">
+                        <WorldMapChart
+                            :data="viewsByCountry"
+                            :title="$t('viewsByCountryLabel')"
+                            :subtitle="$t('globalTrafficOverviewLabel')"
+                            :series-name="$t('totalViewsLabel')"
+                            height="600px"
+                        />
+                        <h3
+                            v-if="viewsByCountry && viewsByCountry.length > 0">
+                            {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
+                        </h3>
+                    </div>
                 </v-col>
             </v-row>
         </v-tabs-window-item>
@@ -182,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, type PropType, ref, watch } from 'vue';
 import StackedBarChart, { type StackedBarSeries } from '../charts/StackedBarChart.vue';
 import OrganisationUnitVisualizationService from '@/services/visualization/OrganisationUnitVisualizationService';
 import { MCategory, type YearlyCounts } from '@/models/Common';
@@ -198,11 +212,28 @@ import DisplayCard from '../charts/DisplayCard.vue';
 import { max, min } from 'lodash';
 import DatePicker from '../core/DatePicker.vue';
 import { localiseDate } from '@/utils/DateUtil';
+import { type OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 
 
 const props = defineProps({
     organisationUnitId: {
         type: Number,
+        required: true
+    },
+    displaySettings: {
+        type: Object as PropType<OUChartDisplaySettings | undefined>,
+        required: true
+    },
+    displayPublicationsTab: {
+        type: Boolean,
+        required: true
+    },
+    displayTypeRatiosTab: {
+        type: Boolean,
+        required: true
+    },
+    displayStatisticsTab: {
+        type: Boolean,
         required: true
     }
 });
@@ -292,6 +323,8 @@ onMounted(() => {
     const currentDate = new Date();
     currentDate.setFullYear((new Date()).getFullYear() - 1);
     startDate.value = currentDate.toISOString().split("T")[0];
+
+    deduceStartTab();
 });
 
 watch(currentTab, () => {
@@ -422,6 +455,16 @@ const getMCategoryCounts = (organisationUnitId: number) => {
             commissionsYearMCategoryData.value.push({commissionName: commissionName, categories, series: typeSeries });
         });
     });
+};
+
+const deduceStartTab = () => {
+    if (props.displayPublicationsTab) {
+        currentTab.value = "publicationCount";
+    } else if (props.displayTypeRatiosTab) {
+        currentTab.value = "publicationType";
+    } else if (props.displayStatisticsTab) {
+        currentTab.value = "statistics";
+    }
 };
 
 </script>

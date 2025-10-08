@@ -404,6 +404,11 @@
             <v-tabs-window-item value="visualizations">
                 <person-visualizations
                     :person-id="(person.id as number)"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                    :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
+                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="collaborationNetwork">
@@ -482,6 +487,7 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
 import PersonCollaborationNetwork from '@/components/person/PersonCollaborationNetwork.vue';
+import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 
 
 export default defineComponent({
@@ -543,6 +549,8 @@ export default defineComponent({
 
         const shouldDisplayCollaborationNetworkFirst = ref(false);
         const collaborationNetworkRef = ref<HTMLElement>();
+
+        const displaySettings = usePersonChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(async () => {
             if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
@@ -874,7 +882,7 @@ export default defineComponent({
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments,
-            collaborationNetworkRef
+            collaborationNetworkRef, displaySettings
         };
 }});
 </script>

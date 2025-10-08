@@ -4,7 +4,8 @@
             <h2>{{ title }}</h2>
             <h4>{{ subtitle }}</h4>
         </div>
-        <v-card 
+        <v-card
+            v-if="leaderboardData.length > 0"
             v-for="(item, index) in leaderboardData" 
             :key="(item.a.databaseId as number)"
             class="leaderboard-card mb-4"
@@ -44,6 +45,11 @@
                 </div>
             </div>
         </v-card>
+        <h5
+            v-else
+            class="d-flex flex-row text-center">
+            {{ $t("noDataInTableMessage") }}
+        </h5>
     </div>
 </template>
 

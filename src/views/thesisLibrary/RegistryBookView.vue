@@ -160,7 +160,7 @@
                         />
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row class="mb-1">
                     <registry-book-entry-table
                         class="mt-15"
                         :entries="tableStates.promoted.entries"
@@ -352,17 +352,19 @@ export default defineComponent({
                         return;
                     }
 
+                    let dateFrom = fromDate.value
+                    let dateTo = toDate.value;
                     if (fromDate.value.includes("%7C")) {
-                        fromDate.value = computeRelativeDate(fromDate.value);
+                        dateFrom = computeRelativeDate(dateFrom);
                     } else if (toDate.value.includes("%7C")) {
-                        toDate.value = computeRelativeDate(toDate.value);
+                        dateTo = computeRelativeDate(dateTo);
                     }
 
                     const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}${tableStates.promoted.sort ? `&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}` : ""}`;
                     const response = await RegistryBookService.getPromoted(
                         selectedInstitution.value.value,
-                        fromDate.value ? fromDate.value.split("T")[0] : "",
-                        toDate.value ? toDate.value.split("T")[0] : "",
+                        dateFrom ? dateFrom.split("T")[0] : "",
+                        dateTo ? dateTo.split("T")[0] : "",
                         authorFullName.value, authorAcquiredTitle.value,
                         query
                     );

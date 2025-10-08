@@ -29,7 +29,9 @@
         color="deep-purple-accent-4"
         align-tabs="start"
     >
-        <v-tab value="statistics">
+        <v-tab
+            v-show="displayStatisticsTab"
+            value="statistics">
             {{ $t("statisticsLabel") }}
         </v-tab>
     </v-tabs>
@@ -41,14 +43,17 @@
         <v-tabs-window-item value="statistics">
             <v-row class="d-flex flex-row text-center mt-10">
                 <v-col
-                    cols="12" md="6"
+                    v-if="displaySettings?.viewCountTotal.display"
+                    cols="12" :md="displaySettings?.viewCountTotal.spanWholeRow ? 12 : 6"
                     class="d-flex justify-center align-center">
                     <display-card
                         :display-value="viewsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
                         :label="$t('totalViewsLabel')"
                     />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                    v-if="displaySettings?.viewCountByMonth.display"
+                    cols="12" :md="displaySettings?.viewCountByMonth.spanWholeRow ? 12 : 6">
                     <simple-bar-chart
                         :data="viewsMonthly"
                         :title="$t('numberOfViewsMonthlyLabel')"
@@ -59,14 +64,18 @@
             </v-row>
             <v-row class="d-flex flex-row text-center mt-10">
                 <v-col
-                    cols="12" md="6"
+                    v-if="displaySettings?.downloadCountTotal.display"
+                    cols="12" :md="displaySettings?.downloadCountTotal.spanWholeRow ? 12 : 6"
                     class="d-flex justify-center align-center">
                     <display-card
                         :display-value="downloadsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
                         :label="$t('totalDownloadsLabel')"
                     />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                    v-if="displaySettings?.downloadCountByMonth.display"
+                    cols="12"
+                    :md="displaySettings?.downloadCountByMonth.spanWholeRow ? 12 : 6">
                     <simple-bar-chart
                         :data="downloadsMonthly"
                         :title="$t('numberOfDownloadsMonthlyLabel')"
@@ -75,42 +84,44 @@
                     />
                 </v-col>
             </v-row>
-            <v-row class="mt-10 d-flex justify-center">
-                <v-col cols="12" md="8">
-                    <WorldMapChart
-                        :data="viewsByCountry"
-                        :title="$t('viewsByCountryLabel')"
-                        :subtitle="$t('globalTrafficOverviewLabel')"
-                        :series-name="$t('totalViewsLabel')"
-                        height="600px"
-                    />
+            <v-row v-if="displaySettings?.viewCountByCountry.display" class="mt-10 d-flex justify-center">
+                <v-col
+                    cols="12"
+                    :md="displaySettings?.viewCountByCountry.spanWholeRow ? 8 : 6">
+                    <div class="d-block text-center">
+                        <WorldMapChart
+                            :data="viewsByCountry"
+                            :title="$t('viewsByCountryLabel')"
+                            :subtitle="$t('globalTrafficOverviewLabel')"
+                            :series-name="$t('totalViewsLabel')"
+                            height="600px"
+                        />
+                        <h3
+                            v-if="viewsByCountry && viewsByCountry.length > 0">
+                            {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
+                        </h3>
+                    </div>
                 </v-col>
             </v-row>
-            <v-row class="d-flex flex-row text-center">
-                <v-col>
-                    <h3
-                        v-if="viewsByCountry && viewsByCountry.length > 0">
-                        {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
-                    </h3>
-                </v-col>
-            </v-row>
-            <v-row class="mt-10 d-flex justify-center">
-                <v-col cols="12" md="8">
-                    <WorldMapChart
-                        :data="downloadsByCountry"
-                        :title="$t('downloadsByCountryLabel')"
-                        :subtitle="$t('globalTrafficOverviewLabel')"
-                        :series-name="$t('totalDownloadsLabel')"
-                        height="600px"
-                    />
-                </v-col>
-            </v-row>
-            <v-row class="d-flex flex-row text-center">
-                <v-col>
-                    <h3
-                        v-if="downloadsByCountry && downloadsByCountry.length > 0">
-                        {{ $t("noCountryDownloads") }}: {{ downloadsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
-                    </h3>
+            <v-row
+                v-if="displaySettings?.downloadCountByCountry.display"
+                class="mt-10 d-flex justify-center">
+                <v-col
+                    cols="12"
+                    :md="displaySettings?.downloadCountByCountry.spanWholeRow ? 8 : 6">
+                    <div class="d-block text-center">
+                        <WorldMapChart
+                            :data="downloadsByCountry"
+                            :title="$t('downloadsByCountryLabel')"
+                            :subtitle="$t('globalTrafficOverviewLabel')"
+                            :series-name="$t('totalDownloadsLabel')"
+                            height="600px"
+                        />
+                        <h3
+                            v-if="downloadsByCountry && downloadsByCountry.length > 0">
+                            {{ $t("noCountryDownloads") }}: {{ downloadsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
+                        </h3>
+                    </div>
                 </v-col>
             </v-row>
         </v-tabs-window-item>
@@ -120,7 +131,7 @@
 <script setup lang="ts">
 import { StatisticsType } from '@/models/AssessmentModel';
 import DocumentVisualizationService from '@/services/visualization/DocumentVisualizationService';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, type PropType, ref, watch } from 'vue';
 import { type CountryStatisticsData } from '../charts/WorldMapChart.vue';
 import SimpleBarChart, { type BarSeries } from '../charts/SimpleBarChart.vue';
 import { localiseDate } from '@/utils/DateUtil';
@@ -128,11 +139,20 @@ import { useI18n } from 'vue-i18n';
 import WorldMapChart from '../charts/WorldMapChart.vue';
 import DisplayCard from '../charts/DisplayCard.vue';
 import DatePicker from '../core/DatePicker.vue';
+import type { DocumentChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 
 
 const props = defineProps({
     documentId: {
         type: Number,
+        required: true
+    },
+    displaySettings: {
+        type: Object as PropType<DocumentChartDisplaySettings | undefined>,
+        required: true
+    },
+    displayStatisticsTab: {
+        type: Boolean,
         required: true
     }
 });
@@ -151,7 +171,7 @@ const initialDatesSet = ref(false);
 const startDate = ref<string>("");
 const endDate = ref<string>("");
 
-onMounted(() => {
+onMounted(async () => {
     endDate.value = (new Date()).toISOString().split("T")[0];
 
     const currentDate = new Date();

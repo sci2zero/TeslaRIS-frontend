@@ -156,7 +156,7 @@
             <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
-            <v-tab value="visualizations">
+            <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -231,6 +231,8 @@
             <v-tabs-window-item value="visualizations">
                 <document-visualizations
                     :document-id="(patent?.id as number)"
+                    :display-settings="displayConfiguration.displaySettings.value"
+                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -291,6 +293,7 @@ import ShareButtons from '@/components/core/ShareButtons.vue';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
+import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 
 
 export default defineComponent({
@@ -323,6 +326,8 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const actionsRef = ref<typeof DocumentActionBox>();
+
+        const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             fetchDisplayData();
@@ -482,7 +487,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
             createIndicator, fetchIndicators, fetchValidationStatus,
-            PublicationType, updateRemark
+            PublicationType, updateRemark, displayConfiguration
         };
 }})
 

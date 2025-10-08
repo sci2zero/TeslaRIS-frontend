@@ -36,13 +36,13 @@
         color="deep-purple-accent-4"
         align-tabs="start"
     >
-        <v-tab value="publicationCount">
+        <v-tab v-show="displayPublicationsTab" value="publicationCount">
             {{ $t("publicationCountLeaderboardLabel") }}
         </v-tab>
-        <v-tab value="citationCount">
+        <v-tab v-show="displayCitationsTab" value="citationCount">
             {{ $t("citationCountLeaderboardLabel") }}
         </v-tab>
-        <v-tab value="assessmentPoints">
+        <v-tab v-show="displayPointsTab" value="assessmentPoints">
             {{ $t("assessmentPointsLeaderboardLabel") }}
         </v-tab>
     </v-tabs>
@@ -52,14 +52,18 @@
         v-model="currentTab"
     >
         <v-tabs-window-item value="publicationCount">
-            <v-row>
-                <v-col :cols="subUnitPublicationCountsLeaderboard.length > 0 ? 6 : 12">
+            <v-row class="d-flex justify-center">
+                <v-col
+                    v-if="displaySettings?.publicationCountPersonLeaderboard.display"
+                    cols="12" :md="displaySettings?.publicationCountPersonLeaderboard.spanWholeRow ? 8 : 6">
                     <leaderboard-table
                         :leaderboard-data="personPublicationCountsLeaderboard"
                         :title="$t('personPublicationCountLeaderboardLabel')"
                     />
                 </v-col>
-                <v-col v-if="subUnitPublicationCountsLeaderboard.length > 0">
+                <v-col
+                    v-if="displaySettings?.publicationCountSubUnitLeaderboard.display && subUnitPublicationCountsLeaderboard.length > 0"
+                    cols="12" :md="displaySettings?.publicationCountSubUnitLeaderboard.spanWholeRow ? 8 : 6">
                     <leaderboard-table
                         :leaderboard-data="subUnitPublicationCountsLeaderboard"
                         :title="$t('subUnitPublicationCountLeaderboardLabel')"
@@ -68,14 +72,18 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="citationCount">
-            <v-row>
-                <v-col :cols="subUnitCitationCountsLeaderboard.length > 0 ? 6 : 12">
+            <v-row class="d-flex justify-center">
+                <v-col
+                    v-if="displaySettings?.citationCountPersonLeaderboard.display"
+                    cols="12" :md="displaySettings?.citationCountPersonLeaderboard.spanWholeRow ? 8 : 6">
                     <leaderboard-table
                         :leaderboard-data="personCitationCountsLeaderboard"
                         :title="$t('personCitationCountLeaderboardLabel')"
                     />
                 </v-col>
-                <v-col v-if="subUnitCitationCountsLeaderboard.length > 0">
+                <v-col
+                    v-if="displaySettings?.citationCountSubUnitLeaderboard.display && subUnitCitationCountsLeaderboard.length > 0"
+                    cols="12" :md="displaySettings?.citationCountSubUnitLeaderboard.spanWholeRow ? 8 : 6">
                     <leaderboard-table
                         :leaderboard-data="subUnitCitationCountsLeaderboard"
                         :title="$t('subUnitCitationCountLeaderboardLabel')"
@@ -84,8 +92,10 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="assessmentPoints">
-            <v-row>
-                <v-col :cols="subUnitAssessmentPointsLeaderboard.length > 0 ? 6 : 12">
+            <v-row class="d-flex justify-center">
+                <v-col
+                    v-if="displaySettings?.assessmentPointPersonLeaderboard.display"
+                    cols="12" :md="displaySettings?.assessmentPointPersonLeaderboard.spanWholeRow ? 12 : 6">
                     <div>
                         <leaderboard-table
                             v-for="leaderboard in personAssessmentPointsLeaderboard" :key="leaderboard.commissionId"
@@ -95,7 +105,9 @@
                         />
                     </div>
                 </v-col>
-                <v-col v-if="subUnitAssessmentPointsLeaderboard.length > 0">
+                <v-col
+                    v-if="displaySettings?.assessmentPointSubUnitLeaderboard.display && subUnitAssessmentPointsLeaderboard.length > 0"
+                    cols="12" :md="displaySettings?.assessmentPointSubUnitLeaderboard.spanWholeRow ? 12 : 6">
                     <div>
                         <leaderboard-table
                             v-for="leaderboard in subUnitAssessmentPointsLeaderboard" :key="leaderboard.commissionId"
@@ -114,15 +126,32 @@
 import type { CommissionAssessmentPointsPersonLeaderboard, LeaderboardEntry } from '@/models/Common';
 import PersonLeaderboardService from '@/services/visualization/PersonLeaderboardService';
 import { max, min } from 'lodash';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, type PropType, ref, watch } from 'vue';
 import LeaderboardTable from '../charts/LeaderboardTable.vue';
 import OrganisationUnitLeaderboardService from '@/services/visualization/OrganisationUnitLeaderboardService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import type { OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 
 
 const props = defineProps({
     organisationUnitId: {
         type: Number,
+        required: true
+    },
+    displaySettings: {
+        type: Object as PropType<OUChartDisplaySettings | undefined>,
+        required: true
+    },
+    displayPublicationsTab: {
+        type: Boolean,
+        required: true
+    },
+    displayCitationsTab: {
+        type: Boolean,
+        required: true
+    },
+    displayPointsTab: {
+        type: Boolean,
         required: true
     }
 });
@@ -144,6 +173,7 @@ const subUnitAssessmentPointsLeaderboard = ref<CommissionAssessmentPointsPersonL
 
 onMounted(() => {
     fetchLeaderboardData();
+    deduceStartTab();
 });
 
 const fetchLeaderboardData = () => {
@@ -221,5 +251,15 @@ watch([fromYear, toYear], () => {
 
     fetchLeaderboardData();
 });
+
+const deduceStartTab = () => {
+    if (props.displayPublicationsTab) {
+        currentTab.value = "publicationCount";
+    } else if (props.displayCitationsTab) {
+        currentTab.value = "citationCount";
+    } else if (props.displayPointsTab) {
+        currentTab.value = "assessmentPoints";
+    }
+};
 
 </script>
