@@ -14,7 +14,7 @@
             :label="$t('depthLabel')" 
             type="number" 
             :min="1"
-            :max="3"
+            :max="selectedCollaborationType.value === CollaborationType.COAUTHORSHIP ? 2 : 3"
         />
     </div>
     <v-row>

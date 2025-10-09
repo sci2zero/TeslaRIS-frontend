@@ -6,7 +6,7 @@
         </div>
         <div v-if="leaderboardData.length > 0">
             <v-card
-                v-for="(item, index) in leaderboardData"
+                v-for="(item, index) in leaderboardData.filter(row => row.a != null)"
                 :key="(item.a.databaseId as number)"
                 class="leaderboard-card mb-4"
                 :class="getCardClass(index)"
