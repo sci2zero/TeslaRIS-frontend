@@ -103,7 +103,12 @@ const options = computed<EChartsOption>(() => {
             gravity: 0.001,
             edgeLength: 300
         },
-        categories: props.data.categories
+        categories: props.data.categories.map(cat => ({
+            name: cat.name,
+            itemStyle: {
+                color: getCategoryColor(cat.value)
+            }
+        })),
     };
 
     return {
@@ -124,7 +129,12 @@ const options = computed<EChartsOption>(() => {
             }
         },
         legend: {
-            data: props.data.categories.map(cat => cat).sort((a, b) => a.value - b.value).map(cat => cat.name),
+            data: props.data.categories.map(cat => cat).sort((a, b) => a.value - b.value).map(cat => ({
+                name: cat.name,
+                itemStyle: {
+                    color: getCategoryColor(cat.value)
+                }
+            })),
             selectedMode: true,
             textStyle: {
                 fontSize: 12
@@ -167,4 +177,18 @@ const onChartReady = (chart: ECharts) => {
         }
     });
 };
+
+const getCategoryColor = (value: number) => {
+    switch(value) {
+        case 0:
+            return "orange";
+        case 1:
+            return "green";
+        case 2:
+            return "blue";
+    }
+
+    return "blue";
+};
+
 </script>
