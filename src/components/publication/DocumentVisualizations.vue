@@ -88,19 +88,14 @@
                 <v-col
                     cols="12"
                     :md="displaySettings?.viewCountByCountry.spanWholeRow ? 8 : 6">
-                    <div class="d-block text-center">
-                        <WorldMapChart
-                            :data="viewsByCountry"
-                            :title="$t('viewsByCountryLabel')"
-                            :subtitle="$t('globalTrafficOverviewLabel')"
-                            :series-name="$t('totalViewsLabel')"
-                            height="600px"
-                        />
-                        <h3
-                            v-if="viewsByCountry && viewsByCountry.length > 0">
-                            {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
-                        </h3>
-                    </div>
+                    <WorldMapChart
+                        :data="viewsByCountry"
+                        :title="$t('viewsByCountryLabel')"
+                        :subtitle="$t('globalTrafficOverviewLabel')"
+                        :series-name="$t('totalViewsLabel')"
+                        height="600px"
+                        :no-country-entries-label="$t('noCountryViews')"
+                    />
                 </v-col>
             </v-row>
             <v-row
@@ -109,19 +104,14 @@
                 <v-col
                     cols="12"
                     :md="displaySettings?.downloadCountByCountry.spanWholeRow ? 8 : 6">
-                    <div class="d-block text-center">
-                        <WorldMapChart
-                            :data="downloadsByCountry"
-                            :title="$t('downloadsByCountryLabel')"
-                            :subtitle="$t('globalTrafficOverviewLabel')"
-                            :series-name="$t('totalDownloadsLabel')"
-                            height="600px"
-                        />
-                        <h3
-                            v-if="downloadsByCountry && downloadsByCountry.length > 0">
-                            {{ $t("noCountryDownloads") }}: {{ downloadsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
-                        </h3>
-                    </div>
+                    <WorldMapChart
+                        :data="downloadsByCountry"
+                        :title="$t('downloadsByCountryLabel')"
+                        :subtitle="$t('globalTrafficOverviewLabel')"
+                        :series-name="$t('totalDownloadsLabel')"
+                        height="600px"
+                        :no-country-entries-label="$t('noCountryDownloads')"
+                    />
                 </v-col>
             </v-row>
         </v-tabs-window-item>

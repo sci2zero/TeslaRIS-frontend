@@ -1,13 +1,19 @@
 <template>
-    <BaseChart
-        v-if="mapRegistered && props.data && props.data.length > 0"
-        :options="(options as EChartsOption)"
-        :width="width"
-        :height="height"
-        :theme="theme"
-        :init-options="initOptions"
-        :loading="loading"
-    />
+    <div class="d-block text-center">
+        <BaseChart
+            v-if="mapRegistered && props.data && props.data.length > 0"
+            :options="(options as EChartsOption)"
+            :width="width"
+            :height="height"
+            :theme="theme"
+            :init-options="initOptions"
+            :loading="loading"
+        />
+        <h3
+            v-if="noCountryEntriesCount > 0">
+            {{ noCountryEntriesLabel }}: {{ noCountryEntriesCount }}
+        </h3>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -74,21 +80,33 @@ const props = defineProps({
     emptyColor: {
         type: String,
         default: "#EEEEEE"
+    },
+    noCountryEntriesLabel: {
+        type: String,
+        required: true
     }
 });
+
 
 const i18n = useI18n();
 const mapRegistered = ref(false);
 
 const loading = ref(true);
 
+const noCountryEntriesCount = ref(0);
+
 watch(() => props.data, () => {
-    shouldBeLoading();
+    onDataChanged();
 });
 
-const shouldBeLoading = () => {
+const onDataChanged = () => {
     if(props.data && props.data.length > 0) {
         loading.value = false;
+    }
+
+    if (props.data) {
+        noCountryEntriesCount.value =
+            props.data.find(entry => entry.countryCode === "N/A")?.value ?? 0;
     }
 };
 
@@ -103,7 +121,7 @@ onMounted(async () => {
         }
     }
 
-    shouldBeLoading();
+    onDataChanged();
 });
 
 const buildNameMap = () => {
@@ -152,8 +170,14 @@ const options = computed(() => {
     }));
 
     const values = props.data.map(item => item.value);
-    const minValue = Math.min(...values);
+    let minValue = Math.min(...values);
     const maxValue = Math.max(...values);
+
+    if (minValue === maxValue) {
+        if (maxValue > 0) {
+            minValue = 0;
+        }
+    }
 
     return {
         title: {
@@ -199,7 +223,9 @@ const options = computed(() => {
             },
             data: mapData,
             nameMap: buildNameMap(),
-            emptyColor: props.emptyColor,
+            outOfRange: {
+                color: [props.emptyColor]
+            },
             universalTransition: true,
             roam: true,
             scaleLimit: {

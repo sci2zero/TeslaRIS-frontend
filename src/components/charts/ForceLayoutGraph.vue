@@ -93,14 +93,14 @@ const options = computed<EChartsOption>(() => {
             target: link.target,
             value: link.value,
             lineStyle: {
-                width: Math.max(1, link.value) // edge thickness by strength
+                width: Math.min(10, Math.max(1, link.value)) // edge thickness by strength
             }
         })),
         label: { show: true, position: "right" },
         emphasis: { focus: "adjacency" },
         force: {
-            repulsion: 100,
-            gravity: 0.001,
+            repulsion: 70,
+            gravity: 0.01,
             edgeLength: 300
         },
         categories: props.data.categories

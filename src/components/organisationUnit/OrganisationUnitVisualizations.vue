@@ -176,19 +176,14 @@
                 <v-col
                     v-if="displaySettings?.viewCountByCountry.display"
                     cols="12" :md="displaySettings?.viewCountByCountry.spanWholeRow ? 8 : 6">
-                    <div class="d-block text-center">
-                        <WorldMapChart
-                            :data="viewsByCountry"
-                            :title="$t('viewsByCountryLabel')"
-                            :subtitle="$t('globalTrafficOverviewLabel')"
-                            :series-name="$t('totalViewsLabel')"
-                            height="600px"
-                        />
-                        <h3
-                            v-if="viewsByCountry && viewsByCountry.length > 0">
-                            {{ $t("noCountryViews") }}: {{ viewsByCountry.find(entry => entry.countryCode === "N/A")?.value }}
-                        </h3>
-                    </div>
+                    <WorldMapChart
+                        :data="viewsByCountry"
+                        :title="$t('viewsByCountryLabel')"
+                        :subtitle="$t('globalTrafficOverviewLabel')"
+                        :series-name="$t('totalViewsLabel')"
+                        height="600px"
+                        :no-country-entries-label="$t('noCountryViews')"
+                    />
                 </v-col>
             </v-row>
         </v-tabs-window-item>

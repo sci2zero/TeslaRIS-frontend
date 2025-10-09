@@ -2,6 +2,7 @@
     <div class="d-flex flex-row justify-start select-component mt-5">
         <v-select
             v-model="selectedCollaborationType"
+            class="collaboration-type-select"
             :items="collaborationTypes"
             :label="$t('collaborationTypeLabel')"
             :rules="requiredSelectionRules"
@@ -25,6 +26,7 @@
                     categories: categories
                 }"
                 :category-resolver="getCategoryNamesFromDepth"
+                :height="`${600 * depth}px`"
                 @list-publications="showPublicationListModal"
             />
         </v-col>
@@ -131,7 +133,11 @@ const showPublicationListModal = (edge: CollaborationLink, collabName: string) =
 <style>
 
 .select-component {
-    max-width: 200px;
+    max-width: 400px;
+}
+
+.collaboration-type-select {
+    min-width: 200px;
 }
 
 </style>
