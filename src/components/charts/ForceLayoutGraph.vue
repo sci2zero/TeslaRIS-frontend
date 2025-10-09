@@ -99,14 +99,15 @@ const options = computed<EChartsOption>(() => {
         label: { show: true, position: "right" },
         emphasis: { focus: "adjacency" },
         force: {
-            repulsion: 70,
-            gravity: 0.01,
-            edgeLength: 300
+            repulsion: 500,
+            gravity: 0.2,
+            edgeLength: 100,
+            layoutAnimation: true
         },
         categories: props.data.categories
-  };
+    };
 
-  return {
+    return {
         title: {
             text: i18n.t("researcherCollaborationNetworkLabel"),
             top: "bottom",
@@ -124,7 +125,7 @@ const options = computed<EChartsOption>(() => {
             }
         },
         legend: {
-            data: props.data.categories.map(cat => cat.name),
+            data: props.data.categories.map(cat => cat.name).reverse(),
             selectedMode: true,
             textStyle: {
                 fontSize: 12
@@ -132,7 +133,14 @@ const options = computed<EChartsOption>(() => {
             top: 'bottom',
             left: 'center'
         },
-        series: [graphSeries]
+        series: [{
+            ...graphSeries,
+            roam: true,
+            scaleLimit: {
+                min: 0.1,
+                max: 1
+            }
+        }]
     };
 });
 
