@@ -24,7 +24,7 @@ const props = defineProps({
         type: Object as PropType<{
                 nodes: PersonNode[];
                 links: CollaborationLink[];
-                categories: {name: string}[];
+                categories: {name: string, value: number}[];
             } | undefined>,
         required: true
     },
@@ -99,10 +99,9 @@ const options = computed<EChartsOption>(() => {
         label: { show: true, position: "right" },
         emphasis: { focus: "adjacency" },
         force: {
-            repulsion: 500,
-            gravity: 0.2,
-            edgeLength: 100,
-            layoutAnimation: true
+            repulsion: 200,
+            gravity: 0.001,
+            edgeLength: 300
         },
         categories: props.data.categories
     };
@@ -125,7 +124,7 @@ const options = computed<EChartsOption>(() => {
             }
         },
         legend: {
-            data: props.data.categories.map(cat => cat.name).reverse(),
+            data: props.data.categories.map(cat => cat).sort((a, b) => a.value - b.value).map(cat => cat.name),
             selectedMode: true,
             textStyle: {
                 fontSize: 12

@@ -66,7 +66,7 @@ const collaborationType = ref();
 
 const nodes = ref<PersonNode[]>([]);
 const links = ref<CollaborationLink[]>([]);
-const categories = ref<{name: string}[]>([]);
+const categories = ref<{name: string, value: number}[]>([]);
 
 const collaborationTypes = ref<{title: string, value: CollaborationType}[]>(getCollaborationTypesForGivenLocale());
 const selectedCollaborationType = ref<{title: string, value: CollaborationType}>(
@@ -113,7 +113,7 @@ const fetchCollaborationNetwork = () => {
     ).then(response => {
         nodes.value = response.data.nodes;
         links.value = response.data.links;
-        categories.value = response.data.nodes.map(node => {return {name: getCategoryNamesFromDepth(node.category)}});
+        categories.value = response.data.nodes.map(node => {return {name: getCategoryNamesFromDepth(node.category), value: node.category}});
     });
 };
 
