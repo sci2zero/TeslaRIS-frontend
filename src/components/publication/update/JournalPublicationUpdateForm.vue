@@ -61,8 +61,11 @@
             </v-col>
             <v-col cols="5">
                 <v-text-field
-                    v-model="numberOfPages" type="number" :min="0" :label="$t('numberOfPagesLabel')"
-                    :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                    v-model="numberOfPages" type="number"
+                    :min="0" :label="$t('numberOfPagesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
+                    :placeholder="$t('numberOfPagesLabel')">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -205,7 +208,8 @@ export default defineComponent({
         const {
             requiredFieldRules, doiValidationRules,
             scopusIdValidationRules, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
         
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -286,8 +290,7 @@ export default defineComponent({
         };
 
         return {
-            isFormValid,
-            title, subtitle,
+            isFormValid, title, subtitle,
             publicationYear, doi, scopus,
             selectedJournal, articleNumber,
             uris, numberOfPages, doiValidationRules,
@@ -298,7 +301,8 @@ export default defineComponent({
             scopusIdValidationRules, titleRef, subtitleRef,
             refreshForm, urisRef, message, snackbar,
             workOpenAlexIdValidationRules, webOfScienceId,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

@@ -334,7 +334,7 @@ export default defineComponent({
             }
 
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-                tableOptions.value.sortBy = [{key: "year", order: "asc"}];
+                tableOptions.value.sortBy = [{key: "year", order: "desc"}];
             }
         })
 
@@ -378,7 +378,7 @@ export default defineComponent({
                 sortBy:[
                     {
                         key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn),
-                        order: "asc"
+                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "desc" : "asc")
                     }
                 ]
             }
@@ -520,7 +520,13 @@ export default defineComponent({
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             if (
                 (
-                    isEqual([{key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn.value), order: "asc"}], tableOptions.value.sortBy) ||
+                    isEqual(
+                        [
+                            {
+                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn.value),
+                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "desc" : "asc")
+                            }
+                        ], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0
                 ) &&
                 page == tableOptions.value.page

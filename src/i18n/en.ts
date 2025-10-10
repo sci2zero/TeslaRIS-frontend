@@ -1109,8 +1109,9 @@ export default {
     publicReviewLengthLabel: "Public review length (days)",
     noFilesForDownloadLabel: "No files for download.",
     eventDescriptionLabel: "Event description",
-    enterOneOfTwoLabel: "Enter at least one of two",
-    enterOneOfThreeLabel: "Enter at least one of three",
+    enterOneOfTwoLabel: "Enter at least one of these two",
+    enterOneOfThreeLabel: "Enter at least one of these three",
     updateChartDisplayConfigurationLabel: "Visualizations display",
-    spanWholeRowLabel: "Span whole row"
+    spanWholeRowLabel: "Span whole row",
+    positiveOrZeroFieldMessage: "This field can't be < 0."
 }

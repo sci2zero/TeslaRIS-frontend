@@ -1115,8 +1115,9 @@ export default {
     publicReviewLengthLabel: "Trajanje javnog uvida (u danima)",
     noFilesForDownloadLabel: "Nema fajlova za preuzimanje.",
     eventDescriptionLabel: "Opis događaja",
-    enterOneOfTwoLabel: "Unesite bar jedno od ova dva polja",
-    enterOneOfThreeLabel: "Unesite bar jedno od ova tri polja",
+    enterOneOfTwoLabel: "Unesite bar jedno od ova dva podatka",
+    enterOneOfThreeLabel: "Unesite bar jedno od ova tri podatka",
     updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
-    spanWholeRowLabel: "Raspon na celi red"
+    spanWholeRowLabel: "Raspon na celi red",
+    positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0."
 }

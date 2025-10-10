@@ -612,9 +612,9 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
-                checkIfUserCanEdit();
-
-                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                EntityClassificationService.canClassifyDocument(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
                     canClassify.value = response.data;
                 });
 
@@ -640,7 +640,11 @@ export default defineComponent({
 
         const checkIfUserCanEdit = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
+                if (thesis.value?.isArchived) {
+                    canEdit.value = false;
+                } else {
+                    canEdit.value = response.data;
+                }
             }).catch(() => canEdit.value = false);
         };
 
@@ -653,8 +657,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 thesis.value = response.data;
-                if (thesis.value.isArchived) {
-                    canEdit.value = false;
+                if (loginStore.userLoggedIn) {
+                    checkIfUserCanEdit();
                 }
 
                 injectFairSignposting(response.headers as AxiosResponseHeaders);

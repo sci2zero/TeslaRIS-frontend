@@ -26,6 +26,7 @@ export const useValidationUtils = () => {
     const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
     const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
     const invalidUDCMessage = computed(() => i18n.t("udcFormatError"));
+    const positiveOrZeroFieldMessage = computed(() => i18n.t("positiveOrZeroFieldMessage"));
 
     
     const requiredFieldRules = [
@@ -45,6 +46,14 @@ export const useValidationUtils = () => {
     const requiredNumericGreaterThanZeroFieldRules = [
         (value: number) => {
             if (!value || value <= 0) return requiredFieldMessage.value;
+            return true;
+        }
+    ];
+
+    const optionalNumericZeroOrGreaterFieldRules = [
+        (value: number) => {
+            if (!value) return true;
+            if (value <= 0) return positiveOrZeroFieldMessage.value;
             return true;
         }
     ];
@@ -353,6 +362,7 @@ export const useValidationUtils = () => {
         atLeastOneRequiredRule, atLeastOneTrueRule, personOpenAlexIdValidationRules,
         institutionOpenAlexIdValidationRules, sourceOpenAlexIdValidationRules,
         rorValidationRules, workOpenAlexIdValidationRules, udcValidationRules,
-        personWebOfScienceIdValidationRules, documentWebOfScienceIdValidationRules
+        personWebOfScienceIdValidationRules, documentWebOfScienceIdValidationRules,
+        optionalNumericZeroOrGreaterFieldRules
     };
 };
