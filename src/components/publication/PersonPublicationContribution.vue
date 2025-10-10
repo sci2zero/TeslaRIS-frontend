@@ -249,6 +249,7 @@ export default defineComponent({
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
                 isBoardPresident: false,
+                employmentTitle: EmploymentTitle.FULL_PROFESSOR,
                 personalTitle: PersonalTitle.DR
             });
         };
@@ -303,9 +304,14 @@ export default defineComponent({
                 if (input.contributionType.value === DocumentContributionType.BOARD_MEMBER && !input.employmentTitle && input.contribution.personId !== -1) {
                     InvolvementService.getEmploymentTitle(input.contribution.personId)
                     .then(response => {
-                        input.employmentTitle = response.data ? response.data : EmploymentTitle.ASSOCIATE_PROFESSOR;
+                        input.employmentTitle = response.data ? response.data : EmploymentTitle.FULL_PROFESSOR;
                         sendContentToParent();
                     });
+                }
+
+                if (input.contributionType.value === DocumentContributionType.BOARD_MEMBER && !input.personalTitle) {
+                    input.personalTitle = PersonalTitle.DR;
+                    sendContentToParent();
                 }
 
                 const advisorOrBoardMember = input.contributionType.value === DocumentContributionType.BOARD_MEMBER || input.contributionType.value === DocumentContributionType.ADVISOR;

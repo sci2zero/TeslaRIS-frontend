@@ -157,6 +157,7 @@
                             <v-text-field
                                 v-model="numberOfPages" type="number"
                                 :label="$t('numberOfPagesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfPagesLabel')">
                             </v-text-field>
                         </v-col>
@@ -164,6 +165,7 @@
                             <v-text-field
                                 v-model="numberOfChapters" type="number"
                                 :label="$t('numberOfChaptersLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfChaptersLabel')">
                             </v-text-field>
                         </v-col>
@@ -171,6 +173,7 @@
                             <v-text-field
                                 v-model="numberOfReferences" type="number"
                                 :label="$t('numberOfReferencesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfReferencesLabel')">
                             </v-text-field>
                         </v-col>
@@ -180,6 +183,7 @@
                             <v-text-field
                                 v-model="numberOfGraphs" type="number"
                                 :label="$t('numberOfGraphsLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfGraphsLabel')">
                             </v-text-field>
                         </v-col>
@@ -187,6 +191,7 @@
                             <v-text-field
                                 v-model="numberOfIllustrations" type="number"
                                 :label="$t('numberOfIllustrationsLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfIllustrationsLabel')">
                             </v-text-field>
                         </v-col>
@@ -194,6 +199,7 @@
                             <v-text-field
                                 v-model="numberOfTables" type="number"
                                 :label="$t('numberOfTablesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfTablesLabel')">
                             </v-text-field>
                         </v-col>
@@ -201,6 +207,7 @@
                             <v-text-field
                                 v-model="numberOfAppendices" type="number"
                                 :label="$t('numberOfAppendicesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfAppendicesLabel')">
                             </v-text-field>
                         </v-col>
@@ -509,7 +516,8 @@ export default defineComponent({
             doiValidationRules, workOpenAlexIdValidationRules,
             isbnValidationRules, udcValidationRules,
             documentWebOfScienceIdValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const submitThesis = (stayOnPage: boolean) => {
@@ -675,7 +683,7 @@ export default defineComponent({
             toMultilingualTextInput, isResearcher, scopus,
             scopusIdValidationRules, languagesWithMoreWritingSystems,
             alternateTitleRef, alternateTitle, isHeadOfLibrary,
-            topLevelInstitutionId
+            topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

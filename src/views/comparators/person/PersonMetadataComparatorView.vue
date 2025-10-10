@@ -9,7 +9,12 @@
 
                 <person-update-form ref="updateLeftRef" :preset-person="leftPerson" :in-modal="false" @update="updateLeft"></person-update-form>
 
-                <description-or-biography-update-form ref="updateLeftBioRef" :preset-description-or-biography="(leftPerson?.biography as MultilingualContent[])" @update="updateLeftBiography"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftBioRef"
+                    :preset-description-or-biography="(leftPerson?.biography as MultilingualContent[])"
+                    :placeholder-label="$t('biographyLabel')"    
+                    @update="updateLeftBiography">
+                </description-or-biography-update-form>
 
                 <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="(leftPerson?.keyword as MultilingualContent[])" @update="updateLeftKeywords"></keyword-update-form>
 
@@ -64,7 +69,12 @@
 
                 <person-update-form ref="updateRightRef" :preset-person="rightPerson" :in-modal="false" @update="updateRight"></person-update-form>
 
-                <description-or-biography-update-form ref="updateRightBioRef" :preset-description-or-biography="(rightPerson?.biography as MultilingualContent[])" @update="updateRightBiography"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightBioRef"
+                    :preset-description-or-biography="(rightPerson?.biography as MultilingualContent[])"
+                    :placeholder-label="$t('biographyLabel')"
+                    @update="updateRightBiography">
+                </description-or-biography-update-form>
 
                 <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightPerson?.keyword as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
 

@@ -80,7 +80,9 @@
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
-                                v-model="numberOfPages" type="number" :min="0" :label="$t('numberOfPagesLabel')"
+                                v-model="numberOfPages" type="number"
+                                :min="0" :label="$t('numberOfPagesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
@@ -218,7 +220,8 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const publicationTypes = computed((): { title: string, value: MonographPublicationType | null }[] => (getMonographPublicationTypesForGivenLocale() as { title: string; value: MonographPublicationType; }[]));
@@ -343,7 +346,7 @@ export default defineComponent({
             contributions, contributionsRef, scopusIdValidationRules, popuateMetadata,
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
             availableMonograph, errorMessage, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules, optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

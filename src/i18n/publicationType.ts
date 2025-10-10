@@ -5,25 +5,25 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 const publicationTypeEn = [
     { title: "Journal Publication", value: PublicationType.JOURNAL_PUBLICATION },
     { title: "Conference Publication", value: PublicationType.PROCEEDINGS_PUBLICATION },
-    { title: "Patent", value: PublicationType.PATENT },
-    { title: "Proceedings", value: PublicationType.PROCEEDINGS },
-    { title: "Dataset", value: PublicationType.DATASET },
-    { title: "Software", value: PublicationType.SOFTWARE },
     { title: "Monograph", value: PublicationType.MONOGRAPH },
     { title: "Monograph publication", value: PublicationType.MONOGRAPH_PUBLICATION },
-    { title: "Thesis", value: PublicationType.THESIS }
+    { title: "Thesis", value: PublicationType.THESIS },
+    { title: "Patent", value: PublicationType.PATENT },
+    { title: "Software", value: PublicationType.SOFTWARE },
+    { title: "Dataset", value: PublicationType.DATASET },
+    { title: "Proceedings", value: PublicationType.PROCEEDINGS }
 ];
 
 const publicationTypeSr = [
     { title: "Rad u časopisu", value: PublicationType.JOURNAL_PUBLICATION },
     { title: "Rad sa konferencije", value: PublicationType.PROCEEDINGS_PUBLICATION },
-    { title: "Patent", value: PublicationType.PATENT },
-    { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
-    { title: "Skup podataka", value: PublicationType.DATASET },
-    { title: "Softver", value: PublicationType.SOFTWARE },
     { title: "Monografija", value: PublicationType.MONOGRAPH },
     { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION },
-    { title: "Završni rad", value: PublicationType.THESIS }
+    { title: "Završni rad", value: PublicationType.THESIS },
+    { title: "Patent", value: PublicationType.PATENT },
+    { title: "Softver", value: PublicationType.SOFTWARE },
+    { title: "Skup podataka", value: PublicationType.DATASET },
+    { title: "Zbornik radova", value: PublicationType.PROCEEDINGS }
 ];
 
 export const getTitleFromValue = (value: PublicationType, publicationTypeArray: {title: string, value: PublicationType}[]) => {

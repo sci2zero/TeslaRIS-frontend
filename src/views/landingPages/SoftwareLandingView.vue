@@ -29,7 +29,12 @@
                 <v-icon v-if="!software" size="x-large" class="large-software-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="software?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="software?.id"
+                    :document-type="PublicationType.SOFTWARE"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -151,6 +156,9 @@
             <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -219,6 +227,13 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(software?.id as number)"
+                    :display-settings="displayConfiguration.displaySettings.value"
+                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <share-buttons
@@ -274,11 +289,13 @@ import ShareButtons from '@/components/core/ShareButtons.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
+import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 
 
 export default defineComponent({
     name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -306,6 +323,8 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const actionsRef = ref<typeof DocumentActionBox>();
+
+        const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             fetchDisplayData();
@@ -467,7 +486,8 @@ export default defineComponent({
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
             fetchIndicators, createIndicator, PublicationType,
-            fetchSoftware, fetchValidationStatus, updateRemark
+            fetchSoftware, fetchValidationStatus, updateRemark,
+            displayConfiguration
         };
 }})
 

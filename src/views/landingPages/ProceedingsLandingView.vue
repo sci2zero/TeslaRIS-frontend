@@ -204,6 +204,9 @@
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
+            <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -274,6 +277,13 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(proceedings?.id as number)"
+                    :display-settings="displayConfiguration.displaySettings.value"
+                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -334,11 +344,13 @@ import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
+import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("");
 
@@ -374,6 +386,8 @@ export default defineComponent({
         const documentIndicators = ref<EntityIndicatorResponse[]>([]);
 
         const loginStore= useLoginStore();
+
+        const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             fetchDisplayData();
@@ -578,7 +592,7 @@ export default defineComponent({
             publications, event, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseDate,
-            languageTagMap, publicationSeriesType,
+            languageTagMap, publicationSeriesType, displayConfiguration,
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

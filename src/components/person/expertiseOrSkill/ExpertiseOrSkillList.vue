@@ -14,7 +14,7 @@
                 :disabled="!inComparator"
             >
                 <div v-for="(expertiseOrSkill, index) in expertiseOrSkills" :key="index" class="py-5">
-                    <v-menu
+                    <!-- <v-menu
                         v-if="canEdit"
                         v-model="menus[index]"
                         :close-on-content-click="true"
@@ -36,16 +36,43 @@
                                 <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
-                    </v-menu>
+                    </v-menu> -->
 
-                    <h4><strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong></h4>
+                    <h4>
+                        <strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong>
+                        <div v-if="canEdit" class="d-flex flex-row justify-end edit-pen">
+                            <v-btn
+                                class="mt-1"
+                                icon variant="outlined"
+                                color="primary"
+                                size="medium"
+                                @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
+                                <v-icon size="large" icon="mdi-delete"></v-icon>
+                            </v-btn>
+                            <expertise-or-skill-modal
+                                :read-only="!canEdit"
+                                class="mt-1 ml-8"
+                                edit
+                                :preset-expertise-or-skill="expertiseOrSkill"
+                                @update="updateExpertiseOrSkill"
+                            />
+                        </div>
+                    </h4>
                     <p>{{ returnCurrentLocaleContent(expertiseOrSkill.description) }}</p>
                     
                     <br />
                     <attachment-list
-                        :attachments="expertiseOrSkill.proofs" :can-edit="canEdit" is-proof @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
-                        @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)" @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)"></attachment-list>
-                    <v-divider v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1 " class="mt-10"></v-divider>
+                        :attachments="expertiseOrSkill.proofs"
+                        :can-edit="canEdit"
+                        is-proof
+                        @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
+                        @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)"
+                        @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)">
+                    </attachment-list>
+                    <v-divider
+                        v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1"
+                        class="mt-10">
+                    </v-divider>
                 </div>
             </draggable>
         </v-card-text>

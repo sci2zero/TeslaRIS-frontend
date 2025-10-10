@@ -29,7 +29,12 @@
                 <v-icon v-if="!proceedingsPublication" size="x-large" class="large-proceedingsPublication-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="proceedingsPublication?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="proceedingsPublication?.id"
+                    :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -178,6 +183,9 @@
             <v-tab v-show="documentClassifications?.length > 0 || canEdit" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -249,6 +257,13 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(proceedingsPublication?.id as number)"
+                    :display-settings="displayConfiguration.displaySettings.value"
+                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <share-buttons
@@ -311,11 +326,13 @@ import { useTrustConfigurationActions } from '@/composables/useTrustConfiguratio
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
+import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -349,6 +366,8 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const actionsRef = ref<typeof DocumentActionBox>();
+
+        const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             fetchDisplayData();
@@ -515,7 +534,7 @@ export default defineComponent({
         };
 
         return {
-            proceedingsPublication, icon, publications, event,
+            proceedingsPublication, icon, publications, event, displayConfiguration,
             totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
