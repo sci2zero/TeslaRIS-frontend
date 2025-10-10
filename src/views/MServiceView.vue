@@ -146,70 +146,75 @@
             <h2 v-if="assessmentResponse" class="mt-15">
                 {{ $t("assessmentResultsLabel") }}
             </h2>
-            <v-container v-if="assessmentResponse && assessmentResponse.assessmentCode">
-                <v-row>
-                    <v-col cols="12" md="4">
-                        <strong>{{ $t("assessmentCodeLabel") }}:</strong>
-                    </v-col>
-                    <v-col cols="12" md="8">
-                        {{ assessmentResponse?.assessmentCode }}
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="12" md="4">
-                        <strong>{{ $t("assessmentReasonLabel") }}:</strong>
-                    </v-col>
-                    <v-col cols="12" md="8">
-                        {{ returnCurrentLocaleContent(assessmentResponse?.assessmentReason) }}
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="12" md="4">
-                        <strong>{{ $t("rawPointsLabel") }}:</strong>
-                    </v-col>
-                    <v-col cols="12" md="8">
-                        {{ assessmentResponse?.rawPoints }}
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="12" md="4">
-                        <strong>{{ $t("rawPointsReasonLabel") }}:</strong>
-                    </v-col>
-                    <v-col cols="12" md="8">
-                        {{ returnCurrentLocaleContent(assessmentResponse?.rawPointsReason) }}
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="12" md="4">
-                        <strong>{{ $t("scaledPointsLabel") }}:</strong>
-                    </v-col>
-                    <v-col cols="12" md="8">
-                        {{ assessmentResponse?.scaledPoints }}
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="12" md="4">
-                        <strong>{{ $t("scaledPointsReasonLabel") }}:</strong>
-                    </v-col>
-                    <v-col cols="12" md="8">
-                        {{ returnCurrentLocaleContent(assessmentResponse?.scaledPointsReason) }}
-                    </v-col>
-                </v-row>
-            </v-container>
-            <h3 v-if="assessmentResponse && !assessmentResponse.assessmentCode">
-                {{ $t("noAssessmentForSelectionMessage") }}
-            </h3>
 
             <div ref="assessmentSectionRef">
+                <v-container v-show="assessmentResponse && assessmentResponse.assessmentCode">
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <strong>{{ $t("assessmentCodeLabel") }}:</strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            {{ assessmentResponse?.assessmentCode }}
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <strong>{{ $t("assessmentReasonLabel") }}:</strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            {{ returnCurrentLocaleContent(assessmentResponse?.assessmentReason) }}
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <strong>{{ $t("rawPointsLabel") }}:</strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            {{ assessmentResponse?.rawPoints }}
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <strong>{{ $t("rawPointsReasonLabel") }}:</strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            {{ returnCurrentLocaleContent(assessmentResponse?.rawPointsReason) }}
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <strong>{{ $t("scaledPointsLabel") }}:</strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            {{ assessmentResponse?.scaledPoints }}
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <strong>{{ $t("scaledPointsReasonLabel") }}:</strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            {{ returnCurrentLocaleContent(assessmentResponse?.scaledPointsReason) }}
+                        </v-col>
+                    </v-row>
+                </v-container>
+                <h3 v-if="assessmentResponse && !assessmentResponse.assessmentCode">
+                    {{ $t("noAssessmentForSelectionMessage") }}
+                </h3>
+            
                 <i-f-table-component
                     v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION"
-                    class="mt-15" :json-data="(ifTableData as IFTableResponse)" :preset-from-year="(yearOfPublication as number) - 2" :preset-to-year="(yearOfPublication as number)"
-                    @years-updated="fetchIFTableData"></i-f-table-component>
+                    class="mt-15"
+                    :json-data="(ifTableData as IFTableResponse)"
+                    :preset-from-year="(yearOfPublication as number) - 2"
+                    :preset-to-year="(yearOfPublication as number)"
+                    @years-updated="fetchIFTableData">
+                </i-f-table-component>
             </div>
         </v-form>
     </v-container>
@@ -364,7 +369,13 @@ export default defineComponent({
                     assessmentResponse.value = response.data;
                     token.value = "";
                     vueRecaptcha.value?.reset();
-                    assessmentSectionRef.value?.scrollIntoView({ behavior: 'smooth' });
+                    assessmentSectionRef.value?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                        inline: "nearest"
+                    });
+                    
+                    scrollToAssessmentSection();
                 });
 
                 fetchIFTableData((yearOfPublication.value as number) - 2, yearOfPublication.value as number);
@@ -373,7 +384,7 @@ export default defineComponent({
                     assessmentResponse.value = response.data;
                     token.value = "";
                     vueRecaptcha.value?.reset();
-                    assessmentSectionRef.value?.scrollIntoView({ behavior: 'smooth' });
+                    
                 });
             }
         };
@@ -393,6 +404,21 @@ export default defineComponent({
         
         const handleVerifyCallback = (response: string) => {
             token.value = response;
+        };
+
+        const scrollToAssessmentSection = () => {
+            assessmentSectionRef.value?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+                inline: "nearest"
+            });
+            
+            setTimeout(() => {
+                window.scrollBy({
+                    top: 200,
+                    behavior: "smooth"
+                });
+            }, 100);
         };
 
         return {

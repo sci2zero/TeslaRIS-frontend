@@ -426,8 +426,8 @@ const router = createRouter({
                             name: "publisherLandingPage",
                             component: PublisherLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.promotionRegistryAdministrator],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
