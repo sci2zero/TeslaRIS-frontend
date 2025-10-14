@@ -190,3 +190,7 @@ label {
     letter-spacing: 0.5px;
     box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
 }
+
+.d-flex {
+    display: flex;
+}
