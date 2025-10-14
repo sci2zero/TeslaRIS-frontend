@@ -62,7 +62,7 @@
                 }"
             @switch-page="switchPage">
             <template #top-left>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                     <search-bar-component v-if="currentTab === 'simpleSearch'" @search="clearSortAndPerformSearch($event)" :transparent="false" size="small"></search-bar-component>
                     <v-btn
                         v-if="currentTab === 'simpleSearch'"

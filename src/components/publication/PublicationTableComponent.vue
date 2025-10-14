@@ -102,7 +102,7 @@
                     </v-list>
                 </v-menu>
             </div>
-            <div :class="[selectedPublications.length > 0 ? 'w-96' : 'w-[32rem]']">
+            <div :class="[selectedPublications.length > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
                 <slot name="top-left"></slot>
             </div>
         </div>
