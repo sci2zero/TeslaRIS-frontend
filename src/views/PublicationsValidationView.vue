@@ -12,7 +12,7 @@
         </div>
 
         <div
-            v-if="(isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor"
+            v-if="(isAdmin && selectedOrganisationUnit && selectedOrganisationUnit.value > 0) || isInstitutionalEditor"
             class="mt-15">
             <v-select
                 v-model="selectedPublicationTypes"

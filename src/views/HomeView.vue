@@ -41,7 +41,15 @@
                                 {{ item.name }}
                             </h3>
                             <div class="text-center">
-                                <div>
+                                <div v-if="isLoadingCounts">
+                                    <v-progress-circular
+                                        indeterminate
+                                        color="white"
+                                        :size="40"
+                                        :width="3"
+                                    ></v-progress-circular>
+                                </div>
+                                <div v-else>
                                     <span class="frosted-number text-lg sm:text-xl md:text-2xl">
                                         {{ item.value }}
                                     </span>
@@ -73,6 +81,11 @@ import BrandingService from "@/services/BrandingService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import Navbar from "@/components/core/MainNavbar.vue";
 import LandingFeatures from "@/components/landing/LandingFeatures.vue";
+import { type PersonIndex } from "@/models/PersonModel";
+import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
+import { type DocumentPublicationIndex } from "@/models/PublicationModel";
+import GlobalLeaderboardService from "@/services/visualization/GlobalLeaderboardService";
+import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 
 
 export default defineComponent({
@@ -92,6 +105,7 @@ export default defineComponent({
         const researcherCount = ref(0);
         const ouCount = ref(0);
         const publicationCount = ref(0);
+        const isLoadingCounts = ref(true);
 
         onMounted(() => {
             BrandingService.fetchBrandingInfo().then((response) => {
@@ -99,18 +113,26 @@ export default defineComponent({
                 description.value = response.data.description;
             });
 
-            PersonService.getResearcherCount().then((response) => researcherCount.value = response.data);
-            OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data);
-            DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data);
+            Promise.all([
+                PersonService.getResearcherCount().then((response) => researcherCount.value = response.data),
+                OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data),
+                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data)
+            ]).finally(() => {
+                isLoadingCounts.value = false;
+            });
 
             document.title = `TeslaRIS - ${i18n.t("homeLabel")}`;
         });
 
+        const mostCitedResearchersLabel = computed(() => i18n.t("mostCitedResearchersLabel"));
+        const mostCitedInstitutionsLabel = computed(() => i18n.t("mostCitedInstitutionsLabel"));
+        const mostCitedPublicationsLabel = computed(() => i18n.t("mostCitedPublicationsLabel"));
+
         const cardsData = ref([
-            { name: personListLabel, value: researcherCount, path: 'persons', icon: 'mdi-account-group' },
-            { name: ouListLabel, value: ouCount, path: 'organisation-units', icon: 'mdi-domain' },
-            { name: scientificResultsListLabel, value: publicationCount, path: 'scientific-results', icon: 'mdi-file-document-multiple' },
-        ])
+        {name: personListLabel, value: researcherCount, topResultsTitle: mostCitedResearchersLabel, path:'persons', icon: 'mdi-account-group'},
+        {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, path: 'organisation-units', icon: 'mdi-domain'},
+        {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, path:'scientific-results', icon: 'mdi-file-document-multiple'},
+    ])
 
         const search = (tokenParams: string) => {
             let token = tokenParams;
@@ -134,13 +156,40 @@ export default defineComponent({
                     }
                 }
             );     
-        }
+        };
+
+        const getItemName = (item: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex): string => {
+            if ("name" in item) {
+                return (item as PersonIndex).name;
+            } else if ("nameSr" in item) {
+                return (item as OrganisationUnitIndex).nameSr;
+            }
+
+            console.log(item as DocumentPublicationIndex)
+            return (item as DocumentPublicationIndex).apa;
+        };
+
+        const navigateToItemPage = (item: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex) => {
+            let pageName;
+            if ("name" in item) {
+                pageName = "researcherLandingPage";
+            } else if ("nameSr" in item) {
+                pageName = "organisationUnitLandingPage";
+            } else {
+                pageName = getDocumentLandingPageName((item as DocumentPublicationIndex).type);
+            }
+
+            router.push({ name: pageName, params: {id: item.databaseId} });
+        };
 
         return {
             search, cardsData,
             title, description,
             returnCurrentLocaleContent,
             router,
+            navigateToItemPage,
+            getItemName,
+            isLoadingCounts
         };
     },
 });

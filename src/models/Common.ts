@@ -1,5 +1,7 @@
 import { RecurrenceType } from "./LoadModel";
-import type { PersonDocumentContribution, PublicationType } from "./PublicationModel";
+import { type OrganisationUnitIndex } from "./OrganisationUnitModel";
+import { type PersonIndex } from "./PersonModel";
+import type { DocumentPublicationIndex, PersonDocumentContribution, PublicationType } from "./PublicationModel";
 
 export interface Page<Type> {
     content: Type[];
@@ -127,7 +129,8 @@ export enum ScheduledTaskType {
     JOURNAL_PUBLICATIONS_ASSESSMENT = "JOURNAL_PUBLICATIONS_ASSESSMENT",
     PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT",
     REPORT_GENERATION = "REPORT_GENERATION",
-    UNMANAGED_DOCUMENTS_DELETION = "UNMANAGED_DOCUMENTS_DELETION"
+    UNMANAGED_DOCUMENTS_DELETION = "UNMANAGED_DOCUMENTS_DELETION",
+    PUBLIC_REVIEW_END_DATE_CHECK = "PUBLIC_REVIEW_END_DATE_CHECK"
 }
 
 export interface BrandingInformation {
@@ -205,7 +208,8 @@ export enum ExportableEndpointType {
     ORGANISATION_UNIT_EMPLOYEES = "ORGANISATION_UNIT_EMPLOYEES",
     THESIS_SIMPLE_SEARCH = "THESIS_SIMPLE_SEARCH",
     THESIS_ADVANCED_SEARCH = "THESIS_ADVANCED_SEARCH",
-    AUTHOR_REPRINT_DOCUMENTS_SEARCH = "AUTHOR_REPRINT_DOCUMENTS_SEARCH"
+    AUTHOR_REPRINT_DOCUMENTS_SEARCH = "AUTHOR_REPRINT_DOCUMENTS_SEARCH",
+    COLLABORATION_PUBLICATIONS = "COLLABORATION_PUBLICATIONS"
 }
 
 export interface TableExportRequest {
@@ -258,19 +262,92 @@ export interface PrepopulatedMetadata {
 }
 
 export interface ContactFormData {
-    name: string,
-    senderEmail: string,
-    subject: string,
-    message: string,
-    captchaToken: string
+    name: string;
+    senderEmail: string;
+    subject: string;
+    message: string;
+    captchaToken: string;
 }
 
 export interface NotificationActionResult {
-    value: string
+    value: string;
+}
+
+export interface YearlyCounts {
+    year: number;
+    countsByCategory: Record<string, number>;
+}
+
+export interface StatisticsByCountry {
+    countryCode: string;
+    countryName: string;
+    value: number;
+}
+
+export interface MCategoryCounts {
+    commissionName: MultilingualContent[];
+    countsByCategory: Record<string, number>
+}
+
+export interface CommissionYearlyCounts {
+    commissionName: MultilingualContent[];
+    yearlyCounts: YearlyCounts[];
+}
+
+export enum MCategory {
+    M10 = "M10",
+    M20 = "M20",
+    M30 = "M30",
+    M40 = "M40",
+    M50 = "M50",
+    M60 = "M60",
+    M70 = "M70",
+    M80 = "M80",
+    M90 = "M90",
+    NONE = "NONE"
 }
 
 export interface DownloadState {
     progress: number
     fileName: string
     isDownloading: boolean
+}
+
+export interface LeaderboardEntry {
+    a: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex;
+    b: number;
+}
+
+export interface CommissionAssessmentPointsPersonLeaderboard {
+    commissionId: number;
+    commissionDescription: MultilingualContent[];
+    leaderboardData: LeaderboardEntry[];
+}
+
+export interface PersonNode {
+    id: string;
+    name: string;
+    symbolSize: number;
+    value: number;
+    category: number;
+}
+
+export interface CollaborationLink {
+    source: string;
+    target: string;
+    value: number;
+    width: number;
+}
+
+export interface CollaborationNetwork {
+    nodes: PersonNode[];
+    links: CollaborationLink[];
+}
+
+export enum CollaborationType {
+    COAUTHORSHIP = "COAUTHORSHIP",
+    MENTORSHIP = "MENTORSHIP",
+    CO_MENTORSHIP = "CO_MENTORSHIP",
+    CO_EDITORSHIP = "CO_EDITORSHIP",
+    CO_MEMBERSHIP_COMMISSION = "CO_MEMBERSHIP_COMMISSION"
 }

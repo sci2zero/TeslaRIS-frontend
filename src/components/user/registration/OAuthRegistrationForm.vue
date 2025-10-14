@@ -175,6 +175,13 @@ export default defineComponent({
             }).catch((error) => {
                 message.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
+
+                if (error.response.data.message === "personAlreadyHasAccountMessage" && selectedPerson.value.value > 0) {
+                    PersonService.getPersonWithUser(selectedPerson.value.value).then(response => {
+                        const email = response.data.user.email;
+                        router.push({name:"login", path:'/login/', query: { "email": email }})
+                    });
+                }
             });
         };
 

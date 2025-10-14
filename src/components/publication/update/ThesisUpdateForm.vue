@@ -111,6 +111,7 @@
                 <v-text-field
                     v-model="numberOfPages" type="number"
                     :label="$t('numberOfPagesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfPagesLabel')">
                 </v-text-field>
             </v-col>
@@ -118,6 +119,7 @@
                 <v-text-field
                     v-model="numberOfChapters" type="number"
                     :label="$t('numberOfChaptersLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfChaptersLabel')">
                 </v-text-field>
             </v-col>
@@ -125,6 +127,7 @@
                 <v-text-field
                     v-model="numberOfReferences" type="number"
                     :label="$t('numberOfReferencesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfReferencesLabel')">
                 </v-text-field>
             </v-col>
@@ -134,6 +137,7 @@
                 <v-text-field
                     v-model="numberOfGraphs" type="number"
                     :label="$t('numberOfGraphsLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfGraphsLabel')">
                 </v-text-field>
             </v-col>
@@ -141,6 +145,7 @@
                 <v-text-field
                     v-model="numberOfIllustrations" type="number"
                     :label="$t('numberOfIllustrationsLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfIllustrationsLabel')">
                 </v-text-field>
             </v-col>
@@ -150,6 +155,7 @@
                 <v-text-field
                     v-model="numberOfTables" type="number"
                     :label="$t('numberOfTablesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfTablesLabel')">
                 </v-text-field>
             </v-col>
@@ -157,6 +163,7 @@
                 <v-text-field
                     v-model="numberOfAppendices" type="number"
                     :label="$t('numberOfAppendicesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfAppendicesLabel')">
                 </v-text-field>
             </v-col>
@@ -194,8 +201,7 @@
                 <v-text-field
                     v-model="udc"
                     :label="$t('udcLabel')"
-                    :placeholder="$t('udcLabel')"
-                    :rules="udcValidationRules">
+                    :placeholder="$t('udcLabel')">
                 </v-text-field>
             </v-col>
         </v-row>
@@ -443,7 +449,8 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules, documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getThesisTypesForGivenLocale());
@@ -578,12 +585,12 @@ export default defineComponent({
             externalOUName, externalOUNameRef, isInstitutionalLibrarian,
             topicAcceptanceDate, thesisDefenceDate, canAddAsNonReference,
             openAlexId, workOpenAlexIdValidationRules, isbnValidationRules,
-            udcValidationRules, printIsbn, eIsbn, placeOfKeep, udc,
+            printIsbn, eIsbn, placeOfKeep, udc, typeOfTitleRef, scopus,
             numberOfChapters, numberOfReferences, numberOfTables,
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
-            scientificSubAreaRef, placeOfKeepRef, typeOfTitleRef, scopus
+            scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

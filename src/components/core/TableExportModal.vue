@@ -202,7 +202,7 @@ export default defineComponent({
         const fieldData = ref<SearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
         const selectedFields = ref<string[]>([]);
-        const exportAll = ref(props.potentialMaxAmountRequested ? true : false);
+        const exportAll = ref(false);
         const exportPageOffset = ref(1);
 
         const langItems = getLangItems();
@@ -247,6 +247,18 @@ export default defineComponent({
             .then(response => {
                 maxExportsPerPage.value = response.data > 0 ? response.data : 1;
             });
+
+            if (props.potentialMaxAmountRequested) {
+                exportAll.value = true;
+            }
+        });
+
+        watch(() => props.potentialMaxAmountRequested, () => {
+            if (props.potentialMaxAmountRequested) {
+                exportAll.value = true;
+            } else {
+                exportAll.value = false;
+            }
         });
 
         watch(i18n.locale, () => {

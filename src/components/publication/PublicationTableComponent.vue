@@ -20,7 +20,7 @@
                         <v-list-item
                             v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
                             @click="deleteSelection"
-                            :disabled="allowResearcherUnbinding ? !canPerformUnbinding() : selectedPublications.length === 0"
+                            :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
                             class="action-menu-item"
                         >
                             <template v-slot:prepend>
@@ -110,7 +110,6 @@
             <slot name="actions"></slot>
         </div>
     </div>
-
     <table-export-modal
         v-if="enableExport"
         ref="exportModal"
@@ -452,7 +451,7 @@ export default defineComponent({
             }
 
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-                tableOptions.value.sortBy = [{key: "year", order: "asc"}];
+                tableOptions.value.sortBy = [{key: "year", order: "desc"}];
             }
         })
 
@@ -483,13 +482,23 @@ export default defineComponent({
             isInstitutionalEditor,
             isInstitutionalLibrarian,
             isHeadOfLibrary, loggedInUser,
-            isUserLoggedIn
+            isUserLoggedIn, isResearcher
         } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
         const tableOptions = ref<any>(
-            {initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: titleColumn, order: "asc"}]}
+            {
+                initialCustomConfiguration: true,
+                page: 1,
+                itemsPerPage: 10,
+                sortBy:[
+                    {
+                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn),
+                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "desc" : "asc")
+                    }
+                ]
+            }
         );
 
         const headers = ref<any>([
@@ -628,7 +637,13 @@ export default defineComponent({
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             if (
                 (
-                    isEqual([{key: titleColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+                    isEqual(
+                        [
+                            {
+                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn.value),
+                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "desc" : "asc")
+                            }
+                        ], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0
                 ) &&
                 page == tableOptions.value.page
@@ -738,7 +753,7 @@ export default defineComponent({
         };
 
         const canPerformUnbinding = (): boolean => {
-            if (isAdmin.value) {
+            if (isAdmin.value || isResearcher.value) {
                 return true;
             }
             

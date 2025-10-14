@@ -14,7 +14,9 @@
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-            <v-col v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion" cols="12" sm="3" md="2">
+            <v-col
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck"
+                cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
                     :items="applicableTypes"
@@ -35,7 +37,7 @@
                     :readonly="false">
                 </v-select>
             </v-col>
-            <v-col v-if="taskReindexing" cols="12" md="4">
+            <v-col v-if="taskReindexing" cols="8" md="4">
                 <v-select
                     v-model="selectedEntityTypes"
                     :items="entityTypes"
@@ -43,6 +45,31 @@
                     :rules="requiredMultiSelectionRules"
                     multiple>
                 </v-select>
+            </v-col>
+            <v-col v-if="taskReindexing" cols="4" md="2">
+                <v-checkbox
+                    v-model="reharvestCitationIndicators"
+                    class="mt-2"
+                    :label="$t('reharvestCitationIndicatorsLabel')"
+                ></v-checkbox>
+            </v-col>
+            <v-col v-if="publicReviewEndCheck" cols="10" md="6">
+                <v-select
+                    v-model="selectedThesisTypes"
+                    :items="thesisTypes"
+                    :label="$t('thesisTypeLabel') + '*'"
+                    :rules="requiredMultiSelectionRules"
+                    multiple>
+                </v-select>
+            </v-col>
+            <v-col v-if="publicReviewEndCheck" cols="3" md="2">
+                <v-text-field
+                    v-model="publicReviewLengthDays"
+                    type="number"
+                    :label="$t('publicReviewLengthLabel') + '*'"
+                    :placeholder="$t('publicReviewLengthLabel') + '*'"
+                    :rules="requiredNumericGreaterThanZeroFieldRules"
+                ></v-text-field>
             </v-col>
             <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
@@ -127,7 +154,9 @@
             <v-col cols="12" sm="3" md="1">
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
-            <v-col v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion" cols="12" sm="3" md="2">
+            <v-col
+                v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck"
+                cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedRecurrenceType"
                     :items="recurrenceTypes"
@@ -173,11 +202,12 @@ import JournalAutocompleteSearch from "@/components/journal/JournalAutocompleteS
 import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import EventAutocompleteSearch from "@/components/event/EventAutocompleteSearch.vue";
-import { PublicationType } from "@/models/PublicationModel";
+import { PublicationType, ThesisType } from "@/models/PublicationModel";
 import { getReportTypesForGivenLocale } from "@/i18n/reportType";
 import { useInterval } from "@/composables/useInterval";
 import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from "@/i18n/recurrenceType";
 import { RecurrenceType } from "@/models/LoadModel";
+import { getThesisTypesForGivenLocale } from "@/i18n/thesisType";
 
 
 export default defineComponent({
@@ -202,7 +232,10 @@ export default defineComponent({
         const classificationSources = getClassificationSourcesForGivenLocale();
         const selectedClassificationSource = ref<{ title: string, value: EntityClassificationSource }>({title: getClassificationSourceTitleFromValueAutoLocale(EntityClassificationSource.MNO) as string, value: EntityClassificationSource.MNO});
 
-        const { requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
+        const {
+            requiredSelectionRules, requiredMultiSelectionRules,
+            requiredNumericGreaterThanZeroFieldRules
+        } = useValidationUtils();
 
         const i18n = useI18n();
 
@@ -221,6 +254,7 @@ export default defineComponent({
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
         const proceedingsPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT);
         const reportGeneration = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REPORT_GENERATION);
+        const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
 
         const years = ref<number[]>([]);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
@@ -239,10 +273,16 @@ export default defineComponent({
         const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
         const selectedCommissions = ref<{title: string, value: number}[]>([]);
 
+        const thesisTypes = ref<{ title: string; value: ThesisType; }[]>(getThesisTypesForGivenLocale() as { title: string; value: ThesisType; }[]);
+        const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([...thesisTypes.value]);
+        const publicReviewLengthDays = ref<number>(30);
+
         const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
         const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
             {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
         );
+
+        const reharvestCitationIndicators = ref(false);
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -338,7 +378,8 @@ export default defineComponent({
                     scheduleTask(() => 
                         TaskManagerService.scheduleDatabaseReindexing(
                             timestamp, selectedEntityTypes.value.map(entityType => entityType.value),
-                            selectedRecurrenceType.value.value
+                            selectedRecurrenceType.value.value,
+                            reharvestCitationIndicators.value
                         )
                     );
                     break;
@@ -401,6 +442,15 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK:
+                    scheduleTask(() => 
+                        TaskManagerService.schedulePublicReviewEndCheck(
+                            timestamp, selectedThesisTypes.value.map(type => type.value),
+                            publicReviewLengthDays.value, selectedRecurrenceType.value.value
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -448,7 +498,7 @@ export default defineComponent({
         };
 
         return {
-            scheduleDate, scheduledTasks,
+            scheduleDate, scheduledTasks, publicReviewLengthDays,
             applicableTypes, selectedApplicableEntityType,
             selectedIndicatorSource, requiredSelectionRules,
             scheduleTaskForComputation, scheduledTime,
@@ -471,8 +521,11 @@ export default defineComponent({
             selectedEvents, selectedReportType,
             isTopLevelReport, isSummaryReport,
             selectedCommissions, recurrenceTypes,
-            selectedRecurrenceType,
-            taskUnmanagedDocumentsDeletion
+            selectedRecurrenceType, thesisTypes,
+            reharvestCitationIndicators,
+            taskUnmanagedDocumentsDeletion,
+            publicReviewEndCheck, selectedThesisTypes,
+            requiredNumericGreaterThanZeroFieldRules
         };
     },
 });

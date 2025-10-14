@@ -14,9 +14,7 @@
         </v-tabs> -->
 
         <v-tabs-window v-model="currentTab">
-            <v-tabs-window-item value="simpleSearch">
-                <!-- <div class="h-10"></div> -->
-                <!-- <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)" :transparent="false" size="small"></search-bar-component> -->
+            <v-tabs-window-item value="simpleSearch">                
             </v-tabs-window-item>
             <v-tabs-window-item value="advancedSearch">
                 <v-btn

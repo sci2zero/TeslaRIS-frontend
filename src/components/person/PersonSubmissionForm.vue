@@ -28,6 +28,7 @@
                                 ref="deduplicationTableRef"
                                 :person-first-name="firstName"
                                 :person-last-name="lastName"
+                                @selected="returnToParent"
                             ></person-deduplication-table>
                         </v-col>
                     </v-row>
@@ -200,7 +201,7 @@ import { ref } from 'vue';
 import { computed } from 'vue';
 import PersonService from "@/services/PersonService";
 import { useRouter } from 'vue-router';
-import type { BasicPerson, PersonName } from "@/models/PersonModel";
+import type { BasicPerson, PersonIndex, PersonName } from "@/models/PersonModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getSexForGivenLocale } from '@/i18n/sex';
@@ -228,7 +229,7 @@ export default defineComponent({
             default: undefined
         }
     },
-    emits: ["create"],
+    emits: ["create", "selected"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -354,6 +355,10 @@ export default defineComponent({
             });
         };
 
+        const returnToParent = (item: PersonIndex) => {
+            emit("selected", item)
+        };
+
         return {
             isFormValid, additionalFields, snackbar, message, deduplicationTableRef, role,
             firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
@@ -361,7 +366,7 @@ export default defineComponent({
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
             scopusAuthorIdValidationRules, loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
-            personWebOfScienceIdValidationRules, webOfScienceId
+            personWebOfScienceIdValidationRules, webOfScienceId, returnToParent
         };
     }
 });

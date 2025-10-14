@@ -18,15 +18,6 @@
             </v-col>
   
             <v-col cols="12" md="6">
-                <v-text-field
-                    ref="schoolYearRef"
-                    v-model="localForm.schoolYear"
-                    :label="$t('schoolYearLabel') + '*'"
-                    :rules="conditionalRule"
-                />
-            </v-col>
-  
-            <v-col cols="12" md="6">
                 <v-select
                     v-model="localForm.academicTitle"
                     :label="$t('academicTitleLabel') + '*'"
@@ -35,16 +26,31 @@
                     :rules="requiredFieldRules"
                 />
             </v-col>
-  
-            <v-col class="mb-2" cols="12" md="6">
-                <date-picker
-                    ref="gradDateRef"
-                    v-model="localForm.graduationDate"
-                    :label="$t('graduationDateLabel') + '*'"
-                    color="primary"
-                ></date-picker>
-            </v-col>
         </v-row>
+  
+        <div class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("enterOneOfTwoLabel") }}
+            </div>
+            <v-row>
+                <v-col cols="12" md="6">
+                    <v-text-field
+                        ref="schoolYearRef"
+                        v-model="localForm.schoolYear"
+                        :label="$t('schoolYearLabel')"
+                        :rules="conditionalRule"
+                    />
+                </v-col>
+                <v-col class="mb-2" cols="12" md="6">
+                    <date-picker
+                        ref="gradDateRef"
+                        v-model="localForm.graduationDate"
+                        :label="$t('graduationDateLabel')"
+                        color="primary"
+                    ></date-picker>
+                </v-col>
+            </v-row>
+        </div>
     </v-form>
 </template>
   

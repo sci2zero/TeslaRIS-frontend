@@ -4,7 +4,7 @@ import axios from "axios";
 import { type ScheduledTaskResponse } from "@/models/Common";
 import { EntityType } from "@/models/MergeModel";
 import { EntityClassificationSource, ReportType, type PublicationAssessmentRequest } from "@/models/AssessmentModel";
-import { PublicationType } from "@/models/PublicationModel";
+import { PublicationType, ThesisType } from "@/models/PublicationModel";
 import { toUtcLocalDateTimeString } from "@/utils/DateUtil";
 
 export class TaskSchedulingService extends BaseService {
@@ -51,8 +51,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${toUtcLocalDateTimeString(timestamp)}&source=${source}&commissionId=${commissionId}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[], recurrence: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `reindex/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
+    async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[], recurrence: string, reharvestCitationIndicators: boolean): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `reindex/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&reharvestCitationIndicators=${reharvestCitationIndicators}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
     }
 
     async schedulePublicationAssessment(timestamp: string, dateFrom: string, body: PublicationAssessmentRequest, type: PublicationType): Promise<AxiosResponse<void>> {
@@ -65,6 +65,15 @@ export class TaskSchedulingService extends BaseService {
 
     async scheduleUnmanagedDocumentsDeletion(timestamp: string, recurrence: string): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `document/schedule-unmanaged-documents-deletion?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
+    }
+
+    async schedulePublicReviewEndCheck(timestamp: string, thesisTypes: ThesisType[], publicReviewLengthDays: number, recurrence: string): Promise<AxiosResponse<void>> {
+        let typesParam = "";
+        thesisTypes.forEach(thesisType => {
+            typesParam += `&types=${thesisType}`;
+        });
+
+        return super.sendRequest(axios.post, `thesis/schedule-public-review-end-check?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&publicReviewLengthDays=${publicReviewLengthDays}${typesParam}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     private createNumericalParameter(paramName: string, values: number[]): string {

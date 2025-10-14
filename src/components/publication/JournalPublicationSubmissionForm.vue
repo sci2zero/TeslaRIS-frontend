@@ -95,7 +95,9 @@
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
-                                v-model="numberOfPages" type="number" :min="0" :label="$t('numberOfPagesLabel')"
+                                v-model="numberOfPages" type="number"
+                                :min="0" :label="$t('numberOfPagesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
@@ -235,7 +237,8 @@ export default defineComponent({
         const {
             requiredFieldRules, doiValidationRules,
             scopusIdValidationRules, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -359,7 +362,7 @@ export default defineComponent({
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, submitJournalPublication, errorMessage,
             popuateMetadata, PublicationType, documentWebOfScienceIdValidationRules,
-            webOfScienceId
+            webOfScienceId, optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

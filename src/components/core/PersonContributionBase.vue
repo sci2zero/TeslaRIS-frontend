@@ -23,6 +23,7 @@
                 is-submission
                 :read-only="false"
                 @create="selectNewlyAddedPerson"
+                @selected="selectExistingSelectedPerson"
             />
         </v-col>
     </v-row>
@@ -215,6 +216,7 @@ export default defineComponent({
         const i18n = useI18n();
         const personOtherNamePlaceholder = ref({title: "", value: -1});
 
+        const personPrimaryName = ref<PersonName>();
         const personOtherNames = ref<{ title: string, value: PersonName | number }[]>([]);
         const selectedOtherName = ref<{ title: string, value: PersonName | number }>(personOtherNamePlaceholder.value);
 
@@ -305,6 +307,12 @@ export default defineComponent({
                             title: i18n.t("notInListLabel", [personName]),
                             value: 0
                         });
+                    } else {
+                        presetPersonNameForCreation.value = {
+                            firstname: tokens[0],
+                            lastname: tokens.length > 1 ? tokens[tokens.length - 1] : "",
+                            otherName: ""
+                        };
                     }
                     
                     persons.value = listOfPersons;
@@ -333,19 +341,16 @@ export default defineComponent({
 
                 if(props.presetContributionValue.personId) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
+                        personPrimaryName.value = personResponse.data.personName;
                         
-                        if (personResponse.data.personName.otherName && personResponse.data.personName.otherName !== "null") {
-                            selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.otherName} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
-                        } else {
-                            selectedPerson.value = {title: `${personResponse.data.personName.firstname} ${personResponse.data.personName.lastname}`, value: personResponse.data.id as number};
-                        }
+                        selectedPerson.value = {title: `${constructDisplayName(personResponse.data.personName)}`, value: personResponse.data.id as number};
 
                         personOtherNames.value = [{title: selectedPerson.value.title, value: -1}];
                         personResponse.data.personOtherNames.forEach((otherName) => {
-                            if (otherName.dateFrom && otherName.dateTo) {
-                                personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName});
+                            if (otherName.dateFrom) {
+                                personOtherNames.value.push({title: `${constructDisplayName(otherName)} | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}`, value: otherName as PersonName});
                             } else {
-                                personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname}`, value: otherName as PersonName});
+                                personOtherNames.value.push({title: `${constructDisplayName(otherName)}`, value: otherName as PersonName});
                             }
                         });
 
@@ -355,9 +360,11 @@ export default defineComponent({
 
                         if(foundName) {
                             selectedOtherName.value = foundName;
+                            clearCustomNameValues();
                         } else if(selectedPersonName.trim() === "") {
                             customNameInput.value = false;
                             selectedOtherName.value = personOtherNames.value[0];
+                            clearCustomNameValues();
                         } else {
                             customNameInput.value = true;
                         }
@@ -370,6 +377,20 @@ export default defineComponent({
                 }
             }
         }, { deep: true });
+
+        watch(customNameInput, () => {
+            if (customNameInput.value && personPrimaryName.value) {
+                firstName.value = firstName.value ? firstName.value : personPrimaryName.value.firstname;
+                lastName.value = lastName.value ? lastName.value : personPrimaryName.value.lastname;
+
+                const isCustomName =
+                    firstName.value !== personPrimaryName.value.firstname || lastName.value !== personPrimaryName.value.lastname;
+
+                if (personPrimaryName.value.otherName && !isCustomName) {
+                    middleName.value = middleName.value ? middleName.value : personPrimaryName.value.otherName;
+                }
+            }
+        });
 
         const onPersonSelect = (selection: {title: string, value: number}) => {
             if (!selection) {
@@ -385,15 +406,24 @@ export default defineComponent({
             }
 
             PersonService.readPerson(selection.value).then((response) => {
+                personPrimaryName.value = response.data.personName;
                 personOtherNames.value = [
-                    {title: `${response.data.personName.firstname} ${response.data.personName.otherName} ${response.data.personName.lastname}`, value: -1}
+                    {title: constructDisplayName(response.data.personName), value: -1}
                 ];
                 selectedOtherName.value = personOtherNames.value[0];
                 response.data.personOtherNames.forEach((otherName) => {
-                    personOtherNames.value.push({title: `${otherName.firstname} ${otherName.otherName} ${otherName.lastname} | ${otherName.dateFrom} - ${otherName.dateTo}`, value: otherName as PersonName})
+                    personOtherNames.value.push({title: `${constructDisplayName(otherName)}` + (otherName.dateFrom ? ` | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}` : ""), value: otherName as PersonName})
                 });
             });
             sendContentToParent();
+        };
+
+        const constructDisplayName = (name: PersonName): string => {
+            if (name.otherName && name.otherName.trim() !== "") {
+                return `${name.firstname} ${name.otherName} ${name.lastname}`;
+            }
+
+            return `${name.firstname} ${name.lastname}`;
         };
 
         const constructExternalCollaboratorFromInput = (selectionTitle: string) => {
@@ -409,6 +439,12 @@ export default defineComponent({
                     firstName.value = toTitleCase(nameTokens[nameTokens.length - 1]);
                 }
             }
+        };
+
+        const clearCustomNameValues = () => {
+            firstName.value = "";
+            lastName.value = "";
+            middleName.value = "";
         };
 
         const extractTextInParentheses = (input: string) => {
@@ -537,6 +573,15 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const selectExistingSelectedPerson = (person: PersonIndex) => {
+            const toSelect = {title: person.name, value: person.databaseId as number};
+            persons.value.push(toSelect);
+            selectedPerson.value = toSelect;
+            personOtherNames.value = [{title: selectedPerson.value.title.split("|")[0], value: -1}];
+            selectedOtherName.value = personOtherNames.value[0];
+            sendContentToParent();
+        };
+
         const toggleExternalSelection = () => {
             selectExternalAssociate.value = !selectExternalAssociate.value;
 
@@ -616,7 +661,7 @@ export default defineComponent({
                 languageTags, valueSet, selectedAffiliations, personAffiliations,
                 PersonSubmissionForm, enterExternalOU, canUserAddPersons,
                 constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation, setContributor
+                presetPersonNameForCreation, setContributor, selectExistingSelectedPerson
             };
     }
 });

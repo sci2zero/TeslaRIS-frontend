@@ -210,6 +210,16 @@
                     :read-only="!canEdit"
                     @update="outputConfigurationUpdated"
                 />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="ChartDisplayConfigurationForm"
+                    :form-props="{ organisationUnitId: organisationUnit?.id }"
+                    entity-name="ChartDisplayConfiguration"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                />
                 <v-btn
                     v-if="isInstitutionalEditor && canEdit"
                     class="mb-5 ml-2" color="primary" density="compact"
@@ -226,15 +236,6 @@
                 </v-btn>
             </div>
         </div>
-
-        <!-- Keywords -->
-        <keyword-list
-            :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
-            :can-edit="canEdit"
-            @search-keyword="searchKeyword($event)"
-            @update="updateKeywords">
-        </keyword-list>
-
         <br />
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
@@ -257,6 +258,12 @@
             </v-tab>
             <v-tab v-if="ouIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-show="displaySettings.shouldDisplayVisualisations()" value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="displaySettings.shouldDisplayLeaderboards()" value="leaderboards">
+                {{ $t("leaderboardsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -373,6 +380,14 @@
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
+                <!-- Keywords -->
+                <keyword-list
+                    :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
+
                 <!-- Research Area -->
                 <v-row>
                     <v-col cols="12">
@@ -396,6 +411,24 @@
                     :can-edit="false"
                     show-statistics
                     @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <organisation-unit-visualizations
+                    :organisation-unit-id="(organisationUnit.id as number)"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="leaderboards">
+                <organisation-unit-leaderboards
+                    :organisation-unit-id="organisationUnit?.id"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"
+                    :display-citations-tab="displaySettings.shouldDisplayCitationLeaderboards()"
+                    :display-points-tab="displaySettings.shouldDisplayAssessmentPointsLeaderboards()"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -455,11 +488,15 @@ import OrganisationUnitOutputConfigurationForm from '@/components/organisationUn
 import OrganisationUnitOutputConfigurationService from '@/services/OrganisationUnitOutputConfigurationService';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import OrganisationUnitVisualizations from '@/components/organisationUnit/OrganisationUnitVisualizations.vue';
+import OrganisationUnitLeaderboards from '@/components/organisationUnit/OrganisationUnitLeaderboards.vue';
+import ChartDisplayConfigurationForm from '@/components/organisationUnit/ChartDisplayConfigurationForm.vue';
+import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards },
     setup() {
         const currentTab = ref("relations");
 
@@ -531,6 +568,8 @@ export default defineComponent({
         const publicationsRef = ref<typeof PublicationTableComponent>();
 
         const showOutputs = ref(false);
+
+        const displaySettings = useOUChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -891,12 +930,12 @@ export default defineComponent({
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
             fetchPublicReviewPageContent, isInstitutionalLibrarian,
-            OrganisationUnitTrustConfigurationForm,
+            OrganisationUnitTrustConfigurationForm, displaySettings,
             OrganisationUnitImportSourceForm, showOutputs,
             OrganisationUnitOutputConfigurationForm,
             InstitutionDefaultSubmissionContentForm,
             outputConfigurationUpdated, loggedInUser,
-            navigateToBackupPage
+            navigateToBackupPage, ChartDisplayConfigurationForm
         };
 }})
 
