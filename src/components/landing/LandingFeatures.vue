@@ -1,39 +1,45 @@
 <template>
-    <div class="bg-gray-100 rounded-[20px] p-4 md:p-6 lg:p-8 shadow-lg border border-slate-200 transition-all duration-300 relative overflow-hidden flex flex-col hover:shadow-2xl hover:border-blue-400/30">
+    <div class="bg-gray-100 p-4 md:p-6 lg:p-8 relative overflow-hidden flex flex-col">
         <div class="container mx-auto px-4 py-16">
             <div class="text-center mb-12">
                 <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 bg-clip-text">
-                    Istraživanja i publikacije
+                    Najznačajniji resursi
                 </h3>
                 <p class="text-base md:text-lg text-slate-500 max-w-4xl mx-auto leading-relaxed">
-                    Najnoviji naučni rezultati i istraživači Univerziteta u Novom Sadu
+                    Najcitiraniji naučni rezultati i istraživači
                 </p>
             </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Recent Publications -->
+                <!-- Top Publications -->
                 <div class="feature-card">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="flex items-center justify-center w-[60px] h-[60px] rounded-[16px] shadow-md flex-shrink-0 bg-gradient-to-br from-slate-50 to-slate-200">
                             <v-icon icon="mdi-book-open-page-variant" size="32" color="#3b82f6"></v-icon>
                         </div>
                         <h4 class="text-xl font-semibold text-slate-800 m-0 leading-[1.3]">
-                            Najnovije publikacije
+                            Najcitiranija dela
                         </h4>
                     </div>
                     <div class="flex-1 mb-6">
-                        <div v-for="(pub, index) in recentPublications" :key="index" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
+                        <div v-if="topPublications.length === 0" class="text-center py-8 text-slate-400">
+                            <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
+                            <p class="mt-2">Učitavanje...</p>
+                        </div>
+                        <div v-else v-for="(pub, index) in topPublications.slice(0, 3)" :key="index" 
+                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
+                             @click="$router.push('/' + $i18n.locale + '/publications/' + pub.item.databaseId)">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-blue-500/10">
-                                <v-icon :icon="pub.icon" size="20" :color="pub.iconColor"></v-icon>
+                                <v-icon icon="mdi-book-open-variant" size="20" color="#3b82f6"></v-icon>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ pub.title }}
+                                <h6 class="text-sm font-semibold text-slate-800 m-0 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {{ $i18n.locale === 'sr' ? pub.item.titleSr || pub.item.apa : pub.item.titleOther || pub.item.apa }}
                                 </h6>
                                 <p class="text-xs text-slate-500 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ pub.authors }}
+                                    {{ pub.item.authorNames }}
                                 </p>
-                                <span class="text-[0.7rem] text-slate-400 font-medium block">{{ pub.year }} • {{ pub.type }}</span>
+                                <span class="text-[0.7rem] text-slate-400 font-medium block">{{ pub.item.year }} • {{ pub.value }} citata</span>
                             </div>
                             <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
                         </div>
@@ -41,48 +47,46 @@
                     <v-btn 
                         variant="outlined" 
                         color="primary" 
-                        class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                        class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
                         @click="$router.push('/' + $i18n.locale + '/publications')"
                     >
                         Pregledaj sve publikacije
                     </v-btn>
                 </div>
 
-                <!-- Featured Researchers -->
+                <!-- Top Researchers -->
                 <div class="feature-card">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="flex items-center justify-center w-[60px] h-[60px] rounded-[16px] shadow-md flex-shrink-0 bg-gradient-to-br from-slate-50 to-slate-200">
                             <v-icon icon="mdi-account-group" size="32" color="#10b981"></v-icon>
                         </div>
                         <h4 class="text-xl font-semibold text-slate-800 m-0 leading-[1.3]">
-                            Istraživači
+                            Najcitiraniji istraživači
                         </h4>
                     </div>
                     <div class="flex-1 mb-6">
-                        <div v-for="(researcher, index) in featuredResearchers" :key="index" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
+                        <div v-if="topResearchers.length === 0" class="text-center py-8 text-slate-400">
+                            <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
+                            <p class="mt-2">Učitavanje...</p>
+                        </div>
+                        <div v-else v-for="(researcher, index) in topResearchers.slice(0, 3)" :key="index" 
+                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
+                             @click="$router.push('/' + $i18n.locale + '/persons/' + researcher.item.databaseId)">
                             <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-slate-200 bg-slate-100">
-                                <img 
-                                    :src="researcher.avatar ?? 'https://randomuser.me/api/portraits/men/90.jpg'" 
-                                    :alt="researcher.name" 
-                                    class="w-full h-full object-cover"
-                                    @error="handleAvatarError"
-                                />
                                 <v-icon 
                                     icon="mdi-account-circle" 
-                                    size="24" 
+                                    size="32" 
                                     color="#94a3b8"
-                                    style="display: none;"
-                                    class="w-full h-full flex items-center justify-center"
                                 ></v-icon>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ researcher.name }}
+                                    {{ researcher.item.name  }}
                                 </h6>
                                 <p class="text-xs text-slate-500 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ researcher.position }}
+                                    {{ $i18n.locale === 'sr' ? researcher.item.employmentsSr : researcher.item.employmentsOther }}
                                 </p>
-                                <span class="text-[0.7rem] text-slate-400 font-medium block">{{ researcher.department }}</span>
+                                <span class="text-[0.7rem] text-slate-400 font-medium block">{{ researcher.value }} citata</span>
                             </div>
                             <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
                         </div>
@@ -90,33 +94,42 @@
                     <v-btn 
                         variant="outlined" 
                         color="success" 
-                        class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                        class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
                         @click="$router.push('/' + $i18n.locale + '/persons')"
                     >
                         Pregledaj sve istraživače
                     </v-btn>
                 </div>
 
-                <!-- Research Areas -->
+                <!-- Top Institutions -->
                 <div class="feature-card">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="flex items-center justify-center w-[60px] h-[60px] rounded-[16px] shadow-md flex-shrink-0 bg-gradient-to-br from-slate-50 to-slate-200">
-                            <v-icon icon="mdi-flask" size="32" color="#f59e0b"></v-icon>
+                            <v-icon icon="mdi-domain" size="32" color="#f59e0b"></v-icon>
                         </div>
                         <h4 class="text-xl font-semibold text-slate-800 m-0 leading-[1.3]">
-                            Oblast istraživanja
+                            Najcitiraniji fakulteti
                         </h4>
                     </div>
                     <div class="flex-1 mb-6">
-                        <div v-for="(area, index) in researchAreas" :key="index" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
+                        <div v-if="topInstitutions.length === 0" class="text-center py-8 text-slate-400">
+                            <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
+                            <p class="mt-2">Učitavanje...</p>
+                        </div>
+                        <div v-else v-for="(institution, index) in topInstitutions.slice(0, 3)" :key="index" 
+                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
+                             @click="$router.push('/' + $i18n.locale + '/organisation-units/' + institution.item.databaseId)">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-amber-500/10">
+                                <v-icon icon="mdi-office-building" size="20" color="#f59e0b"></v-icon>
+                            </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ area.name }}
+                                    {{ $i18n.locale === 'sr' ? institution.item.nameSr : institution.item.nameOther }}
                                 </h6>
                                 <p class="text-xs text-slate-500 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ area.description }}
+                                    {{ $i18n.locale === 'sr' ? institution.item.superOUNameSr : institution.item.superOUNameOther }}
                                 </p>
-                                <span class="text-[0.7rem] text-slate-400 font-medium block">{{ area.publications }} publikacija</span>
+                                <span class="text-[0.7rem] text-slate-400 font-medium block">{{ institution.value }} citata</span>
                             </div>
                             <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
                         </div>
@@ -124,10 +137,10 @@
                     <v-btn 
                         variant="outlined" 
                         color="warning" 
-                        class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                        @click="$router.push('/' + $i18n.locale + '/research-areas')"
+                        class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
+                        @click="$router.push('/' + $i18n.locale + '/organisation-units')"
                     >
-                        Istraži sve oblasti
+                        Pregledaj sve institucije
                     </v-btn>
                 </div>
             </div>
@@ -139,94 +152,50 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import AdditionalInfoSection from './AdditionalInfoSection.vue';
+import GlobalLeaderboardService from '@/services/visualization/GlobalLeaderboardService';
+import { type PersonIndex } from '@/models/PersonModel';
+import { type OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
+import { type DocumentPublicationIndex } from '@/models/PublicationModel';
 
-// Sample data for feature lists
-const recentPublications = ref([
-    {
-        title: "Machine Learning Applications in Bioinformatics",
-        authors: "Petrović, M., Jovanović, S., Nikolić, D.",
-        year: "2024",
-        type: "Journal Article",
-        icon: "mdi-book-open-variant",
-        iconColor: "#3b82f6"
-    },
-    {
-        title: "Sustainable Energy Solutions for Smart Cities",
-        authors: "Kovačević, A., Marković, B., Popović, I.",
-        year: "2024",
-        type: "Conference Paper",
-        icon: "mdi-lightning-bolt",
-        iconColor: "#f59e0b"
-    },
-    {
-        title: "Advanced Materials for Biomedical Applications",
-        authors: "Stojanović, N., Đorđević, M., Vuković, S.",
-        year: "2023",
-        type: "Journal Article",
-        icon: "mdi-flask",
-        iconColor: "#10b981"
-    }
-]);
+// Data from API
+const topResearchers = ref<{item: PersonIndex, value: number}[]>([]);
+const topInstitutions = ref<{item: OrganisationUnitIndex, value: number}[]>([]);
+const topPublications = ref<{item: DocumentPublicationIndex, value: number}[]>([]);
 
-const featuredResearchers = ref([
-    {
-        name: "Dr. Dragan Ivanović",
-        position: "Professor",
-        department: "Faculty of Technical Sciences",
-        avatar: "https://randomuser.me/api/portraits/men/90.jpg?v=1"
-    },
-    {
-        name: "Ivan Mršulja",
-        position: "Assistant",
-        department: "Faculty of Technical Sciences",
-        avatar: "https://randomuser.me/api/portraits/women/90.jpg?v=2"
-    },
-    {
-        name: "Miloš Popović",
-        position: "Assistant",
-        department: "Faculty of Technical Sciences",
-        avatar: "https://randomuser.me/api/portraits/men/90.jpg?v=3"
-    }
-]);
+onMounted(() => {
+    GlobalLeaderboardService.getTopCitedResearchersLeaderboard()
+        .then((response) => {
+            topResearchers.value = response.data.map(le => ({
+                item: le.a as PersonIndex, 
+                value: le.b
+            }));
+        });
+    
+    GlobalLeaderboardService.getTopCitedInstitutionsLeaderboard()
+        .then((response) => {
+            topInstitutions.value = response.data.map(le => ({
+                item: le.a as OrganisationUnitIndex, 
+                value: le.b
+            }));
+        });
 
-const researchAreas = ref([
-    {
-        name: "Artificial Intelligence & Machine Learning",
-        description: "Advanced algorithms and neural networks",
-        publications: 342
-    },
-    {
-        name: "Biomedical Engineering",
-        description: "Medical devices and biotechnology",
-        publications: 198
-    },
-    {
-        name: "Sustainable Energy",
-        description: "Renewable energy and green technology",
-        publications: 156
-    }
-]);
-
-// Handle avatar image loading errors
-const handleAvatarError = (event: Event) => {
-    const target = event.target as HTMLImageElement;
-    if (target) {
-        target.style.display = 'none';
-        const iconElement = target.nextElementSibling as HTMLElement;
-        if (iconElement) {
-            iconElement.style.display = 'flex';
-        }
-    }
-};
+    GlobalLeaderboardService.getTopCitedDocumentsLeaderboard()
+        .then((response) => {
+            topPublications.value = response.data.map(le => ({
+                item: le.a as DocumentPublicationIndex, 
+                value: le.b
+            }));
+        });
+});
 </script>
 
 <style>
 @reference "@/assets/main.css";
 
 .feature-card {
-    @apply bg-white rounded-[20px] p-4 md:p-6 lg:p-8 shadow-lg border border-slate-200 transition-all duration-300 relative overflow-hidden flex flex-col hover:shadow-2xl hover:border-blue-400/30;
+    @apply bg-white rounded-[20px] p-4 md:p-6 lg:p-8 shadow-lg border border-slate-200 transition-all duration-300 relative overflow-hidden flex flex-col;
 }
 
 .feature-card::before {
