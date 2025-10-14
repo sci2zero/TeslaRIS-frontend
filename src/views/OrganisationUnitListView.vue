@@ -1,14 +1,8 @@
 <template>
-    <v-container>
-        <h1>{{ $t("ouListLabel") }}</h1>
-        <br />
-        <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
-        <br />
-        <span :class="'d-flex align-center ' + (isAdmin ? 'mb-3' : '')">
-            <v-btn v-if="isAdmin" color="primary" @click="addOU">
-                {{ $t("createNewOULabel") }}
-            </v-btn>
+    <div class="container py-4 px-4 mx-auto">
+        <h1 class="text-2xl font-bold mb-4">{{ $t("ouListLabel") }}</h1>
+        
+        <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
@@ -33,8 +27,16 @@
             :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
             :endpoint-token-parameters="[searchParams, returnOnlyInstitutionRelatedEntities ? String(loggedInUser?.organisationUnitId) : 'null']"
             @switch-page="switchPage">
+            <template #top-left>
+                <search-bar-component @search="clearSortAndPerformSearch($event)" :transparent="false" size="small"></search-bar-component>
+            </template>
+            <template #actions>
+                <v-btn v-if="isAdmin" color="primary" prepend-icon="mdi-plus" @click="addOU">
+                    {{ $t("createNewOULabel") }}
+                </v-btn>
+            </template>
         </organisation-unit-table-component>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

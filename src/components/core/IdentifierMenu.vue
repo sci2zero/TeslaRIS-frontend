@@ -15,6 +15,9 @@
                     <span v-else-if="type === 'webofscience'" class="size-6 p-0.5">
                         <img src="/icons/wos-logo.svg" alt="SCOPUS" class="identifier-icon" />
                     </span>
+                    <span v-else-if="type === 'doi'" class="size-6 p-0.5">
+                        <img src="/icons/doi.svg" alt="DOI" class="identifier-icon" />
+                    </span>
                     <span v-else>
                         <v-icon class="identifier-icon size-6" color="#666">mdi-identifier</v-icon>
                     </span>
@@ -84,7 +87,7 @@ export default defineComponent({
         type: {
             type: String,
             required: true,
-            validator: (value: string) => ['orcid', 'scopus', 'openalex', 'webofscience'].includes(value)
+            validator: (value: string) => ['orcid', 'scopus', 'openalex', 'webofscience', 'doi'].includes(value)
         }
     },
     setup(props) {
@@ -127,6 +130,15 @@ export default defineComponent({
                         baseUrl: 'https://www.webofscience.com/api/gateway?GWVersion=2&SrcApp=teslaris&SrcAuth=WosAPI&DestLinkType=FullRecord&DestApp=WOS_CPL&KeyUT=WOS:',
                         primaryColor: '#0066CC',
                         titleBackground: 'linear-gradient(135deg, #0066CC 0%, #2196f3 100%)',
+                        titleIconColor: 'white'
+                    };
+                case 'doi':
+                    return {
+                        title: 'DOI',
+                        label: 'Digital Object Identifier',
+                        baseUrl: 'https://doi.org/',
+                        primaryColor: '#FDB714',
+                        titleBackground: 'linear-gradient(135deg, #FDB714 0%, #FDC84D 100%)',
                         titleIconColor: 'white'
                     };
                 default:

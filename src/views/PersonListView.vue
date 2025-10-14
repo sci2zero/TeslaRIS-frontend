@@ -1,5 +1,5 @@
 <template>
-    <div class="container py-4 mx-auto">
+    <div class="container py-4 px-4 mx-auto">
         <h1 class="text-2xl font-bold mb-4">{{ $t("personListLabel") }}</h1>
         
         <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">

@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div class="mt-4">
         <v-row v-for="(clause, index) in queryClauses" :key="clause.id" class="d-flex flex-row justify-left">
             <v-col v-if="index > 0" cols="3">
                 <v-select v-model="clause.operation" :items="operations" :label="$t('operationLabel')" dense />
@@ -57,7 +57,7 @@
                 </v-btn>
             </v-col>
         </v-row>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

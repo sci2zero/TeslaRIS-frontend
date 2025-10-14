@@ -2,17 +2,15 @@
     <!-- Action Menu for Selected Items -->
     <div class="flex justify-between mb-2">
         
-        <div class="min-w-96">
-            <slot name="top-left"></slot>
-        </div>
         <div class="flex items-center gap-2">
-            <div class="action-menu-container">
+            <div class="action-menu-container" v-if="selectedPersons.length > 0">
                 <v-menu offset-y>
                     <template v-slot:activator="{ props }">
                         <v-btn
                             v-bind="props"
                             color="white"
                             variant="elevated"
+                            height="48"
                             prepend-icon="mdi-dots-vertical"
                             class="action-menu-trigger"
                         >
@@ -93,6 +91,12 @@
                     </v-list>
                 </v-menu>
             </div>
+            <div :class="[selectedPersons.length > 0 ? 'w-64' : 'w-96']">
+                <slot name="top-left"></slot>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            
 
             <add-employment-modal 
                 v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
@@ -171,7 +175,7 @@
                                             <v-icon color="primary">mdi-account</v-icon>
                                         </v-avatar>
                                     </localized-link>
-                                    <div class="person-details flex items-center gap-2"><span>
+                                    <div class="flex items-center gap-2"><span>
 
                                         <localized-link :to="'persons/' + item.databaseId" class="person-name">
                                             {{ item.name }}
@@ -523,6 +527,7 @@ export default defineComponent({
         /* text-transform: none; */
         /* font-weight: 500; */
         /* letter-spacing: 0.5px; */
+        border-radius: 12px;
         box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
     }
 
