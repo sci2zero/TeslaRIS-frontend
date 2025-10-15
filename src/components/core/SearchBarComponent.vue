@@ -170,7 +170,6 @@ export default defineComponent(
 .search-card {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
     padding: 4px;
@@ -354,7 +353,6 @@ export default defineComponent(
 .search-card--solid {
     background: white;
     backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

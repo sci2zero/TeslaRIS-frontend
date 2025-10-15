@@ -232,7 +232,6 @@ export default defineComponent({
 .frosted-glass-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
     padding: 24px;
@@ -259,7 +258,6 @@ export default defineComponent({
     background: rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin-bottom: 8px;
 }
