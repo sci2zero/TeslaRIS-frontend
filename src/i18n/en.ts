@@ -1125,5 +1125,29 @@ export default {
     enterOneOfThreeLabel: "Enter at least one of these three",
     updateChartDisplayConfigurationLabel: "Visualizations display",
     spanWholeRowLabel: "Span whole row",
-    positiveOrZeroFieldMessage: "This field can't be < 0."
+    positiveOrZeroFieldMessage: "This field can't be < 0.",
+    loading: "Loading...",
+    citations: "citations",
+    footer: {
+        quickLinks: "Quick Links",
+        contact: "Contact info",
+        location: "Novi Sad, Serbia",
+        allRightsReserved: "All rights reserved"
+    },
+    landingFeatures: {
+        title: "Most Important Resources",
+        subtitle: "Most cited scientific results and researchers",
+        topResearchers: {
+            title: "Most Cited Researchers",
+            viewAll: "View all researchers"
+        },
+        topInstitutions: {
+            title: "Most Cited Faculties",
+            viewAll: "View all institutions"
+        },
+        topPublications: {
+            title: "Most Cited Works",
+            viewAll: "View all publications"
+        }
+    }
 }

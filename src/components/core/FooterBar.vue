@@ -22,7 +22,7 @@
                         <!-- Quick Links -->
                         <div class="col-span-1">
                             <h4 class="text-lg font-semibold text-white text-shadow-xs mb-4">
-                                Brzi linkovi
+                                {{ $t('footer.quickLinks') }}
                             </h4>
                             <ul class="list-none p-0 m-0">
                                 <li v-for="link in quickLinks" :key="link.title" class="mb-2">
@@ -45,17 +45,17 @@
                         <!-- Contact & Info -->
                         <div class="col-span-1">
                             <h4 class="text-lg font-semibold text-white text-shadow-xs mb-4">
-                                Kontakt
+                                {{ $t('footer.contact') }}
                             </h4>
                             <div class="footer-contact">
                                 <p class="text-white/80 text-sm flex items-center mb-2">
                                     <v-icon icon="mdi-map-marker" class="mr-2" size="16"></v-icon>
-                                    Novi Sad, Srbija
+                                    {{ $t('footer.location') }}
                                 </p>
-                                <p class="text-white/80 text-sm flex items-center mb-2">
+                                <!-- <p class="text-white/80 text-sm flex items-center mb-2">
                                     <v-icon icon="mdi-email" class="mr-2" size="16"></v-icon>
-                                    <a href="mailto:chenejac@uns.ac.rs" class="text-white/90 no-underline transition-colors duration-300 hover:text-white hover:underline">
-                                        chenejac@uns.ac.rs
+                                    <a href="mailto:#" class="text-white/90 no-underline transition-colors duration-300 hover:text-white hover:underline">
+                                        #
                                     </a>
                                 </p>
                                 <p class="text-white/80 text-sm flex items-center">
@@ -63,7 +63,15 @@
                                     <a href="https://www.uns.ac.rs" target="_blank" class="text-white/90 no-underline transition-colors duration-300 hover:text-white hover:underline">
                                         www.uns.ac.rs
                                     </a>
-                                </p>
+                                </p> -->
+                                <div class="mt-4">
+                                    <v-btn
+                                        color="white"
+                                        variant="tonal"
+                                        :to="'/' + $i18n.locale + '/contact'">
+                                        {{ $t('contactLabel') }}
+                                    </v-btn>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -73,7 +81,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-center py-4 border-t border-white/20">
                             <div class="footer-copyright mb-2 md:mb-0">
                                 <p class="text-sm text-white/80">
-                                    © {{ new Date().getFullYear() }} CRIS UNS. Sva prava zadržana.
+                                    © {{ new Date().getFullYear() }} CRIS UNS. {{ $t('footer.allRightsReserved') }}.
                                 </p>
                             </div>
                             <div class="text-white/70">

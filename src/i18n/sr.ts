@@ -1131,5 +1131,29 @@ export default {
     enterOneOfThreeLabel: "Unesite bar jedno od ova tri podatka",
     updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
     spanWholeRowLabel: "Raspon na celi red",
-    positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0."
+    positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0.",
+    loading: "Učitavanje...",
+    citations: "citata",
+    footer: {
+        quickLinks: "Brzi linkovi",
+        contact: "Kontakt podaci",
+        location: "Novi Sad, Srbija",
+        allRightsReserved: "Sva prava zadržana"
+    },
+    landingFeatures: {
+        title: "Najznačajniji resursi",
+        subtitle: "Najcitiraniji naučni rezultati i istraživači",
+        topResearchers: {
+            title: "Najcitiraniji istraživači",
+            viewAll: "Pregledaj sve istraživače"
+        },
+        topInstitutions: {
+            title: "Najcitiraniji fakulteti",
+            viewAll: "Pregledaj sve institucije"
+        },
+        topPublications: {
+            title: "Najcitiranija dela",
+            viewAll: "Pregledaj sve publikacije"
+        }
+    }
 }
