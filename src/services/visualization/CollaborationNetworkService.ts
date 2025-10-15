@@ -7,12 +7,12 @@ import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 
 export class CollaborationNetworkService extends BaseService {
 
-    async getPersonCollaborationNetwork(personId: number, collaborationType: CollaborationType, depth: number): Promise<AxiosResponse<CollaborationNetwork>> {
-        return super.sendRequest(axios.get, `collaboration-network/${personId}?collaborationType=${collaborationType}&depth=${depth}`);
+    async getPersonCollaborationNetwork(personId: number, collaborationType: CollaborationType, depth: number, yearFrom: number, yearTo: number): Promise<AxiosResponse<CollaborationNetwork>> {
+        return super.sendRequest(axios.get, `collaboration-network/${personId}?collaborationType=${collaborationType}&depth=${depth}&yearFrom=${yearFrom}&yearTo=${yearTo}`);
     }
 
-    async getPublicationsForCollaboration(sourcePersonId: number, targetPersonId: number, collaborationType: CollaborationType, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-        return super.sendRequest(axios.get, `collaboration-network/works/${sourcePersonId}/${targetPersonId}?collaborationType=${collaborationType}${pageable}`);
+    async getPublicationsForCollaboration(sourcePersonId: number, targetPersonId: number, collaborationType: CollaborationType, yearFrom: number, yearTo: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.get, `collaboration-network/works/${sourcePersonId}/${targetPersonId}?collaborationType=${collaborationType}&yearFrom=${yearFrom}&yearTo=${yearTo}${pageable}`);
     }
 }
 

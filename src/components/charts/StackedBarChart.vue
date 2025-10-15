@@ -6,14 +6,16 @@
         :theme="theme"
         :init-options="initOptions"
         :loading="loading"
+        @chart-ready="onChartReady"
     />
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import BaseChart from "./BaseChart.vue";
-import type { EChartsOption } from "echarts";
+import type { ECharts, EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
+import { getPublicationTypeValueFromTitleAutoLocale } from "@/i18n/publicationType";
 
 
 export interface StackedBarSeries {
@@ -107,7 +109,10 @@ const categoryTotals = computed(() => {
     });
 });
 
+const emit = defineEmits(["listPublications"]);
+
 const loading = ref(true);
+const chartInstance = ref<ECharts | null>(null);
 
 onMounted(() => {
     shouldBeLoading();
@@ -285,4 +290,15 @@ const options = computed(() => {
         ] : undefined
     };
 });
+
+const onChartReady = (chart: ECharts) => {
+    chartInstance.value = chart;
+    chart.on("click", (params: any) => {
+        const publicationType = getPublicationTypeValueFromTitleAutoLocale(params.seriesName);
+        if (publicationType) {
+            emit("listPublications", publicationType, parseInt(params.name));
+        }
+    });
+};
+
 </script>

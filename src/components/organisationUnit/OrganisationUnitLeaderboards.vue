@@ -67,6 +67,7 @@
                     <leaderboard-table
                         :leaderboard-data="subUnitPublicationCountsLeaderboard"
                         :title="$t('subUnitPublicationCountLeaderboardLabel')"
+                        display-employee-count
                     />
                 </v-col>
             </v-row>

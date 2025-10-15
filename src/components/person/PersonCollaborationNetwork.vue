@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-row justify-start select-component mt-5">
+    <div class="d-flex flex-row justify-start select-component mt-5 ml-5">
         <v-select
             v-model="selectedCollaborationType"
             class="collaboration-type-select"
@@ -26,7 +26,7 @@
                     categories: categories
                 }"
                 :category-resolver="getCategoryNamesFromDepth"
-                :height="`${600 * depth}px`"
+                :height="`${Math.min(600 * depth, 1200)}px`"
                 @list-publications="showPublicationListModal"
             />
         </v-col>
@@ -38,6 +38,8 @@
         :target-person-id="targetPersonId"
         :collaboration-type="collaborationType"
         :collaboration-name="collaborationName"
+        :year-from="yearFrom"
+        :year-to="yearTo"
     />
 </template>
 
@@ -54,6 +56,14 @@ import PersonCollaborationPublications from './PersonCollaborationPublications.v
 
 const props = defineProps({
     personId: {
+        type: Number,
+        required: true
+    },
+    yearFrom: {
+        type: Number,
+        required: true
+    },
+    yearTo: {
         type: Number,
         required: true
     }
@@ -101,19 +111,38 @@ onMounted(() => {
     fetchCollaborationNetwork();
 });
 
-watch([selectedCollaborationType, depth], () => {
+watch(
+    [
+        selectedCollaborationType,
+        depth,
+        () => props.yearFrom,
+        () => props.yearTo
+    ], () => {
     fetchCollaborationNetwork();
-})
+});
 
 const fetchCollaborationNetwork = () => {
+    if (!props.yearFrom || !props.yearTo) {
+        return;
+    }
+
     CollaborationNetworkService.getPersonCollaborationNetwork(
         props.personId,
         selectedCollaborationType.value.value,
-        depth.value
+        depth.value,
+        props.yearFrom,
+        props.yearTo
     ).then(response => {
         nodes.value = response.data.nodes;
         links.value = response.data.links;
-        categories.value = response.data.nodes.map(node => {return {name: getCategoryNamesFromDepth(node.category), value: node.category}});
+        categories.value =
+            response.data.nodes.map(node => {
+                return {
+                    name: getCategoryNamesFromDepth(node.category),
+                    value: node.category
+                };
+            }
+        );
     });
 };
 

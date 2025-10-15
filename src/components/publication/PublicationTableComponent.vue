@@ -150,6 +150,20 @@
                                     />
                                 </v-list>
                             </v-menu>
+                            <div
+                                v-else
+                                class="d-flex flex-row justify-center">
+                                <publication-file-download-modal
+                                    :document-id="(item.databaseId as number)"
+                                    :show-thesis-sections="item.type === 'THESIS'"
+                                    hide-empty-sections
+                                    :persistent="false"
+                                    :is-list-item="false"
+                                    :contains-files="item.containsFiles"
+                                />
+                            </div>
+                        </td>
+                        <td>
                             <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
@@ -320,11 +334,11 @@ export default defineComponent({
         const tableWrapper = ref<any>(null);
 
         onMounted(() => {
-            if (props.inClaimer ||
+            if ((props.inClaimer ||
                 isAdmin.value ||
                 isCommission.value ||
-                props.richResultsView ||
-                props.validationView
+                props.validationView) &&
+                !props.richResultsView
             ) {
                 headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
             }
@@ -359,6 +373,7 @@ export default defineComponent({
         const concretePublicationTypeLabel = computed(() => i18n.t("concretePublicationTypeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const assessedByMeLabel = computed(() => i18n.t("assessedByMeLabel"));
+        const downloadableDocumentsLabel = computed(() => i18n.t("downloadableDocumentsLabel"));
 
         const {
             isAdmin, isCommission,
@@ -395,6 +410,7 @@ export default defineComponent({
                 key: "type"
             },
             { title: "DOI", align: "start", sortable: true, key: "doi"},
+            { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"}
         ]);
 
         const headersSortableMappings: Map<string, string> = new Map([

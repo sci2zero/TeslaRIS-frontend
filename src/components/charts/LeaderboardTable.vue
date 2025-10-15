@@ -37,7 +37,7 @@
         
                     <div class="info-section">
                         <div class="name">
-                            {{ getEntityName((item.a as PersonIndex | OrganisationUnitIndex)) }}
+                            {{ getEntityName((item.a as PersonIndex | OrganisationUnitIndex)) }} {{ displayEmployeeCount ? `(${(item.a as OrganisationUnitIndex).employeeCount})` : "" }}
                         </div>
                         <div class="value">
                             {{ formatValue(item.b) }}
@@ -48,7 +48,7 @@
         </div>
         <h5
             v-else
-            class="d-flex flex-row text-center">
+            class="d-flex flex-row justify-center text-center">
             {{ $t("noDataInTableMessage") }}
         </h5>
     </div>
@@ -80,6 +80,10 @@ const props = defineProps({
     subtitle: {
         type: String,
         default: ""
+    },
+    displayEmployeeCount: {
+        type: Boolean,
+        default: false
     }
 });
 

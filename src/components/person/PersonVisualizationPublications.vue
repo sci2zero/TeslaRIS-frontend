@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" persistent>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("collaborationPublicationsLabel") + ` - ${collaborationName} - (${getCollaborationTypeTitleFromValueAutoLocale(props.collaborationType)}, ${yearFrom}-${yearTo})` }}</span>
+                    <span class="text-h5">{{ $t("publicationsLabel") + ` - ${entityName} - (${getPublicationTypeTitleFromValueAutoLocale(props.publicationType)}, ${yearFrom}${(yearTo !== yearFrom) ? ('-' + yearTo) : ''})` }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -14,13 +14,13 @@
                             shows-research-outputs
                             allow-selection
                             enable-export
-                            :endpoint-type="ExportableEndpointType.COLLABORATION_PUBLICATIONS"
+                            :endpoint-type="ExportableEndpointType.VISUALIZATION_PUBLICATIONS"
                             :endpoint-token-parameters="[
-                                String(props.sourcePersonId),
-                                String(props.targetPersonId),
+                                String(props.publicationType),
                                 String(props.yearFrom),
                                 String(props.yearTo),
-                                props.collaborationType
+                                String(props.personId),
+                                String(props.institutionId)
                             ]"
                             :endpoint-body-parameters="
                                 {
@@ -45,30 +45,29 @@
 </template>
 
 <script setup lang="ts">
-import { ExportableEndpointType, type CollaborationType } from '@/models/Common';
-import { type DocumentPublicationIndex } from '@/models/PublicationModel';
-import CollaborationNetworkService from '@/services/visualization/CollaborationNetworkService';
+import { ExportableEndpointType } from '@/models/Common';
+import { PublicationType, type DocumentPublicationIndex } from '@/models/PublicationModel';
 import { type PropType, ref, watch } from 'vue';
 import PublicationTableComponent from '../publication/PublicationTableComponent.vue';
-import { getCollaborationTypeTitleFromValueAutoLocale } from '@/i18n/collaborationType';
+import DocumentVisualizationService from '@/services/visualization/DocumentVisualizationService';
+import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
+import PersonService from '@/services/PersonService';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 const props = defineProps({
-    sourcePersonId: {
+    publicationType: {
+        type: Object as PropType<PublicationType>,
+        required: true
+    },
+    personId: {
         type: Number,
-        required: true
+        default: -1
     },
-    targetPersonId: {
+    institutionId: {
         type: Number,
-        required: true
-    },
-    collaborationType: {
-        type: Object as PropType<CollaborationType>,
-        required: true
-    },
-    collaborationName: {
-        type: String,
-        required: true
+        default: -1
     },
     yearFrom: {
         type: Number,
@@ -82,6 +81,7 @@ const props = defineProps({
 
 
 const dialog = ref(false);
+const entityName = ref("");
 
 defineExpose({
   dialog,
@@ -99,18 +99,18 @@ const direction = ref("");
 
 watch(dialog, () => {
     if (dialog.value &&
-        props.sourcePersonId > 0 &&
-        props.targetPersonId > 0 &&
-        props.collaborationType) {
-        fetchPublications();
+        (props.personId > 0 || props.institutionId > 0) &&
+        props.publicationType
+    ) {
+        setEntityname();
     }
 });
 
 const fetchPublications = () => {
-    CollaborationNetworkService.getPublicationsForCollaboration(
-        props.sourcePersonId,
-        props.targetPersonId,
-        props.collaborationType,
+    DocumentVisualizationService.getPublicationsForTypeAndPeriod(
+        props.publicationType,
+        props.personId,
+        props.institutionId,
         props.yearFrom,
         props.yearTo,
         `&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
@@ -126,6 +126,18 @@ const switchPage = (nextPage: number, pageSize: number, sortField: string, sortD
     sort.value = sortField;
     direction.value = sortDir;
     fetchPublications();
+};
+
+const setEntityname = () => {
+    if (props.personId > 0) {
+        PersonService.getPersonWithUser(props.personId).then(response => {
+            entityName.value = `${response.data.personName.firstname} ${response.data.personName.lastname}`;
+        });
+    } else if (props.institutionId) {
+        OrganisationUnitService.readOU(props.institutionId).then(response => {
+            entityName.value = returnCurrentLocaleContent(response.data.name) as string;
+        });
+    }
 };
 
 </script>

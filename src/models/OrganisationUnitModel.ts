@@ -21,6 +21,7 @@ export interface OrganisationUnitIndex {
     superOUNameOther: string;
     superOUNameOtherSortable: string;
     allowedThesisTypes: ThesisType[];
+    employeeCount: number;
 }
 
 export interface OrganisationUnitRequest {
