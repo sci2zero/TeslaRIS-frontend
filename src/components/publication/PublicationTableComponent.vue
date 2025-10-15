@@ -1,9 +1,9 @@
 <template>
     <div class="flex justify-between mb-2">
         <div class="flex items-center gap-2">
-            <div class="action-menu-container" v-if="selectedPublications.length > 0">
+            <div v-if="selectedPublications.length > 0" class="action-menu-container">
                 <v-menu offset-y>
-                    <template v-slot:activator="{ props }">
+                    <template #activator="{ props }">
                         <v-btn
                             v-bind="props"
                             color="white"
@@ -12,92 +12,122 @@
                             prepend-icon="mdi-dots-vertical"
                             class="action-menu-trigger"
                         >
-                            {{ $t("actions") }} <template v-if="selectedPublications.length > 0">({{ selectedPublications.length }})</template>
+                            {{ $t("actions") }} <template v-if="selectedPublications.length > 0">
+                                ({{ selectedPublications.length }})
+                            </template>
                         </v-btn>
                     </template>
 
                     <v-list class="action-menu-list" density="compact">
                         <v-list-item
                             v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
-                            @click="deleteSelection"
                             :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
                             class="action-menu-item"
+                            @click="deleteSelection"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="error" size="18">mdi-delete</v-icon>
+                            <template #prepend>
+                                <v-icon color="error" size="18">
+                                    mdi-delete
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("deleteLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("deleteLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
 
                         <v-list-item
                             v-if="showsResearchOutputs && canRemoveResearchOutputs"
-                            @click="removeResearchOutputs"
                             :disabled="selectedPublications.length === 0"
                             class="action-menu-item"
+                            @click="removeResearchOutputs"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="warning" size="18">mdi-playlist-remove</v-icon>
+                            <template #prepend>
+                                <v-icon color="warning" size="18">
+                                    mdi-playlist-remove
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("removeLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("removeLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
 
                         <v-list-item
                             v-if="(isAdmin || allowComparison) && !inComparator"
-                            @click="startMetadataComparison"
                             :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
                             class="action-menu-item"
+                            @click="startMetadataComparison"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="info" size="18">mdi-database-search</v-icon>
+                            <template #prepend>
+                                <v-icon color="info" size="18">
+                                    mdi-database-search
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("compareMetadataLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("compareMetadataLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
 
                         <v-list-item
                             v-if="isAdmin && !inComparator"
-                            @click="startPublicationComparison"
                             :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
                             class="action-menu-item"
+                            @click="startPublicationComparison"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="info" size="18">mdi-file-compare</v-icon>
+                            <template #prepend>
+                                <v-icon color="info" size="18">
+                                    mdi-file-compare
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("comparePublicationsLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("comparePublicationsLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
 
                         <v-list-item
                             v-if="validationView"
-                            @click="validateSectionForAll(true)"
                             :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.isApproved === true)"
                             class="action-menu-item"
+                            @click="validateSectionForAll(true)"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="success" size="18">mdi-check-decagram</v-icon>
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-check-decagram
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("validateMetadataLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("validateMetadataLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
 
                         <v-list-item
                             v-if="validationView"
-                            @click="validateSectionForAll(false)"
                             :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.areFilesValid === true)"
                             class="action-menu-item"
+                            @click="validateSectionForAll(false)"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="success" size="18">mdi-file-check</v-icon>
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-file-check
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("validateUploadedFilesLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("validateUploadedFilesLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
 
                         <v-list-item
                             v-if="enableExport"
-                            @click="openExportModal"
                             class="action-menu-item"
+                            @click="openExportModal"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="success" size="18">mdi-download</v-icon>
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-download
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("exportLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("exportLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -138,7 +168,7 @@
             :items-per-page-options="[5, 10, 25, 50]"
             :page="tableOptions.page"
             @update:options="refreshTable">
-            <template #header.type="{isSorted, column, toggleSort, getSortIcon}">
+            <template #[`header.type`]="{ isSorted, column, toggleSort, getSortIcon }">
                 <div class="group flex items-center gap-2" @click="toggleSort(column)">
                     <span>{{ $t("typeOfPublicationLabel") }}</span>
                     <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
@@ -155,7 +185,6 @@
                         </div>
                     </v-menu>
                     <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
-
                 </div>
             </template>
             <template #body="properties">
@@ -184,7 +213,9 @@
                         <td class="py-2!">
                             <div class="flex gap-2">
                                 <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId" class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center hover:bg-purple-200 transition-colors flex-shrink-0">
-                                    <v-icon color="primary" size="20">{{ getPublicationTypeIcon(item.type) }}</v-icon>
+                                    <v-icon color="primary" size="20">
+                                        {{ getPublicationTypeIcon(item.type) }}
+                                    </v-icon>
                                 </localized-link>
                                 <div>
                                     <div class="flex items-baseline gap-2">
@@ -197,14 +228,16 @@
                                         </div>
                                         <span v-if="item.year && item.year > 0" class="text-xs text-gray-600">{{ item.year }}</span>
                                     </div>
-                                    <div class="mt-1 ml-1 text-sm text-gray-600" v-if="item.authorNames.trim() !== ''">
+                                    <div v-if="item.authorNames.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
                                         <div v-for="(author, index) in getDisplayedAuthors(item)" :key="index">
                                             <localized-link
                                                 v-if="item.authorIds[index] !== -1"
                                                 :to="'persons/' + item.authorIds[index]"
                                                 class="flex items-center gap-1"
                                             >
-                                                <v-icon size="14" class="text-gray-500">mdi-account</v-icon>
+                                                <v-icon size="14" class="text-gray-500">
+                                                    mdi-account
+                                                </v-icon>
                                                 {{ `${author.trim()}` }}
                                             </localized-link>
                                             <span v-else class="flex items-center gap-1">
@@ -217,8 +250,8 @@
                                             variant="text"
                                             size="x-small"
                                             color="primary"
-                                            @click="toggleShowAllAuthors(item.databaseId as number)"
                                             class="mt-1"
+                                            @click="toggleShowAllAuthors(item.databaseId as number)"
                                         >
                                             {{ getShowMoreText(item) }}
                                         </v-btn>
@@ -325,7 +358,6 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import IdentifierLink from '../core/IdentifierLink.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
@@ -347,7 +379,7 @@ import IdentifierMenu from '../core/IdentifierMenu.vue';
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal, IdentifierMenu },
+    components: { LocalizedLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal, IdentifierMenu },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -470,8 +502,6 @@ export default defineComponent({
         });
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
-        const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
-        const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
         const concretePublicationTypeLabel = computed(() => i18n.t("concretePublicationTypeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));

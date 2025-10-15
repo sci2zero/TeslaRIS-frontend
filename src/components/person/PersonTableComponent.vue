@@ -1,11 +1,10 @@
 <template>
     <!-- Action Menu for Selected Items -->
     <div class="flex justify-between mb-2">
-        
         <div class="flex items-center gap-2">
-            <div class="action-menu-container" v-if="selectedPersons.length > 0">
+            <div v-if="selectedPersons.length > 0" class="action-menu-container">
                 <v-menu offset-y>
-                    <template v-slot:activator="{ props }">
+                    <template #activator="{ props }">
                         <v-btn
                             v-bind="props"
                             color="white"
@@ -14,7 +13,9 @@
                             prepend-icon="mdi-dots-vertical"
                             class="action-menu-trigger"
                         >
-                        {{ $t("actions") }} <template v-if="selectedPersons.length > 0">({{ selectedPersons.length }})</template>
+                            {{ $t("actions") }} <template v-if="selectedPersons.length > 0">
+                                ({{ selectedPersons.length }})
+                            </template>
                         </v-btn>
                     </template>
                     
@@ -22,38 +23,48 @@
                         <!-- Delete Action -->
                         <v-list-item
                             v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
-                            @click="deleteSelection"
                             :disabled="selectedPersons.length <= 0"
                             class="action-menu-item"
+                            @click="deleteSelection"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="error" size="18">mdi-delete</v-icon>
+                            <template #prepend>
+                                <v-icon color="error" size="18">
+                                    mdi-delete
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("deleteLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("deleteLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
                         
                         <!-- Remove Action -->
                         <v-list-item
                             v-if="(isAdmin || isCommission) && isCommissionResearchersTable"
-                            @click="removeSelection"
                             :disabled="selectedPersons.length <= 0"
                             class="action-menu-item"
+                            @click="removeSelection"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="warning" size="18">mdi-account-remove</v-icon>
+                            <template #prepend>
+                                <v-icon color="warning" size="18">
+                                    mdi-account-remove
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("removeResearcherLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("removeResearcherLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
                         
                         <!-- Compare Publications -->
                         <v-list-item
                             v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
-                            @click="startPublicationComparison"
                             :disabled="selectedPersons.length !== 2"
                             class="action-menu-item"
+                            @click="startPublicationComparison"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="info" size="18">mdi-file-document-multiple</v-icon>
+                            <template #prepend>
+                                <v-icon color="info" size="18">
+                                    mdi-file-document-multiple
+                                </v-icon>
                             </template>
                             <v-list-item-title class="text-body-2">
                                 {{ $t("comparePublicationsLabel") }}
@@ -64,12 +75,14 @@
                         <!-- Compare Metadata -->
                         <v-list-item
                             v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
-                            @click="startMetadataComparison"
                             :disabled="selectedPersons.length !== 2"
                             class="action-menu-item"
+                            @click="startMetadataComparison"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="info" size="18">mdi-database-search</v-icon>
+                            <template #prepend>
+                                <v-icon color="info" size="18">
+                                    mdi-database-search
+                                </v-icon>
                             </template>
                             <v-list-item-title class="text-body-2">
                                 {{ $t("compareMetadataLabel") }}
@@ -80,13 +93,17 @@
                         <!-- Export Action -->
                         <v-list-item
                             v-if="enableExport"
-                            @click="openExportModal"
                             class="action-menu-item"
+                            @click="openExportModal"
                         >
-                            <template v-slot:prepend>
-                                <v-icon color="success" size="18">mdi-download</v-icon>
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-download
+                                </v-icon>
                             </template>
-                            <v-list-item-title class="text-body-2">{{ $t("exportLabel") }}</v-list-item-title>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("exportLabel") }}
+                            </v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -96,8 +113,6 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            
-
             <add-employment-modal 
                 v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
                 class="mb-4"
@@ -151,9 +166,15 @@
                     <tr v-if="props.items?.length === 0" class="empty-state-row">
                         <td colspan="10" class="text-center py-12">
                             <div class="empty-state">
-                                <v-icon size="48" color="grey-lighten-1" class="mb-4">mdi-database-search</v-icon>
-                                <p class="text-h6 text-grey-darken-1 mb-2">{{ $t("noDataInTableMessage") }}</p>
-                                <p class="text-body-2 text-grey">{{ $t("tryAdjustingFilters") }}</p>
+                                <v-icon size="48" color="grey-lighten-1" class="mb-4">
+                                    mdi-database-search
+                                </v-icon>
+                                <p class="text-h6 text-grey-darken-1 mb-2">
+                                    {{ $t("noDataInTableMessage") }}
+                                </p>
+                                <p class="text-body-2 text-grey">
+                                    {{ $t("tryAdjustingFilters") }}
+                                </p>
                             </div>
                         </td>
                     </tr>
@@ -172,53 +193,59 @@
                                 <div class="person-name-section">
                                     <localized-link :to="'persons/' + item.databaseId" class="person-name">
                                         <v-avatar size="40" class="profile-avatar modern-avatar">
-                                            <v-icon color="primary">mdi-account</v-icon>
+                                            <v-icon color="primary">
+                                                mdi-account
+                                            </v-icon>
                                         </v-avatar>
                                     </localized-link>
-                                    <div class="flex items-center gap-2"><span>
+                                    <div class="flex items-center gap-2">
+                                        <span>
 
-                                        <localized-link :to="'persons/' + item.databaseId" class="person-name">
-                                            {{ item.name }}
-                                        </localized-link>
-                                        <span>,</span>
-                                    </span>
+                                            <localized-link :to="'persons/' + item.databaseId" class="person-name">
+                                                {{ item.name }}
+                                            </localized-link>
+                                            <span>,</span>
+                                        </span>
                                         <span v-if="item.birthdate" class="person-year">{{ extractYear(item.birthdate) }}</span>
                                     </div>
                                 </div>
-                                
                             </div>
                         </td>
                         <td class="py-4">
-                            <div class="person-employment" v-if="hasEmployment(item)">
-                                    <div class="employment-item" v-if="$i18n.locale.startsWith('sr')">
-                                        <template v-if="item.employmentsSr.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
-                                            <div v-for="(employment, index) in item.employmentsSr.split('; ')" :key="index" class="employment-entry">
-                                                <v-icon size="16" class="employment-icon">mdi-domain</v-icon>
-                                                <localized-link
-                                                    v-if="item.employmentInstitutionsId[index] !== -1"
-                                                    :to="'organisation-units/' + item.employmentInstitutionsId[index]"
-                                                    class="employment-link">
-                                                    {{ employment.trim() }}
-                                                </localized-link>
-                                                <span v-else class="employment-text">{{ employment.trim() }}</span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <div class="employment-item" v-else>
-                                        <template v-if="item.employmentsOther.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
-                                            <div v-for="(employment, index) in item.employmentsOther.split('; ')" :key="index" class="employment-entry">
-                                                <v-icon size="16" class="employment-icon">mdi-domain</v-icon>
-                                                <localized-link
-                                                    v-if="item.employmentInstitutionsId[index] !== -1"
-                                                    :to="'organisation-units/' + item.employmentInstitutionsId[index]"
-                                                    class="employment-link">
-                                                    {{ employment.trim() }}
-                                                </localized-link>
-                                                <span v-else class="employment-text">{{ employment.trim() }}</span>
-                                            </div>
-                                        </template>
-                                    </div>
+                            <div v-if="hasEmployment(item)" class="person-employment">
+                                <div v-if="$i18n.locale.startsWith('sr')" class="employment-item">
+                                    <template v-if="item.employmentsSr.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
+                                        <div v-for="(employment, index) in item.employmentsSr.split('; ')" :key="index" class="employment-entry">
+                                            <v-icon size="16" class="employment-icon">
+                                                mdi-domain
+                                            </v-icon>
+                                            <localized-link
+                                                v-if="item.employmentInstitutionsId[index] !== -1"
+                                                :to="'organisation-units/' + item.employmentInstitutionsId[index]"
+                                                class="employment-link">
+                                                {{ employment.trim() }}
+                                            </localized-link>
+                                            <span v-else class="employment-text">{{ employment.trim() }}</span>
+                                        </div>
+                                    </template>
                                 </div>
+                                <div v-else class="employment-item">
+                                    <template v-if="item.employmentsOther.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
+                                        <div v-for="(employment, index) in item.employmentsOther.split('; ')" :key="index" class="employment-entry">
+                                            <v-icon size="16" class="employment-icon">
+                                                mdi-domain
+                                            </v-icon>
+                                            <localized-link
+                                                v-if="item.employmentInstitutionsId[index] !== -1"
+                                                :to="'organisation-units/' + item.employmentInstitutionsId[index]"
+                                                class="employment-link">
+                                                {{ employment.trim() }}
+                                            </localized-link>
+                                            <span v-else class="employment-text">{{ employment.trim() }}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                             <!-- <div class="date-cell">
                                 <v-icon size="16" color="grey-darken-1" class="mr-2">mdi-calendar</v-icon>
                                 <span class="text-body-2">{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</span>
@@ -234,7 +261,9 @@
                                 </div>
                             </div>
                             <div v-else class="no-identifiers">
-                                <v-icon size="16" color="grey-lighten-1" class="mr-2">mdi-identifier</v-icon>
+                                <v-icon size="16" color="grey-lighten-1" class="mr-2">
+                                    mdi-identifier
+                                </v-icon>
                                 <span class="text-body-2 text-grey">{{ displayTextOrPlaceholder(item.orcid) }}</span>
                             </div>
                         </td>
@@ -269,7 +298,6 @@ import { localiseDate } from '@/utils/DateUtil';
 import { useRouter } from 'vue-router';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
-import IdentifierLink from '../core/IdentifierLink.vue';
 import IdentifierMenu from '../core/IdentifierMenu.vue';
 import InvolvementService from '@/services/InvolvementService';
 import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
@@ -281,7 +309,7 @@ import { isEqual } from 'lodash';
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, IdentifierLink, AddEmploymentModal, TableExportModal, IdentifierMenu },
+    components: { LocalizedLink, draggable: VueDraggableNext, AddEmploymentModal, TableExportModal, IdentifierMenu },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -347,7 +375,7 @@ export default defineComponent({
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
-        const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
+        // const birthdateLabel = computed(() => i18n.t("birthdateLabel"));
         const identifiers = computed(() => i18n.t("identifiersLabel"));
 
         const { isAdmin, isInstitutionalEditor, isCommission, isUserLoggedIn } = useUserRole();

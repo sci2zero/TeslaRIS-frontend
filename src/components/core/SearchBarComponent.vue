@@ -1,41 +1,41 @@
 <template>
-        <div class="search-card" :class="{ 
+    <div
+        class="search-card" :class="{ 
             'search-card--light': !dark,
             'search-card--transparent': transparent,
             'search-card--solid': !transparent,
             [`search-card--${size}`]: true
         }">
-            <div class="search-input-wrapper">
-                <v-text-field
-                    ref="searchField"
-            v-model="searchInput"
-                    density="comfortable"
-                    variant="outlined"
-                    class="search-input"
-                    :class="{ 
-                        'search-input--light': !dark,
-                        [`search-input--${size}`]: true
-                    }"
-                    :label="$t('searchBarPlaceholder')"
-                    single-line
-                    hide-details
-                    :color="dark ? 'white' : 'black'"
-                    @keydown.enter="onSearch"
-                >
-                    <template #append-inner>
-                        <v-icon 
-                            icon="mdi-magnify" 
-                            :color="dark ? 'white' : 'black'" 
-                            size="28"
-                            class="search-icon"
-                            :class="{ 'search-icon--light': !dark }"
-                            @click="onSearch"
-                        ></v-icon>
-                    </template>
-                </v-text-field>
-            </div>
+        <div class="search-input-wrapper">
+            <v-text-field
+                ref="searchField"
+                v-model="searchInput"
+                density="comfortable"
+                variant="outlined"
+                class="search-input"
+                :class="{ 
+                    'search-input--light': !dark,
+                    [`search-input--${size}`]: true
+                }"
+                :label="$t('searchBarPlaceholder')"
+                single-line
+                hide-details
+                :color="dark ? 'white' : 'black'"
+                @keydown.enter="onSearch"
+            >
+                <template #append-inner>
+                    <v-icon 
+                        icon="mdi-magnify" 
+                        :color="dark ? 'white' : 'black'" 
+                        size="28"
+                        class="search-icon"
+                        :class="{ 'search-icon--light': !dark }"
+                        @click="onSearch"
+                    ></v-icon>
+                </template>
+            </v-text-field>
         </div>
-
+    </div>
 </template>
 
 <script lang="ts">

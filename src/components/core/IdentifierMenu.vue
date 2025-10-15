@@ -2,45 +2,69 @@
     <div v-if="identifier">
         <v-menu open-on-hover location="top" :open-delay="0" :close-on-content-click="false">
             <template #activator="{ props }">
-                <span v-bind="props" class="identifier-icon-link">
+                <span v-bind="props" class="inline-flex items-center cursor-pointer select-none transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105">
                     <span v-if="type === 'orcid'">
-                        <img src="/icons/orcid.svg" alt="ORCID" class="identifier-icon size-6" />
+                        <img src="/icons/orcid.svg" alt="ORCID" class="pointer-events-none size-6" />
                     </span>
                     <span v-else-if="type === 'scopus'" class="size-6 rounded-full bg-[#ff8400] p-[2px]">
-                        <img src="/icons/scopus-icon.png" alt="SCOPUS" class="identifier-icon rounded-full" />
+                        <img src="/icons/scopus-icon.png" alt="SCOPUS" class="pointer-events-none rounded-full" />
                     </span>
                     <span v-else-if="type === 'openalex'" class="size-6 p-0.5">
-                        <img src="/icons/openalex-logo.png" alt="SCOPUS" class="identifier-icon" />
+                        <img src="/icons/openalex-logo.png" alt="SCOPUS" class="pointer-events-none" />
                     </span>
                     <span v-else-if="type === 'webofscience'" class="size-6 p-0.5">
-                        <img src="/icons/wos-logo.svg" alt="SCOPUS" class="identifier-icon" />
+                        <img src="/icons/wos-logo.svg" alt="SCOPUS" class="pointer-events-none" />
                     </span>
                     <span v-else-if="type === 'doi'" class="size-6 p-0.5">
-                        <img src="/icons/doi.svg" alt="DOI" class="identifier-icon" />
+                        <img src="/icons/doi.svg" alt="DOI" class="pointer-events-none" />
                     </span>
                     <span v-else>
-                        <v-icon class="identifier-icon size-6" color="#666">mdi-identifier</v-icon>
+                        <v-icon class="pointer-events-none size-6" color="#666">mdi-identifier</v-icon>
                     </span>
                 </span>
             </template>
-            <v-card class="identifier-menu-card" elevation="8">
-                <v-card-title class="identifier-menu-title" :style="{ background: titleBackground }">
-                    <v-icon class="identifier-menu-icon" :color="titleIconColor">mdi-account-circle</v-icon>
+            <v-card class="min-w-[280px] max-w-[320px] !rounded-xl !shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-black/10 bg-gradient-to-br from-white to-gray-50" elevation="8">
+                <div class="!text-white font-semibold text-[0.9rem]! px-4 py-3 rounded-t-xl flex items-center gap-2" :style="{ background: titleBackground }">
+                    <v-icon class="!text-white text-[1.1rem]" :color="titleIconColor">
+                        mdi-account-circle
+                    </v-icon>
                     {{ titleText }}
-                </v-card-title>
-                <v-card-text class="identifier-menu-content">
-                    <div class="identifier-id-display">
-                        <span class="identifier-label">{{ labelText }}:</span>
-                        <code class="identifier-code">{{ identifier }}</code>
+                </div>
+                <div class="!px-5 !py-4 bg-white rounded-b-xl">
+                    <div class="flex flex-col gap-2">
+                        <!-- <span class="text-xs font-medium text-gray-600 uppercase tracking-wide">{{ labelText }}:</span> -->
+                        <div class="flex items-center gap-2 py-1">
+                            <div class="flex-1">
+                                <a 
+                                    :href="profileUrl"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="text-base break-all leading-6 no-underline text-blue-700 transition-all duration-200 ease-in-out font-medium inline-flex items-center gap-1 hover:underline hover:text-blue-800">
+                                    {{ identifier }}
+                                    <v-icon size="x-small">mdi-open-in-new</v-icon>
+                                </a>
+                            </div>
+                            <v-btn
+                                icon
+                                size="x-medium"
+                                variant="text"
+                                class="opacity-70 hover:opacity-100 transition-opacity duration-200 !min-w-0 !p-0"
+                                color="gray"
+                                @click="copyIdentifier">
+                                <v-icon size="small">
+                                    mdi-content-copy
+                                </v-icon>
+                            </v-btn>
+                        </div>
                     </div>
-                </v-card-text>
-                <v-card-actions class="identifier-menu-actions">
+                </div>
+                <!-- <v-card-actions class="!px-4 !pb-4 !pt-2 bg-gray-50 rounded-b-xl gap-2 justify-between">
                     <v-btn
                         variant="text"
                         size="small"
                         prepend-icon="mdi-content-copy"
                         @click="copyIdentifier"
-                        class="identifier-copy-btn"
+                        class="font-medium text-xs normal-case min-w-0 !px-3 !py-1.5 hover:opacity-80"
                         :style="{ color: primaryColor }">
                         Copy ID
                     </v-btn>
@@ -51,20 +75,20 @@
                         :href="profileUrl"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="identifier-view-btn">
+                        class="!text-blue-700 font-medium text-xs normal-case min-w-0 !px-3 !py-1.5 hover:!bg-blue-700/10">
                         View Profile
                     </v-btn>
-                </v-card-actions>
+                </v-card-actions> -->
             </v-card>
         </v-menu>
         
-        <div class="notificationContainer">
+        <div class="fixed top-5 right-5 z-[9999] max-w-[300px]">
             <v-slide-y-transition group>
                 <v-alert
                     v-for="notification in notifications"
                     :key="notification[0]"
                     theme="dark"
-                    class="identifier-notification"
+                    class="mb-2 rounded-lg text-[0.85rem]"
                 >
                     {{ notification[1] }}
                 </v-alert>
@@ -174,7 +198,7 @@ export default defineComponent({
             try {
                 await navigator.clipboard.writeText(props.identifier);
                 addNotification(i18n.t("identifierCopiedNotification", { identifier: props.identifier }));
-            } catch (err) {
+            } catch {
                 const textArea = document.createElement('textarea');
                 textArea.value = props.identifier;
                 document.body.appendChild(textArea);
@@ -200,128 +224,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-    .identifier-icon-link {
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-        cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        transition: all 0.2s ease;
-    }
-
-    .identifier-icon-link:hover {
-        opacity: 0.8;
-        transform: scale(1.05);
-    }
-
-    .identifier-icon {
-        pointer-events: none;
-    }
-
-    .identifier-menu-card {
-        min-width: 280px;
-        max-width: 320px;
-        border-radius: 12px !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-    }
-
-    .identifier-menu-title {
-        color: white !important;
-        font-weight: 600;
-        font-size: 0.9rem;
-        padding: 12px 16px;
-        border-radius: 12px 12px 0 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .identifier-menu-icon {
-        color: white !important;
-        font-size: 1.1rem;
-    }
-
-    .identifier-menu-content {
-        padding: 16px !important;
-        background: white;
-    }
-
-    .identifier-id-display {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .identifier-label {
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .identifier-code {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 0.85rem;
-        background: #f5f5f5;
-        padding: 8px 12px;
-        border-radius: 6px;
-        border: 1px solid #e0e0e0;
-        color: #333;
-        word-break: break-all;
-        line-height: 1.4;
-    }
-
-    .identifier-menu-actions {
-        padding: 8px 16px 16px 16px !important;
-        background: #fafafa;
-        border-radius: 0 0 12px 12px;
-        gap: 8px;
-        justify-content: space-between;
-    }
-
-    .identifier-copy-btn {
-        font-weight: 500;
-        font-size: 0.8rem;
-        text-transform: none;
-        min-width: auto;
-        padding: 6px 12px !important;
-    }
-
-    .identifier-copy-btn:hover {
-        opacity: 0.8;
-    }
-
-    .identifier-view-btn {
-        color: #1976d2 !important;
-        font-weight: 500;
-        font-size: 0.8rem;
-        text-transform: none;
-        min-width: auto;
-        padding: 6px 12px !important;
-    }
-
-    .identifier-view-btn:hover {
-        background-color: rgba(25, 118, 210, 0.1) !important;
-    }
-
-    .notificationContainer {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        max-width: 300px;
-    }
-
-    .identifier-notification {
-        margin-bottom: 8px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-    }
-</style>

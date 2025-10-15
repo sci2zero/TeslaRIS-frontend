@@ -84,7 +84,6 @@ import LandingFeatures from "@/components/landing/LandingFeatures.vue";
 import { type PersonIndex } from "@/models/PersonModel";
 import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
-import GlobalLeaderboardService from "@/services/visualization/GlobalLeaderboardService";
 import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 
 

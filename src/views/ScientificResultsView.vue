@@ -1,6 +1,8 @@
 <template>
     <div class="container py-4 px-4 mx-auto">
-        <h1 class="text-2xl font-bold mb-4">{{ $t("scientificResultsListLabel") }}</h1>
+        <h1 class="text-2xl font-bold mb-4">
+            {{ $t("scientificResultsListLabel") }}
+        </h1>
         <!-- <v-tabs
             v-model="currentTab"
             align-tabs="center"
@@ -18,16 +20,17 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="advancedSearch">
                 <v-btn
-                        variant="text"
-                        prepend-icon="mdi-chevron-left"
-                        @click="toggleAdvancedSearch"
-                    >{{ $t("backToSimpleSearchLabel") }}
-                    </v-btn>
+                    variant="text"
+                    prepend-icon="mdi-chevron-left"
+                    @click="toggleAdvancedSearch"
+                >
+                    {{ $t("backToSimpleSearchLabel") }}
+                </v-btn>
                 <query-input-component
                     :search-fields="searchFields"
+                    class="mb-4"
                     @search="clearSortAndPerformSearch($event)"
-                    @reset="resetFiltersAndSearch"
-                    class="mb-4">
+                    @reset="resetFiltersAndSearch">
                 </query-input-component>
             </v-tabs-window-item>
         </v-tabs-window>
@@ -61,7 +64,7 @@
             @switch-page="switchPage">
             <template #top-left>
                 <div class="flex items-center gap-1">
-                    <search-bar-component v-if="currentTab === 'simpleSearch'" @search="clearSortAndPerformSearch($event)" :transparent="false" size="small"></search-bar-component>
+                    <search-bar-component v-if="currentTab === 'simpleSearch'" :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
                     <v-btn
                         v-if="currentTab === 'simpleSearch'"
                         variant="text"
@@ -72,7 +75,6 @@
             </template>
             <template #actions>
                 <div class="flex items-center gap-2">
-                    
                     <v-menu>
                         <template #activator="{ props }">
                             <v-btn
@@ -133,7 +135,7 @@
                     </span>
                 </div>
             </template>
-            <template #type-filter-menu="{ column }">
+            <template #type-filter-menu>
                 <div class="publication-type-filter">
                     <div class="filter-header">
                         <span class="filter-title">{{ $t('typeOfPublicationLabel') }}</span>

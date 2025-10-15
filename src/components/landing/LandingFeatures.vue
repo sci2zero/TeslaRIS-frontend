@@ -24,11 +24,14 @@
                     <div class="flex-1 mb-6">
                         <div v-if="topPublications.length === 0" class="text-center py-8 text-slate-400">
                             <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
-                            <p class="mt-2">Učitavanje...</p>
+                            <p class="mt-2">
+                                Učitavanje...
+                            </p>
                         </div>
-                        <div v-else v-for="(pub, index) in topPublications.slice(0, 3)" :key="index" 
-                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
-                             @click="$router.push('/' + $i18n.locale + '/publications/' + pub.item.databaseId)">
+                        <div
+                            v-for="(pub, index) in topPublications.slice(0, 3)" v-else :key="index" 
+                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
+                            @click="$router.push('/' + $i18n.locale + '/publications/' + pub.item.databaseId)">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-blue-500/10">
                                 <v-icon icon="mdi-book-open-variant" size="20" color="#3b82f6"></v-icon>
                             </div>
@@ -67,11 +70,14 @@
                     <div class="flex-1 mb-6">
                         <div v-if="topResearchers.length === 0" class="text-center py-8 text-slate-400">
                             <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
-                            <p class="mt-2">Učitavanje...</p>
+                            <p class="mt-2">
+                                Učitavanje...
+                            </p>
                         </div>
-                        <div v-else v-for="(researcher, index) in topResearchers.slice(0, 3)" :key="index" 
-                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
-                             @click="$router.push('/' + $i18n.locale + '/persons/' + researcher.item.databaseId)">
+                        <div
+                            v-for="(researcher, index) in topResearchers.slice(0, 3)" v-else :key="index" 
+                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
+                            @click="$router.push('/' + $i18n.locale + '/persons/' + researcher.item.databaseId)">
                             <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-slate-200 bg-slate-100">
                                 <v-icon 
                                     icon="mdi-account-circle" 
@@ -81,7 +87,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ researcher.item.name  }}
+                                    {{ researcher.item.name }}
                                 </h6>
                                 <p class="text-xs text-slate-500 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
                                     {{ $i18n.locale === 'sr' ? researcher.item.employmentsSr : researcher.item.employmentsOther }}
@@ -114,11 +120,14 @@
                     <div class="flex-1 mb-6">
                         <div v-if="topInstitutions.length === 0" class="text-center py-8 text-slate-400">
                             <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
-                            <p class="mt-2">Učitavanje...</p>
+                            <p class="mt-2">
+                                Učitavanje...
+                            </p>
                         </div>
-                        <div v-else v-for="(institution, index) in topInstitutions.slice(0, 3)" :key="index" 
-                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
-                             @click="$router.push('/' + $i18n.locale + '/organisation-units/' + institution.item.databaseId)">
+                        <div
+                            v-for="(institution, index) in topInstitutions.slice(0, 3)" v-else :key="index" 
+                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
+                            @click="$router.push('/' + $i18n.locale + '/organisation-units/' + institution.item.databaseId)">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-amber-500/10">
                                 <v-icon icon="mdi-office-building" size="20" color="#f59e0b"></v-icon>
                             </div>

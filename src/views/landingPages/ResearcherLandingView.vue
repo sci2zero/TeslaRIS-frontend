@@ -1,540 +1,922 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-white">
-        <div class="mx-auto max-w-7xl px-6 py-12">
-            <!-- Header Section -->
-            <ResearcherLandingHeader />
-            <ResearcherFeaturedIndicators />
-
-            <!-- Biography and Keywords Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-                <!-- Biography -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl lg:text-3xl font-serif font-bold text-slate-800">
-                                Biografija
-                            </h3>
-                            <v-menu>
-                                <template #activator="{ props }">
-                                    <v-btn
-                                        v-bind="props"
-                                        icon="mdi-dots-vertical"
-                                        variant="text"
-                                        size="small"
-                                        class="text-slate-600 hover:text-slate-800"
-                                    ></v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item>
-                                        <v-list-item-title>
-                                            <span class="mdi mdi-pencil mr-2"></span>
-                                            Uredi biografiju
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item>
-                                        <v-list-item-title>
-                                            <span class="mdi mdi-download mr-2"></span>
-                                            Izvezi podatke
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item>
-                                        <v-list-item-title>
-                                            <span class="mdi mdi-share-variant mr-2"></span>
-                                            Podeli profil
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </div>
-                        
-                        <div class="prose prose-slate max-w-none">
-                            <p class="text-justify text-base lg:text-lg leading-relaxed text-slate-700 mb-4">
-                                {{ person?.biography && person.biography.length > 0 ? returnCurrentLocaleContent(person.biography) : $t("notYetSetMessage") }}
-                            </p>
-                        </div>
-                        
-                        <button class="mt-6 text-emerald-600 hover:text-emerald-700 font-medium text-sm flex items-center gap-2 transition-colors">
-                            <span>Vidi još</span>
-                            <span class="mdi mdi-arrow-right text-base"></span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Keywords -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl lg:text-3xl font-serif font-bold text-slate-800">
-                                Ključne reči
-                            </h3>
-                            <v-btn
-                                icon="mdi-dots-vertical"
-                                variant="text"
-                                size="small"
-                                class="text-slate-600 hover:text-slate-800"
-                            ></v-btn>
-                        </div>
-
-                        <div class="flex flex-wrap gap-2">
-                            <span 
-                                v-for="(keyword, index) in getKeywordsAsArray(person?.keyword)" 
-                                :key="index"
-                                class="inline-block px-4 py-2 bg-slate-50 text-slate-700 rounded-lg text-sm font-medium border border-slate-200 hover:bg-slate-100 transition-colors"
-                            >
-                                {{ keyword.trim() }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Publications Section -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 lg:p-8">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <h3 class="text-2xl lg:text-3xl font-serif font-bold text-slate-800">
-                        Naučni Rezultati
-                    </h3>
-                    <button class="flex items-center gap-3 px-6 py-3 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                        <span class="mdi mdi-plus text-lg"></span>
-                        Dodaj publikaciju
-                    </button>
-                </div>
-
-                <!-- Publication Type Filters -->
-                <div class="mb-8">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="relative">
-                            <button 
-                                @click="toggleFilterDropdown"
-                                class="flex items-center gap-3 px-4 py-2.5 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md min-w-[200px]"
-                            >
-                                <span class="mdi mdi-filter-variant text-lg text-slate-500"></span>
-                                <span class="text-sm font-medium flex-1 text-left">
-                                    {{ selectedPublicationTypes.length === 0 ? 'Svi tipovi publikacija' : `${selectedPublicationTypes.length} tip odabran` }}
-                                </span>
-                                <span class="mdi mdi-chevron-down text-sm text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': isFilterDropdownOpen }"></span>
-                            </button>
-                            
-                            <!-- Dropdown Menu -->
-                            <div v-show="isFilterDropdownOpen" class="absolute right-0 top-full mt-1 w-80 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
-                                <!-- Header -->
-                                <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50 rounded-t-lg">
-                                    <span class="text-sm font-semibold text-slate-700">Tipovi publikacija</span>
-                                    <div class="flex gap-2">
-                                        <button 
-                                            @click="selectAllPublicationTypes"
-                                            class="text-xs px-2 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors duration-200"
-                                        >
-                                            Sve
-                                        </button>
-                                        <button 
-                                            @click="clearAllPublicationTypes"
-                                            class="text-xs px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors duration-200"
-                                        >
-                                            Očisti
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Filter Options -->
-                                <div class="p-4 max-h-64 overflow-y-auto">
-                                    <div class="space-y-1">
-                                        <label 
-                                            v-for="type in publicationTypeSr" 
-                                            :key="type.value"
-                                            class="flex items-center w-full p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer transition-all duration-200 group border border-transparent hover:border-slate-200"
-                                        >
-                                            <div class="flex items-center justify-center w-5 h-5 mr-3">
-                                                <input 
-                                                    type="checkbox" 
-                                                    :value="type"
-                                                    v-model="selectedPublicationTypes"
-                                                    class="w-4 h-4 text-blue-600 border-2 border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 transition-colors duration-200"
-                                                />
-                                            </div>
-                                            <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 flex-1">{{ type.title }}</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <!-- Footer -->
-                                <div class="p-3 border-t border-slate-200 bg-slate-50 rounded-b-lg">
-                                    <div class="text-xs text-slate-500 text-center">
-                                        {{ selectedPublicationTypes.length }} od {{ publicationTypeSr.length }} tipova odabrano
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Selected Filters Display -->
-                    <div v-if="selectedPublicationTypes.length > 0" class="flex flex-wrap gap-2">
-                        <span 
-                            v-for="type in selectedPublicationTypes" 
-                            :key="type.value"
-                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200"
+    <v-container id="researcher">
+        <!-- Header -->
+        <v-row justify="center">
+            <v-col cols="12">
+                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
+                    <v-card-title>
+                        <v-skeleton-loader
+                            :loading="!person"
+                            type="heading"
+                            color="blue-lighten-3"
+                            class="d-flex justify-center align-center"
                         >
-                            <span class="mdi mdi-check-circle text-sm"></span>
-                            {{ type.title }}
-                            <button 
-                                @click="removePublicationType(type.value)"
-                                class="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors duration-200 group"
-                                title="Ukloni filter"
-                            >
-                                <span class="mdi mdi-close text-xs group-hover:text-blue-800"></span>
-                            </button>
-                        </span>
-                    </div>
-                </div>
+                            <p class="text-h5">
+                                {{ researcherName }}
+                            </p>
+                        </v-skeleton-loader>
+                    </v-card-title>
+                    <v-card-subtitle class="text-center">
+                        {{ person?.personalInfo.displayTitle && person.personalInfo.displayTitle.length > 0 ? returnCurrentLocaleContent(person?.personalInfo.displayTitle) as string : $t("researcherLabel") }}
+                    </v-card-subtitle>
+                </v-card>
+            </v-col>
+        </v-row>
 
-                <!-- Search Bar -->
-                <div class="mb-6">
-                    <div class="relative">
-                        <input 
-                            type="text" 
-                            placeholder="Pretraži publikacije..."
-                            class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
-                            @input="handleSearch"
+        <!-- Researcher Info -->
+        <v-row>
+            <v-col cols="3" class="text-center">
+                <person-profile-image
+                    :filename="person?.imageServerFilename"
+                    :person-id="person?.id"
+                    :can-edit="canEdit">
+                </person-profile-image>
+            </v-col>
+            <v-col cols="9">
+                <v-card class="pa-3" variant="flat" color="secondary">
+                    <v-card-text class="edit-pen-container">
+                        <generic-crud-modal
+                            :form-component="PersonUpdateForm"
+                            :form-props="{ presetPerson: person }"
+                            entity-name="Person"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updatePersonalInfo"
                         />
-                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
-                            <span class="mdi mdi-magnify text-xl"></span>
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Publications Table -->
-                <div v-if="publications.length > 0">
-                    <publication-table-component
-                        ref="publicationsRef"
-                        :publications="publications"
-                        :total-publications="totalPublications"
-                        enable-export
-                        :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
-                        :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
-                        :endpoint-body-parameters="
-                            {
-                                allowedTypes: selectedPublicationTypes.length > 0 
-                                    ? selectedPublicationTypes.map(publicationType => publicationType.value)
-                                    : publicationTypeSr.map(type => type.value),
-                                personId: person?.id || 0,
-                                commissionId: null
-                            }"
-                        @switch-page="switchPage">
-                    </publication-table-component>
-                </div>
-
-                <!-- Empty State -->
-                <div v-else class="text-center py-12">
-                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="mdi mdi-file-document text-2xl text-slate-400"></span>
-                    </div>
-                    <h4 class="text-lg font-medium text-slate-600 mb-2">
-                        Nema publikacija
-                    </h4>
-                    <p class="text-slate-500 text-sm">
-                        Dodajte svoju prvu publikaciju da počnete
-                    </p>
-                </div>
+                        <!-- Personal Info -->
+                        <div class="mb-5">
+                            <b>{{ $t("personalInfoLabel") }}</b>
+                        </div>
+                        <basic-info-loader v-if="!person" :citation-button="false" />
+                        <v-row v-else>
+                            <v-col cols="6">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
+                                    {{ $t("birthdateLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate" class="response">
+                                    {{ localiseDate(personalInfo.localBirthDate) }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.sex">
+                                    {{ $t("sexLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.sex" class="response">
+                                    {{ getTitleFromValueAutoLocale(personalInfo.sex) }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.country">
+                                    {{ $t("countryLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.country" class="response">
+                                    {{ personalInfo.country }}
+                                </div>
+                                <div>APVNT:</div>
+                                <div class="response">
+                                    {{ personalInfo.apvnt ? personalInfo.apvnt : $t("notYetSetMessage") }}
+                                </div>
+                                <div>eCRIS-ID:</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.eCrisId" :identifier="personalInfo.eCrisId" type="ecris"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>enaukaID:</div>
+                                <div class="response">
+                                    {{ personalInfo.eNaukaId ? personalInfo.eNaukaId : $t("notYetSetMessage") }}
+                                </div>
+                                <div>ORCID:</div>
+                                <div v-if="personalInfo.orcid" class="response">
+                                    <identifier-link :identifier="personalInfo.orcid" type="orcid"></identifier-link>
+                                </div>
+                                <div v-else class="response">
+                                    {{ $t("notYetSetMessage") }}
+                                </div>
+                                <div>Scopus Author ID:</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.scopusAuthorId" :identifier="personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>Open Alex ID:</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.openAlexId" :identifier="personalInfo.openAlexId" type="open_alex"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>ResearcherID (WoS):</div>
+                                <div class="response">
+                                    <identifier-link v-if="personalInfo.webOfScienceResearcherId" :identifier="personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber">
+                                    {{ $t("streetAndNumberLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber" class="response">
+                                    {{ personalInfo.streetAndNumber }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.city">
+                                    {{ $t("cityLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.city" class="response">
+                                    {{ personalInfo.city }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.placeOfBirth">
+                                    {{ $t("placeOfBirthLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.placeOfBirth" class="response">
+                                    {{ personalInfo.placeOfBirth }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.contactEmail">
+                                    {{ $t("emailLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.contactEmail" class="response">
+                                    <identifier-link :identifier="personalInfo.contact.contactEmail" type="email"></identifier-link>
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber">
+                                    {{ $t("phoneNumberLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber" class="response">
+                                    {{ personalInfo.contact.phoneNumber }}
+                                </div>
+                                <div v-if="loginStore.userLoggedIn">
+                                    {{ $t("researchAreaLabel") }}:
+                                </div>
+                                <div v-if="loginStore.userLoggedIn" class="response">
+                                    {{ researchArea ? returnCurrentLocaleContent(researchArea.name) : $t("notYetSetMessage") }}
+                                </div>
+                                <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
+                                    {{ $t("websiteLabel") }}:
+                                </div>
+                                <div class="response">
+                                    <uri-list :uris="person?.personalInfo.uris"></uri-list>
+                                </div>
+                                <div v-if="activeEmployments.length > 0">
+                                    {{ $t("employmentsLabel") }}:
+                                </div>
+                                <div v-for="employment in activeEmployments.slice(0, 3)" :key="employment.id" class="response">
+                                    <localized-link
+                                        v-if="employment.organisationUnitId"
+                                        :to="'organisation-units/' + employment.organisationUnitId">
+                                        <strong>{{ returnCurrentLocaleContent(employment.organisationUnitName) }} {{ employment.employmentPosition ? `(${getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition)})` : "" }}</strong>
+                                    </localized-link>
+                                    <p v-else>
+                                        {{ returnCurrentLocaleContent(employment.affiliationStatement) }} {{ employment.employmentPosition ? `(${getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition)})` : "" }}
+                                    </p>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+    
+        <div class="actions-box pa-4">
+            <div class="text-subtitle-1 font-weight-medium mb-3">
+                {{ $t("additionalActionsLabel") }}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <person-other-name-modal
+                    :preset-person="person"
+                    :read-only="!canEdit"
+                    @update="updateNames"
+                    @select-primary="selectPrimaryName"
+                />
+                <generic-crud-modal
+                    class="ml-2" 
+                    :form-component="AssessmentResearchAreaForm"
+                    :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
+                    entity-name="ResearchArea"
+                    is-update compact
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="fetchAssessmentResearchArea"
+                />
+                <v-btn
+                    v-if="isResearcher && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('documentClaim')">
+                    {{ $t("documentClaimLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="isResearcher && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('massInstitutionAssignment')">
+                    {{ $t("massInstitutionAssignmentLabel") }}
+                </v-btn>
+                <v-btn
+                    v-if="isResearcher && canEdit"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="performNavigation('importer')">
+                    {{ $t("importerLabel") }}
+                </v-btn>
             </div>
         </div>
-    </div>
+
+        <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
+        <v-tabs
+            v-if="person"
+            v-model="currentTab"
+            color="deep-purple-accent-4"
+            align-tabs="start"
+        >
+            <v-tab value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
+            </v-tab>
+            <v-tab v-if="personIndicators?.length > 0" value="indicators">
+                {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-if="personAssessments?.length > 0" value="assessments">
+                {{ $t("assessmentsLabel") }}
+            </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab value="collaborationNetwork">
+                {{ $t("collaborationNetworkLabel") }}
+            </v-tab>
+        </v-tabs>
+
+        <v-tabs-window
+            v-if="person"
+            v-model="currentTab"
+        >
+            <v-tabs-window-item value="publications">
+                <search-bar-component
+                    class="mt-5"
+                    @search="clearSortAndPerformPublicationSearch($event)"
+                />
+                <div class="mb-5 mt-5">
+                    <add-publication-menu v-if="canEdit" compact />
+                    <v-btn
+                        v-if="isResearcher && canEdit"
+                        class="ml-2" color="primary" density="compact"
+                        @click="performNavigation('importer')">
+                        {{ $t("importerLabel") }}
+                    </v-btn>
+                </div>
+                <v-select
+                    v-model="selectedPublicationTypes"
+                    :items="publicationTypes"
+                    :label="$t('typeOfPublicationLabel')"
+                    return-object
+                    class="publication-type-select mt-3"
+                    multiple
+                ></v-select>
+                <publication-table-component
+                    ref="publicationsRef"
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
+                    :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
+                    :endpoint-body-parameters="
+                        {
+                            allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
+                            personId: person.id,
+                            commissionId: null
+                        }"
+                    :allow-researcher-unbinding="canEdit && isResearcher"
+                    @switch-page="switchPage">
+                </publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="additionalInfo">
+                <!-- Keywords -->
+                <keyword-list
+                    :keywords="keywords"
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
+                </keyword-list>
+
+                <!-- Biography -->
+                <description-section
+                    :description="biography"
+                    :can-edit="canEdit"
+                    is-biography
+                    @update="updateBiography">
+                </description-section>
+
+                <v-row>
+                    <v-col cols="6">
+                        <!-- Expertises and Skills -->
+                        <expertise-or-skill-list
+                            :expertise-or-skills="person?.expertisesOrSkills"
+                            :person="person"
+                            :can-edit="canEdit"
+                            @crud="fetchPerson">
+                        </expertise-or-skill-list>
+                        
+                        <br />
+
+                        <!-- Prizes -->
+                        <prize-list
+                            :prizes="person?.prizes"
+                            :person="person"
+                            :can-edit="canEdit"
+                            @crud="fetchPerson">
+                        </prize-list>
+                    </v-col>
+
+
+                    <!-- Involvements -->
+                    <v-col cols="6">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <person-involvement-modal :read-only="!canEdit" @create="addInvolvement"></person-involvement-modal>
+
+                                <div><h2>{{ $t("involvementsLabel") }}</h2></div>
+                                <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                                <br />
+                                <div v-if="employments.length > 0">
+                                    <h3>{{ $t("employmentsLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list
+                                    :involvements="employments"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
+                                <div v-if="education.length > 0">
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list
+                                    :involvements="education"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
+                                <div v-if="memberships.length > 0">
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                                </div>
+                                <br />
+                                <involvement-list
+                                    :involvements="memberships"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+
+                <v-btn
+                    v-if="isAdmin" 
+                    density="compact" class="mt-5" 
+                    color="blue darken-1"
+                    @click="migrateToUnmanaged">
+                    {{ $t("migrateToUnmanagedResearcherLabel") }}
+                </v-btn>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="indicators">
+                <indicators-section 
+                    :indicators="personIndicators" 
+                    :applicable-types="[ApplicableEntityType.PERSON]" 
+                    :entity-id="person?.id"
+                    :entity-type="ApplicableEntityType.PERSON" 
+                    :can-edit="false"
+                    show-statistics
+                    @updated="fetchIndicators"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="assessments">
+                <person-assessments-view
+                    :assessments="personAssessments"
+                    :is-loading="assessmentsLoading"
+                    @fetch="fetchAssessment">
+                </person-assessments-view>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <person-visualizations
+                    :person-id="(person.id as number)"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                    :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
+                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="collaborationNetwork">
+                <div ref="collaborationNetworkRef">
+                    <person-collaboration-network
+                        :person-id="(person.id as number)"
+                    />
+                </div>
+            </v-tabs-window-item>
+        </v-tabs-window>
+
+        <persistent-question-dialog
+            ref="dialogRef"
+            :title="$t('areYouSureLabel')"
+            :message="dialogMessage"
+            @continue="performMigrationToUnmanaged">
+        </persistent-question-dialog>
+
+        <toast v-model="snackbar" :message="snackbarMessage" />
+    </v-container>
 </template>
 
-<script setup lang="ts">
-import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
-import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
+<script lang="ts">
+import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
+import PersonService from '@/services/PersonService';
+import CountryService from '@/services/CountryService';
+import { computed, onMounted } from 'vue';
+import { defineComponent, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import type { PersonResponse, ExpertiseOrSkillResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
+import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import { type MultilingualContent, ExportableEndpointType } from '@/models/Common';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
-
-import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import PersonService from '@/services/PersonService';
 import InvolvementService from '@/services/InvolvementService';
+import type { Employment, Education, Membership } from '@/models/InvolvementModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Employment } from '@/models/InvolvementModel';
-import type { PersonResponse } from '@/models/PersonModel';
+import type { DocumentFile } from '@/models/DocumentFileModel';
+import DocumentFileService from '@/services/DocumentFileService';
+import KeywordList from '@/components/core/KeywordList.vue';
+import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
+import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
+import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
+import PrizeList from '@/components/person/prize/PrizeList.vue';
+import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
+import { localiseDate } from '@/utils/DateUtil';
+import { getTitleFromValueAutoLocale } from '@/i18n/sex';
+import { getErrorMessageForErrorKey } from '@/i18n';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import UriList from '@/components/core/UriList.vue';
+import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
+import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
+import StatisticsService from '@/services/StatisticsService';
+import { type AssessmentResearchArea, type EntityIndicatorResponse, type ResearcherAssessmentResponse, StatisticsType } from '@/models/AssessmentModel';
+import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
+import { useLoginStore } from '@/stores/loginStore';
+import Toast from '@/components/core/Toast.vue';
+import AssessmentResearchAreaForm from '@/components/assessment/assessmentMeasure/AssessmentResearchAreaForm.vue';
+import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import EntityClassificationService from '@/services/assessment/EntityClassificationService';
+import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
+import { useUserRole } from '@/composables/useUserRole';
+import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
+import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
+import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
+import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
+import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
+import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import { type AxiosResponseHeaders } from 'axios';
+import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
+import PersonCollaborationNetwork from '@/components/person/PersonCollaborationNetwork.vue';
+import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 
-const route = useRoute();
-const router = useRouter();
 
-const person = ref<PersonResponse>();
-const researcherName = ref("");
-const employments = ref<Employment[]>([]);
+export default defineComponent({
+    name: "ResearcherLandingPage",
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, PersonCollaborationNetwork },
+    setup() {
+        const currentTab = ref("additionalInfo");
 
-// Publication state
-const publications = ref<DocumentPublicationIndex[]>([]);
-const totalPublications = ref(0);
-const page = ref(0);
-const size = ref(10);
-const sort = ref("");
-const direction = ref("");
-const publicationSearchParams = ref("tokens=*");
-const publicationsRef = ref<typeof PublicationTableComponent>();
-const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
-const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
+        const dialogRef = ref<typeof PersistentQuestionDialog>();
+        const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
 
-// Filter dropdown state
-const isFilterDropdownOpen = ref(false);
-
-// Serbian publication types
-const publicationTypeSr = [
-    { title: "Rad u časopisu", value: PublicationType.JOURNAL_PUBLICATION },
-    { title: "Rad sa konferencije", value: PublicationType.PROCEEDINGS_PUBLICATION },
-    { title: "Patent", value: PublicationType.PATENT },
-    { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
-    { title: "Skup podataka", value: PublicationType.DATASET },
-    { title: "Softver", value: PublicationType.SOFTWARE },
-    { title: "Monografija", value: PublicationType.MONOGRAPH },
-    { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION },
-    { title: "Završni rad", value: PublicationType.THESIS }
-];
-
-onMounted(() => {
-    fetchPerson();
-    
-    // Start with no filters selected (show all publications)
-    selectedPublicationTypes.value = [];
-    
-    // Add click outside handler for dropdown
-    document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-    // Clean up event listener
-    document.removeEventListener('click', handleClickOutside);
-});
-
-const fetchPerson = async () => {
-    try {
-        const response = await PersonService.readPerson(
-            parseInt(route.params.id as string)
-        );
+        const snackbar = ref(false);
+        const snackbarMessage = ref("");
         
-        person.value = response.data;
+        const router = useRouter();
+        const currentRoute = useRoute();
 
-        // Set document title
-        document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
+        const person = ref<PersonResponse>();
+        const country = ref<Country>();
 
-        // Set researcher name
-        if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
-            researcherName.value =
-                `${response.data.personName.firstname} (${response.data.personName.otherName}) ${response.data.personName.lastname}`;
-        } else {
-            researcherName.value =
-                `${response.data.personName.firstname} ${response.data.personName.lastname}`;
-        }
+        const publications = ref<DocumentPublicationIndex[]>([]);
+        const totalPublications = ref<number>(0);
+        const page = ref(0);
+        const size = ref(1);
+        const sort = ref("");
+        const direction = ref("");
+        const publicationSearchParams = ref("tokens=*");
+        const publicationsRef = ref<typeof PublicationTableComponent>();
+        const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
+        const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
-        // Fetch employments
-        employments.value = [];
-        if (response.data.employmentIds && response.data.employmentIds.length > 0) {
-            const employmentPromises = response.data.employmentIds.map(employmentId => 
-                InvolvementService.getEmployment(employmentId)
-            );
+        const i18n = useI18n();
+
+        const { isAdmin, isResearcher } = useUserRole();
+
+        const researcherName = ref("");
+
+        const personalInfo = ref<any>({contact: {}});
+        
+        const keywords = ref<MultilingualContent[]>([]);
+        const biography = ref<MultilingualContent[]>([]);
+
+        const employments = ref<Employment[]>([]);
+        const activeEmployments = ref<Employment[]>([]);
+        const education = ref<Education[]>([]);
+        const memberships = ref<Membership[]>([]);
+
+        const canEdit = ref(false);
+
+        const personIndicators = ref<EntityIndicatorResponse[]>([]);
+
+        const loginStore = useLoginStore();
+
+        const researchArea = ref<AssessmentResearchArea>();
+
+        const personAssessments = ref<ResearcherAssessmentResponse[]>([]);
+
+        const assessmentsLoading = ref(false);
+
+        const shouldDisplayCollaborationNetworkFirst = ref(false);
+        const collaborationNetworkRef = ref<HTMLElement>();
+
+        const displaySettings = usePersonChartDisplay(parseInt(currentRoute.params.id as string));
+
+        onMounted(async () => {
+            if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
+                shouldDisplayCollaborationNetworkFirst.value = true;
+                currentTab.value = "collaborationNetwork";
+            }
+
+            if (loginStore.userLoggedIn) {
+                PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEdit.value = response.data;
+                });
+                
+                fetchAssessmentResearchArea();
+            }
+
+            fetchPerson(true);
+            StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
             
-            const employmentResponses = await Promise.all(employmentPromises);
-            employments.value = employmentResponses.map(response => response.data);
-        }
+            fetchIndicators();
+            fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
 
-        // Fetch publications after person data is loaded
-        fetchPublications();
+            selectedPublicationTypes.value.splice(0);
+        });
 
-    } catch (error) {
-        console.error('Error fetching person:', error);
-        router.push({ name: "notFound" });
-    }
-};
+        watch(collaborationNetworkRef, () => {
+            if (collaborationNetworkRef.value) {
+                console.log(collaborationNetworkRef.value)
+                collaborationNetworkRef.value.scrollIntoView({ behavior: "smooth", block: "end" });
 
-const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
-    page.value = nextPage;
-    size.value = pageSize;
-    sort.value = sortField;
-    direction.value = sortDir;
-    fetchPublications();
-};
+                setTimeout(() => {
+                    window.scrollBy({
+                        top: 500,
+                        behavior: "smooth"
+                    });
+                }, 400);
+            }
+        });
 
-const fetchPublications = async () => {
-    if (!person.value?.id) {
-        return;
-    }
+        watch(i18n.locale, () => {
+            populateData();
+        });
 
-    try {
-        // If no filters selected, show all publications
-        const allowedTypes = selectedPublicationTypes.value.length > 0 
-            ? selectedPublicationTypes.value.map(publicationType => publicationType.value)
-            : publicationTypeSr.map(type => type.value);
+        const fetchIndicators = () => {
+            EntityIndicatorService.fetchPersonIndicators(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                personIndicators.value = response.data;
+            });
+        };
 
-        const publicationResponse = await DocumentPublicationService.findResearcherPublications(
-            person.value.id as number,
-            allowedTypes,
-            `${publicationSearchParams.value}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
-        );
-        
-        publications.value = publicationResponse.data.content;
-        totalPublications.value = publicationResponse.data.totalElements;
-    } catch (error) {
-        console.error('Error fetching publications:', error);
-        publications.value = [];
-        totalPublications.value = 0;
-    }
-};
+        const fetchAssessment = (startDate: string, endDate: string) => {
+            assessmentsLoading.value = true;
+            EntityClassificationService.fetchPersonAssessment(parseInt(currentRoute.params.id as string), startDate, endDate).then(response => {
+                personAssessments.value = response.data;
+                assessmentsLoading.value = false;
+            });
+        };
 
-const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
-    publicationSearchParams.value = tokenParams;
-    publicationsRef.value?.setSortAndPageOption([], 1);
-    page.value = 0;
-    sort.value = "";
-    direction.value = "";
-    fetchPublications();
-};
+        const fetchPerson = (switchTab: boolean = false) => {
+            PersonService.readPerson(
+                parseInt(currentRoute.params.id as string)
+            ).then((response) => {
+                person.value = response.data;
 
-const handleSearch = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const searchTerm = target.value.trim();
-    
-    if (searchTerm === '') {
-        publicationSearchParams.value = "tokens=*";
-    } else {
-        publicationSearchParams.value = `tokens=${encodeURIComponent(searchTerm)}`;
-    }
-    
-    // Reset pagination and fetch new results
-    page.value = 0;
-    sort.value = "";
-    direction.value = "";
-    fetchPublications();
-};
+                injectFairSignposting(response.headers as AxiosResponseHeaders);
 
-const togglePublicationType = (type: { title: string, value: PublicationType }) => {
-    const index = selectedPublicationTypes.value.findIndex(t => t.value === type.value);
-    if (index > -1) {
-        selectedPublicationTypes.value.splice(index, 1);
-    } else {
-        selectedPublicationTypes.value.push(type);
-    }
-};
+                document.title = `${person.value.personName.firstname} ${person.value.personName.lastname}`;
 
-const isPublicationTypeSelected = (typeValue: PublicationType): boolean => {
-    return selectedPublicationTypes.value.some(t => t.value === typeValue);
-};
+                if (response.data.personName.otherName !== null && response.data.personName.otherName !== "") {
+                    researcherName.value =
+                        `${response.data.personName.firstname} (${response.data.personName.otherName}) ${response.data.personName.lastname}`;
+                } else {
+                    researcherName.value =
+                        `${response.data.personName.firstname} ${response.data.personName.lastname}`;
+                }
 
-const toggleFilterDropdown = () => {
-    isFilterDropdownOpen.value = !isFilterDropdownOpen.value;
-};
+                keywords.value = person.value.keyword;
+                biography.value = person.value.biography;
 
-const selectAllPublicationTypes = () => {
-    selectedPublicationTypes.value = [...publicationTypeSr];
-};
+                employments.value.splice(0);
+                activeEmployments.value.splice(0);
+                response.data.employmentIds.forEach(employmentId => {
+                    InvolvementService.getEmployment(employmentId).then(response => {
+                        employments.value.push(response.data);
+                        if (!response.data.dateTo) {
+                            activeEmployments.value.push(response.data);
+                        }
+                    });
+                });
 
-const clearAllPublicationTypes = () => {
-    selectedPublicationTypes.value = [];
-};
+                education.value = [];
+                response.data.educationIds.forEach(educationId => {
+                    InvolvementService.getEducation(educationId).then(response => {
+                        education.value.push(response.data);
+                    });
+                });
 
-const removePublicationType = (typeValue: PublicationType) => {
-    const index = selectedPublicationTypes.value.findIndex(t => t.value === typeValue);
-    if (index > -1) {
-        selectedPublicationTypes.value.splice(index, 1);
-    }
-};
+                memberships.value = [];
+                response.data.membershipIds.forEach(membershipId => {
+                    InvolvementService.getMembership(membershipId).then(response => {
+                        memberships.value.push(response.data);
+                    });
+                });
 
-const handleClickOutside = (event: Event) => {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.relative')) {
-        isFilterDropdownOpen.value = false;
-    }
-};
+                fetchPublications(switchTab);                
+                populateData();
+            }).catch(() => {
+                router.push({ name: "notFound" });
+            });
+        };
 
-// Watch for publication type changes
-watch(selectedPublicationTypes, () => {
-    fetchPublications();
-});
+        const fetchAssessmentResearchArea = () => {
+            AssessmentResearchAreaService.readPersonAssessmentResearchArea(parseInt(currentRoute.params.id as string)).then(response => {
+                researchArea.value = response.data;
+            });
+        };
 
-const getKeywordsAsArray = (keywords: MultilingualContent[] | undefined): string[] => {
-    if (!keywords || keywords.length === 0) return [];
-    
-    const content = returnCurrentLocaleContent(keywords);
-    if (!content) return [];
-    
-    return content.split('\n').filter(keyword => keyword.trim().length > 0);
-};
+        const populateData = () => {
+            if (person.value === undefined) {
+                return;
+            }
+
+            personalInfo.value = person.value.personalInfo;
+            personalInfo.value.streetAndNumber = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.streetAndNumber as MultilingualContent[]);
+            personalInfo.value.city = returnCurrentLocaleContent(person.value.personalInfo.postalAddress?.city as MultilingualContent[]);
+
+            fetchAndSetCountryInfo();
+        };
+
+        const fetchAndSetCountryInfo = () => {
+            if (person.value?.personalInfo.postalAddress?.countryId === null) {
+                return;
+            }
+
+            CountryService.readCountry(person.value?.personalInfo.postalAddress?.countryId as number).then((response) => {
+                country.value = response.data;
+                personalInfo.value.country = returnCurrentLocaleContent(response.data.name);
+            });
+        };
+
+        const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
+            page.value = nextPage;
+            size.value = pageSize;
+            sort.value = sortField;
+            direction.value = sortDir;
+            fetchPublications();
+        };
+
+        const fetchPublications = (switchTab: boolean = false) => {
+            if (!person.value?.id) {
+                return;
+            }
+
+            DocumentPublicationService.findResearcherPublications(
+                person.value?.id as number,
+                selectedPublicationTypes.value.map(publicationType => publicationType.value),
+                `${publicationSearchParams.value}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+                .then((publicationResponse) => {
+                    publications.value = publicationResponse.data.content;
+                    totalPublications.value = publicationResponse.data.totalElements;
+
+                    if (switchTab && totalPublications.value > 0 && !shouldDisplayCollaborationNetworkFirst.value) {
+                        currentTab.value = "publications";
+                    } else if (shouldDisplayCollaborationNetworkFirst.value) {
+                        shouldDisplayCollaborationNetworkFirst.value = false;
+                    }
+                }
+            );
+        };
+
+        const searchKeyword = (keyword: string) => {
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons" }});
+        };
+
+        const addExpertiseOrSkillProof = (proof: DocumentFile, expertiseOrSkill: ExpertiseOrSkillResponse) => {
+            DocumentFileService.addExpertiseOrSkillProof(proof, expertiseOrSkill.id as number, person.value?.id as number).then((response => {
+                expertiseOrSkill.proofs?.push(response.data);
+            }));
+        };
+
+        const updateExpertiseOrSkillProof = (expertiseOrSkill: ExpertiseOrSkillResponse, proof: DocumentFile) => {
+            DocumentFileService.updateExpertiseOrSkillProof(proof, person.value?.id as number).then((response) => {
+                if (expertiseOrSkill.proofs) {
+                    expertiseOrSkill.proofs = expertiseOrSkill.proofs.filter(proof => proof.id !== response.data.id);
+                }
+                expertiseOrSkill.proofs?.push(response.data);
+            });
+        };
+
+        const deleteExpertiseOrSkillProof = (expertiseOrSkill: ExpertiseOrSkillResponse, proofId: number) => {
+            DocumentFileService.deleteExpertiseOrSkillProof(proofId, expertiseOrSkill.id as number, person.value?.id as number).then(() => {
+                if (expertiseOrSkill.proofs) {
+                    expertiseOrSkill.proofs = expertiseOrSkill.proofs.filter(proof => proof.id !== proofId);
+                }
+            });
+        };
+
+        const updateKeywords = (updatedKeywords: MultilingualContent[]) => {
+            keywords.value = updatedKeywords;
+            PersonService.updateKeywords(person.value?.id as number, updatedKeywords).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
+        const updateBiography = (updatedBiography: MultilingualContent[]) => {
+            biography.value = updatedBiography;
+            PersonService.updateBiography(person.value?.id as number, updatedBiography).then(() => {
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
+        const updatePersonalInfo = (updatedInfo: PersonalInfo) => {
+            PersonService.updatePersonalInfo(person.value?.id as number, updatedInfo).then(() => {
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
+            });
+        };
+
+        const addInvolvement = (involvement: Education | Membership | Employment) => {
+            if("title" in involvement) {
+                InvolvementService.addEducation(involvement, person.value?.id as number).then(() => {
+                    fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                }).catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
+                });
+            } else if("contributionDescription" in involvement) {
+                InvolvementService.addMembership(involvement, person.value?.id as number).then(() => {
+                    fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                }).catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
+                });
+            } else if("employmentPosition" in involvement) {
+                InvolvementService.addEmployment(involvement, person.value?.id as number).then(() => {
+                    fetchPerson();
+                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                    snackbar.value = true;
+                }).catch(() => {
+                    snackbarMessage.value = i18n.t("genericErrorMessage");
+                    snackbar.value = true;
+                });
+            }
+        };
+
+        const updateNames = async (personMainName: PersonName, otherNames: PersonName[]) => {
+            try {
+                await PersonService.updatePrimaryName(person.value?.id as number, personMainName);
+                await PersonService.updateOtherNames(otherNames, person.value?.id as number);
+
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            } catch (_error) {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            }
+        };
+
+        const selectPrimaryName = (personNameId: number) => {
+            PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {
+                fetchPerson();
+                snackbarMessage.value = i18n.t("updatedSuccessMessage");
+                snackbar.value = true;
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
+        const migrateToUnmanaged = () => {
+            dialogRef.value?.toggle();
+        };
+
+        const performMigrationToUnmanaged = () => {
+            PersonService.migrateToUnmanagedResearcher(person.value?.id as number).then(() => {
+                router.push({name:"persons"});
+            }).catch(error => {
+                if (error.response.status === 409) {
+                    snackbarMessage.value = i18n.t("researcherBindedMessage");
+                    snackbar.value = true;
+                }
+            });
+        };
+
+        const performNavigation = (pageName: string) => {
+            router.push({name: pageName});
+        };
+
+        const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
+            publicationSearchParams.value = tokenParams;
+            publicationsRef.value?.setSortAndPageOption([], 1);
+            page.value = 0;
+            sort.value = "";
+            direction.value = "";
+            fetchPublications();
+        };
+
+        watch(selectedPublicationTypes, () => {
+            fetchPublications();
+        });
+
+        return {
+            researcherName, person, personalInfo, keywords, loginStore, researchArea,
+            biography, publications,  totalPublications, switchPage, searchKeyword,
+            returnCurrentLocaleContent, canEdit, employments, education, memberships,
+            addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
+            updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
+            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
+            currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
+            dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
+            fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
+            ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
+            getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
+            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments,
+            collaborationNetworkRef, displaySettings
+        };
+}});
 </script>
 
 <style scoped>
-.font-serif {
-    font-family: 'Georgia', 'Times New Roman', serif;
-}
 
-.prose {
-    color: inherit;
-}
-
-.prose p {
-    margin-bottom: 1rem;
-}
-
-.prose p:last-child {
-    margin-bottom: 0;
-}
-
-/* Responsive publication type filters */
-@media (max-width: 640px) {
-    .flex.flex-wrap.gap-2 {
-        gap: 0.5rem;
+    #researcher .response {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        font-weight: bold;
     }
-    
-    .flex.flex-wrap.gap-2 button {
-        font-size: 0.75rem;
-        padding: 0.5rem 0.75rem;
+
+    .edit-pen-container {
+        position:relative;
     }
-}
 
-@media (max-width: 480px) {
-    .flex.flex-wrap.gap-2 {
-        gap: 0.25rem;
+    .edit-pen-container .edit-pen {
+        top: 0px;
+        right: 0px;
+        position: absolute;
+        z-index: 10;
+        opacity: 0;
     }
-    
-    .flex.flex-wrap.gap-2 button {
-        font-size: 0.7rem;
-        padding: 0.375rem 0.5rem;
-        min-width: fit-content;
+
+    .edit-pen-container:hover .edit-pen {
+        opacity: 0.3;
     }
-}
 
-/* Dropdown positioning and styling */
-.relative {
-    position: relative;
-}
+    .edit-pen-container .edit-pen:hover {
+        opacity: 1;
+    }
 
-.absolute {
-    position: absolute;
-}
+    .publication-type-select {
+        max-width: 500px;
+    }
 
-.z-50 {
-    z-index: 50;
-}
-
-/* Ensure dropdown appears above other content */
-.absolute.top-full {
-    z-index: 9999;
-}
-
-/* Smooth transitions for dropdown */
-.transition-all {
-    transition: all 0.2s ease-in-out;
-}
-
-/* Hover effects for better interactivity */
-.hover\:bg-slate-50:hover {
-    background-color: #f8fafc;
-}
-
-.hover\:bg-blue-50:hover {
-    background-color: #eff6ff;
-}
-
-.hover\:bg-red-50:hover {
-    background-color: #fef2f2;
-}
 </style>

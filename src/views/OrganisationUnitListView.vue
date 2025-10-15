@@ -1,6 +1,8 @@
 <template>
     <div class="container py-4 px-4 mx-auto">
-        <h1 class="text-2xl font-bold mb-4">{{ $t("ouListLabel") }}</h1>
+        <h1 class="text-2xl font-bold mb-4">
+            {{ $t("ouListLabel") }}
+        </h1>
         
         <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">
             <v-checkbox
@@ -28,7 +30,7 @@
             :endpoint-token-parameters="[searchParams, returnOnlyInstitutionRelatedEntities ? String(loggedInUser?.organisationUnitId) : 'null']"
             @switch-page="switchPage">
             <template #top-left>
-                <search-bar-component @search="clearSortAndPerformSearch($event)" :transparent="false" size="small"></search-bar-component>
+                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
             </template>
             <template #actions>
                 <v-btn v-if="isAdmin" color="primary" prepend-icon="mdi-plus" @click="addOU">
