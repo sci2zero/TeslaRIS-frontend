@@ -863,7 +863,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "organisationUnits" }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "organisationUnits", search: "simple" }});
         };
 
         const updateSuccess = () => {

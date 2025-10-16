@@ -1044,7 +1044,7 @@ export default {
     showByCurrentEmploymentsLabel: "Prikaži od trenutno zaposlenih",
     creatingExportLabel: "Izvoz podataka u toku...",
     thesisTypeNotAllowedMessage: "Ovaj tip završnog rada nije dozvoljen za ovu instituciju.",
-    visualizationsLabel: "Vizuelizacije",
+    visualizationsLabel: "Vizuelna analitika",
     totalPublicationsLabel: "Ukupan broj publikacija",
     numberOfPublicationsYearlyLabel: "Broj publikacija po godinama",
     numberOfPublicationsByTypeAndYearLabel: "Broj publikacija po tipu, po godinama",
@@ -1093,8 +1093,8 @@ export default {
     startingDownloadLabel: "Započinjem preuzimanje...",
     downloadCompleteLabel: "Preuzimanje završeno!",
     downloadingLabel: "Preuzimanje...",
-    leaderboardsLabel: "Rang liste",
-    citationCountLabel: "Broj citata",
+    leaderboardsLabel: "Lideri",
+    citationCountLabel: "Citiranost",
     totalCitationsLabel: "Ukupan broj citata",
     numberOfCitationsYearlyLabel: "Broj citata po godinama",
     personPublicationCountLeaderboardLabel: "Top istraživači po broju publikacija",
@@ -1103,9 +1103,9 @@ export default {
     subUnitPublicationCountLeaderboardLabel: "Top pod-institucije po broju publikacija",
     subUnitCitationCountLeaderboardLabel: "Top pod-institucije po broju citata",
     subUnitAssessmentPointsLeaderboardLabel: "Top pod-institucije po broju M-poena",
-    publicationCountLeaderboardLabel: "Po broju publikacija",
-    citationCountLeaderboardLabel: "Po broju citata",
-    assessmentPointsLeaderboardLabel: "Po broju M-poena",
+    publicationCountLeaderboardLabel: "Publikacije",
+    citationCountLeaderboardLabel: "Citati",
+    assessmentPointsLeaderboardLabel: "M-poeni",
     reharvestCitationIndicatorsLabel: "Ponovo učitaj podatke o citiranosti",
     mostCitedResearchersLabel: "Najviše citirani istraživači (po Open Alex-u)",
     mostCitedInstitutionsLabel: "Najviše citirane org. jedinice (po Open Alex-u)",
@@ -1156,4 +1156,5 @@ export default {
             viewAll: "Pregledaj sve publikacije"
         }
     }
+    participationsLabel: "Učešća/Participacije"
 }

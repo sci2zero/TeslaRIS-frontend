@@ -43,6 +43,19 @@ export const getPublicationTypeTitleFromValueAutoLocale = (value: PublicationTyp
     return (publicationTypeArray.find(item => item.value === value) || {}).title;
 };
 
+export const getPublicationTypeValueFromTitleAutoLocale = (title: string) => {
+    const locale = i18n.vueI18n.global.locale;
+
+    let publicationTypeArray = publicationTypeEn;
+    if (locale == "sr") {
+        publicationTypeArray = publicationTypeSr;
+    } else if (locale == "sr-cyr") {
+        publicationTypeArray = transliterateContentToCyrillic(publicationTypeSr);
+    }
+
+    return (publicationTypeArray.find(item => item.title === title) || {}).value;
+};
+
 export const getPublicationTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":

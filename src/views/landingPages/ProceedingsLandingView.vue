@@ -192,14 +192,14 @@
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
-            <v-tab value="additionalInfo">
-                {{ $t("additionalInfoLabel") }}
-            </v-tab>
             <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
             </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
+            </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-if="documentIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -222,6 +222,23 @@
                     show-publication-concrete-type
                     @switch-page="switchPage">
                 </publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-document-contribution-tabs
+                    :document-id="proceedings?.id"
+                    :contribution-list="proceedings?.contributions ? proceedings?.contributions : []"
+                    :read-only="!canEdit"
+                    shows-board-and-reviewers
+                    @update="updateContributions">
+                </person-document-contribution-tabs>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="documents">
+                <attachment-section
+                    :document="proceedings"
+                    :can-edit="canEdit"
+                    :proofs="proceedings?.proofs"
+                    :file-items="proceedings?.fileItems">
+                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -246,23 +263,6 @@
                     is-remark
                     @update="updateRemark"
                 />
-            </v-tabs-window-item>
-            <v-tabs-window-item value="contributions">
-                <person-document-contribution-tabs
-                    :document-id="proceedings?.id"
-                    :contribution-list="proceedings?.contributions ? proceedings?.contributions : []"
-                    :read-only="!canEdit"
-                    shows-board-and-reviewers
-                    @update="updateContributions">
-                </person-document-contribution-tabs>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="documents">
-                <attachment-section
-                    :document="proceedings"
-                    :can-edit="canEdit"
-                    :proofs="proceedings?.proofs"
-                    :file-items="proceedings?.fileItems">
-                </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -492,7 +492,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications" }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
         const goToURL = (uri: string) => {

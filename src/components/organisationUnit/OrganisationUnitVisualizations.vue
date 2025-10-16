@@ -15,6 +15,7 @@
                 class="mr-2"
                 :min="minYear"
                 :max="min([maxYear, toYear])"
+                @update:model-value="handleYearChange"
             ></v-text-field>
         </v-col>
         <v-col cols="5">
@@ -27,6 +28,7 @@
                 :label="$t('toLabel')"
                 :min="max([minYear, fromYear])"
                 :max="maxYear"
+                @update:model-value="handleYearChange"
             ></v-text-field>
         </v-col>
     </v-row>
@@ -61,10 +63,7 @@
         align-tabs="start"
     >
         <v-tab v-show="displayPublicationsTab" value="publicationCount">
-            {{ $t("numberOfPublicationsLabel") }}
-        </v-tab>
-        <v-tab v-show="displayTypeRatiosTab" value="publicationType">
-            {{ $t("publicationTypesLabel") }}
+            {{ $t("publicationsLabel") }}
         </v-tab>
         <v-tab v-show="displayStatisticsTab" value="statistics">
             {{ $t("statisticsLabel") }}
@@ -98,12 +97,24 @@
             </v-row>
             <v-row>
                 <v-col
+                    v-if="displaySettings?.publicationTypeRatio.display"
+                    cols="12" :md="displaySettings?.publicationTypeRatio.spanWholeRow ? 12 : 6">
+                    <pie-chart
+                        :data="publicationTypeRatioData"
+                        :title="$t('publicationTypeRatioLabel')"
+                        :donut="true"
+                        :show-percentage="true"
+                        @list-publications="showPublicationListModalPie"
+                    />
+                </v-col>
+                <v-col
                     v-if="displaySettings?.publicationTypeByYear.display"
                     cols="12" :md="displaySettings?.publicationTypeByYear.spanWholeRow ? 12 : 6">
                     <stacked-bar-chart
                         :data="publicationsYearTypeData"
                         :title="$t('numberOfPublicationsByTypeAndYearLabel')"
                         :y-label="$t('countLabel')"
+                        @list-publications="showPublicationListModalBar"
                     />
                 </v-col>
             </v-row>
@@ -116,20 +127,6 @@
                         :title="$t('numberOfPublicationsByMCategoryAndYearLabel')"
                         :subtitle="$t('commissionLabel') + ': ' + mCategoryCounts.commissionName"
                         :y-label="$t('countLabel')"
-                    />
-                </v-col>
-            </v-row>
-        </v-tabs-window-item>
-        <v-tabs-window-item value="publicationType">
-            <v-row class="mt-10 d-flex justify-center">
-                <v-col
-                    v-if="displaySettings?.publicationTypeRatio.display"
-                    cols="12" :md="displaySettings?.publicationTypeRatio.spanWholeRow ? 8 : 6">
-                    <pie-chart
-                        :data="publicationTypeRatioData"
-                        :title="$t('publicationTypeRatioLabel')"
-                        :donut="true"
-                        :show-percentage="true"
                     />
                 </v-col>
             </v-row>
@@ -188,6 +185,14 @@
             </v-row>
         </v-tabs-window-item>
     </v-tabs-window>
+
+    <person-visualization-publications
+        ref="publicationsViewRef"
+        :institution-id="organisationUnitId"
+        :publication-type="publicationType"
+        :year-from="fromYearList"
+        :year-to="toYearList"
+    />
 </template>
 
 <script setup lang="ts">
@@ -208,6 +213,8 @@ import { max, min } from 'lodash';
 import DatePicker from '../core/DatePicker.vue';
 import { localiseDate } from '@/utils/DateUtil';
 import { type OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
+import lodash from "lodash";
+import PersonVisualizationPublications from '../person/PersonVisualizationPublications.vue';
 
 
 const props = defineProps({
@@ -257,7 +264,12 @@ const maxYear = ref(0);
 const startDate = ref<string>("");
 const endDate = ref<string>("");
 
-watch([fromYear, toYear], () => {
+const publicationType = ref();
+const fromYearList = ref<number>(0);
+const toYearList = ref<number>(0);
+const publicationsViewRef = ref<typeof PersonVisualizationPublications>();
+
+const handleYearChange = lodash.debounce(() => {
     if (watchDates.value) {
         if (fromYear.value < minYear.value) {
             fromYear.value = minYear.value;
@@ -283,7 +295,7 @@ watch([fromYear, toYear], () => {
     } else if(initialDatesSet.value) {
         watchDates.value = true;
     }
-});
+}, 500);
 
 watch([startDate, endDate], () => {
     if (!startDate.value || !endDate.value) {
@@ -459,6 +471,26 @@ const deduceStartTab = () => {
         currentTab.value = "publicationType";
     } else if (props.displayStatisticsTab) {
         currentTab.value = "statistics";
+    }
+};
+
+const showPublicationListModalPie = (sectionType: any) => {
+    if (publicationsViewRef.value) {
+        publicationType.value = sectionType;
+        fromYearList.value = fromYear.value;
+        toYearList.value = toYear.value;
+
+        publicationsViewRef.value.toggle();
+    }
+};
+
+const showPublicationListModalBar = (sectionType: any, year: number) => {
+    if (publicationsViewRef.value) {
+        publicationType.value = sectionType;
+        fromYearList.value = year;
+        toYearList.value = year;
+
+        publicationsViewRef.value.toggle();
     }
 };
 

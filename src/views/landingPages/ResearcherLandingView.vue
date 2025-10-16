@@ -244,9 +244,6 @@
             <v-tab value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab value="collaborationNetwork">
-                {{ $t("collaborationNetworkLabel") }}
-            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -411,13 +408,6 @@
                     :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item value="collaborationNetwork">
-                <div ref="collaborationNetworkRef">
-                    <person-collaboration-network
-                        :person-id="(person.id as number)"
-                    />
-                </div>
-            </v-tabs-window-item>
         </v-tabs-window>
 
         <persistent-question-dialog
@@ -486,13 +476,12 @@ import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
-import PersonCollaborationNetwork from '@/components/person/PersonCollaborationNetwork.vue';
 import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, PersonCollaborationNetwork },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -548,14 +537,13 @@ export default defineComponent({
         const assessmentsLoading = ref(false);
 
         const shouldDisplayCollaborationNetworkFirst = ref(false);
-        const collaborationNetworkRef = ref<HTMLElement>();
 
         const displaySettings = usePersonChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(async () => {
             if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
                 shouldDisplayCollaborationNetworkFirst.value = true;
-                currentTab.value = "collaborationNetwork";
+                currentTab.value = "visualizations";
             }
 
             if (loginStore.userLoggedIn) {
@@ -573,20 +561,6 @@ export default defineComponent({
             fetchAssessment("1970-01-01", ((new Date()).toISOString()).split("T")[0]);
 
             selectedPublicationTypes.value.splice(0);
-        });
-
-        watch(collaborationNetworkRef, () => {
-            if (collaborationNetworkRef.value) {
-                console.log(collaborationNetworkRef.value)
-                collaborationNetworkRef.value.scrollIntoView({ behavior: "smooth", block: "end" });
-
-                setTimeout(() => {
-                    window.scrollBy({
-                        top: 500,
-                        behavior: "smooth"
-                    });
-                }, 400);
-            }
         });
 
         watch(i18n.locale, () => {
@@ -722,7 +696,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons" }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons", search: "simple" }});
         };
 
         const addExpertiseOrSkillProof = (proof: DocumentFile, expertiseOrSkill: ExpertiseOrSkillResponse) => {
@@ -881,8 +855,7 @@ export default defineComponent({
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
-            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments,
-            collaborationNetworkRef, displaySettings
+            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings
         };
 }});
 </script>

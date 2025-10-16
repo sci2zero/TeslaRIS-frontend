@@ -1039,7 +1039,7 @@ export default {
     updateInstitutionDefaultSubmissionContentLabel: "Default submission content",
     creatingExportLabel: "Data export in progress...",
     thesisTypeNotAllowedMessage: "This thesis type is not allowed for this institution.",
-    visualizationsLabel: "Visualizations",
+    visualizationsLabel: "Visual analytics",
     totalPublicationsLabel: "Total publication count",
     numberOfPublicationsYearlyLabel: "Publication count by year",
     numberOfPublicationsByTypeAndYearLabel: "Publication count by year and type",
@@ -1097,9 +1097,9 @@ export default {
     subUnitPublicationCountLeaderboardLabel: "Top sub-units by publication count",
     subUnitCitationCountLeaderboardLabel: "Top sub-units by citation count",
     subUnitAssessmentPointsLeaderboardLabel: "Top sub-units by assessment point count",
-    publicationCountLeaderboardLabel: "By publication count",
-    citationCountLeaderboardLabel: "By citation count",
-    assessmentPointsLeaderboardLabel: "By assessment point count",
+    publicationCountLeaderboardLabel: "Publications",
+    citationCountLeaderboardLabel: "Citations",
+    assessmentPointsLeaderboardLabel: "Assessment points",
     reharvestCitationIndicatorsLabel: "Reharvest citation indicators",
     mostCitedResearchersLabel: "Most cited researchers (by Open Alex)",
     mostCitedInstitutionsLabel: "Most cited org. units (by Open Alex)",
@@ -1150,4 +1150,5 @@ export default {
             viewAll: "View all publications"
         }
     }
+    participationsLabel: "Participations"
 }
