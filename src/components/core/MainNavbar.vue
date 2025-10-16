@@ -1,0 +1,283 @@
+<template>
+    <div id="navbar" :class="navbarClasses">
+        <div class="wide-container flex-wrap toolbar-container px-4">
+            <div class="flex">
+                <v-btn
+                    :icon="sidebarStore.isVisible ? 'mdi-menu-open' : 'mdi-menu'"
+                    variant="text"
+                    :color="variant === 'general' ? '#000' : '#fff'"
+                    class="mr-4 hover:bg-gray-100 transition-colors"
+                    aria-label="Toggle menu"
+                    @click="toggleSidebar"
+                >
+                </v-btn>
+            </div>
+
+            <v-spacer></v-spacer>
+
+            <div class="flex items-center gap-1">
+                <template v-for="(item, index) in menuItems">
+                    <template v-if="item.type == 'divider'">
+                        <v-divider
+                            :key="index" inset class="ms-2" vertical
+                            :color="variant === 'general' ? '#000' : 'white'"></v-divider>
+                    </template>
+                    <template v-else-if="item.type == 'lang_component'">
+                        <component :is="item.component" :key="index" :variant="variant"></component>
+                    </template>
+                    <template v-else-if="item.type == 'notification_component' && item.condition">
+                        <component :is="item.component" :key="index" :variant="variant"></component>
+                    </template>
+                    <template v-else-if="item.type == 'user_profile'">
+                        <span :key="index">
+                            <router-link
+                                v-if="item.condition"
+                                :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                                :class="[
+                                    'user-profile-link flex items-center px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer',
+                                    variant === 'general' 
+                                        ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100' 
+                                        : 'text-white hover:text-gray-200 hover:bg-white/10'
+                                ]">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <v-avatar size="32" color="primary" class="text-white">
+                                            <v-icon size="20">
+                                                {{ item.icon }}
+                                            </v-icon>
+                                        </v-avatar>
+                                    </div>
+                                    <div class="hidden sm:flex flex-col min-w-0">
+                                        <span class="text-sm font-medium truncate">
+                                            {{ userName }}
+                                        </span>
+                                        <span class="text-xs opacity-75 truncate">
+                                            {{ userRole ? getTitleFromValueAutoLocale(userRole as string) : 'User' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </router-link>
+                        </span>
+                    </template>
+                    <template v-else-if="item.type == 'icon'">
+                        <v-btn
+                            v-if="item.condition == undefined || item.condition"
+                            :key="index"
+                            size="small"
+                            :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                            :variant="item.variant" :color="variant === 'general' ? '#222' : '#fff'" class="no-uppercase"
+                            :icon="item.type == 'icon'"
+                            exact
+                            @click="item.click"
+                        >
+                            <v-icon v-if="item.icon" left :class="variant === 'general' ? 'text-dark' : 'dark'">
+                                {{ item.icon }}
+                            </v-icon>
+                            <template v-if="item.type != 'icon'">
+                                {{ item.title }}
+                            </template>
+                        </v-btn>
+                    </template>
+                            
+                    <template v-else>
+                        <router-link
+                            v-if="item.condition" :key="index"
+                            :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
+                            variant="text"
+                                
+                            :class="[
+                                'hover:text-gray-200 cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center',
+                                variant === 'general' 
+                                    ? 'text-dark hover:text-gray-700' 
+                                    : 'text-white hover:text-gray-200'
+                            ]"
+                            @click="item.click">
+                            <v-badge :content="item.badge" :model-value="false">
+                                <v-icon left :class="variant === 'general' ? 'text-dark' : 'text-white'">
+                                    {{ item.icon }}
+                                </v-icon>
+                            </v-badge>
+                            <span v-if="item.type != 'icon'" class="d-none d-md-flex ml-2">
+                                {{ item.title }}
+                            </span>
+                        </router-link>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import LangChangeItem from './LangChangeItem.vue';
+import UserService from "@/services/UserService";
+import AuthenticationService from '@/services/AuthenticationService';
+import { computed, onMounted, watch } from 'vue';
+import { useLoginStore } from '@/stores/loginStore';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useI18n } from "vue-i18n";
+import type { ComputedRef, Ref } from 'vue';
+import type { Component } from 'vue';
+import { shallowRef } from 'vue';
+import NotificationItem from './NotificationItem.vue';
+import PersonService from "@/services/PersonService";
+import { getTitleFromValueAutoLocale } from '@/i18n/userType';
+import BrandingService from '@/services/BrandingService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { useUserRole } from '@/composables/useUserRole';
+import { useBrandingStore } from '@/stores/brandingStore';
+
+import { useSidebarStore } from '@/stores/sidebarStore';
+
+interface MenuItem {
+    title?: ComputedRef<string> | string | undefined;
+    pathName?: string;
+    click?: () => void;
+    icon?: string;
+    type: string;
+    condition?: Ref<boolean> | boolean;
+    badge?: Ref<number> | number;
+    variant?: 'text' | 'outlined' | 'flat' | 'elevated' | 'tonal' | 'plain';
+    color?: string;
+    subItems?: MenuItem[] | Ref<MenuItem[]>;
+    component?: Component;
+    dynamicValue?: ComputedRef;
+}
+
+interface Props {
+    variant?: 'general' | 'home';
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    variant: 'home'
+});
+
+const appTitle = ref("");
+
+const navbarClasses = computed(() => {
+    return {
+        'navbar-general': props.variant === 'general',
+        'navbar-home': props.variant === 'home'
+    };
+});
+
+const langChangeItem = shallowRef(LangChangeItem);
+const notificationItem = shallowRef(NotificationItem);
+
+const { isCommission, isUserBoundToOU } = useUserRole();
+
+const i18n = useI18n();
+const personId = ref(-1);
+const commissionId = ref(-1);
+const institutionId = ref(-1);
+
+
+
+const loginTitle = computed(() => i18n.t("loginLabel"));
+
+
+const brandingStore = useBrandingStore();
+const loginStore = useLoginStore();
+const sidebarStore = useSidebarStore();
+const userName = ref("");
+const router = useRouter();
+
+const populateUserData = () => {
+    UserService.getLoggedInUser().then((response) => {
+        userName.value = response.data.firstname + " " + response.data.lastName;
+
+        if (isCommission.value) {
+            commissionId.value = response.data.commissionId;
+        }
+
+        if (isUserBoundToOU.value) {
+            institutionId.value = response.data.organisationUnitId;
+        }
+    });
+    PersonService.getPersonId().then(response => {
+        if (response.data) {
+            personId.value = response.data;
+        }
+    });
+};
+
+const logout = () => {
+    AuthenticationService.logoutUser();
+    loginStore.explicitlyLogout();
+    router.push({ name: "login" });
+};
+
+const toggleSidebar = () => {
+    sidebarStore.toggle();
+};
+
+watch(() => brandingStore.rebranded, () => {
+    if (brandingStore.rebranded) {
+        appTitle.value = returnCurrentLocaleContent(brandingStore.newTitle) as string;
+        brandingStore.rebrandingHandled();
+    }
+});
+
+watch(() => loginStore.userLoggedIn, () => {
+    if (loginStore.userLoggedIn) {
+        populateUserData();
+    }
+});
+
+watch(() => loginStore.reloadUserName, () => {
+    if (loginStore.reloadUserName) {
+        populateUserData();
+        loginStore.emitUsernameReloaded();
+    }
+});
+
+onMounted(() => {
+    BrandingService.fetchBrandingInfo().then((response) => {
+        appTitle.value = returnCurrentLocaleContent(response.data.title) as string;
+    });
+
+    if (AuthenticationService.userLoggedIn()) {
+        populateUserData();
+    }
+});
+
+const menuItems = ref<MenuItem[]>([
+    { title: undefined, type: 'lang_component', icon: 'mdi-web', condition: true, component: langChangeItem },
+    { type: 'divider' },
+    { title: undefined, type: 'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
+    // { title: registerLabel, type: 'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
+    { title: loginTitle.value, type: 'icon-link', pathName: `login`, icon: 'mdi-login', condition: !loginStore.userLoggedIn, variant: 'outlined', color: 'primary' },
+    { type: 'user_profile', pathName: 'user-profile', icon: 'mdi-account', condition: loginStore.userLoggedIn },
+    { title: undefined, type: 'icon', variant: 'text', click: logout, icon: 'mdi-logout', condition: loginStore.userLoggedIn }
+]);
+</script>
+
+<style scoped>
+@reference "@/assets/main.css";
+
+.app-title {
+    cursor: pointer;
+}
+
+.toolbar-container {
+    min-height: 64px;
+}
+
+.lowered {
+    margin-top: 10px;
+}
+
+.navbar-general {
+    @apply bg-white text-black shadow-sm border-b border-gray-200;
+}
+
+.navbar-home {
+    /* Keep current styling */
+}
+
+
+.user-profile-link:hover {
+    transform: translateY(-1px);
+}
+</style>

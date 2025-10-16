@@ -138,6 +138,7 @@ export default {
     organisationUnitLabel: "Organizaciona Jedinica",
     roleLabel: "Uloga",
     actionLabel: "Akcija",
+    optionsLabel: "Opcije",
     actionFailedNotification: "Došlo je do greške, osvežite stranicu i pokušajte ponovo.",
     successfulltUpdatedNotification: "Uspešno ažurirano",
     userDidNotAllowNotification: "Korisnik nije dozvolio ovu operaciju.",
@@ -149,6 +150,7 @@ export default {
     superOULabel: "Organizaciona nad-jedinica",
     birthdateLabel: "Datum rođenja",
     placeOfBirthLabel: "Mesto rođenja",
+    identifiersLabel: "Identifikatori",
     employmentColumn: "employmentsSr",
     resources: "Resursi",
     manage: "Upravljanje",
@@ -163,6 +165,8 @@ export default {
     nameAbbreviationLabel: "Skraćenica Imena",
     keywordsLabel: "Ključne reči",
     authorNamesLabel: "Autori",
+    showMoreAuthorsLabel: "Prikaži još {count}...",
+    showLessLabel: "Prikaži manje",
     researchAreasLabel: "Oblasti Istraživanja",
     researchAreaLabel: "Oblast Istraživanja",
     nameColumn: "nameSr",
@@ -192,6 +196,7 @@ export default {
     publisherLabel: "Izdavač",
     simpleSearchLabel: "Pretraga",
     advancedSearchLabel: "Napredna pretraga",
+    backToSimpleSearchLabel: "Nazad na osnovnu pretragu",
     saveLabel: "Sačuvaj",
     saveAndAddAnotherLabel: "Sačuvaj i dodaj novo",
     userProfileLabel: "Korisnički profil",
@@ -423,6 +428,7 @@ export default {
     eCrisIdFormatError: "Pogrešan format eCRIS ID-a.",
     eNaukaIdFormatError: "Pogrešan format eNauka ID-a.",
     orcidIdFormatError: "Pogrešan format ORCID ID-a.",
+    identifierCopiedNotification: "Identifikator {identifier} je kopiran u clipboard.",
     scopusAuthorIdFormatError: "Pogrešan format Scopus Author ID-a.",
     apvntExistsError: "APVNT je već u upotrebi.",
     eCrisIdExistsError: "eCRIS ID je već u upotrebi.",
@@ -730,6 +736,8 @@ export default {
     boardPresidentsLabel: "Predsednici komisije",
     searchLabel: "Pretraži",
     filtersLabel: "Filteri",
+    filterLabel: "Filter",
+    filterActiveLabel: "Filter aktivan",
     onlyOpenAccessLabel: "Samo javno dostupno",
     fieldLabel: "Polje",
     operationLabel: "Operacija",
@@ -751,6 +759,10 @@ export default {
     exportColumnsLabel: "Kolone za izvoz",
     pageLabel: "Broj Stranice (izvozi se u stranicama od po {0} slogova)",
     exportLabel: "Izvezi",
+    itemSelected: "stavka izabrana",
+    itemsSelected: "stavki izabrano",
+    actions: "Akcije",
+    tryAdjustingFilters: "Pokušajte da prilagodite filtere pretrage",
     promotionListLabel: "Promocije",
     createNewPromotionLabel: "Kreiraj novu promociju",
     dateTimeLabel: "Datum i vreme",
@@ -1120,6 +1132,30 @@ export default {
     updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
     spanWholeRowLabel: "Raspon na celi red",
     positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0.",
+    loading: "Učitavanje...",
+    citations: "citata",
+    footer: {
+        quickLinks: "Brzi linkovi",
+        contact: "Kontakt podaci",
+        location: "Novi Sad, Srbija",
+        allRightsReserved: "Sva prava zadržana"
+    },
+    landingFeatures: {
+        title: "Istaknuti resursi",
+        subtitle: "Najcitiraniji istraživači, institucije i naučni rezultati",
+        topResearchers: {
+            title: "Najcitiraniji istraživači",
+            viewAll: "Pregledaj sve istraživače"
+        },
+        topInstitutions: {
+            title: "Najcitiranije institucije",
+            viewAll: "Pregledaj sve institucije"
+        },
+        topPublications: {
+            title: "Najcitiranije publikacije",
+            viewAll: "Pregledaj sve publikacije"
+        }
+    },
     participationsLabel: "Učešća/Participacije",
     documentCitationCountLeaderboardLabel: "Top publikacije po broju citata",
     personViewCountsLeaderboardLabel: "Top istraživači po pregledima",

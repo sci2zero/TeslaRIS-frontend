@@ -1,47 +1,148 @@
 <template>
-    <v-btn
-        v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
-        density="compact" class="bottom-spacer"
-        :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
-        @click="deleteSelection">
-        {{ $t("deleteLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="showsResearchOutputs && canRemoveResearchOutputs"
-        density="compact" class="bottom-spacer" :disabled="selectedPublications.length === 0"
-        @click="removeResearchOutputs">
-        {{ $t("removeLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="(isAdmin || allowComparison) && !inComparator" density="compact" class="compare-button"
-        :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
-        @click="startMetadataComparison">
-        {{ $t("compareMetadataLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="isAdmin && !inComparator" density="compact" class="compare-button"
-        :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
-        @click="startPublicationComparison">
-        {{ $t("comparePublicationsLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="validationView"
-        class="compare-button"
-        density="compact"
-        :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.isApproved === true)"
-        @click="validateSectionForAll(true)">
-        {{ $t("validateMetadataLabel") }}
-    </v-btn>
-    <v-btn
-        v-if="validationView"
-        class="compare-button"
-        density="compact"
-        :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.areFilesValid === true)"
-        @click="validateSectionForAll(false)">
-        {{ $t("validateUploadedFilesLabel") }}
-    </v-btn>
+    <div class="flex justify-between mb-2">
+        <div class="flex items-center gap-2">
+            <div v-if="selectedPublications.length > 0" class="action-menu-container">
+                <v-menu offset-y>
+                    <template #activator="{ props }">
+                        <v-btn
+                            v-bind="props"
+                            color="white"
+                            variant="elevated"
+                            height="48"
+                            prepend-icon="mdi-dots-vertical"
+                            class="action-menu-trigger"
+                        >
+                            {{ $t("actions") }} <template v-if="selectedPublications.length > 0">
+                                ({{ selectedPublications.length }})
+                            </template>
+                        </v-btn>
+                    </template>
+
+                    <v-list class="action-menu-list" density="compact">
+                        <v-list-item
+                            v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
+                            :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
+                            class="action-menu-item"
+                            @click="deleteSelection"
+                        >
+                            <template #prepend>
+                                <v-icon color="error" size="18">
+                                    mdi-delete
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("deleteLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item
+                            v-if="showsResearchOutputs && canRemoveResearchOutputs"
+                            :disabled="selectedPublications.length === 0"
+                            class="action-menu-item"
+                            @click="removeResearchOutputs"
+                        >
+                            <template #prepend>
+                                <v-icon color="warning" size="18">
+                                    mdi-playlist-remove
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("removeLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item
+                            v-if="(isAdmin || allowComparison) && !inComparator"
+                            :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
+                            class="action-menu-item"
+                            @click="startMetadataComparison"
+                        >
+                            <template #prepend>
+                                <v-icon color="info" size="18">
+                                    mdi-database-search
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("compareMetadataLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item
+                            v-if="isAdmin && !inComparator"
+                            :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
+                            class="action-menu-item"
+                            @click="startPublicationComparison"
+                        >
+                            <template #prepend>
+                                <v-icon color="info" size="18">
+                                    mdi-file-compare
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("comparePublicationsLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item
+                            v-if="validationView"
+                            :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.isApproved === true)"
+                            class="action-menu-item"
+                            @click="validateSectionForAll(true)"
+                        >
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-check-decagram
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("validateMetadataLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item
+                            v-if="validationView"
+                            :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.areFilesValid === true)"
+                            class="action-menu-item"
+                            @click="validateSectionForAll(false)"
+                        >
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-file-check
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("validateUploadedFilesLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item
+                            v-if="enableExport"
+                            class="action-menu-item"
+                            @click="openExportModal"
+                        >
+                            <template #prepend>
+                                <v-icon color="success" size="18">
+                                    mdi-download
+                                </v-icon>
+                            </template>
+                            <v-list-item-title class="text-body-2">
+                                {{ $t("exportLabel") }}
+                            </v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </div>
+            <div :class="[selectedPublications.length > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
+                <slot name="top-left"></slot>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <slot name="actions"></slot>
+        </div>
+    </div>
     <table-export-modal
         v-if="enableExport"
+        ref="exportModal"
         :export-entity="exportEntity"
         :export-ids="(selectedPublications.map(publication => publication.databaseId) as number[])"
         :disabled="selectedPublications.length === 0"
@@ -49,10 +150,11 @@
         :total-results="totalPublications"
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
-        :endpoint-body-parameters="endpointBodyParameters">
+        :endpoint-body-parameters="endpointBodyParameters"
+        :hide-activation-button="true">
     </table-export-modal>
 
-    <div ref="tableWrapper">
+    <div ref="tableWrapper" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <v-data-table-server
             v-model="selectedPublications"
             :sort-by="tableOptions.sortBy"
@@ -66,9 +168,41 @@
             :items-per-page-options="[5, 10, 25, 50]"
             :page="tableOptions.page"
             @update:options="refreshTable">
+            <template #[`header.`+titleColumn]="{ isSorted, column, toggleSort, getSortIcon }">
+                <div class="flex items-center gap-2 sm:gap-8 md:gap-12 lg:gap-16">
+                    <div class="group flex items-center gap-2" @click.stop="toggleSort(column)">
+                        <span>{{ column.title }}</span>
+                        <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                    </div>
+
+                    <div class="group flex items-center gap-2 px-2 py-4" @click.stop="toggleSort(yearHeader)">
+                        <span>{{ yearHeader.title }}</span>
+                        <v-icon class="" :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)"></v-icon>
+                    </div>
+                </div>
+            </template>
+            <template #[`header.type`]="{ isSorted, column, toggleSort, getSortIcon }">
+                <div class="group flex items-center gap-2" @click="toggleSort(column)">
+                    <span>{{ column.title }}</span>
+                    <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-icon 
+                                v-bind="props" 
+                                :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
+                                :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
+                                icon="mdi-filter"
+                            ></v-icon>
+                        </template>
+                        <div class="p-3 bg-white rounded-lg shadow-lg">
+                            <slot name="type-filter-menu" :column="column"></slot>
+                        </div>
+                    </v-menu>
+                    <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                </div>
+            </template>
             <template #body="properties">
                 <draggable
-                    :list="properties.items"
+                    :list="(properties.items as unknown as any[])"
                     tag="tbody"
                     :disabled="!inComparator"
                     group="publications"
@@ -81,7 +215,7 @@
                         </td>
                     </tr>
                     <tr v-for="item in properties.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || allowSelection || enableExport">
+                        <td v-if="isAdmin || allowSelection || enableExport" class="px-2!">
                             <v-checkbox
                                 v-model="selectedPublications"
                                 :value="item"
@@ -89,41 +223,62 @@
                                 hide-details
                             />
                         </td>
-                        <td v-if="$i18n.locale.startsWith('sr')">
-                            <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
-                                <rich-title-renderer :title="item.titleSr"></rich-title-renderer>
-                            </localized-link>
-                        </td>
-                        <td v-else>
-                            <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
-                                <rich-title-renderer :title="item.titleOther"></rich-title-renderer>
-                            </localized-link>
-                        </td>
-                        <td>
-                            <span v-if="item.authorNames.trim() === ''">
-                                {{ displayTextOrPlaceholder(item.authorNames) }}
-                            </span>
-                            <span v-for="(author, index) in item.authorNames.split(';')" v-else :key="index">
-                                <localized-link
-                                    v-if="item.authorIds[index] !== -1"
-                                    :to="'persons/' + item.authorIds[index]"
-                                >
-                                    {{ `👤${author.trim()};` }}
+                        <td class="py-2!">
+                            <div class="flex gap-2">
+                                <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId" class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center hover:bg-purple-200 transition-colors flex-shrink-0">
+                                    <v-icon color="primary" size="20">
+                                        {{ getPublicationTypeIcon(item.type) }}
+                                    </v-icon>
                                 </localized-link>
-                                <span v-else>{{ `${author.trim()};` }}</span>
-                            </span>
+                                <div>
+                                    <div class="flex items-baseline gap-2">
+                                        <div class="text-gray-800! hover:text-blue-900! font-semibold text-base flex">
+                                            <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
+                                                <rich-title-renderer v-if="$i18n.locale.startsWith('sr')" :title="item.titleSr"></rich-title-renderer>
+                                                <rich-title-renderer v-else :title="item.titleOther"></rich-title-renderer>
+                                            </localized-link>
+                                            <span v-if="item.year && item.year > 0">, </span>
+                                        </div>
+                                        <span v-if="item.year && item.year > 0" class="text-xs text-gray-600">{{ item.year }}</span>
+                                    </div>
+                                    <div v-if="item.authorNames.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
+                                        <div v-for="(author, index) in getDisplayedAuthors(item)" :key="index">
+                                            <localized-link
+                                                v-if="item.authorIds[index] !== -1"
+                                                :to="'persons/' + item.authorIds[index]"
+                                                class="flex items-center gap-1"
+                                            >
+                                                <v-icon size="14" class="text-gray-500">
+                                                    mdi-account
+                                                </v-icon>
+                                                {{ `${author.trim()}` }}
+                                            </localized-link>
+                                            <span v-else class="flex items-center gap-1">
+                                                <v-icon size="14" class="text-gray-500">mdi-account-outline</v-icon>
+                                                {{ `${author.trim()}` }}
+                                            </span>
+                                        </div>
+                                        <v-btn
+                                            v-if="shouldShowMoreButton(item)"
+                                            variant="text"
+                                            size="x-small"
+                                            color="primary"
+                                            class="mt-1"
+                                            @click="toggleShowAllAuthors(item.databaseId as number)"
+                                        >
+                                            {{ getShowMoreText(item) }}
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                         <td>
-                            {{ item.year !== -1 ? item.year : "-" }}
+                            <v-chip size="small" color="primary" variant="flat" :prepend-icon="getPublicationTypeIcon(item.type)">
+                                {{ showPublicationConcreteType ? getConcretePublicationType(item.publicationType) : getPublicationTypeTitleFromValueAutoLocale(item.type) }}
+                            </v-chip>
                         </td>
                         <td>
-                            {{ showPublicationConcreteType ? getConcretePublicationType(item.publicationType) : getPublicationTypeTitleFromValueAutoLocale(item.type) }}
-                        </td>
-                        <td v-if="item.doi">
-                            <identifier-link :identifier="item.doi"></identifier-link>
-                        </td>
-                        <td v-else>
-                            {{ displayTextOrPlaceholder(item.doi) }}
+                            <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi"></identifier-menu>
                         </td>
                         <td>
                             <v-menu
@@ -200,7 +355,7 @@
                         </td>
                         <td v-if="isCommission">
                             <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
-                            <v-icon v-else icon="mdi-cancel"></v-icon>
+                            <v-icon v-else icon="mdi-close"></v-icon>
                         </td>
                     </tr>
                 </draggable>
@@ -230,7 +385,6 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import IdentifierLink from '../core/IdentifierLink.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
 import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
@@ -247,11 +401,12 @@ import { getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@
 import { getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
 import { getTitleFromValueAutoLocale as getMonographPublicationTypeTitle } from '@/i18n/monographPublicationType';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
+import IdentifierMenu from '../core/IdentifierMenu.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, IdentifierLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal },
+    components: { LocalizedLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal, IdentifierMenu },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -320,16 +475,23 @@ export default defineComponent({
         allowResearcherUnbinding: {
             type: Boolean,
             default: false
+        },
+        hasActiveTypeFilters: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
     setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
+        const expandedAuthors = ref<Set<number>>(new Set());
+        const MAX_AUTHORS_DISPLAYED = 4;
 
         const i18n = useI18n();
         const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
+        const exportModal = ref<any>(null);
 
         const tableWrapper = ref<any>(null);
 
@@ -367,7 +529,6 @@ export default defineComponent({
         });
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
-        const authorNamesLabel = computed(() => i18n.t("authorNamesLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
         const concretePublicationTypeLabel = computed(() => i18n.t("concretePublicationTypeLabel"));
@@ -401,8 +562,8 @@ export default defineComponent({
 
         const headers = ref<any>([
             { title: titleLabel, align: "start", sortable: true, key: titleColumn},
-            { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
-            { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
+            // { title: authorNamesLabel, align: "start", sortable: true, key: "authorNames"},
+            // { title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"},
             { title:
                     props.showPublicationConcreteType ? concretePublicationTypeLabel : typeOfPublicationLabel,
                 align: "start",
@@ -412,6 +573,9 @@ export default defineComponent({
             { title: "DOI", align: "start", sortable: true, key: "doi"},
             { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"}
         ]);
+
+        // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
+        const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"})
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
@@ -594,6 +758,29 @@ export default defineComponent({
             return possibleValues.find(publicationType => publicationType);
         };
 
+        const getPublicationTypeIcon = (type: string) => {
+            switch(type) {
+                case 'JOURNAL_PUBLICATION':
+                    return 'mdi-book-open-page-variant';
+                case 'PROCEEDINGS':
+                    return 'mdi-presentation';
+                case 'PATENT':
+                    return 'mdi-shield-check';
+                case 'DATASET':
+                    return 'mdi-database';
+                case 'SOFTWARE':
+                    return 'mdi-code-tags';
+                case 'MONOGRAPH':
+                    return 'mdi-book';
+                case 'MONOGRAPH_PUBLICATION':
+                    return 'mdi-book-open';
+                case 'THESIS':
+                    return 'mdi-school';
+                default:
+                    return 'mdi-file-document';
+            }
+        };
+
         const validateSection = async (documentId: number, metadata: boolean) => {
             const validationMethod = metadata ? 
                 () => OrganisationUnitTrustConfigurationService.validateDocumentMetadata(documentId) :
@@ -640,6 +827,48 @@ export default defineComponent({
             return false;
         };
 
+        const openExportModal = () => {
+            if (exportModal.value) {
+                exportModal.value.openModal();
+            }
+        };
+
+        const toggleShowAllAuthors = (publicationId: number) => {
+            if (expandedAuthors.value.has(publicationId)) {
+                expandedAuthors.value.delete(publicationId);
+            } else {
+                expandedAuthors.value.add(publicationId);
+            }
+        };
+
+        const getDisplayedAuthors = (item: DocumentPublicationIndex) => {
+            const authors = item.authorNames.split(';');
+            const isExpanded = expandedAuthors.value.has(item.databaseId as number);
+            
+            if (authors.length <= MAX_AUTHORS_DISPLAYED || isExpanded) {
+                return authors;
+            }
+            
+            return authors.slice(0, MAX_AUTHORS_DISPLAYED);
+        };
+
+        const shouldShowMoreButton = (item: DocumentPublicationIndex) => {
+            const authors = item.authorNames.split(';');
+            return authors.length > MAX_AUTHORS_DISPLAYED;
+        };
+
+        const getShowMoreText = (item: DocumentPublicationIndex) => {
+            const authors = item.authorNames.split(';');
+            const isExpanded = expandedAuthors.value.has(item.databaseId as number);
+            
+            if (isExpanded) {
+                return i18n.t("showLessLabel");
+            }
+            
+            const remainingCount = authors.length - MAX_AUTHORS_DISPLAYED;
+            return i18n.t("showMoreAuthorsLabel", { count: remainingCount });
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -650,9 +879,24 @@ export default defineComponent({
             declinePublicationClaim, loggedInUser, documentClassified,
             ApplicableEntityType, removeResearchOutputs, ExportEntity,
             getConcretePublicationType, isUserLoggedIn, validateSection,
-            validateSectionForAll, canPerformUnbinding
+            validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
+            toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
+            getPublicationTypeIcon, titleColumn, yearHeader
         };
     }
 });
 </script>
 
+<style scoped>
+
+.action-menu-trigger {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}
+
+.action-menu-list {
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+</style>

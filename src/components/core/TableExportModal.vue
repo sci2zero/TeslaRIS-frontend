@@ -1,7 +1,7 @@
 <template>
     <div justify="start">
         <v-dialog v-model="dialog" persistent class="wide">
-            <template #activator="scope">
+            <template v-if="!hideActivationButton" #activator="scope">
                 <v-btn
                     :disabled="disabled"
                     density="compact"
@@ -187,6 +187,10 @@ export default defineComponent({
         endpointBodyParameters: {
             type: Object as PropType<any>,
             default: undefined
+        },
+        hideActivationButton: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {
@@ -328,6 +332,10 @@ export default defineComponent({
             }
         };
 
+        const openModal = () => {
+            dialog.value = true;
+        };
+
         return { 
             dialog, fields, selectedFields, isFormValid,
             ExportEntity, langItems, selectedLang,
@@ -337,7 +345,7 @@ export default defineComponent({
             requiredNumericGreaterThanZeroFieldRules,
             apa, mla, chicago, harvard, vancouver,
             maxExportsPerPage, ExportFileFormat,
-            requiredMultiSelectionRules, loading
+            requiredMultiSelectionRules, loading, openModal
         };
     }
 });
