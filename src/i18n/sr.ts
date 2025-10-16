@@ -1141,20 +1141,20 @@ export default {
         allRightsReserved: "Sva prava zadržana"
     },
     landingFeatures: {
-        title: "Najznačajniji resursi",
-        subtitle: "Najcitiraniji naučni rezultati i istraživači",
+        title: "Istaknuti resursi",
+        subtitle: "Najcitiraniji istraživači, institucije i naučni rezultati",
         topResearchers: {
             title: "Najcitiraniji istraživači",
             viewAll: "Pregledaj sve istraživače"
         },
         topInstitutions: {
-            title: "Najcitiraniji fakulteti",
+            title: "Najcitiranije institucije",
             viewAll: "Pregledaj sve institucije"
         },
         topPublications: {
-            title: "Najcitiranija dela",
+            title: "Najcitiranije publikacije",
             viewAll: "Pregledaj sve publikacije"
         }
-    }
+    },
     participationsLabel: "Učešća/Participacije"
 }

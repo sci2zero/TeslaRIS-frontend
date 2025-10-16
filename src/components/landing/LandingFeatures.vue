@@ -35,10 +35,10 @@
                                 {{ $t('noDataInTableMessage') }}
                             </p>
                         </div>
-                        <div
-                            v-for="(researcher, index) in topResearchers.slice(0, 3)" v-else :key="index" 
-                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
-                            @click="$router.push('/' + $i18n.locale + '/persons/' + researcher.item.databaseId)">
+                        <RouterLink
+                            v-for="(researcher, index) in topResearchers.slice(0, 3)" v-else :key="index"
+                            :to="'/' + $i18n.locale + '/persons/' + researcher.item.databaseId"
+                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-slate-200 bg-slate-100">
                                 <v-icon 
                                     icon="mdi-account-circle" 
@@ -56,13 +56,13 @@
                                 <span class="text-[0.7rem] text-slate-400 font-medium block">{{ researcher.value }} {{ $t('citations') }}</span>
                             </div>
                             <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
-                        </div>
+                        </RouterLink>
                     </div>
                     <v-btn 
                         variant="outlined" 
                         color="success" 
                         class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
-                        @click="$router.push('/' + $i18n.locale + '/persons')"
+                        :to="'/' + $i18n.locale + '/persons'"
                     >
                         {{ $t('landingFeatures.topResearchers.viewAll') }}
                     </v-btn>
@@ -91,10 +91,10 @@
                                 {{ $t('noDataInTableMessage') }}
                             </p>
                         </div>
-                        <div
-                            v-for="(institution, index) in topInstitutions.slice(0, 3)" v-else :key="index" 
-                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
-                            @click="$router.push('/' + $i18n.locale + '/organisation-units/' + institution.item.databaseId)">
+                        <RouterLink
+                            v-for="(institution, index) in topInstitutions.slice(0, 3)" v-else :key="index"
+                            :to="'/' + $i18n.locale + '/organisation-units/' + institution.item.databaseId"
+                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-amber-500/10">
                                 <v-icon icon="mdi-office-building" size="20" color="#f59e0b"></v-icon>
                             </div>
@@ -108,13 +108,13 @@
                                 <span class="text-[0.7rem] text-slate-400 font-medium block">{{ institution.value }} {{ $t('citations') }}</span>
                             </div>
                             <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
-                        </div>
+                        </RouterLink>
                     </div>
                     <v-btn 
                         variant="outlined" 
                         color="warning" 
                         class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
-                        @click="$router.push('/' + $i18n.locale + '/organisation-units')"
+                        :to="'/' + $i18n.locale + '/organisation-units'"
                     >
                         {{ $t('landingFeatures.topInstitutions.viewAll') }}
                     </v-btn>
@@ -143,10 +143,10 @@
                                 {{ $t('noDataInTableMessage') }}
                             </p>
                         </div>
-                        <div
-                            v-for="(pub, index) in topPublications.slice(0, 3)" v-else :key="index" 
-                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0"
-                            @click="$router.push('/' + $i18n.locale + '/publications/' + pub.item.databaseId)">
+                        <RouterLink
+                            v-for="(pub, index) in topPublications.slice(0, 3)" v-else :key="index"
+                            :to="{ name: getDocumentLandingPageName(pub.item.type), params: { locale: $i18n.locale, id: pub.item.databaseId } }"
+                            class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-blue-500/10">
                                 <v-icon icon="mdi-book-open-variant" size="20" color="#3b82f6"></v-icon>
                             </div>
@@ -160,13 +160,13 @@
                                 <span class="text-[0.7rem] text-slate-400 font-medium block">{{ pub.item.year }} • {{ pub.value }} {{ $t('citations') }}</span>
                             </div>
                             <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
-                        </div>
+                        </RouterLink>
                     </div>
                     <v-btn 
                         variant="outlined" 
                         color="primary" 
                         class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
-                        @click="$router.push('/' + $i18n.locale + '/publications')"
+                        :to="'/' + $i18n.locale + '/publications'"
                     >
                         {{ $t('landingFeatures.topPublications.viewAll') }}
                     </v-btn>
@@ -186,6 +186,7 @@ import GlobalLeaderboardService from '@/services/visualization/GlobalLeaderboard
 import { type PersonIndex } from '@/models/PersonModel';
 import { type OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { type DocumentPublicationIndex } from '@/models/PublicationModel';
+import { getDocumentLandingPageName } from '@/utils/PathResolutionUtil';
 
 // Data from API
 const topResearchers = ref<{item: PersonIndex, value: number}[]>([]);

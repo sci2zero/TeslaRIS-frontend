@@ -168,9 +168,22 @@
             :items-per-page-options="[5, 10, 25, 50]"
             :page="tableOptions.page"
             @update:options="refreshTable">
+            <template #[`header.`+titleColumn]="{ isSorted, column, toggleSort, getSortIcon }">
+                <div class="flex items-center gap-2 sm:gap-8 md:gap-12 lg:gap-16">
+                    <div class="group flex items-center gap-2" @click.stop="toggleSort(column)">
+                        <span>{{ column.title }}</span>
+                        <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                    </div>
+
+                    <div class="group flex items-center gap-2 px-2 py-4" @click.stop="toggleSort(yearHeader)">
+                        <span>{{ yearHeader.title }}</span>
+                        <v-icon class="" :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)"></v-icon>
+                    </div>
+                </div>
+            </template>
             <template #[`header.type`]="{ isSorted, column, toggleSort, getSortIcon }">
                 <div class="group flex items-center gap-2" @click="toggleSort(column)">
-                    <span>{{ $t("typeOfPublicationLabel") }}</span>
+                    <span>{{ column.title }}</span>
                     <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
                         <template #activator="{ props }">
                             <v-icon 
@@ -516,6 +529,7 @@ export default defineComponent({
         });
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
+        const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
         const typeOfPublicationLabel = computed(() => i18n.t("typeOfPublicationLabel"));
         const concretePublicationTypeLabel = computed(() => i18n.t("concretePublicationTypeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
@@ -559,6 +573,9 @@ export default defineComponent({
             { title: "DOI", align: "start", sortable: true, key: "doi"},
             { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"}
         ]);
+
+        // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
+        const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"})
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
@@ -864,7 +881,7 @@ export default defineComponent({
             getConcretePublicationType, isUserLoggedIn, validateSection,
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
             toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
-            getPublicationTypeIcon
+            getPublicationTypeIcon, titleColumn, yearHeader
         };
     }
 });

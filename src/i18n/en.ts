@@ -1135,20 +1135,20 @@ export default {
         allRightsReserved: "All rights reserved"
     },
     landingFeatures: {
-        title: "Most Important Resources",
-        subtitle: "Most cited scientific results and researchers",
+        title: "Featured Resources",
+        subtitle: "Most cited researchers, institutions and scientific results",
         topResearchers: {
             title: "Most Cited Researchers",
             viewAll: "View all researchers"
         },
         topInstitutions: {
-            title: "Most Cited Faculties",
+            title: "Most Cited Institutions",
             viewAll: "View all institutions"
         },
         topPublications: {
             title: "Most Cited Works",
             viewAll: "View all publications"
         }
-    }
+    },
     participationsLabel: "Participations"
 }
