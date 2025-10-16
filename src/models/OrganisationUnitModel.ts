@@ -36,10 +36,10 @@ export interface OrganisationUnitRequest {
     ror? : string;
     uris: string[];
     allowedThesisTypes: ThesisType[];
-    clientInstitution: boolean;
-    institutionEmailDomain: string;
-    validatingEmailDomain: boolean;
-    allowingSubdomains: boolean;
+    clientInstitutionCris: boolean;
+    institutionEmailDomainCris: string;
+    validatingEmailDomainCris: boolean;
+    allowingSubdomainsCris: boolean;
     legalEntity: boolean;
 }
 
@@ -58,10 +58,10 @@ export interface OrganisationUnitResponse {
     logoServerFilename?: string;
     logoBackgroundHex: string;
     allowedThesisTypes: ThesisType[];
-    clientInstitution: boolean;
-    institutionEmailDomain: string;
-    validatingEmailDomain: boolean;
-    allowingSubdomains: boolean;
+    clientInstitutionCris: boolean;
+    institutionEmailDomainCris: string;
+    validatingEmailDomainCris: boolean;
+    allowingSubdomainsCris: boolean;
     legalEntity: boolean;
 }
 

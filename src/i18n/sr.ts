@@ -1120,5 +1120,9 @@ export default {
     updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
     spanWholeRowLabel: "Raspon na celi red",
     positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0.",
-    participationsLabel: "Učešća/Participacije"
+    participationsLabel: "Učešća/Participacije",
+    documentCitationCountLeaderboardLabel: "Top publikacije po broju citata",
+    personViewCountsLeaderboardLabel: "Top istraživači po pregledima",
+    documentViewCountsLeaderboardLabel: "Top publikacije po pregledima",
+    documentDownloadCountsLeaderboardLabel: "Top publikacije po preuzimanjima"
 }

@@ -25,6 +25,10 @@ export class OrganisationUnitVisualizationService extends BaseService {
     async getMonthlyViewsForOrganisationUnit(organisationUnitId: number, startDate: string, endDate: string): Promise<AxiosResponse<Record<string, number>>> {
         return super.sendRequest(axios.get, `visualization-data/organisation-unit/monthly-statistics/${organisationUnitId}?startDate=${startDate}&endDate=${endDate}`);
     }
+
+    async getOrganisationUnitCitationCountsByYear(institutionId: number, from: number | null = null, to: number | null = null): Promise<AxiosResponse<Record<number, number>>> {
+        return super.sendRequest(axios.get, `visualization-data/organisation-unit/yearly-citations/${institutionId}?from=${from ?? ''}&to=${to ?? ''}`);
+    }
 }
 
 export default new OrganisationUnitVisualizationService();

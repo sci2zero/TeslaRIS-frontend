@@ -1,5 +1,6 @@
 <template>
     <v-row
+        v-if="currentTab !== 'statistics'"
         no-gutters
         class="align-center mt-2"
         style="max-width: 250px;">
@@ -29,6 +30,29 @@
             ></v-text-field>
         </v-col>
     </v-row>
+    <v-row
+        v-else-if="currentTab === 'statistics'"
+        class="align-center mt-2"
+        style="max-width: 300px;">
+        <v-col cols="6">
+            <date-picker
+                v-model="startDate"
+                :label="$t('startDateLabel')"
+                color="primary"
+                required
+                :allow-deletion="false"
+            />
+        </v-col>
+        <v-col cols="6">
+            <date-picker
+                v-model="endDate"
+                :label="$t('endDateLabel')"
+                color="primary"
+                required
+                :allow-deletion="false"
+            />
+        </v-col>
+    </v-row>
 
     <v-tabs
         v-if="organisationUnitId"
@@ -44,6 +68,9 @@
         </v-tab>
         <v-tab v-show="displayPointsTab" value="assessmentPoints">
             {{ $t("assessmentPointsLeaderboardLabel") }}
+        </v-tab>
+        <v-tab v-show="displayCitationsTab" value="statistics">
+            {{ $t("viewsLabel") }}
         </v-tab>
     </v-tabs>
 
@@ -90,6 +117,14 @@
                         :title="$t('subUnitCitationCountLeaderboardLabel')"
                     />
                 </v-col>
+                <v-col
+                    v-if="displaySettings?.citationCountDocumentLeaderboard.display"
+                    cols="12" :md="displaySettings?.citationCountDocumentLeaderboard.spanWholeRow ? 8 : 6">
+                    <leaderboard-table
+                        :leaderboard-data="documentCitationCountsLeaderboard"
+                        :title="$t('documentCitationCountLeaderboardLabel')"
+                    />
+                </v-col>
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="assessmentPoints">
@@ -120,6 +155,34 @@
                 </v-col>
             </v-row>
         </v-tabs-window-item>
+        <v-tabs-window-item value="statistics">
+            <v-row class="d-flex justify-center">
+                <v-col
+                    v-if="displaySettings?.viewCountPersonLeaderboard.display"
+                    cols="12" :md="displaySettings?.viewCountPersonLeaderboard.spanWholeRow ? 12 : 6">
+                    <leaderboard-table
+                        :leaderboard-data="personViewCountsLeaderboard"
+                        :title="$t('personViewCountsLeaderboardLabel')"
+                    />
+                </v-col>
+                <v-col
+                    v-if="displaySettings?.viewCountDocumentLeaderboard.display"
+                    cols="12" :md="displaySettings?.viewCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                    <leaderboard-table
+                        :leaderboard-data="documentViewCountsLeaderboard"
+                        :title="$t('documentViewCountsLeaderboardLabel')"
+                    />
+                </v-col>
+                <v-col
+                    v-if="displaySettings?.downloadCountDocumentLeaderboard.display"
+                    cols="12" :md="displaySettings?.downloadCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                    <leaderboard-table
+                        :leaderboard-data="documentDownloadCountsLeaderboard"
+                        :title="$t('documentDownloadCountsLeaderboardLabel')"
+                    />
+                </v-col>
+            </v-row>
+        </v-tabs-window-item>
     </v-tabs-window>
 </template>
 
@@ -132,6 +195,9 @@ import LeaderboardTable from '../charts/LeaderboardTable.vue';
 import OrganisationUnitLeaderboardService from '@/services/visualization/OrganisationUnitLeaderboardService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
+import DocumentLeaderboardService from '@/services/visualization/DocumentLeaderboardService';
+import DatePicker from '../core/DatePicker.vue';
+import { StatisticsType } from '@/models/AssessmentModel';
 
 
 const props = defineProps({
@@ -162,15 +228,23 @@ const toYear = ref<number>((new Date()).getFullYear());
 const minYear = ref(1950);
 const maxYear = ref((new Date()).getFullYear());
 
+const startDate = ref<string>((new Date(`${(new Date()).getFullYear() - 10}-01-01`)).toISOString());
+const endDate = ref<string>((new Date()).toISOString());
+
 const currentTab = ref("publicationCount");
 
 const personPublicationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const personCitationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const personAssessmentPointsLeaderboard = ref<CommissionAssessmentPointsPersonLeaderboard[]>([]);
+const personViewCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 
 const subUnitPublicationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const subUnitCitationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const subUnitAssessmentPointsLeaderboard = ref<CommissionAssessmentPointsPersonLeaderboard[]>([]);
+
+const documentCitationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
+const documentViewCountsLeaderboard = ref<LeaderboardEntry[]>([]);
+const documentDownloadCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 
 onMounted(() => {
     fetchLeaderboardData();
@@ -180,6 +254,7 @@ onMounted(() => {
 const fetchLeaderboardData = () => {
     fetchPersonLeaderboards();
     fetchOrganisationSubUnitsLeaderboards();
+    fetchDocumentLeaderboards();
 };
 
 const fetchPersonLeaderboards = () => {
@@ -187,21 +262,28 @@ const fetchPersonLeaderboards = () => {
     PersonLeaderboardService.getPersonPublicationCountLeaderboard(
         props.organisationUnitId, fromYear.value, toYear.value
     ).then((response) => {
-        personPublicationCountsLeaderboard.value = response.data
+        personPublicationCountsLeaderboard.value = response.data;
     });
 
     personCitationCountsLeaderboard.value.splice(0);
     PersonLeaderboardService.getPersonCitationCountLeaderboard(
         props.organisationUnitId, fromYear.value, toYear.value
     ).then((response) => {
-        personCitationCountsLeaderboard.value = response.data
+        personCitationCountsLeaderboard.value = response.data;
     });
 
     personAssessmentPointsLeaderboard.value.splice(0);
     PersonLeaderboardService.getPersonAssessmentPointsLeaderboard(
         props.organisationUnitId, fromYear.value, toYear.value
     ).then((response) => {
-        personAssessmentPointsLeaderboard.value = response.data
+        personAssessmentPointsLeaderboard.value = response.data;
+    });
+
+    personViewCountsLeaderboard.value.splice(0);
+    PersonLeaderboardService.getPersonViewCountLeaderboard(
+        props.organisationUnitId, startDate.value.split("T")[0], endDate.value.split("T")[0]
+    ).then((response) => {
+        personViewCountsLeaderboard.value = response.data;
     });
 };
 
@@ -210,22 +292,44 @@ const fetchOrganisationSubUnitsLeaderboards = () => {
     OrganisationUnitLeaderboardService.getOrganisationUnitPublicationCountLeaderboard(
         props.organisationUnitId, fromYear.value, toYear.value
     ).then((response) => {
-        subUnitPublicationCountsLeaderboard.value = response.data
+        subUnitPublicationCountsLeaderboard.value = response.data;
     });
 
     subUnitCitationCountsLeaderboard.value.splice(0);
     OrganisationUnitLeaderboardService.getOrganisationUnitCitationCountLeaderboard(
         props.organisationUnitId, fromYear.value, toYear.value
     ).then((response) => {
-        subUnitCitationCountsLeaderboard.value = response.data
+        subUnitCitationCountsLeaderboard.value = response.data;
     });
 
     subUnitAssessmentPointsLeaderboard.value.splice(0);
     OrganisationUnitLeaderboardService.getOrganisationUnitAssessmentPointsLeaderboard(
         props.organisationUnitId, fromYear.value, toYear.value
     ).then((response) => {
-        console.log(response)
-        subUnitAssessmentPointsLeaderboard.value = response.data
+        subUnitAssessmentPointsLeaderboard.value = response.data;
+    });
+};
+
+const fetchDocumentLeaderboards = () => {
+    documentCitationCountsLeaderboard.value.splice(0);
+    DocumentLeaderboardService.getDocumentCitationCountLeaderboard(
+        props.organisationUnitId, fromYear.value, toYear.value
+    ).then((response) => {
+        documentCitationCountsLeaderboard.value = response.data;
+    });
+
+    documentViewCountsLeaderboard.value.splice(0);
+    DocumentLeaderboardService.getDocumentStatisticCountLeaderboard(
+        props.organisationUnitId, startDate.value.split("T")[0], endDate.value.split("T")[0], StatisticsType.VIEW
+    ).then((response) => {
+        documentViewCountsLeaderboard.value = response.data;
+    });
+
+    documentDownloadCountsLeaderboard.value.splice(0);
+    DocumentLeaderboardService.getDocumentStatisticCountLeaderboard(
+        props.organisationUnitId, startDate.value.split("T")[0], endDate.value.split("T")[0], StatisticsType.DOWNLOAD
+    ).then((response) => {
+        documentDownloadCountsLeaderboard.value = response.data;
     });
 };
 

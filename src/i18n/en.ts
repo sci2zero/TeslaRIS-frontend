@@ -1114,5 +1114,8 @@ export default {
     updateChartDisplayConfigurationLabel: "Visualizations display",
     spanWholeRowLabel: "Span whole row",
     positiveOrZeroFieldMessage: "This field can't be < 0.",
-    participationsLabel: "Participations"
+    participationsLabel: "Participations",
+    personViewCountsLeaderboardLabel: "Top researchers by view count",
+    documentViewCountsLeaderboardLabel: "Top publications by view count",
+    documentDownloadCountsLeaderboardLabel: "Top publications by download count"
 }
