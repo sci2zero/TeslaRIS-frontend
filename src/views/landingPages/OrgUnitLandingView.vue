@@ -57,7 +57,7 @@
                         />
                         <v-row v-else>
                             <v-col cols="6">
-                                <div v-if="isAdmin && organisationUnit?.clientInstitution" class="response">
+                                <div v-if="isAdmin && organisationUnit?.clientInstitutionCris" class="response">
                                     {{ $t("clientInstitutionLabel") }}
                                 </div>
                                 <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
@@ -763,10 +763,10 @@ export default defineComponent({
             organisationUnit.value!.ror = basicInfo.ror;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
-            organisationUnit.value!.clientInstitution = basicInfo.clientInstitution;
-            organisationUnit.value!.validatingEmailDomain = basicInfo.validatingEmailDomain;
-            organisationUnit.value!.allowingSubdomains = basicInfo.allowingSubdomains;
-            organisationUnit.value!.institutionEmailDomain = basicInfo.institutionEmailDomain;
+            organisationUnit.value!.clientInstitutionCris = basicInfo.clientInstitutionCris;
+            organisationUnit.value!.validatingEmailDomainCris = basicInfo.validatingEmailDomainCris;
+            organisationUnit.value!.allowingSubdomainsCris = basicInfo.allowingSubdomainsCris;
+            organisationUnit.value!.institutionEmailDomainCris = basicInfo.institutionEmailDomainCris;
             organisationUnit.value!.legalEntity = basicInfo.legalEntity;
             performUpdate(false);
         };
@@ -813,10 +813,10 @@ export default defineComponent({
                 contact: organisationUnit.value?.contact,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
-                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
-                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
-                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
+                validatingEmailDomainCris: organisationUnit.value?.validatingEmailDomainCris as boolean,
+                allowingSubdomainsCris: organisationUnit.value?.allowingSubdomainsCris as boolean,
+                institutionEmailDomainCris: organisationUnit.value?.institutionEmailDomainCris as string,
                 legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 
@@ -841,10 +841,10 @@ export default defineComponent({
                 scopusAfid: organisationUnit.value?.scopusAfid,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
-                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
-                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
-                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
+                clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
+                validatingEmailDomainCris: organisationUnit.value?.validatingEmailDomainCris as boolean,
+                allowingSubdomainsCris: organisationUnit.value?.allowingSubdomainsCris as boolean,
+                institutionEmailDomainCris: organisationUnit.value?.institutionEmailDomainCris as string,
                 legalEntity: organisationUnit.value?.legalEntity as boolean
             };
 

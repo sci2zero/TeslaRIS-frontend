@@ -1150,5 +1150,8 @@ export default {
             viewAll: "View all publications"
         }
     },
-    participationsLabel: "Participations"
+    participationsLabel: "Participations",
+    personViewCountsLeaderboardLabel: "Top researchers by view count",
+    documentViewCountsLeaderboardLabel: "Top publications by view count",
+    documentDownloadCountsLeaderboardLabel: "Top publications by download count"
 }

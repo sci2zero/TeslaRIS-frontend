@@ -45,25 +45,25 @@
                         :label="$t('legalEntityLabel')"
                     ></v-checkbox>
                     <v-checkbox
-                        v-model="clientInstitution"
+                        v-model="clientInstitutionCris"
                         :label="$t('clientInstitutionLabel')"
                     ></v-checkbox>
                 </v-row>
-                <v-row v-if="clientInstitution">
+                <v-row v-if="clientInstitutionCris">
                     <v-checkbox
-                        v-model="validatingEmailDomain"
+                        v-model="validatingEmailDomainCris"
                         :label="$t('validatingEmailDomainLabel')"
                     ></v-checkbox>
                     <v-checkbox
-                        v-if="validatingEmailDomain"
-                        v-model="allowingSubdomains"
+                        v-if="validatingEmailDomainCris"
+                        v-model="allowingSubdomainsCris"
                         :label="$t('allowingSubdomainsLabel')"
                     ></v-checkbox>
                 </v-row>
-                <v-row v-if="clientInstitution && validatingEmailDomain">
+                <v-row v-if="clientInstitutionCris && validatingEmailDomainCris">
                     <v-col cols="12">
                         <v-text-field
-                            v-model="institutionEmailDomain"
+                            v-model="institutionEmailDomainCris"
                             :label="$t('institutionEmailDomainLabel') + '*'"
                             :placeholder="$t('institutionEmailDomainLabel') + '*'"
                             :rules="requiredFieldRules">
@@ -172,10 +172,10 @@ export default defineComponent({
         const ror = ref(props.presetOU?.ror);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
-        const clientInstitution = ref(props.presetOU?.clientInstitution);
-        const validatingEmailDomain = ref(props.presetOU?.validatingEmailDomain);
-        const allowingSubdomains = ref(props.presetOU?.allowingSubdomains);
-        const institutionEmailDomain = ref(props.presetOU?.institutionEmailDomain);
+        const clientInstitutionCris = ref(props.presetOU?.clientInstitutionCris);
+        const validatingEmailDomainCris = ref(props.presetOU?.validatingEmailDomainCris);
+        const allowingSubdomainsCris = ref(props.presetOU?.allowingSubdomainsCris);
+        const institutionEmailDomainCris = ref(props.presetOU?.institutionEmailDomainCris);
         const legalEntity = ref(props.presetOU?.legalEntity);
 
         const thesisTypes = getThesisTypesForGivenLocale();
@@ -223,10 +223,10 @@ export default defineComponent({
                 ror: ror.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
-                clientInstitution: clientInstitution.value as boolean,
-                validatingEmailDomain: validatingEmailDomain.value as boolean,
-                allowingSubdomains: allowingSubdomains.value as boolean,
-                institutionEmailDomain: institutionEmailDomain.value as string,
+                clientInstitutionCris: clientInstitutionCris.value as boolean,
+                validatingEmailDomainCris: validatingEmailDomainCris.value as boolean,
+                allowingSubdomainsCris: allowingSubdomainsCris.value as boolean,
+                institutionEmailDomainCris: institutionEmailDomainCris.value as string,
                 legalEntity: legalEntity.value as boolean
             };
 
@@ -246,10 +246,10 @@ export default defineComponent({
             ror.value = props.presetOU?.ror;
             urisRef.value?.refreshModelValue(uris.value);
 
-            clientInstitution.value = props.presetOU?.clientInstitution;
-            validatingEmailDomain.value = props.presetOU?.validatingEmailDomain;
-            allowingSubdomains.value = props.presetOU?.allowingSubdomains;
-            institutionEmailDomain.value = props.presetOU?.institutionEmailDomain;
+            clientInstitutionCris.value = props.presetOU?.clientInstitutionCris;
+            validatingEmailDomainCris.value = props.presetOU?.validatingEmailDomainCris;
+            allowingSubdomainsCris.value = props.presetOU?.allowingSubdomainsCris;
+            institutionEmailDomainCris.value = props.presetOU?.institutionEmailDomainCris;
             legalEntity.value = props.presetOU?.legalEntity;
             
             selectedThesisType.value.splice(0);
@@ -270,9 +270,9 @@ export default defineComponent({
             nonMandatoryEmailFieldRules, snackbar, ror,
             openAlexId, institutionOpenAlexIdValidationRules,
             rorValidationRules, thesisTypes, selectedThesisType,
-            requiredSelectionRules, clientInstitution,
-            validatingEmailDomain, allowingSubdomains,
-            institutionEmailDomain, isAdmin, legalEntity
+            requiredSelectionRules, clientInstitutionCris,
+            validatingEmailDomainCris, allowingSubdomainsCris,
+            institutionEmailDomainCris, isAdmin, legalEntity
         };
     }
 });

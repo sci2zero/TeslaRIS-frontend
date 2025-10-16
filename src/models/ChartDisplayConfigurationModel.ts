@@ -33,6 +33,10 @@ export interface OUChartDisplaySettings extends BaseChartDisplaySettings {
     citationCountSubUnitLeaderboard: ChartDisplaySettings;
     assessmentPointPersonLeaderboard: ChartDisplaySettings;
     assessmentPointSubUnitLeaderboard: ChartDisplaySettings;
+    viewCountPersonLeaderboard: ChartDisplaySettings;
+    viewCountDocumentLeaderboard: ChartDisplaySettings;
+    downloadCountDocumentLeaderboard: ChartDisplaySettings;
+    citationCountDocumentLeaderboard: ChartDisplaySettings;
 }
 
 export interface PersonChartDisplaySettings extends BaseChartDisplaySettings {

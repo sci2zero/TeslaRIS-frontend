@@ -65,6 +65,9 @@
         <v-tab v-show="displayPublicationsTab" value="publicationCount">
             {{ $t("publicationsLabel") }}
         </v-tab>
+        <v-tab value="citationCount">
+            {{ $t("citationCountLabel") }}
+        </v-tab>
         <v-tab v-show="displayStatisticsTab" value="statistics">
             {{ $t("statisticsLabel") }}
         </v-tab>
@@ -143,6 +146,29 @@
                         :subtitle="$t('commissionLabel') + ': ' + mCategoryRatio.commissionName"
                         :donut="true"
                         :show-percentage="true"
+                    />
+                </v-col>
+            </v-row>
+        </v-tabs-window-item>
+        <v-tabs-window-item value="citationCount">
+            <v-row class="mt-10">
+                <v-col
+                    v-if="displaySettings?.citationCountTotal.display"
+                    cols="12" :md="displaySettings?.citationCountTotal.spanWholeRow ? 12 : 6"
+                    class="d-flex justify-center align-center">
+                    <display-card
+                        :display-value="totalCitationCount"
+                        :label="$t('totalCitationsLabel')"
+                    />
+                </v-col>
+                <v-col
+                    v-if="displaySettings?.citationCountByYear.display"
+                    cols="12" :md="displaySettings?.citationCountByYear.spanWholeRow ? 12 : 6">
+                    <simple-bar-chart
+                        :data="citationsYearData"
+                        :title="$t('numberOfCitationsYearlyLabel')"
+                        :y-label="$t('countLabel')"
+                        show-trend-line
                     />
                 </v-col>
             </v-row>
@@ -243,7 +269,9 @@ const props = defineProps({
 const publicationsYearTypeData = ref<{ categories: string[]; series: StackedBarSeries[]; }>();
 const publicationsYearData = ref<{ categories: string[]; series: BarSeries[]; }>();
 const publicationTypeRatioData = ref<PieDataItem[]>([]);
+const citationsYearData = ref<{ categories: string[]; series: BarSeries[]; }>();
 const totalPublicationCount = ref<number>(-1);
+const totalCitationCount = ref<number>(-1);
 
 const viewsMonthly = ref<{ categories: string[]; series: BarSeries[]; }>();
 const viewsByCountry = ref<CountryStatisticsData[]>([]);
@@ -353,6 +381,38 @@ const fetchVisualizationsData = () => {
     }
 };
 
+const getOUCitationCounts = (institutionId: number, from: number, to: number) => {
+    OrganisationUnitVisualizationService.getOrganisationUnitCitationCountsByYear(institutionId, from, to)
+    .then(async response => {
+        const yearlyCounts: Record<number, number> = response.data;
+
+        const citationData = Object.entries(yearlyCounts)
+            .map(([year, count]) => ({
+                year: parseInt(year),
+                count: count
+            }))
+            .sort((a, b) => a.year - b.year);
+
+        const categories = citationData.map(item => String(item.year));
+        const citationSeries = [{
+            name: i18n.t("citationCountLabel"),
+            data: citationData.map(item => item.count)
+        }];
+
+        if(citationData.length > 0 && !initialDatesSet.value) {
+            minYear.value = citationData[0].year;
+            maxYear.value = citationData[citationData.length - 1].year;
+            initialDatesSet.value = true;
+            fromYear.value = minYear.value;
+            toYear.value = maxYear.value;
+        }
+
+        totalCitationCount.value = citationData.reduce((sum, item) => sum + item.count, 0);
+
+        citationsYearData.value = { categories, series: citationSeries };
+    });
+};
+
 const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: number | null = null, to: number | null = null) => {
     OrganisationUnitVisualizationService.getOrganisationUnitPublicationCountsByYear(organisationUnitId, from, to)
     .then(async response => {
@@ -401,6 +461,7 @@ const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: 
 
         if (totalPublicationCount.value > 0) {
             getMCategoryCounts(organisationUnitId);
+            getOUCitationCounts(props.organisationUnitId, fromYear.value, toYear.value);
         }
     });
 };

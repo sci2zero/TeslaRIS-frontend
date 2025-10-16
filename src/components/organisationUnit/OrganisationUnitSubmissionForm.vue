@@ -78,22 +78,22 @@
                     <v-row v-if="isAdmin && clientInstitution">
                         <v-col>
                             <v-checkbox
-                                v-model="validatingEmailDomain"
+                                v-model="validatingEmailDomainCris"
                                 :label="$t('validatingEmailDomainLabel')"
                             ></v-checkbox>
                         </v-col>
                         <v-col>
                             <v-checkbox
-                                v-if="validatingEmailDomain"
-                                v-model="allowingSubdomains"
+                                v-if="validatingEmailDomainCris"
+                                v-model="allowingSubdomainsCris"
                                 :label="$t('allowingSubdomainsLabel')"
                             ></v-checkbox>
                         </v-col>
                     </v-row>
-                    <v-row v-if="isAdmin && clientInstitution && validatingEmailDomain">
+                    <v-row v-if="isAdmin && clientInstitution && validatingEmailDomainCris">
                         <v-col cols="12">
                             <v-text-field
-                                v-model="institutionEmailDomain"
+                                v-model="institutionEmailDomainCris"
                                 :label="$t('institutionEmailDomainLabel') + '*'"
                                 :placeholder="$t('institutionEmailDomainLabel') + '*'"
                                 :rules="requiredFieldRules">
@@ -182,9 +182,9 @@ export default defineComponent({
         const uris = ref<string[]>([]);
 
         const clientInstitution = ref(false);
-        const validatingEmailDomain = ref(false);
-        const allowingSubdomains = ref(false);
-        const institutionEmailDomain = ref("");
+        const validatingEmailDomainCris = ref(false);
+        const allowingSubdomainsCris = ref(false);
+        const institutionEmailDomainCris = ref("");
         const legalEntity = ref(false);
 
         const thesisTypes = getThesisTypesForGivenLocale();
@@ -232,10 +232,10 @@ export default defineComponent({
                 ror: ror.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
-                clientInstitution: clientInstitution.value,
-                validatingEmailDomain: validatingEmailDomain.value,
-                allowingSubdomains: allowingSubdomains.value,
-                institutionEmailDomain: institutionEmailDomain.value,
+                clientInstitutionCris: clientInstitution.value,
+                validatingEmailDomainCris: validatingEmailDomainCris.value,
+                allowingSubdomainsCris: allowingSubdomainsCris.value,
+                institutionEmailDomainCris: institutionEmailDomainCris.value,
                 legalEntity: legalEntity.value
             };
 
@@ -257,9 +257,9 @@ export default defineComponent({
                     selectedThesisType.value = [];
                     mapRef.value?.clearInput();
                     clientInstitution.value = false;
-                    validatingEmailDomain.value = false;
-                    allowingSubdomains.value = false;
-                    institutionEmailDomain.value = "";
+                    validatingEmailDomainCris.value = false;
+                    allowingSubdomainsCris.value = false;
+                    institutionEmailDomainCris.value = "";
                     legalEntity.value = false;
 
                     message.value = i18n.t("savedMessage");
@@ -285,8 +285,8 @@ export default defineComponent({
             openAlexId, rorValidationRules, ror,
             institutionOpenAlexIdValidationRules,
             thesisTypes, selectedThesisType, isAdmin,
-            requiredSelectionRules, allowingSubdomains,
-            validatingEmailDomain, institutionEmailDomain
+            requiredSelectionRules, allowingSubdomainsCris,
+            validatingEmailDomainCris, institutionEmailDomainCris
         };
     }
 });

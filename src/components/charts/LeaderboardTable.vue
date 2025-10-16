@@ -37,7 +37,7 @@
         
                     <div class="info-section">
                         <div class="name">
-                            {{ getEntityName((item.a as PersonIndex | OrganisationUnitIndex)) }} {{ displayEmployeeCount ? `(${(item.a as OrganisationUnitIndex).employeeCount})` : "" }}
+                            {{ getEntityName(item.a) }} {{ displayEmployeeCount ? `(${(item.a as OrganisationUnitIndex).employeeCount})` : "" }}
                         </div>
                         <div class="value">
                             {{ formatValue(item.b) }}
@@ -58,6 +58,8 @@
 import { type LeaderboardEntry } from '@/models/Common';
 import { type OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { type PersonIndex } from '@/models/PersonModel';
+import { type DocumentPublicationIndex } from '@/models/PublicationModel';
+import { getDocumentLandingPageName } from '@/utils/PathResolutionUtil';
 import { type PropType } from 'vue';
 import { defineProps } from 'vue'
 import { useI18n } from 'vue-i18n';
@@ -105,20 +107,24 @@ const formatValue = (value: number) => {
     return props.valueSuffix ? `${formatted} ${props.valueSuffix}` : formatted
 };
 
-const getEntityName = (index: PersonIndex | OrganisationUnitIndex) => {
+const getEntityName = (index: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex) => {
     if ("name" in index) {
         return index.name;
-    } else {
+    } else if ("nameSr" in index) {
         return i18n.locale.value === "sr" ? index.nameSr : index.nameOther;
+    } else {
+        return index.apa;
     }
 };
 
-const navigateToEntityLandingPage = (index: PersonIndex | OrganisationUnitIndex) => {
+const navigateToEntityLandingPage = (index: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex) => {
     let pageName;
     if ("name" in index) {
         pageName = "researcherLandingPage";
-    } else {
+    } else if ("nameSr" in index) {
         pageName = "organisationUnitLandingPage";
+    } else {
+        pageName = getDocumentLandingPageName((index as DocumentPublicationIndex).type);
     }
 
     router.push({ name: pageName, params: {id: index.databaseId} });

@@ -206,14 +206,14 @@ export default defineComponent({
             organisationUnit1.allowedThesisTypes = organisationUnit2.allowedThesisTypes;
             organisationUnit2.allowedThesisTypes = [];
 
-            organisationUnit1.clientInstitution = organisationUnit2.clientInstitution;
-            organisationUnit2.clientInstitution = false;
-            organisationUnit1.validatingEmailDomain = organisationUnit2.validatingEmailDomain;
-            organisationUnit2.validatingEmailDomain = false;
-            organisationUnit1.allowingSubdomains = organisationUnit2.allowingSubdomains;
-            organisationUnit2.allowingSubdomains = false;
-            organisationUnit1.institutionEmailDomain = organisationUnit2.institutionEmailDomain;
-            organisationUnit2.institutionEmailDomain = "";
+            organisationUnit1.clientInstitutionCris = organisationUnit2.clientInstitutionCris;
+            organisationUnit2.clientInstitutionCris = false;
+            organisationUnit1.validatingEmailDomainCris = organisationUnit2.validatingEmailDomainCris;
+            organisationUnit2.validatingEmailDomainCris = false;
+            organisationUnit1.allowingSubdomainsCris = organisationUnit2.allowingSubdomainsCris;
+            organisationUnit2.allowingSubdomainsCris = false;
+            organisationUnit1.institutionEmailDomainCris = organisationUnit2.institutionEmailDomainCris;
+            organisationUnit2.institutionEmailDomainCris = "";
             organisationUnit1.legalEntity = organisationUnit2.legalEntity;
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
@@ -274,10 +274,10 @@ export default defineComponent({
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
             leftOrganisationUnit.value!.uris = updatedData.uris;
             leftOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
-            leftOrganisationUnit.value!.clientInstitution = updatedData.clientInstitution;
-            leftOrganisationUnit.value!.validatingEmailDomain = updatedData.validatingEmailDomain;
-            leftOrganisationUnit.value!.allowingSubdomains = updatedData.allowingSubdomains;
-            leftOrganisationUnit.value!.institutionEmailDomain = updatedData.institutionEmailDomain;
+            leftOrganisationUnit.value!.clientInstitutionCris = updatedData.clientInstitutionCris;
+            leftOrganisationUnit.value!.validatingEmailDomainCris = updatedData.validatingEmailDomainCris;
+            leftOrganisationUnit.value!.allowingSubdomainsCris = updatedData.allowingSubdomainsCris;
+            leftOrganisationUnit.value!.institutionEmailDomainCris = updatedData.institutionEmailDomainCris;
             leftOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             leftUpdateRequest.value = updatedData;
@@ -299,10 +299,10 @@ export default defineComponent({
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
             rightOrganisationUnit.value!.uris = updatedData.uris;
             rightOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
-            rightOrganisationUnit.value!.clientInstitution = updatedData.clientInstitution;
-            rightOrganisationUnit.value!.validatingEmailDomain = updatedData.validatingEmailDomain;
-            rightOrganisationUnit.value!.allowingSubdomains = updatedData.allowingSubdomains;
-            rightOrganisationUnit.value!.institutionEmailDomain = updatedData.institutionEmailDomain;
+            rightOrganisationUnit.value!.clientInstitutionCris = updatedData.clientInstitutionCris;
+            rightOrganisationUnit.value!.validatingEmailDomainCris = updatedData.validatingEmailDomainCris;
+            rightOrganisationUnit.value!.allowingSubdomainsCris = updatedData.allowingSubdomainsCris;
+            rightOrganisationUnit.value!.institutionEmailDomainCris = updatedData.institutionEmailDomainCris;
             rightOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             rightUpdateRequest.value = updatedData;
