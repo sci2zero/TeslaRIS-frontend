@@ -13,7 +13,7 @@
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
                 @blur="onAutocompleteBlur"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="canUserAddPersons" cols="1">
             <generic-crud-modal

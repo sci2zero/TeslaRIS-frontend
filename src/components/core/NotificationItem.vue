@@ -8,13 +8,15 @@
             <template #activator="{ props }">
                 <v-btn
                     v-bind="props"
+                    :color="variant === 'general' ? '#222' : 'white'"
+                    variant="text"
                     icon="mdi-translate"
                 >
                     <v-badge
                         style="z-index: 5;"
                         :content="notificationCountStore.notificationCount"
                         :model-value="notificationCountStore.notificationCount > 0">
-                        <v-icon left dark>
+                        <v-icon left :class="variant === 'general' ? 'text-dark' : 'dark'">
                             mdi-bell
                         </v-icon>
                     </v-badge>
@@ -34,9 +36,16 @@ import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { useInterval } from '@/composables/useInterval';
 
 
+
 export default defineComponent({
     name: "NotificationItem",
     components: { NotificationList },
+    props: {
+        variant: {
+            type: String as () => 'general' | 'home',
+            default: 'home'
+        }
+    },
     setup() {
         const notificationCountStore = useNotificationCountStore();
 
@@ -57,13 +66,13 @@ export default defineComponent({
         return {
             notificationCountStore
         };
-},
-data: () => ({
-    fav: true,
-    menu: false,
-    message: false,
-    hints: true,
-}),
+    },
+    data: () => ({
+        fav: true,
+        menu: false,
+        message: false,
+        hints: true,
+    }),
 });
 </script>
   

@@ -44,6 +44,7 @@
             <v-col cols="5">
                 <v-text-field
                     v-model="numberOfPages" type="number" :min="0" :label="$t('numberOfPagesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
                     :placeholder="$t('numberOfPagesLabel')"></v-text-field>
             </v-col>
         </v-row>
@@ -138,18 +139,21 @@ export default defineComponent({
             emit("update", updatedProceeedingsPublication);
         };
 
-        const { doiValidationRules, scopusIdValidationRules } = useValidationUtils();
+        const {
+            doiValidationRules, scopusIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
+        } = useValidationUtils();
 
         return {
-            isFormValid,
-            subtitle,
+            isFormValid, subtitle,
             publicationYear, doi, scopus,
             articleNumber, uris, numberOfPages,
-            updateProceedingsPublication, toMultilingualTextInput,
+            updateProceedingsPublication,
             languageTags, startPage, endPage,
             publicationTypes, selectedpublicationType,
             description, keywords, doiValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules, toMultilingualTextInput,
+            optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

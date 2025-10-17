@@ -52,7 +52,13 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field v-model="numberOfPages" type="number" :label="$t('numberOfPagesLabel')" :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                <v-text-field
+                    v-model="numberOfPages"
+                    type="number"
+                    :label="$t('numberOfPagesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
+                    :placeholder="$t('numberOfPagesLabel')">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -302,7 +308,8 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             isbnValidationRules, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -421,7 +428,7 @@ export default defineComponent({
             isbnValidationRules, snackbar, message,
             openAlexId, workOpenAlexIdValidationRules,
             webOfScienceId, documentWebOfScienceIdValidationRules,
-            selectedPublisher
+            selectedPublisher, optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

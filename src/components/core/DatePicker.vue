@@ -17,7 +17,9 @@
             @click.stop>
             <template #header></template>
             <template #actions>
-                <v-btn @click.stop="clearDate">
+                <v-btn
+                    v-if="allowDeletion"
+                    @click.stop="clearDate">
                     {{ $t("deleteLabel") }}
                 </v-btn>
                 <v-btn @click.stop="isMenuOpen = false">
@@ -64,6 +66,10 @@ export default defineComponent({
         additionalRules: {
             type: Array as PropType<Array<(value: string) => string | true>>,
             default: () => []
+        },
+        allowDeletion: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update:modelValue"],

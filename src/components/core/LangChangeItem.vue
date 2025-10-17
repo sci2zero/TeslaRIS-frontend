@@ -8,7 +8,9 @@
             <template #activator="{ props }">
                 <v-btn
                     v-bind="props"
-                    icon="mdi-translate"
+                    icon="mdi-web"
+                    variant="text"
+                    :color="variant === 'general' ? '#222' : '#fff'"
                 >
                 </v-btn>
             </template>
@@ -40,8 +42,14 @@ import { supportedLocales, defaultLocale } from '../../i18n'
 import { getLangItems } from '@/i18n/languages';
 
 
-  export default defineComponent({
+export default defineComponent({
     name: "LangChangeItem",
+    props: {
+        variant: {
+            type: String as () => 'general' | 'home',
+            default: 'home'
+        }
+    },
     setup() {
         const currentRoute = useRoute();
         const router = useRouter();

@@ -21,6 +21,7 @@ export interface OrganisationUnitIndex {
     superOUNameOther: string;
     superOUNameOtherSortable: string;
     allowedThesisTypes: ThesisType[];
+    employeeCount: number;
 }
 
 export interface OrganisationUnitRequest {
@@ -35,10 +36,14 @@ export interface OrganisationUnitRequest {
     ror? : string;
     uris: string[];
     allowedThesisTypes: ThesisType[];
-    clientInstitution: boolean;
-    institutionEmailDomain: string;
-    validatingEmailDomain: boolean;
-    allowingSubdomains: boolean;
+    clientInstitutionCris: boolean;
+    institutionEmailDomainCris: string;
+    validatingEmailDomainCris: boolean;
+    allowingSubdomainsCris: boolean;
+    clientInstitutionDl: boolean;
+    institutionEmailDomainDl: string;
+    validatingEmailDomainDl: boolean;
+    allowingSubdomainsDl: boolean;
     legalEntity: boolean;
 }
 
@@ -57,10 +62,14 @@ export interface OrganisationUnitResponse {
     logoServerFilename?: string;
     logoBackgroundHex: string;
     allowedThesisTypes: ThesisType[];
-    clientInstitution: boolean;
-    institutionEmailDomain: string;
-    validatingEmailDomain: boolean;
-    allowingSubdomains: boolean;
+    clientInstitutionCris: boolean;
+    institutionEmailDomainCris: string;
+    validatingEmailDomainCris: boolean;
+    allowingSubdomainsCris: boolean;
+    clientInstitutionDl: boolean;
+    institutionEmailDomainDl: string;
+    validatingEmailDomainDl: boolean;
+    allowingSubdomainsDl: boolean;
     legalEntity: boolean;
 }
 

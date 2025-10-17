@@ -14,7 +14,9 @@
 </template>
 
 <script lang="ts">
+import { PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
+import { type PropType } from 'vue';
 import { defineComponent, onMounted, ref, watch } from 'vue';
 import Vue3WordCloud from 'vue3-word-cloud';
 
@@ -34,6 +36,10 @@ export default defineComponent({
         compactIcon: {
             type: Boolean,
             default: false
+        },
+        documentType: {
+            type: Object as PropType<PublicationType>,
+            required: true
         }
     },
     setup(props) {
@@ -60,8 +66,10 @@ export default defineComponent({
         });
 
         const fetchWordcloudForDocument = () => {
-            DocumentPublicationService.getWordcloudForSingleDocument(props.forDocumentId)
-                .then(response => {
+            DocumentPublicationService.getWordcloudForSingleDocument(
+                props.forDocumentId,
+                props.documentType
+            ).then(response => {
                     localWordcloudFrequencies.value =
                         response.data.map(
                             termFrequency => [termFrequency.a, termFrequency.b]

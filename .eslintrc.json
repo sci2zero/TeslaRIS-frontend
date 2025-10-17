@@ -1,16 +1,16 @@
-module.exports = {
-    env: {
-        node: true,
+{
+    "env": {
+        "node": true
     },
-    extends: ["eslint:recommended", "plugin:vue/vue3-recommended", "@vue/typescript/recommended"],
-    rules: {
+    "extends": ["eslint:recommended", "plugin:vue/vue3-recommended", "@vue/typescript/recommended"],
+    "rules": {
         "vue/html-indent": ["error", 4],
         "vue/max-attributes-per-line": [
             "error",
             {
-                singleline: 4,
-                multiline: 4,
-            },
+                "singleline": 4,
+                "multiline": 4
+            }
         ],
         "vue/html-closing-bracket-newline": "off",
         "vue/html-self-closing": "off",
@@ -28,9 +28,9 @@ module.exports = {
             }
         ]
     },
-    parserOptions: {
-        parser: "@typescript-eslint/parser",
-        sourceType: "module",
-        ecmaVersion: 2020,
-    },
-};
+    "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "sourceType": "module",
+        "ecmaVersion": 2020
+    }
+}

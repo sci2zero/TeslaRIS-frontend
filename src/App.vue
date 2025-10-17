@@ -1,14 +1,6 @@
 <template>
-    <v-app>
-        <v-main>
-            <navbar
-                v-if="!hideLayout"
-            />
-            
-            <breadcrumbs
-                v-if="!hideLayout"
-            />
-            
+    <v-app class="bg-slate-100">
+        <v-main class="bg-slate-100">
             <router-view
                 :key="$route.path"
             />
@@ -21,15 +13,11 @@
                 ref="downloadProgressRef"
             />
         </v-main>
-        <footerbar
-            v-if="!hideLayout"
-        />
     </v-app>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
-import navbar from "@/components/core/Navbar.vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRoute, useRouter } from "vue-router";
@@ -37,8 +25,6 @@ import { useLoginStore } from '@/stores/loginStore';
 import { jwtDecode } from "jwt-decode";
 import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
-import footerbar from "./components/core/FooterBar.vue";
-import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 import CookieConsent from "./components/core/CookieConsent.vue";
 import { useScriptLoader } from "./composables/useScriptLoader";
 import DownloadProgress from "./components/core/DownloadProgress.vue";
@@ -47,7 +33,7 @@ import { useDownloadStore } from "./stores/downloadStore";
 
 export default defineComponent({
     name: "App",
-    components: { navbar, footerbar, Breadcrumbs, CookieConsent, DownloadProgress },
+    components: { CookieConsent, DownloadProgress },
     setup() {
         const route = useRoute();
 

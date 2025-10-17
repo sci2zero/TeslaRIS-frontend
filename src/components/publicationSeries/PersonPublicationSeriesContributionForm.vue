@@ -1,5 +1,5 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer contributions-box">
+    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer section-box">
         <v-row>
             <v-col cols="10">
                 <person-contribution-base

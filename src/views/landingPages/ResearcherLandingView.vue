@@ -241,6 +241,9 @@
             <v-tab v-if="personAssessments?.length > 0" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -338,17 +341,32 @@
                                     <h3>{{ $t("employmentsLabel") }}</h3>
                                 </div>
                                 <br />
-                                <involvement-list :involvements="employments" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <involvement-list
+                                    :involvements="employments"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                                 <div v-if="education.length > 0">
                                     <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
                                 </div>
                                 <br />
-                                <involvement-list :involvements="education" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <involvement-list
+                                    :involvements="education"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                                 <div v-if="memberships.length > 0">
                                     <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
                                 </div>
                                 <br />
-                                <involvement-list :involvements="memberships" :person="person" :can-edit="canEdit" @refresh-involvements="fetchPerson"></involvement-list>
+                                <involvement-list
+                                    :involvements="memberships"
+                                    :person="person"
+                                    :can-edit="canEdit"
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -379,6 +397,16 @@
                     :is-loading="assessmentsLoading"
                     @fetch="fetchAssessment">
                 </person-assessments-view>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <person-visualizations
+                    :person-id="(person.id as number)"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                    :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
+                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -447,11 +475,13 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
+import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
+import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -506,7 +536,16 @@ export default defineComponent({
 
         const assessmentsLoading = ref(false);
 
-        onMounted(() => {
+        const shouldDisplayCollaborationNetworkFirst = ref(false);
+
+        const displaySettings = usePersonChartDisplay(parseInt(currentRoute.params.id as string));
+
+        onMounted(async () => {
+            if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
+                shouldDisplayCollaborationNetworkFirst.value = true;
+                currentTab.value = "visualizations";
+            }
+
             if (loginStore.userLoggedIn) {
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
@@ -647,15 +686,17 @@ export default defineComponent({
                     publications.value = publicationResponse.data.content;
                     totalPublications.value = publicationResponse.data.totalElements;
 
-                    if (switchTab && totalPublications.value > 0) {
+                    if (switchTab && totalPublications.value > 0 && !shouldDisplayCollaborationNetworkFirst.value) {
                         currentTab.value = "publications";
+                    } else if (shouldDisplayCollaborationNetworkFirst.value) {
+                        shouldDisplayCollaborationNetworkFirst.value = false;
                     }
                 }
             );
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons" }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "persons", search: "simple" }});
         };
 
         const addExpertiseOrSkillProof = (proof: DocumentFile, expertiseOrSkill: ExpertiseOrSkillResponse) => {
@@ -814,7 +855,7 @@ export default defineComponent({
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
-            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments
+            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings
         };
 }});
 </script>

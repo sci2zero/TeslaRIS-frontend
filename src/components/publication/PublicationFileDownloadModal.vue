@@ -13,6 +13,7 @@
                     v-else
                     min-width="70"
                     density="compact"
+                    :disabled="!containsFiles"
                     v-bind="scope.props"
                     v-on="scope.isActive">
                     ...
@@ -66,7 +67,7 @@ import AttachmentSection from "../core/AttachmentSection.vue";
 
 
 export default defineComponent({
-    name: "PublicationReferenceFormats",
+    name: "PublicationFileDownloadModal",
     components: { AttachmentSection },
     props: {
         documentId: {
@@ -86,6 +87,10 @@ export default defineComponent({
             default: false
         },
         isListItem: {
+            type: Boolean,
+            default: true
+        },
+        containsFiles: {
             type: Boolean,
             default: true
         }

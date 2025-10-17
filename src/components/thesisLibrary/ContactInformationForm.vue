@@ -45,7 +45,7 @@
                 <v-text-field
                     v-model="formValue.contact.contactEmail"
                     :label="$t('emailLabel') + '*'"
-                    :rules="requiredFieldRules"
+                    :rules="emailFieldRules"
                 ></v-text-field>
             </v-col>
             <v-col cols="6">
@@ -83,7 +83,7 @@ export default defineComponent({
     },
     emits: ["update:modelValue", "update:valid"],
     setup(props, { emit }) {
-        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
+        const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
 
         const localValid = ref(true);
 
@@ -123,6 +123,7 @@ export default defineComponent({
 
         return {
             formValue,
+            emailFieldRules,
             selectedCountry,
             requiredFieldRules,
             localValid, countries,

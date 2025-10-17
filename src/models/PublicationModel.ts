@@ -40,6 +40,7 @@ export interface DocumentPublicationIndex {
     isApproved: boolean;
     areFilesValid: boolean;
     apa: string;
+    containsFiles: boolean;
 }
 
 export enum PublicationType {

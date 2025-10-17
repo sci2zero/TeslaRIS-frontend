@@ -1,14 +1,10 @@
 <template>
-    <v-container>
-        <h1>{{ $t("personListLabel") }}</h1>
-        <br />
-        <br />
-        <search-bar-component @search="clearSortAndPerformSearch($event)"></search-bar-component>
-        <br />
+    <div class="container py-4 px-4 mx-auto">
+        <h1 class="text-2xl font-bold mb-4">
+            {{ $t("personListLabel") }}
+        </h1>
+        
         <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">
-            <v-btn v-if="isAdmin || isInstitutionalEditor" color="primary" @click="addPerson">
-                {{ $t("createNewPersonLabel") }}
-            </v-btn>
             <v-checkbox
                 v-if="isUserBoundToOU"
                 v-model="returnOnlyInstitutionRelatedEntities"
@@ -33,8 +29,16 @@
             :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
             @switch-page="switchPage">
+            <template #top-left>
+                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+            </template>
+            <template #actions>
+                <v-btn v-if="isAdmin || isInstitutionalEditor" color="primary" prepend-icon="mdi-plus" @click="addPerson">
+                    {{ $t("createNewPersonLabel") }}
+                </v-btn>
+            </template>
         </person-table-component>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

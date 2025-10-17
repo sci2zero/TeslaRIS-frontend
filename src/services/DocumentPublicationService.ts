@@ -286,8 +286,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/fields?export=${onlyExportFields}`);
   }
 
-  async getWordcloudForSingleDocument(documentId: number): Promise<AxiosResponse<TermFrequency[]>> {
-    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?language=${i18n.vueI18n.global.locale.toString()}`);
+  async getWordcloudForSingleDocument(documentId: number, documentType: PublicationType): Promise<AxiosResponse<TermFrequency[]>> {
+    return super.sendRequest(axios.get, `document/wordcloud/${documentId}?documentType=${documentType}&language=${i18n.vueI18n.global.locale.toString()}`);
   }
 }
 

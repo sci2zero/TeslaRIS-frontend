@@ -14,7 +14,7 @@
                 :disabled="!inComparator"
             >
                 <div v-for="(prize, index) in prizes" :key="index" class="py-5">
-                    <v-menu
+                    <!-- <v-menu
                         v-if="canEdit"
                         v-model="menus[index]"
                         :close-on-content-click="true"
@@ -36,12 +36,29 @@
                                 <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
-                    </v-menu>
+                    </v-menu> -->
 
                     <h4>
                         <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
                         <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
                         <strong>{{ localiseDate(prize.date) }}</strong>
+                        <div v-if="canEdit" class="d-flex flex-row justify-end edit-pen">
+                            <v-btn
+                                class="mt-1"
+                                icon variant="outlined"
+                                color="primary"
+                                size="medium"
+                                @click="deletePrize(prize.id)">
+                                <v-icon size="large" icon="mdi-delete"></v-icon>
+                            </v-btn>
+                            <prize-modal
+                                class="mt-1 ml-8"
+                                :read-only="!canEdit"
+                                edit
+                                :preset-prize="prize"
+                                @update="updatePrize">
+                            </prize-modal>
+                        </div>
                     </h4>
                     <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
                     

@@ -57,8 +57,11 @@
                         />
                         <v-row v-else>
                             <v-col cols="6">
-                                <div v-if="isAdmin && organisationUnit?.clientInstitution" class="response">
-                                    {{ $t("clientInstitutionLabel") }}
+                                <div v-if="isAdmin && organisationUnit?.clientInstitutionCris" class="response">
+                                    {{ $t("clientInstitutionCrisLabel") }}
+                                </div>
+                                <div v-if="isAdmin && organisationUnit?.clientInstitutionDl" class="response">
+                                    {{ $t("clientInstitutionDlLabel") }}
                                 </div>
                                 <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
                                     {{ $t("legalEntityLabel") }}
@@ -210,6 +213,16 @@
                     :read-only="!canEdit"
                     @update="outputConfigurationUpdated"
                 />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                    class="ml-2"
+                    :form-component="ChartDisplayConfigurationForm"
+                    :form-props="{ organisationUnitId: organisationUnit?.id }"
+                    entity-name="ChartDisplayConfiguration"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                />
                 <v-btn
                     v-if="isInstitutionalEditor && canEdit"
                     class="mb-5 ml-2" color="primary" density="compact"
@@ -248,6 +261,12 @@
             </v-tab>
             <v-tab v-if="ouIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-show="displaySettings.shouldDisplayVisualisations()" value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="displaySettings.shouldDisplayLeaderboards()" value="leaderboards">
+                {{ $t("leaderboardsLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -397,6 +416,25 @@
                     @updated="fetchIndicators"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <organisation-unit-visualizations
+                    :organisation-unit-id="(organisationUnit.id as number)"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="leaderboards">
+                <organisation-unit-leaderboards
+                    :organisation-unit-id="organisationUnit?.id"
+                    :display-settings="displaySettings.displaySettings.value"
+                    :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"
+                    :display-citations-tab="displaySettings.shouldDisplayCitationLeaderboards()"
+                    :display-points-tab="displaySettings.shouldDisplayAssessmentPointsLeaderboards()"
+                    :is-digital-library-client="organisationUnit?.clientInstitutionDl"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -454,11 +492,15 @@ import OrganisationUnitOutputConfigurationForm from '@/components/organisationUn
 import OrganisationUnitOutputConfigurationService from '@/services/OrganisationUnitOutputConfigurationService';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import OrganisationUnitVisualizations from '@/components/organisationUnit/OrganisationUnitVisualizations.vue';
+import OrganisationUnitLeaderboards from '@/components/organisationUnit/OrganisationUnitLeaderboards.vue';
+import ChartDisplayConfigurationForm from '@/components/organisationUnit/ChartDisplayConfigurationForm.vue';
+import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards },
     setup() {
         const currentTab = ref("relations");
 
@@ -530,6 +572,8 @@ export default defineComponent({
         const publicationsRef = ref<typeof PublicationTableComponent>();
 
         const showOutputs = ref(false);
+
+        const displaySettings = useOUChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -723,11 +767,15 @@ export default defineComponent({
             organisationUnit.value!.ror = basicInfo.ror;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
-            organisationUnit.value!.clientInstitution = basicInfo.clientInstitution;
-            organisationUnit.value!.validatingEmailDomain = basicInfo.validatingEmailDomain;
-            organisationUnit.value!.allowingSubdomains = basicInfo.allowingSubdomains;
-            organisationUnit.value!.institutionEmailDomain = basicInfo.institutionEmailDomain;
+            organisationUnit.value!.clientInstitutionCris = basicInfo.clientInstitutionCris;
+            organisationUnit.value!.validatingEmailDomainCris = basicInfo.validatingEmailDomainCris;
+            organisationUnit.value!.allowingSubdomainsCris = basicInfo.allowingSubdomainsCris;
+            organisationUnit.value!.institutionEmailDomainCris = basicInfo.institutionEmailDomainCris;
             organisationUnit.value!.legalEntity = basicInfo.legalEntity;
+            organisationUnit.value!.clientInstitutionDl = basicInfo.clientInstitutionDl;
+            organisationUnit.value!.validatingEmailDomainDl = basicInfo.validatingEmailDomainDl;
+            organisationUnit.value!.allowingSubdomainsDl = basicInfo.allowingSubdomainsDl;
+            organisationUnit.value!.institutionEmailDomainDl = basicInfo.institutionEmailDomainDl;
             performUpdate(false);
         };
 
@@ -773,11 +821,15 @@ export default defineComponent({
                 contact: organisationUnit.value?.contact,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
-                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
-                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
-                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
-                legalEntity: organisationUnit.value?.legalEntity as boolean
+                clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
+                validatingEmailDomainCris: organisationUnit.value?.validatingEmailDomainCris as boolean,
+                allowingSubdomainsCris: organisationUnit.value?.allowingSubdomainsCris as boolean,
+                institutionEmailDomainCris: organisationUnit.value?.institutionEmailDomainCris as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean,
+                clientInstitutionDl: organisationUnit.value?.clientInstitutionDl as boolean,
+                validatingEmailDomainDl: organisationUnit.value?.validatingEmailDomainDl as boolean,
+                allowingSubdomainsDl: organisationUnit.value?.allowingSubdomainsDl as boolean,
+                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -801,11 +853,15 @@ export default defineComponent({
                 scopusAfid: organisationUnit.value?.scopusAfid,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
-                clientInstitution: organisationUnit.value?.clientInstitution as boolean,
-                validatingEmailDomain: organisationUnit.value?.validatingEmailDomain as boolean,
-                allowingSubdomains: organisationUnit.value?.allowingSubdomains as boolean,
-                institutionEmailDomain: organisationUnit.value?.institutionEmailDomain as string,
-                legalEntity: organisationUnit.value?.legalEntity as boolean
+                clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
+                validatingEmailDomainCris: organisationUnit.value?.validatingEmailDomainCris as boolean,
+                allowingSubdomainsCris: organisationUnit.value?.allowingSubdomainsCris as boolean,
+                institutionEmailDomainCris: organisationUnit.value?.institutionEmailDomainCris as string,
+                legalEntity: organisationUnit.value?.legalEntity as boolean,
+                clientInstitutionDl: organisationUnit.value?.clientInstitutionDl as boolean,
+                validatingEmailDomainDl: organisationUnit.value?.validatingEmailDomainDl as boolean,
+                allowingSubdomainsDl: organisationUnit.value?.allowingSubdomainsDl as boolean,
+                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -823,7 +879,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "organisationUnits" }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "organisationUnits", search: "simple" }});
         };
 
         const updateSuccess = () => {
@@ -890,12 +946,12 @@ export default defineComponent({
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
             fetchPublicReviewPageContent, isInstitutionalLibrarian,
-            OrganisationUnitTrustConfigurationForm,
+            OrganisationUnitTrustConfigurationForm, displaySettings,
             OrganisationUnitImportSourceForm, showOutputs,
             OrganisationUnitOutputConfigurationForm,
             InstitutionDefaultSubmissionContentForm,
             outputConfigurationUpdated, loggedInUser,
-            navigateToBackupPage
+            navigateToBackupPage, ChartDisplayConfigurationForm
         };
 }})
 

@@ -13,9 +13,18 @@
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftConference?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftConference?.description as MultilingualContent[])"
+                    :placeholder-label="$t('eventDescriptionLabel')"
+                    @update="updateLeftDescription">
+                </description-or-biography-update-form>
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftConference?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftConference?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords">
+                </keyword-update-form>
 
                 <br />
 
@@ -58,9 +67,18 @@
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightConference?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightConference?.description as MultilingualContent[])"
+                    :placeholder-label="$t('eventDescriptionLabel')"
+                    @update="updateRightDescription">
+                </description-or-biography-update-form>
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightConference?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightConference?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords">
+                </keyword-update-form>
 
                 <br />
 

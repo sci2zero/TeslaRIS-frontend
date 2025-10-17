@@ -9,6 +9,7 @@
                             v-model="description"
                             :initial-value="toMultilingualTextInput(presetDescriptionOrBiography, languageTags)"
                             :label="$t('abstractLabel')"
+                            :placeholder-label="placeholderLabel ? placeholderLabel : $t('abstractLabel')"
                             is-rich>
                         </multilingual-text-input>
                     </v-col>
@@ -36,6 +37,10 @@ export default defineComponent({
         presetDescriptionOrBiography: {
             type: Object as PropType<MultilingualContent[]>,
             required: true
+        },
+        placeholderLabel: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update"],

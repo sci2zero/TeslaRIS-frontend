@@ -1,0 +1,7 @@
+
+@forward 'vuetify' with (
+  $utilities: false,
+  // $reset: false,
+  $color-pack: true,
+  $layers: true,
+);

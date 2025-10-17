@@ -51,7 +51,8 @@
                                         v-model="selectedOrganisationUnit"
                                         required
                                         disable-submission
-                                        only-client-institutions>
+                                        :only-client-institutions-cris="!fetchOnlyDlClients"
+                                        :only-client-institutions-dl="fetchOnlyDlClients">
                                     </organisation-unit-autocomplete-search>
                                 </v-col>
                                 <v-col v-if="registeringCommission" cols="12">
@@ -124,6 +125,13 @@ export default defineComponent({
         const i18n = useI18n();
 
         const registeringCommission = computed(() => props.employeeRole === UserRole.COMMISSION);
+
+        const fetchOnlyDlClients = computed(() => [
+                UserRole.INSTITUTIONAL_LIBRARIAN,
+                UserRole.HEAD_OF_LIBRARY,
+                UserRole.PROMOTION_REGISTRY_ADMINISTRATOR
+            ].includes(props.employeeRole)
+        );
 
         const name = ref("");
         const surname = ref("");
@@ -237,14 +245,15 @@ export default defineComponent({
 
         return {
             dialog, name, surname, 
-            ouAutocompleteRef, 
+            ouAutocompleteRef, fetchOnlyDlClients,
             selectedOrganisationUnit, 
             email, note, selectedCommission,
             languages, selectedLanguage, 
             registerEmployee, isFormValid,
             emailFieldRules, requiredFieldRules,
             requiredSelectionRules, getTitleLabel,
-            commissionAutocompleteRef, registeringCommission
+            commissionAutocompleteRef,
+            registeringCommission
         };
     }
 });

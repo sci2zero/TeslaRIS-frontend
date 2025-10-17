@@ -16,3 +16,6 @@ export const transliterateContentToCyrillic = <T extends { title: string }>(data
     }));
 };
 
+export const transliterateValueToCyrillic = (value: string): string => {
+    return toCyrillic(value) ?? value;
+};
