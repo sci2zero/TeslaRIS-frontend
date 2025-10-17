@@ -138,6 +138,7 @@ export default {
     organisationUnitLabel: "Organisation Unit",
     roleLabel: "Role",
     actionLabel: "Action",
+    optionsLabel: "Options",
     actionFailedNotification: "Something went wrong, refresh page and try again.",
     successfulltUpdatedNotification: "Sucessfully updated",
     userDidNotAllowNotification: "User did not allow this operation.",
@@ -149,6 +150,7 @@ export default {
     superOULabel: "Super Organisation Unit",
     birthdateLabel: "Birthdate",
     placeOfBirthLabel: "Place of Birth",
+    identifiersLabel: "Identifiers",
     employmentColumn: "employmentsOther",
     resources: "Resources",
     manage: "Manage",
@@ -163,6 +165,8 @@ export default {
     nameAbbreviationLabel: "Name Abbreviation",
     keywordsLabel: "Keywords",
     authorNamesLabel: "Authors",
+    showMoreAuthorsLabel: "Show {count} more...",
+    showLessLabel: "Show less",
     researchAreasLabel: "Research Areas",
     researchAreaLabel: "Research Area",
     nameColumn: "nameOther",
@@ -192,6 +196,7 @@ export default {
     publisherLabel: "Publisher",
     simpleSearchLabel: "Search",
     advancedSearchLabel: "Advanced Search",
+    backToSimpleSearchLabel: "Back to Simple Search",
     saveLabel: "Save",
     saveAndAddAnotherLabel: "Save and Add Another",
     userProfileLabel: "User Profile",
@@ -424,6 +429,7 @@ export default {
     eCrisIdFormatError: "Wrong eCRIS ID format.",
     eNaukaIdFormatError: "Wrong eNauka ID format.",
     orcidIdFormatError: "Wrong ORCID format.",
+    identifierCopiedNotification: "Identifier {identifier} copied to clipboard.",
     scopusAuthorIdFormatError: "Wrong Scopus Author ID format.",
     apvntExistsError: "APVNT allready in use.",
     eCrisIdExistsError: "eCRIS ID allready in use.",
@@ -730,6 +736,8 @@ export default {
     boardPresidentsLabel: "Board presidents",
     searchLabel: "Search",
     filtersLabel: "Filters",
+    filterLabel: "Filter",
+    filterActiveLabel: "Filter active",
     onlyOpenAccessLabel: "Only open-access",
     fieldLabel: "Field",
     operationLabel: "Operation",
@@ -751,6 +759,10 @@ export default {
     exportColumnsLabel: "Export columns",
     pageLabel: "Page Number (export is performed in batches of {0} records)",
     exportLabel: "Export",
+    itemSelected: "item selected",
+    itemsSelected: "items selected",
+    actions: "Actions",
+    tryAdjustingFilters: "Try adjusting your search filters",
     promotionListLabel: "Promotions",
     createNewPromotionLabel: "Create new promotion",
     dateTimeLabel: "Date and time",
@@ -1114,6 +1126,30 @@ export default {
     updateChartDisplayConfigurationLabel: "Visualizations display",
     spanWholeRowLabel: "Span whole row",
     positiveOrZeroFieldMessage: "This field can't be < 0.",
+    loading: "Loading...",
+    citations: "citations",
+    footer: {
+        quickLinks: "Quick Links",
+        contact: "Contact info",
+        location: "Novi Sad, Serbia",
+        allRightsReserved: "All rights reserved"
+    },
+    landingFeatures: {
+        title: "Featured Resources",
+        subtitle: "Most cited researchers, institutions and scientific results",
+        topResearchers: {
+            title: "Most Cited Researchers",
+            viewAll: "View all researchers"
+        },
+        topInstitutions: {
+            title: "Most Cited Institutions",
+            viewAll: "View all institutions"
+        },
+        topPublications: {
+            title: "Most Cited Works",
+            viewAll: "View all publications"
+        }
+    },
     participationsLabel: "Participations",
     personViewCountsLeaderboardLabel: "Top researchers by view count",
     documentViewCountsLeaderboardLabel: "Top publications by view count",

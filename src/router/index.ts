@@ -30,6 +30,7 @@ import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
+import NewResearcherLandingView from "@/views/landingPages/NewResearcherLandingView.vue";
 import OrgUnitLandingView from "@/views/landingPages/OrgUnitLandingView.vue";
 import JournalLandingView from "@/views/landingPages/JournalLandingView.vue";
 import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vue";
@@ -108,6 +109,7 @@ import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
 import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView.vue";
 
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 const roles = {
     researcher: "RESEARCHER",
@@ -153,6 +155,7 @@ const router = createRouter({
         {
             path: "/:locale",
             name: "baseLocale",
+            component: DefaultLayout,
             children: [
                 {
                     path: "",
@@ -458,6 +461,15 @@ const router = createRouter({
                             path: "",
                             name: "persons",
                             component: PersonListView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "new/:id",
+                            name: "researcherLandingPageOld",
+                            component: NewResearcherLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],
