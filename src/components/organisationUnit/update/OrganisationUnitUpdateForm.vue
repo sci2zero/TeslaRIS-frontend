@@ -44,32 +44,71 @@
                         v-model="legalEntity"
                         :label="$t('legalEntityLabel')"
                     ></v-checkbox>
-                    <v-checkbox
-                        v-model="clientInstitutionCris"
-                        :label="$t('clientInstitutionLabel')"
-                    ></v-checkbox>
                 </v-row>
-                <v-row v-if="clientInstitutionCris">
-                    <v-checkbox
-                        v-model="validatingEmailDomainCris"
-                        :label="$t('validatingEmailDomainLabel')"
-                    ></v-checkbox>
-                    <v-checkbox
-                        v-if="validatingEmailDomainCris"
-                        v-model="allowingSubdomainsCris"
-                        :label="$t('allowingSubdomainsLabel')"
-                    ></v-checkbox>
-                </v-row>
-                <v-row v-if="clientInstitutionCris && validatingEmailDomainCris">
-                    <v-col cols="12">
-                        <v-text-field
-                            v-model="institutionEmailDomainCris"
-                            :label="$t('institutionEmailDomainLabel') + '*'"
-                            :placeholder="$t('institutionEmailDomainLabel') + '*'"
-                            :rules="requiredFieldRules">
-                        </v-text-field>
-                    </v-col>
-                </v-row>
+                <v-container class="section-box">
+                    <v-row v-if="isAdmin">
+                        <v-checkbox
+                            v-model="clientInstitutionCris"
+                            :label="$t('clientInstitutionCrisLabel')"
+                        ></v-checkbox>
+                    </v-row>
+                    <v-row v-if="clientInstitutionCris">
+                        <v-checkbox
+                            v-model="validatingEmailDomainCris"
+                            :label="$t('validatingEmailDomainLabel')"
+                        ></v-checkbox>
+                        <v-checkbox
+                            v-if="validatingEmailDomainCris"
+                            v-model="allowingSubdomainsCris"
+                            :label="$t('allowingSubdomainsLabel')"
+                        ></v-checkbox>
+                    </v-row>
+                    <v-row v-if="clientInstitutionCris && validatingEmailDomainCris">
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="institutionEmailDomainCris"
+                                :label="$t('institutionEmailDomainLabel') + '*'"
+                                :placeholder="$t('institutionEmailDomainLabel') + '*'"
+                                :rules="requiredFieldRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-container>
+                <v-container class="section-box mt-2 mb-2">
+                    <v-row>
+                        <v-col>
+                            <v-checkbox
+                                v-model="clientInstitutionDl"
+                                :label="$t('clientInstitutionDlLabel')"
+                            ></v-checkbox>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="isAdmin && clientInstitutionDl">
+                        <v-col>
+                            <v-checkbox
+                                v-model="validatingEmailDomainDl"
+                                :label="$t('validatingEmailDomainLabel')"
+                            ></v-checkbox>
+                        </v-col>
+                        <v-col>
+                            <v-checkbox
+                                v-if="validatingEmailDomainDl"
+                                v-model="allowingSubdomainsDl"
+                                :label="$t('allowingSubdomainsLabel')"
+                            ></v-checkbox>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="isAdmin && clientInstitutionDl && validatingEmailDomainDl">
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="institutionEmailDomainDl"
+                                :label="$t('institutionEmailDomainLabel') + '*'"
+                                :placeholder="$t('institutionEmailDomainLabel') + '*'"
+                                :rules="requiredFieldRules">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-container>
                 <v-row>
                     <v-col>
                         <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
@@ -176,6 +215,12 @@ export default defineComponent({
         const validatingEmailDomainCris = ref(props.presetOU?.validatingEmailDomainCris);
         const allowingSubdomainsCris = ref(props.presetOU?.allowingSubdomainsCris);
         const institutionEmailDomainCris = ref(props.presetOU?.institutionEmailDomainCris);
+
+        const clientInstitutionDl = ref(props.presetOU?.clientInstitutionDl);
+        const validatingEmailDomainDl = ref(props.presetOU?.validatingEmailDomainDl);
+        const allowingSubdomainsDl = ref(props.presetOU?.allowingSubdomainsDl);
+        const institutionEmailDomainDl = ref(props.presetOU?.institutionEmailDomainDl);
+
         const legalEntity = ref(props.presetOU?.legalEntity);
 
         const thesisTypes = getThesisTypesForGivenLocale();
@@ -227,7 +272,11 @@ export default defineComponent({
                 validatingEmailDomainCris: validatingEmailDomainCris.value as boolean,
                 allowingSubdomainsCris: allowingSubdomainsCris.value as boolean,
                 institutionEmailDomainCris: institutionEmailDomainCris.value as string,
-                legalEntity: legalEntity.value as boolean
+                legalEntity: legalEntity.value as boolean,
+                clientInstitutionDl: clientInstitutionDl.value as boolean,
+                validatingEmailDomainDl: validatingEmailDomainDl.value as boolean,
+                allowingSubdomainsDl: allowingSubdomainsDl.value as boolean,
+                institutionEmailDomainDl: institutionEmailDomainDl.value as string
             };
 
             emit("update", updatedOU);
@@ -250,6 +299,10 @@ export default defineComponent({
             validatingEmailDomainCris.value = props.presetOU?.validatingEmailDomainCris;
             allowingSubdomainsCris.value = props.presetOU?.allowingSubdomainsCris;
             institutionEmailDomainCris.value = props.presetOU?.institutionEmailDomainCris;
+            clientInstitutionDl.value = props.presetOU?.clientInstitutionDl;
+            validatingEmailDomainDl.value = props.presetOU?.validatingEmailDomainDl;
+            allowingSubdomainsDl.value = props.presetOU?.allowingSubdomainsDl;
+            institutionEmailDomainDl.value = props.presetOU?.institutionEmailDomainDl;
             legalEntity.value = props.presetOU?.legalEntity;
             
             selectedThesisType.value.splice(0);
@@ -272,7 +325,9 @@ export default defineComponent({
             rorValidationRules, thesisTypes, selectedThesisType,
             requiredSelectionRules, clientInstitutionCris,
             validatingEmailDomainCris, allowingSubdomainsCris,
-            institutionEmailDomainCris, isAdmin, legalEntity
+            institutionEmailDomainCris, isAdmin, legalEntity,
+            clientInstitutionDl, validatingEmailDomainDl,
+            allowingSubdomainsDl, institutionEmailDomainDl
         };
     }
 });

@@ -179,7 +179,6 @@ export default defineComponent({
                 return (item as OrganisationUnitIndex).nameSr;
             }
 
-            console.log(item as DocumentPublicationIndex)
             return (item as DocumentPublicationIndex).apa;
         };
 

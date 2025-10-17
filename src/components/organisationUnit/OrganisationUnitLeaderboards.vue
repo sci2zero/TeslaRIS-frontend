@@ -156,6 +156,14 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
+            <div v-if="isDigitalLibraryClient && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)">
+                <v-checkbox
+                    v-model="displayThesesLibraryAnalytics"
+                    class="table-checkbox"
+                    :label="$t('digitalLibraryAnalyticsLabel')"
+                />
+            </div>
+
             <v-row class="d-flex justify-center">
                 <v-col
                     v-if="displaySettings?.viewCountPersonLeaderboard.display"
@@ -182,6 +190,41 @@
                     />
                 </v-col>
             </v-row>
+
+            <div
+                v-if="displayThesesLibraryAnalytics"
+                ref="thesisLibraryAnalyticsRef">
+                <div class="d-flex flex-column justify-center align-center text-center mt-15">
+                    <h2>{{ $t("digitalLibraryAnalyticsLabel") }}</h2>
+                    <v-select
+                        v-model="selectedThesisTypes"
+                        class="no-empty-outline publication-type-select mt-3"
+                        :items="thesisTypes"
+                        :label="$t('thesisTypeLabel')"
+                        return-object
+                        multiple
+                    ></v-select>
+                </div>
+
+                <v-row>
+                    <v-col
+                        v-if="displaySettings?.viewCountDocumentLeaderboard.display"
+                        cols="12" :md="displaySettings?.viewCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                        <leaderboard-table
+                            :leaderboard-data="thesesViewCountsLeaderboard"
+                            :title="$t('thesesViewCountsLeaderboardLabel')"
+                        />
+                    </v-col>
+                    <v-col
+                        v-if="displaySettings?.downloadCountDocumentLeaderboard.display"
+                        cols="12" :md="displaySettings?.downloadCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                        <leaderboard-table
+                            :leaderboard-data="thesesDownloadCountsLeaderboard"
+                            :title="$t('thesesDownloadCountsLeaderboardLabel')"
+                        />
+                    </v-col>
+                </v-row>
+            </div>
         </v-tabs-window-item>
     </v-tabs-window>
 </template>
@@ -190,7 +233,7 @@
 import type { CommissionAssessmentPointsPersonLeaderboard, LeaderboardEntry } from '@/models/Common';
 import PersonLeaderboardService from '@/services/visualization/PersonLeaderboardService';
 import { max, min } from 'lodash';
-import { onMounted, type PropType, ref, watch } from 'vue';
+import { computed, onMounted, type PropType, ref, watch } from 'vue';
 import LeaderboardTable from '../charts/LeaderboardTable.vue';
 import OrganisationUnitLeaderboardService from '@/services/visualization/OrganisationUnitLeaderboardService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -198,6 +241,10 @@ import type { OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationM
 import DocumentLeaderboardService from '@/services/visualization/DocumentLeaderboardService';
 import DatePicker from '../core/DatePicker.vue';
 import { StatisticsType } from '@/models/AssessmentModel';
+import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { ThesisType } from '@/models/PublicationModel';
+import DigitalLibraryLeaderboardService from '@/services/visualization/DigitalLibraryLeaderboardService';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 const props = defineProps({
@@ -220,6 +267,10 @@ const props = defineProps({
     displayPointsTab: {
         type: Boolean,
         required: true
+    },
+    isDigitalLibraryClient: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -232,6 +283,12 @@ const startDate = ref<string>((new Date(`${(new Date()).getFullYear() - 10}-01-0
 const endDate = ref<string>((new Date()).toISOString());
 
 const currentTab = ref("publicationCount");
+
+const {
+    isAdmin,
+    isInstitutionalLibrarian,
+    isHeadOfLibrary
+} = useUserRole();
 
 const personPublicationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const personCitationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
@@ -246,6 +303,14 @@ const documentCitationCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const documentViewCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 const documentDownloadCountsLeaderboard = ref<LeaderboardEntry[]>([]);
 
+const thesesViewCountsLeaderboard = ref<LeaderboardEntry[]>([]);
+const thesesDownloadCountsLeaderboard = ref<LeaderboardEntry[]>([]);
+
+const thesisTypes = computed(() => getThesisTypesForGivenLocale());
+const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
+
+const displayThesesLibraryAnalytics = ref(false);
+
 onMounted(() => {
     fetchLeaderboardData();
     deduceStartTab();
@@ -255,6 +320,10 @@ const fetchLeaderboardData = () => {
     fetchPersonLeaderboards();
     fetchOrganisationSubUnitsLeaderboards();
     fetchDocumentLeaderboards();
+
+    if (displayThesesLibraryAnalytics.value) {
+        fetchDigitalLibraryLeaderboards();
+    }
 };
 
 const fetchPersonLeaderboards = () => {
@@ -333,6 +402,26 @@ const fetchDocumentLeaderboards = () => {
     });
 };
 
+const fetchDigitalLibraryLeaderboards = () => {
+    thesesViewCountsLeaderboard.value.splice(0);
+    DigitalLibraryLeaderboardService.getThesisStatisticCountLeaderboard(
+        props.organisationUnitId,
+        startDate.value.split("T")[0], endDate.value.split("T")[0],
+        StatisticsType.VIEW, selectedThesisTypes.value.map(type => type.value)
+    ).then((response) => {
+        thesesViewCountsLeaderboard.value = response.data;
+    });
+
+    thesesDownloadCountsLeaderboard.value.splice(0);
+    DigitalLibraryLeaderboardService.getThesisStatisticCountLeaderboard(
+        props.organisationUnitId,
+        startDate.value.split("T")[0], endDate.value.split("T")[0],
+        StatisticsType.DOWNLOAD, selectedThesisTypes.value.map(type => type.value)
+    ).then((response) => {
+        thesesDownloadCountsLeaderboard.value = response.data;
+    });
+};
+
 watch([fromYear, toYear], () => {
     if (fromYear.value < minYear.value) {
         fromYear.value = minYear.value;
@@ -357,6 +446,17 @@ watch([fromYear, toYear], () => {
     fetchLeaderboardData();
 });
 
+watch(
+    [
+        selectedThesisTypes,
+        displayThesesLibraryAnalytics
+    ], () => {
+        if (displayThesesLibraryAnalytics.value) {
+            fetchDigitalLibraryLeaderboards();
+        }
+    }
+);
+
 const deduceStartTab = () => {
     if (props.displayPublicationsTab) {
         currentTab.value = "publicationCount";
@@ -367,4 +467,27 @@ const deduceStartTab = () => {
     }
 };
 
+const thesisLibraryAnalyticsRef = ref<HTMLElement>();
+
+watch(thesisLibraryAnalyticsRef, () => {
+    if (thesisLibraryAnalyticsRef.value) {
+        thesisLibraryAnalyticsRef.value.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        setTimeout(() => {
+            window.scrollBy({
+                top: 500,
+                behavior: "smooth"
+            });
+        }, 400);
+    }
+});
+
 </script>
+
+<style scoped>
+
+.publication-type-select {
+    width: 500px;
+}
+
+</style>

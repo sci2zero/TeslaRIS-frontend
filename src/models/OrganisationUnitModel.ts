@@ -40,6 +40,10 @@ export interface OrganisationUnitRequest {
     institutionEmailDomainCris: string;
     validatingEmailDomainCris: boolean;
     allowingSubdomainsCris: boolean;
+    clientInstitutionDl: boolean;
+    institutionEmailDomainDl: string;
+    validatingEmailDomainDl: boolean;
+    allowingSubdomainsDl: boolean;
     legalEntity: boolean;
 }
 
@@ -62,6 +66,10 @@ export interface OrganisationUnitResponse {
     institutionEmailDomainCris: string;
     validatingEmailDomainCris: boolean;
     allowingSubdomainsCris: boolean;
+    clientInstitutionDl: boolean;
+    institutionEmailDomainDl: string;
+    validatingEmailDomainDl: boolean;
+    allowingSubdomainsDl: boolean;
     legalEntity: boolean;
 }
 

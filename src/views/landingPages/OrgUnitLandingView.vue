@@ -58,7 +58,10 @@
                         <v-row v-else>
                             <v-col cols="6">
                                 <div v-if="isAdmin && organisationUnit?.clientInstitutionCris" class="response">
-                                    {{ $t("clientInstitutionLabel") }}
+                                    {{ $t("clientInstitutionCrisLabel") }}
+                                </div>
+                                <div v-if="isAdmin && organisationUnit?.clientInstitutionDl" class="response">
+                                    {{ $t("clientInstitutionDlLabel") }}
                                 </div>
                                 <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
                                     {{ $t("legalEntityLabel") }}
@@ -429,6 +432,7 @@
                     :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"
                     :display-citations-tab="displaySettings.shouldDisplayCitationLeaderboards()"
                     :display-points-tab="displaySettings.shouldDisplayAssessmentPointsLeaderboards()"
+                    :is-digital-library-client="organisationUnit?.clientInstitutionDl"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -768,6 +772,10 @@ export default defineComponent({
             organisationUnit.value!.allowingSubdomainsCris = basicInfo.allowingSubdomainsCris;
             organisationUnit.value!.institutionEmailDomainCris = basicInfo.institutionEmailDomainCris;
             organisationUnit.value!.legalEntity = basicInfo.legalEntity;
+            organisationUnit.value!.clientInstitutionDl = basicInfo.clientInstitutionDl;
+            organisationUnit.value!.validatingEmailDomainDl = basicInfo.validatingEmailDomainDl;
+            organisationUnit.value!.allowingSubdomainsDl = basicInfo.allowingSubdomainsDl;
+            organisationUnit.value!.institutionEmailDomainDl = basicInfo.institutionEmailDomainDl;
             performUpdate(false);
         };
 
@@ -817,7 +825,11 @@ export default defineComponent({
                 validatingEmailDomainCris: organisationUnit.value?.validatingEmailDomainCris as boolean,
                 allowingSubdomainsCris: organisationUnit.value?.allowingSubdomainsCris as boolean,
                 institutionEmailDomainCris: organisationUnit.value?.institutionEmailDomainCris as string,
-                legalEntity: organisationUnit.value?.legalEntity as boolean
+                legalEntity: organisationUnit.value?.legalEntity as boolean,
+                clientInstitutionDl: organisationUnit.value?.clientInstitutionDl as boolean,
+                validatingEmailDomainDl: organisationUnit.value?.validatingEmailDomainDl as boolean,
+                allowingSubdomainsDl: organisationUnit.value?.allowingSubdomainsDl as boolean,
+                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -845,7 +857,11 @@ export default defineComponent({
                 validatingEmailDomainCris: organisationUnit.value?.validatingEmailDomainCris as boolean,
                 allowingSubdomainsCris: organisationUnit.value?.allowingSubdomainsCris as boolean,
                 institutionEmailDomainCris: organisationUnit.value?.institutionEmailDomainCris as string,
-                legalEntity: organisationUnit.value?.legalEntity as boolean
+                legalEntity: organisationUnit.value?.legalEntity as boolean,
+                clientInstitutionDl: organisationUnit.value?.clientInstitutionDl as boolean,
+                validatingEmailDomainDl: organisationUnit.value?.validatingEmailDomainDl as boolean,
+                allowingSubdomainsDl: organisationUnit.value?.allowingSubdomainsDl as boolean,
+                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {

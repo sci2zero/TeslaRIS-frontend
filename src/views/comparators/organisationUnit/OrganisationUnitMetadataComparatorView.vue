@@ -214,6 +214,14 @@ export default defineComponent({
             organisationUnit2.allowingSubdomainsCris = false;
             organisationUnit1.institutionEmailDomainCris = organisationUnit2.institutionEmailDomainCris;
             organisationUnit2.institutionEmailDomainCris = "";
+            organisationUnit1.clientInstitutionDl = organisationUnit2.clientInstitutionDl;
+            organisationUnit2.clientInstitutionDl = false;
+            organisationUnit1.validatingEmailDomainDl = organisationUnit2.validatingEmailDomainDl;
+            organisationUnit2.validatingEmailDomainDl = false;
+            organisationUnit1.allowingSubdomainsDl = organisationUnit2.allowingSubdomainsDl;
+            organisationUnit2.allowingSubdomainsDl = false;
+            organisationUnit1.institutionEmailDomainDl = organisationUnit2.institutionEmailDomainDl;
+            organisationUnit2.institutionEmailDomainDl = "";
             organisationUnit1.legalEntity = organisationUnit2.legalEntity;
 
             organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
@@ -278,6 +286,10 @@ export default defineComponent({
             leftOrganisationUnit.value!.validatingEmailDomainCris = updatedData.validatingEmailDomainCris;
             leftOrganisationUnit.value!.allowingSubdomainsCris = updatedData.allowingSubdomainsCris;
             leftOrganisationUnit.value!.institutionEmailDomainCris = updatedData.institutionEmailDomainCris;
+            leftOrganisationUnit.value!.clientInstitutionDl = updatedData.clientInstitutionDl;
+            leftOrganisationUnit.value!.validatingEmailDomainDl = updatedData.validatingEmailDomainDl;
+            leftOrganisationUnit.value!.allowingSubdomainsDl = updatedData.allowingSubdomainsDl;
+            leftOrganisationUnit.value!.institutionEmailDomainDl = updatedData.institutionEmailDomainDl;
             leftOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             leftUpdateRequest.value = updatedData;
@@ -303,6 +315,10 @@ export default defineComponent({
             rightOrganisationUnit.value!.validatingEmailDomainCris = updatedData.validatingEmailDomainCris;
             rightOrganisationUnit.value!.allowingSubdomainsCris = updatedData.allowingSubdomainsCris;
             rightOrganisationUnit.value!.institutionEmailDomainCris = updatedData.institutionEmailDomainCris;
+            rightOrganisationUnit.value!.clientInstitutionDl = updatedData.clientInstitutionDl;
+            rightOrganisationUnit.value!.validatingEmailDomainDl = updatedData.validatingEmailDomainDl;
+            rightOrganisationUnit.value!.allowingSubdomainsDl = updatedData.allowingSubdomainsDl;
+            rightOrganisationUnit.value!.institutionEmailDomainDl = updatedData.institutionEmailDomainDl;
             rightOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
 
             rightUpdateRequest.value = updatedData;

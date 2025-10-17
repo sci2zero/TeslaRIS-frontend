@@ -1056,7 +1056,7 @@ export default {
     readMoreLabel: "Vidi još",
     readLessLabel: "Vidi manje",
     nobodyLabel: "Nijedan",
-    clientInstitutionLabel: "Klijentska institucija",
+    clientInstitutionCrisLabel: "Klijentska institucija (CRIS)",
     validatingEmailDomainLabel: "Validiraj domen email adrese",
     allowingSubdomainsLabel: "Dozvoli upotrebu pod-domena",
     institutionEmailDomainLabel: "Domen institucionalne email adrese",
@@ -1124,5 +1124,9 @@ export default {
     documentCitationCountLeaderboardLabel: "Top publikacije po broju citata",
     personViewCountsLeaderboardLabel: "Top istraživači po pregledima",
     documentViewCountsLeaderboardLabel: "Top publikacije po pregledima",
-    documentDownloadCountsLeaderboardLabel: "Top publikacije po preuzimanjima"
+    documentDownloadCountsLeaderboardLabel: "Top publikacije po preuzimanjima",
+    clientInstitutionDlLabel: "Klijentska institucija (Digitalna biblioteka)",
+    digitalLibraryAnalyticsLabel: "Analitika digitalne biblioteke",
+    thesesViewCountsLeaderboardLabel: "Top završni radovi po broju pregleda",
+    thesesDownloadCountsLeaderboardLabel: "Top završni radovi po broju preuyimanja"
 }

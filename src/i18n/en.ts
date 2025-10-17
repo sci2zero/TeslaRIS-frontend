@@ -1051,7 +1051,7 @@ export default {
     readMoreLabel: "Read more",
     readLessLabel: "Read less",
     nobodyLabel: "Nobody",
-    clientInstitutionLabel: "Client institution",
+    clientInstitutionCrisLabel: "Client institution (CRIS)",
     validatingEmailDomainLabel: "Validate email address domain",
     allowingSubdomainsLabel: "Allow subdomain usage",
     institutionEmailDomainLabel: "Institutional email address domain",
@@ -1117,5 +1117,6 @@ export default {
     participationsLabel: "Participations",
     personViewCountsLeaderboardLabel: "Top researchers by view count",
     documentViewCountsLeaderboardLabel: "Top publications by view count",
-    documentDownloadCountsLeaderboardLabel: "Top publications by download count"
+    documentDownloadCountsLeaderboardLabel: "Top publications by download count",
+    clientInstitutionDlLabel: "Client institution (Digital Library)"
 }
