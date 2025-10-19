@@ -37,7 +37,7 @@
                         </div>
                         <RouterLink
                             v-for="(researcher, index) in topResearchers.slice(0, 3)" v-else :key="index"
-                            :to="'/' + $i18n.locale + '/persons/' + researcher.item.databaseId"
+                            :to="{ name: 'researcherLandingPage', params: { locale: $i18n.locale, id: researcher.item.databaseId } }"
                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-slate-200 bg-slate-100">
                                 <v-icon 
@@ -62,7 +62,7 @@
                         variant="outlined" 
                         color="success" 
                         class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
-                        :to="'/' + $i18n.locale + '/persons'"
+                        :to="{ name: 'persons', params: { locale: $i18n.locale } }"
                     >
                         {{ $t('landingFeatures.topResearchers.viewAll') }}
                     </v-btn>
@@ -93,7 +93,7 @@
                         </div>
                         <RouterLink
                             v-for="(institution, index) in topInstitutions.slice(0, 3)" v-else :key="index"
-                            :to="'/' + $i18n.locale + '/organisation-units/' + institution.item.databaseId"
+                            :to="{ name: 'organisationUnitLandingPage', params: { locale: $i18n.locale, id: institution.item.databaseId } }"
                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-amber-500/10">
                                 <v-icon icon="mdi-office-building" size="20" color="#f59e0b"></v-icon>
@@ -114,7 +114,7 @@
                         variant="outlined" 
                         color="warning" 
                         class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
-                        :to="'/' + $i18n.locale + '/organisation-units'"
+                        :to="{ name: 'organisationUnits', params: { locale: $i18n.locale } }"
                     >
                         {{ $t('landingFeatures.topInstitutions.viewAll') }}
                     </v-btn>
@@ -166,7 +166,7 @@
                         variant="outlined" 
                         color="primary" 
                         class="w-full rounded-xl font-semibold normal-case tracking-wide transition-all duration-300 hover:shadow-lg"
-                        :to="'/' + $i18n.locale + '/publications'"
+                        :to="{ name: 'scientificResults', params: { locale: $i18n.locale } }"
                     >
                         {{ $t('landingFeatures.topPublications.viewAll') }}
                     </v-btn>
