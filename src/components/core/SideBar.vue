@@ -47,6 +47,7 @@
                         <v-menu
                             v-if="item.subItems && item.subItems.length > 0"
                             open-on-hover
+                            open-on-click
                             location="end"
                             offset="8"
                             open-delay="100"

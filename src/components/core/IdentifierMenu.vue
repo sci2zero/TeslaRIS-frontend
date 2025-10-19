@@ -1,6 +1,6 @@
 <template>
     <div v-if="identifier">
-        <v-menu open-on-hover location="top" :open-delay="0" :close-on-content-click="false">
+        <v-menu open-on-hover open-on-click location="top" :open-delay="100" :close-on-content-click="false">
             <template #activator="{ props }">
                 <span v-bind="props" class="inline-flex items-center cursor-pointer select-none transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105">
                     <span v-if="type === 'orcid'">
