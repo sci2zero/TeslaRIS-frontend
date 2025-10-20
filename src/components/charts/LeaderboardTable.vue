@@ -1,8 +1,12 @@
 <template>
     <div class="leaderboard-container mt-5">
         <div class="d-block text-center mb-5">
-            <h2>{{ title }}</h2>
-            <h4>{{ subtitle }}</h4>
+            <h2 class="text-2xl font-semibold">
+                {{ title }}
+            </h2>
+            <h4 class="text-l font-semibold">
+                {{ subtitle }}
+            </h4>
         </div>
         <div v-if="leaderboardData.length > 0">
             <v-card

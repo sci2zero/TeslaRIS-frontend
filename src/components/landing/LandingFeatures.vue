@@ -47,7 +47,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ researcher.item.name }}
+                                    {{ researcher.item.name.split(";")[0] }}
                                 </h6>
                                 <p class="text-xs text-slate-500 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
                                     {{ $i18n.locale === 'sr' ? researcher.item.employmentsSr : researcher.item.employmentsOther }}

@@ -16,6 +16,7 @@ import BaseChart from "./BaseChart.vue";
 import type { ECharts, EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
 import { getPublicationTypeValueFromTitleAutoLocale } from "@/i18n/publicationType";
+import { getThesisTypeValueFromTitleAutoLocale } from "@/i18n/thesisType";
 
 
 export interface PieDataItem {
@@ -176,7 +177,12 @@ const onChartReady = (chart: ECharts) => {
     chart.on("click", (params: any) => {
         const publicationType = getPublicationTypeValueFromTitleAutoLocale(params.data.name);
         if (publicationType) {
-            emit("listPublications", publicationType);
+            emit("listPublications", publicationType, false);
+        } else {
+            const thesisType = getThesisTypeValueFromTitleAutoLocale(params.data.name);
+            if (thesisType) {
+                emit("listPublications", thesisType, true);
+            }
         }
     });
 };

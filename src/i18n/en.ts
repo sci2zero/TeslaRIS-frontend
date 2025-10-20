@@ -1154,5 +1154,12 @@ export default {
     personViewCountsLeaderboardLabel: "Top researchers by view count",
     documentViewCountsLeaderboardLabel: "Top publications by view count",
     documentDownloadCountsLeaderboardLabel: "Top publications by download count",
-    clientInstitutionDlLabel: "Client institution (Digital Library)"
+    clientInstitutionDlLabel: "Client institution (Digital Library)",
+    digitalLibraryAnalyticsLabel: "Digital Library Analytics",
+    thesesViewCountsLeaderboardLabel: "Top theses by view count",
+    thesesDownloadCountsLeaderboardLabel: "Top theses by download count",
+    totalThesesLabel: "Total number of theses",
+    numberOfThesesYearlyLabel: "Thesis count by year",
+    thesisTypeRatioLabel: "Thesis type ratio",
+    numberOfThesesByTypeAndYearLabel: "Thesis count by year and type"
 }

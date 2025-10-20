@@ -16,6 +16,7 @@ import BaseChart from "./BaseChart.vue";
 import type { ECharts, EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
 import { getPublicationTypeValueFromTitleAutoLocale } from "@/i18n/publicationType";
+import { getThesisTypeValueFromTitleAutoLocale } from "@/i18n/thesisType";
 
 
 export interface StackedBarSeries {
@@ -296,7 +297,12 @@ const onChartReady = (chart: ECharts) => {
     chart.on("click", (params: any) => {
         const publicationType = getPublicationTypeValueFromTitleAutoLocale(params.seriesName);
         if (publicationType) {
-            emit("listPublications", publicationType, parseInt(params.name));
+            emit("listPublications", publicationType, parseInt(params.name), false);
+        } else {
+            const thesisType = getThesisTypeValueFromTitleAutoLocale(params.seriesName);
+            if (thesisType) {
+                emit("listPublications", thesisType, parseInt(params.name), true);
+            }
         }
     });
 };

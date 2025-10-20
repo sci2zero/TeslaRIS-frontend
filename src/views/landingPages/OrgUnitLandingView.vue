@@ -423,6 +423,7 @@
                     :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
                     :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
                     :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                    :is-digital-library-client="organisationUnit?.clientInstitutionDl"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="leaderboards">

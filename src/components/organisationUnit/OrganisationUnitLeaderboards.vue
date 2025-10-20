@@ -194,8 +194,10 @@
             <div
                 v-if="displayThesesLibraryAnalytics"
                 ref="thesisLibraryAnalyticsRef">
-                <div class="d-flex flex-column justify-center align-center text-center mt-15">
-                    <h2>{{ $t("digitalLibraryAnalyticsLabel") }}</h2>
+                <div class="flex flex-col justify-center items-center text-center mt-14">
+                    <h2 class="text-3xl font-semibold">
+                        {{ $t("digitalLibraryAnalyticsLabel") }}
+                    </h2>
                     <v-select
                         v-model="selectedThesisTypes"
                         class="no-empty-outline publication-type-select mt-3"
@@ -312,6 +314,10 @@ const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
 const displayThesesLibraryAnalytics = ref(false);
 
 onMounted(() => {
+    if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
+        displayThesesLibraryAnalytics.value = true;
+    }
+
     fetchLeaderboardData();
     deduceStartTab();
 });
@@ -472,13 +478,6 @@ const thesisLibraryAnalyticsRef = ref<HTMLElement>();
 watch(thesisLibraryAnalyticsRef, () => {
     if (thesisLibraryAnalyticsRef.value) {
         thesisLibraryAnalyticsRef.value.scrollIntoView({ behavior: "smooth", block: "start" });
-
-        setTimeout(() => {
-            window.scrollBy({
-                top: 500,
-                behavior: "smooth"
-            });
-        }, 400);
     }
 });
 

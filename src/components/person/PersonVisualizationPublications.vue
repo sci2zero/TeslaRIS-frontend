@@ -17,6 +17,7 @@
                             :endpoint-type="ExportableEndpointType.VISUALIZATION_PUBLICATIONS"
                             :endpoint-token-parameters="[
                                 String(props.publicationType),
+                                (props.publicationSubType ? String(props.publicationSubType) : ''),
                                 String(props.yearFrom),
                                 String(props.yearTo),
                                 String(props.personId),
@@ -46,7 +47,7 @@
 
 <script setup lang="ts">
 import { ExportableEndpointType } from '@/models/Common';
-import { PublicationType, type DocumentPublicationIndex } from '@/models/PublicationModel';
+import { PublicationType, ThesisType, type DocumentPublicationIndex } from '@/models/PublicationModel';
 import { type PropType, ref, watch } from 'vue';
 import PublicationTableComponent from '../publication/PublicationTableComponent.vue';
 import DocumentVisualizationService from '@/services/visualization/DocumentVisualizationService';
@@ -59,6 +60,10 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 const props = defineProps({
     publicationType: {
         type: Object as PropType<PublicationType>,
+        required: true
+    },
+    publicationSubType: {
+        type: Object as PropType<ThesisType | null>,
         required: true
     },
     personId: {
@@ -109,6 +114,7 @@ watch(dialog, () => {
 const fetchPublications = () => {
     DocumentVisualizationService.getPublicationsForTypeAndPeriod(
         props.publicationType,
+        props.publicationSubType,
         props.personId,
         props.institutionId,
         props.yearFrom,

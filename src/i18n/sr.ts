@@ -1164,5 +1164,9 @@ export default {
     clientInstitutionDlLabel: "Klijentska institucija (Digitalna biblioteka)",
     digitalLibraryAnalyticsLabel: "Analitika digitalne biblioteke",
     thesesViewCountsLeaderboardLabel: "Top završni radovi po broju pregleda",
-    thesesDownloadCountsLeaderboardLabel: "Top završni radovi po broju preuyimanja"
+    thesesDownloadCountsLeaderboardLabel: "Top završni radovi po broju preuzimanja",
+    totalThesesLabel: "Ukupan broj završnih radova",
+    numberOfThesesYearlyLabel: "Broj završnih radova po godinama",
+    thesisTypeRatioLabel: "Odnos tipova završnih radova",
+    numberOfThesesByTypeAndYearLabel: "Broj publikacija po tipu, po godinama"
 }

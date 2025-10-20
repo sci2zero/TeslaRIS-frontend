@@ -2,7 +2,7 @@
     <v-row
         v-if="initialDatesSet && currentTab !== 'statistics'"
         no-gutters
-        class="align-center mt-2"
+        class="align-center mt-14"
         style="max-width: 250px;">
         <v-col cols="5">
             <v-text-field
@@ -78,6 +78,14 @@
         v-model="currentTab"
     >
         <v-tabs-window-item value="publicationCount">
+            <div v-if="isDigitalLibraryClient && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)" class="mt-7">
+                <v-checkbox
+                    v-model="displayThesesLibraryAnalytics"
+                    class="table-checkbox"
+                    :label="$t('digitalLibraryAnalyticsLabel')"
+                />
+            </div>
+
             <v-row class="mt-10">
                 <v-col
                     v-if="displaySettings?.publicationCountTotal.display"
@@ -149,6 +157,68 @@
                     />
                 </v-col>
             </v-row>
+
+            <div
+                v-if="displayThesesLibraryAnalytics"
+                ref="thesisLibraryAnalyticsRef">
+                <div class="flex flex-col justify-center items-center text-center mt-14">
+                    <h2 class="text-3xl font-semibold">
+                        {{ $t("digitalLibraryAnalyticsLabel") }}
+                    </h2>
+                    <v-select
+                        v-model="selectedThesisTypes"
+                        class="no-empty-outline publication-type-select mt-3"
+                        :items="thesisTypes"
+                        :label="$t('thesisTypeLabel')"
+                        return-object
+                        multiple
+                    ></v-select>
+                </div>
+
+                <v-row class="mt-14!">
+                    <v-col
+                        v-if="displaySettings?.publicationCountTotal.display"
+                        cols="12" :md="displaySettings?.publicationCountTotal.spanWholeRow ? 12 : 6"
+                        class="d-flex justify-center align-center">
+                        <display-card
+                            :display-value="totalThesisCount"
+                            :label="$t('totalThesesLabel')"
+                        />
+                    </v-col>
+                    <v-col
+                        v-if="displaySettings?.publicationCountByYear.display"
+                        cols="12" :md="displaySettings?.publicationCountByYear.spanWholeRow ? 12 : 6">
+                        <simple-bar-chart
+                            :data="thesesYearData"
+                            :title="$t('numberOfThesesYearlyLabel')"
+                            :y-label="$t('countLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col
+                        v-if="displaySettings?.publicationTypeRatio.display"
+                        cols="12" :md="displaySettings?.publicationTypeRatio.spanWholeRow ? 12 : 6">
+                        <pie-chart
+                            :data="thesisTypeRatioData"
+                            :title="$t('thesisTypeRatioLabel')"
+                            :donut="true"
+                            :show-percentage="true"
+                            @list-publications="showPublicationListModalPie"
+                        />
+                    </v-col>
+                    <v-col
+                        v-if="displaySettings?.publicationTypeByYear.display"
+                        cols="12" :md="displaySettings?.publicationTypeByYear.spanWholeRow ? 12 : 6">
+                        <stacked-bar-chart
+                            :data="thesesYearTypeData"
+                            :title="$t('numberOfThesesByTypeAndYearLabel')"
+                            :y-label="$t('countLabel')"
+                            @list-publications="showPublicationListModalBar"
+                        />
+                    </v-col>
+                </v-row>
+            </div>
         </v-tabs-window-item>
         <v-tabs-window-item value="citationCount">
             <v-row class="mt-10">
@@ -218,15 +288,16 @@
         :publication-type="publicationType"
         :year-from="fromYearList"
         :year-to="toYearList"
+        :publication-sub-type="publicationSubType"
     />
 </template>
 
 <script setup lang="ts">
-import { onMounted, type PropType, ref, watch } from 'vue';
+import { computed, onMounted, type PropType, ref, watch } from 'vue';
 import StackedBarChart, { type StackedBarSeries } from '../charts/StackedBarChart.vue';
 import OrganisationUnitVisualizationService from '@/services/visualization/OrganisationUnitVisualizationService';
 import { MCategory, type YearlyCounts } from '@/models/Common';
-import { PublicationType } from '@/models/PublicationModel';
+import { PublicationType, ThesisType } from '@/models/PublicationModel';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import PieChart, { type PieDataItem } from '../charts/PieChart.vue';
 import SimpleBarChart, { type BarSeries } from '../charts/SimpleBarChart.vue';
@@ -241,6 +312,9 @@ import { localiseDate } from '@/utils/DateUtil';
 import { type OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 import lodash from "lodash";
 import PersonVisualizationPublications from '../person/PersonVisualizationPublications.vue';
+import DigitalLibraryVisualizationService from '@/services/visualization/DigitalLibraryVisualizationService';
+import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 const props = defineProps({
@@ -263,6 +337,10 @@ const props = defineProps({
     displayStatisticsTab: {
         type: Boolean,
         required: true
+    },
+    isDigitalLibraryClient: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -295,6 +373,7 @@ const endDate = ref<string>("");
 const publicationType = ref();
 const fromYearList = ref<number>(0);
 const toYearList = ref<number>(0);
+const publicationSubType = ref<ThesisType | null>(null);
 const publicationsViewRef = ref<typeof PersonVisualizationPublications>();
 
 const handleYearChange = lodash.debounce(() => {
@@ -413,6 +492,76 @@ const getOUCitationCounts = (institutionId: number, from: number, to: number) =>
     });
 };
 
+const {
+    isAdmin,
+    isInstitutionalLibrarian,
+    isHeadOfLibrary
+} = useUserRole();
+
+const thesisTypes = computed(() => getThesisTypesForGivenLocale());
+const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
+
+const displayThesesLibraryAnalytics = ref();
+
+const thesesYearTypeData = ref<{ categories: string[]; series: StackedBarSeries[]; }>();
+const thesesYearData = ref<{ categories: string[]; series: BarSeries[]; }>();
+const thesisTypeRatioData = ref<PieDataItem[]>([]);
+const totalThesisCount = ref<number>(0);
+
+watch([
+        displayThesesLibraryAnalytics,
+        selectedThesisTypes
+    ], () => {
+        fetchDigitalLibraryData();
+    }
+);
+
+const fetchDigitalLibraryData = () => {
+    if (fromYear.value == 0 || toYear.value == 0) {
+        return;
+    }
+
+    DigitalLibraryVisualizationService.getOrganisationUnitThesisCountsByYear(
+        props.organisationUnitId,
+        selectedThesisTypes.value.map(t => t.value),
+        fromYear.value, toYear.value
+    ).then(async response => {
+        const yearlyCounts: YearlyCounts[] = response.data;
+
+        const categories = yearlyCounts.map(yc => String(yc.year));
+
+        const typeSeries: any[] = Object.values(ThesisType).map(pubType => ({
+            name: getThesisTitleFromValueAutoLocale(pubType),
+            data: yearlyCounts.map(yc => yc.countsByCategory[pubType] ?? 0)
+        }));
+
+        const totalSeries = [{
+            name: i18n.t("publicationsLabel"),
+            data: yearlyCounts.map(yc => 
+                Object.values(yc.countsByCategory).reduce((sum, count) => sum + (count ?? 0), 0)
+            )
+        }];
+
+        thesisTypeRatioData.value = Object.values(ThesisType).map(pubType => {
+            const total = yearlyCounts.reduce((sum, yc) => {
+                return sum + (yc.countsByCategory[pubType] ?? 0);
+            }, 0);
+
+            return {
+                name: getThesisTitleFromValueAutoLocale(pubType) as string,
+                value: total
+            };
+        });
+
+        totalThesisCount.value = totalSeries.reduce(
+            (sum, series) => sum + series.data.reduce((s, v) => s + v, 0), 0
+        );
+
+        thesesYearTypeData.value = { categories, series: typeSeries };
+        thesesYearData.value = { categories, series: totalSeries };
+    });
+};
+
 const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: number | null = null, to: number | null = null) => {
     OrganisationUnitVisualizationService.getOrganisationUnitPublicationCountsByYear(organisationUnitId, from, to)
     .then(async response => {
@@ -426,6 +575,10 @@ const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: 
             initialDatesSet.value = true;
             fromYear.value = minYear.value;
             toYear.value = maxYear.value;
+
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
+                displayThesesLibraryAnalytics.value = true;
+            }
         }
 
         const typeSeries: any[] = Object.values(PublicationType).map(pubType => ({
@@ -462,6 +615,10 @@ const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: 
         if (totalPublicationCount.value > 0) {
             getMCategoryCounts(organisationUnitId);
             getOUCitationCounts(props.organisationUnitId, fromYear.value, toYear.value);
+
+            if (displayThesesLibraryAnalytics.value) {
+                fetchDigitalLibraryData();
+            }
         }
     });
 };
@@ -535,9 +692,17 @@ const deduceStartTab = () => {
     }
 };
 
-const showPublicationListModalPie = (sectionType: any) => {
+const showPublicationListModalPie = (sectionType: any, isThesisType: boolean) => {
     if (publicationsViewRef.value) {
-        publicationType.value = sectionType;
+        if (isThesisType) {
+            publicationType.value = PublicationType.THESIS;
+            publicationSubType.value = sectionType;
+            console.log(sectionType)
+        } else {
+            publicationType.value = sectionType;
+            publicationSubType.value = null;
+        }
+        
         fromYearList.value = fromYear.value;
         toYearList.value = toYear.value;
 
@@ -545,9 +710,16 @@ const showPublicationListModalPie = (sectionType: any) => {
     }
 };
 
-const showPublicationListModalBar = (sectionType: any, year: number) => {
+const showPublicationListModalBar = (sectionType: any, year: number, isThesisType: boolean) => {
     if (publicationsViewRef.value) {
-        publicationType.value = sectionType;
+        if (isThesisType) {
+            publicationType.value = PublicationType.THESIS;
+            publicationSubType.value = sectionType;
+        } else {
+            publicationType.value = sectionType;
+            publicationSubType.value = null;
+        }
+
         fromYearList.value = year;
         toYearList.value = year;
 
@@ -555,4 +727,22 @@ const showPublicationListModalBar = (sectionType: any, year: number) => {
     }
 };
 
+const thesisLibraryAnalyticsRef = ref<HTMLElement>();
+
+watch(thesisLibraryAnalyticsRef, () => {
+    if (thesisLibraryAnalyticsRef.value) {
+        setTimeout(() => {
+            thesisLibraryAnalyticsRef.value?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 500);
+    }
+});
+
 </script>
+
+<style scoped>
+
+.publication-type-select {
+    width: 500px;
+}
+
+</style>
