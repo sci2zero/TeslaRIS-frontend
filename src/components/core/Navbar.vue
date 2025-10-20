@@ -15,7 +15,7 @@
                         class="d-flex ps-5 flex-wrap">
                         <div v-for="item in leftMenuItems" :key="item.title" class="text-center">
                             <template v-if="item.type == 'menu'">
-                                <v-menu v-if="item.condition == undefined || item.condition" open-on-hover open-delay="0">
+                                <v-menu v-if="item.condition == undefined || item.condition" open-on-hover open-on-click :open-delay="100">
                                     <template #activator="{ props }">
                                         <v-btn size="small" v-bind="props" class="no-uppercase">
                                             {{ item.title }}
@@ -88,7 +88,7 @@
                                     v-if="item.type === 'menu' && (item.condition === undefined || item.condition)"
                                     class="text-left"
                                 >
-                                    <v-menu open-on-hover location="end bottom" open-delay="0">
+                                    <v-menu open-on-hover open-on-click :open-delay="100" location="end bottom">
                                         <template #activator="{ props }">
                                             <v-btn size="small" v-bind="props" class="no-uppercase">
                                                 {{ item.title }}

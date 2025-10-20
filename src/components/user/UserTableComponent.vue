@@ -1,6 +1,6 @@
 <template>
     <v-row class="mb-5">
-        <v-menu open-on-hover>
+        <v-menu open-on-hover open-on-click :open-delay="100">
             <template #activator="{ props }">
                 <v-btn
                     color="primary"
