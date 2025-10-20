@@ -225,20 +225,20 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'publishers', label: computed(() => i18n.t('publisherListLabel')), to: '/publishers', icon: 'mdi-domain' },
     { key: 'countries', label: computed(() => i18n.t('countryListLabel')), to: '/countries', icon: 'mdi-earth' },
     { key: 'research-areas', label: computed(() => i18n.t('researchAreaListLabel')), to: '/research-areas', icon: 'mdi-flask' },
-    { key: 'deduplication', label: computed(() => i18n.t('deduplicateLabel')), to: '/deduplication', icon: 'mdi-content-duplicate', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+    { key: 'deduplication', label: computed(() => i18n.t('routeLabel.deduplication')), to: '/deduplication', icon: 'mdi-content-duplicate', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'branding', label: computed(() => i18n.t('brandingLabel')), to: '/branding', icon: 'mdi-palette' },
     { key: 'api-key-management', label: computed(() => i18n.t('apiKeyManagementLabel')), to: '/api-key-management', icon: 'mdi-key' },
-    { key: 'health-check', label: computed(() => i18n.t('healthCheckLabel')), to: '/health-check', icon: 'mdi-heart-pulse' },
+    { key: 'health-check', label: computed(() => i18n.t('routeLabel.healthCheck')), to: '/health-check', icon: 'mdi-heart-pulse' },
     { key: 'scheduled-tasks', label: computed(() => i18n.t('scheduleTasksLabel')), to: '/scheduled-tasks', icon: 'mdi-clock-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) },
     { key: 'importer', label: computed(() => i18n.t('importerLabel')), to: '/importer', icon: 'mdi-import', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) }
 ]);
 
 const assessmentsMenu = ref<MenuItem[]>([
-    { key: 'indicators', label: computed(() => i18n.t('indicatorPageLabel')), to: '/assessment/indicators', icon: 'mdi-chart-line' },
-    { key: 'classifications', label: computed(() => i18n.t('classificationPageLabel')), to: '/assessment/classifications', icon: 'mdi-tag-multiple' },
+    { key: 'indicators', label: computed(() => i18n.t('routeLabel.indicators')), to: '/assessment/indicators', icon: 'mdi-chart-line' },
+    { key: 'classifications', label: computed(() => i18n.t('routeLabel.classifications')), to: '/assessment/classifications', icon: 'mdi-tag-multiple' },
     { key: 'assessment-rulebooks', label: computed(() => i18n.t('assessmentRulebookPageLabel')), to: '/assessment/assessment-rulebooks', icon: 'mdi-book-open' },
-    { key: 'commissions', label: computed(() => i18n.t('commissionsLabel')), to: '/assessment/commissions', icon: 'mdi-account-group' },
+    { key: 'commissions', label: computed(() => i18n.t('routeLabel.commissions')), to: '/assessment/commissions', icon: 'mdi-account-group' },
     { key: 'reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) }
 ]);
 
@@ -264,7 +264,7 @@ const menuItems: MenuItem[] = reactive([
     { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple' },
     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building' },
     { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' },
-    { key: 'scientific-results-validation', label: computed(() => i18n.t('publicationsValidationLabel')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) },
+    { key: 'scientific-results-validation', label: computed(() => i18n.t('routeLabel.publicationsValidation')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) },
     { key: 'advanced-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/advanced-search', icon: 'mdi-magnify' },
     { key: 'researcher-profile', label: computed(() => i18n.t('researcherProfileLabel')), to: `/persons/${personId.value}`, icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
     { key: 'commission-profile', label: computed(() => i18n.t('commissionProfileLabel')), to: `/assessment/commissions/${commissionId.value}`, icon: 'mdi-account-group', condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },

@@ -155,6 +155,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const appTitle = ref("");
 
+const { userRole } = useUserRole();
+
 const navbarClasses = computed(() => {
     return {
         'navbar-general': props.variant === 'general',
