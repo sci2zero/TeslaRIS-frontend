@@ -1156,7 +1156,7 @@ export default {
             viewAll: "Pregledaj sve publikacije"
         }
     },
-    participationsLabel: "Učešća/Participacije",
+    participationsLabel: "Učešća",
     documentCitationCountLeaderboardLabel: "Top publikacije po broju citata",
     personViewCountsLeaderboardLabel: "Top istraživači po pregledima",
     documentViewCountsLeaderboardLabel: "Top publikacije po pregledima",
