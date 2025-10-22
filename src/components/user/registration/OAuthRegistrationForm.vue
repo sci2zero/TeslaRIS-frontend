@@ -57,7 +57,7 @@
 
 <script lang="ts">
 import { useI18n } from "vue-i18n";
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import AuthenticationService from "@/services/AuthenticationService";
 import { useValidationUtils } from "@/utils/ValidationUtils";
@@ -66,10 +66,12 @@ import { useRoute, useRouter } from "vue-router";
 import Toast from "@/components/core/Toast.vue";
 import { type ResearcherRegistrationRequest } from "@/models/AuthenticationModel";
 import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
-import { useLanguageTags } from "@/composables/useLanguageTags";
 import PersonService from "@/services/PersonService";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import LanguageService from "@/services/LanguageService";
+import { type LanguageTagResponse } from "@/models/Common";
+import { type AxiosResponse } from "axios";
 
 
 export default defineComponent({
@@ -103,7 +105,7 @@ export default defineComponent({
         const { requiredFieldRules, emailFieldRules } = useValidationUtils();
         const requiredFieldMessage = computed(() => i18n.t("mandatoryFieldError"));
 
-        const { languageTagsList: languages, languageTags } = useLanguageTags();
+        const languages = ref<{ title: string, value: number }[]>([]);
 
         const disableOUSelection = ref(false);
         const personSelection = ref(true);
@@ -140,13 +142,16 @@ export default defineComponent({
                 firstName.value = nameParts[0];
                 lastName.value = nameParts[1];
             }
-        });
 
-        watch(languageTags, () => {
-            languageTags.value.forEach((language) => {
-                if (language.languageCode === "SR") {
-                    selectedLanguage.value = {title: language.display, value: language.id};
-                }
+            LanguageService.getAllUILanguages().then((response: AxiosResponse<LanguageTagResponse[]>) => {
+                const listOfLanguages: { title: string, value: number }[] = [];
+                response.data.forEach((language: LanguageTagResponse) => {
+                    listOfLanguages.push({title: language.display, value: language.id})
+                    languages.value = listOfLanguages;
+                    if (language.languageCode === "SR") {
+                        selectedLanguage.value = {title: language.display, value: language.id};
+                    }
+                });
             });
         });
 

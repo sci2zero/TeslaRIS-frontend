@@ -56,7 +56,7 @@
                                     {{ $t("birthdateLabel") }}:
                                 </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate" class="response">
-                                    {{ localiseDate(personalInfo.localBirthDate) }}
+                                    {{ (canEdit && (isResearcher || isAdmin)) ? localiseDate(personalInfo.localBirthDate) : personalInfo.localBirthDate.slice(0, 4) }}
                                 </div>
                                 <div v-if="loginStore.userLoggedIn && personalInfo.sex">
                                     {{ $t("sexLabel") }}:
