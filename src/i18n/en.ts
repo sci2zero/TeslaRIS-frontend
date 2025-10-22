@@ -1161,5 +1161,7 @@ export default {
     totalThesesLabel: "Total number of theses",
     numberOfThesesYearlyLabel: "Thesis count by year",
     thesisTypeRatioLabel: "Thesis type ratio",
-    numberOfThesesByTypeAndYearLabel: "Thesis count by year and type"
+    numberOfThesesByTypeAndYearLabel: "Thesis count by year and type",
+    uploadCompleteLabel: "Upload complete.",
+    uploadingLabel: "Upload in progress..."
 }

@@ -406,6 +406,7 @@
                     :proofs="thesis?.proofs"
                     :file-items="thesis?.fileItems"
                     is-thesis-section
+                    :is-archived="thesis?.isArchived"
                     :preliminary-files="thesis?.preliminaryFiles"
                     :preliminary-supplements="thesis?.preliminarySupplements"
                     :commission-reports="thesis?.commissionReports"

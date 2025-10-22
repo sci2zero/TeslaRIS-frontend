@@ -12,6 +12,10 @@
             <download-progress
                 ref="downloadProgressRef"
             />
+
+            <upload-progress
+                ref="uploadProgressRef"
+            />
         </v-main>
     </v-app>
 </template>
@@ -29,16 +33,20 @@ import CookieConsent from "./components/core/CookieConsent.vue";
 import { useScriptLoader } from "./composables/useScriptLoader";
 import DownloadProgress from "./components/core/DownloadProgress.vue";
 import { useDownloadStore } from "./stores/downloadStore";
+import { useUploadStore } from "./stores/uploadStore";
+import UploadProgress from "./components/core/UploadProgress.vue";
 
 
 export default defineComponent({
     name: "App",
-    components: { CookieConsent, DownloadProgress },
+    components: { CookieConsent, DownloadProgress, UploadProgress },
     setup() {
         const route = useRoute();
 
         const downloadProgressRef = ref<typeof DownloadProgress>();
+        const uploadProgressRef = ref<typeof UploadProgress>();
         const downloadStore = useDownloadStore();
+        const uploadStore = useUploadStore();
 
         const hideLayout = computed(() => {
             return (
@@ -57,11 +65,13 @@ export default defineComponent({
             }
 
             downloadStore.setGlobalDownloadProgressRef(downloadProgressRef.value as typeof DownloadProgress);
+            uploadStore.setGlobalUploadProgressRef(uploadProgressRef.value as typeof UploadProgress);
         });
 
         return {
             hideLayout,
-            downloadProgressRef
+            downloadProgressRef,
+            uploadProgressRef
         };
     },
     beforeMount() {

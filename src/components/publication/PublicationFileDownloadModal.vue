@@ -32,7 +32,8 @@
                         :preliminary-files="(showThesisSections && document) ? (document as Thesis).preliminaryFiles : []"
                         :preliminary-supplements="(showThesisSections && document) ? (document as Thesis).preliminarySupplements : []"
                         :commission-reports="(showThesisSections && document) ? (document as Thesis).commissionReports : []"
-                        :hide-empty-sections="hideEmptySections">
+                        :hide-empty-sections="hideEmptySections"
+                        :hide-regular-sections="hideRegularSections">
                     </attachment-section>
                     <v-progress-circular
                         v-else-if="loading"
@@ -93,6 +94,10 @@ export default defineComponent({
         containsFiles: {
             type: Boolean,
             default: true
+        },
+        hideRegularSections: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {

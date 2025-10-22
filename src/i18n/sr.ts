@@ -1168,5 +1168,7 @@ export default {
     totalThesesLabel: "Ukupan broj završnih radova",
     numberOfThesesYearlyLabel: "Broj završnih radova po godinama",
     thesisTypeRatioLabel: "Odnos tipova završnih radova",
-    numberOfThesesByTypeAndYearLabel: "Broj publikacija po tipu, po godinama"
+    numberOfThesesByTypeAndYearLabel: "Broj publikacija po tipu, po godinama",
+    uploadCompleteLabel: "Otpremanje završeno.",
+    uploadingLabel: "Otpremanje u toku..."
 }

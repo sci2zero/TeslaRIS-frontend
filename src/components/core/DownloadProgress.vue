@@ -82,6 +82,16 @@ const startDownload = (fileName: string) => {
     downloadStore.setDownloadState(downloadState.value);
 };
 
+const cancelDownload = () => {
+    downloadState.value = {
+        progress: 0,
+        fileName: "",
+        isDownloading: false
+    };
+
+    downloadStore.setDownloadState(downloadState.value);
+};
+
 const updateProgress = (newProgress: number) => {
     if (downloadState.value.isDownloading) {
         downloadState.value.progress = Math.min(100, Math.max(0, newProgress))
@@ -103,7 +113,8 @@ const completeDownload = () => {
 
 defineExpose({
     startDownload,
-    updateProgress
+    updateProgress,
+    cancelDownload
 });
 </script>
 

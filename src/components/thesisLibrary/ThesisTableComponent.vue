@@ -61,6 +61,7 @@
                                 hide-empty-sections
                                 :persistent="false"
                                 :is-list-item="false"
+                                hide-regular-sections
                             />
                         </div>
                     </td>

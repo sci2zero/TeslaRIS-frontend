@@ -6,7 +6,6 @@
                 <navbar v-if="!hideLayout && !hideNavbar" variant="general" />
                 <!-- <breadcrumbs v-if="!hideLayout" /> -->
                 <router-view />
-                <cookie-consent v-if="!hideLayout" />
             </div>
             <footerbar v-if="!hideLayout" />
         </v-main>
@@ -15,7 +14,6 @@
 
 <script setup>
 import Navbar from "@/components/core/MainNavbar.vue";
-import CookieConsent from "@/components/core/CookieConsent.vue";
 import Footerbar from "@/components/core/FooterBar.vue";
 import SideBar from "@/components/core/SideBar.vue";
 import { useRoute } from "vue-router";

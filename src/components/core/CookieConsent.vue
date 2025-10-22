@@ -56,16 +56,16 @@ export default defineComponent({
         };
   
         const setOptOutCookie = (value: boolean) => {
-            CookieService.setCookiePreferences(value);
+            CookieService.setCookiePreferences(value).then(() => {
+                showBanner.value = false;
+            });
         };
   
         const acceptAll = () => {
-            showBanner.value = false;
             setOptOutCookie(false);
         };
   
         const declineTracking = () => {
-            showBanner.value = false;
             setOptOutCookie(true);
         };
     
