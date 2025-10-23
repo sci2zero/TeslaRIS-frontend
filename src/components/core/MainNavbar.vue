@@ -3,6 +3,7 @@
         <div class="wide-container flex-wrap toolbar-container px-4">
             <div class="flex">
                 <v-btn
+                    v-if="!showBreadcrumbs || sidebarStore.isMobile"
                     :icon="sidebarStore.isVisible ? 'mdi-menu-open' : 'mdi-menu'"
                     variant="text"
                     :color="variant === 'general' ? '#000' : '#fff'"
@@ -11,6 +12,7 @@
                     @click="toggleSidebar"
                 >
                 </v-btn>
+                <breadcrumbs v-else="showBreadcrumbs" />
             </div>
 
             <v-spacer></v-spacer>
@@ -127,7 +129,7 @@ import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { useBrandingStore } from '@/stores/brandingStore';
-
+import Breadcrumbs from './Breadcrumbs.vue';
 import { useSidebarStore } from '@/stores/sidebarStore';
 
 interface MenuItem {
@@ -147,10 +149,12 @@ interface MenuItem {
 
 interface Props {
     variant?: 'general' | 'home';
+    showBreadcrumbs?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    variant: 'home'
+    variant: 'home',
+    showBreadcrumbs: false
 });
 
 const appTitle = ref("");

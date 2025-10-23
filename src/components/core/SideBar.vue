@@ -138,9 +138,6 @@ const checkScrollButtons = () => {
     const { scrollTop, scrollHeight, clientHeight } = scrollContainer.value;
     canScrollUp.value = scrollTop > 10;
     canScrollDown.value = scrollTop + clientHeight < scrollHeight - 10;
-    
-    // Debug logging
-    console.log('Scroll check:', { scrollTop, scrollHeight, clientHeight, canScrollUp: canScrollUp.value, canScrollDown: canScrollDown.value });
 };
 
 const handleScroll = () => {

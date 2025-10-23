@@ -129,6 +129,8 @@ export default {
     mandatoryFieldError: "This is a mandatory field",
     emailFormatError: "Invalid email format",
     searchBarPlaceholder: "Search",
+    hideDetailsLabel: "Hide details",
+    
     fullNameLabel: "Full Name",
     firstNameLabel: "Name",
     surnameLabel: "Surname",

@@ -1,226 +1,57 @@
 <template>
-    <v-container id="researcher">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title>
-                        <v-skeleton-loader
-                            :loading="!person"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
-                            <p class="text-h5">
-                                {{ researcherName }}
-                            </p>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ person?.personalInfo.displayTitle && person.personalInfo.displayTitle.length > 0 ? returnCurrentLocaleContent(person?.personalInfo.displayTitle) as string : $t("researcherLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Researcher Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <person-profile-image
-                    :filename="person?.imageServerFilename"
-                    :person-id="person?.id"
-                    :can-edit="canEdit">
-                </person-profile-image>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="PersonUpdateForm"
-                            :form-props="{ presetPerson: person }"
-                            entity-name="Person"
-                            is-update
-                            is-section-update
+    <div id="researcher" class="mx-auto max-w-7xl w-full py-12">
+        <ResearcherLandingHeader 
+            :person="person"
+            :researcher-name="researcherName"
+            :employments="employments"
+            :can-edit="canEdit"
+            :research-area="researchArea"
+            :country-name="personalInfo.country"
+        >
+            <template #actions>
+                <div class="mt-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        <person-other-name-modal
+                            :preset-person="person"
                             :read-only="!canEdit"
-                            @update="updatePersonalInfo"
+                            @update="updateNames"
+                            @select-primary="selectPrimaryName"
                         />
-
-                        <!-- Personal Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("personalInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!person" :citation-button="false" />
-                        <v-row v-else>
-                            <v-col cols="6">
-                                <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate">
-                                    {{ $t("birthdateLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.localBirthDate" class="response">
-                                    {{ (canEdit && (isResearcher || isAdmin)) ? localiseDate(personalInfo.localBirthDate) : personalInfo.localBirthDate.slice(0, 4) }}
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.sex">
-                                    {{ $t("sexLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.sex" class="response">
-                                    {{ getTitleFromValueAutoLocale(personalInfo.sex) }}
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.country">
-                                    {{ $t("countryLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.country" class="response">
-                                    {{ personalInfo.country }}
-                                </div>
-                                <div>APVNT:</div>
-                                <div class="response">
-                                    {{ personalInfo.apvnt ? personalInfo.apvnt : $t("notYetSetMessage") }}
-                                </div>
-                                <div>eCRIS-ID:</div>
-                                <div class="response">
-                                    <identifier-link v-if="personalInfo.eCrisId" :identifier="personalInfo.eCrisId" type="ecris"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>enaukaID:</div>
-                                <div class="response">
-                                    {{ personalInfo.eNaukaId ? personalInfo.eNaukaId : $t("notYetSetMessage") }}
-                                </div>
-                                <div>ORCID:</div>
-                                <div v-if="personalInfo.orcid" class="response">
-                                    <identifier-link :identifier="personalInfo.orcid" type="orcid"></identifier-link>
-                                </div>
-                                <div v-else class="response">
-                                    {{ $t("notYetSetMessage") }}
-                                </div>
-                                <div>Scopus Author ID:</div>
-                                <div class="response">
-                                    <identifier-link v-if="personalInfo.scopusAuthorId" :identifier="personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>Open Alex ID:</div>
-                                <div class="response">
-                                    <identifier-link v-if="personalInfo.openAlexId" :identifier="personalInfo.openAlexId" type="open_alex"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>ResearcherID (WoS):</div>
-                                <div class="response">
-                                    <identifier-link v-if="personalInfo.webOfScienceResearcherId" :identifier="personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber">
-                                    {{ $t("streetAndNumberLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.streetAndNumber" class="response">
-                                    {{ personalInfo.streetAndNumber }}
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.city">
-                                    {{ $t("cityLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.city" class="response">
-                                    {{ personalInfo.city }}
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.placeOfBirth">
-                                    {{ $t("placeOfBirthLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.placeOfBirth" class="response">
-                                    {{ personalInfo.placeOfBirth }}
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.contactEmail">
-                                    {{ $t("emailLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.contactEmail" class="response">
-                                    <identifier-link :identifier="personalInfo.contact.contactEmail" type="email"></identifier-link>
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber">
-                                    {{ $t("phoneNumberLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn && personalInfo.contact.phoneNumber" class="response">
-                                    {{ personalInfo.contact.phoneNumber }}
-                                </div>
-                                <div v-if="loginStore.userLoggedIn">
-                                    {{ $t("researchAreaLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn" class="response">
-                                    {{ researchArea ? returnCurrentLocaleContent(researchArea.name) : $t("notYetSetMessage") }}
-                                </div>
-                                <div v-if="person?.personalInfo.uris && person.personalInfo.uris.length > 0">
-                                    {{ $t("websiteLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="person?.personalInfo.uris"></uri-list>
-                                </div>
-                                <div v-if="activeEmployments.length > 0">
-                                    {{ $t("employmentsLabel") }}:
-                                </div>
-                                <div v-for="employment in activeEmployments.slice(0, 3)" :key="employment.id" class="response">
-                                    <localized-link
-                                        v-if="employment.organisationUnitId"
-                                        :to="'organisation-units/' + employment.organisationUnitId">
-                                        <strong>{{ returnCurrentLocaleContent(employment.organisationUnitName) }} {{ employment.employmentPosition ? `(${getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition)})` : "" }}</strong>
-                                    </localized-link>
-                                    <p v-else>
-                                        {{ returnCurrentLocaleContent(employment.affiliationStatement) }} {{ employment.employmentPosition ? `(${getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition)})` : "" }}
-                                    </p>
-                                </div>
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-    
-        <div class="actions-box pa-4">
-            <div class="text-subtitle-1 font-weight-medium mb-3">
-                {{ $t("additionalActionsLabel") }}
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <person-other-name-modal
-                    :preset-person="person"
-                    :read-only="!canEdit"
-                    @update="updateNames"
-                    @select-primary="selectPrimaryName"
-                />
-                <generic-crud-modal
-                    class="ml-2" 
-                    :form-component="AssessmentResearchAreaForm"
-                    :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
-                    entity-name="ResearchArea"
-                    is-update compact
-                    primary-color outlined
-                    :read-only="!canEdit"
-                    @update="fetchAssessmentResearchArea"
-                />
-                <v-btn
-                    v-if="isResearcher && canEdit"
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="performNavigation('documentClaim')">
-                    {{ $t("documentClaimLabel") }}
-                </v-btn>
-                <v-btn
-                    v-if="isResearcher && canEdit"
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="performNavigation('massInstitutionAssignment')">
-                    {{ $t("massInstitutionAssignmentLabel") }}
-                </v-btn>
-                <v-btn
-                    v-if="isResearcher && canEdit"
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="performNavigation('importer')">
-                    {{ $t("importerLabel") }}
-                </v-btn>
-            </div>
-        </div>
+                        <generic-crud-modal
+                            class="ml-2" 
+                            :form-component="AssessmentResearchAreaForm"
+                            :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
+                            entity-name="ResearchArea"
+                            is-update compact
+                            primary-color outlined
+                            :read-only="!canEdit"
+                            @update="fetchAssessmentResearchArea"
+                        />
+                        <v-btn
+                            v-if="isResearcher && canEdit"
+                            class="mb-5 ml-2" color="primary" density="compact"
+                            variant="outlined"
+                            @click="performNavigation('documentClaim')">
+                            {{ $t("documentClaimLabel") }}
+                        </v-btn>
+                        <v-btn
+                            v-if="isResearcher && canEdit"
+                            class="mb-5 ml-2" color="primary" density="compact"
+                            variant="outlined"
+                            @click="performNavigation('massInstitutionAssignment')">
+                            {{ $t("massInstitutionAssignmentLabel") }}
+                        </v-btn>
+                        <v-btn
+                            v-if="isResearcher && canEdit"
+                            class="mb-5 ml-2" color="primary" density="compact"
+                            variant="outlined"
+                            @click="performNavigation('importer')">
+                            {{ $t("importerLabel") }}
+                        </v-btn>
+                    </div>
+                </div>
+            </template>
+        </ResearcherLandingHeader>
 
         <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
         <v-tabs
@@ -251,27 +82,36 @@
             v-model="currentTab"
         >
             <v-tabs-window-item value="publications">
-                <search-bar-component
-                    class="mt-5"
-                    @search="clearSortAndPerformPublicationSearch($event)"
-                />
-                <div class="mb-5 mt-5">
-                    <add-publication-menu v-if="canEdit" compact />
-                    <v-btn
-                        v-if="isResearcher && canEdit"
-                        class="ml-2" color="primary" density="compact"
-                        @click="performNavigation('importer')">
-                        {{ $t("importerLabel") }}
-                    </v-btn>
+                <h3 class="mt-4 text-2xl lg:text-3xl font-serif font-bold text-slate-800">
+                    Naučni Rezultati
+                </h3>
+                <div class="flex justify-between gap-2 mt-4">
+                    <div class="flex gap-2 items-center w-full">
+                        <search-bar-component
+                            :transparent="false"
+                            size="small"
+                            @search="clearSortAndPerformPublicationSearch($event)"
+                        />
+                        <v-select
+                            v-model="selectedPublicationTypes"
+                            :items="publicationTypes"
+                            :label="$t('typeOfPublicationLabel')"
+                            return-object
+                            class="max-w-xs"
+                            multiple
+                        ></v-select>
+                    </div>
+                    <div class="mb-5 mt-5">
+                        <add-publication-menu v-if="canEdit" compact />
+                        <v-btn
+                            v-if="isResearcher && canEdit"
+                            class="ml-2" color="primary" density="compact"
+                            @click="performNavigation('importer')">
+                            {{ $t("importerLabel") }}
+                        </v-btn>
+                    </div>
                 </div>
-                <v-select
-                    v-model="selectedPublicationTypes"
-                    :items="publicationTypes"
-                    :label="$t('typeOfPublicationLabel')"
-                    return-object
-                    class="publication-type-select mt-3"
-                    multiple
-                ></v-select>
+
                 <publication-table-component
                     ref="publicationsRef"
                     :publications="publications"
@@ -418,7 +258,7 @@
         </persistent-question-dialog>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -477,11 +317,12 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
 import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
+import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -888,8 +729,5 @@ export default defineComponent({
         opacity: 1;
     }
 
-    .publication-type-select {
-        max-width: 500px;
-    }
 
 </style>

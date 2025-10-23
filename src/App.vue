@@ -1,9 +1,15 @@
 <template>
     <v-app class="bg-slate-100">
-        <v-main class="bg-slate-100">
+        <SideBar class="h-full" v-if="!hideLayout" />
+        <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
+            <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
+
             <router-view
+                class="flex-1"
                 :key="$route.path"
             />
+
+            <footerbar v-if="!hideLayout" />
             
             <cookie-consent
                 v-if="!hideLayout"
@@ -35,11 +41,15 @@ import DownloadProgress from "./components/core/DownloadProgress.vue";
 import { useDownloadStore } from "./stores/downloadStore";
 import { useUploadStore } from "./stores/uploadStore";
 import UploadProgress from "./components/core/UploadProgress.vue";
+import Navbar from "@/components/core/MainNavbar.vue";
+import Footerbar from "@/components/core/FooterBar.vue";
+import SideBar from "@/components/core/SideBar.vue";
+import { useSidebarStore } from "@/stores/sidebarStore";
 
 
 export default defineComponent({
     name: "App",
-    components: { CookieConsent, DownloadProgress, UploadProgress },
+    components: { CookieConsent, DownloadProgress, UploadProgress, Navbar, Footerbar, SideBar },
     setup() {
         const route = useRoute();
 
@@ -54,6 +64,11 @@ export default defineComponent({
                 route.query.embed === "true"
             );
         });
+
+        const isHome = computed(() => {
+            return route.name === "home";
+        });
+        const sidebarStore = useSidebarStore();
 
         onMounted(async () => {
             try {
@@ -71,7 +86,9 @@ export default defineComponent({
         return {
             hideLayout,
             downloadProgressRef,
-            uploadProgressRef
+            uploadProgressRef,
+            isHome,
+            sidebarStore
         };
     },
     beforeMount() {
@@ -203,6 +220,17 @@ export default defineComponent({
 });
 </script>
 
-<style>
-    /* @import "./assets/main.css"; */
+<style scoped>
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .v-main {
+        margin-left: 0 !important;
+    }
+}
 </style>

@@ -129,6 +129,8 @@ export default {
     mandatoryFieldError: "Ovo je obavezno polje",
     emailFormatError: "Neispravan format email-a",
     searchBarPlaceholder: "Pretraga",
+    hideDetailsLabel: "Sakrij detalje",
+    allDetailsLabel: "Svi detalji",
     fullNameLabel: "Ime i Prezime",
     firstNameLabel: "Ime",
     surnameLabel: "Prezime",

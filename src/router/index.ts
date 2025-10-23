@@ -155,7 +155,7 @@ const router = createRouter({
         {
             path: "/:locale",
             name: "baseLocale",
-            component: DefaultLayout,
+            // component: DefaultLayout,
             children: [
                 {
                     path: "",

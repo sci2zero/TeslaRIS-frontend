@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 export const useSidebarStore = defineStore('sidebar', () => {
   const isOpen = ref(true);
+  const route = useRoute();
   const isMobile = ref(false);
 
   // Load sidebar state from localStorage on initialization
@@ -37,7 +39,11 @@ export const useSidebarStore = defineStore('sidebar', () => {
 
   // Computed property to determine if sidebar should be visible
   const isVisible = computed(() => {
-    return isOpen.value;
+    return isOpen.value || (!isHome.value && !isMobile.value);
+  });
+
+  const isHome = computed(() => {
+    return route.name === "home";
   });
 
   // Computed property for sidebar width
@@ -47,7 +53,7 @@ export const useSidebarStore = defineStore('sidebar', () => {
 
   // Computed property for main content margin
   const mainMargin = computed(() => {
-    if (!isOpen.value) return 'ml-0';
+    if (!isVisible.value) return 'ml-0';
     return 'ml-24';
   });
 
