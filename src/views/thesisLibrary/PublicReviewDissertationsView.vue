@@ -83,6 +83,7 @@
                     :institution-id="currentRoute.query.institutionId ? parseInt(currentRoute.query.institutionId as string) : undefined"
                     :total-theses="totalTheses"
                     :show-review-end-date="!showingNotDefended"
+                    :shows-current-public-review="!selectedYear"
                     @switch-page="switchPage">
                 </thesis-table-component>
             </v-col>

@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
 import { BaseService } from "../BaseService";
-import type { OUChartDisplaySettings, FullChartDisplaySettings, DocumentChartDisplaySettings, PersonChartDisplaySettings } from "@/models/ChartDisplayConfigurationModel";
+import type { OUChartDisplaySettings, FullChartDisplaySettings, DocumentChartDisplaySettings, PersonChartDisplaySettings, DigitalLibraryChartDisplaySettings } from "@/models/ChartDisplayConfigurationModel";
 
 
 export class ChartDisplayConfigurationService extends BaseService {
@@ -12,6 +12,10 @@ export class ChartDisplayConfigurationService extends BaseService {
 
     async getChartDisplaySettingsForOrganisationUnit(organisationUnitId: number): Promise<AxiosResponse<OUChartDisplaySettings>> {
         return super.sendRequest(axios.get, `chart-display-configuration/organisation-unit/${organisationUnitId}`);
+    }
+
+    async getChartDisplaySettingsForDigitalLibrary(organisationUnitId: number): Promise<AxiosResponse<DigitalLibraryChartDisplaySettings>> {
+        return super.sendRequest(axios.get, `chart-display-configuration/digital-library/${organisationUnitId}`);
     }
 
     async getChartDisplaySettingsForPerson(personId: number): Promise<AxiosResponse<PersonChartDisplaySettings>> {

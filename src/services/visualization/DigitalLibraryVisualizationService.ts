@@ -1,6 +1,6 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
-import type { YearlyCounts } from "@/models/Common";
+import type { StatisticsByCountry, YearlyCounts } from "@/models/Common";
 import { BaseService } from "../BaseService";
 import { type StatisticsType } from "@/models/AssessmentModel";
 import { type ThesisType } from "@/models/PublicationModel";
@@ -18,6 +18,12 @@ export class DigitalLibraryVisualizationService extends BaseService {
         const allowedTypesParam = this.createAllowedTypesParam(allowedThesisTypes);
 
         return super.sendRequest(axios.get, `visualization-data/digital-library/monthly-statistics/${organisationUnitId}?from=${startDate}&to=${endDate}&statisticsType=${statisticsType}${allowedTypesParam}`);
+    }
+
+    async getDigitalLibraryStatisticsByCountry(organisationUnitId: number, startDate: string, endDate: string, statisticsType: StatisticsType, allowedThesisTypes: ThesisType[]): Promise<AxiosResponse<StatisticsByCountry[]>> {
+        const allowedTypesParam = this.createAllowedTypesParam(allowedThesisTypes);
+
+        return super.sendRequest(axios.get, `visualization-data/digital-library/statistics/${organisationUnitId}?from=${startDate}&to=${endDate}&statisticsType=${statisticsType}${allowedTypesParam}`);
     }
 
     createAllowedTypesParam(allowedTypes: ThesisType[]): string {

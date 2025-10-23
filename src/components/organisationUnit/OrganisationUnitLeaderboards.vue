@@ -156,7 +156,7 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
-            <div v-if="isDigitalLibraryClient && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)">
+            <div v-if="isDigitalLibraryClient">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -287,7 +287,6 @@ const endDate = ref<string>((new Date()).toISOString());
 const currentTab = ref("publicationCount");
 
 const {
-    isAdmin,
     isInstitutionalLibrarian,
     isHeadOfLibrary
 } = useUserRole();

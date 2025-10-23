@@ -252,6 +252,8 @@ import { type ScheduledTaskResponse } from '@/models/Common';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
 import DatePickerSplit from '@/components/core/DatePickerSplit.vue';
 import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -282,7 +284,7 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
     
         const i18n = useI18n();
-        const { loggedInUser } = useUserRole();
+        const { loggedInUser, isPromotionRegistryAdministrator } = useUserRole();
     
         const promotions = ref<{ title: string; value: number }[]>([]);
         const selectedPromotion = ref<{ title: string; value: number }>({
@@ -434,6 +436,17 @@ export default defineComponent({
     
         watch(i18n.locale, () => {
             fetchAllTables();
+        });
+
+        watch(loggedInUser, () => {
+            if (loggedInUser.value && isPromotionRegistryAdministrator.value) {
+                OrganisationUnitService.readOU(loggedInUser.value?.organisationUnitId as number).then(response => {
+                    selectedInstitution.value = {
+                        title: returnCurrentLocaleContent(response.data.name) as string,
+                        value: response.data.id
+                    };
+                });
+            }
         });
     
         onMounted(() => {

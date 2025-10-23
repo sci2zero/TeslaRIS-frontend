@@ -69,7 +69,7 @@
             {{ $t("citationCountLabel") }}
         </v-tab>
         <v-tab v-show="displayStatisticsTab" value="statistics">
-            {{ $t("statisticsLabel") }}
+            {{ $t("viewsLabel") }}
         </v-tab>
     </v-tabs>
 
@@ -78,7 +78,7 @@
         v-model="currentTab"
     >
         <v-tabs-window-item value="publicationCount">
-            <div v-if="isDigitalLibraryClient && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)" class="mt-7">
+            <div v-if="isDigitalLibraryClient" class="mt-7">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -178,8 +178,8 @@
 
                 <v-row class="mt-14!">
                     <v-col
-                        v-if="displaySettings?.publicationCountTotal.display"
-                        cols="12" :md="displaySettings?.publicationCountTotal.spanWholeRow ? 12 : 6"
+                        v-if="digitalLibraryDisplaySettings?.thesisCountTotal.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisCountTotal.spanWholeRow ? 12 : 6"
                         class="d-flex justify-center align-center">
                         <display-card
                             :display-value="totalThesisCount"
@@ -187,8 +187,8 @@
                         />
                     </v-col>
                     <v-col
-                        v-if="displaySettings?.publicationCountByYear.display"
-                        cols="12" :md="displaySettings?.publicationCountByYear.spanWholeRow ? 12 : 6">
+                        v-if="digitalLibraryDisplaySettings?.thesisCountByYear.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisCountByYear.spanWholeRow ? 12 : 6">
                         <simple-bar-chart
                             :data="thesesYearData"
                             :title="$t('numberOfThesesYearlyLabel')"
@@ -200,8 +200,8 @@
                 </v-row>
                 <v-row>
                     <v-col
-                        v-if="displaySettings?.publicationTypeRatio.display"
-                        cols="12" :md="displaySettings?.publicationTypeRatio.spanWholeRow ? 12 : 6">
+                        v-if="digitalLibraryDisplaySettings?.thesisTypeRatio.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisTypeRatio.spanWholeRow ? 12 : 6">
                         <pie-chart
                             :data="thesisTypeRatioData"
                             :title="$t('thesisTypeRatioLabel')"
@@ -211,8 +211,8 @@
                         />
                     </v-col>
                     <v-col
-                        v-if="displaySettings?.publicationTypeByYear.display"
-                        cols="12" :md="displaySettings?.publicationTypeByYear.spanWholeRow ? 12 : 6">
+                        v-if="digitalLibraryDisplaySettings?.thesisTypeByYear.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisTypeByYear.spanWholeRow ? 12 : 6">
                         <stacked-bar-chart
                             :data="thesesYearTypeData"
                             :title="$t('numberOfThesesByTypeAndYearLabel')"
@@ -247,6 +247,14 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
+            <div v-if="isDigitalLibraryClient" class="mt-7">
+                <v-checkbox
+                    v-model="displayThesesLibraryAnalytics"
+                    class="table-checkbox"
+                    :label="$t('digitalLibraryAnalyticsLabel')"
+                />
+            </div>
+
             <v-row class="d-flex flex-row text-center mt-10">
                 <v-col
                     v-if="displaySettings?.viewCountTotal.display"
@@ -282,6 +290,95 @@
                     />
                 </v-col>
             </v-row>
+
+            <div
+                v-if="displayThesesLibraryAnalytics"
+                ref="thesisLibraryAnalyticsRef">
+                <div class="flex flex-col justify-center items-center text-center mt-14">
+                    <h2 class="text-3xl font-semibold">
+                        {{ $t("digitalLibraryAnalyticsLabel") }}
+                    </h2>
+                    <v-select
+                        v-model="selectedThesisTypes"
+                        class="no-empty-outline publication-type-select mt-3"
+                        :items="thesisTypes"
+                        :label="$t('thesisTypeLabel')"
+                        return-object
+                        multiple
+                    ></v-select>
+                </div>
+            
+                <v-row class="d-flex flex-row text-center mt-10">
+                    <v-col
+                        v-if="digitalLibraryDisplaySettings?.thesisViewCountTotal.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisViewCountTotal.spanWholeRow ? 12 : 6"
+                        class="d-flex justify-center align-center">
+                        <display-card
+                            :display-value="viewsByCountryDl.reduce((sum, entry) => sum += entry.value, 0)"
+                            :label="$t('totalViewsLabel')"
+                        />
+                    </v-col>
+                    <v-col
+                        v-if="digitalLibraryDisplaySettings?.thesisViewCountByMonth.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisViewCountByMonth.spanWholeRow ? 8 : 6">
+                        <simple-bar-chart
+                            :data="viewsMonthlyDL"
+                            :title="$t('numberOfViewsMonthlyLabel')"
+                            :y-label="$t('countLabel')"
+                            show-trend-line
+                        />
+                    </v-col>
+                </v-row>
+                <v-row class="mt-10 d-flex justify-center">
+                    <v-col
+                        v-if="digitalLibraryDisplaySettings?.thesisViewCountByCountry.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisViewCountByCountry.spanWholeRow ? 8 : 6">
+                        <WorldMapChart
+                            :data="viewsByCountryDl"
+                            :title="$t('viewsByCountryLabel')"
+                            :subtitle="$t('globalTrafficOverviewLabel')"
+                            :series-name="$t('totalViewsLabel')"
+                            height="600px"
+                            :no-country-entries-label="$t('noCountryViews')"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row text-center mt-10">
+                    <v-col
+                        v-if="digitalLibraryDisplaySettings?.thesisDownloadCountTotal.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisDownloadCountTotal.spanWholeRow ? 12 : 6"
+                        class="d-flex justify-center align-center">
+                        <display-card
+                            :display-value="downloadsByCountryDl.reduce((sum, entry) => sum += entry.value, 0)"
+                            :label="$t('totalDownloadsLabel')"
+                        />
+                    </v-col>
+                    <v-col
+                        v-if="digitalLibraryDisplaySettings?.thesisDownloadCountByMonth.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisDownloadCountByMonth.spanWholeRow ? 8 : 6">
+                        <simple-bar-chart
+                            :data="downloadsMonthlyDL"
+                            :title="$t('numberOfDownloadsMonthlyLabel')"
+                            :y-label="$t('countLabel')"
+                            show-trend-line
+                        />
+                    </v-col>
+                </v-row>
+                <v-row class="mt-10 d-flex justify-center">
+                    <v-col
+                        v-if="digitalLibraryDisplaySettings?.thesisDownloadCountByCountry.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.thesisDownloadCountByCountry.spanWholeRow ? 8 : 6">
+                        <WorldMapChart
+                            :data="downloadsByCountryDl"
+                            :title="$t('downloadsByCountryLabel')"
+                            :subtitle="$t('globalTrafficOverviewLabel')"
+                            :series-name="$t('totalDownloadsLabel')"
+                            height="600px"
+                            :no-country-entries-label="$t('noCountryDownloads')"
+                        />
+                    </v-col>
+                </v-row>
+            </div>
         </v-tabs-window-item>
     </v-tabs-window>
 
@@ -312,12 +409,13 @@ import DisplayCard from '../charts/DisplayCard.vue';
 import { max, min } from 'lodash';
 import DatePicker from '../core/DatePicker.vue';
 import { localiseDate } from '@/utils/DateUtil';
-import { type OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
+import type { DigitalLibraryChartDisplaySettings, OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 import lodash from "lodash";
 import PersonVisualizationPublications from '../person/PersonVisualizationPublications.vue';
 import DigitalLibraryVisualizationService from '@/services/visualization/DigitalLibraryVisualizationService';
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { useUserRole } from '@/composables/useUserRole';
+import { StatisticsType } from '@/models/AssessmentModel';
 
 
 const props = defineProps({
@@ -327,6 +425,10 @@ const props = defineProps({
     },
     displaySettings: {
         type: Object as PropType<OUChartDisplaySettings | undefined>,
+        required: true
+    },
+    digitalLibraryDisplaySettings: {
+        type: Object as PropType<DigitalLibraryChartDisplaySettings | undefined>,
         required: true
     },
     displayPublicationsTab: {
@@ -356,6 +458,11 @@ const totalCitationCount = ref<number>(-1);
 
 const viewsMonthly = ref<{ categories: string[]; series: BarSeries[]; }>();
 const viewsByCountry = ref<CountryStatisticsData[]>([]);
+
+const viewsMonthlyDL = ref<{ categories: string[]; series: BarSeries[]; }>();
+const downloadsMonthlyDL = ref<{ categories: string[]; series: BarSeries[]; }>();
+const viewsByCountryDl = ref<CountryStatisticsData[]>([]);
+const downloadsByCountryDl = ref<CountryStatisticsData[]>([]);
 
 const commissionMCategoryRatios = ref<{commissionName: string, data: PieDataItem[]}[]>([]);
 const commissionsYearMCategoryData = ref<{commissionName: string, categories: string[]; series: StackedBarSeries[]; }[]>([]);
@@ -496,7 +603,6 @@ const getOUCitationCounts = (institutionId: number, from: number, to: number) =>
 };
 
 const {
-    isAdmin,
     isInstitutionalLibrarian,
     isHeadOfLibrary
 } = useUserRole();
@@ -563,6 +669,8 @@ const fetchDigitalLibraryData = () => {
         thesesYearTypeData.value = { categories, series: typeSeries };
         thesesYearData.value = { categories, series: totalSeries };
     });
+
+    getDigitalLibraryStatistics(props.organisationUnitId, startDate.value, endDate.value);
 };
 
 const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: number | null = null, to: number | null = null) => {
@@ -647,6 +755,66 @@ const getOrganisationUnitStatistics = (organisationUnitId: number, startDate: st
         viewsMonthly.value = {
             categories: categories, series: [
                 {name: i18n.t("viewsLabel"), data: series}
+            ]
+        };
+    });
+};
+
+const getDigitalLibraryStatistics = (organisationUnitId: number, startDate: string, endDate: string) => {
+    const allowedTypes = selectedThesisTypes.value.map(type => type.value);
+
+    DigitalLibraryVisualizationService.getDigitalLibraryStatisticsByCountry(
+        organisationUnitId, startDate, endDate,
+        StatisticsType.VIEW, allowedTypes
+    ).then(response => {
+        viewsByCountryDl.value = response.data;
+    });
+
+    DigitalLibraryVisualizationService.getDigitalLibraryStatisticsByCountry(
+        organisationUnitId, startDate, endDate,
+        StatisticsType.DOWNLOAD, allowedTypes
+    ).then(response => {
+        downloadsByCountryDl.value = response.data;
+    });
+
+    DigitalLibraryVisualizationService.getMonthlyStatisticsForDigitalLibrary(
+        organisationUnitId,
+        startDate, endDate,
+        StatisticsType.VIEW,
+        allowedTypes
+    ).then(response => {
+        const categories: string[] = [];
+        const series: number[] = [];
+        
+        Object.entries(response.data).forEach(pair => {
+            categories.push(localiseDate(pair[0]));
+            series.push(pair[1]);
+        });
+
+        viewsMonthlyDL.value = {
+            categories: categories, series: [
+                {name: i18n.t("viewsLabel"), data: series}
+            ]
+        };
+    });
+
+    DigitalLibraryVisualizationService.getMonthlyStatisticsForDigitalLibrary(
+        organisationUnitId,
+        startDate, endDate,
+        StatisticsType.DOWNLOAD,
+        allowedTypes
+    ).then(response => {
+        const categories: string[] = [];
+        const series: number[] = [];
+        
+        Object.entries(response.data).forEach(pair => {
+            categories.push(localiseDate(pair[0]));
+            series.push(pair[1]);
+        });
+
+        downloadsMonthlyDL.value = {
+            categories: categories, series: [
+                {name: i18n.t("downloadsLabel"), data: series}
             ]
         };
     });

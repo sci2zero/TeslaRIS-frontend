@@ -420,6 +420,7 @@
                 <organisation-unit-visualizations
                     :organisation-unit-id="(organisationUnit.id as number)"
                     :display-settings="displaySettings.displaySettings.value"
+                    :digital-library-display-settings="displaySettingsDL.displaySettings.value"
                     :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
                     :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
                     :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
@@ -497,6 +498,7 @@ import OrganisationUnitVisualizations from '@/components/organisationUnit/Organi
 import OrganisationUnitLeaderboards from '@/components/organisationUnit/OrganisationUnitLeaderboards.vue';
 import ChartDisplayConfigurationForm from '@/components/organisationUnit/ChartDisplayConfigurationForm.vue';
 import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
+import { useDLChartDisplay } from '@/composables/useDLChartDisplay';
 
 
 export default defineComponent({
@@ -575,6 +577,7 @@ export default defineComponent({
         const showOutputs = ref(false);
 
         const displaySettings = useOUChartDisplay(parseInt(currentRoute.params.id as string));
+        const displaySettingsDL = useDLChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -952,7 +955,8 @@ export default defineComponent({
             OrganisationUnitOutputConfigurationForm,
             InstitutionDefaultSubmissionContentForm,
             outputConfigurationUpdated, loggedInUser,
-            navigateToBackupPage, ChartDisplayConfigurationForm
+            navigateToBackupPage, ChartDisplayConfigurationForm,
+            displaySettingsDL
         };
 }})
 

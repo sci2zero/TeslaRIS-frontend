@@ -57,11 +57,11 @@
                         <div class="d-flex flex-row justify-center">
                             <publication-file-download-modal
                                 :document-id="(row.item.databaseId as number)"
-                                show-thesis-sections
+                                :show-thesis-sections="showsCurrentPublicReview"
                                 hide-empty-sections
                                 :persistent="false"
                                 :is-list-item="false"
-                                hide-regular-sections
+                                :hide-regular-sections="showsCurrentPublicReview"
                             />
                         </div>
                     </td>
@@ -107,6 +107,10 @@ export default defineComponent({
             default: true
         },
         allowSelection: {
+            type: Boolean,
+            default: false
+        },
+        showsCurrentPublicReview: {
             type: Boolean,
             default: false
         }
