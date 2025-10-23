@@ -118,7 +118,7 @@
                     <v-col>
                         <v-select
                             v-model="selectedThesisType"
-                            :label="$t('thesisTypeLabel') + '*'"
+                            :label="$t('thesisTypeLabel')"
                             :items="thesisTypes"
                             :rules="requiredSelectionRules"
                             multiple

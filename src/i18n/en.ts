@@ -1136,7 +1136,7 @@ export default {
     },
     landingFeatures: {
         title: "Featured Resources",
-        subtitle: "Most cited researchers, institutions and scientific results",
+        subtitle: "Most cited researchers, institutions and scientific results (source: OpenAlex)",
         topResearchers: {
             title: "Most Cited Researchers",
             viewAll: "View all researchers"
@@ -1163,5 +1163,6 @@ export default {
     thesisTypeRatioLabel: "Thesis type ratio",
     numberOfThesesByTypeAndYearLabel: "Thesis count by year and type",
     uploadCompleteLabel: "Upload complete.",
-    uploadingLabel: "Upload in progress..."
+    uploadingLabel: "Upload in progress...",
+    allLabel: "All"
 }

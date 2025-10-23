@@ -98,6 +98,7 @@
                         :data="publicationsYearData"
                         :title="$t('numberOfPublicationsYearlyLabel')"
                         :y-label="$t('countLabel')"
+                        @list-publications="showPublicationListModalBar"
                     />
                 </v-col>
             </v-row>
@@ -228,6 +229,7 @@
         ref="publicationsViewRef"
         :person-id="personId"
         :publication-type="publicationType"
+        :publication-sub-type="publicationSubType"
         :year-from="fromYearList"
         :year-to="toYearList"
     />
@@ -238,7 +240,7 @@ import { onMounted, type PropType, ref, watch } from 'vue';
 import StackedBarChart, { type StackedBarSeries } from '../charts/StackedBarChart.vue';
 import PersonVisualizationService from '@/services/visualization/PersonVisualizationService';
 import { MCategory, type YearlyCounts } from '@/models/Common';
-import { PublicationType } from '@/models/PublicationModel';
+import { PublicationType, ThesisType } from '@/models/PublicationModel';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import PieChart, { type PieDataItem } from '../charts/PieChart.vue';
 import SimpleBarChart, { type BarSeries } from '../charts/SimpleBarChart.vue';
@@ -315,6 +317,7 @@ const shouldDisplayCollaborationNetworkFirst = ref(false);
 const collaborationNetworkRef = ref<HTMLElement>();
 
 const publicationType = ref();
+const publicationSubType = ref<ThesisType | null>(null);
 const fromYearList = ref<number>(0);
 const toYearList = ref<number>(0);
 const publicationsViewRef = ref<typeof PersonVisualizationPublications>();
@@ -345,7 +348,7 @@ const handleYearChange = lodash.debounce(() => {
     } else if(initialDatesSet.value) {
         watchDates.value = true;
     }
-}, 500);
+}, 1500);
 
 watch([startDate, endDate], () => {
     if (!startDate.value || !endDate.value) {
@@ -582,9 +585,16 @@ const deduceStartTab = () => {
     }
 };
 
-const showPublicationListModalPie = (sectionType: any) => {
+const showPublicationListModalPie = (sectionType: any, isThesisType: boolean) => {
     if (publicationsViewRef.value) {
-        publicationType.value = sectionType;
+        if (isThesisType) {
+            publicationType.value = PublicationType.THESIS;
+            publicationSubType.value = sectionType;
+        } else {
+            publicationType.value = sectionType;
+            publicationSubType.value = null;
+        }
+        
         fromYearList.value = fromYear.value;
         toYearList.value = toYear.value;
 
@@ -592,9 +602,16 @@ const showPublicationListModalPie = (sectionType: any) => {
     }
 };
 
-const showPublicationListModalBar = (sectionType: any, year: number) => {
+const showPublicationListModalBar = (sectionType: any, year: number, isThesisType: boolean) => {
     if (publicationsViewRef.value) {
-        publicationType.value = sectionType;
+        if (isThesisType) {
+            publicationType.value = PublicationType.THESIS;
+            publicationSubType.value = sectionType;
+        } else {
+            publicationType.value = sectionType;
+            publicationSubType.value = null;
+        }
+
         fromYearList.value = year;
         toYearList.value = year;
 

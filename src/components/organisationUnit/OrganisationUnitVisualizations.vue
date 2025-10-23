@@ -103,6 +103,7 @@
                         :data="publicationsYearData"
                         :title="$t('numberOfPublicationsYearlyLabel')"
                         :y-label="$t('countLabel')"
+                        @list-publications="showPublicationListModalBar"
                     />
                 </v-col>
             </v-row>
@@ -192,6 +193,8 @@
                             :data="thesesYearData"
                             :title="$t('numberOfThesesYearlyLabel')"
                             :y-label="$t('countLabel')"
+                            theses-data
+                            @list-publications="showPublicationListModalBar"
                         />
                     </v-col>
                 </v-row>
@@ -402,7 +405,7 @@ const handleYearChange = lodash.debounce(() => {
     } else if(initialDatesSet.value) {
         watchDates.value = true;
     }
-}, 500);
+}, 1500);
 
 watch([startDate, endDate], () => {
     if (!startDate.value || !endDate.value) {
@@ -697,7 +700,6 @@ const showPublicationListModalPie = (sectionType: any, isThesisType: boolean) =>
         if (isThesisType) {
             publicationType.value = PublicationType.THESIS;
             publicationSubType.value = sectionType;
-            console.log(sectionType)
         } else {
             publicationType.value = sectionType;
             publicationSubType.value = null;

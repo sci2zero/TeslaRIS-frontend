@@ -20,7 +20,8 @@
                     multiple
                     disable-submission
                     required
-                    comfortable 
+                    comfortable
+                    only-client-institutions-dl
                     label="institutionsLabel">
                 </organisation-unit-autocomplete-search>
             </v-col>    

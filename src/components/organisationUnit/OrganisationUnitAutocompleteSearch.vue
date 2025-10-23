@@ -118,6 +118,10 @@ export default defineComponent({
         onlyClientInstitutionsDl: {
             type: Boolean,
             default: false
+        },
+        registryBookRelevant: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue"],
@@ -212,7 +216,8 @@ export default defineComponent({
                         props.onlyIndependentInstitutions,
                         props.allowedThesisType,
                         props.onlyClientInstitutionsCris,
-                        props.onlyClientInstitutionsDl
+                        props.onlyClientInstitutionsDl,
+                        props.registryBookRelevant
                     ).then((response) => {
                         recentlySearched.value.clear();
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({

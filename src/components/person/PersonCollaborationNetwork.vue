@@ -26,7 +26,7 @@
                     categories: categories
                 }"
                 :category-resolver="getCategoryNamesFromDepth"
-                :height="`${Math.min(600 * depth, 1200)}px`"
+                :height="selectedCollaborationType.value === CollaborationType.COAUTHORSHIP ? `${Math.min(600 * depth, 1200)}px` : '600px'"
                 @list-publications="showPublicationListModal"
             />
         </v-col>

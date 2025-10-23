@@ -6,13 +6,14 @@
         :theme="theme"
         :init-options="initOptions"
         :loading="loading"
+        @chart-ready="onChartReady"
     />
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import BaseChart from "./BaseChart.vue";
-import type { EChartsOption } from "echarts";
+import type { ECharts, EChartsOption } from "echarts";
 
 export interface BarSeries {
     name: string;
@@ -67,8 +68,14 @@ const props = defineProps({
     showTrendLine: {
         type: Boolean,
         default: false
+    },
+    thesesData: {
+        type: Boolean,
+        default: false
     }
 });
+
+const emit = defineEmits(["listPublications"]);
 
 const categoryTotals = computed(() => {
     if (!props.data) return [];
@@ -78,6 +85,7 @@ const categoryTotals = computed(() => {
 });
 
 const loading = ref(true);
+const chartInstance = ref<ECharts | null>(null);
 
 onMounted(() => {
     shouldBeLoading();
@@ -225,4 +233,12 @@ const options = computed(() => {
         series: allSeries
     };
 });
+
+const onChartReady = (chart: ECharts) => {
+    chartInstance.value = chart;
+    chart.on("click", (params: any) => {
+        emit("listPublications", null, parseInt(params.name), props.thesesData);
+    });
+};
+
 </script>

@@ -101,6 +101,7 @@
                             v-model:model-value="selectedInstitution"
                             :top-level-institution-id="loggedInUser && loggedInUser.organisationUnitId > 0 ? loggedInUser.organisationUnitId : undefined"
                             disable-submission
+                            registry-book-relevant
                         ></organisation-unit-autocomplete-search>
                     </v-col>
                     <v-col cols="12" sm="6" lg="3">
@@ -205,7 +206,17 @@
                         ></date-picker>
                     </v-col>
                 </v-row>
-                <promotion-count-report class="mt-5" :report="reportCounts"></promotion-count-report>
+                <promotion-count-report
+                    v-show="!reportLoading"
+                    class="mt-5"
+                    :report="reportCounts">
+                </promotion-count-report>
+                <v-progress-circular
+                    v-if="reportLoading"
+                    class="ml-2"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
             </v-window-item>
         </v-tabs-window>
         
@@ -264,6 +275,8 @@ export default defineComponent({
 
         const currentTab = ref("nonPromoted");
 
+        const reportLoading = ref(false);
+
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
         const { requiredSelectionRules } = useValidationUtils();
@@ -296,12 +309,15 @@ export default defineComponent({
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
+                reportLoading.value = true;
                 RegistryBookService.getPromotedCounts(
                     fromDate.value.split("T")[0],
                     toDate.value.split("T")[0]
                 ).then(response => {
                     reportCounts.value.splice(0);
                     reportCounts.value = response.data;
+
+                    reportLoading.value = false;
                 });
             } else if (currentTab.value === "forPromotion" && selectedPromotion.value.value > 0) {
                 tableStates.forPromotion.fetchFn();
@@ -526,7 +542,7 @@ export default defineComponent({
             promotionPreviewRef, authorFullName,
             authorAcquiredTitle, recurrenceTypes,
             selectedRecurrenceType, deleteScheduledTask,
-            scheduledTasks, RecurrenceType
+            scheduledTasks, RecurrenceType, reportLoading
         };
     }
 });

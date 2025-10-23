@@ -1104,7 +1104,7 @@ export default {
     subUnitCitationCountLeaderboardLabel: "Top pod-institucije po broju citata",
     subUnitAssessmentPointsLeaderboardLabel: "Top pod-institucije po broju M-poena",
     publicationCountLeaderboardLabel: "Publikacije",
-    citationCountLeaderboardLabel: "Citati",
+    citationCountLeaderboardLabel: "Citiranost",
     assessmentPointsLeaderboardLabel: "M-poeni",
     reharvestCitationIndicatorsLabel: "Ponovo učitaj podatke o citiranosti",
     mostCitedResearchersLabel: "Najviše citirani istraživači (po Open Alex-u)",
@@ -1142,7 +1142,7 @@ export default {
     },
     landingFeatures: {
         title: "Istaknuti resursi",
-        subtitle: "Najcitiraniji istraživači, institucije i naučni rezultati",
+        subtitle: "Najcitiraniji istraživači, institucije i naučni rezultati (izvor: OpenAlex)",
         topResearchers: {
             title: "Najcitiraniji istraživači",
             viewAll: "Pregledaj sve istraživače"
@@ -1170,5 +1170,6 @@ export default {
     thesisTypeRatioLabel: "Odnos tipova završnih radova",
     numberOfThesesByTypeAndYearLabel: "Broj publikacija po tipu, po godinama",
     uploadCompleteLabel: "Otpremanje završeno.",
-    uploadingLabel: "Otpremanje u toku..."
+    uploadingLabel: "Otpremanje u toku...",
+    allLabel: "Sve"
 }

@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" persistent>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ $t("publicationsLabel") + ` - ${entityName} - (${getPublicationTypeTitleFromValueAutoLocale(props.publicationType)}, ${yearFrom}${(yearTo !== yearFrom) ? ('-' + yearTo) : ''})` }}</span>
+                    <span class="text-h5">{{ $t("publicationsLabel") + ` - ${entityName} - (${props.publicationType ? getPublicationTypeTitleFromValueAutoLocale(props.publicationType) : $t('allLabel')}, ${yearFrom}${(yearTo !== yearFrom) ? ('-' + yearTo) : ''})` }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -16,7 +16,7 @@
                             enable-export
                             :endpoint-type="ExportableEndpointType.VISUALIZATION_PUBLICATIONS"
                             :endpoint-token-parameters="[
-                                String(props.publicationType),
+                                (props.publicationType ? String(props.publicationType) : ''),
                                 (props.publicationSubType ? String(props.publicationSubType) : ''),
                                 String(props.yearFrom),
                                 String(props.yearTo),

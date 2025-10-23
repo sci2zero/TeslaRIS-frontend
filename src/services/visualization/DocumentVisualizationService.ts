@@ -16,8 +16,8 @@ export class DocumentVisualizationService extends BaseService {
         return super.sendRequest(axios.get, `visualization-data/document/monthly-statistics/${documentId}/${statisticsType}?startDate=${startDate}&endDate=${endDate}`);
     }
 
-    async getPublicationsForTypeAndPeriod(type: PublicationType, subType: ThesisType | null, personId: number, institutionId: number, yearFrom: number, yearTo: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-        return super.sendRequest(axios.get, `visualization-data/document/publications?type=${type}${subType ? ("&subType=" + subType) : ""}&personId=${personId}&institutionId=${institutionId}&yearFrom=${yearFrom}&yearTo=${yearTo}${pageable}`);
+    async getPublicationsForTypeAndPeriod(type: PublicationType | null, subType: ThesisType | null, personId: number, institutionId: number, yearFrom: number, yearTo: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.get, `visualization-data/document/publications?personId=${personId}${type ? ("&type=" + type) : ""}${subType ? ("&subType=" + subType) : ""}&institutionId=${institutionId}&yearFrom=${yearFrom}&yearTo=${yearTo}${pageable}`);
     }
 }
 
