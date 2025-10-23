@@ -1,12 +1,12 @@
 <template>
     <v-app class="bg-slate-100">
-        <SideBar class="h-full" v-if="!hideLayout" />
+        <SideBar v-if="!hideLayout" class="h-full" />
         <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
             <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
 
             <router-view
-                class="flex-1"
                 :key="$route.path"
+                class="flex-1"
             />
 
             <footerbar v-if="!hideLayout" />

@@ -70,7 +70,8 @@
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Email</span>
-                                <span class="text-slate-700 text-sm">{{ props.person.personalInfo.contact.contactEmail }}</span>
+                                <identifier-link v-if="person?.personalInfo.contact?.contactEmail" :identifier="person?.personalInfo.contact.contactEmail" type="email"></identifier-link>
+                                <span v-else>-</span>
                             </div>
                         </div>
                     </div>
@@ -117,9 +118,9 @@
                     <!-- Mobile Dropdown -->
                     <div class="md:hidden px-6 py-4">
                         <v-menu>
-                            <template #activator="{ props }">
+                            <template #activator="{ props: menuProps }">
                                 <button
-                                    v-bind="props"
+                                    v-bind="menuProps"
                                     class="w-full flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                                 >
                                     <span>{{ tabs.find(tab => tab.id === activeTab)?.name }}</span>
@@ -267,7 +268,8 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">eCRIS-ID</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personalInfo?.eCrisId || '-' }}
+                                        <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris"></identifier-link>
+                                        <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div>
@@ -278,26 +280,32 @@
                                 </div>
                                 <div v-if="props.person?.personalInfo?.orcid">
                                     <label class="block text-sm font-medium text-gray-700">ORCID</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.orcid }}
-                                    </p>
+                                    <div v-if="person?.personalInfo.orcid" class="response">
+                                        <identifier-link :identifier="person?.personalInfo.orcid" type="orcid"></identifier-link>
+                                    </div>
+                                    <div v-else class="response">
+                                        -
+                                    </div>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.scopusAuthorId">
                                     <label class="block text-sm font-medium text-gray-700">{{ t('scopusAuthorIdLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.scopusAuthorId }}
+                                        <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
+                                        <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.openAlexId">
                                     <label class="block text-sm font-medium text-gray-700">{{ t('openAlexIdLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.openAlexId }}
+                                        <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex"></identifier-link>
+                                        <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.webOfScienceResearcherId">
                                     <label class="block text-sm font-medium text-gray-700">{{ t('researcherIdLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.webOfScienceResearcherId }}
+                                        <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
+                                        <span v-else>-</span>
                                     </p>
                                 </div>
                             </div>
@@ -316,6 +324,7 @@
                                         {{ uri }}
                                     </a>
                                 </div>
+                                <!-- <uri-list :uris="person?.personalInfo.uris"></uri-list> -->
                             </div>
                         </div>
 
@@ -327,7 +336,17 @@
                             </h3>
                             <div class="space-y-3">
                                 <div v-for="employment in activeEmployments.slice(0, 5)" :key="employment.id" class="border-l-4 border-orange-200 pl-4">
-                                    <div class="font-medium text-gray-900">
+                                    <localized-link
+                                        v-if="employment.organisationUnitId"
+                                        :to="'organisation-units/' + employment.organisationUnitId"
+                                        class="font-medium text-gray-900 underline"
+                                    >
+                                        <div class="font-medium text-gray-900">
+                                            <v-icon icon="mdi-domain" size="16" class="mr-1"></v-icon>
+                                            {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.affiliationStatement) }}
+                                        </div>
+                                    </localized-link>
+                                    <div v-else class="font-medium text-gray-900">
                                         {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.affiliationStatement) }}
                                     </div>
                                     <div v-if="employment.employmentPosition" class="text-sm text-gray-600">
@@ -337,8 +356,6 @@
                             </div>
                         </div>
                     </div>
-
-                    
                 </div>
             </div>
         </div>
@@ -356,9 +373,9 @@ import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import type { Employment } from '@/models/InvolvementModel';
 import type { PersonResponse } from '@/models/PersonModel';
 import { Sex } from '@/models/PersonModel';
-import type { MultilingualContent } from '@/models/Common';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
-
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 interface Props {
     person: PersonResponse | undefined;
@@ -400,17 +417,6 @@ const formatDate = (dateString: string | null | undefined): string => {
 const formatSex = (sex: Sex | null | undefined): string => {
     if (!sex) return "-";
     return getTitleFromValueAutoLocale(sex) || "-";
-};
-
-const getKeywordsAsArray = (keywords: MultilingualContent[] | undefined): string[] => {
-    if (!keywords || keywords.length === 0) return [];
-    
-    // Get the content from the current locale or first available
-    const content = returnCurrentLocaleContent(keywords);
-    if (!content) return [];
-    
-    // Split by newlines and filter out empty strings
-    return content.split('\n').filter(keyword => keyword.trim().length > 0);
 };
 </script>
 

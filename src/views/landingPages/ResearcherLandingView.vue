@@ -290,11 +290,8 @@ import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/Expertise
 import { localiseDate } from '@/utils/DateUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
-import UriList from '@/components/core/UriList.vue';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
-import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type AssessmentResearchArea, type EntityIndicatorResponse, type ResearcherAssessmentResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -306,9 +303,7 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
-import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
@@ -322,7 +317,7 @@ import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherL
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, IdentifierLink, UriList, PersistentQuestionDialog, PersonProfileImage, PersonAssessmentsView, AddPublicationMenu, LocalizedLink, BasicInfoLoader, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader },
     setup() {
         const currentTab = ref("additionalInfo");
 

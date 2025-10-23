@@ -109,7 +109,6 @@ import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
 import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView.vue";
 
-import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 const roles = {
     researcher: "RESEARCHER",
@@ -155,7 +154,6 @@ const router = createRouter({
         {
             path: "/:locale",
             name: "baseLocale",
-            // component: DefaultLayout,
             children: [
                 {
                     path: "",

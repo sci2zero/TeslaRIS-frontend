@@ -12,7 +12,7 @@
                     @click="toggleSidebar"
                 >
                 </v-btn>
-                <breadcrumbs v-else="showBreadcrumbs" />
+                <breadcrumbs v-else />
             </div>
 
             <v-spacer></v-spacer>
