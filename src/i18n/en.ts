@@ -1060,6 +1060,7 @@ export default {
     numberOfPublicationsByMCategoryAndYearLabel: "Publication count by year and M category",
     notClassifiedLabel: "Not classified",
     viewsLabel: "Views",
+    downloadsLabel: "Downloads",
     numberOfViewsMonthlyLabel: "Number of monthly views",
     mServiceDescriptionLabel: "On this service, you can check the category of a paper that has been published or is planned for publication in a journal, as well as a paper that has been presented or is planned for presentation at a conference.",
     readMoreLabel: "Read more",
@@ -1166,5 +1167,6 @@ export default {
     numberOfThesesByTypeAndYearLabel: "Thesis count by year and type",
     uploadCompleteLabel: "Upload complete.",
     uploadingLabel: "Upload in progress...",
-    allLabel: "All"
+    allLabel: "All",
+    updateDLDisplayConfigurationLabel: "Digital Library visualizations display"
 }

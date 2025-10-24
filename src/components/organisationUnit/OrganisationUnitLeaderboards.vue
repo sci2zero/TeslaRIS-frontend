@@ -210,16 +210,16 @@
 
                 <v-row>
                     <v-col
-                        v-if="displaySettings?.viewCountDocumentLeaderboard.display"
-                        cols="12" :md="displaySettings?.viewCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                        v-if="digitalLibraryDisplaySettings?.viewCountThesisLeaderboard.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.viewCountThesisLeaderboard.spanWholeRow ? 12 : 6">
                         <leaderboard-table
                             :leaderboard-data="thesesViewCountsLeaderboard"
                             :title="$t('thesesViewCountsLeaderboardLabel')"
                         />
                     </v-col>
                     <v-col
-                        v-if="displaySettings?.downloadCountDocumentLeaderboard.display"
-                        cols="12" :md="displaySettings?.downloadCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                        v-if="digitalLibraryDisplaySettings?.downloadCountThesisLeaderboard.display"
+                        cols="12" :md="digitalLibraryDisplaySettings?.downloadCountThesisLeaderboard.spanWholeRow ? 12 : 6">
                         <leaderboard-table
                             :leaderboard-data="thesesDownloadCountsLeaderboard"
                             :title="$t('thesesDownloadCountsLeaderboardLabel')"
@@ -239,7 +239,7 @@ import { computed, onMounted, type PropType, ref, watch } from 'vue';
 import LeaderboardTable from '../charts/LeaderboardTable.vue';
 import OrganisationUnitLeaderboardService from '@/services/visualization/OrganisationUnitLeaderboardService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
+import type { DigitalLibraryChartDisplaySettings, OUChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
 import DocumentLeaderboardService from '@/services/visualization/DocumentLeaderboardService';
 import DatePicker from '../core/DatePicker.vue';
 import { StatisticsType } from '@/models/AssessmentModel';
@@ -256,6 +256,10 @@ const props = defineProps({
     },
     displaySettings: {
         type: Object as PropType<OUChartDisplaySettings | undefined>,
+        required: true
+    },
+    digitalLibraryDisplaySettings: {
+        type: Object as PropType<DigitalLibraryChartDisplaySettings | undefined>,
         required: true
     },
     displayPublicationsTab: {

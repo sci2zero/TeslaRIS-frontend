@@ -494,7 +494,8 @@ const submit = () => {
         {
             documentChartDisplaySettings: documentSettings.value as DocumentChartDisplaySettings,
             personChartDisplaySettings: personSettings.value as PersonChartDisplaySettings,
-            ouChartDisplaySettings: ouSettings.value as OUChartDisplaySettings
+            ouChartDisplaySettings: ouSettings.value as OUChartDisplaySettings,
+            digitalLibraryChartDisplaySettings: null
         }
     ).then(() => {
         message.value = i18n.t("updatedSuccessMessage");
