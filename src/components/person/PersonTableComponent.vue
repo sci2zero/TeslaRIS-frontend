@@ -193,9 +193,17 @@
                                 <div class="person-name-section">
                                     <localized-link :to="'persons/' + item.databaseId" class="person-name">
                                         <v-avatar size="40" class="profile-avatar modern-avatar">
-                                            <v-icon color="primary">
-                                                mdi-account
-                                            </v-icon>
+                                            <v-img
+                                                :src="`${baseServerUrl}file/raw-image/${item.databaseId}`"
+                                                class="avatar-img"
+                                                cover
+                                            >
+                                                <template #error>
+                                                    <v-icon color="primary" class="mt-2">
+                                                        mdi-account
+                                                    </v-icon>
+                                                </template>
+                                            </v-img>
                                         </v-avatar>
                                     </localized-link>
                                     <div class="flex items-center gap-2">
@@ -355,6 +363,8 @@ export default defineComponent({
     emits: ["switchPage", "dragged", "delete"],
     setup(props, {emit}) {
         const selectedPersons = ref<PersonIndex[]>([]);
+
+        const baseServerUrl = import.meta.env.VITE_BASE_URL as string;
 
         const i18n = useI18n();
         const router = useRouter();
@@ -537,7 +547,9 @@ export default defineComponent({
             tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
             localiseDate, startPublicationComparison, isCommission,
             startMetadataComparison, onDropCallback, removeSelection,
-            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable, hasEmployment, extractYear, openExportModal, exportModal
+            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable,
+            hasEmployment, extractYear, openExportModal, exportModal,
+            baseServerUrl
         };
     }
 });

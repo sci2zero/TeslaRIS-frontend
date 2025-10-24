@@ -160,7 +160,7 @@
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('lastNameLabel') }}</label>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('surnameLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         {{ props.person?.personName?.lastname }}
                                     </p>
@@ -168,7 +168,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">{{ t('birthdateLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ formatDate(props.person?.personalInfo?.localBirthDate) }}
+                                        {{ ((isResearcher || isAdmin) && canEdit) ? formatDate(props.person?.personalInfo?.localBirthDate) : props.person?.personalInfo?.localBirthDate.slice(0, 4) }}
                                     </p>
                                 </div>
                                 <div>
@@ -288,21 +288,21 @@
                                     </div>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.scopusAuthorId">
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('scopusAuthorIdLabel') }}</label>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('Scopus Author ID') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.openAlexId">
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('openAlexIdLabel') }}</label>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('OpenAlex ID') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex"></identifier-link>
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.webOfScienceResearcherId">
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('researcherIdLabel') }}</label>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('ResearcherID (WoS)') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
                                         <span v-else>-</span>
@@ -376,6 +376,7 @@ import { Sex } from '@/models/PersonModel';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 interface Props {
     person: PersonResponse | undefined;
@@ -391,6 +392,8 @@ const { t } = useI18n();
 
 const showDetails = ref(false);
 const activeTab = ref('personal');
+
+const {isResearcher, isAdmin} = useUserRole();
 
 const tabs = computed(() => [
     { id: 'personal', name: t('allDetailsLabel') },

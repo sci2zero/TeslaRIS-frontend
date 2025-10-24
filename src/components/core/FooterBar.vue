@@ -9,7 +9,7 @@
                         <!-- Logo and Description -->
                         <div class="col-span-1 md:col-span-2">
                             <div class="text-white">
-                                <img src="/logov1.svg" alt="CRIS UNS Logo" class="mx-auto md:mx-0 h-12 md:h-16 w-auto brightness-0 invert opacity-90 mb-4" />
+                                <img src="/logov1.svg" alt="TeslaRIS Logo" class="mx-auto md:mx-0 h-12 md:h-16 w-auto brightness-0 invert opacity-90 mb-4" />
                                 <h3 class="text-3xl font-bold text-white mb-3 text-shadow-2xs">
                                     {{ returnCurrentLocaleContent(title) }}
                                 </h3>
@@ -81,7 +81,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-center py-4 border-t border-white/20">
                             <div class="footer-copyright mb-2 md:mb-0">
                                 <p class="text-sm text-white/80">
-                                    © {{ new Date().getFullYear() }} CRIS UNS. {{ $t('footer.allRightsReserved') }}.
+                                    © {{ new Date().getFullYear() }} Sci2Zero. {{ $t('footer.allRightsReserved') }}.
                                 </p>
                             </div>
                             <div class="text-white/70">
