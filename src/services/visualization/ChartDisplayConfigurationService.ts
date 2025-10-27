@@ -29,6 +29,10 @@ export class ChartDisplayConfigurationService extends BaseService {
     async saveFullChartDisplaySettings(organisationUnitId: number, configuration: FullChartDisplaySettings): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `chart-display-configuration/base/${organisationUnitId}`, configuration);
     }
+
+    async saveDigitalLibraryChartDisplaySettings(organisationUnitId: number, configuration: DigitalLibraryChartDisplaySettings): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `chart-display-configuration/digital-library/${organisationUnitId}`, configuration);
+    }
 }
 
 export default new ChartDisplayConfigurationService();

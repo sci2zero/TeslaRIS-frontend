@@ -61,5 +61,5 @@ export interface FullChartDisplaySettings {
     personChartDisplaySettings: PersonChartDisplaySettings;
     ouChartDisplaySettings: OUChartDisplaySettings;
     documentChartDisplaySettings: DocumentChartDisplaySettings;
-    digitalLibraryChartDisplaySettings: DigitalLibraryChartDisplaySettings;
+    digitalLibraryChartDisplaySettings: DigitalLibraryChartDisplaySettings | null;
 }

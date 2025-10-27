@@ -1065,6 +1065,7 @@ export default {
     numberOfPublicationsByMCategoryAndYearLabel: "Broj publikacija po M kategoriji, po godinama",
     notClassifiedLabel: "Neklasifikovane",
     viewsLabel: "Pregledi",
+    downloadsLabel: "Preuzimanja",
     numberOfViewsMonthlyLabel: "Broj pregleda po mesecima",
     mServiceDescriptionLabel: "Na ovom servisu možete proveriti kategoriju rada objavljenog ili planiranog za objavljivanje u časopisu, kao i rada prezentovanog ili planiranog za prezentovanje na konferenciji.",
     readMoreLabel: "Vidi još",
@@ -1173,5 +1174,6 @@ export default {
     numberOfThesesByTypeAndYearLabel: "Broj publikacija po tipu, po godinama",
     uploadCompleteLabel: "Otpremanje završeno.",
     uploadingLabel: "Otpremanje u toku...",
-    allLabel: "Sve"
+    allLabel: "Sve",
+    updateDLDisplayConfigurationLabel: "Prikaz vizuelizacija digitalne biblioteke"
 }

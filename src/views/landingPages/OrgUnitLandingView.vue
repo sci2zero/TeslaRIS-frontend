@@ -223,6 +223,16 @@
                     primary-color outlined
                     :read-only="!canEdit"
                 />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)"
+                    class="ml-2"
+                    :form-component="DLDisplayConfigurationForm"
+                    :form-props="{ organisationUnitId: organisationUnit?.id }"
+                    entity-name="DLDisplayConfiguration"
+                    is-update compact wide
+                    primary-color outlined
+                    :read-only="!canEdit"
+                />
                 <v-btn
                     v-if="isInstitutionalEditor && canEdit"
                     class="mb-5 ml-2" color="primary" density="compact"
@@ -431,6 +441,7 @@
                 <organisation-unit-leaderboards
                     :organisation-unit-id="organisationUnit?.id"
                     :display-settings="displaySettings.displaySettings.value"
+                    :digital-library-display-settings="displaySettingsDL.displaySettings.value"
                     :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"
                     :display-citations-tab="displaySettings.shouldDisplayCitationLeaderboards()"
                     :display-points-tab="displaySettings.shouldDisplayAssessmentPointsLeaderboards()"
@@ -499,6 +510,7 @@ import OrganisationUnitLeaderboards from '@/components/organisationUnit/Organisa
 import ChartDisplayConfigurationForm from '@/components/organisationUnit/ChartDisplayConfigurationForm.vue';
 import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
 import { useDLChartDisplay } from '@/composables/useDLChartDisplay';
+import DLDisplayConfigurationForm from '@/components/organisationUnit/DLDisplayConfigurationForm.vue';
 
 
 export default defineComponent({
@@ -928,7 +940,7 @@ export default defineComponent({
         });
 
         return {
-            organisationUnit, currentTab,
+            organisationUnit, currentTab, isHeadOfLibrary,
             publications, totalPublications,
             employees, totalEmployees, publicationsRef,
             switchPublicationsPage, publicationTypes,
@@ -956,7 +968,7 @@ export default defineComponent({
             InstitutionDefaultSubmissionContentForm,
             outputConfigurationUpdated, loggedInUser,
             navigateToBackupPage, ChartDisplayConfigurationForm,
-            displaySettingsDL
+            displaySettingsDL, DLDisplayConfigurationForm
         };
 }})
 
