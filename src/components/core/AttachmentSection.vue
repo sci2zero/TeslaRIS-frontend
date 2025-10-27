@@ -26,10 +26,12 @@
                 :attachments="preliminarySupplements"
                 :can-edit="canEditThesisAttachments"
                 :in-comparator="inComparator"
-                disable-updates 
+                disable-updates
+                :can-make-official="isThesisSection"
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
+                @update="notifyAboutSectionChange()"
             />
         </v-col>
     </v-row>

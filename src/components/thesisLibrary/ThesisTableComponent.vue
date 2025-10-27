@@ -143,7 +143,7 @@ export default defineComponent({
                     );
             }
 
-            if (props.institutionId || !allFromSameFaculty.value) {
+            if (allFromSameFaculty.value) {
                 headers.value = headers.value.filter(header => header.key !== "faculty");
             }
         };
@@ -174,7 +174,7 @@ export default defineComponent({
             { title: downloadableDocumentsLabel, align: "start", sortable: false}
         ]);
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25});
 
         const refreshTable = (event: any) => {
             if (tableOptions.value.initialCustomConfiguration) {

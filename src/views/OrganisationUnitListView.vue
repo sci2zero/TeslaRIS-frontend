@@ -80,8 +80,12 @@ export default defineComponent({
             loading.value = true;
         });
 
+        const initialLoad = ref(true);
+
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
-            search(searchParams.value);
+            if (!initialLoad.value) {
+                search(searchParams.value);
+            }
         });
 
         const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -95,6 +99,7 @@ export default defineComponent({
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
             if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                initialLoad.value = false;
                 return;
             }
 
@@ -108,6 +113,7 @@ export default defineComponent({
             })
             .finally(() => {
                 loading.value = false;
+                initialLoad.value = false;
             });
         };
 
@@ -116,12 +122,13 @@ export default defineComponent({
             size.value = pageSize;
             sort.value = sortField;
             direction.value = sortDir;
+
             search(searchParams.value);
-        }
+        };
 
         const addOU = () => {
             router.push({name: "submitOrganisationUnit"});
-        }
+        };
 
         return {
             search, organisationUnits, totalOUs,

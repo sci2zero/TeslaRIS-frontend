@@ -6,7 +6,7 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 export const collaborationTypeSr = [
     { title: "Koautorstvo", value: CollaborationType.COAUTHORSHIP },
     { title: "Mentorstvo", value: CollaborationType.MENTORSHIP },
-    { title: "Komentrostvo", value: CollaborationType.CO_MENTORSHIP },
+    { title: "Komentorstvo", value: CollaborationType.CO_MENTORSHIP },
     { title: "Kouredništvo", value: CollaborationType.CO_EDITORSHIP },
     { title: "Kočlanstvo u komisiji", value: CollaborationType.CO_MEMBERSHIP_COMMISSION }
 ];

@@ -174,7 +174,7 @@ export default defineComponent({
         };
 
         const moveToOfficial = (documentFile: DocumentFileResponse) => {
-            DocumentFileService.makeThesisPreprintOfficial(
+            DocumentFileService.makeThesisDocumentOfficial(
                 parseInt(currentRoute.params.id as string),
                 documentFile.id as number
             ).then(() => {

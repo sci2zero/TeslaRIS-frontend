@@ -238,15 +238,20 @@ export default defineComponent({
             }
         });
 
+        const initialLoad = ref(true);
+
         watch([
             loggedInUser, returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities, selectedPublicationTypes,
             returnOnlyUnmanagedPublications], () => {
-            search(searchParams.value);
+            if (!initialLoad.value) {
+                search(searchParams.value);
+            }
         });
 
         const search = (tokenParams: string) => {
             if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                initialLoad.value = false;
                 return;
             }
 
@@ -278,6 +283,7 @@ export default defineComponent({
                 totalPublications.value = response.data.totalElements;
             }).finally(() => {
                 loading.value = false;
+                initialLoad.value = false;
             });
         };
 
@@ -298,6 +304,7 @@ export default defineComponent({
             size.value = pageSize;
             sort.value = sortField;
             direction.value = sortDir;
+
             search(searchParams.value);
         };
 

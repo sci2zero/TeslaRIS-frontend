@@ -352,3 +352,10 @@ export enum CollaborationType {
     CO_EDITORSHIP = "CO_EDITORSHIP",
     CO_MEMBERSHIP_COMMISSION = "CO_MEMBERSHIP_COMMISSION"
 }
+
+export interface PersonFeaturedInformation {
+    publicationCount: number;
+    currentCitationCount: number;
+    currentCitationTrend: number;
+    hIndex: number;
+}

@@ -1,6 +1,6 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
-import type { CommissionYearlyCounts, MCategoryCounts, StatisticsByCountry, YearlyCounts } from "@/models/Common";
+import type { CommissionYearlyCounts, MCategoryCounts, PersonFeaturedInformation, StatisticsByCountry, YearlyCounts } from "@/models/Common";
 import { BaseService } from "../BaseService";
 
 
@@ -28,6 +28,10 @@ export class PersonVisualizationService extends BaseService {
 
     async getMonthlyViewsForPerson(personId: number, startDate: string, endDate: string): Promise<AxiosResponse<Record<string, number>>> {
         return super.sendRequest(axios.get, `visualization-data/person/monthly-statistics/${personId}?startDate=${startDate}&endDate=${endDate}`);
+    }
+
+    async getFeaturedInformationForPerson(personId: number): Promise<AxiosResponse<PersonFeaturedInformation>> {
+        return super.sendRequest(axios.get, `visualization-data/person/featured/${personId}`);
     }
 }
 

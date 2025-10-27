@@ -81,14 +81,19 @@ export default defineComponent({
             loading.value = true;
         });
 
+        const initialLoad = ref(true);
+
         watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
-            search(searchParams.value);
+            if (!initialLoad.value) {
+                search(searchParams.value);
+            }
         });
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
 
             if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                initialLoad.value = false;
                 return;
             }
 
@@ -102,6 +107,7 @@ export default defineComponent({
             })
             .finally(() => {
                 loading.value = false;
+                initialLoad.value = false;
             });
         };
 

@@ -292,8 +292,8 @@ export default defineComponent({
             value: -1
         });
 
-        const fromDate = ref("");
-        const toDate = ref("");
+        const fromDate = ref(new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]);
+        const toDate = ref((new Date()).toISOString().split("T")[0]);
         const selectedInstitution = ref<{ title: string; value: number }>({
             title: "",
             value: -1
