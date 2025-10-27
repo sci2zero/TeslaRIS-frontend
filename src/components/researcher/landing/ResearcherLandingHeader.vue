@@ -168,7 +168,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">{{ t('birthdateLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ ((isResearcher || isAdmin) && canEdit) ? formatDate(props.person?.personalInfo?.localBirthDate) : props.person?.personalInfo?.localBirthDate.slice(0, 4) }}
+                                        {{ ((isResearcher || isAdmin) && canEdit) ? formatDate(props.person?.personalInfo?.localBirthDate) : props.person?.personalInfo?.localBirthDate?.slice(0, 4) }}
                                     </p>
                                 </div>
                                 <div>
@@ -329,7 +329,7 @@
                         </div>
 
                         <!-- Employments -->
-                        <div v-if="activeEmployments.length > 0" class="bg-gray-50 p-6 rounded-lg">
+                        <div v-if="activeEmployments && activeEmployments.length > 0" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                                 <span class="mdi mdi-office-building mr-2 text-orange-600"></span>
                                 {{ t('employmentsLabel') }}
