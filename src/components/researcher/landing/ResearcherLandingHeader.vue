@@ -168,7 +168,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">{{ t('birthdateLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        {{ ((isResearcher || isAdmin) && canEdit) ? formatDate(props.person?.personalInfo?.localBirthDate) : props.person?.personalInfo?.localBirthDate.slice(0, 4) }}
+                                        {{ ((isResearcher || isAdmin) && canEdit) ? formatDate(props.person?.personalInfo?.localBirthDate) : props.person?.personalInfo?.localBirthDate?.slice(0, 4) }}
                                     </p>
                                 </div>
                                 <div>
