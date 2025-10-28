@@ -1,7 +1,8 @@
 import type { AxiosResponse } from "axios";
 import axios from "axios";
-import type { CommissionYearlyCounts, MCategoryCounts, PersonFeaturedInformation, StatisticsByCountry, YearlyCounts } from "@/models/Common";
+import type { CommissionYearlyCounts, MCategoryCounts, PersonFeaturedInformation, StatisticsByCountry, YearlyCounts, YearRange } from "@/models/Common";
 import { BaseService } from "../BaseService";
+import { DocumentContributionType } from "@/models/PublicationModel";
 
 
 export class PersonVisualizationService extends BaseService {
@@ -32,6 +33,16 @@ export class PersonVisualizationService extends BaseService {
 
     async getFeaturedInformationForPerson(personId: number): Promise<AxiosResponse<PersonFeaturedInformation>> {
         return super.sendRequest(axios.get, `visualization-data/person/featured/${personId}`);
+    }
+
+    async getMinAndMaxYearForFiltering(personId: number, contributionTypes: DocumentContributionType[]): Promise<AxiosResponse<YearRange>> {
+        let contributionTypesParam = "";
+        contributionTypes.forEach(contributionType => {
+            contributionTypesParam += `&contributionTypes=${contributionType}`;
+        });
+        contributionTypesParam = contributionTypesParam.slice(1);
+
+        return super.sendRequest(axios.get, `visualization-data/person/year-range/${personId}?${contributionTypesParam}`);
     }
 }
 

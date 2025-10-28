@@ -28,12 +28,15 @@
             </div>
         </div>
     </v-snackbar>
+
+    <toast v-model="error" :message="$t('uploadFailedMessage')" />
 </template>
 
 <script setup lang="ts">
 import { useUploadStore } from '@/stores/uploadStore';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import Toast from './Toast.vue';
 
 
 const uploadState = ref({
@@ -48,6 +51,8 @@ const fileName = computed(() => uploadState.value.fileName);
 
 const i18n = useI18n();
 const uploadStore = useUploadStore();
+
+const error = ref<boolean>(false);
 
 const statusMessage = computed(() => {
     if (progress.value === 100) {
@@ -86,9 +91,24 @@ const completeUpload = () => {
     }, 1500);
 };
 
+const cancelUpload = (displayErrorMessage: boolean = false) => {
+    uploadState.value = {
+        progress: 0,
+        fileName: "",
+        isUploading: false
+    };
+
+    uploadStore.setUploadState(uploadState.value.progress, uploadState.value.fileName);
+
+    if (displayErrorMessage) {
+        error.value = true;
+    }
+};
+
 defineExpose({
     startUpload,
-    updateProgress
+    updateProgress,
+    cancelUpload
 });
 </script>
 

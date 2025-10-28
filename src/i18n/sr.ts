@@ -1175,5 +1175,7 @@ export default {
     uploadCompleteLabel: "Otpremanje završeno.",
     uploadingLabel: "Otpremanje u toku...",
     allLabel: "Sve",
-    updateDLDisplayConfigurationLabel: "Prikaz vizuelizacija digitalne biblioteke"
+    updateDLDisplayConfigurationLabel: "Prikaz vizuelizacija digitalne biblioteke",
+    uploadFailedMessage: "Neuspešno otpremanje. Molimo Vas pokušajte ponovo. Ako se greška i dalje ponavlja, kontaktirajte administratora sistema.",
+    contributionsForDateRangeLabel: "Tipovi kontribucija uzeti u obzir za organičavanje perioda pretrage"
 }

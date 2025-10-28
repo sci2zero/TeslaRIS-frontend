@@ -359,3 +359,8 @@ export interface PersonFeaturedInformation {
     currentCitationTrend: number;
     hIndex: number;
 }
+
+export interface YearRange {
+    a: number;
+    b: number;
+}

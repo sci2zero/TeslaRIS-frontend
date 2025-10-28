@@ -55,6 +55,21 @@
             />
         </v-col>
     </v-row>
+    <v-row v-if="currentTab === 'collaborationNetwork'">
+        <v-col>
+            <span class="flex flex-row justify-start">
+                <h3 class="mt-5 mr-5">{{ $t("contributionsForDateRangeLabel") }}:</h3>
+                <v-select
+                    v-model="selectedContributionTypes"
+                    :items="contributionTypes"
+                    class="contribution-type-select"
+                    :label="$t('contributionTypeLabel')"
+                    return-object
+                    multiple>
+                </v-select>
+            </span>
+        </v-col>
+    </v-row>
 
     <v-tabs
         v-if="personId"
@@ -236,11 +251,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, type PropType, ref, watch } from 'vue';
+import { computed, onMounted, type PropType, ref, watch } from 'vue';
 import StackedBarChart, { type StackedBarSeries } from '../charts/StackedBarChart.vue';
 import PersonVisualizationService from '@/services/visualization/PersonVisualizationService';
 import { MCategory, type YearlyCounts } from '@/models/Common';
-import { PublicationType, ThesisType } from '@/models/PublicationModel';
+import { DocumentContributionType, PublicationType, ThesisType } from '@/models/PublicationModel';
 import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
 import PieChart, { type PieDataItem } from '../charts/PieChart.vue';
 import SimpleBarChart, { type BarSeries } from '../charts/SimpleBarChart.vue';
@@ -257,6 +272,7 @@ import lodash from "lodash";
 import PersonCollaborationNetwork from '@/components/person/PersonCollaborationNetwork.vue';
 import { useRoute } from 'vue-router';
 import PersonVisualizationPublications from './PersonVisualizationPublications.vue';
+import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/documentContributionType';
 
 
 const props = defineProps({
@@ -321,6 +337,9 @@ const publicationSubType = ref<ThesisType | null>(null);
 const fromYearList = ref<number>(0);
 const toYearList = ref<number>(0);
 const publicationsViewRef = ref<typeof PersonVisualizationPublications>();
+
+const contributionTypes = computed(() => getTypesForGivenLocale());
+const selectedContributionTypes = ref<{ title: string, value: DocumentContributionType }[]>([]);
 
 const handleYearChange = lodash.debounce(() => {
     if (watchDates.value) {
@@ -388,12 +407,45 @@ watch(collaborationNetworkRef, () => {
     }
 });
 
+watch(selectedContributionTypes, () => {
+    if (initialDatesSet.value) {
+        PersonVisualizationService.getMinAndMaxYearForFiltering(
+            props.personId,
+            selectedContributionTypes.value.map(type => type.value)
+        ).then(response => {
+            minYear.value = response.data.a;
+            maxYear.value = response.data.b;
+            fromYear.value = minYear.value;
+            toYear.value = maxYear.value;
+
+            getPersonPublicationCounts(props.personId, fromYear.value, toYear.value);
+        });
+    }
+});
+
 onMounted(() => {
     if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
         shouldDisplayCollaborationNetworkFirst.value = true;
     }
 
-    getPersonPublicationCounts(props.personId);
+    selectedContributionTypes.value.push(
+        {
+            title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR) as string,
+            value: DocumentContributionType.AUTHOR
+        }
+    );
+
+    PersonVisualizationService.getMinAndMaxYearForFiltering(
+        props.personId,
+        selectedContributionTypes.value.map(type => type.value)
+    ).then(response => {
+        minYear.value = response.data.a;
+        maxYear.value = response.data.b;
+        initialDatesSet.value = true;
+        fromYear.value = minYear.value;
+        toYear.value = maxYear.value;
+        getPersonPublicationCounts(props.personId);
+    });
 
     endDate.value = (new Date()).toISOString().split("T")[0];
 
@@ -429,14 +481,6 @@ const getPersonPublicationCounts = (personId: number, from: number | null = null
         const yearlyCounts: YearlyCounts[] = response.data;
 
         const categories = yearlyCounts.map(yc => String(yc.year));
-
-        if(categories.length > 0 && !initialDatesSet.value) {
-            minYear.value = parseInt(categories[0]);
-            maxYear.value = parseInt(categories[categories.length - 1]);
-            initialDatesSet.value = true;
-            fromYear.value = minYear.value;
-            toYear.value = maxYear.value;
-        }
 
         const typeSeries: any[] = Object.values(PublicationType).map(pubType => ({
             name: getPublicationTypeTitleFromValueAutoLocale(pubType),
@@ -620,3 +664,11 @@ const showPublicationListModalBar = (sectionType: any, year: number, isThesisTyp
 };
 
 </script>
+
+<style>
+
+.contribution-type-select {
+    max-width: 400px;
+}
+
+</style>

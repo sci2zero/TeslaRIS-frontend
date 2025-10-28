@@ -1168,5 +1168,7 @@ export default {
     uploadCompleteLabel: "Upload complete.",
     uploadingLabel: "Upload in progress...",
     allLabel: "All",
-    updateDLDisplayConfigurationLabel: "Digital Library visualizations display"
+    updateDLDisplayConfigurationLabel: "Digital Library visualizations display",
+    uploadFailedMessage: "Upload failed. Please try again. If the error persists, please contact your system administrator.",
+    contributionsForDateRangeLabel: "Contribution types considered for search period restriction"
 }

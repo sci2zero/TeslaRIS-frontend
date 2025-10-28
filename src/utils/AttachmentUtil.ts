@@ -19,7 +19,9 @@ export const addAttachment = (attachment: DocumentFile, isProof: boolean, docume
         }
 
         uploadStore.uploadProgressRef?.updateProgress(100);
-    }));
+    })).catch(() => {
+        uploadStore.uploadProgressRef?.cancelUpload(true);
+    });
 };
 
 export const addThesisAttachment = (attachment: DocumentFile, attachmentType: ThesisAttachmentType, thesis?: Thesis) => {
@@ -43,7 +45,9 @@ export const addThesisAttachment = (attachment: DocumentFile, attachmentType: Th
         }
 
         uploadStore.uploadProgressRef?.updateProgress(100);
-    }));
+    })).catch(() => {
+        uploadStore.uploadProgressRef?.cancelUpload(true);
+    });
 };
 
 export const updateAttachment = (attachment: DocumentFile, isProof: boolean, document?: Document) => {
@@ -68,6 +72,8 @@ export const updateAttachment = (attachment: DocumentFile, isProof: boolean, doc
         if (attachment.file.size > 0) {
             uploadStore.uploadProgressRef?.updateProgress(100);
         }
+    }).catch(() => {
+        uploadStore.uploadProgressRef?.cancelUpload(true);
     });
 };
 
