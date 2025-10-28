@@ -1,7 +1,7 @@
 <template>
     <v-btn
         v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedJournals.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
@@ -80,6 +80,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedJournals.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -95,11 +103,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "JournalTableComponent",
-    components: { LocalizedLink, EntityClassificationModalContent },
+    components: { LocalizedLink, EntityClassificationModalContent, PersistentQuestionDialog },
     props: {
         journals: {
             type: Array<JournalIndex>,
@@ -247,13 +256,19 @@ export default defineComponent({
             }
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             selectedJournals, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startPublicationComparison, startMetadataComparison,
             setSortAndPageOption, isCommission, loggedInUser,
-            ApplicableEntityType, journalClassified
+            ApplicableEntityType, journalClassified,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

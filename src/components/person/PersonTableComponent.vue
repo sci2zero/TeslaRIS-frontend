@@ -25,7 +25,7 @@
                             v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
                             :disabled="selectedPersons.length <= 0"
                             class="action-menu-item"
-                            @click="deleteSelection"
+                            @click="startDeletionProcess"
                         >
                             <template #prepend>
                                 <v-icon color="error" size="18">
@@ -292,6 +292,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedPersons.map(entity => entity.name.split('; ')[0])"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -313,11 +321,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, AddEmploymentModal, TableExportModal, IdentifierMenu },
+    components: { LocalizedLink, draggable: VueDraggableNext, AddEmploymentModal, TableExportModal, IdentifierMenu, PersistentQuestionDialog },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -541,6 +550,11 @@ export default defineComponent({
             }
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             selectedPersons, headers, notifications, isUserLoggedIn,
             refreshTable, isAdmin, deleteSelection, ExportEntity,
@@ -549,7 +563,7 @@ export default defineComponent({
             startMetadataComparison, onDropCallback, removeSelection,
             tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable,
             hasEmployment, extractYear, openExportModal, exportModal,
-            baseServerUrl
+            baseServerUrl, startDeletionProcess, displayPersistentDialog
         };
     }
 });

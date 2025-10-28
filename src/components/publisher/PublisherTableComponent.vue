@@ -1,7 +1,7 @@
 <template>
     <v-btn
         v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedPublishers.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
@@ -76,6 +76,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedPublishers.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -89,11 +97,12 @@ import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "PublisherTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, PersistentQuestionDialog },
     props: {
         publishers: {
             type: Array<PublisherIndex>,
@@ -222,12 +231,18 @@ export default defineComponent({
             }});
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             selectedPublishers, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             setSortAndPageOption, startMetadataComparison,
-            startPublicationComparison
+            startPublicationComparison, displayPersistentDialog,
+            startDeletionProcess
         };
     }
 });

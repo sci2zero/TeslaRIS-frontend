@@ -7,17 +7,18 @@
         >
             <v-card
                 prepend-icon="mdi-alert"
-                :text="message"
+                :text="message + (entityNames ? `\n\n• ${entityNames.join('\n• ')}` : '')"
                 :title="title"
+                class="multiline-text"
             >
                 <template #actions>
                     <v-spacer></v-spacer>
   
-                    <v-btn @click="dialog = false">
+                    <v-btn @click="cancelOperation">
                         {{ $t("cancelLabel") }}
                     </v-btn>
   
-                    <v-btn @click="dialog = false; continueOperation();">
+                    <v-btn @click="continueOperation">
                         {{ $t("continueLabel") }}
                     </v-btn>
                 </template>
@@ -27,12 +28,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
     name: "PersistentQuestionDialog",
     props: {
+        modelValue: {
+            type: Boolean,
+            default: false
+        },
         message: {
             type: String,
             default: ""
@@ -40,23 +44,50 @@ export default defineComponent({
         title: {
             type: String,
             default: ""
+        },
+        entityNames: {
+            type: Array<string>,
+            default: []
         }
     },
-    emits: ["continue"],
-    setup(_, { emit }) {
-        const dialog = ref(false);
+    emits: ["continue", "update:modelValue"],
+    setup(props, { emit }) {
+        const dialog = ref(props.modelValue);
+
+        watch(() => props.modelValue, (newValue) => {
+            dialog.value = newValue;
+        });
+
+        watch(dialog, (newValue) => {
+            emit('update:modelValue', newValue);
+        });
+
+        const cancelOperation = () => {
+            dialog.value = false;
+        };
 
         const toggle = () => {
             dialog.value = !dialog.value;
         };
 
         const continueOperation = () => {
+            dialog.value = false;
             emit("continue");
         };
 
-        return { 
-            dialog, toggle, continueOperation
+        return {
+            dialog, toggle,
+            cancelOperation,
+            continueOperation
         };
     },
 });
 </script>
+
+<style>
+
+.multiline-text {
+    white-space: pre-line;
+}
+
+</style>

@@ -1,7 +1,7 @@
 <template>
     <v-btn
         v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedBookSeries.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
@@ -68,6 +68,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedBookSeries.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -81,11 +89,12 @@ import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "BookSeriesTableComponent",
-    components: { LocalizedLink },
+    components: { LocalizedLink, PersistentQuestionDialog },
     props: {
         bookSeries: {
             type: Array<BookSeriesIndex>,
@@ -209,11 +218,18 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
-        return {selectedBookSeries, headers, notifications, 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        return {
+            selectedBookSeries, headers, notifications, 
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
-            startPublicationComparison,
-            startMetadataComparison, setSortAndPageOption
+            startPublicationComparison, startDeletionProcess,
+            startMetadataComparison, setSortAndPageOption,
+            displayPersistentDialog
         };
     }
 });

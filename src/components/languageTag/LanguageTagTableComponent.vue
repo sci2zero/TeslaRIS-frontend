@@ -3,7 +3,7 @@
         <v-col cols="auto">
             <v-btn
                 density="compact" class="bottom-spacer" :disabled="selectedLanguageTags.length === 0"
-                @click="deleteSelection">
+                @click="startDeletionProcess">
                 {{ $t("deleteLabel") }}
             </v-btn>
         </v-col>
@@ -69,6 +69,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedLanguageTags.map(entity => entity.display)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -82,11 +90,12 @@ import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LanguageTagForm from './LanguageTagForm.vue';
 import LanguageService from '@/services/LanguageService';
 import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "LanguageTagTableComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
         languageTags: {
             type: Array<LanguageTagResponse>,
@@ -207,11 +216,18 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, LanguageTagForm,
             selectedLanguageTags, notifications, createNewLanguageTag,
-            updateLanguageTag, setSortAndPageOption
+            updateLanguageTag, setSortAndPageOption, displayPersistentDialog,
+            startDeletionProcess
         };
     }
 });

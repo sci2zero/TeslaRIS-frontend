@@ -5,7 +5,7 @@
                 density="compact"
                 class="bottom-spacer"
                 :disabled="selectedResearchAreas.length === 0"
-                @click="deleteSelection">
+                @click="startDeletionProcess">
                 {{ $t("deleteLabel") }}
             </v-btn>
         </v-col>
@@ -82,6 +82,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedResearchAreas.map(entity => returnCurrentLocaleContent(entity.name) as string)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -97,11 +105,12 @@ import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ResearchAreaForm from './ResearchAreaForm.vue';
 import { isEqual } from 'lodash';
 import RichTextEditor from '../core/RichTextEditor.vue';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "ResearchAreaTableComponent",
-    components: { GenericCrudModal, RichTextEditor },
+    components: { GenericCrudModal, RichTextEditor, PersistentQuestionDialog },
     props: {
         researchAreas: {
             type: Array<ResearchAreaResponse>,
@@ -220,11 +229,17 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedResearchAreas, notifications, createNewResearchArea,
-            updateResearchArea, setSortAndPageOption, ResearchAreaForm
+            updateResearchArea, setSortAndPageOption, ResearchAreaForm,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

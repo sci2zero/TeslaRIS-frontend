@@ -1,7 +1,7 @@
 <template>
     <v-btn
         density="compact" class="bottom-spacer" :disabled="selectedIndicators.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-crud-modal
@@ -62,6 +62,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedIndicators.map(entity => entity.code)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -75,11 +83,12 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import IndicatorService from '@/services/assessment/IndicatorService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import IndicatorForm from './IndicatorForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "IndicatorTableComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
         indicators: {
             type: Array<IndicatorResponse>,
@@ -169,11 +178,18 @@ export default defineComponent({
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+        
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedIndicators, notifications, createNewIndicator,
-            updateIndicator, IndicatorForm
+            updateIndicator, IndicatorForm, displayPersistentDialog,
+            startDeletionProcess
         };
     }
 });

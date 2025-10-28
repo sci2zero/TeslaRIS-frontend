@@ -460,7 +460,7 @@
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit && !thesis?.isOnPublicReview"
                     show-statistics
-                    :has-attached-files="thesis?.fileItems && thesis?.fileItems.length > 0"
+                    :has-attached-files="(thesis?.fileItems && thesis?.fileItems.length > 0) || (thesis?.preliminaryFiles && thesis?.preliminaryFiles.length > 0)"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />

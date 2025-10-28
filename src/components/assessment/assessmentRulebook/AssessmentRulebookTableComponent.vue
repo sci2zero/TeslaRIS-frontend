@@ -1,7 +1,7 @@
 <template>
     <v-btn
         density="compact" class="bottom-spacer" :disabled="selectedAssessmentRulebooks.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-crud-modal
@@ -72,6 +72,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedAssessmentRulebooks.map(entity => returnCurrentLocaleContent(entity.name) as string)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -87,11 +95,12 @@ import { localiseDate } from '@/utils/DateUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentRulebookForm from './AssessmentRulebookForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "AssessmentRulebookTableComponent",
-    components: { LocalizedLink, GenericCrudModal },
+    components: { LocalizedLink, GenericCrudModal, PersistentQuestionDialog },
     props: {
         assessmentRulebooks: {
             type: Array<AssessmentRulebookResponse>,
@@ -100,7 +109,8 @@ export default defineComponent({
         totalAssessmentRulebooks: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedAssessmentRulebooks = ref<AssessmentRulebookResponse[]>([]);
@@ -189,11 +199,18 @@ export default defineComponent({
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent, setDefault,
             selectedAssessmentRulebooks, notifications, createNewAssessmentRulebook,
-            updateAssessmentRulebook, localiseDate, AssessmentRulebookForm
+            updateAssessmentRulebook, localiseDate, AssessmentRulebookForm,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

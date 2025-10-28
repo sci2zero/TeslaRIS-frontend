@@ -1170,5 +1170,6 @@ export default {
     allLabel: "All",
     updateDLDisplayConfigurationLabel: "Digital Library visualizations display",
     uploadFailedMessage: "Upload failed. Please try again. If the error persists, please contact your system administrator.",
-    contributionsForDateRangeLabel: "Contribution types considered for search period restriction"
+    contributionsForDateRangeLabel: "Contribution types considered for search period restriction",
+    confirmDeletionMessage: "Confirm the deletion of the following entities:"
 }

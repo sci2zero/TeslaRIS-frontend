@@ -23,7 +23,7 @@
                             v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
                             :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
                             class="action-menu-item"
-                            @click="deleteSelection"
+                            @click="startDeletionProcess"
                         >
                             <template #prepend>
                                 <v-icon color="error" size="18">
@@ -374,6 +374,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedPublications.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -402,11 +410,12 @@ import { getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } fro
 import { getTitleFromValueAutoLocale as getMonographPublicationTypeTitle } from '@/i18n/monographPublicationType';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 import IdentifierMenu from '../core/IdentifierMenu.vue';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal, IdentifierMenu },
+    components: { LocalizedLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal, IdentifierMenu, PersistentQuestionDialog },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -869,6 +878,11 @@ export default defineComponent({
             return i18n.t("showMoreAuthorsLabel", { count: remainingCount });
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             selectedPublications, headers, notifications,
             refreshTable, isAdmin, deleteSelection, tableWrapper,
@@ -881,7 +895,8 @@ export default defineComponent({
             getConcretePublicationType, isUserLoggedIn, validateSection,
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
             toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
-            getPublicationTypeIcon, titleColumn, yearHeader
+            getPublicationTypeIcon, titleColumn, yearHeader, displayPersistentDialog,
+            startDeletionProcess
         };
     }
 });

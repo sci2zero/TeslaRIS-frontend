@@ -1,7 +1,7 @@
 <template>
     <v-btn
         density="compact" class="bottom-spacer" :disabled="selectedClassifications.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-crud-modal
@@ -62,6 +62,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedClassifications.map(entity => entity.code)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -75,11 +83,12 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentClassificationForm from './AssessmentClassificationForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "AssessmentClassificationTableComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
         classifications: {
             type: Array<AssessmentClassification>,
@@ -88,7 +97,8 @@ export default defineComponent({
         totalClassifications: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedClassifications = ref<AssessmentClassification[]>([]);
@@ -169,11 +179,18 @@ export default defineComponent({
             });
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedClassifications, notifications, createNewClassification,
-            updateClassification, AssessmentClassificationForm
+            updateClassification, AssessmentClassificationForm,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

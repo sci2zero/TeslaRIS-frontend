@@ -25,7 +25,7 @@
                             v-if="(isAdmin || allowComparison)"
                             :disabled="selectedOUs.length <= 0"
                             class="action-menu-item"
-                            @click="deleteSelection"
+                            @click="startDeletionProcess"
                         >
                             <template #prepend>
                                 <v-icon color="error" size="18">
@@ -234,6 +234,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedOUs.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -250,11 +258,12 @@ import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 import { isEqual } from 'lodash';
 import AddSubUnitModal from './AddSubUnitModal.vue';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
-    components: { LocalizedLink, TableExportModal, AddSubUnitModal },
+    components: { LocalizedLink, TableExportModal, AddSubUnitModal, PersistentQuestionDialog },
     props: {
         organisationUnits: {
             type: Array<OrganisationUnitIndex>,
@@ -437,11 +446,15 @@ export default defineComponent({
         };
 
         const exportModal = ref<any>(null);
-
         const openExportModal = () => {
             if (exportModal.value) {
                 exportModal.value.openModal();
             }
+        };
+
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
         };
 
         return {
@@ -451,7 +464,8 @@ export default defineComponent({
             startEmploymentComparison, setSortAndPageOption,
             startMetadataComparison, ExportEntity,
             isUserLoggedIn, isInstitutionalEditor,
-            notifyUserAndRefreshTable, openExportModal, exportModal
+            notifyUserAndRefreshTable, openExportModal, exportModal,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

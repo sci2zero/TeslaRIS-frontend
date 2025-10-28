@@ -3,7 +3,7 @@
         <v-col cols="auto">
             <v-btn
                 density="compact" class="bottom-spacer" :disabled="selectedApiKeys.length === 0"
-                @click="deleteSelection">
+                @click="startDeletionProcess">
                 {{ $t("deleteLabel") }}
             </v-btn>
         </v-col>
@@ -75,6 +75,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedApiKeys.map(entity => returnCurrentLocaleContent(entity.name) as string)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -88,11 +96,12 @@ import ApiKeyService from '@/services/ApiKeyService';
 import ApiKeyForm from './ApiKeyForm.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import { localiseDate } from '@/utils/DateUtil';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "ApiKeyList",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
         apiKeys: {
             type: Array<ApiKeyResponse>,
@@ -175,12 +184,18 @@ export default defineComponent({
             });
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             headers, refreshTable, selectedApiKeys,
             returnCurrentLocaleContent, deleteSelection,
             getApiKeyTypeTitleFromValueAutoLocale,
             createNewApiKey, tableOptions, ApiKeyForm,
-            notifications, updateApiKey, localiseDate
+            notifications, updateApiKey, localiseDate,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });
