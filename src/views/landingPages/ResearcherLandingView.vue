@@ -48,6 +48,13 @@
                             @click="performNavigation('importer')">
                             {{ $t("importerLabel") }}
                         </v-btn>
+                        <v-btn
+                            v-if="(isAdmin || isInstitutionalEditor) && canEdit"
+                            class="mb-5 ml-2" color="primary" density="compact"
+                            variant="outlined"
+                            @click="performIndicatorHarvest">
+                            {{ $t("harvestExternalIndicatorsLabel") }}
+                        </v-btn>
                     </div>
                 </div>
             </template>
@@ -313,6 +320,7 @@ import { type AxiosResponseHeaders } from 'axios';
 import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
 import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
+import ExternalIndicatorConfigurationService from '@/services/assessment/ExternalIndicatorConfigurationService';
 
 
 export default defineComponent({
@@ -346,7 +354,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const { isAdmin, isResearcher } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
 
         const researcherName = ref("");
 
@@ -679,6 +687,13 @@ export default defineComponent({
             fetchPublications();
         });
 
+        const performIndicatorHarvest = async () => {
+            ExternalIndicatorConfigurationService.harvestIndicatorsForPerson(person.value?.id as number);
+
+            snackbarMessage.value = i18n.t("indicatorHarvestStartedMessage");
+            snackbar.value = true;
+        };
+
         return {
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword,
@@ -691,7 +706,8 @@ export default defineComponent({
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
-            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings
+            publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
+            isInstitutionalEditor, performIndicatorHarvest
         };
 }});
 </script>

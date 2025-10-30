@@ -67,6 +67,15 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="12">
+                        <multilingual-text-input
+                            ref="scientificAreaRef"
+                            v-model="scientificArea"
+                            :label="$t('scientificAreaLabel')">
+                        </multilingual-text-input>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col>
                         <h2>{{ $t("authorLabel") }}</h2>
                         <person-publication-contribution
@@ -132,15 +141,6 @@
                                 :items="languageTagsList"
                                 return-object
                             ></v-select>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <multilingual-text-input
-                                ref="scientificAreaRef"
-                                v-model="scientificArea"
-                                :label="$t('scientificAreaLabel')">
-                            </multilingual-text-input>
                         </v-col>
                     </v-row>
                     <v-row>

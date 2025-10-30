@@ -207,14 +207,27 @@
                                         </v-avatar>
                                     </localized-link>
                                     <div class="flex items-center gap-2">
-                                        <span>
-
-                                            <localized-link :to="'persons/' + item.databaseId" class="person-name">
-                                                {{ item.name }}
-                                            </localized-link>
-                                            <span>,</span>
-                                        </span>
-                                        <span v-if="item.birthdate" class="person-year">{{ extractYear(item.birthdate) }}</span>
+                                        <div class="flex flex-col items-start text-center">
+                                            <div class="flex flex-wrap justify-left gap-x-1">
+                                                <span v-for="(nameVariant, index) in getDisplayedNameVariants(item)" :key="nameVariant" class="whitespace-nowrap">
+                                                    <localized-link :to="'persons/' + item.databaseId" class="person-name">
+                                                        {{ nameVariant }}
+                                                    </localized-link>
+                                                    <span v-if="(index + 1 < getDisplayedNameVariants(item).length) || item.birthdate">, </span>
+                                                </span>
+                                                <span v-if="item.birthdate" class="person-year">{{ extractYear(item.birthdate) }}</span>
+                                            </div>
+                                            <v-btn
+                                                v-if="shouldShowMoreButton(item)"
+                                                variant="text"
+                                                size="x-small"
+                                                color="primary"
+                                                :class="item.birthdate ? 'ml-[-0.5rem]' : 'ml-[-0.35rem]'"
+                                                @click="toggleShowAllNameVariants(item.databaseId as number)"
+                                            >
+                                                {{ getShowMoreText(item) }}
+                                            </v-btn>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -555,6 +568,44 @@ export default defineComponent({
             displayPersistentDialog.value = true;
         };
 
+        const expandedNames = ref<Set<number>>(new Set());
+
+        const getDisplayedNameVariants = (item: PersonIndex) => {
+            const nameVariants = item.name.split("; ");
+            const isExpanded = expandedNames.value.has(item.databaseId as number);
+            
+            if (nameVariants.length <= 1 || isExpanded) {
+                return nameVariants;
+            }
+            
+            return nameVariants.slice(0, 1);
+        };
+
+        const toggleShowAllNameVariants = (personId: number) => {
+            if (expandedNames.value.has(personId)) {
+                expandedNames.value.delete(personId);
+            } else {
+                expandedNames.value.add(personId);
+            }
+        };
+
+        const shouldShowMoreButton = (item: PersonIndex) => {
+            const authors = item.name.split("; ");
+            return authors.length > 1;
+        };
+
+        const getShowMoreText = (item: PersonIndex) => {
+            const nameVariants = item.name.split("; ");
+            const isExpanded = expandedNames.value.has(item.databaseId as number);
+            
+            if (isExpanded) {
+                return i18n.t("showLessLabel");
+            }
+            
+            const remainingCount = nameVariants.length - 1;
+            return i18n.t("showMoreNameVariantsLabel", { count: remainingCount });
+        };
+
         return {
             selectedPersons, headers, notifications, isUserLoggedIn,
             refreshTable, isAdmin, deleteSelection, ExportEntity,
@@ -563,7 +614,9 @@ export default defineComponent({
             startMetadataComparison, onDropCallback, removeSelection,
             tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable,
             hasEmployment, extractYear, openExportModal, exportModal,
-            baseServerUrl, startDeletionProcess, displayPersistentDialog
+            baseServerUrl, startDeletionProcess, displayPersistentDialog,
+            getShowMoreText, shouldShowMoreButton, toggleShowAllNameVariants,
+            getDisplayedNameVariants
         };
     }
 });
@@ -699,6 +752,7 @@ export default defineComponent({
         font-size: 0.85rem;
         color: #666;
         font-weight: 400;
+        margin-top: 0.15rem;
     }
 
     .employment-item {

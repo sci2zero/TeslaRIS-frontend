@@ -1178,5 +1178,8 @@ export default {
     updateDLDisplayConfigurationLabel: "Prikaz vizuelizacija digitalne biblioteke",
     uploadFailedMessage: "Neuspešno otpremanje. Molimo Vas pokušajte ponovo. Ako se greška i dalje ponavlja, kontaktirajte administratora sistema.",
     contributionsForDateRangeLabel: "Tipovi kontribucija uzeti u obzir za organičavanje perioda pretrage",
-    confirmDeletionMessage: "Potvrdite brisanje sledećih entiteta:"
+    confirmDeletionMessage: "Potvrdite brisanje sledećih entiteta:",
+    showMoreNameVariantsLabel: "Prikaži još oblika imena ({count})...",
+    harvestExternalIndicatorsLabel: "Preuzmi eksterne indikatore",
+    indicatorHarvestStartedMessage: "Započeto preuzimanje indikatora, nakon nekog vremena će se pojaviti na stranici."
 }

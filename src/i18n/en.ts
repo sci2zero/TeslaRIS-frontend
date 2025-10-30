@@ -1171,5 +1171,8 @@ export default {
     updateDLDisplayConfigurationLabel: "Digital Library visualizations display",
     uploadFailedMessage: "Upload failed. Please try again. If the error persists, please contact your system administrator.",
     contributionsForDateRangeLabel: "Contribution types considered for search period restriction",
-    confirmDeletionMessage: "Confirm the deletion of the following entities:"
+    confirmDeletionMessage: "Confirm the deletion of the following entities:",
+    showMoreNameVariantsLabel: "Show more name variants ({count})...",
+    harvestExternalIndicatorsLabel: "Harvest external indicators",
+    indicatorHarvestStartedMessage: "Started harvesting indicators, after some time thez will appear on landing page."
 }
