@@ -145,7 +145,8 @@ export default defineComponent({
                     if (loginStore.explicitlyLoggedOut) {
                         loginStore.reachedLoginPage();
                     } else {
-                        if (from.name !== "notFound") {
+                        const excludedRoutes = ["notFound", "resetPassword", "register", "oauth2", "activateAccount"];
+                        if (!excludedRoutes.includes(from.name)) {
                             routeStore.setRouteAndParams(from.name, from.params);
                         }
                     }
