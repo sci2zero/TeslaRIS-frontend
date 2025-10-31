@@ -1174,5 +1174,7 @@ export default {
     confirmDeletionMessage: "Confirm the deletion of the following entities:",
     showMoreNameVariantsLabel: "Show more name variants ({count})...",
     harvestExternalIndicatorsLabel: "Harvest external indicators",
-    indicatorHarvestStartedMessage: "Started harvesting indicators, after some time thez will appear on landing page."
+    indicatorHarvestStartedMessage: "Started harvesting indicators, after some time thez will appear on landing page.",
+    organisationUnitMetadataComparatorLabel: "Comparing organisation units",
+    personPublicationsComparatorLabel: "Comparing publications between researchers"
 }

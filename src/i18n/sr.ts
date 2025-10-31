@@ -1181,5 +1181,7 @@ export default {
     confirmDeletionMessage: "Potvrdite brisanje sledećih entiteta:",
     showMoreNameVariantsLabel: "Prikaži još oblika imena ({count})...",
     harvestExternalIndicatorsLabel: "Preuzmi eksterne indikatore",
-    indicatorHarvestStartedMessage: "Započeto preuzimanje indikatora, nakon nekog vremena će se pojaviti na stranici."
+    indicatorHarvestStartedMessage: "Započeto preuzimanje indikatora, nakon nekog vremena će se pojaviti na stranici.",
+    organisationUnitMetadataComparatorLabel: "Poređenje organizacionih jedinica",
+    personPublicationsComparatorLabel: "Poređenje publikacija među istraživačima"
 }
