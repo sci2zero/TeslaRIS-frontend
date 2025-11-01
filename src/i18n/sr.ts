@@ -1183,5 +1183,7 @@ export default {
     harvestExternalIndicatorsLabel: "Preuzmi eksterne indikatore",
     indicatorHarvestStartedMessage: "Započeto preuzimanje indikatora, nakon nekog vremena će se pojaviti na stranici.",
     organisationUnitMetadataComparatorLabel: "Poređenje organizacionih jedinica",
-    personPublicationsComparatorLabel: "Poređenje publikacija među istraživačima"
+    personPublicationsComparatorLabel: "Poređenje publikacija među istraživačima",
+    bookSeriesPublicationsComparatorLabel: "Poređenje publikacija u serijama knjiga",
+    bookSeriesMetadataComparatorLabel: "Poređenje serija knjiga"
 }

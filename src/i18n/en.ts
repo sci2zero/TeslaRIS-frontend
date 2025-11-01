@@ -1176,5 +1176,7 @@ export default {
     harvestExternalIndicatorsLabel: "Harvest external indicators",
     indicatorHarvestStartedMessage: "Started harvesting indicators, after some time thez will appear on landing page.",
     organisationUnitMetadataComparatorLabel: "Comparing organisation units",
-    personPublicationsComparatorLabel: "Comparing publications between researchers"
+    personPublicationsComparatorLabel: "Comparing publications between researchers",
+    bookSeriesPublicationsComparatorLabel: "Comparing publications between book series",
+    bookSeriesMetadataComparatorLabel: "Comparing book series"
 }
