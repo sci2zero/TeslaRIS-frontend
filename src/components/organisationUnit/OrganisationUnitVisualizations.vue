@@ -2,7 +2,7 @@
     <v-row
         v-if="initialDatesSet && currentTab !== 'statistics'"
         no-gutters
-        class="align-center mt-14"
+        class="align-center mt-2!"
         style="max-width: 250px;">
         <v-col cols="5">
             <v-text-field
@@ -34,7 +34,7 @@
     </v-row>
     <v-row
         v-else-if="initialDatesSet && currentTab === 'statistics'"
-        class="align-center mt-2"
+        class="align-center mt-1!"
         style="max-width: 300px;">
         <v-col cols="6">
             <date-picker
@@ -90,7 +90,7 @@
                 <v-col
                     v-if="displaySettings?.publicationCountTotal.display"
                     cols="12" :md="displaySettings?.publicationCountTotal.spanWholeRow ? 12 : 6"
-                    class="d-flex justify-center align-center">
+                    class="d-flex justify-center items-center">
                     <display-card
                         :display-value="totalPublicationCount"
                         :label="$t('totalPublicationsLabel')"
@@ -180,7 +180,7 @@
                     <v-col
                         v-if="digitalLibraryDisplaySettings?.thesisCountTotal.display"
                         cols="12" :md="digitalLibraryDisplaySettings?.thesisCountTotal.spanWholeRow ? 12 : 6"
-                        class="d-flex justify-center align-center">
+                        class="d-flex justify-center items-center">
                         <display-card
                             :display-value="totalThesisCount"
                             :label="$t('totalThesesLabel')"
@@ -228,7 +228,7 @@
                 <v-col
                     v-if="displaySettings?.citationCountTotal.display"
                     cols="12" :md="displaySettings?.citationCountTotal.spanWholeRow ? 12 : 6"
-                    class="d-flex justify-center align-center">
+                    class="d-flex justify-center items-center">
                     <display-card
                         :display-value="totalCitationCount"
                         :label="$t('totalCitationsLabel')"
@@ -259,7 +259,7 @@
                 <v-col
                     v-if="displaySettings?.viewCountTotal.display"
                     cols="12" :md="displaySettings?.viewCountTotal.spanWholeRow ? 12 : 6"
-                    class="d-flex justify-center align-center">
+                    class="d-flex justify-center items-center">
                     <display-card
                         :display-value="viewsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
                         :label="$t('totalViewsLabel')"
@@ -312,7 +312,7 @@
                     <v-col
                         v-if="digitalLibraryDisplaySettings?.thesisViewCountTotal.display"
                         cols="12" :md="digitalLibraryDisplaySettings?.thesisViewCountTotal.spanWholeRow ? 12 : 6"
-                        class="d-flex justify-center align-center">
+                        class="d-flex justify-center items-center">
                         <display-card
                             :display-value="viewsByCountryDl.reduce((sum, entry) => sum += entry.value, 0)"
                             :label="$t('totalViewsLabel')"
@@ -347,7 +347,7 @@
                     <v-col
                         v-if="digitalLibraryDisplaySettings?.thesisDownloadCountTotal.display"
                         cols="12" :md="digitalLibraryDisplaySettings?.thesisDownloadCountTotal.spanWholeRow ? 12 : 6"
-                        class="d-flex justify-center align-center">
+                        class="d-flex justify-center items-center">
                         <display-card
                             :display-value="downloadsByCountryDl.reduce((sum, entry) => sum += entry.value, 0)"
                             :label="$t('totalDownloadsLabel')"

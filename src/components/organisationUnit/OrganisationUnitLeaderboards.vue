@@ -2,7 +2,7 @@
     <v-row
         v-if="currentTab !== 'statistics'"
         no-gutters
-        class="align-center mt-2"
+        class="align-center mt-2!"
         style="max-width: 250px;">
         <v-col cols="5">
             <v-text-field
@@ -32,7 +32,7 @@
     </v-row>
     <v-row
         v-else-if="currentTab === 'statistics'"
-        class="align-center mt-2"
+        class="align-center"
         style="max-width: 300px;">
         <v-col cols="6">
             <date-picker

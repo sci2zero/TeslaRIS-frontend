@@ -138,10 +138,10 @@
         </v-row>
 
         <div class="actions-box pa-4">
-            <div class="text-subtitle-1 font-weight-medium mb-3">
+            <div class="text-base font-medium mb-3 ml-1 leading-6">
                 {{ $t("additionalActionsLabel") }}
             </div>
-            <div class="d-flex flex-row flex-wrap">
+            <div class="d-flex flex-row flex-wrap ml-2">
                 <generic-crud-modal
                     v-if="canEdit"
                     class="ml-2" 
@@ -368,7 +368,7 @@
                             <v-card-text class="edit-pen-container">
                                 <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations"></organisation-unit-relation-update-modal>
 
-                                <div><b>{{ $t("relationsLabel") }}</b></div>
+                                <h2>{{ $t("relationsLabel") }}</h2>
                                 <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
                             </v-card-text>
                         </v-card>
@@ -408,7 +408,9 @@
                             <v-card-text class="edit-pen-container">
                                 <research-areas-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-areas-update-modal>
 
-                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                                <h3 class="mb-1">
+                                    {{ $t("researchAreasLabel") }}
+                                </h3>
                                 <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
                             </v-card-text>
                         </v-card>

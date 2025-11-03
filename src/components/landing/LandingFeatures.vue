@@ -187,12 +187,11 @@ import { type OrganisationUnitIndex } from '@/models/OrganisationUnitModel';
 import { type DocumentPublicationIndex } from '@/models/PublicationModel';
 import { getDocumentLandingPageName } from '@/utils/PathResolutionUtil';
 
-// Data from API
+
 const topResearchers = ref<{item: PersonIndex, value: number}[]>([]);
 const topInstitutions = ref<{item: OrganisationUnitIndex, value: number}[]>([]);
 const topPublications = ref<{item: DocumentPublicationIndex, value: number}[]>([]);
 
-// Loading flags
 const isLoadingResearchers = ref(true);
 const isLoadingInstitutions = ref(true);
 const isLoadingPublications = ref(true);

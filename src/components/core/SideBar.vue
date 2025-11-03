@@ -84,7 +84,7 @@
                         
                         <router-link
                             v-else
-                            :to="'/' + $i18n.locale + item.to"
+                            :to="'/' + $i18n.locale + item.to + (item.dynamicValue ? item.dynamicValue : '')"
                             class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20"
                             :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
                             :aria-label="item.label"
@@ -111,23 +111,33 @@
 
 <script setup lang="ts">
 import { useUserRole } from '@/composables/useUserRole';
+import AuthenticationService from '@/services/AuthenticationService';
+import PersonService from '@/services/PersonService';
+import UserService from '@/services/UserService';
 import { useLoginStore } from '@/stores/loginStore';
 import { useSidebarStore } from '@/stores/sidebarStore';
-import { computed, reactive, ref, onMounted, nextTick, onUnmounted } from 'vue';
+import { computed, ref, onMounted, nextTick, onUnmounted, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 
+
 const route = useRoute();
 const i18n = useI18n();
-const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
+const {
+    isAdmin, isResearcher, isCommission,
+    isViceDeanForScience, isHeadOfLibrary,
+    isUserBoundToOU, isInstitutionalEditor,
+    isInstitutionalLibrarian,
+    isPromotionRegistryAdministrator
+} = useUserRole();
+
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
 const personId = ref(-1);
 const commissionId = ref(-1);
 const institutionId = ref(-1);
 
-// Scroll functionality
 const scrollContainer = ref<HTMLElement>();
 const canScrollUp = ref(false);
 const canScrollDown = ref(false);
@@ -158,12 +168,10 @@ const scrollDown = () => {
 
 onMounted(() => {
     nextTick(() => {
-        // Wait a bit more for the DOM to be fully rendered
         setTimeout(() => {
             checkScrollButtons();
         }, 100);
         
-        // Add resize observer to handle dynamic content changes
         if (scrollContainer.value) {
             const resizeObserver = new ResizeObserver(() => {
                 checkScrollButtons();
@@ -172,27 +180,57 @@ onMounted(() => {
         }
     });
 
-    // Check initial screen size
     checkScreenSize();
     
-    // Add resize listener for responsive behavior
     window.addEventListener('resize', checkScreenSize);
+
+    if (AuthenticationService.userLoggedIn()) {
+        populateUserData();
+    }
 });
 
-// Check screen size and update mobile state
+const populateUserData = () => {
+    UserService.getLoggedInUser().then((response) => {
+        if (isCommission.value) {
+            commissionId.value = response.data.commissionId;
+        }
+        
+        if (isUserBoundToOU.value) {
+            institutionId.value = response.data.organisationUnitId;
+        }
+    });
+
+    PersonService.getPersonId().then(response => {
+        if(response.data) {
+            personId.value = response.data;
+        }
+    });
+};
+
+watch(() => loginStore.reloadUserName, () => {
+    if (loginStore.reloadUserName) {
+        populateUserData();
+        loginStore.emitUsernameReloaded();
+    }
+});
+
+watch(() => loginStore.userLoggedIn, () => {
+    if (loginStore.userLoggedIn) {
+        populateUserData();
+    }
+});
+
 const checkScreenSize = () => {
     const isMobileView = window.innerWidth < 768;
     const isVerySmall = window.innerWidth < 640;
     
     sidebarStore.setMobile(isMobileView);
     
-    // Auto-hide sidebar on very small screens
     if (isVerySmall && sidebarStore.isVisible) {
         sidebarStore.close();
     }
 };
 
-// Cleanup resize listener
 onUnmounted(() => {
     window.removeEventListener('resize', checkScreenSize);
 });
@@ -206,6 +244,7 @@ type MenuItem = {
     icon: string; // mdi class
     subItems?: MenuItem[];
     condition?: any;
+    dynamicValue?: any;
 };
 
 // const resourcesMenu = ref<MenuItem[]>([
@@ -250,7 +289,7 @@ const thesisLibraryMenu = ref<MenuItem[]>([
     { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) }
 ]);
 
-const menuItems: MenuItem[] = reactive([
+const menuItems = ref<MenuItem[]>([
     // { key: 'home', label: computed(() => i18n.t('homeLabel')), to: '/', icon: 'mdi-home' },
     // { 
     //     key: 'resources', 
@@ -259,14 +298,20 @@ const menuItems: MenuItem[] = reactive([
     //     icon: 'mdi-folder-multiple',
     //     subItems: resourcesMenu.value
     // },
-    { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple' },
-    { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building' },
-    { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple' },
+    { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isPromotionRegistryAdministrator.value)) },
+    { key: 'promotion-list', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isPromotionRegistryAdministrator.value)) },
+    { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'theses-list', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+    { key: 'public-review', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'scientific-results-validation', label: computed(() => i18n.t('routeLabel.publicationsValidation')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) },
-    { key: 'advanced-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/advanced-search', icon: 'mdi-magnify' },
-    { key: 'researcher-profile', label: computed(() => i18n.t('researcherProfileLabel')), to: `/persons/${personId.value}`, icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
-    { key: 'commission-profile', label: computed(() => i18n.t('commissionProfileLabel')), to: `/assessment/commissions/${commissionId.value}`, icon: 'mdi-account-group', condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
-    { key: 'institution-profile', label: computed(() => i18n.t('institutionProfileLabel')), to: `/organisation-units/${institutionId.value}`, icon: 'mdi-office-building', condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
+    { key: 'advanced-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/advanced-search', icon: 'mdi-magnify', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'thesis-library-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/thesis-library-search', icon: 'mdi-magnify', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value || isPromotionRegistryAdministrator.value)) },
+    { key: 'theses-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value))) },
+    { key: 'researcher-profile', label: computed(() => i18n.t('researcherProfileLabel')), to: '/persons/', dynamicValue: computed(() => personId.value), icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
+    { key: 'commission-profile', label: computed(() => i18n.t('commissionProfileLabel')), to: '/assessment/commissions/', dynamicValue: computed(() => commissionId.value), icon: 'mdi-account-group', condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
+    { key: 'institution-profile', label: computed(() => i18n.t('institutionProfileLabel')), to: '/organisation-units/', dynamicValue: computed(() => institutionId.value), icon: 'mdi-office-building', condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
     { 
         key: 'manage', 
         label: computed(() => i18n.t('manage')), 
@@ -289,16 +334,17 @@ const menuItems: MenuItem[] = reactive([
         label: computed(() => i18n.t('thesisLibraryLabel')), 
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
-        subItems: thesisLibraryMenu.value
+        subItems: thesisLibraryMenu.value,
+        condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value)
     },
     { key: 'events', label: computed(() => i18n.t('eventListLabel')), to: '/events', icon: 'mdi-calendar', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
-    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: true }
+    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) }
 ]);
 
 const filteredMenuItems = computed(() => {
-    return menuItems.filter(item => {
+    return menuItems.value.filter(item => {
         // Check main item condition
         if (item.condition !== undefined) {
             const conditionResult = typeof item.condition === 'function' ? item.condition() : item.condition;
@@ -328,6 +374,7 @@ const filteredMenuItems = computed(() => {
 function isActive(path: string): boolean {
     return route.path === path || route.path.startsWith(path + '/');
 }
+
 </script>
 
 <style scoped>

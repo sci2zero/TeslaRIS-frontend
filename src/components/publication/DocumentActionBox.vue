@@ -1,12 +1,12 @@
 <template>
     <div v-if="!(forProceedings && isResearcher && !canEdit)" class="actions-box pa-4">
-        <div class="text-subtitle-1 font-weight-medium mb-3">
+        <div class="text-base font-medium mb-3 ml-1 leading-6">
             {{ $t("additionalActionsLabel") }}
         </div>
 
         <v-row dense>
             <v-col cols="12" sm="6" class="action-section">
-                <div class="d-flex flex-row justify-start">
+                <div class="d-flex flex-row justify-start ml-2">
                     <citation-selector
                         v-if="displayCitation"
                         ref="citationRef"

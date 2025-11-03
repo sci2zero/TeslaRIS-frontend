@@ -45,7 +45,7 @@
                 <v-col
                     v-if="displaySettings?.viewCountTotal.display"
                     cols="12" :md="displaySettings?.viewCountTotal.spanWholeRow ? 12 : 6"
-                    class="d-flex justify-center align-center">
+                    class="d-flex justify-center items-center">
                     <display-card
                         :display-value="viewsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
                         :label="$t('totalViewsLabel')"
@@ -66,7 +66,7 @@
                 <v-col
                     v-if="displaySettings?.downloadCountTotal.display"
                     cols="12" :md="displaySettings?.downloadCountTotal.spanWholeRow ? 12 : 6"
-                    class="d-flex justify-center align-center">
+                    class="d-flex justify-center items-center">
                     <display-card
                         :display-value="downloadsByCountry.reduce((sum, entry) => sum += entry.value, 0)"
                         :label="$t('totalDownloadsLabel')"

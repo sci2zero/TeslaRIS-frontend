@@ -41,6 +41,17 @@
                 <!-- Academic Identifiers -->
                 <div class="mb-6 flex justify-center lg:justify-start">
                     <div class="space-y-3">
+                        <!-- WOS Number -->
+                        <div v-if="props.person?.personalInfo.webOfScienceResearcherId" class="flex items-center justify-start space-x-3">
+                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                                <span class="text-white text-sm font-bold">WoS</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Researcher ID (Web of Science)</span>
+                                <span class="text-slate-700 text-sm font-mono">{{ props.person.personalInfo.webOfScienceResearcherId }}</span>
+                            </div>
+                        </div>
+
                         <!-- ORCID -->
                         <div v-if="props.person?.personalInfo.orcid" class="flex items-center justify-start space-x-3">
                             <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md">
@@ -95,6 +106,16 @@
 
         <!-- Expandable Details Section -->
         <div v-if="showDetails" class="mt-12 transition-all duration-300 ease-in-out">
+            <generic-crud-modal
+                :form-component="PersonUpdateForm"
+                :form-props="{ presetPerson: person }"
+                entity-name="Person"
+                is-update
+                is-section-update
+                primary-color outlined
+                :read-only="!canEdit"
+                @update="updatePersonalInfo"
+            />
             <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
                 <!-- Section Tabs -->
                 <div class="border-b border-gray-200">
@@ -366,17 +387,19 @@
 
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-
+import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import type { Employment } from '@/models/InvolvementModel';
-import type { PersonResponse } from '@/models/PersonModel';
+import type { PersonalInfo, PersonResponse } from '@/models/PersonModel';
 import { Sex } from '@/models/PersonModel';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+
 
 interface Props {
     person: PersonResponse | undefined;
@@ -388,6 +411,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(["update"]);
 const { t } = useI18n();
 
 const showDetails = ref(false);
@@ -421,6 +445,11 @@ const formatSex = (sex: Sex | null | undefined): string => {
     if (!sex) return "-";
     return getTitleFromValueAutoLocale(sex) || "-";
 };
+
+const updatePersonalInfo = (personalInfo: PersonalInfo) => {
+    emit("update", personalInfo);
+};
+
 </script>
 
 <style scoped>

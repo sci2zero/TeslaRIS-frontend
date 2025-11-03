@@ -1185,5 +1185,12 @@ export default {
     organisationUnitMetadataComparatorLabel: "Poređenje organizacionih jedinica",
     personPublicationsComparatorLabel: "Poređenje publikacija među istraživačima",
     bookSeriesPublicationsComparatorLabel: "Poređenje publikacija u serijama knjiga",
-    bookSeriesMetadataComparatorLabel: "Poređenje serija knjiga"
+    bookSeriesMetadataComparatorLabel: "Poređenje serija knjiga",
+    yearUnknownLabel: "Nije još poznata godina izdanja",
+    updateEmailLabel: "Ažuriraj email",
+    newEmailLabel: "Novi email",
+    metadataStandardisationLabel: "Metadata standardizacija",
+    metadataStandardisationMessage: "Standardizacija metapodataka prema međunarodnim CRIS standardima.",
+    visualizationsDescriptionMessage: "Interaktivni grafikoni i dijagrami za analizu naučne produkcije i istraživačkih trendova.",
+    deduplicationDescriptionMessage: "Napredni algoritmi za automatsko prepoznavanje i uklanjanje duplikata u naučnim publikacijama."
 }

@@ -5,7 +5,7 @@
         color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
             <prize-modal :read-only="!canEdit" @create="createPrize"></prize-modal>
-            <div><b>{{ $t("prizesLabel") }}</b></div>
+            <h3>{{ $t("prizesLabel") }}</h3>
             <strong v-if="prizes?.length === 0">{{ $t("notYetSetMessage") }}</strong>
             <br />
             <draggable 

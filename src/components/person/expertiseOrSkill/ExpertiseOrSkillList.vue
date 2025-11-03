@@ -5,7 +5,7 @@
         color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
             <expertise-or-skill-modal :read-only="!canEdit" @create="createExpertiseOrSkill"></expertise-or-skill-modal>
-            <div><b>{{ $t("expertisesAndSkillsLabel") }}</b></div>
+            <h3>{{ $t("expertisesAndSkillsLabel") }}</h3>
             <strong v-if="expertiseOrSkills?.length === 0">{{ $t("notYetSetMessage") }}</strong>
             <br />
             <draggable 

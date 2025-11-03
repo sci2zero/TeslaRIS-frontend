@@ -7,6 +7,7 @@
             :can-edit="canEdit"
             :research-area="researchArea"
             :country-name="personalInfo.country"
+            @update="updatePersonalInfo"
         >
             <template #actions>
                 <div class="mt-4">
@@ -104,7 +105,7 @@
                             :items="publicationTypes"
                             :label="$t('typeOfPublicationLabel')"
                             return-object
-                            class="max-w-xs"
+                            class="max-w-xs mt-5"
                             multiple
                         ></v-select>
                     </div>
@@ -112,7 +113,7 @@
                         <add-publication-menu v-if="canEdit" compact />
                         <v-btn
                             v-if="isResearcher && canEdit"
-                            class="ml-2" color="primary" density="compact"
+                            class="mt-2" color="primary" density="compact"
                             @click="performNavigation('importer')">
                             {{ $t("importerLabel") }}
                         </v-btn>

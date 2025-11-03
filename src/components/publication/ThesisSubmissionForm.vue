@@ -623,6 +623,10 @@ export default defineComponent({
             uris.value.push(metadata.url);
             doi.value = doi.value ? doi.value : metadata.doi;
 
+            if (metadata.year > 0) {
+                publicationYear.value = `${metadata.year}`;
+            }
+
             if (contributions.value.length === 0) {
                 contributions.value = metadata.contributions;
                 contributionsRef.value?.fillDummyAuthors(contributions.value.length);

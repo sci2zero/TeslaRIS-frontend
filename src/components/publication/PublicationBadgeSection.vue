@@ -1,6 +1,6 @@
 <template>
     <div v-show="preloadedDoi || description" class="pr-4">
-        <div class="d-sr-only text-subtitle-1 font-weight-medium mb-3">
+        <div class="sr-only text-base font-medium mb-3">
             {{ $t("externalMetricsLabel") }}
         </div>
         <div class="d-flex flex-row justify-end flex-wrap gap-2">

@@ -114,6 +114,11 @@
                                         :allowed-roles="[row.item.userRole]"
                                         @migrate="notifyUserAboutMigration">
                                     </user-migration-selection-modal>
+                                    <user-email-change-modal
+                                        :user-id="row.item.databaseId"
+                                        :preset-email="row.item.email"
+                                        :read-only="row.item.active">
+                                    </user-email-change-modal>
                                 </v-list>
                             </v-menu>
                         </div>
@@ -141,11 +146,12 @@ import Toast from '../core/Toast.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import UserMigrationSelectionModal from './UserMigrationSelectionModal.vue';
 import { isEqual } from 'lodash';
+import UserEmailChangeModal from './UserEmailChangeModal.vue';
 
 
 export default defineComponent({
     name: "UserTableComponent",
-    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal },
+    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal, UserEmailChangeModal },
     props: {
         users: {
             type: Array<UserAccountIndex>,

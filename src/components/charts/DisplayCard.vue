@@ -5,7 +5,7 @@
         <v-card-title class="justify-center text-h6">
             {{ label }}
         </v-card-title>
-        <v-card-text class="d-flex flex-column align-center justify-center">
+        <v-card-text class="d-flex flex-column items-center justify-center">
             <h1 v-if="displayValue >= 0" class="text-h2 font-weight-bold">
                 {{ displayValue }}
             </h1>

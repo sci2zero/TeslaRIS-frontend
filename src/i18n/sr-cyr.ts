@@ -82,4 +82,7 @@ export default {
     emailDomainErrorMessage: "Морате се регистровати са адресом е-поште ваше институције.",
     volumeLabel: "Свеска (Volume)",
     issueLabel: "Број (Issue)",
+    updateEmailLabel: "Ажурирај адресу е-поште",
+    newEmailLabel: "Нова адреса е-поште",
+    metadataStandardisationMessage: "Стандардизација метаподатака према међународним CRIS стандардима.",
 };

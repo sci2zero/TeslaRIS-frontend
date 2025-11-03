@@ -225,3 +225,29 @@ label {
 .d-flex {
     display: flex;
 }
+
+/* Heading styles matching Vuetify 3 / Bootstrap proportions */
+
+h1 {
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+}

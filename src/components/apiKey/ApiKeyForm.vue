@@ -33,8 +33,12 @@
         <v-row>
             <v-col cols="12">
                 <v-text-field
-                    v-model="clientEmail" :readonly="presetApiKey !== undefined" :label="$t('clientEmailLabel') + '*'" :placeholder="$t('clientEmailLabel') + '*'"
-                    :rules="emailFieldRules"></v-text-field>
+                    v-model="clientEmail"
+                    :readonly="presetApiKey !== undefined"
+                    :label="$t('clientEmailLabel') + '*'"
+                    :placeholder="$t('clientEmailLabel') + '*'"
+                    :rules="emailFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>

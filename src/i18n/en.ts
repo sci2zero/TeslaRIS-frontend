@@ -1178,5 +1178,12 @@ export default {
     organisationUnitMetadataComparatorLabel: "Comparing organisation units",
     personPublicationsComparatorLabel: "Comparing publications between researchers",
     bookSeriesPublicationsComparatorLabel: "Comparing publications between book series",
-    bookSeriesMetadataComparatorLabel: "Comparing book series"
+    bookSeriesMetadataComparatorLabel: "Comparing book series",
+    yearUnknownLabel: "Year of publication is currently unknown",
+    updateEmailLabel: "Update email",
+    newEmailLabel: "New email",
+    metadataStandardisationLabel: "Metadata standardization",
+    metadataStandardisationMessage: "Standardization of metadata according to international CRIS standards.",
+    visualizationsDescriptionMessage: "Interactive charts and diagrams for analysis of scientific production and research trends.",
+    deduplicationDescriptionMessage: "Advanced algorithms for automatic recognition and removal of duplicates in scientific publications."
 }
