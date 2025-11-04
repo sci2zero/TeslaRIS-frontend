@@ -72,12 +72,14 @@
                             exact
                             @click="item.click"
                         >
-                            <v-icon v-if="item.icon" left :class="variant === 'general' ? 'text-dark' : 'dark'">
-                                {{ item.icon }}
-                            </v-icon>
-                            <template v-if="item.type != 'icon'">
-                                {{ item.title }}
-                            </template>
+                            <v-tooltip v-if="item.icon && item.title" location="top">
+                                <template #activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" left :class="variant === 'general' ? 'text-dark' : 'dark'">
+                                        {{ item.icon }}
+                                    </v-icon>
+                                </template>
+                                <span>{{ item.title }}</span>
+                            </v-tooltip>
                         </v-btn>
                     </template>
                             
@@ -178,10 +180,9 @@ const personId = ref(-1);
 const commissionId = ref(-1);
 const institutionId = ref(-1);
 
-
-
 const loginTitle = computed(() => i18n.t("loginLabel"));
-
+const registerTitle = computed(() => i18n.t("registerLabel"));
+const logoutTitle = computed(() => i18n.t("logoutLabel"));
 
 const brandingStore = useBrandingStore();
 const loginStore = useLoginStore();
@@ -252,10 +253,10 @@ const menuItems = ref<MenuItem[]>([
     { title: undefined, type: 'lang_component', icon: 'mdi-web', condition: true, component: langChangeItem },
     { type: 'divider' },
     { title: undefined, type: 'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
-    // { title: registerLabel, type: 'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
-    { title: loginTitle.value, type: 'icon-link', pathName: `login`, icon: 'mdi-login', condition: !loginStore.userLoggedIn, variant: 'outlined', color: 'primary' },
-    { type: 'user_profile', pathName: 'user-profile', icon: 'mdi-account', condition: loginStore.userLoggedIn },
-    { title: undefined, type: 'icon', variant: 'text', click: logout, icon: 'mdi-logout', condition: loginStore.userLoggedIn }
+    { title: registerTitle, type: 'icon-link', pathName: `register`, icon: 'mdi-clipboard-account-outline', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
+    { title: loginTitle, type: 'icon-link', pathName: `login`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color: 'primary' },
+    { type: 'user_profile', pathName: 'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn) },
+    { title: logoutTitle, type: 'icon', variant: 'text', click: logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }
 ]);
 </script>
 

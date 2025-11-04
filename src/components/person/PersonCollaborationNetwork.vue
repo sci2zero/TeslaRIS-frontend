@@ -52,6 +52,7 @@ import { getCollaborationTypesForGivenLocale, getCollaborationTypeTitleFromValue
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { useI18n } from 'vue-i18n';
 import PersonCollaborationPublications from './PersonCollaborationPublications.vue';
+import { DocumentContributionType } from '@/models/PublicationModel';
 
 
 const props = defineProps({
@@ -68,6 +69,8 @@ const props = defineProps({
         required: true
     }
 });
+
+const emit = defineEmits(["collaborationTypeUpdated"]);
 
 const sourcePersonId = ref(-1);
 const targetPersonId = ref(-1);
@@ -111,9 +114,28 @@ onMounted(() => {
     fetchCollaborationNetwork();
 });
 
+watch(selectedCollaborationType, () => {
+    switch(selectedCollaborationType.value.value) {
+        case CollaborationType.COAUTHORSHIP:
+            emit("collaborationTypeUpdated", [DocumentContributionType.AUTHOR]);
+            return;
+        case CollaborationType.CO_MENTORSHIP:
+            emit("collaborationTypeUpdated", [DocumentContributionType.ADVISOR]);
+            return;
+        case CollaborationType.CO_EDITORSHIP:
+            emit("collaborationTypeUpdated", [DocumentContributionType.EDITOR]);
+            return;
+        case CollaborationType.CO_MEMBERSHIP_COMMISSION:
+            emit("collaborationTypeUpdated", [DocumentContributionType.BOARD_MEMBER]);
+            return;
+        case CollaborationType.MENTORSHIP:
+            emit("collaborationTypeUpdated", [DocumentContributionType.AUTHOR, DocumentContributionType.ADVISOR]);
+            return;
+    }
+});
+
 watch(
     [
-        selectedCollaborationType,
         depth,
         () => props.yearFrom,
         () => props.yearTo
@@ -156,6 +178,10 @@ const showPublicationListModal = (edge: CollaborationLink, collabName: string) =
         publicationsViewRef.value.toggle();
     }
 };
+
+defineExpose({
+    fetchCollaborationNetwork
+});
 
 </script>
 

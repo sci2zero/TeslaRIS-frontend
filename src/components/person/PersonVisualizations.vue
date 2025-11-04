@@ -55,10 +55,10 @@
             />
         </v-col>
     </v-row>
-    <v-row v-if="currentTab === 'collaborationNetwork'">
+    <!-- <v-row v-if="currentTab === 'collaborationNetwork'">
         <v-col>
             <span class="flex flex-row justify-start">
-                <h3 class="mt-5 mr-5">{{ $t("contributionsForDateRangeLabel") }}:</h3>
+                <h4 class="mt-5 mr-5">{{ $t("contributionsForDateRangeLabel") }}:</h4>
                 <v-select
                     v-model="selectedContributionTypes"
                     :items="contributionTypes"
@@ -69,7 +69,7 @@
                 </v-select>
             </span>
         </v-col>
-    </v-row>
+    </v-row> -->
 
     <v-tabs
         v-if="personId"
@@ -195,9 +195,11 @@
         <v-tabs-window-item value="collaborationNetwork">
             <div ref="collaborationNetworkRef">
                 <person-collaboration-network
+                    ref="personCollaborationNetworkRef"
                     :person-id="(personId as number)"
                     :year-from="fromYear"
                     :year-to="toYear"
+                    @collaboration-type-updated="updateContributionTypes"
                 />
             </div>
         </v-tabs-window-item>
@@ -251,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, type PropType, ref, watch } from 'vue';
+import { onMounted, type PropType, ref, watch } from 'vue';
 import StackedBarChart, { type StackedBarSeries } from '../charts/StackedBarChart.vue';
 import PersonVisualizationService from '@/services/visualization/PersonVisualizationService';
 import { MCategory, type YearlyCounts } from '@/models/Common';
@@ -272,7 +274,7 @@ import lodash from "lodash";
 import PersonCollaborationNetwork from '@/components/person/PersonCollaborationNetwork.vue';
 import { useRoute } from 'vue-router';
 import PersonVisualizationPublications from './PersonVisualizationPublications.vue';
-import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/documentContributionType';
+import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
 
 
 const props = defineProps({
@@ -331,6 +333,7 @@ const endDate = ref<string>("");
 const currentRoute = useRoute();
 const shouldDisplayCollaborationNetworkFirst = ref(false);
 const collaborationNetworkRef = ref<HTMLElement>();
+const personCollaborationNetworkRef = ref<typeof PersonCollaborationNetwork>();
 
 const publicationType = ref();
 const publicationSubType = ref<ThesisType | null>(null);
@@ -338,7 +341,6 @@ const fromYearList = ref<number>(0);
 const toYearList = ref<number>(0);
 const publicationsViewRef = ref<typeof PersonVisualizationPublications>();
 
-const contributionTypes = computed(() => getTypesForGivenLocale());
 const selectedContributionTypes = ref<{ title: string, value: DocumentContributionType }[]>([]);
 
 const handleYearChange = lodash.debounce(() => {
@@ -407,12 +409,21 @@ watch(collaborationNetworkRef, () => {
     }
 });
 
-watch(selectedContributionTypes, () => {
+const updateContributionTypes = (types: DocumentContributionType[]) => {
     if (initialDatesSet.value) {
         PersonVisualizationService.getMinAndMaxYearForFiltering(
-            props.personId,
-            selectedContributionTypes.value.map(type => type.value)
+            props.personId, types
         ).then(response => {
+            if (response.data.a == 0 && response.data.b == 0) {
+                personCollaborationNetworkRef.value?.fetchCollaborationNetwork();
+                return;
+            }
+
+            if (minYear.value == response.data.a && maxYear.value == response.data.b) {
+                personCollaborationNetworkRef.value?.fetchCollaborationNetwork();
+                return;
+            }
+
             minYear.value = response.data.a;
             maxYear.value = response.data.b;
             fromYear.value = minYear.value;
@@ -421,7 +432,7 @@ watch(selectedContributionTypes, () => {
             getPersonPublicationCounts(props.personId, fromYear.value, toYear.value);
         });
     }
-});
+};
 
 onMounted(() => {
     if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {

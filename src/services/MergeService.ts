@@ -1,6 +1,7 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
 import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedSoftware, MergedTheses } from "@/models/MergeModel";
+import { DocumentContributionType } from "@/models/PublicationModel";
 
 export class MergeService extends BaseService {
 
@@ -46,8 +47,8 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/person/${sourcePersonId}/target/${targetPersonId}/publication/${publicationId}`);
     }
 
-    async switchAllPublicationsToOtherPerson(sourcePersonId: number, targetPersonId: number): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/person/source/${sourcePersonId}/target/${targetPersonId}`);
+    async switchAllPublicationsToOtherPerson(sourcePersonId: number, targetPersonId: number, contributionType: DocumentContributionType = DocumentContributionType.AUTHOR): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/person/source/${sourcePersonId}/target/${targetPersonId}?contributionType=${contributionType}`);
     }
 
     async switchInvolvementsToOtherPerson(involvementIds: number[], sourcePersonId: number, targetPersonId: number): Promise<AxiosResponse<void>> {

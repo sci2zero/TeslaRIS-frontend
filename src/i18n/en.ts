@@ -485,7 +485,8 @@ export default {
     monographPublicationLabel: "Monograph Publication",
     updateMonographPublicationLabel: "Update Monograph Publication",
     noRecentPublicationsMonographLabel: "You don't have any publications in this monograph yet.",
-    journalPublicationsLabel: "Publications in this journal",
+    thisJournalPublicationsLabel: "Publications in this journal",
+    journalPublicationsLabel: "Journal publications",
     addThesisLabel: "Thesis",
     thesisLabel: "Thesis",
     thesisTypeLabel: "Thesis type",
@@ -1185,5 +1186,8 @@ export default {
     metadataStandardisationLabel: "Metadata standardization",
     metadataStandardisationMessage: "Standardization of metadata according to international CRIS standards.",
     visualizationsDescriptionMessage: "Interactive charts and diagrams for analysis of scientific production and research trends.",
-    deduplicationDescriptionMessage: "Advanced algorithms for automatic recognition and removal of duplicates in scientific publications."
+    deduplicationDescriptionMessage: "Advanced algorithms for automatic recognition and removal of duplicates in scientific publications.",
+    notHarvestedLabel: "Not harvested",
+    thisYearLabel: "this year",
+    monographsLabel: "Monographs"
 }

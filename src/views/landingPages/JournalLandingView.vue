@@ -115,7 +115,7 @@
         >
             <v-tabs-window-item value="publications">
                 <!-- Publications Table -->
-                <h2>{{ $t("journalPublicationsLabel") }}</h2>
+                <h2>{{ $t("thisJournalPublicationsLabel") }}</h2>
                 <publication-table-component
                     :publications="publications"
                     :total-publications="totalPublications"

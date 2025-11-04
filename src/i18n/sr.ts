@@ -484,7 +484,8 @@ export default {
     monographPublicationLabel: "Rad u monografiji",
     updateMonographPublicationLabel: "Ažuriraj rad u monografiji",
     noRecentPublicationsMonographLabel: "Nemate ni jednu publikaciju u ovoj monografiji.",
-    journalPublicationsLabel: "Radovi u ovom časopisu",
+    thisJournalPublicationsLabel: "Radovi u ovom časopisu",
+    journalPublicationsLabel: "Radovi u časopisu",
     addThesisLabel: "Završni rad",
     thesisLabel: "Završni rad",
     thesisTypeLabel: "Tip završnog rada",
@@ -1192,5 +1193,8 @@ export default {
     metadataStandardisationLabel: "Metadata standardizacija",
     metadataStandardisationMessage: "Standardizacija metapodataka prema međunarodnim CRIS standardima.",
     visualizationsDescriptionMessage: "Interaktivni grafikoni i dijagrami za analizu naučne produkcije i istraživačkih trendova.",
-    deduplicationDescriptionMessage: "Napredni algoritmi za automatsko prepoznavanje i uklanjanje duplikata u naučnim publikacijama."
+    deduplicationDescriptionMessage: "Napredni algoritmi za automatsko prepoznavanje i uklanjanje duplikata u naučnim publikacijama.",
+    notHarvestedLabel: "Nije preuzeto",
+    thisYearLabel: "ove godine",
+    monographsLabel: "Monografije"
 }

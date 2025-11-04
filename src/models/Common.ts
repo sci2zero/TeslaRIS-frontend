@@ -358,6 +358,10 @@ export interface PersonFeaturedInformation {
     currentCitationCount: number;
     currentCitationTrend: number;
     hIndex: number;
+    journalPublicationsCount: number;
+    proceedingsPublicationsCount: number;
+    monographsCount: number;
+    publicationsGain: number;
 }
 
 export interface YearRange {

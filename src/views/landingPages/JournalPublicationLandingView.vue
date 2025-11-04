@@ -86,11 +86,14 @@
                                 <div v-if="journalPublication?.endPage" class="response">
                                     {{ journalPublication.endPage }}
                                 </div>
-                                <div v-if="journalPublication?.documentDate">
+                                <div>
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="journalPublication?.documentDate" class="response">
                                     {{ localiseDate(journalPublication.documentDate) }}
+                                </div>
+                                <div v-else class="response">
+                                    {{ $t("notYetSetMessage") }}
                                 </div>
                                 <div v-if="journalPublication?.journalId">
                                     {{ $t("journalLabel") }}:

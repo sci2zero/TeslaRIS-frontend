@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import type { CitationResponse, Dataset, Document, DocumentAffiliationRequest, DocumentPublicationIndex, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, ProceedingsPublicationResponse, PublicationType, Software, TermFrequency, Thesis, ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import { type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, DocumentContributionType, type DocumentPublicationIndex, type JournalPublication, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type Software, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -121,13 +121,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `proceedings-publication/event/${eventId}?${pageable}`);
   }
 
-  async findResearcherPublications(researcherId: number, allowedTypes: PublicationType[], tokens: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async findResearcherPublications(researcherId: number, allowedTypes: PublicationType[], tokens: string, contributionType: DocumentContributionType = DocumentContributionType.AUTHOR): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
 
-    return super.sendRequest(axios.get, `document/for-researcher/${researcherId}?${tokens}${allowedTypesParam}`);
+    return super.sendRequest(axios.get, `document/for-researcher/${researcherId}?${tokens}${allowedTypesParam}&contributionType=${contributionType}`);
   }
 
   async findResearchOutputIds(documentId: number): Promise<AxiosResponse<number[]>> {

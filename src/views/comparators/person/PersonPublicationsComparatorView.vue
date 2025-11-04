@@ -1,4 +1,18 @@
 <template>
+    <v-row class="mt-15!">
+        <v-col>
+            <span class="flex flex-row justify-center">
+                <v-select
+                    v-model="selectedContributionType"
+                    :items="contributionTypes"
+                    class="contribution-type-select"
+                    :label="$t('contributionTypeLabel')"
+                    return-object>
+                </v-select>
+            </span>
+        </v-col>
+    </v-row>
+
     <v-container id="journal-publications-comparator">
         <v-row class="d-flex flex-row justify-center align-start">
             <v-col cols="5">
@@ -52,18 +66,19 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
+import { DocumentContributionType, type DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import PersonService from '@/services/PersonService';
 import MergeService from '@/services/MergeService';
 import type { PersonResponse } from '@/models/PersonModel';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '@/components/core/Toast.vue';
+import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/documentContributionType';
 
 
 export default defineComponent({
@@ -96,9 +111,20 @@ export default defineComponent({
         const i18n = useI18n();
         const router = useRouter();
 
+        const contributionTypes = computed(() => getTypesForGivenLocale());
+        const selectedContributionType = ref<{ title: string, value: DocumentContributionType }>(
+            {
+                title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR) as string,
+                value: DocumentContributionType.AUTHOR
+            }
+        );
+
         onMounted(() => {
             document.title = i18n.t("personPublicationsComparatorLabel");
             fetchPersons();
+        });
+
+        watch(selectedContributionType, () => {
             fetchPublications();
         });
 
@@ -119,14 +145,22 @@ export default defineComponent({
         };
 
         const fetchLeftPublications = () => {
-            DocumentPublicationService.findResearcherPublications(parseInt(currentRoute.params.leftId as string), [], `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`).then((publicationResponse) => {
+            DocumentPublicationService.findResearcherPublications(
+                parseInt(currentRoute.params.leftId as string),
+                [], `page=${leftPage.value}&size=${leftSize.value}&sort=${leftSort.value},${leftDirection.value}`,
+                selectedContributionType.value.value
+            ).then((publicationResponse) => {
                 leftPublications.value = publicationResponse.data.content;
                 leftTotalPublications.value = publicationResponse.data.totalElements
             });
         };
 
         const fetchRightPublications = () => {
-            DocumentPublicationService.findResearcherPublications(parseInt(currentRoute.params.rightId as string), [], `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`).then((publicationResponse) => {
+            DocumentPublicationService.findResearcherPublications(
+                parseInt(currentRoute.params.rightId as string),
+                [], `page=${rightPage.value}&size=${rightSize.value}&sort=${rightSort.value},${rightDirection.value}`,
+                selectedContributionType.value.value
+            ).then((publicationResponse) => {
                 rightPublications.value = publicationResponse.data.content;
                 rightTotalPublications.value = publicationResponse.data.totalElements
             });
@@ -174,8 +208,9 @@ export default defineComponent({
             loading.value = true;
             MergeService.switchAllPublicationsToOtherPerson(
                 (fromLeftToRight ? leftPerson.value?.id : rightPerson.value?.id) as number, 
-                (fromLeftToRight ? rightPerson.value?.id : leftPerson.value?.id) as number)
-                .then(() => {
+                (fromLeftToRight ? rightPerson.value?.id : leftPerson.value?.id) as number,
+                selectedContributionType.value.value
+            ).then(() => {
                     fetchPublications();
                     loading.value = false;
             });
@@ -193,7 +228,8 @@ export default defineComponent({
             leftPublications, leftTotalPublications,
             rightPublications, rightTotalPublications,
             leftPerson, rightPerson, handleDrag,
-            moveAll, loading, navigateToMetadataComparison
+            moveAll, loading, navigateToMetadataComparison,
+            contributionTypes, selectedContributionType
         };
 }})
 

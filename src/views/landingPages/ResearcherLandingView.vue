@@ -61,6 +61,10 @@
             </template>
         </ResearcherLandingHeader>
 
+        <researcher-featured-indicators
+            :person-id="(person?.id as number)"
+        />
+
         <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
         <v-tabs
             v-if="person"
@@ -322,11 +326,12 @@ import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
 import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
 import ExternalIndicatorConfigurationService from '@/services/assessment/ExternalIndicatorConfigurationService';
+import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators },
     setup() {
         const currentTab = ref("additionalInfo");
 

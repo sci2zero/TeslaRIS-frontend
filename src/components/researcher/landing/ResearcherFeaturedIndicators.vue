@@ -1,43 +1,5 @@
-
-
-
 <template>
-    <!-- <div class="flex overflow-x-auto p-2 -ml-2">
-
-<div class="bg-white rounded-lg shadow-md py-4 px-4 sm:px-6 lg:px-8 min-w-fit">
-
-    <div class="flex serif gap-4 sm:gap-6 lg:gap-10">
-        <div class="flex-shrink-0">
-            <div class="text-gray-600 mb-1 sm:mb-2 text-sm sm:text-base">Ukupno</div>
-            <div class="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">125</div>
-        </div>
-
-        <div class="flex-shrink-0">
-            <div class="text-gray-600 mb-1 sm:mb-2 text-nowrap text-sm sm:text-base">H-Index</div>
-            <div class="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">26</div>
-        </div>
-
-        <div class="flex items-end gap-2 flex-shrink-0">
-            <div>
-                <div class="text-gray-600 mb-1 sm:mb-2 text-sm sm:text-base">Citata</div>
-                <div class="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">1232</div>
-            </div>
-            <div class="text-base sm:text-lg text-green-800 mb-1 sm:mb-2 flex items-center gap-1">
-                <span class="mdi mdi-arrow-up text-sm sm:text-base"></span>
-                33
-            </div>
-        </div>
-    </div>
-</div>
-</div> -->
-
     <div class="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 lg:p-8 mb-8">
-        <div class="mb-6">
-            <h2 class="text-xl lg:text-2xl font-serif font-bold text-slate-800 mb-2">
-                Naučni Indikatori
-            </h2>
-        </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
             <!-- Total Publications -->
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
@@ -47,15 +9,25 @@
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-blue-600 font-medium uppercase tracking-wide">
-                            Ukupno
+                            {{ $t("totalPublicationsLabel") }} (TeslaRIS)
                         </div>
                     </div>
                 </div>
-                <div class="text-3xl lg:text-4xl font-bold text-blue-800 mb-1">
-                    125
+                <v-progress-circular
+                    v-if="loading"
+                    color="primary"
+                    indeterminate
+                />
+                <div v-else class="text-3xl lg:text-4xl font-bold text-blue-800 mb-1">
+                    {{ featuredInformation?.publicationCount }}
                 </div>
-                <div class="text-sm text-blue-600 font-medium">
-                    Publikacija
+                <div
+                    v-if="featuredInformation?.publicationCount"
+                    class="flex items-center gap-2 text-sm text-blue-600 font-medium">
+                    <span 
+                        class="mdi mdi-trending-up text-base">
+                    </span>
+                    +{{ featuredInformation.publicationsGain }} {{ $t("thisYearLabel") }}
                 </div>
             </div>
 
@@ -67,15 +39,22 @@
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-emerald-600 font-medium uppercase tracking-wide">
-                            H-Index
+                            H-Index (OpenAlex)
                         </div>
                     </div>
                 </div>
-                <div class="text-3xl lg:text-4xl font-bold text-emerald-800 mb-1">
-                    26
+                <v-progress-circular
+                    v-if="loading"
+                    color="emerald-800"
+                    indeterminate
+                />
+                <div v-else class="text-3xl lg:text-4xl font-bold text-emerald-800 mb-1">
+                    {{ featuredInformation?.hIndex ? featuredInformation?.hIndex : $t("notHarvestedLabel") }}
                 </div>
-                <div class="text-sm text-emerald-600 font-medium">
-                    Hirsch indeks
+                <div
+                    v-if="featuredInformation?.hIndex"
+                    class="flex items-center gap-2 text-sm text-emerald-600 font-medium">
+                    Hirsch index
                 </div>
             </div>
 
@@ -87,53 +66,54 @@
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-amber-600 font-medium uppercase tracking-wide">
-                            Citata
+                            {{ $t("totalCitationsLabel") }} (OpenAlex)
                         </div>
                     </div>
                 </div>
-                <div class="text-3xl lg:text-4xl font-bold text-amber-800 mb-1">
-                    1,232
+                <v-progress-circular
+                    v-if="loading"
+                    color="amber-800"
+                    indeterminate
+                />
+                <div v-else class="text-3xl lg:text-4xl font-bold text-amber-800 mb-1">
+                    {{ featuredInformation?.currentCitationCount ? featuredInformation?.currentCitationCount : $t("notHarvestedLabel") }}
                 </div>
-                <div class="flex items-center gap-2 text-sm text-amber-600 font-medium">
-                    <span class="mdi mdi-trending-up text-base"></span>
-                    +33 ove godine
+                <div
+                    v-if="featuredInformation?.currentCitationCount"
+                    class="flex items-center gap-2 text-sm text-amber-600 font-medium">
+                    <span 
+                        :class="`mdi mdi-trending-${areCitationsTrendingUp ? 'up' : 'down'} text-base`">
+                    </span>
+                    {{ areCitationsTrendingUp ? "+" : "-" }}{{ featuredInformation.currentCitationTrend }} {{ $t("thisYearLabel") }}
                 </div>
             </div>
         </div>
 
         <!-- Additional Metrics Row -->
         <div class="mt-6 pt-6 border-t border-slate-200">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div class="text-center">
                     <div class="text-lg font-bold text-slate-800">
-                        89
+                        {{ featuredInformation?.journalPublicationsCount }}
                     </div>
                     <div class="text-xs text-slate-500 uppercase tracking-wide">
-                        Radovi u časopisu
+                        {{ $t("journalPublicationsLabel") }}
                     </div>
                 </div>
                 <div class="text-center">
                     <div class="text-lg font-bold text-slate-800">
-                        23
+                        {{ featuredInformation?.proceedingsPublicationsCount }}
                     </div>
                     <div class="text-xs text-slate-500 uppercase tracking-wide">
-                        Konferencije
+                        {{ $t("proceedingsPublicationsLabel") }}
                     </div>
                 </div>
                 <div class="text-center">
                     <div class="text-lg font-bold text-slate-800">
-                        12
+                        {{ featuredInformation?.monographsCount }}
                     </div>
                     <div class="text-xs text-slate-500 uppercase tracking-wide">
-                        Knjige
-                    </div>
-                </div>
-                <div class="text-center">
-                    <div class="text-lg font-bold text-slate-800">
-                        1
-                    </div>
-                    <div class="text-xs text-slate-500 uppercase tracking-wide">
-                        Monografije
+                        {{ $t("monographsLabel") }}
                     </div>
                 </div>
             </div>
@@ -142,11 +122,52 @@
 </template>
 
 <script setup lang="ts">
+import { type PersonFeaturedInformation } from '@/models/Common';
+import PersonVisualizationService from '@/services/visualization/PersonVisualizationService';
+import { onMounted, ref, watch } from 'vue';
+
+
+const props = defineProps({
+    personId: {
+        type: Number,
+        required: true
+    }
+});
+
+
+const featuredInformation = ref<PersonFeaturedInformation>();
+const areCitationsTrendingUp = ref(true);
+const loading = ref(false);
+
+onMounted(() => {
+    loading.value = true;
+});
+
+watch(() => props.personId, () => {
+    fetchFeaturedInformation();
+});
+
+const fetchFeaturedInformation = () => {
+    if (!props.personId) {
+        return;
+    }
+
+    PersonVisualizationService.getFeaturedInformationForPerson(
+        props.personId
+    ).then(response => {
+        featuredInformation.value = response.data;
+        areCitationsTrendingUp.value = !!featuredInformation.value?.currentCitationTrend && featuredInformation.value?.currentCitationTrend > 0;
+    }).finally(() => {
+        loading.value = false
+    });
+};
 
 </script>
 
 <style scoped>
+
 .font-serif {
     font-family: 'Georgia', 'Times New Roman', serif;
 }
+
 </style>
