@@ -1172,7 +1172,8 @@ export default {
     updateDLDisplayConfigurationLabel: "Digital Library visualizations display",
     uploadFailedMessage: "Upload failed. Please try again. If the error persists, please contact your system administrator.",
     contributionsForDateRangeLabel: "Contribution types considered for search period restriction",
-    confirmDeletionMessage: "Confirm the deletion of the following entities:",
+    confirmDeletionMessage: "Confirm deletion of the following entities:",
+    confirmUnbindingMessage: "Confirm removal of the following entities:",
     showMoreNameVariantsLabel: "Show more name variants ({count})...",
     harvestExternalIndicatorsLabel: "Harvest external indicators",
     indicatorHarvestStartedMessage: "Started harvesting indicators, after some time thez will appear on landing page.",
@@ -1189,5 +1190,6 @@ export default {
     deduplicationDescriptionMessage: "Advanced algorithms for automatic recognition and removal of duplicates in scientific publications.",
     notHarvestedLabel: "Not harvested",
     thisYearLabel: "this year",
-    monographsLabel: "Monographs"
+    monographsLabel: "Monographs",
+    unbindLabel: "Remove from profile"
 }

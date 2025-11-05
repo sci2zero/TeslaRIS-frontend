@@ -1180,6 +1180,7 @@ export default {
     uploadFailedMessage: "Neuspešno otpremanje. Molimo Vas pokušajte ponovo. Ako se greška i dalje ponavlja, kontaktirajte administratora sistema.",
     contributionsForDateRangeLabel: "Tipovi kontribucija uzeti u obzir za organičavanje perioda pretrage",
     confirmDeletionMessage: "Potvrdite brisanje sledećih entiteta:",
+    confirmUnbindingMessage: "Potvrdite uklanjanje sledećih entiteta:",
     showMoreNameVariantsLabel: "Prikaži još oblika imena ({count})...",
     harvestExternalIndicatorsLabel: "Preuzmi eksterne indikatore",
     indicatorHarvestStartedMessage: "Započeto preuzimanje indikatora, nakon nekog vremena će se pojaviti na stranici.",
@@ -1196,5 +1197,6 @@ export default {
     deduplicationDescriptionMessage: "Napredni algoritmi za automatsko prepoznavanje i uklanjanje duplikata u naučnim publikacijama.",
     notHarvestedLabel: "Nije preuzeto",
     thisYearLabel: "ove godine",
-    monographsLabel: "Monografije"
+    monographsLabel: "Monografije",
+    unbindLabel: "Ukloni sa profila"
 }

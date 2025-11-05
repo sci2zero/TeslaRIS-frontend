@@ -31,7 +31,7 @@
                                 </v-icon>
                             </template>
                             <v-list-item-title class="text-body-2">
-                                {{ $t("deleteLabel") }}
+                                {{ allowResearcherUnbinding ? $t("unbindLabel") : $t("deleteLabel") }}
                             </v-list-item-title>
                         </v-list-item>
 
@@ -378,7 +378,7 @@
     <persistent-question-dialog
         v-model="displayPersistentDialog"
         :title="$t('areYouSureLabel')"
-        :message="$t('confirmDeletionMessage')"
+        :message="!allowResearcherUnbinding ? $t('confirmDeletionMessage') : $t('confirmUnbindingMessage')"
         :entity-names="selectedPublications.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
         @continue="deleteSelection">
     </persistent-question-dialog>

@@ -7,7 +7,7 @@
         >
             <v-card
                 prepend-icon="mdi-alert"
-                :text="message + (entityNames ? `\n\n• ${entityNames.join('\n• ')}` : '')"
+                :text="message + ((entityNames && entityNames.length > 0) ? `\n\n• ${entityNames.join('\n• ')}` : '')"
                 :title="title"
                 class="multiline-text"
             >
