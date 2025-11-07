@@ -1,7 +1,7 @@
 <template>
-    <v-row>
+    <v-row class="mt-1">
         <v-col cols="12">
-            <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+            <v-card class="pt-10 pb-3" variant="flat" color="grey-lighten-5">
                 <v-card-text class="edit-pen-container">
                     <event-contribution-update-modal
                         :read-only="readOnly"
@@ -11,7 +11,7 @@
                     </event-contribution-update-modal>
 
                     <div v-if="contributionList?.length === 0">
-                        <b>{{ $t("contributionsLabel") }}</b>
+                        <b>{{ $t("participationsLabel") }}</b>
                     </div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <v-tabs

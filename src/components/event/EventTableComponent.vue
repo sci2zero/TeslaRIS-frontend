@@ -1,7 +1,7 @@
 <template>
     <v-btn
         v-if="isAdmin" density="compact" class="bottom-spacer" :disabled="selectedEvents.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-btn
@@ -87,6 +87,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedEvents.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -102,11 +110,12 @@ import EntityClassificationModalContent from '../assessment/classifications/Enti
 import { useUserRole } from '@/composables/useUserRole';
 import { ApplicableEntityType } from '@/models/Common';
 import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "EventTableComponent",
-    components: { LocalizedLink, EntityClassificationModalContent },
+    components: { LocalizedLink, EntityClassificationModalContent, PersistentQuestionDialog },
     props: {
         events: {
             type: Array<EventIndex>,
@@ -291,13 +300,19 @@ export default defineComponent({
             }
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             selectedEvents, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startProceedingsComparison, startMetadataComparison,
             setSortAndPageOption, loggedInUser, isCommission,
-            eventClassified, ApplicableEntityType
+            eventClassified, ApplicableEntityType,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

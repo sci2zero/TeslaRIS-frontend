@@ -42,7 +42,12 @@
                 <v-icon v-if="!thesis" size="x-large" class="large-thesis-icon">
                     {{ icon }}
                 </v-icon>
-                <wordcloud v-else :for-document-id="thesis?.id" compact-icon />
+                <wordcloud
+                    v-else
+                    :for-document-id="thesis?.id"
+                    :document-type="PublicationType.THESIS"
+                    compact-icon
+                />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
@@ -266,13 +271,13 @@
             </v-col>
         </v-row>
 
-        <div v-if="isAdmin || isHeadOfLibrary || (userCanPutOnPublicReview && !thesis?.isArchived)" class="actions-box pa-4">
+        <div v-if="isAdmin || isHeadOfLibrary || userCanPutOnPublicReview" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <v-btn
-                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived"
+                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived && !thesis?.isOnPublicReviewPause"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="changePublicReviewState(true, false)">
@@ -326,7 +331,7 @@
                     :form-component="RegistryBookEntryForm"
                     :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
                     entity-name="RegistryBookEntry"
-                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                    :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
                     primary-color compact
                     disable-submission
                     outlined wide
@@ -375,6 +380,9 @@
             <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
+            <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
+                {{ $t("visualizationsLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -398,6 +406,7 @@
                     :proofs="thesis?.proofs"
                     :file-items="thesis?.fileItems"
                     is-thesis-section
+                    :is-archived="thesis?.isArchived"
                     :preliminary-files="thesis?.preliminaryFiles"
                     :preliminary-supplements="thesis?.preliminarySupplements"
                     :commission-reports="thesis?.commissionReports"
@@ -451,7 +460,7 @@
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit && !thesis?.isOnPublicReview"
                     show-statistics
-                    :has-attached-files="thesis?.fileItems && thesis?.fileItems.length > 0"
+                    :has-attached-files="(thesis?.fileItems && thesis?.fileItems.length > 0) || (thesis?.preliminaryFiles && thesis?.preliminaryFiles.length > 0)"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -465,6 +474,13 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
                     @create="createClassification"
                     @update="fetchClassifications"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="visualizations">
+                <document-visualizations
+                    :document-id="(thesis?.id as number)"
+                    :display-settings="displayConfiguration.displaySettings.value"
+                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -543,11 +559,13 @@ import { useTrustConfigurationActions } from '@/composables/useTrustConfiguratio
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
+import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
+import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -587,25 +605,21 @@ export default defineComponent({
 
         const actionsRef = ref<typeof DocumentActionBox>();
 
+        const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
+
         onMounted(() => {
             fetchDisplayData();
         });
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
-                checkIfUserCanEdit();
-
-                EntityClassificationService.canClassifyDocument(parseInt(currentRoute.params.id as string)).then((response) => {
+                EntityClassificationService.canClassifyDocument(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
                     canClassify.value = response.data;
                 });
 
-                RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
-                    canCreateRegistryBookEntry.value = response.data ? false : true;
-                    registryBookEntryId.value = response.data;
-                }).catch(() => {
-                    canCreateRegistryBookEntry.value = false;
-                    registryBookEntryId.value = -1;
-                });
+                fetchRegistryBookData();
 
                 fetchClassifications();
             }
@@ -615,9 +629,23 @@ export default defineComponent({
             fetchIndicators();
         };
 
+        const fetchRegistryBookData = () => {
+            RegistryBookService.canAddToRegistryBook(parseInt(currentRoute.params.id as string)).then((response) => {
+                canCreateRegistryBookEntry.value = response.data ? false : true;
+                registryBookEntryId.value = response.data;
+            }).catch(() => {
+                canCreateRegistryBookEntry.value = false;
+                registryBookEntryId.value = -1;
+            });
+        };
+
         const checkIfUserCanEdit = () => {
             DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
-                canEdit.value = response.data;
+                if (thesis.value?.isArchived) {
+                    canEdit.value = false;
+                } else {
+                    canEdit.value = response.data;
+                }
             }).catch(() => canEdit.value = false);
         };
 
@@ -630,8 +658,8 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 thesis.value = response.data;
-                if (thesis.value.isArchived) {
-                    canEdit.value = false;
+                if (loginStore.userLoggedIn) {
+                    checkIfUserCanEdit();
                 }
 
                 injectFairSignposting(response.headers as AxiosResponseHeaders);
@@ -695,7 +723,7 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications" }});
+            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
         const goToURL = (uri: string) => {
@@ -878,6 +906,7 @@ export default defineComponent({
                 .then(() => {
                     thesis.value!.isArchived = false;
                     checkIfUserCanEdit();
+                    fetchRegistryBookData();
                 });
             } else {
                 DocumentPublicationService.archiveThesis(
@@ -885,6 +914,7 @@ export default defineComponent({
                 .then(() => {
                     thesis.value!.isArchived = true;
                     canEdit.value = false;
+                    fetchRegistryBookData();
                 })
                 .catch((error) => {
                     snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
@@ -899,6 +929,7 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 canCreateRegistryBookEntry.value = false;
+                fetchRegistryBookData();
                 if (isAdmin.value) {
                     router.push({name: "registryBookLandingPage", params: {id: response.data.id}});
                 }
@@ -929,7 +960,7 @@ export default defineComponent({
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
-            fetchValidationStatus, fetchThesis, PublicationType
+            fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration
         };
 }})
 

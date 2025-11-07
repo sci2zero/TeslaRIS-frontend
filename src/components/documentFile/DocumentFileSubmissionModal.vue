@@ -96,7 +96,9 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return {dialog, submissionFormRef, emitCreateToParent, emitUpdateToParent};
+        return {
+            dialog, submissionFormRef, emitCreateToParent, emitUpdateToParent
+        };
     }
 });
 </script>

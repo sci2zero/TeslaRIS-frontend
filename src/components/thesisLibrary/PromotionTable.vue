@@ -3,7 +3,7 @@
         <v-col cols="auto">
             <v-btn
                 density="compact" class="bottom-spacer" :disabled="selectedPromotions.length === 0"
-                @click="deleteSelection">
+                @click="startDeletionProcess">
                 {{ $t("deleteLabel") }}
             </v-btn>
         </v-col>
@@ -75,6 +75,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedPromotions.map(entity => localiseDate(entity.promotionDate))"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -90,11 +98,12 @@ import PromotionForm from './PromotionForm.vue';
 import type { Promotion } from '@/models/ThesisLibraryModel';
 import { localiseDate, localiseTime } from '@/utils/DateUtil';
 import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "PromotionTableComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
         promotions: {
             type: Array<Promotion>,
@@ -216,12 +225,18 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedPromotions, notifications, createNewPromotion,
             updatePromotion, setSortAndPageOption, PromotionForm,
-            localiseDate, localiseTime
+            localiseDate, localiseTime, displayPersistentDialog,
+            startDeletionProcess
         };
     }
 });

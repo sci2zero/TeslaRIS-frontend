@@ -28,6 +28,7 @@
                                 ref="deduplicationTableRef"
                                 :person-first-name="firstName"
                                 :person-last-name="lastName"
+                                :return-selected="inModal"
                                 @selected="returnToParent"
                             ></person-deduplication-table>
                         </v-col>

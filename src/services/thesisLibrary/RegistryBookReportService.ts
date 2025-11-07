@@ -38,7 +38,7 @@ export class RegistryBookReportService extends BaseService {
                 }
             }
         );
-        this.initialzeDownload(response, `${reportFileName}.pdf`, ".pdf");
+        this.initialzeDownload(response, `${reportFileName}`, "");
     }
 }
 

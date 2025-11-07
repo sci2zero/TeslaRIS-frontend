@@ -1,6 +1,6 @@
 <template>
     <v-row
-        v-if="canEditThesisAttachments || isOnPublicReview && (!hideEmptySections || (preliminaryFiles && preliminaryFiles.length > 0))"
+        v-if="canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (preliminaryFiles && preliminaryFiles.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminaryFilesLabel") }}</h2>
@@ -18,7 +18,7 @@
         </v-col>
     </v-row>
     <v-row
-        v-if="canEditThesisAttachments || isOnPublicReview && (!hideEmptySections || (preliminarySupplements && preliminarySupplements.length > 0))"
+        v-if="canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (preliminarySupplements && preliminarySupplements.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
@@ -26,15 +26,17 @@
                 :attachments="preliminarySupplements"
                 :can-edit="canEditThesisAttachments"
                 :in-comparator="inComparator"
-                disable-updates 
+                disable-updates
+                :can-make-official="isThesisSection"
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
+                @update="notifyAboutSectionChange()"
             />
         </v-col>
     </v-row>
     <v-row
-        v-if="canEditThesisAttachments || isOnPublicReview && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
+        v-if="canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("commissionReportsLabel") }}</h2>
@@ -47,7 +49,7 @@
             />
         </v-col>
     </v-row>
-    <v-row v-if="!hideEmptySections || (fileItems && fileItems.length > 0)" class="mt-10">
+    <v-row v-if="!hideRegularSections && (!hideEmptySections || (fileItems && fileItems.length > 0))" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <attachment-list
@@ -60,7 +62,7 @@
             />
         </v-col>
     </v-row>
-    <v-row v-if="!hideEmptySections || (proofs && proofs.length > 0)" class="mt-10">
+    <v-row v-if="!hideRegularSections && (!hideEmptySections || (proofs && proofs.length > 0))" class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("proofsLabel") }}</h2>
             <attachment-list
@@ -133,6 +135,14 @@ export default defineComponent({
     hideEmptySections: {
         type: Boolean,
         default: false
+    },
+    isArchived: {
+        type: Boolean,
+        default: false
+    },
+    hideRegularSections: {
+        type: Boolean,
+        default: false
     }
   },
   emits: ["update"],
@@ -149,6 +159,10 @@ export default defineComponent({
         ) && props.isThesisSection
     );
 
+    const canSeeThesisSectionsWhenArchived = computed(() => {
+        return isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value
+    });
+
     const notifyAboutSectionChange = () => {
         emit("update");
     };
@@ -157,7 +171,8 @@ export default defineComponent({
         addAttachment, updateAttachment, deleteAttachment,
         canEditThesisAttachments, addThesisAttachment,
         deleteThesisAttachment, ThesisAttachmentType,
-        notifyAboutSectionChange, ResourceType
+        notifyAboutSectionChange, ResourceType,
+        canSeeThesisSectionsWhenArchived
     };
   },
 });

@@ -101,6 +101,7 @@
                             v-model:model-value="selectedInstitution"
                             :top-level-institution-id="loggedInUser && loggedInUser.organisationUnitId > 0 ? loggedInUser.organisationUnitId : undefined"
                             disable-submission
+                            registry-book-relevant
                         ></organisation-unit-autocomplete-search>
                     </v-col>
                     <v-col cols="12" sm="6" lg="3">
@@ -160,7 +161,7 @@
                         />
                     </v-col>
                 </v-row>
-                <v-row>
+                <v-row class="mb-1">
                     <registry-book-entry-table
                         class="mt-15"
                         :entries="tableStates.promoted.entries"
@@ -205,7 +206,17 @@
                         ></date-picker>
                     </v-col>
                 </v-row>
-                <promotion-count-report class="mt-5" :report="reportCounts"></promotion-count-report>
+                <promotion-count-report
+                    v-show="!reportLoading"
+                    class="mt-5"
+                    :report="reportCounts">
+                </promotion-count-report>
+                <v-progress-circular
+                    v-if="reportLoading"
+                    class="ml-2"
+                    color="primary"
+                    indeterminate
+                ></v-progress-circular>
             </v-window-item>
         </v-tabs-window>
         
@@ -241,6 +252,8 @@ import { type ScheduledTaskResponse } from '@/models/Common';
 import ScheduledTasksList from '@/components/core/ScheduledTasksList.vue';
 import DatePickerSplit from '@/components/core/DatePickerSplit.vue';
 import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
   
 
 type TabKey = "nonPromoted" | "forPromotion" | "promoted";
@@ -264,12 +277,14 @@ export default defineComponent({
 
         const currentTab = ref("nonPromoted");
 
+        const reportLoading = ref(false);
+
         const langItems = getLangItems();
         const selectedLang = ref<{title: string, value: string}>({title: "Srpski", value: "sr"});
         const { requiredSelectionRules } = useValidationUtils();
     
         const i18n = useI18n();
-        const { loggedInUser } = useUserRole();
+        const { loggedInUser, isPromotionRegistryAdministrator } = useUserRole();
     
         const promotions = ref<{ title: string; value: number }[]>([]);
         const selectedPromotion = ref<{ title: string; value: number }>({
@@ -277,8 +292,8 @@ export default defineComponent({
             value: -1
         });
 
-        const fromDate = ref("");
-        const toDate = ref("");
+        const fromDate = ref(new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]);
+        const toDate = ref((new Date()).toISOString().split("T")[0]);
         const selectedInstitution = ref<{ title: string; value: number }>({
             title: "",
             value: -1
@@ -296,12 +311,15 @@ export default defineComponent({
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
+                reportLoading.value = true;
                 RegistryBookService.getPromotedCounts(
                     fromDate.value.split("T")[0],
                     toDate.value.split("T")[0]
                 ).then(response => {
                     reportCounts.value.splice(0);
                     reportCounts.value = response.data;
+
+                    reportLoading.value = false;
                 });
             } else if (currentTab.value === "forPromotion" && selectedPromotion.value.value > 0) {
                 tableStates.forPromotion.fetchFn();
@@ -352,17 +370,19 @@ export default defineComponent({
                         return;
                     }
 
+                    let dateFrom = fromDate.value
+                    let dateTo = toDate.value;
                     if (fromDate.value.includes("%7C")) {
-                        fromDate.value = computeRelativeDate(fromDate.value);
+                        dateFrom = computeRelativeDate(dateFrom);
                     } else if (toDate.value.includes("%7C")) {
-                        toDate.value = computeRelativeDate(toDate.value);
+                        dateTo = computeRelativeDate(dateTo);
                     }
 
                     const query = `page=${tableStates.promoted.page}&size=${tableStates.promoted.size}${tableStates.promoted.sort ? `&sort=${tableStates.promoted.sort},${tableStates.promoted.direction}` : ""}`;
                     const response = await RegistryBookService.getPromoted(
                         selectedInstitution.value.value,
-                        fromDate.value ? fromDate.value.split("T")[0] : "",
-                        toDate.value ? toDate.value.split("T")[0] : "",
+                        dateFrom ? dateFrom.split("T")[0] : "",
+                        dateTo ? dateTo.split("T")[0] : "",
                         authorFullName.value, authorAcquiredTitle.value,
                         query
                     );
@@ -416,6 +436,17 @@ export default defineComponent({
     
         watch(i18n.locale, () => {
             fetchAllTables();
+        });
+
+        watch(loggedInUser, () => {
+            if (loggedInUser.value && isPromotionRegistryAdministrator.value) {
+                OrganisationUnitService.readOU(loggedInUser.value?.organisationUnitId as number).then(response => {
+                    selectedInstitution.value = {
+                        title: returnCurrentLocaleContent(response.data.name) as string,
+                        value: response.data.id
+                    };
+                });
+            }
         });
     
         onMounted(() => {
@@ -524,7 +555,7 @@ export default defineComponent({
             promotionPreviewRef, authorFullName,
             authorAcquiredTitle, recurrenceTypes,
             selectedRecurrenceType, deleteScheduledTask,
-            scheduledTasks, RecurrenceType
+            scheduledTasks, RecurrenceType, reportLoading
         };
     }
 });

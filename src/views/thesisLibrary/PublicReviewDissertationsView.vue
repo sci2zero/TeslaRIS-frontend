@@ -83,6 +83,7 @@
                     :institution-id="currentRoute.query.institutionId ? parseInt(currentRoute.query.institutionId as string) : undefined"
                     :total-theses="totalTheses"
                     :show-review-end-date="!showingNotDefended"
+                    :shows-current-public-review="!selectedYear"
                     @switch-page="switchPage">
                 </thesis-table-component>
             </v-col>
@@ -173,7 +174,7 @@ export default defineComponent({
             fetchPublicReviewTheses();
         });
 
-        watch(returnOnlyInstitutionRelatedTheses, () => {
+        watch([returnOnlyInstitutionRelatedTheses, showingNotDefended], () => {
             fetchPublicReviewTheses();
         });
 
@@ -202,7 +203,14 @@ export default defineComponent({
         };
 
         const navigateToSearch = () => {
-            router.push({name: "thesisLibrarySearch"});
+            const embedExists = !!currentRoute.query.embed;
+
+            if (embedExists && (currentRoute.query.embed as string === "true")) {
+                const route = router.resolve({ name: "thesisLibrarySearch" });
+                window.open(route.href, "_blank");
+            } else {
+                router.push({name: "thesisLibrarySearch"});
+            }
         };
 
         const navigateToThisView = (notYetDefended: boolean) => {
@@ -210,14 +218,21 @@ export default defineComponent({
                 router.push({name: "notFound"});
                 return;
             }
+
+            const query: any = {
+                institutionId: parseInt(currentRoute.query.institutionId as string),
+                notYetDefended: `${notYetDefended}`
+            };
+
+            const embedExists = !!currentRoute.query.embed;
+            if (embedExists) {
+                query.embed = currentRoute.query.embed as string;
+            }
             
             router.push(
                 {
                     name: "publicDissertationsReport",
-                    query: {
-                        institutionId: parseInt(currentRoute.query.institutionId as string),
-                        notYetDefended: `${notYetDefended}`
-                    }
+                    query: query
                 }
             );
         };

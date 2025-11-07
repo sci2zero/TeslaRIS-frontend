@@ -30,6 +30,7 @@ import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
+import NewResearcherLandingView from "@/views/landingPages/NewResearcherLandingView.vue";
 import OrgUnitLandingView from "@/views/landingPages/OrgUnitLandingView.vue";
 import JournalLandingView from "@/views/landingPages/JournalLandingView.vue";
 import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vue";
@@ -426,8 +427,8 @@ const router = createRouter({
                             name: "publisherLandingPage",
                             component: PublisherLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin, roles.researcher, roles.institutionalEditor, roles.viceDeanForScience, roles.institutionalLibrarian, roles.headOfLibrary, roles.promotionRegistryAdministrator],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
@@ -458,6 +459,15 @@ const router = createRouter({
                             path: "",
                             name: "persons",
                             component: PersonListView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "new/:id",
+                            name: "researcherLandingPageOld",
+                            component: NewResearcherLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

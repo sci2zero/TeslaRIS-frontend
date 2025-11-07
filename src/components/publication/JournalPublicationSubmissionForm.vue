@@ -54,8 +54,19 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="10">
-                        <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                    <v-col v-if="!disableYearInput" cols="8">
+                        <v-text-field
+                            v-model="publicationYear"
+                            :label="$t('yearOfPublicationLabel') + '*'"
+                            :placeholder="$t('yearOfPublicationLabel') + '*'"
+                            :rules="requiredFieldRules">
+                        </v-text-field>
+                    </v-col>
+                    <v-col :cols="disableYearInput ? 10 : 2">
+                        <v-checkbox
+                            v-model="disableYearInput"
+                            :label="$t('yearUnknownLabel')"
+                        ></v-checkbox>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -95,7 +106,9 @@
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
-                                v-model="numberOfPages" type="number" :min="0" :label="$t('numberOfPagesLabel')"
+                                v-model="numberOfPages" type="number"
+                                :min="0" :label="$t('numberOfPagesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfPagesLabel')"></v-text-field>
                         </v-col>
                     </v-row>
@@ -229,13 +242,16 @@ export default defineComponent({
         const numberOfPages = ref();
         const uris = ref<string[]>([]);
 
+        const disableYearInput = ref(false);
+
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
 
         const {
             requiredFieldRules, doiValidationRules,
             scopusIdValidationRules, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
@@ -269,6 +285,10 @@ export default defineComponent({
             endPage.value = endPage.value ? endPage.value : metadata.endPage;
             uris.value.push(metadata.url);
             doi.value = doi.value ? doi.value : metadata.doi;
+            
+            if (metadata.year > 0) {
+                publicationYear.value = `${metadata.year}`;
+            }
 
             if (metadata.publishedInName && selectedJournal.value.value <= 0) {
                 selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
@@ -359,7 +379,7 @@ export default defineComponent({
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, submitJournalPublication, errorMessage,
             popuateMetadata, PublicationType, documentWebOfScienceIdValidationRules,
-            webOfScienceId
+            webOfScienceId, optionalNumericZeroOrGreaterFieldRules, disableYearInput
         };
     }
 });

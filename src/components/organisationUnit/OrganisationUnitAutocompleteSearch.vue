@@ -111,7 +111,15 @@ export default defineComponent({
             type: Object as PropType<ThesisType | null>,
             default: null
         },
-        onlyClientInstitutions: {
+        onlyClientInstitutionsCris: {
+            type: Boolean,
+            default: false
+        },
+        onlyClientInstitutionsDl: {
+            type: Boolean,
+            default: false
+        },
+        registryBookRelevant: {
             type: Boolean,
             default: false
         }
@@ -207,7 +215,9 @@ export default defineComponent({
                         props.onlyHarvestableInstitutions,
                         props.onlyIndependentInstitutions,
                         props.allowedThesisType,
-                        props.onlyClientInstitutions
+                        props.onlyClientInstitutionsCris,
+                        props.onlyClientInstitutionsDl,
+                        props.registryBookRelevant
                     ).then((response) => {
                         recentlySearched.value.clear();
                         organisationUnits.value = response.data.content.map((organisationUnit: OrganisationUnitIndex) => ({

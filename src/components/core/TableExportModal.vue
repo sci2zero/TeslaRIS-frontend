@@ -1,7 +1,7 @@
 <template>
     <div justify="start">
         <v-dialog v-model="dialog" persistent class="wide">
-            <template #activator="scope">
+            <template v-if="!hideActivationButton" #activator="scope">
                 <v-btn
                     :disabled="disabled"
                     density="compact"
@@ -187,6 +187,10 @@ export default defineComponent({
         endpointBodyParameters: {
             type: Object as PropType<any>,
             default: undefined
+        },
+        hideActivationButton: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {
@@ -198,7 +202,7 @@ export default defineComponent({
         const fieldData = ref<SearchFieldsResponse[]>([]);
         const fields = ref<{ title: string; value: string; type: string }[]>([]);
         const selectedFields = ref<string[]>([]);
-        const exportAll = ref(props.potentialMaxAmountRequested ? true : false);
+        const exportAll = ref(false);
         const exportPageOffset = ref(1);
 
         const langItems = getLangItems();
@@ -243,6 +247,18 @@ export default defineComponent({
             .then(response => {
                 maxExportsPerPage.value = response.data > 0 ? response.data : 1;
             });
+
+            if (props.potentialMaxAmountRequested) {
+                exportAll.value = true;
+            }
+        });
+
+        watch(() => props.potentialMaxAmountRequested, () => {
+            if (props.potentialMaxAmountRequested) {
+                exportAll.value = true;
+            } else {
+                exportAll.value = false;
+            }
         });
 
         watch(i18n.locale, () => {
@@ -316,6 +332,10 @@ export default defineComponent({
             }
         };
 
+        const openModal = () => {
+            dialog.value = true;
+        };
+
         return { 
             dialog, fields, selectedFields, isFormValid,
             ExportEntity, langItems, selectedLang,
@@ -325,7 +345,7 @@ export default defineComponent({
             requiredNumericGreaterThanZeroFieldRules,
             apa, mla, chicago, harvard, vancouver,
             maxExportsPerPage, ExportFileFormat,
-            requiredMultiSelectionRules, loading
+            requiredMultiSelectionRules, loading, openModal
         };
     }
 });

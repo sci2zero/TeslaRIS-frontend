@@ -30,6 +30,9 @@ export class DocumentFileService extends BaseService {
                         downloadStore.downloadProgressRef?.updateProgress(percent);
                     }
                 }
+            }).catch(error => {
+                downloadStore.downloadProgressRef?.cancelDownload();
+                throw error;
             });
 
             this.initialzeDownload(response, fileName, extension);
@@ -126,7 +129,7 @@ export class DocumentFileService extends BaseService {
         return super.sendRequest(axios.delete, `prize/${personId}/${prizeId}/${proofId}`);
     }
 
-    async makeThesisPreprintOfficial(thesisId: number, documentFileId: number): Promise<void> {
+    async makeThesisDocumentOfficial(thesisId: number, documentFileId: number): Promise<void> {
         return super.sendRequest(axios.patch, `thesis/make-official/${thesisId}/${documentFileId}`);
     }
 }

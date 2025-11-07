@@ -18,7 +18,7 @@
                 v-model="selectedOrganisationUnit"
                 :disabled="isPersonSelected()"
                 required
-                only-client-institutions>
+                only-client-institutions-cris>
             </organisation-unit-autocomplete-search>
             <v-select
                 v-model="selectedLanguage"

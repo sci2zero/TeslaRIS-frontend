@@ -17,6 +17,14 @@ export class ExternalIndicatorConfigurationService extends BaseService {
     async updateIndicatorConfiguration(body: ExternalIndicatorConfiguration, institutionId: number): Promise<AxiosResponse<ExternalIndicatorConfiguration>> {
         return super.sendRequest(axios.patch, `external-indicator-configuration/${institutionId}`, body);
     }
+
+    async harvestIndicatorsForPerson(personId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `external-indicator/harvest-person/${personId}`, {});
+    }
+
+    async deduceIndicatorsForInstitution(institutionId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `external-indicator/deduce-institution/${institutionId}`, {});
+    }
 }
 
 export default new ExternalIndicatorConfigurationService();

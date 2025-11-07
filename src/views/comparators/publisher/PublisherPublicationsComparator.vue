@@ -97,7 +97,7 @@ export default defineComponent({
         const router = useRouter();
 
         onMounted(() => {
-            document.title = i18n.t("PublisherPublicationsComparatorLabel");
+            document.title = i18n.t("publisherPublicationsComparatorLabel");
             fetchPublishers();
             fetchPublications();
         });

@@ -48,7 +48,7 @@ export class ThesisLibraryReportingService extends BaseService {
             }
         });
         
-        this.initialzeDownload(response, "report.docx", ".docx");
+        this.initialzeDownload(response, "report.docx", "");
     }
 
     async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string, forMyInstitution: boolean): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {

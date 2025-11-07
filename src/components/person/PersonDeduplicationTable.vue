@@ -22,11 +22,11 @@
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
                 </td>
-                <td>{{ displayTextOrPlaceholder(row.item.birthdate) }}</td>
+                <td>{{ displayTextOrPlaceholder(row.item.birthdate.length === 4 ? row.item.birthdate.slice(0, 4) : localiseDate(row.item.birthdate)) }}</td>
                 <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
                 <td>
                     <publications-dialog :button-text="$t('viewPublicationsLabel')" :id-for-fetching="row.item.databaseId" icon="mdi-note" :title="$t('publicationsLabel')"></publications-dialog>
-                    <v-btn size="small" color="primary" @click="returnSelected ? navigateToLandingPage(row.item.databaseId) : returnToParent(row.item)">
+                    <v-btn size="small" color="primary" @click="returnSelected ? returnToParent(row.item) : navigateToLandingPage(row.item.databaseId)">
                         {{ $t("selectLabel") }}
                     </v-btn>
                 </td>
@@ -43,6 +43,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import lodash from "lodash";
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -156,7 +157,7 @@ export default defineComponent({
 
         return {
             displayTextOrPlaceholder,
-            refreshTable, headers,
+            refreshTable, headers, localiseDate,
             totalPersons, potentialMatches,
             tableOptions, navigateToLandingPage,
             resetTable, returnToParent

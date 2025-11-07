@@ -1,7 +1,7 @@
 <template>
     <v-btn
         density="compact" class="bottom-spacer" :disabled="selectedCommissions.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-crud-modal
@@ -58,6 +58,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedCommissions.map(entity => returnCurrentLocaleContent(entity.description) as string)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -73,11 +81,12 @@ import { localiseDate } from '@/utils/DateUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import CommissionForm from './CommissionForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "CommissionTableComponent",
-    components: { LocalizedLink, GenericCrudModal },
+    components: { LocalizedLink, GenericCrudModal, PersistentQuestionDialog },
     props: {
         commissions: {
             type: Array<CommissionResponse>,
@@ -86,7 +95,8 @@ export default defineComponent({
         totalCommissions: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedCommissions = ref<CommissionResponse[]>([]);
@@ -160,11 +170,17 @@ export default defineComponent({
             });
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedCommissions, notifications, localiseDate,
-            CommissionForm, createNewCommission
+            CommissionForm, createNewCommission, displayPersistentDialog,
+            startDeletionProcess
         };
     }
 });

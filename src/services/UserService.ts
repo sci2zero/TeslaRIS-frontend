@@ -102,6 +102,10 @@ export class UserService extends BaseService {
   async isRegisterResearcherCreationAllowed(): Promise<AxiosResponse> {
     return super.sendRequest(axios.get, "user/register-researcher-creation-allowed");
   }
+
+  async forceChangeUserEmail(userId: number, email: string): Promise<AxiosResponse> {
+    return super.sendRequest(axios.patch, `user/force-email-change/${userId}`, {newEmail: email});
+  }
 }
 
 export default new UserService();

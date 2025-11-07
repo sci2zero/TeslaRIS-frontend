@@ -1,12 +1,10 @@
 <template>
-    <v-container>
-        <h1>{{ $t("scientificResultsListLabel") }}</h1>
-        <br />
-        <br />
-        <v-tabs
+    <div class="container py-4 px-4 mx-auto">
+        <h1 class="text-2xl font-bold mb-4">
+            {{ $t("scientificResultsListLabel") }}
+        </h1>
+        <!-- <v-tabs
             v-model="currentTab"
-            bg-color="blue-grey-lighten-5"
-            color="deep-purple-accent-4"
             align-tabs="center"
         >
             <v-tab value="simpleSearch">
@@ -15,73 +13,30 @@
             <v-tab value="advancedSearch">
                 {{ $t("advancedSearchLabel") }}
             </v-tab>
-        </v-tabs>
+        </v-tabs> -->
 
         <v-tabs-window v-model="currentTab">
-            <v-tabs-window-item value="simpleSearch">
-                <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+            <v-tabs-window-item value="simpleSearch">                
             </v-tabs-window-item>
             <v-tabs-window-item value="advancedSearch">
+                <v-btn
+                    variant="text"
+                    prepend-icon="mdi-chevron-left"
+                    @click="toggleAdvancedSearch"
+                >
+                    {{ $t("backToSimpleSearchLabel") }}
+                </v-btn>
                 <query-input-component
                     :search-fields="searchFields"
+                    class="mb-4"
                     @search="clearSortAndPerformSearch($event)"
                     @reset="resetFiltersAndSearch">
                 </query-input-component>
             </v-tabs-window-item>
         </v-tabs-window>
-        <div class="d-flex flex-row justify-start mt-10">
-            <span
-                v-if="canUserAddPublications"
-                :class="'d-flex align-center ' + (canUserAddPublications ? 'mb-3' : '')">
-                <add-publication-menu />
-            </span>
-            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
-                <v-btn
-                    color="primary" density="default"
-                    @click="performNavigation('publicationsValidation')">
-                    {{ $t("routeLabel.publicationsValidation") }}
-                </v-btn>
-            </span>
-            <span v-if="isAdmin || isInstitutionalEditor" class="ml-2">
-                <v-btn
-                    color="primary" density="default"
-                    @click="performNavigation('authorReprints')">
-                    {{ $t("routeLabel.authorReprints") }}
-                </v-btn>
-            </span>
-        </div>
 
-        <v-select
-            v-model="selectedPublicationTypes"
-            :items="publicationTypes"
-            :label="$t('typeOfPublicationLabel')"
-            return-object
-            class="publication-type-select no-empty-outline mt-3"
-            multiple
-        ></v-select>
 
-        <span class="d-flex align-center">
-            <v-checkbox
-                v-if="isUserBoundToOU"
-                v-model="returnOnlyInstitutionRelatedEntities"
-                :label="$t('showEntitiesForMyInstitutionLabel')"
-                class="ml-4 mt-3"
-            ></v-checkbox>
-
-            <v-checkbox
-                v-if="isCommission"
-                v-model="returnOnlyUnassessedEntities"
-                :label="$t('showUnassessedLabel')"
-                class="ml-4 mt-3"
-            ></v-checkbox>
-
-            <v-checkbox
-                v-if="isAdmin"
-                v-model="returnOnlyUnmanagedPublications"
-                :label="$t('showOnlyUnmanagedLabel')"
-                class="ml-4 mt-3"
-            ></v-checkbox>
-        </span>
+        
 
         <tab-content-loader
             v-if="loading"
@@ -96,6 +51,7 @@
             :total-publications="totalPublications"
             enable-export
             :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
+            :has-active-type-filters="selectedPublicationTypes.length > 0"
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
             :endpoint-body-parameters="
@@ -106,8 +62,106 @@
                     onlyUnmanaged: returnOnlyUnmanagedPublications
                 }"
             @switch-page="switchPage">
+            <template #top-left>
+                <div class="flex items-center gap-1">
+                    <search-bar-component v-if="currentTab === 'simpleSearch'" :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                    <v-btn
+                        v-if="currentTab === 'simpleSearch'"
+                        variant="text"
+                        icon="mdi-tune"
+                        @click="toggleAdvancedSearch"
+                    />
+                </div>
+            </template>
+            <template #actions>
+                <div class="flex items-center gap-2">
+                    <v-menu>
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                color="white"
+                                prepend-icon="mdi-dots-vertical"
+                                class="action-menu-trigger"
+                            >
+                                {{ $t("optionsLabel") }}
+                            </v-btn>
+                        </template>
+                        <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                            <span class="flex align-center flex-row gap-2">
+                                <v-checkbox
+                                    v-if="isUserBoundToOU"
+                                    v-model="returnOnlyInstitutionRelatedEntities"
+                                    :label="$t('showEntitiesForMyInstitutionLabel')"
+                                    class=""
+                                ></v-checkbox>
+
+                                <v-checkbox
+                                    v-if="isCommission"
+                                    v-model="returnOnlyUnassessedEntities"
+                                    :label="$t('showUnassessedLabel')"
+                                    class=""
+                                ></v-checkbox>
+
+                                <v-checkbox
+                                    v-if="isAdmin"
+                                    v-model="returnOnlyUnmanagedPublications"
+                                    :label="$t('showOnlyUnmanagedLabel')"
+                                    class=""
+                                ></v-checkbox>
+                            </span>
+
+                            <div class="flex items-center gap-2">
+                                <span v-if="isAdmin || isInstitutionalEditor">
+                                    <v-btn
+                                        color="primary" density="default"
+                                        @click="performNavigation('publicationsValidation')">
+                                        {{ $t('routeLabel.publicationsValidation') }}
+                                    </v-btn>
+                                </span>
+                                <span v-if="isAdmin || isInstitutionalEditor">
+                                    <v-btn
+                                        color="primary" density="default"
+                                        @click="performNavigation('authorReprints')">
+                                        {{ $t('routeLabel.authorReprints') }}
+                                    </v-btn>
+                                </span>
+                            </div>
+                        </div>
+                    </v-menu>
+                    <span
+                        v-if="canUserAddPublications"
+                        :class="'d-flex align-center ' + (canUserAddPublications ? '' : '')">
+                        <add-publication-menu />
+                    </span>
+                </div>
+            </template>
+            <template #type-filter-menu>
+                <div class="publication-type-filter">
+                    <div class="filter-header">
+                        <span class="filter-title">{{ $t('typeOfPublicationLabel') }}</span>
+                    </div>
+                    <v-divider class="my-2"></v-divider>
+                    <div class="checkbox-grid">
+                        <div 
+                            v-for="type in publicationTypes"
+                            :key="type.value"
+                            class="checkbox-item"
+                        >
+                            <v-checkbox
+                                :model-value="selectedPublicationTypes.some(t => t.value === type.value)"
+                                :label="type.title"
+                                density="compact"
+                                hide-details
+                                class="w-full"
+                                color="primary"
+                                @update:model-value="togglePublicationType(type, !!$event)"
+                            ></v-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </publication-table-component>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -184,15 +238,20 @@ export default defineComponent({
             }
         });
 
+        const initialLoad = ref(true);
+
         watch([
             loggedInUser, returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities, selectedPublicationTypes,
             returnOnlyUnmanagedPublications], () => {
-            search(searchParams.value);
+            if (!initialLoad.value) {
+                search(searchParams.value);
+            }
         });
 
         const search = (tokenParams: string) => {
             if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
+                initialLoad.value = false;
                 return;
             }
 
@@ -224,6 +283,7 @@ export default defineComponent({
                 totalPublications.value = response.data.totalElements;
             }).finally(() => {
                 loading.value = false;
+                initialLoad.value = false;
             });
         };
 
@@ -244,6 +304,7 @@ export default defineComponent({
             size.value = pageSize;
             sort.value = sortField;
             direction.value = sortDir;
+
             search(searchParams.value);
         };
 
@@ -253,6 +314,25 @@ export default defineComponent({
 
         const performNavigation = (pageName: string) => {
             router.push({name: pageName});
+        };
+
+        const togglePublicationType = (type: { title: string, value: PublicationType }, isSelected: boolean) => {
+            if (isSelected) {
+                selectedPublicationTypes.value.push(type);
+            } else {
+                const index = selectedPublicationTypes.value.findIndex(t => t.value === type.value);
+                if (index > -1) selectedPublicationTypes.value.splice(index, 1);
+            }
+
+            search(searchParams.value);
+        };
+
+        const toggleAdvancedSearch = () => {
+            if (currentTab.value === "simpleSearch") {
+                currentTab.value = "advancedSearch";
+            } else {
+                currentTab.value = "simpleSearch";
+            }
         };
 
         return {
@@ -265,7 +345,8 @@ export default defineComponent({
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams, currentTab,
             resetFiltersAndSearch, loggedInUser, loading,
-            performNavigation, returnOnlyUnmanagedPublications
+            performNavigation, returnOnlyUnmanagedPublications,
+            togglePublicationType, toggleAdvancedSearch
         };
     }
 });
@@ -273,16 +354,73 @@ export default defineComponent({
 
 <style scoped>
 
-.publication-type-select {
+.publication-type-filter {
+    min-width: 500px;
     max-width: 700px;
+    padding: 12px;
+    background: #ffffff;
 }
 
-.no-empty-outline :deep(.v-field__outline) {
-  opacity: 0;
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
 }
 
-.no-empty-outline:deep(.v-select--focused .v-field__outline) {
-  opacity: 1;
+.filter-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: 0.01em;
 }
 
+.filter-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.checkbox-item {
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-item:hover {
+    background-color: #f5f5f5;
+}
+
+.checkbox-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.checkbox-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.checkbox-grid::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.checkbox-grid::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+</style>
+
+<style>
+.checkbox-item .v-label--clickable {
+    width: 100%;
+}
 </style>

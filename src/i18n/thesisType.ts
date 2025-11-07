@@ -35,6 +35,19 @@ export const getThesisTitleFromValueAutoLocale = (value: ThesisType) => {
     return (thesisTypeArray.find(item => item.value === value) || {}).title;
 };
 
+export const getThesisTypeValueFromTitleAutoLocale = (title: string) => {
+    const locale = i18n.vueI18n.global.locale;
+
+    let thesisTypeArray = thesisTypeEn;
+    if (locale == "sr") {
+        thesisTypeArray = thesisTypeSr;
+    } else if (locale == "sr-cyr") {
+        thesisTypeArray = transliterateContentToCyrillic(thesisTypeSr);
+    }
+
+    return (thesisTypeArray.find(item => item.title === title) || {}).value;
+};
+
 export const getThesisTypesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":

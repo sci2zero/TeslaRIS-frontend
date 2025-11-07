@@ -5,7 +5,7 @@
         :disabled="!inComparator"
     >
         <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
-            <v-menu
+            <!-- <v-menu
                 v-if="canEdit"
                 v-model="menus[index]"
                 :close-on-content-click="true"
@@ -22,12 +22,17 @@
                 </template>
 
                 <v-list min-width="150">
-                    <person-involvement-modal :read-only="!canEdit" edit :preset-involvement="involvement" @update="updateInvolvement"></person-involvement-modal>
+                    <person-involvement-modal
+                        :read-only="!canEdit"
+                        edit
+                        :preset-involvement="involvement"
+                        @update="updateInvolvement">
+                    </person-involvement-modal>
                     <v-list-item @click="deleteInvolvement(involvement.id)">
                         <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
                     </v-list-item>
                 </v-list>
-            </v-menu>
+            </v-menu> -->
             <h4>
                 <localized-link
                     v-if="involvement.organisationUnitId"
@@ -48,6 +53,23 @@
                 <span v-else>
                     {{ involvement.dateTo ? `${$t("unknownDateMessage")} - ${localiseDate(involvement.dateTo)}` : $t("currentLabel") }}
                 </span>
+                <div v-if="canEdit" class="d-flex flex-row justify-end edit-pen">
+                    <v-btn
+                        class="mt-1"
+                        icon variant="outlined"
+                        color="primary"
+                        size="medium"
+                        @click="deleteInvolvement(involvement.id)">
+                        <v-icon size="large" icon="mdi-delete"></v-icon>
+                    </v-btn>
+                    <person-involvement-modal
+                        class="mt-1 ml-8"
+                        :read-only="!canEdit"
+                        edit
+                        :preset-involvement="involvement"
+                        @update="updateInvolvement">
+                    </person-involvement-modal>
+                </div>
             </h4>
             <p v-if="involvement.involvementType === 'MEMBER_OF'">
                 {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}

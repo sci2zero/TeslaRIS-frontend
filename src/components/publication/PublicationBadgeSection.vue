@@ -1,6 +1,6 @@
 <template>
     <div v-show="preloadedDoi || description" class="pr-4">
-        <div class="d-sr-only text-subtitle-1 font-weight-medium mb-3">
+        <div class="sr-only text-base font-medium mb-3">
             {{ $t("externalMetricsLabel") }}
         </div>
         <div class="d-flex flex-row justify-end flex-wrap gap-2">
@@ -121,6 +121,19 @@ export default defineComponent({
             });
         };
 
+        const fixLinkToSourceOpenCitations = (rootDivClassName: string) => {
+            document.querySelectorAll("." + rootDivClassName).forEach(container => {
+                const elements = container.querySelectorAll('[id="0__badge"]');
+                const links = Array.from(elements).filter(el => el.tagName.toLowerCase() === 'a');
+                
+                links.forEach(link => {
+                    link.setAttribute("target", "_blank");
+                    link.setAttribute("rel", "noopener noreferrer");
+                    link.setAttribute("href", `https://search.opencitations.net/search?text=${props.preloadedDoi}&rule=citeddoi`);
+                });
+            });
+        };
+
         watch(
             [
                 () => props.preloadedDoi,
@@ -139,8 +152,8 @@ export default defineComponent({
                             script.setAttribute("data-return", "citation-count");
                             openCitationsContainer.value.innerHTML = '';
                             openCitationsContainer.value.appendChild(script);
-                            fixLinkToSource("openCitationsContainer");
-                            setTimeout(() => fixLinkToSource("openCitationsContainer"), 2000);   
+                            
+                            observeOpenCitationsContainer(openCitationsContainer.value);
                         }
 
                         if (response.data.showUnpaywall) {
@@ -154,6 +167,40 @@ export default defineComponent({
                 }
             }
         );
+
+        const observeOpenCitationsContainer = (container: HTMLElement) => {
+            const observer = new MutationObserver((mutations) => {
+                for (const mutation of mutations) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        let foundLinks = false;
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType === Node.ELEMENT_NODE) {
+                                const element = node as Element;
+                                if (element.querySelectorAll('a[id="0__badge"]').length > 0) {
+                                    foundLinks = true;
+                                }
+                            }
+                        });
+                        
+                        if (foundLinks) {
+                            fixLinkToSourceOpenCitations("openCitationsContainer");
+                            observer.disconnect();
+                        }
+                    }
+                }
+            });
+
+            observer.observe(container, {
+                childList: true,
+                subtree: true
+            });
+
+            // Set a timeout as fallback in case MutationObserver doesn't catch it
+            setTimeout(() => {
+                observer.disconnect();
+                fixLinkToSourceOpenCitations("openCitationsContainer");
+            }, 5000);
+        };
 
         watch(() => props.description, async () => {
             if (props.description) {

@@ -131,6 +131,7 @@
                                 v-model="numberOfPages"
                                 type="number"
                                 :label="$t('numberOfPagesLabel')"
+                                :rules="optionalNumericZeroOrGreaterFieldRules"
                                 :placeholder="$t('numberOfPagesLabel')">
                             </v-text-field>
                         </v-col>
@@ -327,7 +328,8 @@ export default defineComponent({
             requiredFieldRules, doiValidationRules,
             isbnValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -426,6 +428,10 @@ export default defineComponent({
             uris.value.push(metadata.url);
             doi.value = doi.value ? doi.value : metadata.doi;
 
+            if (metadata.year > 0) {
+                publicationYear.value = `${metadata.year}`;
+            }
+
             if (metadata.publishedInName && selectedJournal.value.value <= 0) {
                 selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
             }
@@ -447,7 +453,8 @@ export default defineComponent({
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submit, acronymRef,
             scopusIdValidationRules, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules, webOfScienceId
+            documentWebOfScienceIdValidationRules, webOfScienceId,
+            optionalNumericZeroOrGreaterFieldRules
         };
     }
 });

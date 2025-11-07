@@ -1,17 +1,15 @@
 <template>
-    <v-app>
-        <v-main>
-            <navbar
-                v-if="!hideLayout"
-            />
-            
-            <breadcrumbs
-                v-if="!hideLayout"
-            />
-            
+    <v-app class="bg-slate-100">
+        <SideBar v-if="!hideLayout" class="h-full" />
+        <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
+            <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
+
             <router-view
                 :key="$route.path"
+                class="flex-1"
             />
+
+            <footerbar v-if="!hideLayout" />
             
             <cookie-consent
                 v-if="!hideLayout"
@@ -20,16 +18,16 @@
             <download-progress
                 ref="downloadProgressRef"
             />
+
+            <upload-progress
+                ref="uploadProgressRef"
+            />
         </v-main>
-        <footerbar
-            v-if="!hideLayout"
-        />
     </v-app>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
-import navbar from "@/components/core/Navbar.vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRoute, useRouter } from "vue-router";
@@ -37,22 +35,28 @@ import { useLoginStore } from '@/stores/loginStore';
 import { jwtDecode } from "jwt-decode";
 import i18n, {fallbackLocale, supportedLocales} from './i18n';
 import { useRouteStore } from "./stores/routeStore";
-import footerbar from "./components/core/FooterBar.vue";
-import Breadcrumbs from "./components/core/Breadcrumbs.vue";
 import CookieConsent from "./components/core/CookieConsent.vue";
 import { useScriptLoader } from "./composables/useScriptLoader";
 import DownloadProgress from "./components/core/DownloadProgress.vue";
 import { useDownloadStore } from "./stores/downloadStore";
+import { useUploadStore } from "./stores/uploadStore";
+import UploadProgress from "./components/core/UploadProgress.vue";
+import Navbar from "@/components/core/MainNavbar.vue";
+import Footerbar from "@/components/core/FooterBar.vue";
+import SideBar from "@/components/core/SideBar.vue";
+import { useSidebarStore } from "@/stores/sidebarStore";
 
 
 export default defineComponent({
     name: "App",
-    components: { navbar, footerbar, Breadcrumbs, CookieConsent, DownloadProgress },
+    components: { CookieConsent, DownloadProgress, UploadProgress, Navbar, Footerbar, SideBar },
     setup() {
         const route = useRoute();
 
         const downloadProgressRef = ref<typeof DownloadProgress>();
+        const uploadProgressRef = ref<typeof UploadProgress>();
         const downloadStore = useDownloadStore();
+        const uploadStore = useUploadStore();
 
         const hideLayout = computed(() => {
             return (
@@ -60,6 +64,11 @@ export default defineComponent({
                 route.query.embed === "true"
             );
         });
+
+        const isHome = computed(() => {
+            return route.name === "home";
+        });
+        const sidebarStore = useSidebarStore();
 
         onMounted(async () => {
             try {
@@ -71,11 +80,15 @@ export default defineComponent({
             }
 
             downloadStore.setGlobalDownloadProgressRef(downloadProgressRef.value as typeof DownloadProgress);
+            uploadStore.setGlobalUploadProgressRef(uploadProgressRef.value as typeof UploadProgress);
         });
 
         return {
             hideLayout,
-            downloadProgressRef
+            downloadProgressRef,
+            uploadProgressRef,
+            isHome,
+            sidebarStore
         };
     },
     beforeMount() {
@@ -132,7 +145,8 @@ export default defineComponent({
                     if (loginStore.explicitlyLoggedOut) {
                         loginStore.reachedLoginPage();
                     } else {
-                        if (from.name !== "notFound") {
+                        const excludedRoutes = ["notFound", "resetPassword", "register", "oauth2", "activateAccount"];
+                        if (!excludedRoutes.includes(from.name)) {
                             routeStore.setRouteAndParams(from.name, from.params);
                         }
                     }
@@ -207,6 +221,17 @@ export default defineComponent({
 });
 </script>
 
-<style>
-    /* @import "./assets/main.css"; */
+<style scoped>
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .v-main {
+        margin-left: 0 !important;
+    }
+}
 </style>

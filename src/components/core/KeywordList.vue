@@ -13,7 +13,9 @@
                         @update="emitToParent"
                     />
 
-                    <div><b>{{ $t("keywordsLabel") }}</b></div>
+                    <div class="mb-2">
+                        <b>{{ $t("keywordsLabel") }}</b>
+                    </div>
                     <strong v-if="!parsedKeywords || parsedKeywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
                     <v-chip v-for="(keyword, index) in parsedKeywords" :key="index" outlined @click="searchKeyword(keyword)">
                         {{ keyword }}

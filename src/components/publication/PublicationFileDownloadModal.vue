@@ -13,6 +13,7 @@
                     v-else
                     min-width="70"
                     density="compact"
+                    :disabled="!containsFiles"
                     v-bind="scope.props"
                     v-on="scope.isActive">
                     ...
@@ -31,7 +32,8 @@
                         :preliminary-files="(showThesisSections && document) ? (document as Thesis).preliminaryFiles : []"
                         :preliminary-supplements="(showThesisSections && document) ? (document as Thesis).preliminarySupplements : []"
                         :commission-reports="(showThesisSections && document) ? (document as Thesis).commissionReports : []"
-                        :hide-empty-sections="hideEmptySections">
+                        :hide-empty-sections="hideEmptySections"
+                        :hide-regular-sections="hideRegularSections">
                     </attachment-section>
                     <v-progress-circular
                         v-else-if="loading"
@@ -66,7 +68,7 @@ import AttachmentSection from "../core/AttachmentSection.vue";
 
 
 export default defineComponent({
-    name: "PublicationReferenceFormats",
+    name: "PublicationFileDownloadModal",
     components: { AttachmentSection },
     props: {
         documentId: {
@@ -88,6 +90,14 @@ export default defineComponent({
         isListItem: {
             type: Boolean,
             default: true
+        },
+        containsFiles: {
+            type: Boolean,
+            default: true
+        },
+        hideRegularSections: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {

@@ -121,12 +121,12 @@
         >
             <v-tab v-show="!conference?.serialEvent" value="publications">
                 {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab value="contributions">
+                {{ $t("participationsLabel") }}
             </v-tab>    
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
-            </v-tab>
-            <v-tab value="contributions">
-                {{ $t("contributionsLabel") }}
             </v-tab>
             <v-tab v-show="eventIndicators?.length > 0 || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -138,8 +138,7 @@
 
         <v-tabs-window
             v-show="conference"
-            v-model="currentTab"
-        >
+            v-model="currentTab">
             <v-tabs-window-item value="publications">
                 <div class="mt-10">
                     <h2 class="mb-5">
@@ -151,6 +150,14 @@
                         @switch-page="switchPublicationsPage">
                     </publication-table-component>
                 </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="contributions">
+                <person-event-contribution-tabs
+                    :event-id="conference?.id"
+                    :contribution-list="conference?.contributions ? conference.contributions : []"
+                    :read-only="!canEdit"
+                    @update="updateContributions">
+                </person-event-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list
@@ -173,14 +180,6 @@
                 <div class="mt-10">
                     <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
                 </div>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="contributions">
-                <person-event-contribution-tabs
-                    :event-id="conference?.id"
-                    :contribution-list="conference?.contributions ? conference.contributions : []"
-                    :read-only="!canEdit"
-                    @update="updateContributions">
-                </person-event-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

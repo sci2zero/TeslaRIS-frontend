@@ -14,6 +14,7 @@ export default {
     eCrisIdFormatError: "Погрешан формат eCRIS ID-а.",
     eNaukaIdFormatError: "Погрешан формат eNauka ID-а.",
     orcidIdFormatError: "Погрешан формат ORCID ID-а.",
+    identifierCopiedNotification: "Идентификатор {identifier} је копиран у clipboard.",
     scopusAuthorIdFormatError: "Погрешан формат Scopus Author ID-а.",
     apvntExistsError: "APVNT је већ у употреби.",
     eCrisIdExistsError: "eCRIS ID је већ у употреби.",
@@ -81,4 +82,7 @@ export default {
     emailDomainErrorMessage: "Морате се регистровати са адресом е-поште ваше институције.",
     volumeLabel: "Свеска (Volume)",
     issueLabel: "Број (Issue)",
+    updateEmailLabel: "Ажурирај адресу е-поште",
+    newEmailLabel: "Нова адреса е-поште",
+    metadataStandardisationMessage: "Стандардизација метаподатака према међународним CRIS стандардима.",
 };

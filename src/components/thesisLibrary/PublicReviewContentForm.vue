@@ -1,6 +1,6 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
-        <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer contributions-box">
+        <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer section-box">
             <v-row>
                 <v-col cols="10">
                     <multilingual-text-input

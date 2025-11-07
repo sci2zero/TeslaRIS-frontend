@@ -24,10 +24,10 @@
                         />
                     </td>
                     <td>{{ row.item.nameAndSurname.replaceAll("*", "") }}</td>
-                    <td v-if="institutionId === undefined && $i18n.locale.startsWith('sr')">
+                    <td v-if="(institutionId === undefined || !allFromSameFaculty) && $i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameSr }}
                     </td>
-                    <td v-if="institutionId === undefined && !$i18n.locale.startsWith('sr')">
+                    <td v-if="(institutionId === undefined || !allFromSameFaculty) && !$i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameOther }}
                     </td>
                     <td v-if="$i18n.locale.startsWith('sr')">
@@ -57,10 +57,11 @@
                         <div class="d-flex flex-row justify-center">
                             <publication-file-download-modal
                                 :document-id="(row.item.databaseId as number)"
-                                show-thesis-sections
+                                :show-thesis-sections="showsCurrentPublicReview"
                                 hide-empty-sections
                                 :persistent="false"
                                 :is-list-item="false"
+                                :hide-regular-sections="showsCurrentPublicReview"
                             />
                         </div>
                     </td>
@@ -108,6 +109,10 @@ export default defineComponent({
         allowSelection: {
             type: Boolean,
             default: false
+        },
+        showsCurrentPublicReview: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage"],
@@ -120,11 +125,28 @@ export default defineComponent({
 
         const tableWrapper = ref<any>(null);
 
+        const allFromSameFaculty = ref(false);
+
         onMounted(() => {
-            if (props.institutionId) {
+            shouldDisplayInstitution();
+        });
+
+        watch(() => props.theses, () => {
+            shouldDisplayInstitution();
+        });
+
+        const shouldDisplayInstitution = () => {
+            if (props.theses && props.theses.length > 0) {
+                allFromSameFaculty.value =
+                    props.theses.every(entry => 
+                        entry.organisationUnitNameSr === props.theses[0].organisationUnitNameSr
+                    );
+            }
+
+            if (allFromSameFaculty.value) {
                 headers.value = headers.value.filter(header => header.key !== "faculty");
             }
-        })
+        };
 
         watch(tableWrapper, () => {
             if (tableWrapper.value) {
@@ -152,8 +174,7 @@ export default defineComponent({
             { title: downloadableDocumentsLabel, align: "start", sortable: false}
         ]);
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10});
-
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25});
 
         const refreshTable = (event: any) => {
             if (tableOptions.value.initialCustomConfiguration) {
@@ -169,7 +190,7 @@ export default defineComponent({
             refreshTable, tableWrapper, tableOptions,
             displayTextOrPlaceholder, selectedTheses,
             getPublicationTypeTitleFromValueAutoLocale,
-            getDocumentLandingPageBasePath
+            getDocumentLandingPageBasePath, allFromSameFaculty
         };
     }
 });

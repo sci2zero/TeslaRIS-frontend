@@ -1,4 +1,11 @@
-@import "./base.css";
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+@layer base {
+  @import "./reset.scss";
+  @import "./base.css";
+}
+
+@import "tailwindcss";
 
 #app {
     margin: 0 auto;
@@ -36,17 +43,16 @@ a,
 }
 
 /* Forms */
-input {
+/* input {
     display: block;
     width: 100%;
     padding: 0.4em;
-    border: 1px solid #bcbcbc;;
     border-radius: 0.25em;
 }
 
 label {
     display: block;
-}
+} */
 
 .no-uppercase {
     text-transform: none;
@@ -67,10 +73,10 @@ label {
 
 .can-not-find-message {
     margin-top: 20px;
-    margin-bottom: 20px
+    margin-bottom: 20px;
 }
 
-.contributions-box {
+.section-box {
     border: 2px solid lightskyblue;
     border-radius: 12px;
 }
@@ -163,4 +169,85 @@ label {
 
 .move-up {
     margin-top: -30px;
+}
+
+.serif {
+    font-family: 'Libre Baskerville', serif;
+}
+
+
+/* Vuetify update */
+
+.v-btn {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.v-btn.v-btn--elevated {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}
+
+.d-flex {
+    display: flex;
+}
+
+.total-count-card {
+    width: 100%;
+    height: 100%;
+    max-width: 350px;
+    max-height: 250px;
+}
+
+.serif {
+    font-family: 'Libre Baskerville', serif;
+}
+
+
+/* Vuetify update */
+
+.v-btn {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.v-btn.v-btn--elevated {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}
+
+.d-flex {
+    display: flex;
+}
+
+/* Heading styles matching Vuetify 3 / Bootstrap proportions */
+
+h1 {
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
 }

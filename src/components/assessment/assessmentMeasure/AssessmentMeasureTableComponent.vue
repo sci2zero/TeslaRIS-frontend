@@ -1,7 +1,7 @@
 <template>
     <v-btn
         density="compact" class="bottom-spacer" :disabled="selectedAssessmentMeasures.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <generic-crud-modal
@@ -67,6 +67,14 @@
             </v-alert>
         </v-slide-y-transition>
     </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedAssessmentMeasures.map(entity => returnCurrentLocaleContent(entity.title) as string)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
 
 <script lang="ts">
@@ -81,11 +89,12 @@ import AssessmentMeasureService from '@/services/assessment/AssessmentMeasureSer
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import AssessmentMeasureForm from './AssessmentMeasureForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "AssessmentMeasureTableComponent",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
         assessmentMeasures: {
             type: Array<AssessmentMeasure>,
@@ -94,7 +103,8 @@ export default defineComponent({
         totalAssessmentMeasures: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage", "create", "update"],
     setup(_, {emit}) {
         const selectedAssessmentMeasures = ref<AssessmentMeasure[]>([]);
@@ -176,12 +186,18 @@ export default defineComponent({
             });
         };
 
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
+
         return {
             headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedAssessmentMeasures, notifications, createNewAssessmentMeasure,
-            updateAssessmentMeasure, localiseDate, AssessmentMeasureForm
+            updateAssessmentMeasure, localiseDate, AssessmentMeasureForm,
+            displayPersistentDialog, startDeletionProcess
         };
     }
 });

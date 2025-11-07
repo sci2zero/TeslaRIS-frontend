@@ -33,6 +33,9 @@ export class DocumentBackupService extends BaseService {
                     downloadStore.downloadProgressRef?.updateProgress(percent);
                 }
             }
+        }).catch(error => {
+            downloadStore.downloadProgressRef?.cancelDownload();
+            throw error;
         });
         
         this.initialzeDownload(response, backupFileName, ".zip");

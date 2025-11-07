@@ -2,7 +2,7 @@
     <v-btn
         v-if="!disableBulkActions"
         density="compact" class="bottom-spacer" :disabled="selectedEntries.length === 0"
-        @click="deleteSelection">
+        @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
     <v-data-table-server
@@ -73,6 +73,14 @@
             </tr>
         </template>
     </v-data-table-server>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedEntries.map(entity => `${entity.personalInformation.authorName.firstname} ${entity.personalInformation.authorName.lastname}`)"
+        @continue="deleteSelection">
+    </persistent-question-dialog>
 </template>
   
 <script lang="ts">
@@ -86,11 +94,12 @@ import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
   
 
 export default defineComponent({
     name: "RegistryBookTableComponent",
-    components: { GenericCrudModal, LocalizedLink },
+    components: { GenericCrudModal, LocalizedLink, PersistentQuestionDialog },
     props: {
         entries: {
           type: Array as () => RegistryBookEntry[],
@@ -207,6 +216,11 @@ export default defineComponent({
         const removeNotification = (notificationId: string) => {
             notifications.value.delete(notificationId);
         };
+
+        const displayPersistentDialog = ref(false);
+        const startDeletionProcess = () => {
+            displayPersistentDialog.value = true;
+        };
     
         return {
             selectedEntries, tableOptions,
@@ -215,10 +229,12 @@ export default defineComponent({
             displayTextOrPlaceholder,
             PromotionSelectorForm,
             addToPromotion, deleteSelection,
-            returnCurrentLocaleContent
+            returnCurrentLocaleContent,
+            displayPersistentDialog,
+            startDeletionProcess
         };
-        },
-    });
+    },
+});
 </script>
   
   <style scoped>
