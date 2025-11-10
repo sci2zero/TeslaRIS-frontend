@@ -1191,5 +1191,8 @@ export default {
     notHarvestedLabel: "Not harvested",
     thisYearLabel: "this year",
     monographsLabel: "Monographs",
-    unbindLabel: "Remove from profile"
+    unbindLabel: "Remove from profile",
+    emailChangedMessage: "Email successfully changed from {0} to {1}.",
+    userWithEmailExistsMessage: "This email is already in use.",
+    showNonArchivedLabel: "Show only non-archived"
 }

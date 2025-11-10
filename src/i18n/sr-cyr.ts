@@ -85,4 +85,6 @@ export default {
     updateEmailLabel: "Ажурирај адресу е-поште",
     newEmailLabel: "Нова адреса е-поште",
     metadataStandardisationMessage: "Стандардизација метаподатака према међународним CRIS стандардима.",
+    emailChangedMessage: "Адреса електронске поште успешно променјена са {0} на {1}.",
+    userWithEmailExistsMessage: "Ова адреса електронске поште је већ у употреби."
 };

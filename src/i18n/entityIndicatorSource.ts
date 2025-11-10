@@ -3,7 +3,7 @@ import i18n from ".";
 import { EntityIndicatorSource } from "@/models/AssessmentModel";
 
 export const indicatorSourceSr = [
-    { title: "Ručno unešeno", value: EntityIndicatorSource.MANUAL },
+    { title: "Ručno uneseno", value: EntityIndicatorSource.MANUAL },
     { title: "Web Of Science", value: EntityIndicatorSource.WEB_OF_SCIENCE },
     { title: "Scimago", value: EntityIndicatorSource.SCIMAGO },
     { title: "ERIH PLUS", value: EntityIndicatorSource.ERIH_PLUS },

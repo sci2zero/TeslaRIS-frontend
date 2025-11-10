@@ -284,7 +284,7 @@ export default {
     addNewEntityLabel: "Dodaj novi rezultat...",
     noAvailableProceedingsMessage: "Nema dostupnih zbornika radova.",
     noAvailableRelationsMessage: "Nema dostupnih relacija.",
-    notYetSetMessage: "Nije unešeno.",
+    notYetSetMessage: "Nije uneseno.",
     researcherLabel: "Istraživač",
     personalInfoLabel: "Lični podaci",
     biographyLabel: "Biografija",
@@ -642,7 +642,7 @@ export default {
     defaultLabel: "Podrazumevan",
     setDefaultLabel: "Postavi podrazumevan",
     citePublicationLabel: "Citiraj dokument",
-    manualLabel: "Ručno unešeno",
+    manualLabel: "Ručno uneseno",
     reportTypeLabel: "Tip izveštaja",
     reportYearLabel: "Godina izveštavanja",
     topLevelInstitutionLabel: "Vrhovna institucija",
@@ -1198,5 +1198,8 @@ export default {
     notHarvestedLabel: "Nije preuzeto",
     thisYearLabel: "ove godine",
     monographsLabel: "Monografije",
-    unbindLabel: "Ukloni sa profila"
+    unbindLabel: "Ukloni sa profila",
+    emailChangedMessage: "Email je uspešno promenjen sa {0} na {1}.",
+    userWithEmailExistsMessage: "Ovaj email je već u upotrebi.",
+    showNonArchivedLabel: "Prikaži samo nearhivirane"
 }
