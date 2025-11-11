@@ -1194,5 +1194,8 @@ export default {
     unbindLabel: "Remove from profile",
     emailChangedMessage: "Email successfully changed from {0} to {1}.",
     userWithEmailExistsMessage: "This email is already in use.",
-    showNonArchivedLabel: "Show only non-archived"
+    showNonArchivedLabel: "Show only non-archived",
+    publicationTypeToIndexMessage: "You can constrain publication reindex on only one type if you want:",
+    emailSentMessage: "Email successfully sent.",
+    resendActivationEmailLabel: "Resend activation email"
 }

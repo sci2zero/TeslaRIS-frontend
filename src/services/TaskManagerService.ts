@@ -51,8 +51,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification/schedule-classification-load?timestamp=${toUtcLocalDateTimeString(timestamp)}&source=${source}&commissionId=${commissionId}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[], recurrence: string, reharvestCitationIndicators: boolean): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `reindex/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&reharvestCitationIndicators=${reharvestCitationIndicators}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
+    async scheduleDatabaseReindexing(timestamp: string, entityTypes: EntityType[], recurrence: string, reharvestCitationIndicators: boolean, selectedPublicationType: PublicationType | null): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `reindex/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&reharvestCitationIndicators=${reharvestCitationIndicators}${selectedPublicationType ? ("&concretePublicationType=" + selectedPublicationType) : ""}`, {indexesToRepopulate: entityTypes}, TaskSchedulingService.idempotencyKey);
     }
 
     async schedulePublicationAssessment(timestamp: string, dateFrom: string, body: PublicationAssessmentRequest, type: PublicationType): Promise<AxiosResponse<void>> {

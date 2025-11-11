@@ -53,9 +53,9 @@
                 <span v-else>
                     {{ involvement.dateTo ? `${$t("unknownDateMessage")} - ${localiseDate(involvement.dateTo)}` : $t("currentLabel") }}
                 </span>
-                <div v-if="canEdit" class="d-flex flex-row justify-end edit-pen">
+                <div v-if="canEdit" class="inline-flex justify-end edit-pen!">
                     <v-btn
-                        class="mt-1"
+                        class="mt-1! ml-2!"
                         icon variant="outlined"
                         color="primary"
                         size="medium"
@@ -63,7 +63,7 @@
                         <v-icon size="large" icon="mdi-delete"></v-icon>
                     </v-btn>
                     <person-involvement-modal
-                        class="mt-1 ml-8"
+                        class="mt-1! ml-2!"
                         :read-only="!canEdit"
                         edit
                         :preset-involvement="involvement"

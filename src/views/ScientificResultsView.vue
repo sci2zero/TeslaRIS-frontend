@@ -35,9 +35,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-
-        
-
         <tab-content-loader
             v-if="loading"
             button-header

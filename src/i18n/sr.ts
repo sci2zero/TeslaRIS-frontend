@@ -1201,5 +1201,8 @@ export default {
     unbindLabel: "Ukloni sa profila",
     emailChangedMessage: "Email je uspešno promenjen sa {0} na {1}.",
     userWithEmailExistsMessage: "Ovaj email je već u upotrebi.",
-    showNonArchivedLabel: "Prikaži samo nearhivirane"
+    showNonArchivedLabel: "Prikaži samo nearhivirane",
+    publicationTypeToIndexMessage: "Možete ograničiti reindeksiranje publikacija na samo jedan tip ako želite:",
+    emailSentMessage: "Uspešno poslato.",
+    resendActivationEmailLabel: "Pošalji aktivacioni link"
 }
