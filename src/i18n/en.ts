@@ -971,8 +971,10 @@ export default {
     numberOfGraphsLabel: "Number of graphs",
     numberOfTablesLabel: "Number of tables",
     numberOfAppendicesLabel: "Number of appendices",
-    scientificAreaLabel: "Scientific field",
+    scientificAreaLabel: "Scientific field (scientific discipline)",
     scientificSubAreaLabel: "Scientific subfield (scientific discipline)",
+    artAreaLabel: "Artistic field",
+    artSubAreaLabel: "Artistic subfield",
     placeOfKeepLabel: "Place of storage",
     udcLabel: "UDC number",
     typeOfTitleLabel: "Type of title",
@@ -1024,6 +1026,8 @@ export default {
     notMyPublicationLabel: "Not my publication",
     oaiSourcesLabel: "OAI-PMH sources",
     oaiSourceLabel: "OAI-PMH source",
+    skgifSourcesLabel: "SKG-IF sources",
+    skgifSourceLabel: "SKG-IF source",
     dayLabel: "Day",
     monthLabel: "Month",
     yearLabel: "Year",
@@ -1197,5 +1201,7 @@ export default {
     showNonArchivedLabel: "Show only non-archived",
     publicationTypeToIndexMessage: "You can constrain publication reindex on only one type if you want:",
     emailSentMessage: "Email successfully sent.",
-    resendActivationEmailLabel: "Resend activation email"
+    resendActivationEmailLabel: "Resend activation email",
+    contributorIdentifierLabel: "Contributor identifier",
+    institutionIdentifierLabel: "Institution identifier"
 }

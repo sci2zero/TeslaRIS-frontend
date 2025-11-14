@@ -971,8 +971,10 @@ export default {
     numberOfGraphsLabel: "Broj grafova",
     numberOfTablesLabel: "Broj tabela",
     numberOfAppendicesLabel: "Broj priloga",
-    scientificAreaLabel: "Naučna oblast",
+    scientificAreaLabel: "Naučna oblast (naučna disciplina)",
     scientificSubAreaLabel: "Uža naučna oblast (naučna disciplina)",
+    artAreaLabel: "Umetnička oblast",
+    artSubAreaLabel: "Uža umetnička oblast",
     placeOfKeepLabel: "Mesto čuvanja",
     udcLabel: "UDK broj",
     typeOfTitleLabel: "Vrsta titule",
@@ -1024,6 +1026,8 @@ export default {
     notMyPublicationLabel: "Nije moj rad",
     oaiSourcesLabel: "OAI-PMH izvori",
     oaiSourceLabel: "OAI-PMH izvor",
+    skgifSourcesLabel: "SKG-IF izvori",
+    skgifSourceLabel: "SKG-IF izvor",
     dayLabel: "Dan",
     monthLabel: "Mesec",
     yearLabel: "Godina",
@@ -1204,5 +1208,7 @@ export default {
     showNonArchivedLabel: "Prikaži samo nearhivirane",
     publicationTypeToIndexMessage: "Možete ograničiti reindeksiranje publikacija na samo jedan tip ako želite:",
     emailSentMessage: "Uspešno poslato.",
-    resendActivationEmailLabel: "Pošalji aktivacioni link"
+    resendActivationEmailLabel: "Pošalji aktivacioni link",
+    contributorIdentifierLabel: "Identifikator kontributora",
+    institutionIdentifierLabel: "Identifikator institucije"
 }

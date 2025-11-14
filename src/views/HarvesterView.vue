@@ -79,6 +79,9 @@
                     <v-tab v-if="isAdmin" value="oaiSources">
                         {{ $t("oaiSourcesLabel") }}
                     </v-tab>
+                    <v-tab v-if="isAdmin" value="skgifSources">
+                        {{ $t("skgifSourcesLabel") }}
+                    </v-tab>
                     <v-tab v-if="isResearcher" value="files">
                         {{ $t("blibliographisFormatFilesLabel") }}
                     </v-tab>
@@ -149,46 +152,23 @@
                         </h2>
                     </v-window-item>
                     <v-window-item value="oaiSources">
-                        <v-row class="d-flex flex-row justify-center">
-                            <v-col cols="12" sm="8">
-                                <v-select
-                                    v-model="selectedOaiSource"
-                                    :items="oaiSources"
-                                    :label="$t('oaiSourceLabel') + '*'"
-                                    :rules="requiredSelectionRules">
-                                </v-select>
-                            </v-col>
-                        </v-row>
-                        <v-row class="d-flex flex-row justify-center">
-                            <v-col cols="12" sm="4">
-                                <date-picker-split
-                                    v-model="startDateOai"
-                                    :label="$t('startDateLabel')"
-                                    color="primary"
-                                    required
-                                ></date-picker-split>
-                            </v-col>
-                            <v-col cols="12" sm="4">
-                                <date-picker-split
-                                    v-model="endDateOai"
-                                    :label="$t('endDateLabel')"
-                                    color="primary"
-                                    required
-                                ></date-picker-split>
-                            </v-col>
-                        </v-row>
-                        <v-row class="d-flex flex-row justify-center">
-                            <v-col cols="auto">
-                                <generic-crud-modal
-                                    :form-component="ScheduleHarvestForm"
-                                    :form-props="{startDate: startDateOai, endDate: endDateOai}"
-                                    entity-name="ScheduleHarvest"
-                                    primary-color
-                                    :disabled="!isFormValid"
-                                    @create="scheduleOaiHarvest"
-                                />
-                            </v-col>
-                        </v-row>
+                        <external-source-harvest-configuration-form
+                            :sources="oaiSources"
+                            :is-form-valid="isFormValid"
+                            :endpoint-type="'oai'"
+                            :is-focused="currentTab === 'oaiSources'"
+                            @schedule-harvest="scheduleOaiHarvest"
+                        />
+                    </v-window-item>
+                    <v-window-item value="skgifSources">
+                        <external-source-harvest-configuration-form
+                            :sources="skgifSources"
+                            :is-form-valid="isFormValid"
+                            show-identifier-inputs
+                            :endpoint-type="'skgif'"
+                            :is-focused="currentTab === 'skgifSources'"
+                            @schedule-harvest="scheduleSkgifHarvest"
+                        />
                     </v-window-item>
                     <v-window-item value="files">
                         <v-row class="d-flex flex-row justify-center">
@@ -293,7 +273,7 @@ import OrganisationUnitService from "@/services/OrganisationUnitService";
 import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
 import LoadingConfigurationService from "@/services/importer/LoadingConfigurationService";
 import { useRouter } from "vue-router";
-import { type AuthorCentricInstitutionHarvestRequest } from "@/models/LoadModel";
+import { RecurrenceType, type AuthorCentricInstitutionHarvestRequest } from "@/models/LoadModel";
 import ScheduleHarvestForm from "@/components/import/ScheduleHarvestForm.vue";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import { type ScheduledTaskResponse } from "@/models/Common";
@@ -304,11 +284,12 @@ import OrganisationUnitImportSourceService from "@/services/importer/Organisatio
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import DatePickerSplit from "@/components/core/DatePickerSplit.vue";
 import UserService from "@/services/UserService";
+import ExternalSourceHarvestConfigurationForm from "@/components/import/ExternalSourceHarvestConfigurationForm.vue";
 
 
 export default defineComponent({
     name: "HarvesterView",
-    components: { DatePicker, DatePickerSplit, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList },
+    components: { DatePicker, DatePickerSplit, Toast, OrganisationUnitAutocompleteSearch, LoadingConfigurationForm, PersonAutocompleteSearch, GenericCrudModal, ScheduledTasksList, ExternalSourceHarvestConfigurationForm },
     setup() {
         const isFormValid = ref(false);
         const canPerformHarvest = ref(false);
@@ -326,9 +307,6 @@ export default defineComponent({
 
         const startDate = ref();
         const endDate = ref();
-
-        const startDateOai = ref();
-        const endDateOai = ref();
 
         const loading = ref(false);
         const harvestComplete = ref(false);
@@ -375,6 +353,7 @@ export default defineComponent({
 
             if (isAdmin.value) {
                 fetchOaiSources();
+                fetchSkgifSources();
             }
         });
 
@@ -568,23 +547,43 @@ export default defineComponent({
         };
 
         const oaiSources = ref<string[]>([]);
-        const selectedOaiSource = ref<string>("");
         const fetchOaiSources = () => {
             ImportService.fetchOAIPMHSources().then(response => {
                 oaiSources.value = response.data;
-                if (oaiSources.value.length > 0) {
-                    selectedOaiSource.value = oaiSources.value[0];
-                }
             })
         };
 
-        const scheduleOaiHarvest = (scheduleParams: any) => {
+        const skgifSources = ref<string[]>([]);
+        const fetchSkgifSources = () => {
+            ImportService.fetchSKGIFSources().then(response => {
+                skgifSources.value = response.data;
+            })
+        };
+
+        const scheduleOaiHarvest = (source: string, scheduledAt: string, recurrence: RecurrenceType, from: string, until: string) => {
             ImportService.scheduleOAIPMHHarvest(
-                selectedOaiSource.value,
-                scheduleParams[0],
-                scheduleParams[1],
-                startDateOai.value.split("T")[0],
-                endDateOai.value.split("T")[0]
+                source,
+                scheduledAt,
+                recurrence,
+                from.split("T")[0],
+                until.split("T")[0]
+            ).then(() => {
+                fetchScheduledTasks();
+                currentTab.value = "scheduledHarvests";
+            }).catch((error) => {
+                handleError(error.response.status);
+            });
+        };
+
+        const scheduleSkgifHarvest = (source: string, scheduledAt: string, recurrence: RecurrenceType, from: string, until: string, authorIdentifier: string, institutionIdentifier: string) => {
+            ImportService.scheduleSKGIFHarvest(
+                source,
+                scheduledAt,
+                recurrence,
+                from.split("T")[0],
+                until.split("T")[0],
+                authorIdentifier,
+                institutionIdentifier
             ).then(() => {
                 fetchScheduledTasks();
                 currentTab.value = "scheduledHarvests";
@@ -594,27 +593,18 @@ export default defineComponent({
         };
 
         return {
-            startDate, endDate,
-            loading, startHarvest,
-            numberOfHarvestedDocuments,
-            newDocumentsHarvested,
-            harvestComplete, isAdmin,
-            isFormValid, snackbar, files,
-            errorMessage, canPerformHarvest,
-            selectedOrganisationUnit,
-            isInstitutionalEditor,
-            isResearcher, currentTab,
-            uploadBibliographicFiles,
-            isCSVFileSelected,
-            requiredSelectionRules,
-            requiredFieldsDescription,
-            supportedFieldsDescription,
-            searchHarvestableInstitutions,
-            selectedPersons, researcherSelection,
-            ScheduleHarvestForm, scheduleHarvest,
-            scheduledTasks, deleteScheduledHarvestTask,
-            oaiSources, selectedOaiSource,
-            scheduleOaiHarvest, startDateOai, endDateOai
+            startDate, endDate, loading, startHarvest,
+            numberOfHarvestedDocuments, newDocumentsHarvested,
+            harvestComplete, isAdmin, isFormValid, snackbar, files,
+            errorMessage, canPerformHarvest, selectedOrganisationUnit,
+            isInstitutionalEditor, isResearcher, currentTab,
+            uploadBibliographicFiles, isCSVFileSelected,
+            requiredSelectionRules, requiredFieldsDescription,
+            supportedFieldsDescription, searchHarvestableInstitutions,
+            selectedPersons, researcherSelection, ScheduleHarvestForm,
+            scheduleHarvest, scheduledTasks, deleteScheduledHarvestTask,
+            oaiSources, skgifSources, scheduleOaiHarvest,
+            scheduleSkgifHarvest
         };
     },
 });
