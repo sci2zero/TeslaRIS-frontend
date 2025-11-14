@@ -6,7 +6,11 @@
                     <v-col
                         v-if="!enterExternalOU"
                         cols="12">
-                        <organisation-unit-autocomplete-search ref="orgUnitAutocompleteRef" v-model:model-value="selectedOrganisationUnit" required></organisation-unit-autocomplete-search>
+                        <organisation-unit-autocomplete-search
+                            ref="orgUnitAutocompleteRef"
+                            v-model:model-value="selectedOrganisationUnit"
+                            required>
+                        </organisation-unit-autocomplete-search>
                     </v-col>
                 </v-row>
                 <v-row
@@ -185,8 +189,10 @@ export default defineComponent({
         const enterExternalOU = ref(false);
 
         onMounted(() => {
-            if(props.presetInvolvement?.organisationUnitId) {
+            if( props.presetInvolvement?.organisationUnitId) {
                 selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(props.presetInvolvement.organisationUnitName) as string, value: props.presetInvolvement?.organisationUnitId as number};
+            } else if (props.presetInvolvement) {
+                enterExternalOU.value = true;
             }
 
             if(props.presetInvolvement && (props.presetInvolvement as Employment).employmentPosition) {
@@ -223,7 +229,7 @@ export default defineComponent({
                 dateTo: dateTo.value as string,
                 involvementType: selectedInvolvementType.value?.value as InvolvementType,
                 affiliationStatement: externalOUName.value,
-                organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined
+                organisationUnitId: (!enterExternalOU.value && selectedOrganisationUnit.value.value > 0) ? selectedOrganisationUnit.value.value : undefined
             };
 
             if(involvement.involvementType == InvolvementType.MEMBER_OF) {

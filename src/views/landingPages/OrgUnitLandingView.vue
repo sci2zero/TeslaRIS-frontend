@@ -301,14 +301,22 @@
                         {{ $t("importerLabel") }}
                     </v-btn>
                 </div>
-                <v-select
-                    v-model="selectedPublicationTypes"
-                    :items="publicationTypes"
-                    :label="$t('typeOfPublicationLabel')"
-                    return-object
-                    class="publication-type-select mt-3"
-                    multiple
-                ></v-select>
+                <span class="flex justify-start">
+                    <v-select
+                        v-model="selectedPublicationTypes"
+                        :items="publicationTypes"
+                        :label="$t('typeOfPublicationLabel')"
+                        return-object
+                        class="publication-type-select mt-3"
+                        multiple
+                    ></v-select>
+                    <v-checkbox
+                        v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
+                        v-model="returnOnlyNonArchived"
+                        :label="$t('showNonArchivedLabel')"
+                        class="mt-2"
+                    ></v-checkbox>
+                </span>
                 <publication-table-component
                     ref="publicationsRef"
                     :publications="publications"
@@ -316,7 +324,7 @@
                     enable-export
                     :allow-comparison="isInstitutionalEditor && canEdit"
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
-                    :endpoint-token-parameters="[`${organisationUnit?.id}`, publicationSearchParams]"
+                    :endpoint-token-parameters="[`${organisationUnit?.id}`, `${returnOnlyNonArchived}`, publicationSearchParams]"
                     :endpoint-body-parameters="
                         {
                             allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
@@ -583,6 +591,7 @@ export default defineComponent({
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
+        const returnOnlyNonArchived = ref(false);
 
         const employeesRef = ref<typeof PersonTableComponent>();
         const alumniRef = ref<typeof PersonTableComponent>();
@@ -717,7 +726,8 @@ export default defineComponent({
             return DocumentPublicationService.findPublicationsForOrganisationUnit(
                 parseInt(currentRoute.params.id as string),
                 selectedPublicationTypes.value.map(publicationType => publicationType.value),
-                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value},${publicationsDirection.value}`
+                `${publicationSearchParams.value}&page=${publicationsPage.value}&size=${publicationsSize.value}&sort=${publicationsSort.value},${publicationsDirection.value}`,
+                returnOnlyNonArchived.value
             ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements;
@@ -937,7 +947,7 @@ export default defineComponent({
             });
         };
 
-        watch(selectedPublicationTypes, () => {
+        watch([selectedPublicationTypes, returnOnlyNonArchived], () => {
             fetchPublications();
         });
 
@@ -970,7 +980,8 @@ export default defineComponent({
             InstitutionDefaultSubmissionContentForm,
             outputConfigurationUpdated, loggedInUser,
             navigateToBackupPage, ChartDisplayConfigurationForm,
-            displaySettingsDL, DLDisplayConfigurationForm
+            displaySettingsDL, DLDisplayConfigurationForm,
+            returnOnlyNonArchived
         };
 }})
 

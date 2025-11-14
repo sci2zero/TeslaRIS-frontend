@@ -144,6 +144,14 @@ export class ImportService extends BaseService {
     async scheduleOAIPMHHarvest(sourceName: string, timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string): Promise<AxiosResponse<string[]>> {
         return super.sendRequest(axios.get, `oai-harvest/schedule?sourceName=${sourceName}&from=${dateFrom}&until=${dateTo}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`);
     }
+
+    async fetchSKGIFSources(): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, "skg-if-harvest/sources");
+    }
+
+    async scheduleSKGIFHarvest(sourceName: string, timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string, authorIdentifier: string, institutionIdentifier: string): Promise<AxiosResponse<string[]>> {
+        return super.sendRequest(axios.get, `skg-if-harvest/schedule?sourceName=${sourceName}&from=${dateFrom}&until=${dateTo}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&authorIdentifier=${authorIdentifier}&institutionIdentifier=${institutionIdentifier}`);
+    }
 }
   
 export default new ImportService();
