@@ -17,10 +17,10 @@
             <v-tab value="promoted">
                 {{ $t("promotedLabel") }}
             </v-tab>
-            <v-tab value="scheduledTasks">
+            <v-tab v-show="isAdmin || isPromotionRegistryAdministrator" value="scheduledTasks">
                 {{ $t("scheduleTasksLabel") }}
             </v-tab>
-            <v-tab value="reports">
+            <v-tab v-show="isAdmin || isPromotionRegistryAdministrator" value="reports">
                 {{ $t("generatedRegistryBooksLabel") }}
             </v-tab>
             <v-tab value="institutionReport">
@@ -31,7 +31,6 @@
         <v-tabs-window v-model="currentTab">
             <v-window-item value="nonPromoted">
                 <registry-book-entry-table
-                    class="mt-3"
                     :entries="tableStates.nonPromoted.entries"
                     :total-entries="tableStates.nonPromoted.totalEntries"
                     @switch-page="(args: any[]) => switchPage('nonPromoted', ...(args as [number, number, string, string]))"
@@ -58,7 +57,7 @@
 
                 <div
                     v-if="tableStates.forPromotion.totalEntries > 0"
-                    class="d-flex flex-row justify-between mb-5">
+                    class="d-flex flex-row justify-between mb-5 mt-5">
                     <promotion-printed-lists
                         :promotion-id="selectedPromotion.value"
                     />
@@ -70,6 +69,7 @@
                         @continue="promoteAll">
                     </persistent-table-dialog>
                     <v-btn
+                        v-if="isAdmin || isPromotionRegistryAdministrator"
                         class="ml-3"
                         color="primary"
                         @click="previewPromotion">
@@ -119,7 +119,7 @@
                         </v-text-field>
                     </v-col>
                 </v-row>
-                <v-row class="justify-start">
+                <v-row v-if="isPromotionRegistryAdministrator || isAdmin" class="justify-start">
                     <v-col
                         v-if="tableStates.promoted.entries.length > 0" cols="6" md="3"
                         lg="2">
@@ -176,7 +176,7 @@
             </v-window-item>
             <v-window-item value="scheduledTasks">
                 <scheduled-tasks-list
-                    class="mt-10"
+                    class="mt-10!"
                     :scheduled-tasks="scheduledTasks"
                     @delete="deleteScheduledTask">
                 </scheduled-tasks-list>
@@ -189,7 +189,7 @@
                 </v-row>
             </v-window-item>
             <v-window-item value="institutionReport">
-                <v-row class="justify-start mt-3">
+                <v-row class="justify-start mt-3!">
                     <v-col cols="6" md="3" lg="1">
                         <date-picker
                             v-model="fromDate"
@@ -284,7 +284,7 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
     
         const i18n = useI18n();
-        const { loggedInUser, isPromotionRegistryAdministrator } = useUserRole();
+        const { loggedInUser, isPromotionRegistryAdministrator, isAdmin } = useUserRole();
     
         const promotions = ref<{ title: string; value: number }[]>([]);
         const selectedPromotion = ref<{ title: string; value: number }>({
@@ -307,7 +307,15 @@ export default defineComponent({
             {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
         );
 
-        watch([fromDate, toDate, selectedInstitution, authorFullName, authorAcquiredTitle, selectedPromotion], () => {
+        watch(
+            [
+                fromDate, toDate,
+                selectedInstitution,
+                authorFullName,
+                authorAcquiredTitle,
+                selectedPromotion,
+                currentTab
+            ], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
                 tableStates.promoted.fetchFn();
             } else if (currentTab.value === "institutionReport" && fromDate.value && toDate.value) {
@@ -418,19 +426,19 @@ export default defineComponent({
     
         const fetchPromotions = () => {
             PromotionService.getNonFinishedPromotions().then(response => {
-            promotions.value.splice(0);
-            response.data.forEach(promotion => {
-                promotions.value.push({
-                title: localiseDate(promotion.promotionDate) as string,
-                value: promotion.id as number
+                promotions.value.splice(0);
+                response.data.forEach(promotion => {
+                    promotions.value.push({
+                    title: localiseDate(promotion.promotionDate) as string,
+                    value: promotion.id as number
+                    });
                 });
-            });
-    
-            if (promotions.value.length > 0) {
-                selectedPromotion.value = promotions.value[0];
-            }
-    
-            fetchAllTables();
+        
+                if (promotions.value.length > 0) {
+                    selectedPromotion.value = promotions.value[0];
+                }
+        
+                fetchAllTables();
             });
         };
     
@@ -452,7 +460,10 @@ export default defineComponent({
         onMounted(() => {
             document.title = i18n.t("registryBookLabel");
             fetchPromotions();
-            fetchScheduledTasks();
+
+            if (isAdmin.value || isPromotionRegistryAdministrator.value) {
+                fetchScheduledTasks();
+            }
         });
 
         const promotionPreviewRef = ref<typeof PersistentTableDialog>();
@@ -546,7 +557,7 @@ export default defineComponent({
             currentTab, fromDate, toDate,
             tableStates, switchPage, headers,
             promotions, selectedPromotion,
-            fetchAllTables, promoteAll,
+            fetchAllTables, promoteAll, isAdmin,
             snackbar, message, loggedInUser,
             selectedInstitution, reportCounts,
             generateRegistryBookReport, langItems,
@@ -555,7 +566,8 @@ export default defineComponent({
             promotionPreviewRef, authorFullName,
             authorAcquiredTitle, recurrenceTypes,
             selectedRecurrenceType, deleteScheduledTask,
-            scheduledTasks, RecurrenceType, reportLoading
+            scheduledTasks, RecurrenceType, reportLoading,
+            isPromotionRegistryAdministrator
         };
     }
 });
