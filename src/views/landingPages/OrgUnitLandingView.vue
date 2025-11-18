@@ -192,7 +192,7 @@
                     :read-only="!canEdit"
                 />
                 <generic-crud-modal
-                    v-if="(canEdit && (isAdmin || isInstitutionalEditor)) || (isInstitutionalLibrarian && loggedInUser?.organisationUnitId === organisationUnit?.id)"
+                    v-if="canEditDefaultSubmissionContent"
                     class="ml-2"
                     :form-component="InstitutionDefaultSubmissionContentForm"
                     :form-props="{ institutionId: organisationUnit?.id }"
@@ -521,6 +521,7 @@ import ChartDisplayConfigurationForm from '@/components/organisationUnit/ChartDi
 import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
 import { useDLChartDisplay } from '@/composables/useDLChartDisplay';
 import DLDisplayConfigurationForm from '@/components/organisationUnit/DLDisplayConfigurationForm.vue';
+import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDefaultSubmissionContentService';
 
 
 export default defineComponent({
@@ -571,6 +572,7 @@ export default defineComponent({
         const subUnitsDirection = ref("");
 
         const canEdit = ref(false);
+        const canEditDefaultSubmissionContent = ref(false);
 
         const i18n = useI18n();
 
@@ -606,6 +608,10 @@ export default defineComponent({
             if (loginStore.userLoggedIn) {
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
+                });
+
+                InstitutionDefaultSubmissionContentService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                    canEditDefaultSubmissionContent.value = response.data;
                 });
             }
 
@@ -981,7 +987,7 @@ export default defineComponent({
             outputConfigurationUpdated, loggedInUser,
             navigateToBackupPage, ChartDisplayConfigurationForm,
             displaySettingsDL, DLDisplayConfigurationForm,
-            returnOnlyNonArchived
+            returnOnlyNonArchived, canEditDefaultSubmissionContent
         };
 }})
 
