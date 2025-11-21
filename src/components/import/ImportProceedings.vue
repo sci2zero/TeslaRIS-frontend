@@ -165,29 +165,30 @@ export default defineComponent({
                 if(response.data) {
                     if (response.data.totalElements === 0) {
                         addNew();
-                    } else if (response.data.totalElements === 1) {
+                    } else if (response.data.totalElements > 0) {
                         potentialMatches.value = response.data.content;
-                        const nameSufficientlyMatches = props.publicationForLoading.conferenceName.some(
-                            name => name.content.toLowerCase() === potentialMatches.value[0].nameSr.toLowerCase() ||
-                                name.content.toLowerCase() === potentialMatches.value[0].nameOther.toLowerCase()
-                            );
-
-                        let date = potentialMatches.value[0].dateFromTo;
-                        date = date.includes("-") ? date.substring(6, 10) : date.substring(0, 4);
                         
-                        if (nameSufficientlyMatches && props.publicationForLoading.documentDate === date) {
-                            selectManually(potentialMatches.value[0]);
+                        const matchingConference = potentialMatches.value.find(conference => {
+                            const nameMatches = props.publicationForLoading.conferenceName.some(
+                                name => name.content.toLowerCase() === conference.nameSr.toLowerCase() ||
+                                    name.content.toLowerCase() === conference.nameOther.toLowerCase()
+                            );
+                            
+                            let conferenceDate = conference.dateFromTo;
+                            conferenceDate = conferenceDate.includes("-") ? conferenceDate.substring(6, 10) : conferenceDate.substring(0, 4);
+                            const dateMatches = props.publicationForLoading.eventDateFrom.substring(0, 4) === conferenceDate;
+                            
+                            return nameMatches && dateMatches;
+                        });
+                        
+                        if (matchingConference) {
+                            selectManually(matchingConference);
                         } else {
                             showTable.value = true;
                             automaticProcessCompleted.value = true;
                             waitingOnUserInput.value = true;
                         }
-                    } else {
-                        potentialMatches.value = response.data.content;
-                        showTable.value = true;
-                        automaticProcessCompleted.value = true;
-                        waitingOnUserInput.value = true;
-                    }   
+                    } 
                 }
             });
         };
